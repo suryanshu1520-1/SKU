@@ -1,13 +1,4 @@
 {
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/server" }
-  ],
-  "functions": {
-    "api/server.ts": {
-      "memory": 512,
-      "maxDuration": 30
-    }
-  },
   "crons": [
     {
       "path": "/api/cron/newsdata",
