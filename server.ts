@@ -5,10 +5,10 @@ import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
-import scrapeHandler from "./api/cron/scrape.js";
-import newsdataHandler from "./api/cron/newsdata.js";
-import syncFeedHandler from "./api/sync-feed.js";
-import trainingQuestionsHandler from "./api/training-questions.js";
+import scrapeHandler from "./server-lib/cron/scrape.js";
+import newsdataHandler from "./server-lib/cron/newsdata.js";
+import syncFeedHandler from "./server-lib/sync-feed.js";
+import trainingQuestionsHandler from "./server-lib/training-questions.js";
 
 dotenv.config();
 
