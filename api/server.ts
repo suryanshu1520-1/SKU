@@ -11,6 +11,7 @@ import trainingQuestionsHandler from "../server-lib/training-questions.js";
 import registerHandler from "../server-lib/auth/register.js";
 import scrapeHandler from "../server-lib/cron/scrape.js";
 import newsdataHandler from "../server-lib/cron/newsdata.js";
+import resetLeaderboardHandler from "../server-lib/cron/reset-leaderboard.js";
 
 function cleanEnvValue(val: any): string {
   if (typeof val !== 'string') return '';
@@ -45,6 +46,8 @@ app.get("/api/cron/scrape", scrapeHandler);
 app.post("/api/cron/scrape", scrapeHandler);
 app.get("/api/cron/newsdata", newsdataHandler);
 app.post("/api/cron/newsdata", newsdataHandler);
+app.get("/api/cron/reset-leaderboard", resetLeaderboardHandler);
+app.post("/api/cron/reset-leaderboard", resetLeaderboardHandler);
 
 app.all("/api/bookmark", bookmarkHandler);
 app.post("/api/explanation", explanationHandler);
