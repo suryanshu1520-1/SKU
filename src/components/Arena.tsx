@@ -165,6 +165,7 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
   // Pre-flight: "Begin Assessment" clicked -> show motivational modal
   const handleBeginAssessment = () => {
     setIsRanked(true);
+    setShowTrainingSetup(false);
     setMotivation(getRandomMotivation());
     setShowModal(true);
   };
@@ -265,6 +266,7 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
       setQuestions(questionsList);
       setIsLoading(false);
     } catch (err: any) {
+      console.error("Initialization Failed:", err);
       setErrorMsg('Failed to load training questions: ' + (err.message || 'Unknown error'));
       setIsLoading(false);
       setArenaPhase('intro');
@@ -327,6 +329,7 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
         const selected = shuffled.slice(0, 25);
         setQuestions(selected);
       } catch (error: any) {
+        console.error("Initialization Failed:", error);
         setErrorMsg('Failed to initialize arena: ' + (error.message || 'Unknown network error.'));
       } finally {
         setIsLoading(false);

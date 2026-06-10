@@ -172,12 +172,12 @@ export async function createApp() {
         .limit(500);
       if (error) {
         console.error("Error fetching static questions via backend:", error);
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: error.message, stack: error.stack });
       }
       return res.json({ questions: data || [] });
     } catch (err: any) {
       console.error("Backend questions fetch exception:", err);
-      return res.status(500).json({ error: err.message || "An unexpected error occurred while loading questions." });
+      return res.status(500).json({ error: err.message || "An unexpected error occurred while loading questions.", stack: err.stack });
     }
   });
 

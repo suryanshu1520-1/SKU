@@ -154,8 +154,8 @@ export default async function handler(req: any, res: any) {
     res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=600');
 
     return res.status(200).json({ questions: finalQuestions });
-  } catch (err: any) {
+    } catch (err: any) {
     console.error("[training-questions] Handler error:", err);
-    return res.status(500).json({ error: err.message || "An unexpected error occurred." });
+    return res.status(500).json({ error: err.message, stack: err.stack || "An unexpected error occurred." });
   }
 }

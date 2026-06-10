@@ -64,7 +64,7 @@ export default async function handler(req: any, res: any) {
 
     if (error) {
       console.error("Error fetching static questions via serverless route:", error);
-      return res.status(500).json({ error: error.message });
+      return res.status(500).json({ error: error.message, stack: error.stack });
     }
 
     // Set Cache-Control headers to make fetching ultra-fast and optimize serverless costs
@@ -73,6 +73,6 @@ export default async function handler(req: any, res: any) {
     return res.status(200).json({ questions: data || [] });
   } catch (err: any) {
     console.error("Serverless questions fetch exception:", err);
-    return res.status(500).json({ error: err.message || "An unexpected error occurred while loading questions." });
+    return res.status(500).json({ error: err.message, stack: err.stack || "An unexpected error occurred while loading questions." });
   }
 }
