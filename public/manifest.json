@@ -1,0 +1,16 @@
+{
+  "name": "Tark 1.0",
+  "short_name": "Tark",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "description": "Sterile, minimalist, and analytical competitive exam testing arena.",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}

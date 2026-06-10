@@ -1,0 +1,6 @@
+{
+  "name": "Tark 1.0",
+  "description": "Sterile, minimalist, and analytical competitive exam testing arena.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,71 @@
+@import "@fontsource/inter/300.css";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/playfair-display/400.css";
+@import "@fontsource/playfair-display/500.css";
+@import "@fontsource/playfair-display/600.css";
+@import "@fontsource/playfair-display/400-italic.css";
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-stencil: "Stardos Stencil", serif;
+
+  --color-zinc-950: #072e63;
+  --color-zinc-900: #136c99;
+  --color-zinc-800: #0194a8;
+  --color-zinc-700: #0194a8;
+  --color-zinc-600: #a69a7f;
+  --color-zinc-500: #a69a7f;
+  --color-zinc-400: #c8b998;
+  --color-zinc-300: #e0d0ab;
+  --color-zinc-200: #e0d0ab;
+  --color-zinc-100: #e0d0ab;
+  --color-zinc-50: #e0d0ab;
+
+  --color-neutral-950: #072e63;
+  --color-neutral-900: #136c99;
+  --color-neutral-800: #0194a8;
+  --color-neutral-700: #0194a8;
+  --color-neutral-600: #a69a7f;
+  --color-neutral-500: #a69a7f;
+  --color-neutral-400: #c8b998;
+  --color-neutral-300: #e0d0ab;
+  --color-neutral-200: #e0d0ab;
+  --color-neutral-100: #e0d0ab;
+  --color-neutral-50: #e0d0ab;
+
+  --color-stone-950: #072e63;
+  --color-stone-900: #136c99;
+  --color-stone-800: #0194a8;
+  --color-stone-700: #0194a8;
+  --color-stone-600: #a69a7f;
+  --color-stone-500: #a69a7f;
+  --color-stone-400: #c8b998;
+  --color-stone-300: #e0d0ab;
+  --color-stone-200: #e0d0ab;
+  --color-stone-100: #e0d0ab;
+  --color-stone-50: #e0d0ab;
+
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-green-400: #34d399;
+  --color-green-500: #10b981;
+
+  --color-rose-400: #e14e4e;
+  --color-rose-500: #ad0202;
+  --color-red-400: #e14e4e;
+  --color-red-500: #ad0202;
+
+  --color-white: #e0d0ab;
+  --color-black: #0e577a;
+}
+
+body {
+  background-color: #072e63;
+  color: #e0d0ab;
+}
+
