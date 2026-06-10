@@ -381,28 +381,22 @@ export async function createApp() {
     }
   });
 
-  // Static file serving for production
-  const distPath = path.join(process.cwd(), 'dist');
-  if (process.env.NODE_ENV !== "production") {
+  // Local development: Vite middleware for hot reload
+  if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
     try {
       const vite = await createViteServer({ server: { middlewareMode: true }, appType: "spa" });
       app.use(vite.middlewares);
     } catch (e) {
-      // Fallback to static if Vite isn't configured
-      app.use(express.static(distPath));
-      app.get('*', (req: any, res: any) => res.sendFile(path.join(distPath, 'index.html')));
+      console.warn("Vite middleware unavailable, static fallback may be needed:", e);
     }
-  } else {
-    app.use(express.static(distPath));
-    app.get('*', (req: any, res: any) => res.sendFile(path.join(distPath, 'index.html')));
   }
 
   return app;
 }
 
-// Local development server
-const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+// Local development server (not used on Vercel)
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
   createApp().then(app => {
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server running on http://localhost:${PORT}`);
