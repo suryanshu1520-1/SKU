@@ -167,8 +167,6 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
   // Explanation cache states
   const [explanationCache, setExplanationCache] = useState<Record<string, string>>({});
   const [loadingExplanationMap, setLoadingExplanationMap] = useState<Record<string, boolean>>({});
-  const [awaitingGenerateInsight, setAwaitingGenerateInsight] = useState<Set<string>>(new Set());
-  const [generatingInsight, setGeneratingInsight] = useState<Set<string>>(new Set());
 
   // Bookmark states
   const [savedInsightIds, setSavedInsightIds] = useState<Set<string>>(new Set());
@@ -483,7 +481,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
     return () => clearInterval(timer);
   }, [arenaPhase, currentQuestionId, timeLeft, userAnswers, timeouts, isLoading, errorMsg, questions, quizSubmitted]);
 
-  // Hybrid Insight Fetching: DB-first, then wait for user click to call AI
+  // Insights / Conceptual Explanation Fetching and Caching Loop
   useEffect(() => {
     if (arenaPhase !== 'quiz') return;
     if (!currentQuestionId || quizSubmitted) return;
@@ -492,110 +490,56 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
     const isTimeout = !!timeouts[currentQuestionId];
     const isLocked = isAnswered || isTimeout;
 
-    if (!isLocked) return;
-    if (explanationCache[currentQuestionId]) return;
-    if (loadingExplanationMap[currentQuestionId]) return;
-    if (generatingInsight.has(currentQuestionId)) return;
-
-    // Step 1: Skip if we already have ai_insights on the question object
-    if (currentQuestion.ai_insights) {
-      setExplanationCache(prev => ({ ...prev, [currentQuestionId]: currentQuestion.ai_insights }));
-      return;
-    }
-
-    // Step 2: Silent DB read first - check static_questions for cached ai_insights
-    setLoadingExplanationMap(prev => ({ ...prev, [currentQuestionId]: true }));
-
-    (async () => {
-      try {
-        const { data: dbQuestion, error } = await supabase
-          .from('static_questions')
-          .select('ai_insights, conceptual_explanation')
-          .eq('id', currentQuestionId)
-          .maybeSingle();
-
-        if (error) {
-          console.warn("DB insight fetch error:", error);
-        }
-
-        if (dbQuestion?.ai_insights) {
-          // DB cache HIT - render instantly
-          setExplanationCache(prev => ({ ...prev, [currentQuestionId]: dbQuestion.ai_insights }));
-          setQuestions(prevQ => prevQ.map(q => q.id === currentQuestionId ? { ...q, ai_insights: dbQuestion.ai_insights } : q));
-          return;
-        }
-
-        if (dbQuestion?.conceptual_explanation) {
-          // Static fallback available - render it
-          setExplanationCache(prev => ({ ...prev, [currentQuestionId]: dbQuestion.conceptual_explanation }));
-          return;
-        }
-
-        // Step 3: Neither cached - mark as needing user click to generate
-        setAwaitingGenerateInsight(prev => new Set(prev).add(currentQuestionId));
-      } catch (err) {
-        console.warn("Hybrid insight fetch error:", err);
-      } finally {
-        setLoadingExplanationMap(prev => ({ ...prev, [currentQuestionId]: false }));
+    if (isLocked) {
+      if (currentQuestion.ai_insights) {
+        setExplanationCache(prev => ({ ...prev, [currentQuestionId]: currentQuestion.ai_insights }));
+        return;
       }
-    })();
-  }, [arenaPhase, currentQuestionId, userAnswers, timeouts, quizSubmitted, questions, explanationCache, loadingExplanationMap, generatingInsight]);
 
-  // Handle explicit user click on "Generate AI Insight" button
-  const handleGenerateInsight = async () => {
-    if (!currentQuestionId) return;
+      if (explanationCache[currentQuestionId] || loadingExplanationMap[currentQuestionId]) return;
 
-    setAwaitingGenerateInsight(prev => {
-      const next = new Set(prev);
-      next.delete(currentQuestionId);
-      return next;
-    });
-    setGeneratingInsight(prev => new Set(prev).add(currentQuestionId));
-    setLoadingExplanationMap(prev => ({ ...prev, [currentQuestionId]: true }));
+      setLoadingExplanationMap(prev => ({ ...prev, [currentQuestionId]: true }));
 
-    const optionsStr = typeof currentQuestion.options_matrix === 'string'
-      ? JSON.parse(currentQuestion.options_matrix)
-      : currentQuestion.options_matrix;
-    const answerStr = optionsStr ? optionsStr[currentQuestion.correct_option] : "Unknown";
+      const optionsStr = typeof currentQuestion.options_matrix === 'string'
+        ? JSON.parse(currentQuestion.options_matrix)
+        : currentQuestion.options_matrix;
+      const answerStr = optionsStr ? optionsStr[currentQuestion.correct_option] : "Unknown";
 
-    try {
-      const res = await fetch('/api/explanation', {
+      fetch('/api/explanation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           question: currentQuestion.question_text,
           answer: answerStr,
           questionId: currentQuestionId,
-          userId,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (res.status === 403 && (data.error === 'PAYWALL_REACHED' || data.error === 'limit_reached')) {
-        if (data.error === 'limit_reached') {
-          setIsAIFrostedGlass(true);
-        } else {
-          setShowPaywallModal(true);
+          userId
+        })
+      })
+      .then(async (res) => {
+        const data = await res.json();
+        if (res.status === 403 && (data.error === 'PAYWALL_REACHED' || data.error === 'limit_reached')) {
+          if (data.error === 'limit_reached') {
+            setIsAIFrostedGlass(true);
+          } else {
+            setShowPaywallModal(true);
+          }
+          return null;
         }
-        return;
-      }
-
-      if (data.explanation) {
-        setExplanationCache(prev => ({ ...prev, [currentQuestionId]: data.explanation }));
-        setQuestions(prevQ => prevQ.map(q => q.id === currentQuestionId ? { ...q, ai_insights: data.explanation, is_generated: true } : q));
-      }
-    } catch (err) {
-      console.error("AI Generation error:", err);
-    } finally {
-      setGeneratingInsight(prev => {
-        const next = new Set(prev);
-        next.delete(currentQuestionId);
-        return next;
+        return data;
+      })
+      .then(data => {
+        if (!data) return;
+        if (data.explanation) {
+          setExplanationCache(prev => ({ ...prev, [currentQuestionId]: data.explanation }));
+          setQuestions(prevQ => prevQ.map(q => q.id === currentQuestionId ? { ...q, ai_insights: data.explanation, is_generated: true } : q));
+        }
+      })
+      .catch(err => console.error("Cache retrieval fail:", err))
+      .finally(() => {
+        setLoadingExplanationMap(prev => ({ ...prev, [currentQuestionId]: false }));
       });
-      setLoadingExplanationMap(prev => ({ ...prev, [currentQuestionId]: false }));
     }
-  };
+  }, [arenaPhase, currentQuestionId, userAnswers, timeouts, quizSubmitted, questions]);
 
   const handleSelect = (key: string) => {
     const isAnswered = userAnswers[currentQuestionId] !== undefined;
@@ -688,8 +632,6 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
     setQuizSubmitted(false);
     setExplanationCache({});
     setLoadingExplanationMap({});
-    setAwaitingGenerateInsight(new Set());
-    setGeneratingInsight(new Set());
     setSavedInsightIds(new Set());
     setShowResumeOverlay(false);
     setIsAIFrostedGlass(false);
@@ -1211,8 +1153,6 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
   const isLoadingExplanation = !!loadingExplanationMap[currentQuestionId];
   const isBookmarked = savedInsightIds.has(String(currentQuestionId));
   const isBookmarkLoading = !!bookmarkToggling[String(currentQuestionId)];
-  const needsGenerateClick = awaitingGenerateInsight.has(currentQuestionId) && !currentExplanation && !isLoadingExplanation;
-  const isGeneratingNow = generatingInsight.has(currentQuestionId);
 
   const getButtonClass = (key: string) => {
     const baseClass = "w-full max-w-full text-left p-4 rounded border-2 font-sans text-sm transition-all focus:outline-none relative ";
@@ -1402,15 +1342,10 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
                   )}
                 </div>
 
-                {isLoadingExplanation && !currentExplanation ? (
+                {isLoadingExplanation && !currentExplanation && !isAIFrostedGlass ? (
                   <div className="flex items-center gap-2 text-sm text-zinc-500">
                     <Loader2 className="w-4 h-4 animate-spin" />
                     Retrieving insights...
-                  </div>
-                ) : isGeneratingNow ? (
-                  <div className="flex items-center gap-2 text-sm text-zinc-500">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Generating AI insight...
                   </div>
                 ) : isAIFrostedGlass ? (
                   <div className="relative">
@@ -1427,19 +1362,6 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
                         Limit Reached. Join the Founders Club for unlimited subjective analysis.
                       </button>
                     </div>
-                  </div>
-                ) : needsGenerateClick ? (
-                  <div className="flex flex-col items-center gap-4 py-4">
-                    <p className="text-[11px] text-zinc-500 font-sans leading-relaxed text-center">
-                      No cached insight available for this question.
-                    </p>
-                    <button
-                      onClick={handleGenerateInsight}
-                      className="inline-flex items-center gap-2 px-5 py-3 bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 text-[#e0d0ab] font-sans text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-[#e0d0ab]/20 transition-all"
-                    >
-                      <WandSparkles className="w-4 h-4" />
-                      Generate AI Insight (Consumes 1 Attempt)
-                    </button>
                   </div>
                 ) : currentExplanation ? (
                    <div className="prose prose-invert prose-p:text-sm prose-li:text-sm prose-p:leading-relaxed prose-li:leading-relaxed max-w-none text-stone-300 font-serif">
