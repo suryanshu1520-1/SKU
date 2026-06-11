@@ -126,24 +126,23 @@ export default async function handler(req: any, res: any) {
     return res.status(401).json({ error: "UNAUTHORIZED", message: "User identification required." });
   }
 
-  // ─── PRE-FLIGHT: Tier & Ledger Check ─────────────────────────
+  // ─── PRE-FLIGHT: Tier & Autopsy Limit Check ─────────────────
   try {
     const { data: profile, error: profileError } = await supabaseServer
       .from('user_profiles')
-      .select('membership_tier, insights_consumed')
+      .select('membership_tier, ai_autopsies_used')
       .eq('user_id', userId)
       .maybeSingle();
 
     if (profileError) {
       console.error("[ledger] Profile fetch error:", profileError);
-      // Fail open — allow request but log the error
     }
 
-    if (profile && profile.membership_tier === 'free' && profile.insights_consumed >= 15) {
+    if (profile && profile.membership_tier !== 'premium' && profile.ai_autopsies_used >= 3) {
       return res.status(403).json({
-        error: "PAYWALL_REACHED",
-        message: "Free tier insight limit exhausted.",
-        insightsConsumed: profile.insights_consumed,
+        error: "limit_reached",
+        message: "Free tier autopsy limit exhausted. 3 of 3 AI autopsies used.",
+        autopsiesUsed: profile.ai_autopsies_used,
       });
     }
   } catch (profileErr) {

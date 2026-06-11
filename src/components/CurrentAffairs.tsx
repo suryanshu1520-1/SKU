@@ -454,7 +454,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               {syncing ? (
                 <>
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  <span>Pruning & Syncing...</span>
+                  <span>Fetching Latest Dispatches...</span>
                 </>
               ) : syncCooldown > 0 ? (
                 <>

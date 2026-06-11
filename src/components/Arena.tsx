@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
 import type { Question } from '../types';
-import { Loader2, Hourglass, ChevronLeft, ChevronRight, Check, Bookmark, BookmarkCheck, Sparkles, ArrowRight, Lock, Crown, Swords, Target } from 'lucide-react';
+import { Loader2, Hourglass, ChevronLeft, ChevronRight, Check, Bookmark, BookmarkCheck, Sparkles, ArrowRight, Lock, Crown, Swords, Target, WandSparkles } from 'lucide-react';
 import InfoTooltip from './InfoTooltip';
 import Markdown from 'react-markdown';
 
@@ -15,9 +15,11 @@ interface ArenaProps {
     subjectStats: Record<string, { correct: number; total: number }>;
   }, percentile: number) => void;
   userId: string;
+  onReturnToDashboard?: () => void;
 }
 
 const SESSION_STORAGE_KEY = 'tark_arena_session';
+const ACTIVE_SESSION_KEY = 'tark_active_session';
 
 interface CachedSession {
   questions: Question[];
@@ -32,6 +34,12 @@ interface CachedSession {
   savedInsightIds: string[];
   userId: string;
   isRanked: boolean;
+}
+
+interface ActiveSessionMeta {
+  currentQuestionIndex: number;
+  isRanked: boolean;
+  mode: 'vanguard' | 'training';
 }
 
 const MOTIVATIONAL_STRINGS = [
@@ -80,8 +88,27 @@ function loadSessionFromCache(): CachedSession | null {
 function clearSessionCache() {
   try {
     localStorage.removeItem(SESSION_STORAGE_KEY);
+    localStorage.removeItem(ACTIVE_SESSION_KEY);
   } catch (e) {
     console.warn("Failed to clear arena session cache:", e);
+  }
+}
+
+function saveActiveSessionMeta(meta: ActiveSessionMeta) {
+  try {
+    localStorage.setItem(ACTIVE_SESSION_KEY, JSON.stringify(meta));
+  } catch (e) {
+    console.warn("Failed to save active session meta:", e);
+  }
+}
+
+function loadActiveSessionMeta(): ActiveSessionMeta | null {
+  try {
+    const raw = localStorage.getItem(ACTIVE_SESSION_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as ActiveSessionMeta;
+  } catch {
+    return null;
   }
 }
 
@@ -115,7 +142,7 @@ function clearCachedResults() {
   } catch {}
 }
 
-export default function Arena({ onComplete, userId }: ArenaProps) {
+export default function Arena({ onComplete, userId, onReturnToDashboard }: ArenaProps) {
   const [arenaPhase, setArenaPhase] = useState<'intro' | 'quiz' | 'results'>('intro');
   const [cachedResults, setCachedResults] = useState<CachedResults | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -125,6 +152,10 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
+
+  // Resume countdown state
+  const [showResumeOverlay, setShowResumeOverlay] = useState(false);
+  const [resumeCountdown, setResumeCountdown] = useState(3);
 
   // Cost Optimizations & Non-Linear Mapping States
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
@@ -136,11 +167,14 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
   // Explanation cache states
   const [explanationCache, setExplanationCache] = useState<Record<string, string>>({});
   const [loadingExplanationMap, setLoadingExplanationMap] = useState<Record<string, boolean>>({});
+  const [awaitingGenerateInsight, setAwaitingGenerateInsight] = useState<Set<string>>(new Set());
+  const [generatingInsight, setGeneratingInsight] = useState<Set<string>>(new Set());
 
-  // Bookmark states (Requirement A)
+  // Bookmark states
   const [savedInsightIds, setSavedInsightIds] = useState<Set<string>>(new Set());
   const [bookmarkToggling, setBookmarkToggling] = useState<Record<string, boolean>>({});
   const [showPaywallModal, setShowPaywallModal] = useState(false);
+  const [isAIFrostedGlass, setIsAIFrostedGlass] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
 
   // Bifurcation states
@@ -153,14 +187,54 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
   const [trainingLength, setTrainingLength] = useState<number>(25);
   const [loadingSubjects, setLoadingSubjects] = useState(false);
 
-  // On mount, check if cached results exist and skip to results
+  // On mount, check for active session or cached results
   useEffect(() => {
     const cached = loadCachedResults();
     if (cached) {
       setCachedResults(cached);
       setArenaPhase('results');
+      return;
     }
-  }, []);
+
+    const activeMeta = loadActiveSessionMeta();
+    if (activeMeta && activeMeta.isRanked) {
+      const fullCached = loadSessionFromCache();
+      if (fullCached && fullCached.userId === userId && fullCached.questions.length > 0 && !fullCached.quizSubmitted) {
+        // Hydrate all state from cache
+        setQuestions(fullCached.questions);
+        setCurrentQuestionIndex(fullCached.currentQuestionIndex);
+        setUserAnswers(fullCached.userAnswers);
+        setTimeouts(fullCached.timeouts);
+        setTimeLeftMap(fullCached.timeLeftMap);
+        setTimeSpentMap(fullCached.timeSpentMap);
+        setQuizSubmitted(fullCached.quizSubmitted);
+        setExplanationCache(fullCached.explanationCache || {});
+        setLoadingExplanationMap(fullCached.loadingExplanationMap || {});
+        setSavedInsightIds(new Set(fullCached.savedInsightIds || []));
+        setIsRanked(fullCached.isRanked);
+        setIsLoading(false);
+        setShowResumeOverlay(true);
+        setResumeCountdown(3);
+        setArenaPhase('quiz');
+        return;
+      }
+    }
+  }, [userId]);
+
+  // Countdown timer for resume overlay
+  useEffect(() => {
+    if (!showResumeOverlay || resumeCountdown <= 0) return;
+    const timer = setTimeout(() => {
+      setResumeCountdown(prev => {
+        if (prev <= 1) {
+          setShowResumeOverlay(false);
+          return 3;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [showResumeOverlay, resumeCountdown]);
 
   // Pre-flight: "Begin Assessment" clicked -> show motivational modal
   const handleBeginAssessment = () => {
@@ -171,7 +245,6 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
 
   // Open Training Ground setup
   const handleTrainingGround = async () => {
-    // Check membership tier
     let tier = 'free';
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -194,7 +267,6 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
       return;
     }
 
-    // Premium user - show training setup
     setIsRanked(false);
     setLoadingSubjects(true);
     try {
@@ -263,6 +335,11 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
       }
 
       setQuestions(questionsList);
+      saveActiveSessionMeta({
+        currentQuestionIndex: 0,
+        isRanked: false,
+        mode: 'training',
+      });
       setIsLoading(false);
     } catch (err: any) {
       setErrorMsg('Failed to load training questions: ' + (err.message || 'Unknown error'));
@@ -271,33 +348,16 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
     }
   };
 
-  // "I'm ready" -> close modal, switch to quiz phase, fetch questions
   const handleReady = () => {
     setShowModal(false);
     setArenaPhase('quiz');
   };
 
-  // Fetch questions only when entering quiz phase (not on mount) - only for ranked
+  // Fetch questions for ranked mode
   useEffect(() => {
     if (arenaPhase !== 'quiz') return;
-    if (!isRanked) return; // Training ground fetches via startTraining
-
-    const cached = loadSessionFromCache();
-    if (cached && cached.userId === userId && cached.questions.length > 0 && !cached.quizSubmitted && cached.isRanked) {
-      // Hydrate all state from cache
-      setQuestions(cached.questions);
-      setCurrentQuestionIndex(cached.currentQuestionIndex);
-      setUserAnswers(cached.userAnswers);
-      setTimeouts(cached.timeouts);
-      setTimeLeftMap(cached.timeLeftMap);
-      setTimeSpentMap(cached.timeSpentMap);
-      setQuizSubmitted(cached.quizSubmitted);
-      setExplanationCache(cached.explanationCache || {});
-      setLoadingExplanationMap(cached.loadingExplanationMap || {});
-      setSavedInsightIds(new Set(cached.savedInsightIds || []));
-      setIsLoading(false);
-      return;
-    }
+    if (!isRanked) return;
+    if (questions.length > 0) return; // Already hydrated from resume
 
     const fetchQuestions = async () => {
       setIsLoading(true);
@@ -322,10 +382,16 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
           return;
         }
 
-        // Shuffle and pick 25 questions
         const shuffled = [...questionsList].sort(() => 0.5 - Math.random());
         const selected = shuffled.slice(0, 25);
         setQuestions(selected);
+
+        // Save active session meta after first fetch
+        saveActiveSessionMeta({
+          currentQuestionIndex: 0,
+          isRanked: true,
+          mode: 'vanguard',
+        });
       } catch (error: any) {
         setErrorMsg('Failed to initialize arena: ' + (error.message || 'Unknown network error.'));
       } finally {
@@ -334,7 +400,7 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
     };
 
     fetchQuestions();
-  }, [arenaPhase, userId, isRanked]);
+  }, [arenaPhase, userId, isRanked, questions.length]);
 
   // Persist core state to localStorage whenever it changes (only during quiz phase)
   useEffect(() => {
@@ -354,6 +420,11 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
       userId,
       isRanked,
     });
+    saveActiveSessionMeta({
+      currentQuestionIndex,
+      isRanked,
+      mode: isRanked ? 'vanguard' : 'training',
+    });
   }, [
     arenaPhase,
     questions,
@@ -367,7 +438,7 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
     loadingExplanationMap,
     savedInsightIds,
     userId,
-    isRanked
+    isRanked,
   ]);
 
   // Parse Matrix safely
@@ -412,7 +483,7 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
     return () => clearInterval(timer);
   }, [arenaPhase, currentQuestionId, timeLeft, userAnswers, timeouts, isLoading, errorMsg, questions, quizSubmitted]);
 
-  // Insights / Conceptual Explanation Fetching and Caching Loop
+  // Hybrid Insight Fetching: DB-first, then wait for user click to call AI
   useEffect(() => {
     if (arenaPhase !== 'quiz') return;
     if (!currentQuestionId || quizSubmitted) return;
@@ -421,52 +492,110 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
     const isTimeout = !!timeouts[currentQuestionId];
     const isLocked = isAnswered || isTimeout;
 
-    if (isLocked) {
-      if (currentQuestion.ai_insights) {
-        setExplanationCache(prev => ({ ...prev, [currentQuestionId]: currentQuestion.ai_insights }));
-        return;
+    if (!isLocked) return;
+    if (explanationCache[currentQuestionId]) return;
+    if (loadingExplanationMap[currentQuestionId]) return;
+    if (generatingInsight.has(currentQuestionId)) return;
+
+    // Step 1: Skip if we already have ai_insights on the question object
+    if (currentQuestion.ai_insights) {
+      setExplanationCache(prev => ({ ...prev, [currentQuestionId]: currentQuestion.ai_insights }));
+      return;
+    }
+
+    // Step 2: Silent DB read first - check static_questions for cached ai_insights
+    setLoadingExplanationMap(prev => ({ ...prev, [currentQuestionId]: true }));
+
+    (async () => {
+      try {
+        const { data: dbQuestion, error } = await supabase
+          .from('static_questions')
+          .select('ai_insights, conceptual_explanation')
+          .eq('id', currentQuestionId)
+          .maybeSingle();
+
+        if (error) {
+          console.warn("DB insight fetch error:", error);
+        }
+
+        if (dbQuestion?.ai_insights) {
+          // DB cache HIT - render instantly
+          setExplanationCache(prev => ({ ...prev, [currentQuestionId]: dbQuestion.ai_insights }));
+          setQuestions(prevQ => prevQ.map(q => q.id === currentQuestionId ? { ...q, ai_insights: dbQuestion.ai_insights } : q));
+          return;
+        }
+
+        if (dbQuestion?.conceptual_explanation) {
+          // Static fallback available - render it
+          setExplanationCache(prev => ({ ...prev, [currentQuestionId]: dbQuestion.conceptual_explanation }));
+          return;
+        }
+
+        // Step 3: Neither cached - mark as needing user click to generate
+        setAwaitingGenerateInsight(prev => new Set(prev).add(currentQuestionId));
+      } catch (err) {
+        console.warn("Hybrid insight fetch error:", err);
+      } finally {
+        setLoadingExplanationMap(prev => ({ ...prev, [currentQuestionId]: false }));
       }
+    })();
+  }, [arenaPhase, currentQuestionId, userAnswers, timeouts, quizSubmitted, questions, explanationCache, loadingExplanationMap, generatingInsight]);
 
-      if (explanationCache[currentQuestionId] || loadingExplanationMap[currentQuestionId]) return;
+  // Handle explicit user click on "Generate AI Insight" button
+  const handleGenerateInsight = async () => {
+    if (!currentQuestionId) return;
 
-      setLoadingExplanationMap(prev => ({ ...prev, [currentQuestionId]: true }));
+    setAwaitingGenerateInsight(prev => {
+      const next = new Set(prev);
+      next.delete(currentQuestionId);
+      return next;
+    });
+    setGeneratingInsight(prev => new Set(prev).add(currentQuestionId));
+    setLoadingExplanationMap(prev => ({ ...prev, [currentQuestionId]: true }));
 
-      const optionsStr = typeof currentQuestion.options_matrix === 'string'
-        ? JSON.parse(currentQuestion.options_matrix)
-        : currentQuestion.options_matrix;
-      const answerStr = optionsStr ? optionsStr[currentQuestion.correct_option] : "Unknown";
+    const optionsStr = typeof currentQuestion.options_matrix === 'string'
+      ? JSON.parse(currentQuestion.options_matrix)
+      : currentQuestion.options_matrix;
+    const answerStr = optionsStr ? optionsStr[currentQuestion.correct_option] : "Unknown";
 
-      fetch('/api/explanation', {
+    try {
+      const res = await fetch('/api/explanation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           question: currentQuestion.question_text,
           answer: answerStr,
           questionId: currentQuestionId,
-          userId
-        })
-      })
-      .then(async (res) => {
-        const data = await res.json();
-        if (res.status === 403 && data.error === 'PAYWALL_REACHED') {
-          setShowPaywallModal(true);
-          return null;
-        }
-        return data;
-      })
-      .then(data => {
-        if (!data) return;
-        if (data.explanation) {
-          setExplanationCache(prev => ({ ...prev, [currentQuestionId]: data.explanation }));
-          setQuestions(prevQ => prevQ.map(q => q.id === currentQuestionId ? { ...q, ai_insights: data.explanation, is_generated: true } : q));
-        }
-      })
-      .catch(err => console.error("Cache retrieval fail:", err))
-      .finally(() => {
-        setLoadingExplanationMap(prev => ({ ...prev, [currentQuestionId]: false }));
+          userId,
+        }),
       });
+
+      const data = await res.json();
+
+      if (res.status === 403 && (data.error === 'PAYWALL_REACHED' || data.error === 'limit_reached')) {
+        if (data.error === 'limit_reached') {
+          setIsAIFrostedGlass(true);
+        } else {
+          setShowPaywallModal(true);
+        }
+        return;
+      }
+
+      if (data.explanation) {
+        setExplanationCache(prev => ({ ...prev, [currentQuestionId]: data.explanation }));
+        setQuestions(prevQ => prevQ.map(q => q.id === currentQuestionId ? { ...q, ai_insights: data.explanation, is_generated: true } : q));
+      }
+    } catch (err) {
+      console.error("AI Generation error:", err);
+    } finally {
+      setGeneratingInsight(prev => {
+        const next = new Set(prev);
+        next.delete(currentQuestionId);
+        return next;
+      });
+      setLoadingExplanationMap(prev => ({ ...prev, [currentQuestionId]: false }));
     }
-  }, [arenaPhase, currentQuestionId, userAnswers, timeouts, quizSubmitted, questions]);
+  };
 
   const handleSelect = (key: string) => {
     const isAnswered = userAnswers[currentQuestionId] !== undefined;
@@ -474,9 +603,14 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
     if (isAnswered || isTimeout || quizSubmitted) return;
 
     setUserAnswers(prev => ({ ...prev, [currentQuestionId]: key }));
+    saveActiveSessionMeta({
+      currentQuestionIndex,
+      isRanked,
+      mode: isRanked ? 'vanguard' : 'training',
+    });
   };
 
-  // Bookmark toggle handler (Requirement A)
+  // Bookmark toggle handler
   const toggleBookmark = async () => {
     if (!currentQuestionId || !userId) return;
 
@@ -527,7 +661,6 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
             return next;
           });
 
-          // First-time save onboarding toast
           if (!localStorage.getItem('tark_first_save_seen')) {
             localStorage.setItem('tark_first_save_seen', 'true');
             setToastMsg('Saved! You can view your saved insights and articles in your Profile section.');
@@ -543,43 +676,67 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
 
   const handleRestart = () => {
     clearCachedResults();
+    clearSessionCache();
     setCachedResults(null);
     setArenaPhase('intro');
+    setQuestions([]);
+    setCurrentQuestionIndex(0);
+    setUserAnswers({});
+    setTimeouts({});
+    setTimeLeftMap({});
+    setTimeSpentMap({});
+    setQuizSubmitted(false);
+    setExplanationCache({});
+    setLoadingExplanationMap({});
+    setAwaitingGenerateInsight(new Set());
+    setGeneratingInsight(new Set());
+    setSavedInsightIds(new Set());
+    setShowResumeOverlay(false);
+    setIsAIFrostedGlass(false);
+  };
+
+  const handleReturnToDashboard = () => {
+    clearSessionCache();
+    if (onReturnToDashboard) {
+      onReturnToDashboard();
+    }
   };
 
   const finishArena = async () => {
     setIsLoading(true);
     setQuizSubmitted(true);
+
+    // Compute local stats first (before any fetch)
+    let correctCount = 0;
+    let incorrectCount = 0;
+    let unattemptedCount = 0;
+    let totalTime = 0;
+    const finalSubjectStats: Record<string, { correct: number; total: number }> = {};
+
+    questions.forEach(q => {
+      const selected = userAnswers[q.id];
+      const isTimeout = !!timeouts[q.id];
+      const isCorrect = selected === q.correct_option?.trim();
+      const subj = q.subject_category || 'CORE';
+
+      if (!finalSubjectStats[subj]) {
+        finalSubjectStats[subj] = { correct: 0, total: 0 };
+      }
+      finalSubjectStats[subj].total += 1;
+
+      if (!selected) {
+        unattemptedCount += 1;
+      } else if (isCorrect) {
+        correctCount += 1;
+        finalSubjectStats[subj].correct += 1;
+      } else {
+        incorrectCount += 1;
+      }
+
+      totalTime += timeSpentMap[q.id] || 0;
+    });
+
     try {
-      let correctCount = 0;
-      let incorrectCount = 0;
-      let unattemptedCount = 0;
-      let totalTime = 0;
-      const finalSubjectStats: Record<string, { correct: number; total: number }> = {};
-
-      questions.forEach(q => {
-        const selected = userAnswers[q.id];
-        const isTimeout = !!timeouts[q.id];
-        const isCorrect = selected === q.correct_option?.trim();
-        const subj = q.subject_category || 'CORE';
-
-        if (!finalSubjectStats[subj]) {
-          finalSubjectStats[subj] = { correct: 0, total: 0 };
-        }
-        finalSubjectStats[subj].total += 1;
-
-        if (!selected) {
-          unattemptedCount += 1;
-        } else if (isCorrect) {
-          correctCount += 1;
-          finalSubjectStats[subj].correct += 1;
-        } else {
-          incorrectCount += 1;
-        }
-
-        totalTime += timeSpentMap[q.id] || 0;
-      });
-
       const response = await fetch('/api/submit-quiz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -600,16 +757,14 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
       });
 
       if (!response.ok) {
-        const errData = await response.json();
+        const errData = await response.json().catch(() => ({ error: "Server returned non-JSON" }));
         throw new Error(errData.error || `Server responded with ${response.status}`);
       }
 
       const result = await response.json();
 
-      // CRITICAL: Clear the localStorage cache since this session is submitted
       clearSessionCache();
 
-      // Save results to localStorage for persistence across tab switches
       const resultsToCache: CachedResults = {
         status: 'reviewing',
         resultsData: {
@@ -634,8 +789,30 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
       }, result.percentile);
     } catch (err: any) {
       console.error(err);
-      setErrorMsg('Failed to record session: ' + (err.message || 'Unknown error'));
-      setIsLoading(false);
+
+      // Force results navigation with locally computed stats even if backend fails
+      const resultsToCache: CachedResults = {
+        status: 'reviewing',
+        resultsData: {
+          correct: correctCount,
+          incorrect: incorrectCount,
+          unattempted: unattemptedCount,
+          totalTimeSeconds: totalTime,
+          subjectStats: finalSubjectStats,
+        },
+        percentile: 0,
+      };
+      try {
+        localStorage.setItem(RESULTS_STORAGE_KEY, JSON.stringify(resultsToCache));
+      } catch {}
+
+      onComplete({
+        correct: correctCount,
+        incorrect: incorrectCount,
+        unattempted: unattemptedCount,
+        totalTimeSeconds: totalTime,
+        subjectStats: finalSubjectStats,
+      }, 0);
     }
   };
 
@@ -646,7 +823,7 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
     return () => clearTimeout(t);
   }, [toastMsg]);
 
-  // Fetch saved insight IDs on mount (Requirement A) -- only in quiz phase if not restored from cache
+  // Fetch saved insight IDs on mount
   useEffect(() => {
     if (arenaPhase !== 'quiz') return;
     if (!userId) return;
@@ -671,27 +848,23 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
   if (arenaPhase === 'intro' && !showTrainingSetup) {
     return (
       <div className="min-h-screen bg-zinc-950 text-stone-50 font-sans flex flex-col items-center justify-center p-6 relative overflow-hidden">
-        {/* Background grid */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f1f23_1px,transparent_1px),linear-gradient(to_bottom,#1f1f23_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20 pointer-events-none" />
 
         <div className="w-full max-w-xl z-10 flex flex-col items-center">
-          {/* Badge */}
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-sm text-[8px] uppercase font-mono text-zinc-400 tracking-widest mb-8 select-none">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             Test Arena - Pre-Flight Briefing
           </div>
 
-          {/* Title */}
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="font-stencil text-3xl md:text-4xl font-bold tracking-widest text-[#e0d0ab] drop-shadow-[0_0_12px_rgba(224,208,171,0.2)] mb-10 text-center"
+            className="font-serif text-3xl md:text-4xl font-bold tracking-widest text-[#e0d0ab] drop-shadow-[0_0_12px_rgba(224,208,171,0.2)] mb-10 text-center"
           >
             Choose Your Assessment
           </motion.h1>
 
-          {/* Vanguard Assessment Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -719,7 +892,6 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
             </button>
           </motion.div>
 
-          {/* Training Ground Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -753,7 +925,6 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
           </motion.div>
         </div>
 
-        {/* Motivational Modal */}
         <AnimatePresence>
           {showModal && (
             <motion.div
@@ -775,33 +946,16 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
                   <div className="p-3 bg-zinc-800/60 border border-zinc-700/40 rounded-sm mb-6">
                     <Sparkles className="w-6 h-6 text-[#e0d0ab]" />
                   </div>
-
-                  <h2 className="text-xs uppercase tracking-widest font-bold text-zinc-400 mb-4">
-                    Pre-Flight Checklist
-                  </h2>
-
+                  <h2 className="text-xs uppercase tracking-widest font-bold text-zinc-400 mb-4">Pre-Flight Checklist</h2>
                   <div className="bg-zinc-950/60 border border-zinc-800/40 rounded-sm px-5 py-4 mb-6 w-full">
-                    <p className="text-sm text-stone-200 font-serif italic leading-relaxed">
-                      "{motivation}"
-                    </p>
+                    <p className="text-sm text-stone-200 font-serif italic leading-relaxed">"{motivation}"</p>
                   </div>
-
-                  <p className="text-[10px] text-zinc-500 uppercase tracking-wider mb-6 font-mono">
-                    25 questions - 20 seconds per question
-                  </p>
-
-                  <button
-                    onClick={handleReady}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 px-6 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded-sm transition-all shadow-lg shadow-emerald-500/10"
-                  >
+                  <p className="text-[10px] text-zinc-500 uppercase tracking-wider mb-6 font-mono">25 questions - 20 seconds per question</p>
+                  <button onClick={handleReady} className="w-full flex items-center justify-center gap-2 py-2.5 px-6 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded-sm transition-all shadow-lg shadow-emerald-500/10">
                     I'm ready
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
-
-                  <button
-                    onClick={() => setShowModal(false)}
-                    className="mt-3 text-[10px] text-zinc-600 hover:text-zinc-400 uppercase tracking-wider font-mono transition-colors"
-                  >
+                  <button onClick={() => setShowModal(false)} className="mt-3 text-[10px] text-zinc-600 hover:text-zinc-400 uppercase tracking-wider font-mono transition-colors">
                     Not yet, go back
                   </button>
                 </div>
@@ -810,7 +964,6 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
           )}
         </AnimatePresence>
 
-        {/* Paywall Modal */}
         <AnimatePresence>
           {showPaywallModal && (
             <motion.div
@@ -832,27 +985,13 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
                   <div className="p-3 bg-zinc-800/60 border border-zinc-700/40 rounded-sm mb-6">
                     <Lock className="w-6 h-6 text-[#e0d0ab]" />
                   </div>
-
-                  <h2 className="text-xs uppercase tracking-widest font-bold text-zinc-400 mb-4">
-                    Training Ground Locked
-                  </h2>
-
-                  <p className="text-sm text-stone-300 leading-relaxed mb-6 font-sans">
-                    Unlock the Training Ground with Founders Club. Custom assessments, zero ranking pressure.
-                  </p>
-
-                  <button
-                    onClick={() => setToastMsg('Payment Gateway Integration Pending')}
-                    className="w-full flex items-center justify-center gap-2 py-2.5 px-6 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded-sm transition-all shadow-lg shadow-[#e0d0ab]/10 mb-3"
-                  >
+                  <h2 className="text-xs uppercase tracking-widest font-bold text-zinc-400 mb-4">Training Ground Locked</h2>
+                  <p className="text-sm text-stone-300 leading-relaxed mb-6 font-sans">Unlock the Training Ground with Founders Club. Custom assessments, zero ranking pressure.</p>
+                  <button onClick={() => setToastMsg('Payment Gateway Integration Pending')} className="w-full flex items-center justify-center gap-2 py-2.5 px-6 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded-sm transition-all shadow-lg shadow-[#e0d0ab]/10 mb-3">
                     <Crown className="w-4 h-4" />
                     Join Founders Club: Rs 51
                   </button>
-
-                  <button
-                    onClick={() => setShowPaywallModal(false)}
-                    className="text-[10px] text-zinc-600 hover:text-zinc-400 uppercase tracking-wider font-mono transition-colors"
-                  >
+                  <button onClick={() => setShowPaywallModal(false)} className="text-[10px] text-zinc-600 hover:text-zinc-400 uppercase tracking-wider font-mono transition-colors">
                     Continue Free
                   </button>
                 </div>
@@ -861,7 +1000,6 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
           )}
         </AnimatePresence>
 
-        {/* Toast Notification */}
         <AnimatePresence>
           {toastMsg && (
             <motion.div
@@ -870,9 +1008,7 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
               exit={{ opacity: 0, y: 20 }}
               className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] px-6 py-3 bg-zinc-900 border border-zinc-700/60 rounded-sm shadow-2xl"
             >
-              <p className="text-xs text-stone-200 font-sans whitespace-nowrap">
-                {toastMsg}
-              </p>
+              <p className="text-xs text-stone-200 font-sans whitespace-nowrap">{toastMsg}</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -896,15 +1032,10 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
             The Training Ground - Custom Setup
           </div>
 
-          <h2 className="font-stencil text-2xl font-bold tracking-widest text-[#e0d0ab] mb-8">
-            Configure Your Assessment
-          </h2>
+          <h2 className="font-serif text-2xl font-bold tracking-widest text-[#e0d0ab] mb-8">Configure Your Assessment</h2>
 
-          {/* Subject Selection */}
           <div className="bg-zinc-900/30 border border-zinc-800/60 rounded-sm p-6 mb-6">
-            <h3 className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 mb-4">
-              Select Subjects
-            </h3>
+            <h3 className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 mb-4">Select Subjects</h3>
             <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
               {allSubjects.map(subject => (
                 <button
@@ -925,11 +1056,8 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
             )}
           </div>
 
-          {/* Quiz Length Selection */}
           <div className="bg-zinc-900/30 border border-zinc-800/60 rounded-sm p-6 mb-6">
-            <h3 className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 mb-4">
-              Quiz Length
-            </h3>
+            <h3 className="text-[10px] uppercase tracking-widest font-bold text-zinc-400 mb-4">Quiz Length</h3>
             <div className="flex gap-3">
               {lengthOptions.map(opt => (
                 <button
@@ -947,13 +1075,9 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex gap-3">
             <button
-              onClick={() => {
-                setShowTrainingSetup(false);
-                setArenaPhase('intro');
-              }}
+              onClick={() => { setShowTrainingSetup(false); setArenaPhase('intro'); }}
               className="flex-1 py-2.5 px-4 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-sans text-xs font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer"
             >
               Back
@@ -973,17 +1097,42 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
   }
 
   // ----------------------------------------------------------------
-  // RENDER: RESULTS PHASE (cached results restored from localStorage)
+  // RENDER: RESULTS PHASE
   // ----------------------------------------------------------------
   if (arenaPhase === 'results' && cachedResults) {
     const r = cachedResults.resultsData;
     const total = r.correct + r.incorrect + r.unattempted;
     const accuracy = total > 0 ? ((r.correct / total) * 100).toFixed(1) : '0';
+    const isVanguard = Number(accuracy) >= 80 && isRanked;
     return (
       <div className="min-h-screen bg-zinc-950 text-stone-50 font-sans flex flex-col items-center justify-center p-6">
         <div className="w-full max-w-xl text-center">
-          <h1 className="text-3xl font-sans font-bold tracking-tight mb-2">Previous Results</h1>
-          <p className="text-zinc-500 text-xs uppercase tracking-widest mb-8">Cached from last session</p>
+          {/* Vanguard Reward Badge */}
+          <AnimatePresence>
+            {isVanguard && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ delay: 0.8, duration: 0.5 }}
+                className="relative overflow-hidden rounded-sm border border-[#e0d0ab]/30 mb-6"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#e0d0ab]/15 to-transparent animate-[glare_2s_ease-in-out_infinite]" />
+                <div className="relative px-4 py-3 bg-[#e0d0ab]/5 text-[#e0d0ab] font-sans font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2">
+                  <Crown className="w-4 h-4" />
+                  Vanguard Threshold Achieved: +25 CP
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <h1 className="text-3xl font-sans font-bold tracking-tight mb-2">Assessment Complete</h1>
+          {isVanguard && (
+            <p className="text-zinc-400 text-xs uppercase tracking-widest mb-8">Vanguard performance recorded</p>
+          )}
+          {!isVanguard && (
+            <p className="text-zinc-500 text-xs uppercase tracking-widest mb-8">Session recorded</p>
+          )}
 
           <div className="grid grid-cols-3 gap-px bg-zinc-800 border border-zinc-800 mb-8 rounded-sm overflow-hidden">
             <div className="bg-zinc-950 p-6 flex flex-col items-center justify-center">
@@ -1010,13 +1159,22 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
             </p>
           </div>
 
-          <button
-            onClick={handleRestart}
-            className="inline-flex items-center gap-2 py-3 px-8 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-sans text-xs font-bold uppercase tracking-widest rounded-sm transition-all shadow-lg shadow-emerald-500/10"
-          >
-            <Sparkles className="w-4 h-4" />
-            Take Next Assessment
-          </button>
+          {/* Navigation Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              onClick={handleReturnToDashboard}
+              className="inline-flex items-center justify-center gap-2 py-3 px-8 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 font-sans text-xs font-bold uppercase tracking-widest rounded-sm transition-all shadow-lg shadow-[#e0d0ab]/10"
+            >
+              Return to Dashboard
+            </button>
+            <button
+              onClick={handleRestart}
+              className="inline-flex items-center justify-center gap-2 py-3 px-8 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-sans text-xs font-bold uppercase tracking-widest rounded-sm transition-all border border-zinc-800"
+            >
+              <Sparkles className="w-4 h-4" />
+              Deploy Next Assessment
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -1053,28 +1211,52 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
   const isLoadingExplanation = !!loadingExplanationMap[currentQuestionId];
   const isBookmarked = savedInsightIds.has(String(currentQuestionId));
   const isBookmarkLoading = !!bookmarkToggling[String(currentQuestionId)];
+  const needsGenerateClick = awaitingGenerateInsight.has(currentQuestionId) && !currentExplanation && !isLoadingExplanation;
+  const isGeneratingNow = generatingInsight.has(currentQuestionId);
 
   const getButtonClass = (key: string) => {
-    const baseClass = "w-full text-left p-4 rounded border font-sans text-sm transition-all focus:outline-none relative ";
+    const baseClass = "w-full max-w-full text-left p-4 rounded border-2 font-sans text-sm transition-all focus:outline-none relative ";
     if (!isLocked) {
-      return baseClass + "border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300 cursor-pointer";
+      return baseClass + "border-transparent bg-zinc-900/50 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300 cursor-pointer";
     }
 
     if (key === correctOpt) {
-      return baseClass + "border-emerald-500 bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500 opacity-100 font-medium z-10 scale-[1.01]";
+      return baseClass + "border-emerald-500 bg-emerald-500/20 text-emerald-400 opacity-100 font-medium z-10";
     }
 
     if (key === selectedOption && key !== correctOpt) {
       return baseClass + "border-rose-500/50 bg-rose-500/10 text-rose-400 opacity-100";
     }
 
-    return baseClass + "border-zinc-800 bg-zinc-900/20 text-zinc-500 opacity-40 select-none";
+    return baseClass + "border-transparent bg-zinc-900/20 text-zinc-500 opacity-40 select-none";
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-stone-50 p-4 md:p-8 flex flex-col items-center">
-      <div className="w-full max-w-2xl mt-4 md:mt-12 flex-1">
+    <div className="min-h-screen bg-zinc-950 text-stone-50 p-4 md:p-8 flex flex-col items-center relative">
+      {/* Resume Overlay */}
+      <AnimatePresence>
+        {showResumeOverlay && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[400] bg-zinc-950/90 backdrop-blur-sm flex items-center justify-center"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="text-center"
+            >
+              <h2 className="font-serif text-3xl font-bold text-[#e0d0ab] mb-4">Resuming Assessment</h2>
+              <p className="text-6xl font-mono font-bold text-stone-100">{resumeCountdown}</p>
+              <p className="text-zinc-500 text-xs uppercase tracking-widest mt-4 font-mono">Recalibrating focus...</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
+      <div className="w-full max-w-2xl mt-4 md:mt-12 flex-1">
         {/* Mode Badge */}
         <div className="flex items-center justify-between mb-4">
           <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-[8px] uppercase font-mono tracking-widest rounded-sm border ${
@@ -1082,11 +1264,7 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
               ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
               : 'bg-[#e0d0ab]/10 text-[#e0d0ab] border-[#e0d0ab]/20'
           }`}>
-            {isRanked ? (
-              <Swords className="w-3 h-3" />
-            ) : (
-              <Target className="w-3 h-3" />
-            )}
+            {isRanked ? <Swords className="w-3 h-3" /> : <Target className="w-3 h-3" />}
             {isRanked ? 'Vanguard Assessment' : 'Training Ground'}
           </div>
           <span className="text-[9px] font-mono text-zinc-600">
@@ -1115,15 +1293,11 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
                           : 'bg-zinc-800 border-zinc-700 hover:bg-zinc-700'
                     }`}
                     initial={false}
-                    animate={{
-                      scale: isCurrent ? 1.3 : 1,
-                    }}
+                    animate={{ scale: isCurrent ? 1.3 : 1 }}
                     transition={{ duration: 0.3 }}
                   />
                 </button>
-                {idx < questions.length - 1 && (
-                  <div className="flex-1 h-[1px] mx-0.5 bg-zinc-800" />
-                )}
+                {idx < questions.length - 1 && <div className="flex-1 h-[1px] mx-0.5 bg-zinc-800" />}
               </div>
             );
           })}
@@ -1132,13 +1306,13 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
         {/* Header & Meta */}
         <div className="flex items-start justify-between mb-8">
           <div className="flex flex-wrap gap-2">
-            <span className="px-2 py-1 text-[10px] uppercase tracking-wider font-sans bg-zinc-900 text-zinc-400 rounded-sm border border-zinc-800">
+            <span className="text-xs text-zinc-500 border border-zinc-800 rounded-full px-2 py-1">
               {currentQuestion.exam_origin_tag || 'GENERIC'}
             </span>
-            <span className="px-2 py-1 text-[10px] uppercase tracking-wider font-sans bg-zinc-900 text-zinc-400 rounded-sm border border-zinc-800">
+            <span className="text-xs text-zinc-500 border border-zinc-800 rounded-full px-2 py-1">
               {currentQuestion.subject_category || 'CORE'}
             </span>
-            <span className="px-2 py-1 text-[10px] uppercase tracking-wider font-sans bg-zinc-900 text-zinc-400 rounded-sm border border-zinc-800">
+            <span className="text-xs text-zinc-500 border border-zinc-800 rounded-full px-2 py-1">
               {currentQuestion.difficulty_level || 'standard'}
             </span>
           </div>
@@ -1150,10 +1324,7 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
                   initial={{ opacity: 0, scale: 0.8, rotate: 0 }}
                   animate={{ opacity: 1, scale: 1, rotate: 180 }}
                   exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
-                  transition={{
-                    rotate: { duration: 20, ease: "linear" },
-                    opacity: { duration: 0.3 }
-                  }}
+                  transition={{ rotate: { duration: 20, ease: "linear" }, opacity: { duration: 0.3 } }}
                   className={`text-zinc-400 ${timeLeft <= 5 ? 'text-rose-500' : ''}`}
                 >
                   <Hourglass className="w-5 h-5 animate-pulse" />
@@ -1173,12 +1344,12 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
         </div>
 
         {/* Query Headline */}
-        <h2 className="text-xl md:text-2xl font-serif whitespace-pre-wrap font-medium leading-relaxed mb-8 text-stone-100">
+        <h2 className="text-lg md:text-xl font-serif whitespace-pre-wrap font-medium leading-relaxed mb-6 text-stone-100">
           {currentQuestion.question_text}
         </h2>
 
         {/* Options */}
-        <div className="space-y-3 mb-8">
+        <div className="space-y-3 mb-8 max-h-[calc(85vh-300px)] overflow-y-auto overflow-x-hidden">
           {Object.entries(options).map(([key, value]) => (
             <button
               key={key}
@@ -1206,32 +1377,69 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-sans font-medium text-xs text-zinc-500 uppercase tracking-widest inline-flex items-center gap-1.5">
                     Conceptual Insights
-                    <InfoTooltip text="Free tier grants 15 total AI explanations to ensure server stability. Founders Club members receive unlimited access." />
+                    <InfoTooltip text="Free tier grants 3 total AI explanations to ensure server stability. Founders Club members receive unlimited access." />
                   </h3>
-                  <button
-                    onClick={toggleBookmark}
-                    disabled={isBookmarkLoading || isLoadingExplanation}
-                    className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] uppercase font-bold tracking-widest rounded-sm border transition-all ${
-                      isBookmarked
-                        ? 'bg-[#e0d0ab]/10 text-[#e0d0ab] border-[#e0d0ab]/30 hover:bg-[#e0d0ab]/20'
-                        : 'bg-zinc-800/50 text-zinc-400 border-zinc-700/50 hover:text-zinc-300 hover:border-zinc-600'
-                    } disabled:opacity-40 disabled:cursor-not-allowed`}
-                    title={isBookmarked ? 'Remove from saved insights' : 'Save this insight'}
-                  >
-                    {isBookmarkLoading ? (
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                    ) : isBookmarked ? (
-                      <BookmarkCheck className="w-3 h-3 text-[#e0d0ab]" />
-                    ) : (
-                      <Bookmark className="w-3 h-3" />
-                    )}
-                    <span>{isBookmarked ? 'Saved' : 'Bookmark'}</span>
-                  </button>
+                  {currentExplanation && (
+                    <button
+                      onClick={toggleBookmark}
+                      disabled={isBookmarkLoading || isLoadingExplanation}
+                      className={`flex items-center gap-1.5 px-2.5 py-1.5 text-[10px] uppercase font-bold tracking-widest rounded-sm border transition-all ${
+                        isBookmarked
+                          ? 'bg-[#e0d0ab]/10 text-[#e0d0ab] border-[#e0d0ab]/30 hover:bg-[#e0d0ab]/20'
+                          : 'bg-zinc-800/50 text-zinc-400 border-zinc-700/50 hover:text-zinc-300 hover:border-zinc-600'
+                      } disabled:opacity-40 disabled:cursor-not-allowed`}
+                      title={isBookmarked ? 'Remove from saved insights' : 'Save this insight'}
+                    >
+                      {isBookmarkLoading ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : isBookmarked ? (
+                        <BookmarkCheck className="w-3 h-3 text-[#e0d0ab]" />
+                      ) : (
+                        <Bookmark className="w-3 h-3" />
+                      )}
+                      <span>{isBookmarked ? 'Saved' : 'Bookmark'}</span>
+                    </button>
+                  )}
                 </div>
-                {isLoadingExplanation ? (
+
+                {isLoadingExplanation && !currentExplanation ? (
                   <div className="flex items-center gap-2 text-sm text-zinc-500">
                     <Loader2 className="w-4 h-4 animate-spin" />
                     Retrieving insights...
+                  </div>
+                ) : isGeneratingNow ? (
+                  <div className="flex items-center gap-2 text-sm text-zinc-500">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Generating AI insight...
+                  </div>
+                ) : isAIFrostedGlass ? (
+                  <div className="relative">
+                    <div className="select-none blur-sm">
+                      <p className="text-[15px] md:text-base text-stone-300 leading-relaxed font-serif whitespace-pre-wrap">
+                        Detailed AI-powered conceptual insights are generated for each question after submission, providing in-depth analysis of the correct answer, contextual background, and related policy frameworks.
+                      </p>
+                    </div>
+                    <div className="absolute inset-0 backdrop-blur-md bg-zinc-950/40 flex items-center justify-center">
+                      <button
+                        onClick={() => setShowPaywallModal(true)}
+                        className="px-4 py-2.5 bg-[#e0d0ab] text-zinc-950 font-sans text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-stone-100 transition-all shadow-lg shadow-[#e0d0ab]/10"
+                      >
+                        Limit Reached. Join the Founders Club for unlimited subjective analysis.
+                      </button>
+                    </div>
+                  </div>
+                ) : needsGenerateClick ? (
+                  <div className="flex flex-col items-center gap-4 py-4">
+                    <p className="text-[11px] text-zinc-500 font-sans leading-relaxed text-center">
+                      No cached insight available for this question.
+                    </p>
+                    <button
+                      onClick={handleGenerateInsight}
+                      className="inline-flex items-center gap-2 px-5 py-3 bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 text-[#e0d0ab] font-sans text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-[#e0d0ab]/20 transition-all"
+                    >
+                      <WandSparkles className="w-4 h-4" />
+                      Generate AI Insight (Consumes 1 Attempt)
+                    </button>
                   </div>
                 ) : currentExplanation ? (
                    <div className="prose prose-invert prose-p:text-sm prose-li:text-sm prose-p:leading-relaxed prose-li:leading-relaxed max-w-none text-stone-300 font-serif">
@@ -1250,7 +1458,10 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
         {/* Non-Linear Navigation Controls */}
         <div className="flex items-center justify-between gap-4 mt-12 pt-6 border-t border-zinc-900">
           <button
-            onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
+            onClick={() => {
+              setCurrentQuestionIndex(prev => Math.max(0, prev - 1));
+              saveActiveSessionMeta({ currentQuestionIndex: Math.max(0, currentQuestionIndex - 1), isRanked, mode: isRanked ? 'vanguard' : 'training' });
+            }}
             disabled={currentQuestionIndex === 0}
             className="flex items-center gap-1 py-2.5 px-4 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-sans text-xs font-semibold uppercase tracking-wider rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed border border-zinc-800"
           >
@@ -1260,7 +1471,10 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
 
           {currentQuestionIndex < questions.length - 1 ? (
             <button
-              onClick={() => setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}
+              onClick={() => {
+                setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1));
+                saveActiveSessionMeta({ currentQuestionIndex: Math.min(questions.length - 1, currentQuestionIndex + 1), isRanked, mode: isRanked ? 'vanguard' : 'training' });
+              }}
               className="flex items-center gap-1 py-2.5 px-5 bg-zinc-100 hover:bg-white text-zinc-950 font-sans text-xs font-semibold uppercase tracking-wider rounded transition-colors"
             >
               Next
@@ -1284,7 +1498,6 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
         </p>
       </div>
 
-      {/* Toast Notification */}
       <AnimatePresence>
         {toastMsg && (
           <motion.div
@@ -1293,9 +1506,7 @@ export default function Arena({ onComplete, userId }: ArenaProps) {
             exit={{ opacity: 0, y: 20 }}
             className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] px-6 py-3 bg-zinc-900 border border-zinc-700/60 rounded-sm shadow-2xl"
           >
-            <p className="text-xs text-stone-200 font-sans whitespace-nowrap">
-              {toastMsg}
-            </p>
+            <p className="text-xs text-stone-200 font-sans whitespace-nowrap">{toastMsg}</p>
           </motion.div>
         )}
       </AnimatePresence>

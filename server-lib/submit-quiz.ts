@@ -159,8 +159,8 @@ export default async function handler(req: any, res: any) {
       .single();
 
     if (sessionError) {
-      console.error("Session insert error:", sessionError);
-      return res.status(500).json({ error: "Failed to record quiz session: " + sessionError.message });
+      console.error("CRITICAL SUBMISSION DB ERROR:", sessionError);
+      return res.status(500).json({ error: "Database error", details: sessionError.message });
     }
 
     const sessionId = session.id;
@@ -176,7 +176,8 @@ export default async function handler(req: any, res: any) {
       .insert(attemptRowsWithSession);
 
     if (attemptsError) {
-      console.error("Question attempts insert error:", attemptsError);
+      console.error("CRITICAL SUBMISSION DB ERROR:", attemptsError);
+      return res.status(500).json({ error: "Database error", details: attemptsError.message });
     }
 
     // 5. Return success
@@ -192,7 +193,7 @@ export default async function handler(req: any, res: any) {
       },
     });
   } catch (err: any) {
-    console.error("Submit quiz handler error:", err);
+    console.error("CRITICAL SUBMISSION DB ERROR:", err);
     return res.status(500).json({ error: err.message || "An unexpected error occurred." });
   }
 }

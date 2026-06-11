@@ -17,7 +17,7 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
         {/* Brand Badge */}
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-sm text-[8px] uppercase font-mono text-zinc-400 tracking-widest mb-6 select-none">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          TARK Evaluation Engine v1.0
+          TARK v1.0
         </div>
 
         {/* Hero Section */}
@@ -27,11 +27,11 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-center mb-12"
         >
-          <h1 className="font-stencil text-4xl md:text-5xl font-bold tracking-widest text-[#e0d0ab] drop-shadow-[0_0_15px_rgba(224,208,171,0.25)] mb-6 select-none">
+          <h1 className="font-serif text-4xl md:text-5xl font-bold tracking-widest text-[#e0d0ab] drop-shadow-[0_0_15px_rgba(224,208,171,0.25)] mb-6 select-none">
             Tark 1.0 | तर्क 1.0
           </h1>
           <p className="text-zinc-400 text-sm md:text-base font-sans max-w-lg mx-auto leading-relaxed">
-            A focused evaluation terminal for the disciplined mind. Precision assessment through structured reasoning.
+            Assess. Analyze. Track. A focused instrument for the disciplined mind.
           </p>
         </motion.div>
 
@@ -53,7 +53,7 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
               </h3>
             </div>
             <p className="text-zinc-500 text-xs leading-relaxed font-sans">
-              Time-bound multi-subject assessment engine with real-time feedback, conceptual insights, and performance analytics. Each session tests your reasoning under pressure.
+              Time-bound multi-subject assessments with real-time feedback, conceptual insights, and performance analytics. Each session tests your reasoning under pressure.
             </p>
           </motion.button>
 
@@ -69,7 +69,7 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
                 <Shield className="w-5 h-5 text-[#e0d0ab]" />
               </div>
               <h3 className="text-xs uppercase tracking-widest font-bold text-zinc-300 group-hover:text-[#e0d0ab] transition-colors">
-                Policy Engine
+                Policy Tracker
               </h3>
             </div>
             <p className="text-zinc-500 text-xs leading-relaxed font-sans">
@@ -89,7 +89,7 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
             className="group inline-flex items-center gap-2 py-3 px-8 bg-[#e0d0ab] text-zinc-950 font-sans text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-stone-100 transition-all shadow-lg shadow-[#e0d0ab]/10 hover:shadow-[#e0d0ab]/20"
           >
             <Target className="w-4 h-4" />
-            Enter Tark Space
+            Start Your First Assessment
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </motion.div>
