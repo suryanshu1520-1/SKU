@@ -1,23 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 
-function cleanEnvValue(val: any): string {
-  if (typeof val !== 'string') return '';
-  let cleaned = val.trim();
-  while (cleaned.startsWith('"') || cleaned.startsWith("'")) {
-    cleaned = cleaned.substring(1);
-  }
-  while (cleaned.endsWith('"') || cleaned.endsWith("'")) {
-    cleaned = cleaned.substring(0, cleaned.length - 1);
-  }
-  return cleaned.trim();
-}
+const supabaseUrl = process.env.SUPABASE_URL ?? "https://ixngfxaerlkkcacrbdgc.supabase.co";
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
 
-const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
-const rawServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  process.env.VITE_SUPABASE_SERVICE_ROLE_KEY ||
-  "";
-
-const supabase = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawServiceKey));
+const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
 /**
  * Calls the update_source_reputation PostgreSQL function to record
