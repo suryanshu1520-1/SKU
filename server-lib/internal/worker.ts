@@ -54,6 +54,8 @@ function deriveMinistryTag(text: string): string {
 }
 
 export default async function handler(req: any, res: any) {
+  console.log(`[Worker] Received request for source: ${req.query.source}`);
+
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
@@ -66,10 +68,10 @@ export default async function handler(req: any, res: any) {
   const sourceKey: string | undefined = req.query?.source;
 
   // Authenticate via Authorization header
-  const authHeader = req.headers?.authorization || '';
   const workerSecret = process.env.INTERNAL_WORKER_SECRET || '';
-  if (!workerSecret || authHeader !== `Bearer ${workerSecret}`) {
-    return res.status(401).json({ error: 'Unauthorized' });
+  if (req.headers.authorization !== `Bearer ${workerSecret}`) {
+    console.error(`[Worker] Auth failed! Received: ${req.headers.authorization}`);
+    return res.status(403).json({ error: 'Unauthorized' });
   }
 
   if (!sourceKey) {
@@ -229,11 +231,7 @@ export default async function handler(req: any, res: any) {
     const latency = Date.now() - startTime;
     await callUpdateSourceReputation(normalizedSource, false, latency);
 
-    console.error(`[internal/worker] Error processing ${normalizedSource}:`, err);
-    return res.status(500).json({
-      error: `Failed to process source: ${normalizedSource}`,
-      message: err.message || 'Unknown error',
-      latency_ms: latency,
-    });
+    console.error(`[Worker] CRITICAL FAILURE for ${req.query.source}:`, err);
+    return res.status(500).json({ error: 'Scraping failed', details: err.message });
   }
 }
