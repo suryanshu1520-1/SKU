@@ -53,6 +53,37 @@ function deriveMinistryTag(text: string): string {
   return 'Government of India';
 }
 
+// ================================================================
+// SUMMARY NORMALIZER: Enforces strict { bullets: string[] } contract
+// ================================================================
+function normalizeSummary(raw: any): { bullets: string[] } {
+  // Already valid object with bullets array
+  if (raw && typeof raw === 'object' && Array.isArray(raw.bullets)) {
+    return { bullets: raw.bullets.map((b: any) => String(b).trim()).filter((b: string) => b.length > 0) };
+  }
+  // String fallback: strip markdown, try JSON parse, then line-split
+  if (typeof raw === 'string') {
+    const cleaned = raw.replace(/```json|```/g, '').trim();
+    try {
+      const parsed = JSON.parse(cleaned);
+      if (parsed && typeof parsed === 'object' && Array.isArray(parsed.bullets)) {
+        return { bullets: parsed.bullets.map((b: any) => String(b).trim()).filter((b: string) => b.length > 0) };
+      }
+      // Fallback: extract any non-object values into bullet array
+      if (typeof parsed === 'string') {
+        const lines = parsed.split(/\n+/).map((l: string) => l.replace(/^[^a-zA-Z0-9]+/, '').trim()).filter(Boolean);
+        return { bullets: lines.slice(0, 3) };
+      }
+    } catch {
+      // Line-split fallback for raw prose or numbered lists
+      const lines = cleaned.split(/\n+/).map((l: string) => l.replace(/^[^a-zA-Z0-9]+/, '').trim()).filter(Boolean);
+      return { bullets: lines.slice(0, 3) };
+    }
+  }
+  // Last resort empty fallback
+  return { bullets: [] };
+}
+
 export default async function handler(req: any, res: any) {
   console.log(`[Worker] Received request for source: ${req.query.source}`);
 
@@ -90,39 +121,55 @@ export default async function handler(req: any, res: any) {
   try {
     console.log(`[internal/worker] Processing source=${normalizedSource} url=${feedUrl}`);
 
-    // Fetch RSS XML using got-scraping with granular timeouts and single retry
-    const response = await got.get(feedUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'application/xml, text/xml, */*',
-      },
-      timeout: {
-        lookup: 1000,
-        connect: 2000,
-        secureConnect: 2000,
-        response: 4000,
-        read: 5000,
-      },
-      retry: {
-        limit: 1,
-      },
-      responseType: 'text',
-    });
+    // ------ Source-specific fetch with granular error trace ------
+    let xml: string;
+    try {
+      const response = await got.get(feedUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'application/xml, text/xml, */*',
+        },
+        timeout: {
+          lookup: 1000,
+          connect: 2000,
+          secureConnect: 2000,
+          response: 4000,
+          read: 5000,
+        },
+        retry: {
+          limit: 1,
+        },
+        responseType: 'text',
+      });
+      xml = response.body;
+    } catch (fetchErr: any) {
+      const latency = Date.now() - startTime;
+      await callUpdateSourceReputation(normalizedSource, false, latency);
+      console.error("[Worker] Parser crash details for source " + normalizedSource + ":", fetchErr);
+      return res.status(502).json({ error: 'Network fetch failed', source: normalizedSource, details: fetchErr.message });
+    }
 
-    const xml = response.body;
     if (!xml || xml.length < 100) {
       const latency = Date.now() - startTime;
       await callUpdateSourceReputation(normalizedSource, false, latency);
-      return res.status(502).json({ error: 'Empty or too-short RSS feed response', latency });
+      return res.status(502).json({ error: 'Empty or too-short RSS feed response', latency, source: normalizedSource });
     }
 
-    // Parse RSS XML with fast-xml-parser
-    const parser = new XMLParser({
-      ignoreAttributes: false,
-      attributeNamePrefix: '@_',
-      isArray: (name) => name === 'item' || name === 'entry',
-    });
-    const parsed = parser.parse(xml);
+    // ------ Source-specific XML parse with granular error trace ------
+    let parsed: any;
+    try {
+      const parser = new XMLParser({
+        ignoreAttributes: false,
+        attributeNamePrefix: '@_',
+        isArray: (name) => name === 'item' || name === 'entry',
+      });
+      parsed = parser.parse(xml);
+    } catch (parseErr: any) {
+      const latency = Date.now() - startTime;
+      await callUpdateSourceReputation(normalizedSource, false, latency);
+      console.error("[Worker] Parser crash details for source " + normalizedSource + ":", parseErr);
+      return res.status(502).json({ error: 'XML parse failure', source: normalizedSource, details: parseErr.message });
+    }
 
     // Extract items (RSS 2.0: rss.channel.item, Atom: feed.entry)
     const channel = parsed?.rss?.channel || parsed?.feed;
@@ -145,72 +192,96 @@ export default async function handler(req: any, res: any) {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     for (const item of toProcess) {
-      // Extract fields (RSS uses title/link, Atom uses title/link with href)
-      const title = typeof item.title === 'string' ? item.title : item.title?.['#text'] || item.title?._text || '';
-      let link = '';
-      if (typeof item.link === 'string') {
-        link = item.link;
-      } else if (item.link?.['@_href']) {
-        link = item.link['@_href'];
-      } else if (item.link?._text) {
-        link = item.link._text;
-      }
+      try {
+        // ---- Defensive array-type guard for title ----
+        const rawTitle = item.title;
+        const title = Array.isArray(rawTitle)
+          ? rawTitle.find((t: any) => typeof t === 'string') || String(rawTitle[0]?.['#text'] || rawTitle[0]?._text || '')
+          : typeof rawTitle === 'string' ? rawTitle : rawTitle?.['#text'] || rawTitle?._text || '';
 
-      if (!title || !link) continue;
+        // ---- Defensive array-type guard for link ----
+        let link = '';
+        const rawLink = item.link;
+        if (typeof rawLink === 'string') {
+          link = rawLink;
+        } else if (Array.isArray(rawLink)) {
+          const firstLink = rawLink[0];
+          link = typeof firstLink === 'string' ? firstLink : firstLink?.['@_href'] || firstLink?._text || '';
+        } else if (rawLink?.['@_href']) {
+          link = rawLink['@_href'];
+        } else if (rawLink?._text) {
+          link = rawLink._text;
+        }
 
-      // Exclusion keyword filter
-      const description = typeof item.description === 'string' ? item.description : item.description?.['#text'] || item.contentSnippet || title;
-      const checkText = (title + ' ' + description).toUpperCase();
-      let excluded = false;
-      for (const keyword of EXCLUDE_KEYWORDS) {
-        if (checkText.includes(keyword)) { excluded = true; break; }
-      }
-      if (excluded) {
-        filtered++;
+        if (!title || !link) continue;
+
+        // ---- Defensive array-type guard for description ----
+        const rawDesc = item.description;
+        const description = Array.isArray(rawDesc)
+          ? rawDesc.map((d: any) => typeof d === 'string' ? d : d?.['#text'] || '').join(' ')
+          : typeof rawDesc === 'string' ? rawDesc : rawDesc?.['#text'] || item.contentSnippet || title;
+
+        // Exclusion keyword filter
+        const checkText = (title + ' ' + description).toUpperCase();
+        let excluded = false;
+        for (const keyword of EXCLUDE_KEYWORDS) {
+          if (checkText.includes(keyword)) { excluded = true; break; }
+        }
+        if (excluded) {
+          filtered++;
+          continue;
+        }
+
+        // Dedup check
+        const { data: existing } = await supabase
+          .from('current_affairs')
+          .select('id')
+          .eq('url', link)
+          .maybeSingle();
+
+        if (existing) {
+          duplicates++;
+          continue;
+        }
+
+        // Build raw summary payload from title + description
+        const cleanTitle = title.replace(/<!\[CDATA\[|\]\]>/g, '').trim();
+        const cleanDesc = typeof description === 'string'
+          ? description.replace(/<[^>]*>/g, '').replace(/<!\[CDATA\[|\]\]>/g, '').replace(/\s+/g, ' ').trim()
+          : '';
+
+        const rawSummary: string[] = [`${normalizedSource} release: ${cleanTitle}`];
+        if (cleanDesc) {
+          rawSummary.push(`Context: ${cleanDesc.substring(0, 200)}`);
+        }
+
+        const ministry = deriveMinistryTag(cleanTitle + ' ' + cleanDesc);
+
+        // Normalize summary through the resilient parser before insert
+        const normalizedSummary = normalizeSummary({ bullets: rawSummary });
+
+        const { error: upsertErr } = await supabase
+          .from('current_affairs')
+          .insert({
+            source: normalizedSource,
+            ministry,
+            headline: cleanTitle,
+            url: link,
+            summary: normalizedSummary,
+            created_at: new Date().toISOString()
+          });
+
+        if (upsertErr) {
+          console.error(`[internal/worker] Upsert error for "${cleanTitle.substring(0, 60)}":`, upsertErr);
+        } else {
+          processed++;
+          console.log(`[internal/worker] Ingested [${ministry}]: ${cleanTitle.substring(0, 60)}`);
+        }
+      } catch (itemErr: any) {
+        const itemTitle = typeof item?.title === 'string' ? item.title.substring(0, 60) : 'unknown';
+        console.error(`[Worker] Per-item processing crash for source ${normalizedSource} on "${itemTitle}":`, itemErr);
+        // Do not propagate per-item crash - let other items process
         continue;
-      }
-
-      // Dedup check
-      const { data: existing } = await supabase
-        .from('current_affairs')
-        .select('id')
-        .eq('url', link)
-        .maybeSingle();
-
-      if (existing) {
-        duplicates++;
-        continue;
-      }
-
-      // Build summary bullets from title + description
-      const cleanTitle = title.replace(/<!\[CDATA\[|\]\]>/g, '').trim();
-      const cleanDesc = typeof description === 'string'
-        ? description.replace(/<[^>]*>/g, '').replace(/<!\[CDATA\[|\]\]>/g, '').replace(/\s+/g, ' ').trim()
-        : '';
-
-      const bullets: string[] = [`${normalizedSource} release: ${cleanTitle}`];
-      if (cleanDesc) {
-        bullets.push(`Context: ${cleanDesc.substring(0, 200)}`);
-      }
-
-      const ministry = deriveMinistryTag(cleanTitle + ' ' + cleanDesc);
-
-      const { error: upsertErr } = await supabase
-        .from('current_affairs')
-        .insert({
-          source: normalizedSource,
-          ministry,
-          headline: cleanTitle,
-          url: link,
-          summary: { bullets },
-          created_at: new Date().toISOString()
-        });
-
-      if (upsertErr) {
-        console.error(`[internal/worker] Upsert error for "${cleanTitle.substring(0, 60)}":`, upsertErr);
-      } else {
-        processed++;
-        console.log(`[internal/worker] Ingested [${ministry}]: ${cleanTitle.substring(0, 60)}`);
       }
     }
 
