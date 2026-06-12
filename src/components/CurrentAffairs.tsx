@@ -43,12 +43,22 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
   const [ministries, setMinistries] = useState<string[]>([]);
   const [sources, setSources] = useState<string[]>([]);
 
+  // Background sync processing toast state
+  const [showBackgroundToast, setShowBackgroundToast] = useState(false);
+
   // Auto-dismiss toast
   useEffect(() => {
     if (!toastMsg) return;
     const t = setTimeout(() => setToastMsg(''), 4000);
     return () => clearTimeout(t);
   }, [toastMsg]);
+
+  // Auto-dismiss background sync toast
+  useEffect(() => {
+    if (!showBackgroundToast) return;
+    const t = setTimeout(() => setShowBackgroundToast(false), 5000);
+    return () => clearTimeout(t);
+  }, [showBackgroundToast]);
 
   // Cooldown countdown interval
   useEffect(() => {
@@ -159,6 +169,16 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
         const remaining = data.remaining || 300;
         setSyncCooldown(remaining);
         setErrorMsg(data.message || `Sync cooldown active. Please wait.`);
+        return;
+      }
+
+      if (response.status === 202) {
+        // Background ingestion dispatched -- do not block with spinner
+        setShowBackgroundToast(true);
+        setSyncSuccess(true);
+        // Reload data after a short delay so ingested items appear
+        setTimeout(() => fetchPolicyData(false), 10000);
+        setTimeout(() => setSyncSuccess(null), 5000);
         return;
       }
 
@@ -606,7 +626,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
           </div>
         )}
 
-        {/* Toast Notification */}
+        {/* Toast Notifications */}
         <AnimatePresence>
           {toastMsg && (
             <motion.div
@@ -617,6 +637,23 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
             >
               <p className="text-xs text-stone-200 font-sans whitespace-nowrap">
                 {toastMsg}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Background Sync Toast: shown when 202 Accepted returned */}
+        <AnimatePresence>
+          {showBackgroundToast && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[300] px-6 py-3 bg-zinc-900 border border-emerald-800/60 rounded-sm shadow-2xl"
+            >
+              <p className="text-xs text-emerald-300 font-sans whitespace-nowrap flex items-center gap-2">
+                <RefreshCw className="w-3 h-3 animate-spin text-emerald-400" />
+                Extraction initialized. Updates will pop live in your ledger momentarily.
               </p>
             </motion.div>
           )}
