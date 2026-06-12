@@ -4,6 +4,8 @@ import { got } from "got-scraping";
 import { createClient } from "@supabase/supabase-js";
 import { callUpdateSourceReputation } from "./reputation.js";
 import { upsertCurrentAffairs } from "../cron/db.js";
+import { getLlama3Insight } from "../cron/ai.js";
+import type { CronConfig } from "../cron/config.js";
 
 // Clean env helper
 function cleanEnvValue(val: any): string {
@@ -191,6 +193,21 @@ export default async function handler(req: any, res: any) {
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Build shared CronConfig for LLM inference
+    const sharedConfig: CronConfig = {
+      feeds: [],
+      maxItemsPerFeed: 1,
+      aiEndpointUrl: process.env.AI_ENDPOINT_URL || "https://sku1-meta-llama-llama-3-1-8b-instruct.hf.space/run/chat_fn",
+      supabaseUrl: supabaseUrl,
+      supabaseServiceRoleKey: supabaseKey,
+      timeoutMs: 20000,
+      maxConcurrency: 1,
+      browserHeaders: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "application/xml, text/xml, */*",
+      },
+    };
+
     for (const item of toProcess) {
       try {
         // ---- Defensive array-type guard for title ----
@@ -244,20 +261,39 @@ export default async function handler(req: any, res: any) {
           continue;
         }
 
-        // Build raw summary payload from title + description
+        // Clean fields for processing
         const cleanTitle = title.replace(/<!\[CDATA\[|\]\]>/g, '').trim();
         const cleanDesc = typeof description === 'string'
           ? description.replace(/<[^>]*>/g, '').replace(/<!\[CDATA\[|\]\]>/g, '').replace(/\s+/g, ' ').trim()
           : '';
 
-        const rawSummary: string[] = [`${normalizedSource} release: ${cleanTitle}`];
-        if (cleanDesc) {
-          rawSummary.push(`Context: ${cleanDesc.substring(0, 200)}`);
-        }
-
         const ministry = deriveMinistryTag(cleanTitle + ' ' + cleanDesc);
 
-        // Normalize summary through the resilient parser before insert
+        // Build policy text for LLM inference
+        const policyText = cleanTitle + (cleanDesc ? " " + cleanDesc : "");
+
+        // ---- AI summary extraction with fallback ----
+        let aiInsight: { text: string } | null = null;
+        try {
+          aiInsight = await getLlama3Insight(policyText, sharedConfig);
+        } catch (aiErr: any) {
+          console.error("[Worker] AI summary extraction failed for item: " + cleanTitle, aiErr);
+        }
+
+        const rawSummary: string[] = [];
+        if (aiInsight && aiInsight.text) {
+          const bulletLines = aiInsight.text.split("\n").map((l: string) => l.trim()).filter(Boolean);
+          rawSummary.push(...bulletLines);
+        } else {
+          // Smooth transition to structured three-bullet placeholder
+          rawSummary.push(`${normalizedSource} release: ${cleanTitle}`);
+          if (cleanDesc) {
+            rawSummary.push(`Context: ${cleanDesc.substring(0, 200)}`);
+          }
+          rawSummary.push("Summary pending.");
+        }
+
+        // Normalize summary through the resilient safety parser before insert
         const normalizedSummary = normalizeSummary({ bullets: rawSummary });
 
         const { error: upsertErr } = await supabase
