@@ -85,11 +85,11 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
           transition={{ duration: 0.5, delay: 0.5 }}
         >
           <button
-            onClick={onNavigateProfile}
+            onClick={onNavigateArena}
             className="group inline-flex items-center gap-2 py-3 px-8 bg-[#e0d0ab] text-zinc-950 font-sans text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-stone-100 transition-all shadow-lg shadow-[#e0d0ab]/10 hover:shadow-[#e0d0ab]/20"
           >
             <Target className="w-4 h-4" />
-            Start Your First Assessment
+            Enter The Arena
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </motion.div>

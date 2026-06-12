@@ -490,10 +490,22 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
               </div>
               <div>
                 <span className="block text-[9px] uppercase tracking-widest text-zinc-500 font-medium mb-1">PRIVILEGE GROUP</span>
-                <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-[#e0d0ab]/10 text-[#e0d0ab] rounded-sm text-[10px] uppercase font-bold tracking-widest border border-[#e0d0ab]/20">
-                  <Award className="w-3.5 h-3.5" />
-                  Standard Candidate
-                </div>
+                {loadingTier ? (
+                  <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-zinc-800/50 text-zinc-500 rounded-sm text-[10px] uppercase font-bold tracking-widest border border-zinc-800/40">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Loading...
+                  </div>
+                ) : membershipTier === 'premium' ? (
+                  <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-cyan-500/10 text-cyan-400 font-semibold rounded-sm text-[10px] uppercase tracking-widest border border-cyan-500/30 drop-shadow-[0_0_8px_rgba(34,211,238,0.6)] animate-pulse">
+                    <Crown className="w-3.5 h-3.5" />
+                    Premium Member
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-[#e0d0ab]/10 text-[#e0d0ab] rounded-sm text-[10px] uppercase font-bold tracking-widest border border-[#e0d0ab]/20">
+                    <Award className="w-3.5 h-3.5" />
+                    Standard Candidate
+                  </div>
+                )}
               </div>
               <div>
                 <span className="block text-[9px] uppercase tracking-widest text-zinc-500 font-medium mb-1">PROFILE VISIBILITY</span>

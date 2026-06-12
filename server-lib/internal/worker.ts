@@ -7,6 +7,21 @@ import { upsertCurrentAffairs } from "../cron/db.js";
 import { getLlama3Insight } from "../cron/ai.js";
 import type { CronConfig } from "../cron/config.js";
 
+// Fast HTML entity decoder for RSS text sanitization
+function decodeHtmlEntities(text: string): string {
+  if (!text) return "";
+  return text
+    .replace(/&#8217;/g, "'")
+    .replace(/&#8216;/g, "'")
+    .replace(/&#8220;/g, '"')
+    .replace(/&#8221;/g, '"')
+    .replace(/\x26amp;/g, '\x26')
+    .replace(/\x26lt;/g, '\x3C')
+    .replace(/\x26gt;/g, '\x3E')
+    .replace(/\x26quot;/g, '\x22')
+    .replace(/&#39;/g, "'");
+}
+
 // Clean env helper
 function cleanEnvValue(val: any): string {
   if (typeof val !== 'string') return '';
@@ -261,10 +276,14 @@ export default async function handler(req: any, res: any) {
           continue;
         }
 
+        // Apply HTML entity decoding BEFORE cleaning
+        const decodedTitle = decodeHtmlEntities(title);
+        const decodedDesc = decodeHtmlEntities(typeof description === 'string' ? description : '');
+
         // Clean fields for processing
-        const cleanTitle = title.replace(/<!\[CDATA\[|\]\]>/g, '').trim();
-        const cleanDesc = typeof description === 'string'
-          ? description.replace(/<[^>]*>/g, '').replace(/<!\[CDATA\[|\]\]>/g, '').replace(/\s+/g, ' ').trim()
+        const cleanTitle = decodedTitle.replace(/<!\[CDATA\[|\]\]>/g, '').trim();
+        const cleanDesc = typeof decodedDesc === 'string'
+          ? decodedDesc.replace(/<[^>]*>/g, '').replace(/<!\[CDATA\[|\]\]>/g, '').replace(/\s+/g, ' ').trim()
           : '';
 
         const ministry = deriveMinistryTag(cleanTitle + ' ' + cleanDesc);
