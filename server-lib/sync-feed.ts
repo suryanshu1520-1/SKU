@@ -33,13 +33,6 @@ const ALL_SOURCES = [
   "BUSINESS STANDARD"
 ];
 
-// Exponential backoff: 5 minutes * 2^(fail_count - 1), capped at 24 hours
-function computeCooldownMs(failCount: number): number {
-  if (failCount <= 0) return 0;
-  const raw = 5 * 60 * 1000 * Math.pow(2, failCount - 1);
-  return Math.min(raw, 86_400_000); // cap at 24 hours
-}
-
 export default async function handler(req: any, res: any) {
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -106,26 +99,35 @@ export default async function handler(req: any, res: any) {
           }
         }
 
-        const now = Date.now();
         const activeSources: string[] = [];
 
         for (const source of ALL_SOURCES) {
-          const rep = reputationMap[source];
-          const failCount = rep?.fail_count ?? 0;
+          const status = reputationMap[source];
+          console.log(`[sync-feed] Evaluating source: ${source}, status:`, status);
 
-          if (failCount > 0) {
-            const lastFailure = rep?.last_failure_at;
-            const lastFailureMs = lastFailure ? new Date(lastFailure).getTime() : 0;
-            const cooldownMs = computeCooldownMs(failCount);
+          let isEligible = true; // Open by default
 
-            if (now - lastFailureMs < cooldownMs) {
-              console.log("Adaptive Scraper: Backing off from volatile source: " + source);
-              continue;
+          // Only apply backoff logic if the record explicitly shows failures
+          if (status && status.fail_count > 0 && status.last_failure_at) {
+            const lastFail = new Date(status.last_failure_at).getTime();
+            const cooldown = 5 * 60 * 1000 * Math.pow(2, status.fail_count - 1);
+
+            const diff = Date.now() - lastFail;
+            console.log(`[sync-feed] Backoff check for ${source}: diff=${diff}, cooldown=${cooldown}`);
+
+            // If within the cooldown period, skip
+            if (diff < Math.min(cooldown, 86400000)) {
+              console.log(`[sync-feed] Adaptive Scraper: Backing off from volatile source: ${source}`);
+              isEligible = false;
             }
           }
 
-          activeSources.push(source);
+          if (isEligible) {
+            activeSources.push(source);
+          }
         }
+
+        console.log(`[sync-feed] Active sources identified for dispatch:`, activeSources);
 
         // Step 3: Construct absolute base URL for internal worker dispatch
         const baseUrl = process.env.VERCEL_URL
