@@ -10,6 +10,7 @@ import syncFeedHandler from "../server-lib/sync-feed.js";
 import trainingQuestionsHandler from "../server-lib/training-questions.js";
 import registerHandler from "../server-lib/auth/register.js";
 import scrapeHandler from "../server-lib/cron/scrape.js";
+import internalWorkerHandler from "../server-lib/internal/worker.js";
 import newsdataHandler from "../server-lib/cron/newsdata.js";
 import resetLeaderboardHandler from "../server-lib/cron/reset-leaderboard.js";
 
@@ -55,6 +56,7 @@ app.post("/api/insights", insightsHandler);
 app.get("/api/questions", questionsHandler);
 app.post("/api/submit-quiz", submitQuizHandler);
 app.post("/api/sync-feed", syncFeedHandler);
+app.get("/api/internal/worker", internalWorkerHandler);
 app.post("/api/training-questions", trainingQuestionsHandler);
 app.post("/api/auth/register", registerHandler);
 

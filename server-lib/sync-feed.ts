@@ -19,148 +19,24 @@ const rawServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ||
 
 const supabase = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawServiceKey));
 
-const COOLDOWN_SECONDS = 300; // 5 minutes
+const COOLDOWN_SECONDS = 300; // 5 minutes user-level throttle
 
-// Lightweight per-feed sync: fetches the PIB RSS feed only, processes up to 3
-// items with zero AI inference and zero deep scraping, completing in <5 seconds.
-async function quickFeedSync(): Promise<{ processed: number; error: string | null }> {
-  try {
-    const feedUrl = 'https://pib.gov.in/RssFeed.aspx?PingID=1';
-    console.log('[sync-feed][quick] Fetching PIB RSS feed...');
-    const res = await fetch(feedUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'application/xml, text/xml, */*'
-      },
-      signal: AbortSignal.timeout(15000)
-    });
+// 7 target sources for the adaptive scraper engine
+const ALL_SOURCES = [
+  "PIB",
+  "ECONOMIC TIMES",
+  "LIVEMINT",
+  "THE HINDU",
+  "RBI",
+  "INDIAN EXPRESS",
+  "BUSINESS STANDARD"
+];
 
-    if (!res.ok) {
-      console.warn(`[sync-feed][quick] PIB feed returned ${res.status}`);
-      return { processed: 0, error: `PIB feed returned status ${res.status}` };
-    }
-
-    const xml = await res.text();
-    if (!xml || xml.length < 100) {
-      return { processed: 0, error: 'Empty or too-short PIB feed response' };
-    }
-
-    const items: Array<{ title: string; link: string; description: string; source: string }> = [];
-    const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
-    let match;
-    let limit = 0;
-
-    while ((match = itemRegex.exec(xml)) !== null && limit < 3) {
-      const itemContent = match[1];
-      const titleMatch = itemContent.match(/<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/i);
-      const linkMatch = itemContent.match(/<link>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/link>/i);
-      const descriptionMatch = itemContent.match(/<description>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/description>/i);
-
-      let title = titleMatch ? titleMatch[1].trim() : '';
-      let link = linkMatch ? linkMatch[1].trim() : '';
-      let description = descriptionMatch ? descriptionMatch[1].trim() : '';
-
-      if (title && link) {
-        title = title.replace(/<!\[CDATA\[|\]\]>/g, '').trim();
-        link = link.replace(/<!\[CDATA\[|\]\]>/g, '').trim();
-        description = description
-          .replace(/<[^>]*>/g, '')
-          .replace(/<!\[CDATA\[|\]\]>/g, '')
-          .replace(/\s+/g, ' ')
-          .trim();
-
-        items.push({ title, link, description: description.substring(0, 300), source: 'PIB' });
-        limit++;
-      }
-    }
-
-    console.log(`[sync-feed][quick] Parsed ${items.length} items from PIB feed`);
-
-    // Exclusion keywords (zero AI cost pre-filter)
-    const EXCLUDE_KEYWORDS = [
-      'MURDER', 'RAPE', 'ACCIDENT', 'ASSAULT', 'ARRESTED', 'DIED', 'DEATH',
-      'CELEBRITY', 'CINEMA', 'FILM', 'BOLLYWOOD', 'CRIME'
-    ];
-
-    let processed = 0;
-    for (const article of items) {
-      const checkText = (article.title + ' ' + article.description).toUpperCase();
-      let excluded = false;
-      for (const keyword of EXCLUDE_KEYWORDS) {
-        if (checkText.includes(keyword)) { excluded = true; break; }
-      }
-      if (excluded) continue;
-
-      // Check for existing duplicate
-      const { data: existing } = await supabase
-        .from('current_affairs')
-        .select('id')
-        .eq('url', article.link)
-        .maybeSingle();
-
-      if (existing) continue;
-
-      // Deterministic ministry tagging (zero AI cost)
-      let ministry = 'Government of India';
-      const combined = (article.title + ' ' + article.description).toUpperCase();
-      if (combined.includes('FINANCE') || combined.includes('ECONOMY') || combined.includes('BUDGET') || combined.includes('TAX')) {
-        ministry = 'Ministry of Finance';
-      } else if (combined.includes('DEFENCE') || combined.includes('DEFENSE') || combined.includes('MILITARY')) {
-        ministry = 'Ministry of Defence';
-      } else if (combined.includes('COMMERCE') || combined.includes('TRADE') || combined.includes('EXPORT') || combined.includes('IMPORT')) {
-        ministry = 'Ministry of Commerce & Industry';
-      } else if (combined.includes('CABINET') || combined.includes('GOVERNMENT') || combined.includes('PRIME MINISTER') || combined.includes('PMO')) {
-        ministry = 'Union Cabinet';
-      } else if (combined.includes('EDUCATION') || combined.includes('SCHOOL') || combined.includes('COLLEGE') || combined.includes('UNIVERSITY')) {
-        ministry = 'Ministry of Education';
-      } else if (combined.includes('HEALTH') || combined.includes('HOSPITAL') || combined.includes('MEDICAL') || combined.includes('AYUSH')) {
-        ministry = 'Ministry of Health and Family Welfare';
-      } else if (combined.includes('AGRICULTURE') || combined.includes('FARMER') || combined.includes('FARM')) {
-        ministry = 'Ministry of Agriculture & Farmers Welfare';
-      } else if (combined.includes('RAILWAY') || combined.includes('RAIL') || combined.includes('TRAIN')) {
-        ministry = 'Ministry of Railways';
-      } else if (combined.includes('POWER') || combined.includes('ENERGY') || combined.includes('ELECTRICITY') || combined.includes('RENEWABLE')) {
-        ministry = 'Ministry of Power';
-      } else if (combined.includes('HOME') || combined.includes('INTERNAL SECURITY') || combined.includes('POLICE')) {
-        ministry = 'Ministry of Home Affairs';
-      } else if (combined.includes('EXTERNAL') || combined.includes('FOREIGN') || combined.includes('DIPLOMATIC') || combined.includes('EMBASSY')) {
-        ministry = 'Ministry of External Affairs';
-      } else if (combined.includes('RBI') || combined.includes('RESERVE BANK') || combined.includes('MONETARY') || combined.includes('BANKING')) {
-        ministry = 'Reserve Bank of India';
-      }
-
-      // Build a headline-based summary (no AI, no deep scrape)
-      const bullets = [
-        `PIB release: ${article.title}`,
-        article.description
-          ? `Context: ${article.description.substring(0, 200)}`
-          : 'Latest administrative update from PIB.',
-      ].filter(Boolean);
-
-      const { error: upsertErr } = await supabase
-        .from('current_affairs')
-        .insert({
-          source: 'PIB',
-          ministry,
-          headline: article.title,
-          url: article.link,
-          summary: { bullets },
-          created_at: new Date().toISOString()
-        });
-
-      if (upsertErr) {
-        console.error(`[sync-feed][quick] Upsert error for "${article.title.substring(0, 60)}":`, upsertErr);
-      } else {
-        processed++;
-        console.log(`[sync-feed][quick] Ingested [${ministry}]: ${article.title.substring(0, 60)}`);
-      }
-    }
-
-    return { processed, error: null };
-  } catch (err: any) {
-    console.error('[sync-feed][quick] Error:', err);
-    return { processed: 0, error: err.message || 'Quick sync error' };
-  }
+// Exponential backoff: 5 minutes * 2^(fail_count - 1), capped at 24 hours
+function computeCooldownMs(failCount: number): number {
+  if (failCount <= 0) return 0;
+  const raw = 5 * 60 * 1000 * Math.pow(2, failCount - 1);
+  return Math.min(raw, 86_400_000); // cap at 24 hours
 }
 
 export default async function handler(req: any, res: any) {
@@ -179,7 +55,7 @@ export default async function handler(req: any, res: any) {
       return res.status(400).json({ error: 'Missing required field: userId' });
     }
 
-    // Step 1: Query the user's last_sync_timestamp
+    // Step 1: Query the user's last_sync_timestamp (user-level throttle)
     const { data: profile, error: profileError } = await supabase
       .from('user_profiles')
       .select('last_sync_timestamp')
@@ -207,18 +83,76 @@ export default async function handler(req: any, res: any) {
       }
     }
 
-    // Step 2: Dispatch 202 Accepted immediately -- do not block the HTTP response
+    // Step 2: Query source_reputation for all sources
+    const { data: reputationRows } = await supabase
+      .from('source_reputation')
+      .select('source_id, fail_count, last_failure_at')
+      .in('source_id', ALL_SOURCES);
+
+    const reputationMap: Record<string, { fail_count: number; last_failure_at: string | null }> = {};
+    if (reputationRows) {
+      for (const row of reputationRows) {
+        reputationMap[row.source_id] = {
+          fail_count: row.fail_count ?? 0,
+          last_failure_at: row.last_failure_at
+        };
+      }
+    }
+
+    const now = Date.now();
+    const activeSources: string[] = [];
+
+    for (const source of ALL_SOURCES) {
+      const rep = reputationMap[source];
+      const failCount = rep?.fail_count ?? 0;
+
+      if (failCount > 0) {
+        const lastFailure = rep?.last_failure_at;
+        const lastFailureMs = lastFailure ? new Date(lastFailure).getTime() : 0;
+        const cooldownMs = computeCooldownMs(failCount);
+
+        if (now - lastFailureMs < cooldownMs) {
+          console.log("Adaptive Scraper: Backing off from volatile source: " + source);
+          continue; // skip this source
+        }
+      }
+
+      activeSources.push(source);
+    }
+
+    // Step 3: Construct absolute base URL for internal worker dispatch
+    const baseUrl = process.env.VERCEL_URL
+      ? "https://" + process.env.VERCEL_URL
+      : "http://localhost:3000";
+
+    const workerSecret = process.env.INTERNAL_WORKER_SECRET || "";
+
+    // Step 4: Fire-and-forget concurrent dispatch to internal worker endpoints
+    for (const source of activeSources) {
+      const workerUrl = `${baseUrl}/api/internal/worker?source=${encodeURIComponent(source)}`;
+      const headers: Record<string, string> = {
+        'Accept': 'application/json',
+      };
+      if (workerSecret) {
+        headers['Authorization'] = 'Bearer ' + workerSecret;
+      }
+
+      // Non-blocking: fire fetch, do NOT await response body
+      fetch(workerUrl, { headers }).catch((err: any) => {
+        console.error("[sync-feed] Worker fetch error for " + source + ":", err);
+      });
+    }
+
+    // TCP safety buffer: ensure outbound sockets begin opening before response
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    // Step 5: Return 202 Accepted immediately
     res.status(202).json({
-      status: 'processing',
-      message: 'Policy extraction pipeline initiated in background.'
+      status: "processing",
+      active_sources: activeSources
     });
 
-    // Step 3: Execute lightweight quick sync in the background.
-    // Vercel serverless functions maintain a grace period after response delivery,
-    // allowing this brief <5s execution to complete before teardown.
-    const syncResult = await quickFeedSync();
-
-    // Step 4: Update the last_sync_timestamp regardless of sync outcome
+    // Step 6: Update the last_sync_timestamp in background
     const { error: updateError } = await supabase
       .from('user_profiles')
       .update({ last_sync_timestamp: new Date().toISOString() })
@@ -228,13 +162,13 @@ export default async function handler(req: any, res: any) {
       console.error('[sync-feed] Failed to update sync timestamp:', updateError);
     }
 
-    console.log(`[sync-feed] Background sync complete: ${syncResult.processed} items ingested.`);
+    console.log("[sync-feed] Dispatched " + activeSources.length + " active sources: " + activeSources.join(", "));
 
-    if (syncResult.error) {
-      console.warn(`[sync-feed] Background sync had error: ${syncResult.error}`);
-    }
   } catch (err: any) {
     console.error('[sync-feed] Handler error:', err);
-    // Response already sent (202) at this point -- no further action needed
+    // Response may already be sent (202); if not, send a fallback
+    if (!res.headersSent) {
+      return res.status(500).json({ error: err.message || "An unexpected error occurred." });
+    }
   }
 }
