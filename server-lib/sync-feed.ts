@@ -130,26 +130,31 @@ export default async function handler(req: any, res: any) {
         console.log(`[sync-feed] Active sources identified for dispatch:`, activeSources);
 
         // Step 3: Construct absolute base URL for internal worker dispatch
-        const baseUrl = process.env.VERCEL_URL
-          ? "https://" + process.env.VERCEL_URL
-          : "http://localhost:3000";
+        // Use production domain to guarantee reachability; fallback for local dev
+        const baseUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+          ? "https://" + process.env.VERCEL_PROJECT_PRODUCTION_URL
+          : "https://tarkv1.vercel.app";
 
         const workerSecret = process.env.INTERNAL_WORKER_SECRET || "";
 
-        // Step 4: Fire-and-forget concurrent dispatch to internal worker endpoints
-        for (const source of activeSources) {
-          const workerUrl = baseUrl + "/api/internal/worker?source=" + encodeURIComponent(source);
-          const headers: Record<string, string> = {
-            'Accept': 'application/json',
-          };
-          if (workerSecret) {
-            headers['Authorization'] = 'Bearer ' + workerSecret;
-          }
+        // Step 4: Await dispatches using Promise.all to force the event loop
+        // to hold open until outbound network requests are fired.
+        await Promise.all(activeSources.map(async (source) => {
+          const targetUrl = baseUrl + "/api/internal/worker?source=" + encodeURIComponent(source);
+          console.log("[sync-feed] Attempting dispatch to: " + targetUrl);
 
-          fetch(workerUrl, { headers }).catch((err: any) => {
-            console.error("[sync-feed] Worker fetch error for " + source + ":", err);
-          });
-        }
+          try {
+            const response = await fetch(targetUrl, {
+              headers: {
+                'Accept': 'application/json',
+                'Authorization': 'Bearer ' + workerSecret,
+              }
+            });
+            console.log("[sync-feed] Dispatch success for " + source + ": " + response.status);
+          } catch (error) {
+            console.error("[sync-feed] Dispatch FAILED for " + source + ":", error);
+          }
+        }));
 
         // Step 5: Update the last_sync_timestamp after dispatch
         const { error: updateError } = await supabase
