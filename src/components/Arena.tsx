@@ -195,7 +195,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
     }
 
     const activeMeta = loadActiveSessionMeta();
-    if (activeMeta && activeMeta.isRanked) {
+    if (activeMeta) {
       const fullCached = loadSessionFromCache();
       if (fullCached && fullCached.userId === userId && fullCached.questions.length > 0 && !fullCached.quizSubmitted) {
         // Hydrate all state from cache
