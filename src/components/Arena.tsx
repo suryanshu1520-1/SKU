@@ -174,6 +174,137 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
   const [showPaywallModal, setShowPaywallModal] = useState(false);
   const [isAIFrostedGlass, setIsAIFrostedGlass] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
+  const [processingPayment, setProcessingPayment] = useState(false);
+
+  // Inject Razorpay checkout script dynamically
+  useEffect(() => {
+    if (document.getElementById('razorpay-checkout-script')) return;
+    const script = document.createElement('script');
+    script.id = 'razorpay-checkout-script';
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+  
+  // Handle Founders Club payment with Razorpay
+  const handleJoinFoundersClub = async () => {
+    if (processingPayment) return;
+    setProcessingPayment(true);
+    setToastMsg('');
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const currentUserId = session?.user?.id || userId;
+      
+      // Step 1: Create Razorpay order via backend
+      const orderRes = await fetch('/api/create-razorpay-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUserId }),
+      });
+      
+      const orderData = await orderRes.json();
+      
+      // Handle 403 — Founders Club is full
+      if (orderRes.status === 403) {
+        setToastMsg(orderData.error || 'Founders Club is full. The 500-seat capacity has been reached.');
+        setProcessingPayment(false);
+        return;
+      }
+      
+      // Handle already premium
+      if (orderData.alreadyPremium) {
+        setToastMsg('You are already a Founders Club member!');
+        setShowPaywallModal(false);
+        setProcessingPayment(false);
+        return;
+      }
+      
+      if (!orderRes.ok || !orderData.order_id) {
+        setToastMsg(orderData.error || 'Failed to initiate payment. Please try again.');
+        setProcessingPayment(false);
+        return;
+      }
+      
+      // Step 2: Check if Razorpay is loaded
+      if (!(window as any).Razorpay) {
+        setToastMsg('Payment gateway is loading. Please try again in a moment.');
+        setProcessingPayment(false);
+        return;
+      }
+      
+      // Step 3: Launch Razorpay checkout modal
+      const razorpayKeyId = orderData.key_id;
+      const options = {
+        key: razorpayKeyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Tark 1.0',
+        description: 'Founders Club Membership',
+        order_id: orderData.order_id,
+        prefill: {
+          name: session?.user?.user_metadata?.name || '',
+          email: session?.user?.email || '',
+        },
+        theme: {
+          color: '#e0d0ab',
+        },
+        handler: async function(response: any) {
+          // Payment successful — verify on backend
+          setToastMsg('Payment successful! Verifying membership...');
+          
+          try {
+            const verifyRes = await fetch('/api/verify-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+                userId: currentUserId,
+              }),
+            });
+            
+            const verifyData = await verifyRes.json();
+            
+            if (verifyRes.ok && verifyData.success) {
+              setToastMsg('Welcome to Founders Club! 🎉');
+              setShowPaywallModal(false);
+              // Refresh user profile membership display by toggling
+              // The user will see their new premium status on next profile load
+            } else {
+              setToastMsg(verifyData.error || 'Payment verified but membership update failed. Contact support with ID: ' + response.razorpay_payment_id);
+            }
+          } catch (verifyErr) {
+            console.error('[Arena] Payment verification error:', verifyErr);
+            setToastMsg('Payment verified but connection issue. Your membership will be activated shortly.');
+          }
+          
+          setProcessingPayment(false);
+        },
+        modal: {
+          ondismiss: function() {
+            setProcessingPayment(false);
+            setToastMsg('Payment cancelled. You can upgrade anytime.');
+          },
+        },
+      };
+      
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on('payment.failed', function(response: any) {
+        console.error('[Arena] Razorpay payment failed:', response.error);
+        setToastMsg('Payment failed: ' + (response.error?.description || 'Please try again.'));
+        setProcessingPayment(false);
+      });
+      
+      rzp.open();
+      
+    } catch (err: any) {
+      console.error('[Arena] Payment flow error:', err);
+      setToastMsg(err.message || 'Payment processing error. Please try again.');
+      setProcessingPayment(false);
+    }
+  };
 
   // Bifurcation states
   const [isRanked, setIsRanked] = useState(true);
@@ -929,9 +1060,9 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
                   </div>
                   <h2 className="text-xs uppercase tracking-widest font-bold text-zinc-400 mb-4">Training Ground Locked</h2>
                   <p className="text-sm text-stone-300 leading-relaxed mb-6 font-sans">Unlock the Training Ground with Founders Club. Custom assessments, zero ranking pressure.</p>
-                  <button onClick={() => setToastMsg('Payment Gateway Integration Pending')} className="w-full flex items-center justify-center gap-2 py-2.5 px-6 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded-sm transition-all shadow-lg shadow-[#e0d0ab]/10 mb-3">
+                  <button onClick={handleJoinFoundersClub} disabled={processingPayment} className="w-full flex items-center justify-center gap-2 py-2.5 px-6 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded-sm transition-all shadow-lg shadow-[#e0d0ab]/10 mb-3 disabled:opacity-50 disabled:cursor-not-allowed">
                     <Crown className="w-4 h-4" />
-                    Join Founders Club: Rs 51
+                    {processingPayment ? 'Processing...' : 'Join Founders Club: ₹399'}
                   </button>
                   <button onClick={() => setShowPaywallModal(false)} className="text-[10px] text-zinc-600 hover:text-zinc-400 uppercase tracking-wider font-mono transition-colors">
                     Continue Free

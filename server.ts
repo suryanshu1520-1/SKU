@@ -9,6 +9,8 @@ import scrapeHandler from "./server-lib/cron/scrape.js";
 import newsdataHandler from "./server-lib/cron/newsdata.js";
 import syncFeedHandler from "./server-lib/sync-feed.js";
 import trainingQuestionsHandler from "./server-lib/training-questions.js";
+import createRazorpayOrderHandler from "./server-lib/create-razorpay-order.js";
+import verifyPaymentHandler from "./server-lib/verify-payment.js";
 
 dotenv.config();
 
@@ -168,6 +170,8 @@ async function startServer() {
   app.post("/api/cron/newsdata", newsdataHandler);
   app.post("/api/sync-feed", syncFeedHandler);
   app.post("/api/training-questions", trainingQuestionsHandler);
+  app.post("/api/create-razorpay-order", createRazorpayOrderHandler);
+  app.post("/api/verify-payment", verifyPaymentHandler);
 
   app.get("/api/questions", async (req, res) => {
     try {

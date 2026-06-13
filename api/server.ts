@@ -13,6 +13,8 @@ import scrapeHandler from "../server-lib/cron/scrape.js";
 import internalWorkerHandler from "../server-lib/internal/worker.js";
 import newsdataHandler from "../server-lib/cron/newsdata.js";
 import resetLeaderboardHandler from "../server-lib/cron/reset-leaderboard.js";
+import createRazorpayOrderHandler from "../server-lib/create-razorpay-order.js";
+import verifyPaymentHandler from "../server-lib/verify-payment.js";
 
 function cleanEnvValue(val: any): string {
   if (typeof val !== 'string') return '';
@@ -59,6 +61,8 @@ app.post("/api/sync-feed", syncFeedHandler);
 app.get("/api/internal/worker", internalWorkerHandler);
 app.post("/api/training-questions", trainingQuestionsHandler);
 app.post("/api/auth/register", registerHandler);
+app.post("/api/create-razorpay-order", createRazorpayOrderHandler);
+app.post("/api/verify-payment", verifyPaymentHandler);
 
 // Inline API routes
 app.get("/api/questions/inline", async (req: any, res: any) => {
