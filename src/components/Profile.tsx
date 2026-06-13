@@ -341,7 +341,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
     setExpandedInsightId(prev => prev === id ? null : id);
   };
 
-  // CSV Export utility — native Blob, zero dependencies
+  // CSV Export utility
   const exportToCSV = () => {
     if (!history || history.length === 0) return;
     const headers = "Date,Correct,Incorrect,Unattempted,Total Time (s),Percentile\n";
@@ -384,7 +384,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
               </div>
               <div>
                 <h3 className="font-sans font-bold text-xs uppercase tracking-widest text-zinc-400">Account Identity</h3>
-                <p className="text-stone-300 text-[10px] font-mono leading-none mt-0.5">AUTHENTICATED TERMINAL</p>
+                <p className="text-stone-300 text-[10px] font-mono leading-none mt-0.5">AUTHENTICATED</p>
               </div>
             </div>
 
@@ -485,11 +485,11 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
                 )}
               </div>
               <div>
-                <span className="block text-[9px] uppercase tracking-widest text-zinc-500 font-medium mb-1">SECURE PROTOCOL EMAIL</span>
+                <span className="block text-[9px] uppercase tracking-widest text-zinc-500 font-medium mb-1">EMAIL ADDRESS</span>
                 <p className="text-sm text-zinc-300 font-mono select-all truncate">{userEmail}</p>
               </div>
               <div>
-                <span className="block text-[9px] uppercase tracking-widest text-zinc-500 font-medium mb-1">PRIVILEGE GROUP</span>
+                <span className="block text-[9px] uppercase tracking-widest text-zinc-500 font-medium mb-1">MEMBERSHIP</span>
                 {loadingTier ? (
                   <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-zinc-800/50 text-zinc-500 rounded-sm text-[10px] uppercase font-bold tracking-widest border border-zinc-800/40">
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -559,7 +559,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
               </div>
               <div>
                 <h3 className="font-sans font-bold text-xs uppercase tracking-widest text-zinc-400">Tactical Baseline</h3>
-                <p className="text-stone-300 text-[10px] font-mono leading-none mt-0.5">LAST ATTEMPT SCORECARDS</p>
+                <p className="text-stone-300 text-[10px] font-mono leading-none mt-0.5">LAST ATTEMPT</p>
               </div>
             </div>
 
@@ -577,7 +577,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
                 </div>
 
                 <div className="flex items-center justify-between px-4 py-3 bg-zinc-900/40 border border-zinc-800/80 rounded-sm">
-                  <span className="text-xs text-zinc-400">Unattempted protocols</span>
+                  <span className="text-xs text-zinc-400">Unanswered</span>
                   <span className="text-sm font-mono font-bold text-zinc-300">{lastAttempt.unattempted_count}</span>
                 </div>
                 
@@ -588,8 +588,8 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
             ) : (
               <div className="flex flex-col items-center justify-center h-48 text-center text-zinc-500">
                 <AlertCircle className="w-8 h-8 opacity-40 mb-3" />
-                <p className="text-xs">No simulation session registered for this terminal.</p>
-                <p className="text-[10px] uppercase tracking-wider text-[#e0d0ab] mt-2 font-semibold">Ready to begin initial evaluation.</p>
+                <p className="text-xs">No attempts registered for this account.</p>
+                <p className="text-[10px] uppercase tracking-wider text-[#e0d0ab] mt-2 font-semibold">Ready to begin initial assessment.</p>
               </div>
             )}
           </div>
@@ -610,146 +610,30 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
 
             <div className="space-y-4">
               <div className="flex items-center justify-between py-2 border-b border-zinc-800/40">
-                <span className="text-xs text-zinc-400">Total Simulation Sessions</span>
+                <span className="text-xs text-zinc-400">Total Attempts</span>
                 <span className="text-sm font-mono font-bold text-stone-100">{totalAttempts}</span>
               </div>
               <div className="flex items-center justify-between py-2 border-b border-zinc-800/40">
                 <span className="text-xs text-zinc-400 inline-flex items-center gap-1.5">
-                  Mean Score (Correct Protocols)
+                  Mean Score
                   <InfoTooltip text="Earn 25 CP per Vanguard Assessment by breaching the 80% accuracy threshold." />
                 </span>
                 <span className="text-sm font-mono font-bold text-emerald-400">{averageCorrect} <span className="text-[10px] text-zinc-500">/ 25</span></span>
               </div>
               <div className="flex items-center justify-between py-2 border-b border-zinc-800/40">
-                <span className="text-xs text-zinc-400">Optimal Historical Attempt</span>
+                <span className="text-xs text-zinc-400">Best Score</span>
                 <span className="text-sm font-mono font-bold text-[#e0d0ab]">{bestScore} <span className="text-[10px] text-zinc-500">/ 25</span></span>
               </div>
             </div>
           </div>
 
           <div className="mt-6 p-4 bg-zinc-900/40 border border-zinc-800/50 rounded-sm text-[10px] leading-relaxed text-zinc-500">
-            Analytics aggregated from real-time database transactions. Candidate details and security session tags are automatically scrubbed upon terminal checkout.
+            Analytics aggregated from real-time database transactions.
           </div>
         </div>
       </div>
 
-      {/* Lower Section: Full Quiz History */}
-      <div id="quiz-history-section" className="bg-zinc-900/10 border border-zinc-800 p-6 rounded-sm">
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-800">
-          <div className="flex items-center gap-2">
-            <History className="w-4.5 h-4.5 text-[#e0d0ab]" />
-            <h3 className="font-sans font-bold text-xs uppercase tracking-widest text-zinc-400">Historic Simulation Records</h3>
-          </div>
-          {/* CSV Export Button */}
-          <button
-            onClick={handleExportClick}
-            disabled={history.length === 0 || loadingTier}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-[9px] uppercase font-bold tracking-widest rounded-sm border transition-all ${
-              membershipTier === 'premium'
-                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20 cursor-pointer'
-                : 'bg-zinc-900/30 text-zinc-600 border-zinc-800/40 opacity-50 cursor-not-allowed'
-            } disabled:opacity-40 disabled:cursor-not-allowed`}
-            title={membershipTier === 'premium' ? 'Export CSV' : 'Upgrade to Founders Club to export'}
-          >
-            <Download className="w-3 h-3" />
-            {membershipTier === 'premium' ? 'Export CSV' : 'Export Locked'}
-            {membershipTier === 'premium' && <Crown className="w-3 h-3 text-emerald-400" />}
-          </button>
-        </div>
-
-        {loading ? (
-          <div className="py-12 flex items-center justify-center text-zinc-500">
-            <span className="animate-pulse text-xs font-mono">RETRIEVING ATTEMPTS LOG...</span>
-          </div>
-        ) : errorMsg ? (
-          <div className="py-8 text-center text-rose-400 text-xs font-sans">
-            {errorMsg}
-          </div>
-        ) : history.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center text-zinc-600">
-            <Inbox className="w-10 h-10 opacity-30 mb-3" />
-            <p className="text-xs">No prior session records mapped to this email identity.</p>
-            <p className="text-[10px] text-zinc-500 mt-1 uppercase tracking-tighter">Enter the Test Arena to register your first record.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse font-sans">
-              <thead>
-                <tr className="border-b border-zinc-900 text-zinc-500 text-[9px] uppercase tracking-widest font-bold">
-                  <th className="py-3 px-4">SEQUENCE IDENTIFIER</th>
-                  <th className="py-3 px-4">TIMESTAMP</th>
-                  <th className="py-3 px-4">CORRECT RATIO</th>
-                  <th className="py-3 px-4">ACCURACY STATUS</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-900 text-xs">
-                {history.map((attempt, index) => {
-                  const totalCount = (attempt.correct_count || 0) + (attempt.incorrect_count || 0) + (attempt.unattempted_count || 0);
-                  const maxPossible = totalCount > 0 ? totalCount : 25;
-                  const ratio = ((attempt.correct_count / maxPossible) * 100).toFixed(0);
-                  const isExcellent = Number(ratio) >= 70;
-                  const isPass = Number(ratio) >= 40;
-
-                  return (
-                    <tr key={attempt.id || index} className="hover:bg-zinc-900/30 text-stone-300 transition-colors">
-                      <td className="py-4 px-4 font-mono text-zinc-500 text-[10px]/none uppercase">
-                        AT-{attempt.id ? attempt.id.substring(0, 8) : `LOG${history.length - index}`}
-                      </td>
-                      <td className="py-4 px-4 font-mono text-[11px] text-zinc-400">
-                        {formatDate(attempt.created_at)}
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-mono text-stone-100 font-bold">{attempt.correct_count}</span>
-                          <span className="text-zinc-600 font-mono">/</span>
-                          <span className="text-zinc-500 font-mono text-[10px]">{maxPossible}</span>
-                          <span className="text-[10px] text-zinc-500 font-mono ml-1">({ratio}%)</span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4">
-                        <span className={`inline-flex items-center gap-1 text-[9px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-sm ${
-                          isExcellent
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                            : isPass
-                              ? 'bg-amber-500/10 text-[#e0d0ab] border border-amber-500/20'
-                              : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                        }`}>
-                          {isExcellent ? (
-                            <CheckCircle2 className="w-3 h-3" />
-                          ) : isPass ? (
-                            <CheckCircle2 className="w-3 h-3" />
-                          ) : (
-                            <XCircle className="w-3 h-3" />
-                          )}
-                          {isExcellent ? 'ADVANCED' : isPass ? 'ADEQUATE' : 'MARGINAL'}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      {/* Export Toast Notification */}
-      <AnimatePresence>
-        {exportToast && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] px-6 py-3 bg-zinc-900 border border-zinc-700/60 rounded-sm shadow-2xl"
-          >
-            <p className="text-xs text-stone-200 font-sans whitespace-nowrap">
-              {exportToast}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Saved Information Section (Requirement A - Bookmark Flashcard UI) */}
+      {/* Saved Information Section - moved ABOVE Previous Attempts */}
       <div id="saved-information-section" className="bg-zinc-900/10 border border-zinc-800 p-6 rounded-sm">
         <div className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-800">
           <div className="flex items-center gap-2">
@@ -883,7 +767,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
                             <div className="px-4 pb-4 pt-0 border-t border-zinc-800/50">
                               <div className="mt-3 p-4 bg-zinc-900/60 border border-zinc-800/60 rounded-sm">
                                 <h4 className="font-sans font-bold text-[9px] uppercase tracking-widest text-[#e0d0ab]/70 mb-3">
-                                  CONCEPTUAL INSIGHT — FLASHCARD
+                                  CONCEPTUAL INSIGHT - FLASHCARD
                                 </h4>
                                 <div className="prose prose-invert prose-p:text-sm prose-li:text-sm prose-p:leading-relaxed prose-li:leading-relaxed max-w-none text-stone-300 font-serif">
                                   <Markdown>{insight.insight_text}</Markdown>
@@ -977,6 +861,122 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
           </>
         )}
       </div>
+
+      {/* Lower Section: Previous Attempts */}
+      <div id="quiz-history-section" className="bg-zinc-900/10 border border-zinc-800 p-6 rounded-sm">
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-800">
+          <div className="flex items-center gap-2">
+            <History className="w-4.5 h-4.5 text-[#e0d0ab]" />
+            <h3 className="font-sans font-bold text-xs uppercase tracking-widest text-zinc-400">Previous Attempts</h3>
+          </div>
+          {/* CSV Export Button */}
+          <button
+            onClick={handleExportClick}
+            disabled={history.length === 0 || loadingTier}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-[9px] uppercase font-bold tracking-widest rounded-sm border transition-all ${
+              membershipTier === 'premium'
+                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20 cursor-pointer'
+                : 'bg-zinc-900/30 text-zinc-600 border-zinc-800/40 opacity-50 cursor-not-allowed'
+            } disabled:opacity-40 disabled:cursor-not-allowed`}
+            title={membershipTier === 'premium' ? 'Export CSV' : 'Upgrade to Founders Club to export'}
+          >
+            <Download className="w-3 h-3" />
+            {membershipTier === 'premium' ? 'Export CSV' : 'Export Locked'}
+            {membershipTier === 'premium' && <Crown className="w-3 h-3 text-emerald-400" />}
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="py-12 flex items-center justify-center text-zinc-500">
+            <span className="animate-pulse text-xs font-mono">LOADING ATTEMPTS...</span>
+          </div>
+        ) : errorMsg ? (
+          <div className="py-8 text-center text-rose-400 text-xs font-sans">
+            {errorMsg}
+          </div>
+        ) : history.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center text-zinc-600">
+            <Inbox className="w-10 h-10 opacity-30 mb-3" />
+            <p className="text-xs">No prior attempts recorded for this account.</p>
+            <p className="text-[10px] text-zinc-500 mt-1 uppercase tracking-tighter">Enter the Test Arena to register your first record.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto max-h-96 overflow-y-auto">
+            <table className="w-full text-left border-collapse font-sans">
+              <thead>
+                <tr className="border-b border-zinc-900 text-zinc-500 text-[9px] uppercase tracking-widest font-bold">
+                  <th className="py-3 px-4 sticky top-0 bg-zinc-950">ATTEMPT ID</th>
+                  <th className="py-3 px-4 sticky top-0 bg-zinc-950">DATE</th>
+                  <th className="py-3 px-4 sticky top-0 bg-zinc-950">SCORE</th>
+                  <th className="py-3 px-4 sticky top-0 bg-zinc-950">ACCURACY</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-900 text-xs">
+                {history.map((attempt, index) => {
+                  const totalCount = (attempt.correct_count || 0) + (attempt.incorrect_count || 0) + (attempt.unattempted_count || 0);
+                  const maxPossible = totalCount > 0 ? totalCount : 25;
+                  const ratio = ((attempt.correct_count / maxPossible) * 100).toFixed(0);
+                  const isExcellent = Number(ratio) >= 70;
+                  const isPass = Number(ratio) >= 40;
+
+                  return (
+                    <tr key={attempt.id || index} className="hover:bg-zinc-900/30 text-stone-300 transition-colors">
+                      <td className="py-4 px-4 font-mono text-zinc-500 text-[10px]/none uppercase">
+                        AT-{attempt.id ? attempt.id.substring(0, 8) : `LOG${history.length - index}`}
+                      </td>
+                      <td className="py-4 px-4 font-mono text-[11px] text-zinc-400">
+                        {formatDate(attempt.created_at)}
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono text-stone-100 font-bold">{attempt.correct_count}</span>
+                          <span className="text-zinc-600 font-mono">/</span>
+                          <span className="text-zinc-500 font-mono text-[10px]">{maxPossible}</span>
+                          <span className="text-[10px] text-zinc-500 font-mono ml-1">({ratio}%)</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <span className={`inline-flex items-center gap-1 text-[9px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-sm ${
+                          isExcellent
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                            : isPass
+                              ? 'bg-amber-500/10 text-[#e0d0ab] border border-amber-500/20'
+                              : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                        }`}>
+                          {isExcellent ? (
+                            <CheckCircle2 className="w-3 h-3" />
+                          ) : isPass ? (
+                            <CheckCircle2 className="w-3 h-3" />
+                          ) : (
+                            <XCircle className="w-3 h-3" />
+                          )}
+                          {isExcellent ? 'ADVANCED' : isPass ? 'ADEQUATE' : 'MARGINAL'}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Export Toast Notification */}
+      <AnimatePresence>
+        {exportToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] px-6 py-3 bg-zinc-900 border border-zinc-700/60 rounded-sm shadow-2xl"
+          >
+            <p className="text-xs text-stone-200 font-sans whitespace-nowrap">
+              {exportToast}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

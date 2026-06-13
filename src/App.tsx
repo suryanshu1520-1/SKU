@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'motion/react';
 import Login from './components/Login';
 import Landing from './components/Landing';
+import Manifesto from './components/Manifesto';
 import Arena from './components/Arena';
 import Autopsy from './components/Autopsy';
 import CurrentAffairs from './components/CurrentAffairs';
@@ -10,7 +11,7 @@ import Leaderboard from './components/Leaderboard';
 import PublicProfile from './components/PublicProfile';
 import PasswordReset from './components/PasswordReset';
 import { supabase } from './lib/supabase';
-import { Loader2, Trophy, Swords, Globe, User } from 'lucide-react';
+import { Loader2, Trophy, Swords, Globe, User, House } from 'lucide-react';
 // @ts-ignore
 import logoUrl from './assets/logo.png';
 
@@ -25,6 +26,9 @@ export default function App() {
 
   const [viewingAnalystId, setViewingAnalystId] = useState<string | null>(null);
   const [showPasswordReset, setShowPasswordReset] = useState(false);
+
+  // Manifesto modal overlay state
+  const [showManifesto, setShowManifesto] = useState(false);
 
   const [arenaStats, setArenaStats] = useState({
     correct: 0,
@@ -145,6 +149,16 @@ export default function App() {
     setActiveTab('arena');
   };
 
+  const handleNavigateManifesto = () => {
+    setShowManifesto(true);
+  };
+
+  const handleNavigateHome = () => {
+    setGameState('landing');
+    setActiveTab('arena');
+    setShowManifesto(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
@@ -177,22 +191,36 @@ export default function App() {
             <nav className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               <LayoutGroup>
                  <button
-                   onClick={() => {
-                     setActiveTab('arena');
-                     if (gameState === 'autopsy') {
-                       setGameState('arena');
-                     }
-                   }}
+                   onClick={handleNavigateHome}
                    className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none transition-colors"
+                   title="Home"
                  >
-                   {activeTab === 'arena' && (
+                   {gameState === 'landing' && (
                      <motion.div
                        layoutId="active-nav-pill"
                        className="absolute inset-0 bg-zinc-100 rounded-sm z-0"
                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                      />
                    )}
-                   <span className={`relative z-10 flex items-center gap-1.5 ${activeTab === 'arena' ? 'text-zinc-950' : 'text-zinc-400'}`}>
+                   <span className={`relative z-10 flex items-center gap-1.5 ${gameState === 'landing' ? 'text-zinc-950' : 'text-zinc-400'}`}>
+                     <House className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                     <span className="hidden sm:inline">Home</span>
+                     <span className="sm:hidden">Home</span>
+                   </span>
+                 </button>
+
+                 <button
+                   onClick={() => { setGameState('arena'); setActiveTab('arena'); }}
+                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none transition-colors"
+                 >
+                   {gameState !== 'landing' && activeTab === 'arena' && (
+                     <motion.div
+                       layoutId="active-nav-pill"
+                       className="absolute inset-0 bg-zinc-100 rounded-sm z-0"
+                       transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                     />
+                   )}
+                   <span className={`relative z-10 flex items-center gap-1.5 ${gameState !== 'landing' && activeTab === 'arena' ? 'text-zinc-950' : 'text-zinc-400'}`}>
                      <Swords className="w-3.5 h-3.5 md:w-4 md:h-4" />
                      <span className="hidden sm:inline">Test Arena</span>
                      <span className="sm:hidden">Arena</span>
@@ -200,17 +228,17 @@ export default function App() {
                  </button>
 
                  <button
-                   onClick={() => setActiveTab('tracker')}
+                   onClick={() => { setGameState('arena'); setActiveTab('tracker'); }}
                    className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none transition-colors"
                  >
-                   {activeTab === 'tracker' && (
+                   {gameState !== 'landing' && activeTab === 'tracker' && (
                      <motion.div
                        layoutId="active-nav-pill"
                        className="absolute inset-0 bg-zinc-100 rounded-sm z-0"
                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                      />
                    )}
-                   <span className={`relative z-10 flex items-center gap-1.5 ${activeTab === 'tracker' ? 'text-zinc-950' : 'text-zinc-400'}`}>
+                   <span className={`relative z-10 flex items-center gap-1.5 ${gameState !== 'landing' && activeTab === 'tracker' ? 'text-zinc-950' : 'text-zinc-400'}`}>
                      <Globe className="w-3.5 h-3.5 md:w-4 md:h-4" />
                      <span className="hidden sm:inline">Policy Tracker</span>
                      <span className="sm:hidden">Tracker</span>
@@ -218,17 +246,17 @@ export default function App() {
                  </button>
 
                  <button
-                   onClick={() => setActiveTab('leaderboard')}
+                   onClick={() => { setGameState('arena'); setActiveTab('leaderboard'); }}
                    className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none transition-colors"
                  >
-                   {activeTab === 'leaderboard' && (
+                   {gameState !== 'landing' && activeTab === 'leaderboard' && (
                      <motion.div
                        layoutId="active-nav-pill"
                        className="absolute inset-0 bg-zinc-100 rounded-sm z-0"
                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                      />
                    )}
-                   <span className={`relative z-10 flex items-center gap-1.5 ${activeTab === 'leaderboard' ? 'text-zinc-950' : 'text-zinc-400'}`}>
+                   <span className={`relative z-10 flex items-center gap-1.5 ${gameState !== 'landing' && activeTab === 'leaderboard' ? 'text-zinc-950' : 'text-zinc-400'}`}>
                      <Trophy className="w-3.5 h-3.5 md:w-4 md:h-4" />
                      <span className="hidden sm:inline">Leaderboard</span>
                      <span className="sm:hidden">Rank</span>
@@ -236,17 +264,17 @@ export default function App() {
                  </button>
 
                  <button
-                   onClick={() => setActiveTab('profile')}
+                   onClick={() => { setGameState('arena'); setActiveTab('profile'); }}
                    className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none transition-colors"
                  >
-                   {activeTab === 'profile' && (
+                   {gameState !== 'landing' && activeTab === 'profile' && (
                      <motion.div
                        layoutId="active-nav-pill"
                        className="absolute inset-0 bg-zinc-100 rounded-sm z-0"
                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                      />
                    )}
-                   <span className={`relative z-10 flex items-center gap-1.5 ${activeTab === 'profile' ? 'text-zinc-950' : 'text-zinc-400'}`}>
+                   <span className={`relative z-10 flex items-center gap-1.5 ${gameState !== 'landing' && activeTab === 'profile' ? 'text-zinc-950' : 'text-zinc-400'}`}>
                      <User className="w-3.5 h-3.5 md:w-4 md:h-4" />
                      <span className="hidden sm:inline">Profile & History</span>
                      <span className="sm:hidden">Profile</span>
@@ -260,7 +288,7 @@ export default function App() {
 
       {/* Screen Routing */}
       {gameState === 'login' && (
-        <Login onAuthenticated={handleAuthenticated} />
+        <Login onAuthenticated={handleAuthenticated} onNavigateManifesto={handleNavigateManifesto} />
       )}
 
       {gameState === 'landing' && (
@@ -268,6 +296,7 @@ export default function App() {
           onNavigateArena={() => { setGameState('arena'); setActiveTab('arena'); }}
           onNavigateTracker={() => { setGameState('arena'); setActiveTab('tracker'); }}
           onNavigateProfile={() => { setGameState('arena'); setActiveTab('profile'); }}
+          onNavigateManifesto={handleNavigateManifesto}
         />
       )}
 
@@ -301,6 +330,26 @@ export default function App() {
       <AnimatePresence>
         {showPasswordReset && (
           <PasswordReset onClose={() => setShowPasswordReset(false)} />
+        )}
+      </AnimatePresence>
+
+      {/* Manifesto Modal Overlay - rendered as z-50 overlay to preserve base routing state */}
+      <AnimatePresence>
+        {showManifesto && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/90 backdrop-blur-sm flex justify-center items-start pt-12"
+          >
+            <Manifesto
+              onNavigateArena={() => { setGameState('arena'); setActiveTab('arena'); setShowManifesto(false); }}
+              onNavigateSignup={() => { setShowManifesto(false); }}
+              onClose={() => setShowManifesto(false)}
+              userId={userId}
+            />
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

@@ -5,11 +5,12 @@ import { supabase } from '../lib/supabase';
 
 interface LoginProps {
   onAuthenticated: (email: string, name: string, uuid?: string) => void;
+  onNavigateManifesto?: () => void;
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export default function Login({ onAuthenticated }: LoginProps) {
+export default function Login({ onAuthenticated, onNavigateManifesto }: LoginProps) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -55,7 +56,6 @@ export default function Login({ onAuthenticated }: LoginProps) {
       const cleanedEmail = email.toLowerCase().trim();
 
       if (isSignUp) {
-        // Create account through admin backend proxy
         const response = await fetch('/api/auth/register', {
           method: 'POST',
           headers: {
@@ -83,7 +83,6 @@ export default function Login({ onAuthenticated }: LoginProps) {
         }
       }
 
-      // Sign in to populate session
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: cleanedEmail,
         password: password,
@@ -189,17 +188,11 @@ export default function Login({ onAuthenticated }: LoginProps) {
 
       {/* Right Panel - Auth Form */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 relative">
-        {/* Decorative background grid */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f1f23_1px,transparent_1px),linear-gradient(to_bottom,#1f1f23_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20 pointer-events-none" />
 
         <div className="w-full max-w-sm z-10">
           {/* Brand Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-sm text-[8px] uppercase font-mono text-zinc-400 tracking-widest mb-3.5 select-none">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              TARK v1.0
-            </div>
-
             <motion.h1
               layoutId="brand-header-h1"
               className="font-serif text-3xl sm:text-4xl font-bold tracking-widest text-[#e0d0ab] drop-shadow-[0_0_15px_rgba(224,208,171,0.25)] text-center whitespace-nowrap mb-1 select-none"
@@ -212,8 +205,6 @@ export default function Login({ onAuthenticated }: LoginProps) {
             >
               Tark 1.0 | तर्क 1.0
             </motion.h1>
-
-            <p className="text-zinc-500 font-mono text-[9px] uppercase tracking-widest leading-none mt-1">Log In to Tark</p>
           </div>
 
           <AnimatePresence mode="wait">
@@ -226,10 +217,6 @@ export default function Login({ onAuthenticated }: LoginProps) {
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
-              <h2 className="text-xs uppercase tracking-widest text-[#e0d0ab] font-bold font-mono mb-2">
-                {forgotPasswordMode ? "RESET PASSWORD" : isSignUp ? "ENROLL" : "SIGN IN"}
-              </h2>
-
               {forgotPasswordMode ? (
                 <>
                   {forgotSent ? (
@@ -405,6 +392,18 @@ export default function Login({ onAuthenticated }: LoginProps) {
               )}
             </motion.form>
           </AnimatePresence>
+
+          {/* Navigate to Manifesto */}
+          {onNavigateManifesto && (
+            <div className="text-center mt-6">
+              <button
+                onClick={onNavigateManifesto}
+                className="text-[10px] text-zinc-600 hover:text-[#e0d0ab] transition-colors font-mono uppercase tracking-widest"
+              >
+                Read the Manifesto
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -5,21 +5,16 @@ interface LandingProps {
   onNavigateArena: () => void;
   onNavigateTracker: () => void;
   onNavigateProfile: () => void;
+  onNavigateManifesto?: () => void;
 }
 
-export default function Landing({ onNavigateArena, onNavigateTracker, onNavigateProfile }: LandingProps) {
+export default function Landing({ onNavigateArena, onNavigateTracker, onNavigateProfile, onNavigateManifesto }: LandingProps) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-zinc-950 text-stone-50 font-sans relative overflow-hidden">
-      {/* Subtle background grid overlay — matches Login aesthetic */}
+      {/* Subtle background grid overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f1f23_1px,transparent_1px),linear-gradient(to_bottom,#1f1f23_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20 pointer-events-none" />
 
       <div className="w-full max-w-2xl z-10 flex flex-col items-center justify-center min-h-[80vh]">
-        {/* Brand Badge */}
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-sm text-[8px] uppercase font-mono text-zinc-400 tracking-widest mb-6 select-none">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          TARK v1.0
-        </div>
-
         {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -31,11 +26,11 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
             Tark 1.0 | तर्क 1.0
           </h1>
           <p className="text-zinc-400 text-sm md:text-base font-sans max-w-lg mx-auto leading-relaxed">
-            Assess. Analyze. Track. A focused instrument for the disciplined mind.
+            Assess. Analyze. Track.
           </p>
         </motion.div>
 
-        {/* Capability Cards — Clickable */}
+        {/* Capability Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mb-12">
           <motion.button
             onClick={onNavigateArena}
@@ -78,24 +73,24 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
           </motion.button>
         </div>
 
-        {/* Main CTA — Enter Tark Space */}
+        {/* Main CTA - Read the Manifesto */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
           <button
-            onClick={onNavigateArena}
+            onClick={onNavigateManifesto}
             className="group inline-flex items-center gap-2 py-3 px-8 bg-[#e0d0ab] text-zinc-950 font-sans text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-stone-100 transition-all shadow-lg shadow-[#e0d0ab]/10 hover:shadow-[#e0d0ab]/20"
           >
             <Target className="w-4 h-4" />
-            Enter The Arena
+            Read the Manifesto
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </motion.div>
 
         {/* Footer */}
-        <div className="mt-16 text-center">
+        <div className="mt-12 text-center space-y-4">
           <p className="text-[10px] font-sans text-zinc-600 uppercase tracking-widest">
             TARK 1.0 IS AN AD-FREE INITIATIVE FOREVER.
           </p>
