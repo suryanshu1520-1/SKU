@@ -34,6 +34,8 @@ interface CachedSession {
   savedInsightIds: string[];
   userId: string;
   isRanked: boolean;
+  pendingAnswersMap: Record<string, string>;
+  lockedMap: Record<string, boolean>;
 }
 
 interface ActiveSessionMeta {
@@ -163,6 +165,10 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
   const [timeLeftMap, setTimeLeftMap] = useState<Record<string, number>>({});
   const [timeSpentMap, setTimeSpentMap] = useState<Record<string, number>>({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
+
+  // Map-Based Lock Architecture (per-question, no flat booleans)
+  const [pendingAnswersMap, setPendingAnswersMap] = useState<Record<string, string>>({});
+  const [lockedMap, setLockedMap] = useState<Record<string, boolean>>({});
 
   // Explanation cache states
   const [explanationCache, setExplanationCache] = useState<Record<string, string>>({});
@@ -341,6 +347,9 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
         setLoadingExplanationMap(fullCached.loadingExplanationMap || {});
         setSavedInsightIds(new Set(fullCached.savedInsightIds || []));
         setIsRanked(fullCached.isRanked);
+        // Hydrate map-based states
+        if (fullCached.pendingAnswersMap) setPendingAnswersMap(fullCached.pendingAnswersMap);
+        if (fullCached.lockedMap) setLockedMap(fullCached.lockedMap);
         setIsLoading(false);
         setShowResumeOverlay(true);
         setResumeCountdown(3);
@@ -548,6 +557,8 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
       savedInsightIds: Array.from(savedInsightIds),
       userId,
       isRanked,
+      pendingAnswersMap,
+      lockedMap,
     });
     saveActiveSessionMeta({
       currentQuestionIndex,
@@ -568,6 +579,8 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
     savedInsightIds,
     userId,
     isRanked,
+    pendingAnswersMap,
+    lockedMap,
   ]);
 
   // Parse Matrix safely
@@ -582,18 +595,20 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
 
   const currentQuestion = questions[currentQuestionIndex];
   const currentQuestionId = currentQuestion?.id;
-  const timeLeft = timeLeftMap[currentQuestionId] !== undefined ? timeLeftMap[currentQuestionId] : 20;
 
-  // Global Clock / Ticker Effect (per-question remaining time)
+  // Timer: per-question map-based timer. Pauses if lockedMap[qId] is true.
+  // When timeLeftMap[qId] === 0 and !lockedMap[qId], auto-locks and triggers insight.
   useEffect(() => {
     if (arenaPhase !== 'quiz' || isLoading || errorMsg || questions.length === 0 || !currentQuestionId || quizSubmitted) return;
 
-    const isAnswered = userAnswers[currentQuestionId] !== undefined;
-    const isTimeout = !!timeouts[currentQuestionId];
+    const isCurrentlyLocked = !!lockedMap[currentQuestionId];
+    if (isCurrentlyLocked) return; // Pause timer when locked
 
-    if (isAnswered || isTimeout) return;
+    const currentTimeLeft = timeLeftMap[currentQuestionId] !== undefined ? timeLeftMap[currentQuestionId] : 20;
 
-    if (timeLeft <= 0) {
+    if (currentTimeLeft <= 0) {
+      // Auto-lock when timer expires: sets lockedMap AND timeouts simultaneously
+      setLockedMap(prev => ({ ...prev, [currentQuestionId]: true }));
       setTimeouts(prev => ({ ...prev, [currentQuestionId]: true }));
       return;
     }
@@ -610,18 +625,17 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [arenaPhase, currentQuestionId, timeLeft, userAnswers, timeouts, isLoading, errorMsg, questions, quizSubmitted]);
+  }, [arenaPhase, currentQuestionId, timeLeftMap, lockedMap, isLoading, errorMsg, questions, quizSubmitted]);
 
   // Insights / Conceptual Explanation Fetching and Caching Loop
   useEffect(() => {
     if (arenaPhase !== 'quiz') return;
     if (!currentQuestionId || quizSubmitted) return;
 
-    const isAnswered = userAnswers[currentQuestionId] !== undefined;
-    const isTimeout = !!timeouts[currentQuestionId];
-    const isLocked = isAnswered || isTimeout;
+    // Trigger insight if either lockedMap or timeouts marks this question as resolved
+    const questionIsLocked = !!lockedMap[currentQuestionId] || !!timeouts[currentQuestionId];
 
-    if (isLocked) {
+    if (questionIsLocked) {
       if (currentQuestion.ai_insights) {
         setExplanationCache(prev => ({ ...prev, [currentQuestionId]: currentQuestion.ai_insights }));
         return;
@@ -670,19 +684,86 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
         setLoadingExplanationMap(prev => ({ ...prev, [currentQuestionId]: false }));
       });
     }
-  }, [arenaPhase, currentQuestionId, userAnswers, timeouts, quizSubmitted, questions]);
+  }, [arenaPhase, currentQuestionId, lockedMap, timeouts, quizSubmitted, questions]);
 
+  // Select an option (stores in pendingAnswersMap only, does NOT lock)
   const handleSelect = (key: string) => {
-    const isAnswered = userAnswers[currentQuestionId] !== undefined;
-    const isTimeout = !!timeouts[currentQuestionId];
-    if (isAnswered || isTimeout || quizSubmitted) return;
+    if (!currentQuestionId) return;
+    const alreadyLocked = !!lockedMap[currentQuestionId] || !!timeouts[currentQuestionId] || quizSubmitted;
+    if (alreadyLocked) return;
+    setPendingAnswersMap(prev => ({ ...prev, [currentQuestionId]: key }));
+  };
 
-    setUserAnswers(prev => ({ ...prev, [currentQuestionId]: key }));
+  // Lock the answer: move pendingAnswer to userAnswers, set lockedMap
+  const handleLock = () => {
+    if (!currentQuestionId) return;
+    const pending = pendingAnswersMap[currentQuestionId];
+    if (!pending) return;
+
+    setUserAnswers(prev => ({ ...prev, [currentQuestionId]: pending }));
+    setLockedMap(prev => ({ ...prev, [currentQuestionId]: true }));
     saveActiveSessionMeta({
       currentQuestionIndex,
       isRanked,
       mode: isRanked ? 'vanguard' : 'training',
     });
+  };
+
+  // Navigate to previous question (preserves all map-based state per question)
+  const handlePrevious = () => {
+    if (currentQuestionIndex <= 0) return;
+    setCurrentQuestionIndex(prev => prev - 1);
+    saveActiveSessionMeta({
+      currentQuestionIndex: currentQuestionIndex - 1,
+      isRanked,
+      mode: isRanked ? 'vanguard' : 'training',
+    });
+  };
+
+  // Advance to next question or submit
+  const handleNext = () => {
+    if (!currentQuestionId) return;
+
+    // Ensure any pending answer is saved before moving forward
+    const pending = pendingAnswersMap[currentQuestionId];
+    if (pending && !userAnswers[currentQuestionId]) {
+      setUserAnswers(prev => ({ ...prev, [currentQuestionId]: pending }));
+    }
+
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+      saveActiveSessionMeta({
+        currentQuestionIndex: currentQuestionIndex + 1,
+        isRanked,
+        mode: isRanked ? 'vanguard' : 'training',
+      });
+    } else {
+      finishArena();
+    }
+  };
+
+  // Escape Hatch: End assessment early
+  const handleEndEarly = () => {
+    const confirmed = window.confirm("Are you sure you want to end this assessment early? Progress will be lost.");
+    if (confirmed) {
+      clearSessionCache();
+      setArenaPhase('intro');
+      setQuestions([]);
+      setCurrentQuestionIndex(0);
+      setUserAnswers({});
+      setTimeouts({});
+      setTimeLeftMap({});
+      setTimeSpentMap({});
+      setQuizSubmitted(false);
+      setExplanationCache({});
+      setLoadingExplanationMap({});
+      setSavedInsightIds(new Set());
+      setPendingAnswersMap({});
+      setLockedMap({});
+      if (onReturnToDashboard) {
+        onReturnToDashboard();
+      }
+    }
   };
 
   // Bookmark toggle handler
@@ -766,6 +847,8 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
     setSavedInsightIds(new Set());
     setShowResumeOverlay(false);
     setIsAIFrostedGlass(false);
+    setPendingAnswersMap({});
+    setLockedMap({});
   };
 
   const handleReturnToDashboard = () => {
@@ -1276,9 +1359,10 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
 
   const options = getOptions(currentQuestion.options_matrix);
   const correctOpt = currentQuestion.correct_option?.trim();
-  const selectedOption = userAnswers[currentQuestionId] || null;
+  const hasUserAnswered = userAnswers[currentQuestionId] !== undefined;
   const isTimeout = !!timeouts[currentQuestionId];
-  const isLocked = selectedOption !== null || isTimeout || quizSubmitted;
+  const isQuestionLocked = !!lockedMap[currentQuestionId] || isTimeout || quizSubmitted;
+  const hasLockedWithAnswer = isQuestionLocked && (hasUserAnswered || !!pendingAnswersMap[currentQuestionId] || isTimeout);
 
   const currentExplanation = explanationCache[currentQuestionId] || currentQuestion.ai_insights;
   const isLoadingExplanation = !!loadingExplanationMap[currentQuestionId];
@@ -1287,7 +1371,12 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
 
   const getButtonClass = (key: string) => {
     const baseClass = "w-full max-w-full text-left p-4 rounded border-2 font-sans text-sm transition-all focus:outline-none relative ";
-    if (!isLocked) {
+    if (!isQuestionLocked) {
+      // Pending answer highlight (gold) vs normal hover - keyed to currentQuestionId
+      const pending = pendingAnswersMap[currentQuestionId];
+      if (pending === key) {
+        return baseClass + "border-[#e0d0ab]/70 bg-[#e0d0ab]/10 text-[#e0d0ab] cursor-pointer";
+      }
       return baseClass + "border-transparent bg-zinc-900/50 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300 cursor-pointer";
     }
 
@@ -1295,7 +1384,8 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
       return baseClass + "border-emerald-500 bg-emerald-500/20 text-emerald-400 opacity-100 font-medium z-10";
     }
 
-    if (key === selectedOption && key !== correctOpt) {
+    const selectedForReveal = userAnswers[currentQuestionId] || pendingAnswersMap[currentQuestionId];
+    if (key === selectedForReveal && key !== correctOpt) {
       return baseClass + "border-rose-500/50 bg-rose-500/10 text-rose-400 opacity-100";
     }
 
@@ -1328,19 +1418,24 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
       </AnimatePresence>
 
       <div className="w-full max-w-2xl mt-4 md:mt-12 flex-1">
-        {/* Mode Badge */}
+        {/* Mode Badge with Escape Hatch */}
         <div className="flex items-center justify-between mb-4">
-          <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-[8px] uppercase font-mono tracking-widest rounded-sm border ${
+          <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tracking-widest uppercase backdrop-blur-md ${
             isRanked
-              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-              : 'bg-[#e0d0ab]/10 text-[#e0d0ab] border-[#e0d0ab]/20'
+              ? 'bg-white/5 border border-white/10 text-slate-300'
+              : 'bg-white/5 border border-white/10 text-slate-300'
           }`}>
-            {isRanked ? <Swords className="w-3 h-3" /> : <Target className="w-3 h-3" />}
+            {isRanked ? <Swords className="w-3.5 h-3.5" /> : <Target className="w-3.5 h-3.5" />}
             {isRanked ? 'Vanguard Assessment' : 'Training Ground'}
           </div>
-          <span className="text-[9px] font-mono text-zinc-600">
-            {currentQuestionIndex + 1} / {questions.length}
-          </span>
+
+          {/* Escape Hatch Button */}
+          <button
+            onClick={handleEndEarly}
+            className="text-xs uppercase tracking-wider text-slate-400 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 px-3 py-1.5 rounded-md transition-all duration-200 cursor-pointer"
+          >
+            End Assessment Early
+          </button>
         </div>
 
         {/* Dynamic Clickable Progress Chain */}
@@ -1374,31 +1469,21 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
           })}
         </div>
 
-        {/* Header & Meta */}
-        <div className="flex items-start justify-between mb-8">
-          <div className="flex flex-wrap gap-2">
-            <span className="text-xs text-zinc-500 border border-zinc-800 rounded-full px-2 py-1">
-              {currentQuestion.exam_origin_tag || 'GENERIC'}
-            </span>
-            <span className="text-xs text-zinc-500 border border-zinc-800 rounded-full px-2 py-1">
-              {currentQuestion.subject_category || 'CORE'}
-            </span>
-            <span className="text-xs text-zinc-500 border border-zinc-800 rounded-full px-2 py-1">
-              {currentQuestion.difficulty_level || 'standard'}
-            </span>
-          </div>
+        {/* Timer Display - reads from timeLeftMap keyed to currentQuestionId */}
+        <div className="flex items-center justify-end mb-4">
           <div className="flex relative items-center justify-center min-w-[60px] h-[30px]">
             <AnimatePresence mode="popLayout">
-              {!isLocked ? (
+              {!isQuestionLocked ? (
                 <motion.div
-                  key={`hourglass-${currentQuestionIndex}`}
-                  initial={{ opacity: 0, scale: 0.8, rotate: 0 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 180 }}
-                  exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
-                  transition={{ rotate: { duration: 20, ease: "linear" }, opacity: { duration: 0.3 } }}
-                  className={`text-zinc-400 ${timeLeft <= 5 ? 'text-rose-500' : ''}`}
+                  key={`timer-${currentQuestionIndex}`}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  className={`font-mono text-sm font-bold tracking-wider ${
+                    timeLeftMap[currentQuestionId] !== undefined && timeLeftMap[currentQuestionId] <= 5 ? 'text-rose-500' : 'text-zinc-400'
+                  }`}
                 >
-                  <Hourglass className="w-5 h-5 animate-pulse" />
+                  {timeLeftMap[currentQuestionId] !== undefined ? timeLeftMap[currentQuestionId] : 20}s
                 </motion.div>
               ) : (
                 <motion.div
@@ -1414,6 +1499,21 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
           </div>
         </div>
 
+        {/* Header & Meta */}
+        <div className="flex items-start justify-between mb-8">
+          <div className="flex flex-wrap gap-2">
+            <span className="text-xs text-zinc-500 border border-zinc-800 rounded-full px-2 py-1">
+              {currentQuestion.exam_origin_tag || 'GENERIC'}
+            </span>
+            <span className="text-xs text-zinc-500 border border-zinc-800 rounded-full px-2 py-1">
+              {currentQuestion.subject_category || 'CORE'}
+            </span>
+            <span className="text-xs text-zinc-500 border border-zinc-800 rounded-full px-2 py-1">
+              {currentQuestion.difficulty_level || 'standard'}
+            </span>
+          </div>
+        </div>
+
         {/* Query Headline */}
         <h2 className="text-lg md:text-xl font-serif whitespace-pre-wrap font-medium leading-relaxed mb-6 text-stone-100">
           {currentQuestion.question_text}
@@ -1425,7 +1525,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
             <button
               key={key}
               onClick={() => handleSelect(key)}
-              disabled={isLocked}
+              disabled={isQuestionLocked}
               className={getButtonClass(key)}
             >
               <div className="flex items-start">
@@ -1436,15 +1536,18 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
           ))}
         </div>
 
-        {/* Explanation Container */}
+        {/* Explanation Container - Only shows when locked, animated with Framer Motion */}
         <AnimatePresence>
-          {isLocked && (
+          {hasLockedWithAnswer && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
+              key={`insight-${currentQuestionIndex}`}
+              initial={{ opacity: 0, height: 0, marginTop: 0 }}
+              animate={{ opacity: 1, height: "auto", marginTop: 24 }}
+              exit={{ opacity: 0, height: 0, marginTop: 0 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
               className="overflow-hidden"
             >
-              <div className="bg-zinc-900/50 border border-zinc-800 rounded p-6 mb-8 mt-4">
+              <div className="bg-zinc-900/50 border border-zinc-800 rounded p-6 mb-8">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-sans font-medium text-xs text-zinc-500 uppercase tracking-widest inline-flex items-center gap-1.5">
                     Conceptual Insights
@@ -1508,38 +1611,44 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
           )}
         </AnimatePresence>
 
-        {/* Non-Linear Navigation Controls */}
+        {/* Assessment UX Protocol: Previous + Lock/Next Navigation */}
         <div className="flex items-center justify-between gap-4 mt-12 pt-6 border-t border-zinc-900">
+          {/* Previous Button - always visible */}
           <button
-            onClick={() => {
-              setCurrentQuestionIndex(prev => Math.max(0, prev - 1));
-              saveActiveSessionMeta({ currentQuestionIndex: Math.max(0, currentQuestionIndex - 1), isRanked, mode: isRanked ? 'vanguard' : 'training' });
-            }}
+            onClick={handlePrevious}
             disabled={currentQuestionIndex === 0}
-            className="flex items-center gap-1 py-2.5 px-4 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-sans text-xs font-semibold uppercase tracking-wider rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed border border-zinc-800"
+            className="flex items-center gap-1 py-2.5 px-4 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-sans text-xs font-semibold uppercase tracking-wider rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed border border-zinc-800 cursor-pointer"
           >
             <ChevronLeft className="w-4 h-4" />
             Previous
           </button>
 
-          {currentQuestionIndex < questions.length - 1 ? (
+          {/* Lock / Next Button */}
+          {!isQuestionLocked ? (
             <button
-              onClick={() => {
-                setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1));
-                saveActiveSessionMeta({ currentQuestionIndex: Math.min(questions.length - 1, currentQuestionIndex + 1), isRanked, mode: isRanked ? 'vanguard' : 'training' });
-              }}
-              className="flex items-center gap-1 py-2.5 px-5 bg-zinc-100 hover:bg-white text-zinc-950 font-sans text-xs font-semibold uppercase tracking-wider rounded transition-colors"
+              onClick={handleLock}
+              disabled={!pendingAnswersMap[currentQuestionId]}
+              className="flex items-center gap-2 py-2.5 px-6 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 font-sans text-xs font-bold uppercase tracking-widest rounded-sm transition-all shadow-lg shadow-[#e0d0ab]/10 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
             >
-              Next
-              <ChevronRight className="w-4 h-4" />
+              <Lock className="w-4 h-4" />
+              Lock Answer
             </button>
           ) : (
             <button
-              onClick={finishArena}
-              className="flex items-center gap-1.5 py-2.5 px-5 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded transition-colors shadow-lg shadow-emerald-500/10"
+              onClick={handleNext}
+              className="flex items-center gap-2 py-2.5 px-6 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-sans text-xs font-bold uppercase tracking-widest rounded-sm transition-all shadow-lg shadow-emerald-500/10 cursor-pointer"
             >
-              <Check className="w-4 h-4" />
-              Submit Exam
+              {currentQuestionIndex < questions.length - 1 ? (
+                <>
+                  Next Question
+                  <ChevronRight className="w-4 h-4" />
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4" />
+                  Submit Exam
+                </>
+              )}
             </button>
           )}
         </div>

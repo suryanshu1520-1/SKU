@@ -26,6 +26,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
   const [syncSuccess, setSyncSuccess] = useState<boolean | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [syncCooldown, setSyncCooldown] = useState(0);
+  const [rowLimit, setRowLimit] = useState<number>(10);
 
   // Bookmark state
   const [savedArticleIds, setSavedArticleIds] = useState<Set<string>>(new Set());
@@ -119,7 +120,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
         query = query.lt('created_at', endInclusive.toISOString().split('T')[0]);
       }
 
-      const { data, error } = await query.order('created_at', { ascending: false });
+      const { data, error } = await query.order('created_at', { ascending: false }).limit(rowLimit);
 
       if (error) {
         throw error;
@@ -143,10 +144,10 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
     }
   };
 
-  // Re-fetch when date filters change
+  // Re-fetch when date filters or row limit changes
   useEffect(() => {
     fetchPolicyData(true, startDate || undefined, endDate || undefined);
-  }, [startDate, endDate]);
+  }, [startDate, endDate, rowLimit]);
 
   // Sync action trigger calling the cooldown-aware endpoint
   const handleSyncFeed = async () => {
@@ -623,6 +624,26 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                 );
               })}
             </AnimatePresence>
+          </div>
+        )}
+
+        {/* Row Limit Selector */}
+        {!loading && items.length > 0 && (
+          <div className="flex items-center justify-end mt-6 pt-4 border-t border-zinc-900">
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-mono uppercase tracking-widest text-zinc-500 font-bold">
+                Rows
+              </span>
+              <select
+                value={rowLimit}
+                onChange={(e) => setRowLimit(Number(e.target.value))}
+                className="px-2.5 py-1.5 text-[10px] font-sans font-bold uppercase tracking-wider bg-zinc-900/50 border border-zinc-800 text-zinc-300 rounded-sm focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50 focus:border-[#e0d0ab]/50 cursor-pointer"
+              >
+                <option value={10}>10</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+            </div>
           </div>
         )}
 
