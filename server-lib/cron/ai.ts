@@ -77,10 +77,8 @@ export async function getLlama3Insight(
   ].join("\n");
 
   try {
-    // 1. Connects seamlessly just like: Client("SKU1/meta-llama-Llama-3.1-8B-Instruct")
-    // Note: If your space is private, you can add your token like this:
-    // const client = await Client.connect("SKU1/...", { hf_token: process.env.HF_TOKEN });
-    const client = await Client.connect("SKU1/meta-llama-Llama-3.1-8B-Instruct");
+    const hfToken = (globalThis as any)?.process?.env?.HF_ACCESS_TOKEN || "";
+    const client = await Client.connect("SKU1/meta-llama-Llama-3.1-8B-Instruct", hfToken ? { hf_token: hfToken } : undefined);
     
     // 2. Exact match to your Python params: message="...", api_name="/chat_fn"
     const result = await client.predict("/chat_fn", {
