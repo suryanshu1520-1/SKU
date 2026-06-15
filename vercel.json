@@ -14,10 +14,6 @@
       "schedule": "0 0 * * *"
     },
     {
-      "path": "/api/cron/scrape",
-      "schedule": "0 6 * * *"
-    },
-    {
       "path": "/api/cron/reset-leaderboard",
       "schedule": "30 8 * * 0"
     }
