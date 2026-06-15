@@ -458,42 +458,11 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-            {/* Interactive Fetch Sync Control */}
-            <button
-              onClick={handleSyncFeed}
-              disabled={syncing || syncCooldown > 0}
-              className={`flex items-center justify-center gap-2 px-4 py-2 border rounded-sm text-xs font-sans font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                syncing
-                  ? 'bg-zinc-900 border-zinc-800 text-zinc-500 cursor-not-allowed'
-                  : syncCooldown > 0
-                  ? 'bg-zinc-900 border-amber-800/50 text-amber-400 cursor-not-allowed'
-                  : syncSuccess
-                  ? 'bg-emerald-950/20 border-emerald-800 text-emerald-400 hover:bg-emerald-950/40'
-                  : 'bg-zinc-900 border-zinc-800 text-[#e0d0ab] hover:bg-zinc-850 hover:border-[#e0d0ab]/30 hover:text-stone-100'
-              }`}
-            >
-              {syncing ? (
-                <>
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  <span>Fetching Latest Dispatches...</span>
-                </>
-              ) : syncCooldown > 0 ? (
-                <>
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  <span>Available in {formatCooldown(syncCooldown)}</span>
-                </>
-              ) : syncSuccess ? (
-                <>
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Feeds Polished & Loaded</span>
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  <span>Sync Policy Feed</span>
-                </>
-              )}
-            </button>
+            {/* Passive Auto-Sync Indicator */}
+            <div className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-sans font-bold tracking-[0.2em] uppercase text-zinc-600 select-none">
+              <RefreshCw className="w-3 h-3 opacity-50" />
+              <span>Autonomously synced 3x daily</span>
+            </div>
 
             <div className="flex items-center justify-center gap-1.5 text-stone-200 text-xs font-sans bg-zinc-900/30 border border-zinc-900 px-3 py-2 rounded-sm select-none">
               <BookOpen className="w-3.5 h-3.5 text-[#e0d0ab]" />
@@ -535,8 +504,8 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
           <div className="flex flex-col items-center justify-center p-14 border border-dashed border-zinc-850 text-center rounded-sm bg-zinc-900/5">
             <Inbox className="w-9 h-9 text-zinc-700 mb-4" />
             <h4 className="text-xs uppercase font-mono tracking-wider font-bold text-stone-200 mb-1">Policy brief index empty</h4>
-            <p className="text-xs font-sans text-zinc-500 max-w-sm leading-relaxed">
-              No daily updates ingested under these parameters. Click "Sync Policy Feed" above to clean the system and fetch the latest high-signal press items.
+            <p className="text-zinc-500 text-sm max-w-md mx-auto leading-relaxed">
+              No daily updates ingested under these parameters. The system autonomously synchronizes the latest high-signal press items 3 times a day. Check back later.
             </p>
           </div>
         ) : (
