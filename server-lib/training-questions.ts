@@ -83,70 +83,25 @@ export default async function handler(req: any, res: any) {
       subjectCounts[subject] = fetchCount;
     }
 
-    // Fetch questions per subject
-    let allQuestions: any[] = [];
-    const subjectFetchResults: Record<string, any[]> = {};
-    let deficit = 0;
+    // Single query for all requested subjects
+    let query = supabaseAnon
+      .from('static_questions')
+      .select('*')
+      .in('subject_category', subjects);
 
-    for (const subject of subjects) {
-      const fetchCount = subjectCounts[subject];
-      let query = supabaseAnon
-        .from('static_questions')
-        .select('*')
-        .eq('subject_category', subject);
-
-      if (seenIds.length > 0) {
-        query = query.not('id', 'in', `(${seenIds.join(',')})`);
-      }
-
-      const { data, error } = await query.limit(fetchCount + 5); // extra buffer for dedup
-
-      if (error) {
-        console.warn(`[training-questions] Error fetching subject "${subject}":`, error);
-        continue;
-      }
-
-      const fetched = (data || []).slice(0, fetchCount);
-      subjectFetchResults[subject] = fetched;
-
-      if (fetched.length < fetchCount) {
-        deficit += fetchCount - fetched.length;
-      }
-
-      allQuestions = [...allQuestions, ...fetched];
+    if (seenIds.length > 0) {
+      query = query.not('id', 'in', `(${seenIds.join(',')})`);
     }
 
-    // Backfill deficit from any subject that has extra questions
-    if (deficit > 0 && subjects.length > 1) {
-      const subjectsWithExtra = subjects.filter(s => {
-        const fetched = subjectFetchResults[s] || [];
-        const target = subjectCounts[s];
-        return fetched.length >= target;
-      });
+    // We fetch a larger pool and shuffle/slice on the server
+    const { data, error } = await query.limit(N * 3 + 10);
 
-      if (subjectsWithExtra.length > 0) {
-        for (const subject of shuffleArray(subjectsWithExtra)) {
-          if (deficit <= 0) break;
-          let query = supabaseAnon
-            .from('static_questions')
-            .select('*')
-            .eq('subject_category', subject);
-
-          if (seenIds.length > 0) {
-            query = query.not('id', 'in', `(${seenIds.join(',')})`);
-          }
-
-          const alreadyFetchedIds = new Set(allQuestions.map((q: any) => q.id));
-          const { data } = await query.limit(deficit + 5);
-
-          if (data) {
-            const fresh = data.filter((q: any) => !alreadyFetchedIds.has(q.id)).slice(0, deficit);
-            allQuestions = [...allQuestions, ...fresh];
-            deficit -= fresh.length;
-          }
-        }
-      }
+    if (error) {
+      console.warn(`[training-questions] Error fetching subjects:`, error);
+      return res.status(500).json({ error: "Failed to fetch questions from the database." });
     }
+
+    let allQuestions = data || [];
 
     // Shuffle the final set and return
     const finalQuestions = shuffleArray(allQuestions).slice(0, N);

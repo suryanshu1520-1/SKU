@@ -11,6 +11,7 @@ import syncFeedHandler from "./server-lib/sync-feed.js";
 import trainingQuestionsHandler from "./server-lib/training-questions.js";
 import createRazorpayOrderHandler from "./server-lib/create-razorpay-order.js";
 import verifyPaymentHandler from "./server-lib/verify-payment.js";
+import userLimitsHandler from "./server-lib/user-limits.js";
 
 dotenv.config();
 
@@ -41,32 +42,7 @@ const rawSupabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY ||
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4bmdmeGFlcmxra2NhY3JiZGdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTY3NDQsImV4cCI6MjA5NTc5Mjc0NH0.G44wtBZZKGPb-ZTX3zaIPCXFcRtPP9Vtv-0saO0dEXE";
 const supabaseAnon = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseAnonKey));
 
-const INSIGHTS_CACHE_FILE = path.join(process.cwd(), "ai_insights_cache.json");
-let inMemoryInsightsCache: Record<string, string> = {};
-
-try {
-  if (fs.existsSync(INSIGHTS_CACHE_FILE)) {
-    const content = fs.readFileSync(INSIGHTS_CACHE_FILE, "utf-8");
-    inMemoryInsightsCache = JSON.parse(content);
-    console.log(`[Cache System] Loaded ${Object.keys(inMemoryInsightsCache).length} AI insights from local cache file.`);
-  } else {
-    fs.writeFileSync(INSIGHTS_CACHE_FILE, JSON.stringify({}, null, 2), "utf-8");
-    console.log(`[Cache System] Created fresh local AI insights cache file.`);
-  }
-} catch (err) {
-  console.error("[Cache System] Error loading local AI insights cache:", err);
-}
-
-function saveToLocalCache(questionId: string, insights: string) {
-  if (!questionId || !insights) return;
-  inMemoryInsightsCache[questionId] = insights;
-  try {
-    fs.writeFileSync(INSIGHTS_CACHE_FILE, JSON.stringify(inMemoryInsightsCache, null, 2), "utf-8");
-    console.log(`[Cache System] Successfully cached & bound insights for question ${questionId} to persistent local file.`);
-  } catch (err) {
-    console.error("[Cache System] Error writing to local AI insights cache file:", err);
-  }
-}
+// Local file cache disabled to match Vercel serverless behavior
 
 function generateFallbackInsights(stats: any): string {
   const correct = stats?.correct || 0;
@@ -168,6 +144,7 @@ async function startServer() {
   app.post("/api/cron/scrape", scrapeHandler);
   app.get("/api/cron/newsdata", newsdataHandler);
   app.post("/api/cron/newsdata", newsdataHandler);
+  app.get("/api/user-limits", userLimitsHandler);
   app.post("/api/sync-feed", syncFeedHandler);
   app.post("/api/training-questions", trainingQuestionsHandler);
   app.post("/api/create-razorpay-order", createRazorpayOrderHandler);
@@ -256,11 +233,7 @@ Provide up to 3 bullet points with a brief sentence giving conceptual explanatio
   app.post("/api/explanation", async (req, res) => {
     const { question, answer, questionId } = req.body;
     
-    // Step 0: Check in-memory/file-based cache first
-    if (questionId && inMemoryInsightsCache[questionId]) {
-      console.log(`[Cache System] Serving local cached AI insights for question ${questionId}`);
-      return res.json({ explanation: inMemoryInsightsCache[questionId] });
-    }
+    // In-memory/file cache step removed to match Vercel deployment behavior
     
     const handleExplanationFallback = async () => {
       if (questionId) {
@@ -272,12 +245,14 @@ Provide up to 3 bullet points with a brief sentence giving conceptual explanatio
             .maybeSingle();
 
           if (!error && dbQuestion && dbQuestion.conceptual_explanation) {
+            res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
             return res.json({ explanation: dbQuestion.conceptual_explanation });
           }
         } catch (dbErr) {
           console.warn("Supabase explanation fallback error:", dbErr);
         }
       }
+      res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
       return res.json({
         explanation: "- Detailed AI insights are currently throttled or unavailable.\n- Please refer to core textbook materials or consult reference sources for this topic."
       });
@@ -294,8 +269,7 @@ Provide up to 3 bullet points with a brief sentence giving conceptual explanatio
             .maybeSingle();
 
           if (!error && dbQuestion && dbQuestion.ai_insights) {
-            // Save to local cache so for next time we don't query DB
-            saveToLocalCache(questionId, dbQuestion.ai_insights);
+            res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
             return res.json({ explanation: dbQuestion.ai_insights });
           }
         } catch (dbErr) {
@@ -322,9 +296,6 @@ Requirement: Provide 2-3 insightful bullet points with highly credible informati
       const generatedInsights = response.text;
 
       if (questionId && generatedInsights) {
-        // Save to persistent file cache
-        saveToLocalCache(questionId, generatedInsights);
-
         // Step 4: Write back to the database instantly to preserve it for all future users
         try {
           await supabaseServer
@@ -339,6 +310,7 @@ Requirement: Provide 2-3 insightful bullet points with highly credible informati
         }
       }
 
+      res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
       res.json({ explanation: generatedInsights });
     } catch (error: any) {
       console.error("Gemini API Error (explanation):", error);

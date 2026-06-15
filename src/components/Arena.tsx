@@ -16,6 +16,7 @@ interface ArenaProps {
   }, percentile: number) => void;
   userId: string;
   onReturnToDashboard?: () => void;
+  onNavigateManifesto?: () => void;
 }
 
 const SESSION_STORAGE_KEY = 'tark_arena_session';
@@ -144,11 +145,12 @@ function clearCachedResults() {
   } catch {}
 }
 
-export default function Arena({ onComplete, userId, onReturnToDashboard }: ArenaProps) {
+export default function Arena({ onComplete, userId, onReturnToDashboard, onNavigateManifesto }: ArenaProps) {
   const [arenaPhase, setArenaPhase] = useState<'intro' | 'quiz' | 'results'>('intro');
   const [cachedResults, setCachedResults] = useState<CachedResults | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [motivation, setMotivation] = useState('');
+  const [userLimits, setUserLimits] = useState<{ vanguardUsed: number, insightsUsed: number, tier: string } | null>(null);
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -177,140 +179,10 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
   // Bookmark states
   const [savedInsightIds, setSavedInsightIds] = useState<Set<string>>(new Set());
   const [bookmarkToggling, setBookmarkToggling] = useState<Record<string, boolean>>({});
-  const [showPaywallModal, setShowPaywallModal] = useState(false);
   const [isAIFrostedGlass, setIsAIFrostedGlass] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
-  const [processingPayment, setProcessingPayment] = useState(false);
 
-  // Inject Razorpay checkout script dynamically
-  useEffect(() => {
-    if (document.getElementById('razorpay-checkout-script')) return;
-    const script = document.createElement('script');
-    script.id = 'razorpay-checkout-script';
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.async = true;
-    document.body.appendChild(script);
-  }, []);
-  
-  // Handle Founders Club payment with Razorpay
-  const handleJoinFoundersClub = async () => {
-    if (processingPayment) return;
-    setProcessingPayment(true);
-    setToastMsg('');
-    
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const currentUserId = session?.user?.id || userId;
-      
-      // Step 1: Create Razorpay order via backend
-      const orderRes = await fetch('/api/create-razorpay-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: currentUserId }),
-      });
-      
-      const orderData = await orderRes.json();
-      
-      // Handle 403 — Founders Club is full
-      if (orderRes.status === 403) {
-        setToastMsg(orderData.error || 'Founders Club is full. The 500-seat capacity has been reached.');
-        setProcessingPayment(false);
-        return;
-      }
-      
-      // Handle already premium
-      if (orderData.alreadyPremium) {
-        setToastMsg('You are already a Founders Club member!');
-        setShowPaywallModal(false);
-        setProcessingPayment(false);
-        return;
-      }
-      
-      if (!orderRes.ok || !orderData.order_id) {
-        setToastMsg(orderData.error || 'Failed to initiate payment. Please try again.');
-        setProcessingPayment(false);
-        return;
-      }
-      
-      // Step 2: Check if Razorpay is loaded
-      if (!(window as any).Razorpay) {
-        setToastMsg('Payment gateway is loading. Please try again in a moment.');
-        setProcessingPayment(false);
-        return;
-      }
-      
-      // Step 3: Launch Razorpay checkout modal
-      const razorpayKeyId = orderData.key_id;
-      const options = {
-        key: razorpayKeyId,
-        amount: orderData.amount,
-        currency: orderData.currency,
-        name: 'Tark 1.0',
-        description: 'Founders Club Membership',
-        order_id: orderData.order_id,
-        prefill: {
-          name: session?.user?.user_metadata?.name || '',
-          email: session?.user?.email || '',
-        },
-        theme: {
-          color: '#e0d0ab',
-        },
-        handler: async function(response: any) {
-          // Payment successful — verify on backend
-          setToastMsg('Payment successful! Verifying membership...');
-          
-          try {
-            const verifyRes = await fetch('/api/verify-payment', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature,
-                userId: currentUserId,
-              }),
-            });
-            
-            const verifyData = await verifyRes.json();
-            
-            if (verifyRes.ok && verifyData.success) {
-              setToastMsg('Welcome to Founders Club! 🎉');
-              setShowPaywallModal(false);
-              // Refresh user profile membership display by toggling
-              // The user will see their new premium status on next profile load
-            } else {
-              setToastMsg(verifyData.error || 'Payment verified but membership update failed. Contact support with ID: ' + response.razorpay_payment_id);
-            }
-          } catch (verifyErr) {
-            console.error('[Arena] Payment verification error:', verifyErr);
-            setToastMsg('Payment verified but connection issue. Your membership will be activated shortly.');
-          }
-          
-          setProcessingPayment(false);
-        },
-        modal: {
-          ondismiss: function() {
-            setProcessingPayment(false);
-            setToastMsg('Payment cancelled. You can upgrade anytime.');
-          },
-        },
-      };
-      
-      const rzp = new (window as any).Razorpay(options);
-      rzp.on('payment.failed', function(response: any) {
-        console.error('[Arena] Razorpay payment failed:', response.error);
-        setToastMsg('Payment failed: ' + (response.error?.description || 'Please try again.'));
-        setProcessingPayment(false);
-      });
-      
-      rzp.open();
-      
-    } catch (err: any) {
-      console.error('[Arena] Payment flow error:', err);
-      setToastMsg(err.message || 'Payment processing error. Please try again.');
-      setProcessingPayment(false);
-    }
-  };
+
 
   // Bifurcation states
   const [isRanked, setIsRanked] = useState(true);
@@ -321,6 +193,20 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
   const [selectedSubjects, setSelectedSubjects] = useState<Set<string>>(new Set());
   const [trainingLength, setTrainingLength] = useState<number>(25);
   const [loadingSubjects, setLoadingSubjects] = useState(false);
+
+  // Fetch user limits on mount if in intro
+  useEffect(() => {
+    if (arenaPhase === 'intro' && userId) {
+      fetch(`/api/user-limits?userId=${encodeURIComponent(userId)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.error) {
+            setUserLimits(data);
+          }
+        })
+        .catch(err => console.warn("Failed to fetch user limits:", err));
+    }
+  }, [arenaPhase, userId]);
 
   // On mount, check for active session or cached results
   useEffect(() => {
@@ -376,6 +262,10 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
 
   // Pre-flight: "Begin Assessment" clicked -> show motivational modal
   const handleBeginAssessment = () => {
+    if (userLimits && userLimits.tier !== 'premium' && userLimits.vanguardUsed >= 3) {
+      if (onNavigateManifesto) onNavigateManifesto();
+      return;
+    }
     setIsRanked(true);
     setMotivation(getRandomMotivation());
     setShowModal(true);
@@ -401,7 +291,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
     }
 
     if (tier !== 'premium') {
-      setShowPaywallModal(true);
+      if (onNavigateManifesto) onNavigateManifesto();
       return;
     }
 
@@ -666,7 +556,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
           if (data.error === 'limit_reached') {
             setIsAIFrostedGlass(true);
           } else {
-            setShowPaywallModal(true);
+            if (onNavigateManifesto) onNavigateManifesto();
           }
           return null;
         }
@@ -1033,7 +923,11 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
             >
               <div className="flex items-center gap-4">
                 <div className="p-2.5 bg-zinc-800/60 border border-zinc-700/40 rounded-sm group-hover:border-emerald-500/30 transition-colors">
-                  <Swords className="w-5 h-5 text-emerald-400" />
+                  {userLimits && userLimits.tier !== 'premium' && userLimits.vanguardUsed >= 3 ? (
+                    <Lock className="w-5 h-5 text-rose-400" />
+                  ) : (
+                    <Swords className="w-5 h-5 text-emerald-400" />
+                  )}
                 </div>
                 <div className="flex-1">
                   <h3 className="font-sans font-bold text-sm uppercase tracking-widest text-stone-100 mb-1">
@@ -1042,8 +936,17 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
                   <p className="text-[10px] text-zinc-400 font-mono leading-relaxed">
                     Ranked mode - 25 questions, mixed subjects, awards Contender Points
                   </p>
+                  {userLimits && userLimits.tier !== 'premium' && (
+                    <p className="text-[10px] font-mono mt-1 font-bold text-emerald-500">
+                      Assessment {Math.min(userLimits.vanguardUsed + 1, 3)} of 3 free
+                    </p>
+                  )}
                 </div>
-                <Sparkles className="w-4 h-4 text-emerald-400/60 group-hover:text-emerald-400 transition-colors" />
+                {userLimits && userLimits.tier !== 'premium' && userLimits.vanguardUsed >= 3 ? (
+                  <span className="text-[9px] font-mono uppercase bg-rose-500/10 text-rose-400 px-2 py-1 rounded-sm border border-rose-500/20">Locked</span>
+                ) : (
+                  <Sparkles className="w-4 h-4 text-emerald-400/60 group-hover:text-emerald-400 transition-colors" />
+                )}
               </div>
             </button>
           </motion.div>
@@ -1120,41 +1023,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
           )}
         </AnimatePresence>
 
-        <AnimatePresence>
-          {showPaywallModal && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm"
-              onClick={() => setShowPaywallModal(false)}
-            >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                onClick={(e) => e.stopPropagation()}
-                className="bg-zinc-950 border border-zinc-800 p-8 md:p-10 rounded-sm max-w-md w-full shadow-2xl"
-              >
-                <div className="flex flex-col items-center text-center">
-                  <div className="p-3 bg-zinc-800/60 border border-zinc-700/40 rounded-sm mb-6">
-                    <Lock className="w-6 h-6 text-[#e0d0ab]" />
-                  </div>
-                  <h2 className="text-xs uppercase tracking-widest font-bold text-zinc-400 mb-4">Training Ground Locked</h2>
-                  <p className="text-sm text-stone-300 leading-relaxed mb-6 font-sans">Unlock the Training Ground with Founders Club. Custom assessments, zero ranking pressure.</p>
-                  <button onClick={handleJoinFoundersClub} disabled={processingPayment} className="w-full flex items-center justify-center gap-2 py-2.5 px-6 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded-sm transition-all shadow-lg shadow-[#e0d0ab]/10 mb-3 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <Crown className="w-4 h-4" />
-                    {processingPayment ? 'Processing...' : 'Join Founders Club: ₹399'}
-                  </button>
-                  <button onClick={() => setShowPaywallModal(false)} className="text-[10px] text-zinc-600 hover:text-zinc-400 uppercase tracking-wider font-mono transition-colors">
-                    Continue Free
-                  </button>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+
 
         <AnimatePresence>
           {toastMsg && (
@@ -1420,10 +1289,10 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
       <div className="w-full max-w-2xl mt-4 md:mt-12 flex-1">
         {/* Mode Badge with Escape Hatch */}
         <div className="flex items-center justify-between mb-4">
-          <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tracking-widest uppercase backdrop-blur-md ${
+          <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-xs font-semibold tracking-widest uppercase backdrop-blur-md ${
             isRanked
-              ? 'bg-white/5 border border-white/10 text-slate-300'
-              : 'bg-white/5 border border-white/10 text-slate-300'
+              ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+              : 'bg-[#e0d0ab]/10 border border-[#e0d0ab]/20 text-[#e0d0ab]'
           }`}>
             {isRanked ? <Swords className="w-3.5 h-3.5" /> : <Target className="w-3.5 h-3.5" />}
             {isRanked ? 'Vanguard Assessment' : 'Training Ground'}
@@ -1432,7 +1301,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
           {/* Escape Hatch Button */}
           <button
             onClick={handleEndEarly}
-            className="text-xs uppercase tracking-wider text-slate-400 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 px-3 py-1.5 rounded-md transition-all duration-200 cursor-pointer"
+            className="text-xs uppercase tracking-wider text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 px-3 py-1.5 rounded-sm transition-all duration-200 cursor-pointer"
           >
             End Assessment Early
           </button>
@@ -1453,7 +1322,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
                   <motion.div
                     className={`w-2.5 h-2.5 rounded-full border transition-all ${
                       isCurrent
-                        ? 'bg-[#e0d0ab] border-stone-100'
+                        ? 'bg-[#e0d0ab] border-zinc-400'
                         : answeredStatus
                           ? 'bg-emerald-500/80 border-emerald-500'
                           : 'bg-zinc-800 border-zinc-700 hover:bg-zinc-700'
@@ -1551,7 +1420,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-sans font-medium text-xs text-zinc-500 uppercase tracking-widest inline-flex items-center gap-1.5">
                     Conceptual Insights
-                    <InfoTooltip text="Free tier grants 3 total AI explanations to ensure server stability. Founders Club members receive unlimited access." />
+                    <InfoTooltip text="Free tier grants 15 total AI explanations to ensure server stability. Founders Club members receive unlimited access." />
                   </h3>
                   {currentExplanation && (
                     <button
@@ -1590,7 +1459,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard }: Arena
                     </div>
                     <div className="absolute inset-0 backdrop-blur-md bg-zinc-950/40 flex items-center justify-center">
                       <button
-                        onClick={() => setShowPaywallModal(true)}
+                        onClick={() => onNavigateManifesto && onNavigateManifesto()}
                         className="px-4 py-2.5 bg-[#e0d0ab] text-zinc-950 font-sans text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-stone-100 transition-all shadow-lg shadow-[#e0d0ab]/10"
                       >
                         Limit Reached. Join the Founders Club for unlimited subjective analysis.

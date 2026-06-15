@@ -34,10 +34,10 @@ export default async function handler(req: any, res: any) {
     // Extract optional userId for no-repeat logic
     const userId: string | undefined = req.query?.userId;
 
-    // Build the base query
+    // Build the base query with column pruning
     let query = supabaseAnon
       .from('static_questions')
-      .select('*')
+      .select('id, exam_origin_tag, subject_category, difficulty_level, question_text, options_matrix, correct_option')
       .limit(500);
 
     // If userId is provided, exclude previously seen questions
@@ -70,7 +70,15 @@ export default async function handler(req: any, res: any) {
     // Set Cache-Control headers to make fetching ultra-fast and optimize serverless costs
     res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=1200, stale-while-revalidate=60');
 
-    return res.status(200).json({ questions: data || [] });
+    let finalQuestions = data || [];
+    // Server-side shuffle and pick 25
+    for (let i = finalQuestions.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [finalQuestions[i], finalQuestions[j]] = [finalQuestions[j], finalQuestions[i]];
+    }
+    finalQuestions = finalQuestions.slice(0, 25);
+
+    return res.status(200).json({ questions: finalQuestions });
   } catch (err: any) {
     console.error("Serverless questions fetch exception:", err);
     return res.status(500).json({ error: err.message, stack: err.stack || "An unexpected error occurred while loading questions." });

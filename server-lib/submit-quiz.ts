@@ -180,6 +180,16 @@ export default async function handler(req: any, res: any) {
       return res.status(500).json({ error: "Database error", details: attemptsError.message });
     }
 
+    // 4.5 If Vanguard (ranked), increment the user's freemium quota consumption
+    if (isRanked) {
+      const { error: rpcError } = await supabase.rpc('increment_vanguard_count', {
+        user_id_param: payload.userId,
+      });
+      if (rpcError) {
+        console.error("Failed to increment vanguard limit, but saving quiz anyway:", rpcError);
+      }
+    }
+
     // 5. Return success
     return res.status(200).json({
       sessionId,

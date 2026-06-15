@@ -12,9 +12,10 @@ interface AutopsyProps {
     subjectStats?: Record<string, { correct: number; total: number }>;
   };
   percentile: number;
+  onNavigateManifesto?: () => void;
 }
 
-export default function Autopsy({ stats, percentile }: AutopsyProps) {
+export default function Autopsy({ stats, percentile, onNavigateManifesto }: AutopsyProps) {
   const [insights, setInsights] = useState<string | null>(null);
   const [loadingInsights, setLoadingInsights] = useState(false);
 
@@ -58,7 +59,7 @@ export default function Autopsy({ stats, percentile }: AutopsyProps) {
           <p className="text-zinc-500 font-sans text-xs uppercase tracking-widest">Post-Session Analysis</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-zinc-800 border border-zinc-800 mb-8 rounded-lg overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-zinc-800 border border-zinc-800 mb-8 rounded-sm overflow-hidden">
           <div className="bg-zinc-950 p-6 flex flex-col items-center justify-center">
             <span className="text-4xl font-sans font-medium mb-1 text-emerald-400">{stats.correct}</span>
             <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-widest">Correct</span>
@@ -73,7 +74,7 @@ export default function Autopsy({ stats, percentile }: AutopsyProps) {
           </div>
         </div>
 
-        <div className="border border-zinc-800 bg-zinc-900/30 p-8 text-center rounded-lg mb-12">
+        <div className="border border-zinc-800 bg-zinc-900/30 p-8 text-center rounded-sm mb-12">
           <p className="text-lg font-sans text-zinc-300 leading-relaxed font-medium">
             You processed <span className="text-stone-100">{total}</span> protocols.
             <br className="mt-4" />
@@ -84,7 +85,7 @@ export default function Autopsy({ stats, percentile }: AutopsyProps) {
         </div>
 
         {/* Real Performance Metrics */}
-        <div className="relative border border-zinc-800 bg-[#0c0c0c] rounded-xl overflow-hidden mt-8">
+        <div className="relative border border-zinc-800 bg-[#0c0c0c] rounded-sm overflow-hidden mt-8">
           
           <div className="p-8 pb-12 space-y-12 transition-all">
             <div className="text-center">
@@ -170,20 +171,18 @@ export default function Autopsy({ stats, percentile }: AutopsyProps) {
         </div>
 
         {/* Founder's Club Bit */}
-        <div className="mt-12 w-full max-w-xl mx-auto backdrop-blur-md bg-zinc-900/40 border border-zinc-800/50 rounded-xl p-8 text-center shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
-          <h3 className="text-lg font-sans font-semibold text-white mb-4">Unlock The Network</h3>
-          <p className="text-sm font-sans text-zinc-400 mb-6 leading-relaxed">
+        <div className="mt-12 w-full max-w-xl mx-auto backdrop-blur-md bg-zinc-900/40 border border-zinc-800/50 rounded-sm p-8 text-center shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#e0d0ab]/20 to-transparent" />
+          <h3 className="text-lg font-sans font-semibold text-[#e0d0ab] mb-4">Unlock The Network</h3>
+          <p className="text-sm font-sans text-stone-300 mb-6 leading-relaxed">
             TARK is an ad-free initiative, forever. Secure Founder Status to unlock global rankings, peer-to-peer combat, direct dev communication, and personalized feedback for rapid growth in our paid package.
           </p>
-          <a 
-            href="https://razorpay.com/link/placeholder"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full sm:w-auto inline-block py-3 px-6 rounded-md text-sm font-sans font-medium text-black bg-white hover:bg-zinc-200 focus:outline-none transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] mb-8"
+          <button 
+            onClick={onNavigateManifesto}
+            className="w-full sm:w-auto inline-block py-3 px-6 rounded-sm text-sm font-sans font-medium text-zinc-950 bg-[#e0d0ab] hover:bg-stone-100 focus:outline-none transition-all shadow-[0_0_20px_rgba(224,208,171,0.1)] hover:shadow-[0_0_30px_rgba(224,208,171,0.3)] mb-8 cursor-pointer uppercase tracking-widest font-bold"
           >
             Secure Founder Status
-          </a>
+          </button>
           <div className="pt-6 border-t border-zinc-800/50">
             <p className="text-sm font-sans text-zinc-300 leading-relaxed max-w-md mx-auto italic">
               "I built this platform to test the absolute limits of true prep and your knowledge horizons. Founder Status gives you direct access. If you see a flaw in the system, I want to hear from you. - Your Architect."

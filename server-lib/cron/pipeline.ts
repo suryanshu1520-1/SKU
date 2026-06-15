@@ -407,6 +407,14 @@ export async function runPolicyPipeline(): Promise<{
   total_fetched: number;
 }> {
   console.log("[pipeline] Starting unified policy pipeline...");
+  
+  // Hard 55s timeout guard to prevent Vercel process kill
+  const globalTimeout = AbortSignal.timeout(55000);
+  let isTimedOut = false;
+  globalTimeout.addEventListener('abort', () => {
+    isTimedOut = true;
+    console.warn("[pipeline] Global 55s timeout reached. Initiating graceful exit.");
+  });
 
   // Build a shared CronConfig once for all getLlama3Insight calls
   const sharedConfig = getDefaultCronConfig();
@@ -424,6 +432,7 @@ export async function runPolicyPipeline(): Promise<{
 
   let allArticles: any[] = [];
   for (const feed of rssFeeds) {
+    if (isTimedOut) break;
     const articles = await fetchRssFeed(feed.url, feed.name);
     allArticles = [...allArticles, ...articles];
     await sleep(1500);
@@ -452,6 +461,10 @@ export async function runPolicyPipeline(): Promise<{
   const processedStore: any[] = [];
 
   for (const article of allArticles) {
+    if (isTimedOut) {
+      console.log(`[pipeline] Exiting early due to global timeout.`);
+      break;
+    }
     if (processedCount >= processLimit) {
       console.log(`[pipeline] Reached processing limit (${processLimit}). Stopping.`);
       break;

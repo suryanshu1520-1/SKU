@@ -309,7 +309,7 @@ export default function App() {
           ) : activeTab === 'tracker' ? (
             <CurrentAffairs userId={userId} />
           ) : gameState === 'arena' ? (
-            <Arena onComplete={handleArenaComplete} userId={userId} onReturnToDashboard={() => setActiveTab('tracker')} />
+            <Arena onComplete={handleArenaComplete} userId={userId} onReturnToDashboard={() => setActiveTab('tracker')} onNavigateManifesto={handleNavigateManifesto} />
           ) : (
             <Autopsy stats={arenaStats} percentile={percentile} />
           )}

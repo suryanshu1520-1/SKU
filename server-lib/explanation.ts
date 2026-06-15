@@ -30,27 +30,8 @@ const rawSupabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY ||
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4bmdmeGFlcmxra2NhY3JiZGdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTY3NDQsImV4cCI6MjA5NTc5Mjc0NH0.G44wtBZZKGPb-ZTX3zaIPCXFcRtPP9Vtv-0saO0dEXE";
 const supabaseAnon = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseAnonKey));
 
-const INSIGHTS_CACHE_FILE = path.join(process.cwd(), "ai_insights_cache.json");
-let inMemoryInsightsCache: Record<string, string> = {};
+// File-based cache removed for Vercel serverless compatibility.
 
-try {
-  if (fs.existsSync(INSIGHTS_CACHE_FILE)) {
-    const content = fs.readFileSync(INSIGHTS_CACHE_FILE, "utf-8");
-    inMemoryInsightsCache = JSON.parse(content);
-  }
-} catch (err) {
-  console.error("Local explanation cache load error:", err);
-}
-
-function saveToLocalCache(questionId: string, insights: string) {
-  if (!questionId || !insights) return;
-  inMemoryInsightsCache[questionId] = insights;
-  try {
-    fs.writeFileSync(INSIGHTS_CACHE_FILE, JSON.stringify(inMemoryInsightsCache, null, 2), "utf-8");
-  } catch (err) {
-    console.error("Local explanation cache write error:", err);
-  }
-}
 
 async function generateContentWithRetry(aiClient: any, params: any, maxRetries = 3, initialDelay = 1000) {
   let attempt = 0;
@@ -138,10 +119,10 @@ export default async function handler(req: any, res: any) {
       console.error("[ledger] Profile fetch error:", profileError);
     }
 
-    if (profile && profile.membership_tier !== 'premium' && profile.ai_autopsies_used >= 3) {
+    if (profile && profile.membership_tier !== 'premium' && profile.ai_autopsies_used >= 15) {
       return res.status(403).json({
         error: "limit_reached",
-        message: "Free tier autopsy limit exhausted. 3 of 3 AI autopsies used.",
+        message: "Free tier autopsy limit exhausted. 15 of 15 AI autopsies used.",
         autopsiesUsed: profile.ai_autopsies_used,
       });
     }
@@ -150,15 +131,7 @@ export default async function handler(req: any, res: any) {
     // Fail open — allow the request to proceed if we can't verify
   }
 
-  // Step 0: Check local persistent cache first
-  if (questionId && inMemoryInsightsCache[questionId]) {
-    try {
-      await incrementInsightLedger(userId);
-    } catch (incErr) {
-      console.error("[ledger] Failed to increment on local cache hit:", incErr);
-    }
-    return res.status(200).json({ explanation: inMemoryInsightsCache[questionId] });
-  }
+  // Local cache check removed for serverless compatibility.
 
   try {
     // Step 1: Query the database first
@@ -171,13 +144,13 @@ export default async function handler(req: any, res: any) {
           .maybeSingle();
 
         if (!error && dbQuestion && dbQuestion.ai_insights) {
-          saveToLocalCache(questionId, dbQuestion.ai_insights);
           // ─── LEDGER INCREMENT: Cache HIT path ───────────────
           try {
             await incrementInsightLedger(userId);
           } catch (incErr) {
             console.error("[ledger] Failed to increment on DB cache hit:", incErr);
           }
+          res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
           return res.status(200).json({ explanation: dbQuestion.ai_insights });
         }
       } catch (dbErr) {
@@ -197,6 +170,7 @@ export default async function handler(req: any, res: any) {
 
           if (!error && dbQuestion && dbQuestion.conceptual_explanation) {
             // Fallback conceptual explanations are static content — do NOT increment ledger
+            res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
             return res.status(200).json({ explanation: dbQuestion.conceptual_explanation });
           }
         } catch (dbErr) {
@@ -230,8 +204,6 @@ export default async function handler(req: any, res: any) {
     const generatedInsights = response.text;
 
     if (questionId && generatedInsights) {
-      saveToLocalCache(questionId, generatedInsights);
-
       // Step 4: Write back to the database as best effort
       try {
         await supabaseServer
@@ -253,6 +225,7 @@ export default async function handler(req: any, res: any) {
       }
     }
 
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
     return res.status(200).json({ explanation: generatedInsights });
   } catch (error: any) {
     console.error("Gemini API Error (explanation):", error);
