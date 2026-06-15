@@ -40,7 +40,7 @@ export function getCronConfig(): CronConfig {
     feeds = [
       "https://economictimes.indiatimes.com/news/economy/policy/rssfeeds/2142142220.cms",
       "https://www.livemint.com/rss/economy",
-      "https://pib.gov.in/RssFeed.aspx?PingID=1",
+      "https://www.pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3&reg=48",
       "https://www.thehindu.com/news/national/feeder/default.rss"
     ];
   }

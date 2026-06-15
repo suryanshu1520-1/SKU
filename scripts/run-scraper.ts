@@ -208,6 +208,9 @@ async function run() {
 
   await browser.close();
   console.log(`[scraper-daemon] Finished. Processed: ${processedCount}, Filtered: ${filteredCount}, Errors: ${errorCount}`);
+  
+  // Force exit to ensure GitHub Actions runner terminates successfully despite dangling WebSocket connections from Gradio
+  process.exit(0);
 }
 
 run().catch(err => {
