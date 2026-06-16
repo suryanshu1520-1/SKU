@@ -11,7 +11,7 @@
 
 import { gotScraping } from "got-scraping";
 import * as cheerio from "cheerio";
-import { GoogleGenAI } from "@google/genai";
+import { Client } from "@gradio/client";
 import { createClient } from "@supabase/supabase-js";
 import WebSocket from 'ws';
 import dotenv from "dotenv";
@@ -191,41 +191,38 @@ async function scrapeArticleBody(url: string): Promise<string> {
 
     let contentText = "";
 
-    // Broad semantic selectors (not fragile CSS classes)
+    // Broad semantic selectors for the main article wrapper
     const selectors = [
       ".entry-content",
+      ".td-post-content",
+      ".post-content",
       "article",
       "main",
-      ".post-content",
-      ".td-post-content",
-      ".article-detail",
     ];
 
+    let contentContainer = null;
     for (const selector of selectors) {
       const container = $(selector);
-      if (container.length > 0 && container.text().trim().length > 200) {
-        contentText = container.text().trim();
+      if (container.length > 0) {
+        contentContainer = container;
         break;
       }
     }
 
-    // Fallback: extract all paragraphs
-    if (!contentText || contentText.length < 200) {
-      const paragraphs: string[] = [];
-      $("p").each((_i, el) => {
-        const text = $(el).text().trim();
-        if (text.length > 30) {
-          paragraphs.push(text);
-        }
-      });
-      contentText = paragraphs.join("\n\n");
+    if (!contentContainer || contentContainer.length === 0) {
+      contentContainer = $("body");
     }
 
-    // Clean up whitespace
-    contentText = contentText
-      .replace(/\s+/g, " ")
-      .replace(/\n{3,}/g, "\n\n")
-      .trim();
+    // Extract text specifically from content-bearing tags to avoid truncation and squashing
+    const chunks: string[] = [];
+    contentContainer.find("h1, h2, h3, h4, p, li").each((_i, el) => {
+      const text = $(el).text().replace(/\s+/g, " ").trim();
+      if (text.length > 20) {
+        chunks.push(text);
+      }
+    });
+
+    contentText = chunks.join("\n\n");
 
     if (contentText.length < 50) {
       console.warn(`[pib-aggregator] Article body too short (${contentText.length} chars), skipping: ${url}`);
@@ -360,8 +357,8 @@ function parseLlmJson(raw: string): DigestPayload | null {
   return null;
 }
 
-async function transformWithGemini(rawText: string): Promise<DigestPayload | null> {
-  console.log("[pib-aggregator] Connecting to Gemini API...");
+async function transformWithLlama(rawText: string): Promise<DigestPayload | null> {
+  console.log("[pib-aggregator] Connecting to Llama 3.1 8B-Instruct Gradio space...");
 
   const promptPayload = [
     EDITORIAL_SYSTEM_PROMPT,
@@ -371,36 +368,31 @@ async function transformWithGemini(rawText: string): Promise<DigestPayload | nul
   ].join("\n");
 
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      console.warn("[pib-aggregator] GEMINI_API_KEY is not set.");
-      return null;
-    }
+    const hfToken = process.env.HF_ACCESS_TOKEN || "";
+    const client = await Client.connect(
+      "SKU1/meta-llama-Llama-3.1-8B-Instruct",
+      hfToken ? ({ hf_token: hfToken } as any) : undefined
+    );
 
-    const ai = new GoogleGenAI({ apiKey });
+    console.log("[pib-aggregator] Sending text to Llama 3.1 for editorial formatting...");
 
-    console.log("[pib-aggregator] Sending text to Gemini for editorial formatting...");
-
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: promptPayload,
-      config: {
-        temperature: 0.2,
-      }
+    const result = await client.predict("/chat_fn", {
+      message: promptPayload,
     });
 
-    const outputText = response.text;
+    const aiResult = (result as any).data?.[0];
 
-    if (!outputText) {
-      console.warn("[pib-aggregator] Gemini returned empty result");
+    if (!aiResult) {
+      console.warn("[pib-aggregator] Gradio returned empty result");
       return null;
     }
 
+    const outputText = typeof aiResult === "string" ? aiResult : JSON.stringify(aiResult);
     console.log(`[pib-aggregator] LLM returned ${outputText.length} chars`);
 
     return parseLlmJson(outputText);
   } catch (error: any) {
-    console.error(`[pib-aggregator] Gemini connection failed: ${error.message}`);
+    console.error(`[pib-aggregator] Llama 3.1 connection failed: ${error.message}`);
     return null;
   }
 }
@@ -507,9 +499,9 @@ async function main() {
 
   console.log(`[pib-aggregator] Successfully scraped ${rawTexts.length} articles`);
 
-  // Step 3: Concatenate and send to Gemini
+  // Step 3: Concatenate and send to Llama 3.1
   const combinedRawText = rawTexts.join("\n\n---\n\n");
-  const digest = await transformWithGemini(combinedRawText);
+  const digest = await transformWithLlama(combinedRawText);
 
   if (!digest) {
     console.error("[pib-aggregator] LLM transformation failed or JSON parsing failed. Exiting.");
