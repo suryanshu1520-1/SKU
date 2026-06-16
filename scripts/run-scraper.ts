@@ -1,4 +1,5 @@
-import { chromium } from "playwright";
+import { gotScraping } from "got-scraping";
+import * as cheerio from "cheerio";
 import TurndownService from "turndown";
 import { getCronConfig } from "../server-lib/cron/config.js";
 import { fetchAndParseRssFeed } from "../server-lib/cron/rss.js";
@@ -27,16 +28,6 @@ async function run() {
   const turndownService = new TurndownService({
     headingStyle: 'atx',
     codeBlockStyle: 'fenced'
-  });
-
-  console.log("[scraper-daemon] Booting Playwright Chromium instance...");
-  const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({
-    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-    viewport: { width: 1280, height: 720 },
-    extraHTTPHeaders: {
-      "Accept-Language": "en-US,en;q=0.9",
-    }
   });
 
   let processedCount = 0;
@@ -80,54 +71,85 @@ async function run() {
         }
 
         console.log(`[scraper-daemon] Scraping: ${itemUrl}`);
-        const page = await context.newPage();
         
         try {
-          // Robust navigation for JS challenged sites like PIB
-          await page.goto(itemUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
-          
-          // If it's PIB, wait a bit longer for ASP.NET ViewState or JS redirect
-          if (itemUrl.includes('pib.gov.in')) {
-            console.log(`[scraper-daemon] PIB detected, waiting for network idle...`);
-            try {
-              await page.waitForLoadState('networkidle', { timeout: 15000 });
-            } catch (e) {
-               console.warn(`[scraper-daemon] PIB networkidle timeout, continuing...`);
-            }
-            
-            try {
-              await page.waitForSelector('.release-text, .ReleaseId, #content, .content-area', { state: 'attached', timeout: 10000 });
-            } catch (e) {
-               console.warn(`[scraper-daemon] PIB specific selector wait failed, using current DOM.`);
-            }
-          } else {
-             // For standard sites, wait a short moment for dynamic content
-             await page.waitForTimeout(2000);
+          // Initial GET request via got-scraping
+          const requestOptions: any = {
+            url: itemUrl,
+            headerGeneratorOptions: {
+              browsers: [{ name: 'chrome', minVersion: 115 }],
+              devices: ['desktop'],
+              locales: ['en-US', 'en'],
+              operatingSystems: ['windows', 'linux']
+            },
+            timeout: { request: 30000 }
+          };
+
+          if (process.env.PROXY_URL) {
+            requestOptions.proxyUrl = process.env.PROXY_URL;
           }
 
-          // Aggressive DOM pruning
-          await page.evaluate(() => {
-            const selectorsToRemove = [
-              'nav', 'header', 'footer', 'aside', '.sidebar', 'script', 'style', 
-              '.social-share', '.ad-banner', '.ads', 'iframe', 'form', '.newsletter', 
-              '.cookie-banner', '#comments', '.comments', '.related-articles',
-              'noscript', 'svg', 'img', 'video', 'audio', '.menu', '#menu'
-            ];
+          let response = await gotScraping(requestOptions);
+          let html = response.body;
+
+          // ASP.NET ViewState / Postback handling for .aspx pages (e.g. PIB)
+          if (itemUrl.includes('.aspx') && itemUrl.includes('pib.gov.in')) {
+            console.log(`[scraper-daemon] ASP.NET page detected, checking for ViewState...`);
+            let $ = cheerio.load(html);
+            const viewState = $('#__VIEWSTATE').val() as string;
+            const viewStateGenerator = $('#__VIEWSTATEGENERATOR').val() as string;
+            const eventValidation = $('#__EVENTVALIDATION').val() as string;
             
-            document.querySelectorAll(selectorsToRemove.join(', ')).forEach(el => el.remove());
-            
-            // Further targeted pruning for typical Indian news sites
-            document.querySelectorAll('[class*="banner"], [id*="banner"], [class*="ad-"], [id*="ad-"], [class*="social"], [class*="share"], [class*="widget"], [class*="promo"]').forEach(el => el.remove());
-          });
+            if (viewState) {
+               console.log(`[scraper-daemon] ViewState found. Executing ASP.NET POST...`);
+               const cookies = response.headers['set-cookie'];
+               
+               const postOptions: any = {
+                 url: itemUrl,
+                 method: 'POST',
+                 headerGeneratorOptions: requestOptions.headerGeneratorOptions,
+                 form: {
+                    __VIEWSTATE: viewState,
+                    __VIEWSTATEGENERATOR: viewStateGenerator || '',
+                    __EVENTVALIDATION: eventValidation || ''
+                 },
+                 timeout: { request: 30000 }
+               };
+
+               if (cookies) {
+                 postOptions.headers = { 'Cookie': cookies.join('; ') };
+               }
+               if (process.env.PROXY_URL) {
+                 postOptions.proxyUrl = process.env.PROXY_URL;
+               }
+
+               response = await gotScraping(postOptions);
+               html = response.body;
+            }
+          }
+
+          const $ = cheerio.load(html);
+
+          // Aggressive DOM pruning with Cheerio
+          const selectorsToRemove = [
+            'nav', 'header', 'footer', 'aside', '.sidebar', 'script', 'style', 
+            '.social-share', '.ad-banner', '.ads', 'iframe', 'form', '.newsletter', 
+            '.cookie-banner', '#comments', '.comments', '.related-articles',
+            'noscript', 'svg', 'img', 'video', 'audio', '.menu', '#menu',
+            '[class*="banner"]', '[id*="banner"]', '[class*="ad-"]', '[id*="ad-"]', 
+            '[class*="social"]', '[class*="share"]', '[class*="widget"]', '[class*="promo"]'
+          ];
+          
+          $(selectorsToRemove.join(', ')).remove();
 
           // Extract main content semantic HTML
           let contentHtml = '';
           const mainContainers = ['article', 'main', '.release-text', '.content-area', '#content', 'body'];
           
           for (const selector of mainContainers) {
-            const el = await page.$(selector);
-            if (el) {
-              contentHtml = await el.innerHTML();
+            const el = $(selector);
+            if (el.length > 0) {
+              contentHtml = el.html() || '';
               if (contentHtml.length > 200) {
                  break;
               }
@@ -136,7 +158,6 @@ async function run() {
 
           if (!contentHtml || contentHtml.length < 50) {
             console.warn(`[scraper-daemon] Failed to extract meaningful HTML for ${itemUrl}`);
-            await page.close();
             filteredCount++;
             continue;
           }
@@ -153,7 +174,6 @@ async function run() {
           if (!aiInsight || !aiInsight.text) {
             console.warn(`[scraper-daemon] AI returned null (no insight) for ${itemUrl}`);
             filteredCount++;
-            await page.close();
             continue;
           }
 
@@ -196,8 +216,6 @@ async function run() {
         } catch (pageErr: any) {
           console.error(`[scraper-daemon] Page error for ${itemUrl}: ${pageErr.message}`);
           errorCount++;
-        } finally {
-          await page.close();
         }
       }
     } catch (feedErr: any) {
@@ -206,7 +224,6 @@ async function run() {
     }
   }
 
-  await browser.close();
   console.log(`[scraper-daemon] Finished. Processed: ${processedCount}, Filtered: ${filteredCount}, Errors: ${errorCount}`);
   
   // Force exit to ensure GitHub Actions runner terminates successfully despite dangling WebSocket connections from Gradio

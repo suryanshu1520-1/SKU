@@ -78,7 +78,7 @@ export async function getLlama3Insight(
 
   try {
     const hfToken = (globalThis as any)?.process?.env?.HF_ACCESS_TOKEN || "";
-    const client = await Client.connect("SKU1/meta-llama-Llama-3.1-8B-Instruct", hfToken ? { hf_token: hfToken } : undefined);
+    const client = await Client.connect("SKU1/meta-llama-Llama-3.1-8B-Instruct", hfToken ? { hf_token: hfToken } as any : undefined);
     
     // 2. Exact match to your Python params: message="...", api_name="/chat_fn"
     const result = await client.predict("/chat_fn", {
