@@ -17,6 +17,15 @@ interface CurrentAffairsItem {
   created_at?: string;
 }
 
+interface PibDigestItem {
+  id: string;
+  title: string;
+  date: string;
+  content: string;
+  url: string;
+  created_at: string;
+}
+
 interface CurrentAffairsProps {
   userId: string;
 }
@@ -51,7 +60,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
   // PIB Digest modal state
   const [showPibModal, setShowPibModal] = useState(false);
-  const [pibDigests, setPibDigests] = useState<any[]>([]);
+  const [pibDigests, setPibDigests] = useState<PibDigestItem[]>([]);
   const [activeDigestIndex, setActiveDigestIndex] = useState(0);
 
   // Fetch PIB digests when modal is opened
@@ -59,10 +68,9 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
     if (!showPibModal) return;
     (async () => {
       const { data } = await supabase
-        .from('current_affairs')
+        .from('pib_digests')
         .select('*')
-        .eq('source', 'PIB_Digest')
-        .order('created_at', { ascending: false });
+        .order('date', { ascending: false });
       if (data) {
         setPibDigests(data);
         setActiveDigestIndex(0);
@@ -715,11 +723,11 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                   <>
                     <div className="mb-8 border-b border-zinc-800 pb-6 pr-8">
                       <h2 className="text-2xl font-sans font-bold tracking-tight text-[#e0d0ab] mb-2">
-                        {pibDigests[activeDigestIndex]?.headline || 'PIB Digest'}
+                        {pibDigests[activeDigestIndex]?.title || 'PIB Digest'}
                       </h2>
-                      {pibDigests[activeDigestIndex]?.created_at && (
+                      {pibDigests[activeDigestIndex]?.date && (
                         <p className="text-xs text-zinc-500 font-mono tracking-wider uppercase">
-                          {new Date(pibDigests[activeDigestIndex].created_at).toLocaleDateString(undefined, {
+                          {new Date(pibDigests[activeDigestIndex].date).toLocaleDateString(undefined, {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric'
@@ -730,7 +738,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
                     <div className="prose prose-invert max-w-none font-merriweather w-full overflow-x-auto">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {pibDigests[activeDigestIndex]?.summary?.bullets?.[0] || 'No content available.'}
+                        {pibDigests[activeDigestIndex]?.content || 'No content available.'}
                       </ReactMarkdown>
                     </div>
 

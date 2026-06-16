@@ -411,25 +411,22 @@ async function upsertDigest(
   const digestUrl = `pib-digest://${digest.date}`;
 
   const row = {
-    source: "PIB_Digest",
-    headline: digest.title,
-    summary: { bullets: [digest.content] },
+    title: digest.title,
+    date: digest.date.includes("T") ? digest.date.split("T")[0] : digest.date,
+    content: digest.content,
     url: digestUrl,
-    ministry: "Press Information Bureau",
-    published_at: digest.date.includes("T") ? digest.date : digest.date + "T00:00:00.000Z",
     created_at: new Date().toISOString(),
   };
 
-  console.log("[pib-aggregator] Upserting to Supabase...", {
-    headline: row.headline.substring(0, 60),
-    source: row.source,
+  console.log("[pib-aggregator] Upserting to Supabase pib_digests...", {
+    title: row.title.substring(0, 60),
     url: row.url,
-    published_at: row.published_at,
+    date: row.date,
   });
 
   try {
     const { error } = await supabase
-      .from("current_affairs")
+      .from("pib_digests")
       .upsert([row], { onConflict: "url" });
 
     if (error) {
@@ -527,7 +524,8 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("\n[pib-aggregator] Pipeline complete. Digest inserted into Supabase with source='PIB_Digest'.");
+  console.log("\n[pib-aggregator] Pipeline complete. Digest inserted into Supabase pib_digests table.");
+  process.exit(0);
 }
 
 // Run when executed directly
