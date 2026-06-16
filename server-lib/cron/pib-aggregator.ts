@@ -11,7 +11,7 @@
 
 import { gotScraping } from "got-scraping";
 import * as cheerio from "cheerio";
-import { Client } from "@gradio/client";
+import { GoogleGenAI } from "@google/genai";
 import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
 
@@ -347,8 +347,8 @@ function parseLlmJson(raw: string): DigestPayload | null {
   return null;
 }
 
-async function transformWithLlama(rawText: string): Promise<DigestPayload | null> {
-  console.log("[pib-aggregator] Connecting to Llama 3.1 8B-Instruct Gradio space...");
+async function transformWithGemini(rawText: string): Promise<DigestPayload | null> {
+  console.log("[pib-aggregator] Connecting to Gemini API...");
 
   const promptPayload = [
     EDITORIAL_SYSTEM_PROMPT,
@@ -358,31 +358,36 @@ async function transformWithLlama(rawText: string): Promise<DigestPayload | null
   ].join("\n");
 
   try {
-    const hfToken = process.env.HF_ACCESS_TOKEN || "";
-    const client = await Client.connect(
-      "SKU1/meta-llama-Llama-3.1-8B-Instruct",
-      hfToken ? ({ hf_token: hfToken } as any) : undefined
-    );
-
-    console.log("[pib-aggregator] Sending text to Llama 3.1 for editorial formatting...");
-
-    const result = await client.predict("/chat_fn", {
-      message: promptPayload,
-    });
-
-    const aiResult = (result as any).data?.[0];
-
-    if (!aiResult) {
-      console.warn("[pib-aggregator] Gradio returned empty result");
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      console.warn("[pib-aggregator] GEMINI_API_KEY is not set.");
       return null;
     }
 
-    const outputText = typeof aiResult === "string" ? aiResult : JSON.stringify(aiResult);
+    const ai = new GoogleGenAI({ apiKey });
+
+    console.log("[pib-aggregator] Sending text to Gemini for editorial formatting...");
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: promptPayload,
+      config: {
+        temperature: 0.2,
+      }
+    });
+
+    const outputText = response.text;
+
+    if (!outputText) {
+      console.warn("[pib-aggregator] Gemini returned empty result");
+      return null;
+    }
+
     console.log(`[pib-aggregator] LLM returned ${outputText.length} chars`);
 
     return parseLlmJson(outputText);
   } catch (error: any) {
-    console.error(`[pib-aggregator] Llama 3.1 connection failed: ${error.message}`);
+    console.error(`[pib-aggregator] Gemini connection failed: ${error.message}`);
     return null;
   }
 }
@@ -489,9 +494,9 @@ async function main() {
 
   console.log(`[pib-aggregator] Successfully scraped ${rawTexts.length} articles`);
 
-  // Step 3: Concatenate and send to Llama 3.1
+  // Step 3: Concatenate and send to Gemini
   const combinedRawText = rawTexts.join("\n\n---\n\n");
-  const digest = await transformWithLlama(combinedRawText);
+  const digest = await transformWithGemini(combinedRawText);
 
   if (!digest) {
     console.error("[pib-aggregator] LLM transformation failed or JSON parsing failed. Exiting.");
