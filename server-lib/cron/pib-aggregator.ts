@@ -13,6 +13,7 @@ import { gotScraping } from "got-scraping";
 import * as cheerio from "cheerio";
 import { GoogleGenAI } from "@google/genai";
 import { createClient } from "@supabase/supabase-js";
+import WebSocket from 'ws';
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -56,7 +57,19 @@ function getSupabaseClient() {
     console.warn("[pib-aggregator] WARNING: SUPABASE_SERVICE_ROLE_KEY is empty. DB writes will fail.");
   }
 
-  return createClient(supabaseUrl, supabaseServiceRoleKey);
+  const options = {
+    auth: {
+      persistSession: false,
+    },
+    realtime: {
+      transport: WebSocket,
+      params: {
+        eventsPerSecond: 10,
+      },
+    },
+  };
+
+  return createClient(supabaseUrl, supabaseServiceRoleKey, options);
 }
 
 // ============================================================
