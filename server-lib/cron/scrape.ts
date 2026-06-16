@@ -110,7 +110,7 @@ export default async function handler(req: any, res: any) {
         if (itemUrl.includes("livemint.com")) sourceTag = "LIVEMINT";
         else if (itemUrl.includes("economictimes.indiatimes")) sourceTag = "ECONOMIC TIMES";
         else if (itemUrl.includes("thehindu.com")) sourceTag = "THE HINDU";
-        else if (itemUrl.includes("pib.gov.in")) sourceTag = "PIB";
+
 
         // 2. DYNAMIC MINISTRY TAGGING
         let ministryTag = "GENERAL";

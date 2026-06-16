@@ -1,0 +1,33 @@
+name: PIB Aggregator Daemon
+
+on:
+  schedule:
+    # 6:00 AM IST (00:30 UTC)
+    - cron: '30 0 * * *'
+    # 12:00 AM Midnight IST (18:30 UTC)
+    - cron: '30 18 * * *'
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  run-aggregator:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Execute PIB Aggregator
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          HF_ACCESS_TOKEN: ${{ secrets.HF_ACCESS_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: npx tsx server-lib/cron/pib-aggregator.ts

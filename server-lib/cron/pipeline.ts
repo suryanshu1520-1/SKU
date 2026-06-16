@@ -369,7 +369,6 @@ function deriveSourceTag(url: string, fallbackSource: string): string {
   if (url.includes("livemint.com")) return "LIVEMINT";
   if (url.includes("economictimes.indiatimes")) return "ECONOMIC TIMES";
   if (url.includes("thehindu.com")) return "THE HINDU";
-  if (url.includes("pib.gov.in")) return "PIB";
   if (url.includes("indianexpress.com")) return "INDIAN EXPRESS";
   if (url.includes("business-standard.com")) return "BUSINESS STANDARD";
   if (url.includes("rbi.org.in")) return "RBI";
@@ -421,7 +420,6 @@ export async function runPolicyPipeline(): Promise<{
 
   // 1. Fetch RSS feeds from multiple sources (extended with the two new URLs)
   const rssFeeds = [
-    { url: 'https://pib.gov.in/RssFeed.aspx?PingID=1', name: 'PIB English National' },
     { url: 'https://www.thehindu.com/opinion/editorial/feeder/default.rss', name: 'The Hindu Editorials' },
     { url: 'https://www.thehindu.com/business/Economy/feeder/default.rss', name: 'The Hindu Macro-Economy' },
     { url: 'https://indianexpress.com/section/explained/feed/', name: 'Indian Express Explained' },

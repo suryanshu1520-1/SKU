@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
-import { ExternalLink, Filter, RotateCcw, BookOpen, Inbox, RefreshCw, CheckCircle2, AlertCircle, Calendar, Bookmark } from 'lucide-react';
+import { ExternalLink, Filter, RotateCcw, BookOpen, Inbox, RefreshCw, CheckCircle2, AlertCircle, Calendar, Bookmark, X } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface CurrentAffairsItem {
   id?: string;
@@ -46,6 +48,27 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
   // Background sync processing toast state
   const [showBackgroundToast, setShowBackgroundToast] = useState(false);
+
+  // PIB Digest modal state
+  const [showPibModal, setShowPibModal] = useState(false);
+  const [pibDigests, setPibDigests] = useState<any[]>([]);
+  const [activeDigestIndex, setActiveDigestIndex] = useState(0);
+
+  // Fetch PIB digests when modal is opened
+  useEffect(() => {
+    if (!showPibModal) return;
+    (async () => {
+      const { data } = await supabase
+        .from('current_affairs')
+        .select('*')
+        .eq('source', 'PIB_Digest')
+        .order('created_at', { ascending: false });
+      if (data) {
+        setPibDigests(data);
+        setActiveDigestIndex(0);
+      }
+    })();
+  }, [showPibModal]);
 
   // Auto-dismiss toast
   useEffect(() => {
@@ -107,7 +130,8 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
     try {
       let query = supabase
         .from('current_affairs')
-        .select('*');
+        .select('*')
+        .neq('source', 'PIB_Digest');
 
       // Apply server-side date filtering when dates are set
       if (filterStartDate) {
@@ -439,6 +463,17 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
             })}
           </div>
         </div>
+
+        {/* PIB Digest Trigger Button */}
+        <div className="mt-8 pt-6 border-t border-zinc-900">
+          <button
+            onClick={() => setShowPibModal(true)}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-zinc-900/40 hover:bg-zinc-900 border border-zinc-800 hover:border-[#e0d0ab]/50 text-stone-300 hover:text-[#e0d0ab] rounded-sm transition-all focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50 shadow-sm cursor-pointer"
+          >
+            <BookOpen className="w-4 h-4" />
+            <span className="text-xs font-sans font-bold tracking-wider uppercase">PIB Digests</span>
+          </button>
+        </div>
       </div>
 
       {/* Main Dashboard Feed */}
@@ -645,6 +680,85 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                 <RefreshCw className="w-3 h-3 animate-spin text-emerald-400" />
                 Extraction initialized. Updates will pop live in your ledger momentarily.
               </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        {/* PIB Digest Modal */}
+        <AnimatePresence>
+          {showPibModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/80 backdrop-blur-md flex justify-center items-start pt-12 pb-12 px-4"
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                className="bg-zinc-900 border border-zinc-800 w-full max-w-3xl rounded-xl p-8 shadow-2xl relative"
+              >
+                <button
+                  onClick={() => setShowPibModal(false)}
+                  className="absolute top-4 right-4 text-zinc-500 hover:text-zinc-200 transition-colors cursor-pointer"
+                  aria-label="Close PIB Digest"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+
+                {pibDigests.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center p-12 text-center">
+                    <Inbox className="w-8 h-8 text-zinc-700 mb-4" />
+                    <p className="text-zinc-400 font-sans text-sm">No PIB Digests available at this time.</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="mb-8 border-b border-zinc-800 pb-6 pr-8">
+                      <h2 className="text-2xl font-sans font-bold tracking-tight text-[#e0d0ab] mb-2">
+                        {pibDigests[activeDigestIndex]?.headline || 'PIB Digest'}
+                      </h2>
+                      {pibDigests[activeDigestIndex]?.created_at && (
+                        <p className="text-xs text-zinc-500 font-mono tracking-wider uppercase">
+                          {new Date(pibDigests[activeDigestIndex].created_at).toLocaleDateString(undefined, {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                          })}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="prose prose-invert max-w-none font-merriweather w-full overflow-x-auto">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {pibDigests[activeDigestIndex]?.summary?.bullets?.[0] || 'No content available.'}
+                      </ReactMarkdown>
+                    </div>
+
+                    {/* The Navigation Dock */}
+                    <div className="mt-10 pt-6 border-t border-zinc-800 flex items-center justify-between">
+                      <button
+                        onClick={() => setActiveDigestIndex(Math.max(0, activeDigestIndex - 1))}
+                        disabled={activeDigestIndex === 0}
+                        className="px-4 py-2 bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-stone-300 rounded-sm transition-colors disabled:opacity-30 disabled:cursor-not-allowed font-sans text-sm font-medium flex items-center gap-2 cursor-pointer"
+                      >
+                        ← Previous Edition
+                      </button>
+                      
+                      <div className="text-xs font-mono text-zinc-500">
+                        {activeDigestIndex + 1} of {pibDigests.length}
+                      </div>
+
+                      <button
+                        onClick={() => setActiveDigestIndex(Math.min(pibDigests.length - 1, activeDigestIndex + 1))}
+                        disabled={activeDigestIndex === pibDigests.length - 1}
+                        className="px-4 py-2 bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-stone-300 rounded-sm transition-colors disabled:opacity-30 disabled:cursor-not-allowed font-sans text-sm font-medium flex items-center gap-2 cursor-pointer"
+                      >
+                        Next Edition →
+                      </button>
+                    </div>
+                  </>
+                )}
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
