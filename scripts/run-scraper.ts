@@ -37,7 +37,31 @@ async function run() {
   for (const feedUrl of config.feeds) {
     try {
       console.log(`[scraper-daemon] Processing feed: ${feedUrl}`);
-      const items = await fetchAndParseRssFeed(feedUrl, config) || [];
+      let items: any[] = [];
+
+      if (feedUrl.includes("pib.gov.in/allRel.aspx")) {
+         try {
+           const response = await gotScraping({
+             url: feedUrl,
+             headerGeneratorOptions: { browsers: [{ name: 'chrome', minVersion: 115 }] }
+           });
+           const $ = cheerio.load(response.body);
+           $('ul li a, .content-area a').each((i, el) => {
+             const href = $(el).attr('href');
+             if (href && href.includes('PressReleasePage.aspx')) {
+               items.push({
+                 title: $(el).text().trim(),
+                 link: href.startsWith('http') ? href : 'https://pib.gov.in/' + href.replace(/^\//, '')
+               });
+             }
+           });
+         } catch (e: any) {
+           console.error(`[scraper-daemon] Failed to scrape PIB HTML index: ${e.message}`);
+         }
+      } else {
+         items = await fetchAndParseRssFeed(feedUrl, config) || [];
+      }
+
       const toProcess = items.slice(0, config.maxItemsPerFeed);
 
       for (const item of toProcess) {
