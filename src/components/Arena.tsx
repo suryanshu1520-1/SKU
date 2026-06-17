@@ -1384,9 +1384,16 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
         </div>
 
         {/* Query Headline */}
-        <h2 className="text-lg md:text-xl font-serif whitespace-pre-wrap font-medium leading-relaxed mb-6 text-stone-100">
-          {currentQuestion.question_text}
-        </h2>
+        <div className="text-lg md:text-xl font-serif font-medium leading-relaxed mb-6 text-stone-100">
+          <Markdown components={{
+            p: ({node, ...props}: any) => <p className="mb-4 last:mb-0" {...props} />,
+            ol: ({node, ...props}: any) => <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />,
+            ul: ({node, ...props}: any) => <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />,
+            li: ({node, ...props}: any) => <li className="pl-1 [&>p]:mb-0 [&>p]:mt-0" {...props} />
+          }}>
+            {currentQuestion.question_text}
+          </Markdown>
+        </div>
 
         {/* Options */}
         <div className="space-y-3 mb-8 max-h-[calc(85vh-300px)] overflow-y-auto overflow-x-hidden">
@@ -1399,7 +1406,9 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
             >
               <div className="flex items-start">
                 <span className="font-sans font-medium text-xs mr-4 mt-0.5 opacity-50">{key}.</span>
-                <span>{value as string}</span>
+                <Markdown components={{ p: ({node, ...props}: any) => <span {...props} /> }}>
+                  {value as string}
+                </Markdown>
               </div>
             </button>
           ))}

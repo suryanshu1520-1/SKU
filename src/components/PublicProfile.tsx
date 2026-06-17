@@ -182,8 +182,8 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
           {dossierState === 'TARGET_PRIVATE' && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Shield className="w-12 h-12 text-zinc-700 mb-4" />
-              <p className="text-sm text-zinc-400 font-sans leading-relaxed">
-                This analyst's dossier is classified.
+              <p className="text-sm text-zinc-400 font-sans leading-relaxed font-bold">
+                CLASSIFIED: This Operator has restricted external telemetry.
               </p>
               <p className="text-[10px] text-zinc-600 mt-3 uppercase tracking-wider font-mono">
                 Operator went dark

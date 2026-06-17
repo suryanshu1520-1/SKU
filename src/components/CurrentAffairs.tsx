@@ -37,7 +37,9 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
   const [syncSuccess, setSyncSuccess] = useState<boolean | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [syncCooldown, setSyncCooldown] = useState(0);
-  const [rowLimit, setRowLimit] = useState<number>(10);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const PAGE_SIZE = 50;
 
   // Bookmark state
   const [savedArticleIds, setSavedArticleIds] = useState<Set<string>>(new Set());
@@ -135,17 +137,25 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
         }
 
         if (data) {
-          setSavedArticleIds(new Set(data.map(row => row.article_id)));
+          setSavedArticleIds(prev => {
+            const next = new Set(data.map(row => row.article_id));
+            // Preserve optimistically saving items
+            savingArticleIds.forEach(id => {
+              if (prev.has(id)) next.add(id);
+              else next.delete(id);
+            });
+            return next;
+          });
         }
       } catch (err) {
         console.warn("Error fetching saved article IDs:", err);
       }
     })();
-  }, [userId]);
+  }, [userId, savingArticleIds]);
 
   // Distinct fetch helper - conditionally applies date filters to the Supabase query
-  const fetchPolicyData = async (showSkeleton = true, filterStartDate?: string, filterEndDate?: string) => {
-    if (showSkeleton) setLoading(true);
+  const fetchPolicyData = async (showSkeleton = true, filterStartDate?: string, filterEndDate?: string, pageIndex = 0) => {
+    if (showSkeleton && pageIndex === 0) setLoading(true);
     setErrorMsg('');
     try {
       let query = supabase
@@ -164,34 +174,48 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
         query = query.lt('created_at', endInclusive.toISOString().split('T')[0]);
       }
 
-      const { data, error } = await query.order('created_at', { ascending: false }).limit(rowLimit);
+      const from = pageIndex * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+
+      const { data, error } = await query.order('created_at', { ascending: false }).range(from, to);
 
       if (error) {
         throw error;
       }
 
       if (data) {
-        setItems(data);
+        if (pageIndex === 0) {
+          setItems(data);
+        } else {
+          setItems(prev => [...prev, ...data]);
+        }
+        
+        setHasMore(data.length === PAGE_SIZE);
 
         // Extract unique ministries and sources for the filters
         const uniqueMinistries = Array.from(new Set(data.map((item: any) => item.ministry).filter(Boolean))) as string[];
         const uniqueSources = Array.from(new Set(data.map((item: any) => item.source).filter(Boolean))) as string[];
 
-        setMinistries(uniqueMinistries.sort());
-        setSources(uniqueSources.sort());
+        if (pageIndex === 0) {
+          setMinistries(uniqueMinistries.sort());
+          setSources(uniqueSources.sort());
+        } else {
+          setMinistries(prev => Array.from(new Set([...prev, ...uniqueMinistries])).sort());
+          setSources(prev => Array.from(new Set([...prev, ...uniqueSources])).sort());
+        }
       }
     } catch (err: any) {
       console.error("Error fetching current affairs:", err);
       setErrorMsg(err.message || "Failed to load policy tracking feed.");
     } finally {
-      setLoading(false);
+      if (pageIndex === 0 || showSkeleton) setLoading(false);
     }
   };
 
-  // Re-fetch when date filters or row limit changes
+  // Re-fetch when date filters or page changes
   useEffect(() => {
-    fetchPolicyData(true, startDate || undefined, endDate || undefined);
-  }, [startDate, endDate, rowLimit]);
+    fetchPolicyData(true, startDate || undefined, endDate || undefined, page);
+  }, [startDate, endDate, page]);
 
   // Sync action trigger calling the cooldown-aware endpoint
   const handleSyncFeed = async () => {
@@ -361,7 +385,13 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
           </div>
           {(selectedMinistry !== 'ALL' || selectedSource !== 'ALL') && (
             <button
-              onClick={resetFilters}
+              onClick={() => {
+                setSelectedMinistry('ALL');
+                setSelectedSource('ALL');
+                setStartDate('');
+                setEndDate('');
+                setPage(0);
+              }}
               className="text-[#e0d0ab] hover:text-white transition-colors flex items-center gap-1 text-[10px] uppercase font-mono tracking-wider cursor-pointer"
               id="reset-filters"
             >
@@ -418,7 +448,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               <input
                 type="date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                onChange={(e) => { setStartDate(e.target.value); setPage(0); }}
                 className="w-full px-2.5 py-1.5 text-[11px] font-sans bg-zinc-900 border border-zinc-800 rounded-sm text-zinc-300 focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50 focus:border-[#e0d0ab]/50 [color-scheme:dark]"
               />
             </div>
@@ -427,7 +457,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               <input
                 type="date"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+                onChange={(e) => { setEndDate(e.target.value); setPage(0); }}
                 className="w-full px-2.5 py-1.5 text-[11px] font-sans bg-zinc-900 border border-zinc-800 rounded-sm text-zinc-300 focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50 focus:border-[#e0d0ab]/50 [color-scheme:dark]"
               />
             </div>
@@ -436,6 +466,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                 onClick={() => {
                   setStartDate('');
                   setEndDate('');
+                  setPage(0);
                 }}
                 className="w-full text-left text-[9px] text-zinc-600 hover:text-rose-400 transition-colors font-mono uppercase tracking-wider pt-1"
               >
@@ -645,23 +676,15 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
           </div>
         )}
 
-        {/* Row Limit Selector */}
-        {!loading && items.length > 0 && (
-          <div className="flex items-center justify-end mt-6 pt-4 border-t border-zinc-900">
-            <div className="flex items-center gap-2">
-              <span className="text-[9px] font-mono uppercase tracking-widest text-zinc-500 font-bold">
-                Rows
-              </span>
-              <select
-                value={rowLimit}
-                onChange={(e) => setRowLimit(Number(e.target.value))}
-                className="px-2.5 py-1.5 text-[10px] font-sans font-bold uppercase tracking-wider bg-zinc-900/50 border border-zinc-800 text-zinc-300 rounded-sm focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50 focus:border-[#e0d0ab]/50 cursor-pointer"
-              >
-                <option value={10}>10</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-            </div>
+        {/* Deep Archive Pagination */}
+        {!loading && hasMore && filteredItems.length > 0 && (
+          <div className="flex justify-center mt-12 mb-8 border-t border-zinc-900 pt-12">
+            <button
+              onClick={() => setPage(prev => prev + 1)}
+              className="px-8 py-4 bg-zinc-950 border-2 border-zinc-800 text-stone-300 font-sans font-bold text-xs uppercase tracking-[0.2em] hover:bg-zinc-900 hover:border-[#e0d0ab] hover:text-[#e0d0ab] transition-all cursor-pointer shadow-[0_0_15px_rgba(0,0,0,0.5)]"
+            >
+              [ Retrieve Older Dispatches ]
+            </button>
           </div>
         )}
 

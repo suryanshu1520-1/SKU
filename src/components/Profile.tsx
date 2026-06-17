@@ -698,7 +698,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className={`grid grid-cols-1 ${expandedInsightId ? '' : 'md:grid-cols-2'} gap-4`}>
                 {savedInsights.map((insight) => {
                   const isExpanded = expandedInsightId === insight.id;
                   const isDeleting = deletingInsightId === insight.id;
@@ -715,7 +715,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
                         className="p-4 cursor-pointer flex items-start justify-between gap-3"
                       >
                         <div className="flex-1 min-w-0">
-                          <p className="text-[11px] font-sans text-stone-200 leading-relaxed line-clamp-2">
+                          <p className="text-[11px] font-sans text-stone-200 leading-relaxed h-auto">
                             {insight.question_text}
                           </p>
                           <p className="text-[9px] font-mono text-zinc-500 mt-2">
