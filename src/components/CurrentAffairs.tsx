@@ -698,20 +698,22 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 overflow-y-auto flex justify-center items-start pt-12 pb-12 px-4 min-h-screen bg-zinc-950 text-zinc-300 relative overflow-x-hidden"
+              onClick={() => setShowPibModal(false)}
+              className="fixed inset-0 z-[500] flex items-center justify-center bg-zinc-950/80 backdrop-blur-sm p-4 overflow-y-auto"
             >
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
-                className="max-w-3xl mx-auto px-6 py-8 bg-[#f2e1bb] text-[#002113] my-8 rounded-sm shadow-xl w-full relative"
+                onClick={(e) => e.stopPropagation()}
+                className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-[#f2e1bb] text-[#002113] rounded-sm shadow-2xl px-8 py-10"
               >
                 <button
                   onClick={() => setShowPibModal(false)}
-                  className="absolute top-4 right-4 text-zinc-500 hover:text-zinc-800 transition-colors cursor-pointer"
+                  className="absolute top-4 right-5 font-sans text-xs font-bold tracking-widest hover:opacity-70 transition-opacity cursor-pointer text-[#002113]"
                   aria-label="Close PIB Digest"
                 >
-                  <X className="w-6 h-6" />
+                  [ X ]
                 </button>
 
                 {pibDigests.length === 0 ? (
@@ -747,25 +749,25 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                     </div>
 
                     {/* The Navigation Dock */}
-                    <div className="mt-10 pt-6 border-t border-zinc-800 flex items-center justify-between">
+                    <div className="mt-10 pt-6 border-t border-[#002113]/20 flex items-center justify-between">
                       <button
                         onClick={() => setActiveDigestIndex(Math.max(0, activeDigestIndex - 1))}
                         disabled={activeDigestIndex === 0}
-                        className="px-4 py-2 bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-stone-300 rounded-sm transition-colors disabled:opacity-30 disabled:cursor-not-allowed font-sans text-sm font-medium flex items-center gap-2 cursor-pointer"
+                        className="font-sans text-xs font-bold tracking-widest hover:opacity-70 transition-opacity cursor-pointer text-[#002113] disabled:opacity-30 disabled:cursor-not-allowed"
                       >
-                        ← Previous Edition
+                        [ PREV ]
                       </button>
                       
-                      <div className="text-xs font-mono text-zinc-500">
-                        {activeDigestIndex + 1} of {pibDigests.length}
+                      <div className="text-xs font-mono text-[#002113]/50 tracking-widest">
+                        {activeDigestIndex + 1} / {pibDigests.length}
                       </div>
 
                       <button
                         onClick={() => setActiveDigestIndex(Math.min(pibDigests.length - 1, activeDigestIndex + 1))}
                         disabled={activeDigestIndex === pibDigests.length - 1}
-                        className="px-4 py-2 bg-zinc-900/50 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-stone-300 rounded-sm transition-colors disabled:opacity-30 disabled:cursor-not-allowed font-sans text-sm font-medium flex items-center gap-2 cursor-pointer"
+                        className="font-sans text-xs font-bold tracking-widest hover:opacity-70 transition-opacity cursor-pointer text-[#002113] disabled:opacity-30 disabled:cursor-not-allowed"
                       >
-                        Next Edition →
+                        [ NEXT ]
                       </button>
                     </div>
                   </>
