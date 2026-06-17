@@ -698,17 +698,17 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/80 backdrop-blur-md flex justify-center items-start pt-12 pb-12 px-4"
+              className="fixed inset-0 z-50 overflow-y-auto flex justify-center items-start pt-12 pb-12 px-4 min-h-screen bg-zinc-950 text-zinc-300 relative overflow-x-hidden"
             >
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
-                className="bg-zinc-900 border border-zinc-800 w-full max-w-3xl rounded-xl p-8 shadow-2xl relative"
+                className="max-w-3xl mx-auto px-6 py-8 bg-[#f2e1bb] text-[#002113] my-8 rounded-sm shadow-xl w-full relative"
               >
                 <button
                   onClick={() => setShowPibModal(false)}
-                  className="absolute top-4 right-4 text-zinc-500 hover:text-zinc-200 transition-colors cursor-pointer"
+                  className="absolute top-4 right-4 text-zinc-500 hover:text-zinc-800 transition-colors cursor-pointer"
                   aria-label="Close PIB Digest"
                 >
                   <X className="w-6 h-6" />
@@ -721,8 +721,9 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                   </div>
                 ) : (
                   <>
-                    <div className="mb-8 border-b border-zinc-800 pb-6 pr-8">
-                      <h2 className="text-2xl font-sans font-bold tracking-tight text-[#e0d0ab] mb-2">
+                    <div className="mb-8 border-b border-zinc-300/30 pb-6 pr-8">
+                      <div className="font-sans text-xs tracking-widest uppercase text-zinc-500 mb-4">Today's Intelligence</div>
+                      <h2 className="text-2xl font-sans font-bold tracking-tight text-[#002113] mb-2">
                         {pibDigests[activeDigestIndex]?.title || 'PIB Digest'}
                       </h2>
                       {pibDigests[activeDigestIndex]?.date && (
@@ -736,8 +737,11 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                       )}
                     </div>
 
-                    <div className="prose prose-invert max-w-none font-merriweather w-full overflow-x-auto">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    <div className="w-full overflow-x-auto">
+                      <ReactMarkdown 
+                        className="prose prose-invert prose-zinc max-w-none font-serif w-full"
+                        remarkPlugins={[remarkGfm]}
+                      >
                         {pibDigests[activeDigestIndex]?.content || 'No content available.'}
                       </ReactMarkdown>
                     </div>
