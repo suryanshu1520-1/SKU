@@ -42,8 +42,8 @@ export default function App() {
   // Restore authenticated states on start
   useEffect(() => {
     async function restoreSession() {
-      const isRecovery = window.location.hash.includes('type=recovery');
-      console.log("[Tark Auth] Hash:", window.location.hash, "isRecovery:", isRecovery);
+      const isRecovery = window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery');
+      console.log("[Tark Auth] Hash:", window.location.hash, "Search:", window.location.search, "isRecovery:", isRecovery);
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
@@ -103,7 +103,7 @@ export default function App() {
     const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
       console.log("[Tark Auth] Event:", event, "Hash:", window.location.hash);
       if (event === 'PASSWORD_RECOVERY' ||
-          (event === 'SIGNED_IN' && window.location.hash.includes('type=recovery'))) {
+          (event === 'SIGNED_IN' && (window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery')))) {
         setShowPasswordReset(true);
       }
     });
@@ -330,7 +330,13 @@ export default function App() {
       {/* Password Reset Overlay */}
       <AnimatePresence>
         {showPasswordReset && (
-          <PasswordReset onClose={() => setShowPasswordReset(false)} />
+          <PasswordReset onClose={() => {
+            setShowPasswordReset(false);
+            if (userEmail) {
+              setGameState('landing');
+              setActiveTab('arena');
+            }
+          }} />
         )}
       </AnimatePresence>
 

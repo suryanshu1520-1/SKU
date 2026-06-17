@@ -34,7 +34,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto }: LoginPro
     setErrorMsg('');
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(targetEmail, {
-        redirectTo: `${window.location.origin}/`,
+        redirectTo: `${window.location.origin}/?type=recovery`,
       });
       if (error) throw error;
       setForgotSent(true);
