@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@fontsource/inter": "^5.2.8",
+    "@fontsource/jetbrains-mono": "^5.2.8",
     "@fontsource/merriweather": "^5.2.11",
     "@fontsource/playfair-display": "^5.2.8",
     "@google/genai": "^2.4.0",

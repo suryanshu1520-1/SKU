@@ -7,12 +7,16 @@
 @import "@fontsource/merriweather/700.css";
 @import "@fontsource/merriweather/700-italic.css";
 @import "@fontsource/merriweather/300-italic.css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+@import "@fontsource/jetbrains-mono/700.css";
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Merriweather", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   --color-zinc-950: #072e63;
   --color-zinc-900: #136c99;
@@ -62,6 +66,16 @@
 
   --color-white: #e0d0ab;
   --color-black: #0e577a;
+
+  /* ── PIB Dossier semantic tokens ── */
+  --color-surface: #002113;
+  --color-surface-dim: #001a0e;
+  --color-surface-container-highest: #00301c;
+  --color-surface-container-lowest: #001108;
+  --color-on-surface: #e0d0ab;
+  --color-on-surface-variant: #c8b998;
+  --color-primary: #e0d0ab;
+  --color-primary-container: #e0d0ab;
 }
 
 body {
@@ -77,3 +91,61 @@ body {
     transform: translateX(100%);
   }
 }
+
+/* ── PIB Digest – Newspaper multi-column layout ── */
+.multi-column {
+  column-count: 2;
+  column-gap: 2.5rem;
+  column-rule: 1px solid rgba(224, 208, 171, 0.15);
+}
+
+@media (max-width: 640px) {
+  .multi-column {
+    column-count: 1;
+  }
+}
+
+/* ── Drop-cap on the very first <p> inside the content ── */
+.first-p-drop-cap > p:first-of-type::first-letter {
+  float: left;
+  font-family: "Merriweather", serif;
+  font-size: 3.5rem;
+  line-height: 0.8;
+  font-weight: 700;
+  color: #e0d0ab;
+  padding-right: 0.6rem;
+  padding-top: 0.25rem;
+}
+
+/* ── Custom scrollbar for the modal body ── */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(224, 208, 171, 0.2);
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(224, 208, 171, 0.35);
+}
+
+/* ── Square list-style for custom lists ── */
+.list-square {
+  list-style-type: square;
+}
+
+/* ── Light-theme override for the PIB modal ── */
+.light-theme {
+  --color-surface: #f5f0e8;
+  --color-surface-dim: #ebe5d9;
+  --color-surface-container-highest: #ddd6c8;
+  --color-surface-container-lowest: #f9f5ee;
+  --color-on-surface: #1a1a1a;
+  --color-on-surface-variant: #3a3a3a;
+  --color-primary: #002113;
+  --color-primary-container: #002113;
+}
+

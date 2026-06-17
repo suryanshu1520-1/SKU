@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
-import { ExternalLink, Filter, RotateCcw, BookOpen, Inbox, RefreshCw, CheckCircle2, AlertCircle, Calendar, Bookmark, X } from 'lucide-react';
+import { ExternalLink, Filter, RotateCcw, BookOpen, Inbox, RefreshCw, CheckCircle2, AlertCircle, Calendar, Bookmark, X, Share2, Sun, Moon } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -62,6 +62,18 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
   const [showPibModal, setShowPibModal] = useState(false);
   const [pibDigests, setPibDigests] = useState<PibDigestItem[]>([]);
   const [activeDigestIndex, setActiveDigestIndex] = useState(0);
+
+  const [isLightMode, setIsLightMode] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const target = e.currentTarget;
+    const scrollHeight = target.scrollHeight;
+    const clientHeight = target.clientHeight;
+    const maxScroll = scrollHeight - clientHeight;
+    const progress = maxScroll > 0 ? (target.scrollTop / maxScroll) * 100 : 0;
+    setScrollProgress(progress);
+  };
 
   // Fetch PIB digests when modal is opened
   useEffect(() => {
@@ -367,11 +379,10 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
           <div className="space-y-1 max-h-56 overflow-y-auto pr-1 custom-scrollbar">
             <button
               onClick={() => setSelectedMinistry('ALL')}
-              className={`w-full text-left px-2.5 py-2 text-xs font-sans transition-colors rounded-sm flex items-center justify-between cursor-pointer ${
-                selectedMinistry === 'ALL'
+              className={`w-full text-left px-2.5 py-2 text-xs font-sans transition-colors rounded-sm flex items-center justify-between cursor-pointer ${selectedMinistry === 'ALL'
                   ? 'bg-zinc-900 text-stone-150 font-medium border border-zinc-800'
                   : 'text-zinc-550 hover:text-stone-300 hover:bg-zinc-900/40'
-              }`}
+                }`}
             >
               <span className="truncate">All Departments</span>
               <span className="text-[10px] opacity-60">({items.length})</span>
@@ -382,11 +393,10 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                 <button
                   key={min}
                   onClick={() => setSelectedMinistry(min)}
-                  className={`w-full text-left px-2.5 py-2 text-xs font-sans transition-colors rounded-sm flex items-center justify-between cursor-pointer ${
-                    selectedMinistry === min
+                  className={`w-full text-left px-2.5 py-2 text-xs font-sans transition-colors rounded-sm flex items-center justify-between cursor-pointer ${selectedMinistry === min
                       ? 'bg-zinc-900 text-stone-150 font-medium border border-[#e0d0ab]/30'
                       : 'text-zinc-550 hover:text-stone-300 hover:bg-zinc-900/40'
-                  }`}
+                    }`}
                 >
                   <span className="truncate" title={min}>{min}</span>
                   <span className="text-[10px] opacity-60">({count})</span>
@@ -443,11 +453,10 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
           <div className="space-y-1">
             <button
               onClick={() => setSelectedSource('ALL')}
-              className={`w-full text-left px-2.5 py-2 text-xs font-sans transition-colors rounded-sm flex items-center justify-between cursor-pointer ${
-                selectedSource === 'ALL'
+              className={`w-full text-left px-2.5 py-2 text-xs font-sans transition-colors rounded-sm flex items-center justify-between cursor-pointer ${selectedSource === 'ALL'
                   ? 'bg-zinc-900 text-stone-150 font-medium border border-zinc-800'
                   : 'text-zinc-550 hover:text-stone-300 hover:bg-zinc-900/40'
-              }`}
+                }`}
             >
               <span>All Sources</span>
               <span className="text-[10px] opacity-60">({items.length})</span>
@@ -458,11 +467,10 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                 <button
                   key={src}
                   onClick={() => setSelectedSource(src)}
-                  className={`w-full text-left px-2.5 py-2 text-xs font-sans transition-colors rounded-sm flex items-center justify-between cursor-pointer ${
-                    selectedSource === src
+                  className={`w-full text-left px-2.5 py-2 text-xs font-sans transition-colors rounded-sm flex items-center justify-between cursor-pointer ${selectedSource === src
                       ? 'bg-zinc-900 text-stone-150 font-medium border border-[#e0d0ab]/30'
                       : 'text-zinc-550 hover:text-stone-300 hover:bg-zinc-900/40'
-                  }`}
+                    }`}
                 >
                   <span className="truncate">{src}</span>
                   <span className="text-[10px] opacity-60">({count})</span>
@@ -604,17 +612,15 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                       <button
                         onClick={() => toggleBookmark(articleId)}
                         disabled={isSaving}
-                        className={`inline-flex items-center gap-1 text-[10px] font-sans font-bold uppercase tracking-wider transition-colors cursor-pointer ${
-                          isSaved
+                        className={`inline-flex items-center gap-1 text-[10px] font-sans font-bold uppercase tracking-wider transition-colors cursor-pointer ${isSaved
                             ? 'text-emerald-400 hover:text-emerald-300'
                             : 'text-zinc-500 hover:text-[#e0d0ab]'
-                        } disabled:opacity-50`}
+                          } disabled:opacity-50`}
                         title={isSaved ? 'Remove bookmark' : 'Bookmark this article'}
                       >
                         <Bookmark
-                          className={`w-3.5 h-3.5 transition-all ${
-                            isSaved ? 'fill-emerald-500 text-emerald-500' : 'text-current'
-                          }`}
+                          className={`w-3.5 h-3.5 transition-all ${isSaved ? 'fill-emerald-500 text-emerald-500' : 'text-current'
+                            }`}
                         />
                         <span>{isSaved ? 'Saved' : 'Save'}</span>
                       </button>
@@ -707,41 +713,60 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                 exit={{ opacity: 0, y: 24 }}
                 transition={{ type: 'spring', stiffness: 320, damping: 30 }}
                 onClick={(e) => e.stopPropagation()}
-                className="relative w-full max-w-3xl max-h-[90vh] flex flex-col bg-[#002113] text-white rounded-sm shadow-[0_32px_80px_rgba(0,0,0,0.7)] overflow-hidden"
+                className={`relative w-full max-w-4xl max-h-[90vh] flex flex-col bg-surface text-on-surface rounded-sm shadow-[0_32px_80px_rgba(0,0,0,0.7)] overflow-hidden ${isLightMode ? 'light-theme' : ''}`}
               >
                 {/* Masthead Bar */}
-                <div className="flex-shrink-0 flex items-center justify-between px-6 py-3 border-b border-[#e0d0ab]/20 bg-[#001a0e]">
-                  <span className="font-sans text-sm font-black tracking-[0.25em] uppercase text-white">
-                    CIVIL INTEL PIB
-                  </span>
-                  <div className="flex items-center gap-5">
-                    <span className="font-mono text-[10px] tracking-widest uppercase text-[#e0d0ab]/50">
-                      {pibDigests.length > 0 ? `${activeDigestIndex + 1} / ${pibDigests.length}` : ''}
+                <div className="flex-shrink-0 flex flex-col border-b border-primary-container/20 bg-surface-dim relative">
+                  <div className="flex items-center justify-between px-6 py-3">
+                    <span className="font-mono text-sm font-bold tracking-[0.25em] uppercase text-on-surface">
+                      CIVIL INTEL PIB
                     </span>
-                    <button
-                      onClick={() => setShowPibModal(false)}
-                      className="font-sans text-xs font-bold tracking-widest text-[#e0d0ab]/60 hover:text-white transition-colors cursor-pointer"
-                      aria-label="Close PIB Digest"
-                    >
-                      ✕
-                    </button>
+                    <div className="flex items-center gap-5">
+                      <span className="font-mono text-[10px] tracking-widest uppercase text-primary-container/70 hidden sm:inline-block">
+                        {pibDigests.length > 0 ? `${activeDigestIndex + 1} / ${pibDigests.length}` : ''}
+                      </span>
+                      <button
+                        onClick={() => setIsLightMode(!isLightMode)}
+                        className="text-primary-container/60 hover:text-on-surface transition-colors cursor-pointer"
+                        aria-label="Toggle Theme"
+                      >
+                        {isLightMode ? <Moon size={16} /> : <Sun size={16} />}
+                      </button>
+                      <button className="text-primary-container/60 hover:text-on-surface transition-colors cursor-pointer" aria-label="Share">
+                        <Share2 size={16} />
+                      </button>
+                      <button
+                        onClick={() => setShowPibModal(false)}
+                        className="font-mono text-xs font-bold tracking-widest text-primary-container/60 hover:text-on-surface transition-colors cursor-pointer"
+                        aria-label="Close PIB Digest"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                  {/* Reading Progress Bar */}
+                  <div className="absolute bottom-0 left-0 w-full h-[2px] bg-primary-container/10">
+                    <div
+                      className="h-full bg-primary transition-all duration-150 ease-out"
+                      style={{ width: `${scrollProgress}%` }}
+                    />
                   </div>
                 </div>
 
                 {/* Scrollable Body */}
-                <div className="overflow-y-auto flex-1">
+                <div className="overflow-y-auto flex-1 custom-scrollbar" onScroll={handleScroll}>
                   {pibDigests.length === 0 ? (
                     <div className="flex flex-col items-center justify-center p-16 text-center">
-                      <Inbox className="w-8 h-8 text-[#e0d0ab]/30 mb-4" />
-                      <p className="text-[#e0d0ab]/50 font-sans text-sm tracking-widest uppercase">
+                      <Inbox className="w-8 h-8 text-primary-container/30 mb-4" />
+                      <p className="text-primary-container/50 font-sans text-sm tracking-widest uppercase">
                         No digests available yet.
                       </p>
                     </div>
                   ) : (
                     <>
                       {/* Hero Header */}
-                      <div className="px-8 pt-8 pb-6">
-                        <p className="font-sans text-[10px] font-semibold tracking-[0.2em] uppercase text-[#e0d0ab] mb-4">
+                      <div className="px-8 pt-10 pb-6 text-center border-b border-primary-container/10">
+                        <p className="font-mono text-[10px] font-medium tracking-[0.15em] uppercase text-primary-container mb-4">
                           Press Information Bureau
                           {pibDigests[activeDigestIndex]?.date && (
                             <>
@@ -754,49 +779,59 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                             </>
                           )}
                         </p>
-                        <h2 className="font-serif text-3xl font-bold leading-tight text-white mb-6">
+                        <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-on-surface mb-8 max-w-3xl mx-auto">
                           {pibDigests[activeDigestIndex]?.title || 'PIB Digest'}
                         </h2>
-                        <div className="h-[2px] w-full bg-[#e0d0ab]/40 mb-1" />
-                        <div className="h-px w-full bg-[#e0d0ab]/15 mb-6" />
+                        <div className="h-[2px] w-full max-w-xl mx-auto bg-primary-container/40 mb-1" />
+                        <div className="h-px w-full max-w-xl mx-auto bg-primary-container/15" />
                       </div>
 
                       {/* Markdown Body */}
-                      <div className="px-8 pb-8 w-full overflow-x-auto">
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm]}
-                          className="prose prose-invert max-w-none font-serif
-                            prose-headings:font-sans prose-headings:text-[#e0d0ab] prose-headings:tracking-wide prose-headings:uppercase prose-headings:text-sm prose-headings:font-bold prose-headings:mt-8 prose-headings:mb-3
-                            prose-p:text-zinc-200 prose-p:leading-relaxed prose-p:mb-4
-                            prose-strong:text-[#e0d0ab] prose-strong:font-semibold
-                            prose-li:text-zinc-200 prose-li:leading-relaxed
-                            prose-blockquote:border-l-[#e0d0ab]/50 prose-blockquote:text-zinc-400 prose-blockquote:italic
-                            prose-table:text-sm prose-th:text-[#e0d0ab] prose-th:font-sans prose-th:tracking-wider prose-th:uppercase prose-td:text-zinc-300
-                            prose-hr:border-[#e0d0ab]/20 w-full"
-                        >
-                          {pibDigests[activeDigestIndex]?.content || 'No content available.'}
-                        </ReactMarkdown>
+                      <div className="px-8 py-10 w-full">
+                        <div className="multi-column text-on-surface-variant first-p-drop-cap">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                              p: ({ node, ...props }) => <p className="font-serif text-[16px] leading-[1.7] mb-5 text-justify" {...props} />,
+                              h1: ({ node, ...props }) => <h1 className="font-serif text-[24px] font-bold text-primary border-b border-primary-container/30 pb-2 mb-4 mt-8 break-inside-avoid" {...props} />,
+                              h2: ({ node, ...props }) => <h2 className="font-serif text-[20px] font-bold text-primary border-b border-primary-container/20 pb-2 mb-4 mt-6 break-inside-avoid" {...props} />,
+                              h3: ({ node, ...props }) => <h3 className="font-serif text-[18px] font-bold text-on-surface mb-3 mt-6 break-inside-avoid" {...props} />,
+                              h4: ({ node, ...props }) => <h4 className="font-serif text-[16px] font-bold text-on-surface mb-2 mt-4 break-inside-avoid" {...props} />,
+                              ul: ({ node, ...props }) => <ul className="font-serif list-square pl-5 mb-6 mt-2 text-[15px] leading-[1.7]" {...props} />,
+                              ol: ({ node, ...props }) => <ol className="font-serif list-decimal pl-5 mb-6 mt-2 text-[15px] leading-[1.7]" {...props} />,
+                              li: ({ node, ...props }) => <li className="mb-2 pl-1" {...props} />,
+                              strong: ({ node, ...props }) => <strong className="text-primary font-semibold" {...props} />,
+                              blockquote: ({ node, ...props }) => <blockquote className="font-serif border-l-[3px] border-primary-container/50 pl-4 py-1 italic my-6 text-on-surface-variant break-inside-avoid" {...props} />,
+                              table: ({ node, ...props }) => <div className="overflow-x-auto w-full mb-8 border border-primary-container/30 break-inside-avoid shadow-sm"><table className="w-full font-mono text-[11px] md:text-[12px] border-collapse bg-surface-dim/30" {...props} /></div>,
+                              thead: ({ node, ...props }) => <thead className="bg-surface-container-highest" {...props} />,
+                              th: ({ node, ...props }) => <th className="font-mono text-primary-container font-bold uppercase tracking-widest border border-primary-container/30 p-3 text-left" {...props} />,
+                              td: ({ node, ...props }) => <td className="font-mono border border-primary-container/20 p-3" {...props} />,
+                            }}
+                          >
+                            {pibDigests[activeDigestIndex]?.content || 'No content available.'}
+                          </ReactMarkdown>
+                        </div>
                       </div>
                     </>
                   )}
                 </div>
 
                 {/* Navigation Dock */}
-                <div className="flex-shrink-0 flex items-center justify-between px-8 py-4 border-t border-[#e0d0ab]/15 bg-[#001a0e]">
+                <div className="flex-shrink-0 flex items-center justify-between px-8 py-4 border-t border-primary-container/20 bg-surface-dim">
                   <button
                     onClick={() => setActiveDigestIndex(Math.max(0, activeDigestIndex - 1))}
                     disabled={activeDigestIndex === 0}
-                    className="font-sans text-[10px] font-black tracking-[0.25em] uppercase text-[#e0d0ab] hover:text-white transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+                    className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase text-primary-container hover:text-on-surface transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
                   >
                     [ PREV ]
                   </button>
-                  <div className="font-mono text-[10px] text-[#e0d0ab]/40 tracking-widest">
+                  <div className="font-mono text-[10px] text-primary-container/50 tracking-widest">
                     EDITION {activeDigestIndex + 1} OF {pibDigests.length}
                   </div>
                   <button
                     onClick={() => setActiveDigestIndex(Math.min(pibDigests.length - 1, activeDigestIndex + 1))}
                     disabled={activeDigestIndex === pibDigests.length - 1}
-                    className="font-sans text-[10px] font-black tracking-[0.25em] uppercase text-[#e0d0ab] hover:text-white transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+                    className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase text-primary-container hover:text-on-surface transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
                   >
                     [ NEXT ]
                   </button>
