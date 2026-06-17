@@ -6,6 +6,7 @@ import InfoTooltip from './InfoTooltip';
 
 interface PublicProfileProps {
   analystId: string;
+  currentUserId: string;
   onClose: () => void;
 }
 
@@ -18,19 +19,33 @@ interface DossierData {
   average_accuracy?: number;
 }
 
-export default function PublicProfile({ analystId, onClose }: PublicProfileProps) {
+export default function PublicProfile({ analystId, currentUserId, onClose }: PublicProfileProps) {
   const [dossier, setDossier] = useState<DossierData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [dossierState, setDossierState] = useState<'LOADING' | 'EQUIVALENT_EXCHANGE_BLOCKED' | 'TARGET_PRIVATE' | 'PUBLIC_DOSSIER' | 'ERROR'>('LOADING');
   const [error, setError] = useState('');
 
   useEffect(() => {
     let cancelled = false;
 
     async function fetchDossier() {
-      setLoading(true);
+      setDossierState('LOADING');
       setError('');
 
       try {
+        // Equivalent Exchange Check
+        const { data: currentUserProfile, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('is_public')
+          .eq('user_id', currentUserId)
+          .single();
+
+        if (profileError) throw profileError;
+
+        if (!currentUserProfile?.is_public) {
+          if (!cancelled) setDossierState('EQUIVALENT_EXCHANGE_BLOCKED');
+          return;
+        }
+
         const { data, error: rpcError } = await supabase.rpc('get_analyst_dossier', {
           target_user_id: analystId,
         });
@@ -41,15 +56,34 @@ export default function PublicProfile({ analystId, onClose }: PublicProfileProps
           throw rpcError;
         }
 
-        setDossier(data as DossierData);
+        const dossierData = data as DossierData;
+        
+        if (dossierData.status === 'private') {
+          setDossierState('TARGET_PRIVATE');
+        } else {
+          setDossierState('PUBLIC_DOSSIER');
+          setDossier(dossierData);
+          
+          // Log raw payload
+          const { data: rawSessions } = await supabase
+            .from('quiz_sessions')
+            .select('*')
+            .eq('user_id', analystId);
+            
+          if (rawSessions) {
+            console.log("Raw Payload:", rawSessions.map(s => ({
+              total_questions: s.correct_count + s.incorrect_count + s.unattempted_count,
+              score: s.correct_count,
+              mode: s.subject_stats ? 'Vanguard' : 'Training'
+            })));
+          }
+        }
+
       } catch (err: any) {
-        console.error('[PublicProfile] RPC error:', err);
+        console.error('[PublicProfile] Fetch error:', err);
         if (!cancelled) {
           setError(err.message || 'Failed to load analyst dossier');
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
+          setDossierState('ERROR');
         }
       }
     }
@@ -95,14 +129,14 @@ export default function PublicProfile({ analystId, onClose }: PublicProfileProps
 
         {/* Content */}
         <div className="p-6">
-          {loading && (
+          {dossierState === 'LOADING' && (
             <div className="flex flex-col items-center justify-center py-12 text-zinc-500">
               <Loader2 className="w-5 h-5 animate-spin mb-3" />
               <p className="text-xs font-mono uppercase tracking-wider">Decrypting dossier...</p>
             </div>
           )}
 
-          {!loading && error && (
+          {dossierState === 'ERROR' && error && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Shield className="w-10 h-10 text-rose-400/60 mb-3" />
               <p className="text-xs text-rose-400 font-sans">{error}</p>
@@ -110,19 +144,31 @@ export default function PublicProfile({ analystId, onClose }: PublicProfileProps
             </div>
           )}
 
-          {!loading && !error && dossier && dossier.status === 'private' && (
+          {dossierState === 'EQUIVALENT_EXCHANGE_BLOCKED' && (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <Shield className="w-12 h-12 text-rose-500/60 mb-4" />
+              <p className="text-sm text-stone-200 font-sans leading-relaxed font-bold">
+                CLASSIFIED: You must make your own telemetry public to view competitor dossiers.
+              </p>
+              <p className="text-[10px] text-zinc-500 mt-3 uppercase tracking-wider font-mono">
+                Equivalent Exchange Enforced
+              </p>
+            </div>
+          )}
+
+          {dossierState === 'TARGET_PRIVATE' && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Shield className="w-12 h-12 text-zinc-700 mb-4" />
               <p className="text-sm text-zinc-400 font-sans leading-relaxed">
                 This analyst's dossier is classified.
               </p>
               <p className="text-[10px] text-zinc-600 mt-3 uppercase tracking-wider font-mono">
-                The profile is set to private.
+                Operator went dark
               </p>
             </div>
           )}
 
-          {!loading && !error && dossier && dossier.status === 'public' && (
+          {dossierState === 'PUBLIC_DOSSIER' && dossier && (
             <div className="space-y-6">
               {/* Identity Header */}
               <div className="flex items-center gap-3 pb-4 border-b border-zinc-800">

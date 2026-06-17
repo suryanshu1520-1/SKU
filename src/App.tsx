@@ -321,6 +321,7 @@ export default function App() {
         {viewingAnalystId && (
           <PublicProfile
             analystId={viewingAnalystId}
+            currentUserId={userId}
             onClose={() => setViewingAnalystId(null)}
           />
         )}
