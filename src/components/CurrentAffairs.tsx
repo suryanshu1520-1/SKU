@@ -699,79 +699,108 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowPibModal(false)}
-              className="fixed inset-0 z-[500] flex items-center justify-center bg-zinc-950/80 backdrop-blur-sm p-4 overflow-y-auto"
+              className="fixed inset-0 z-[500] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
             >
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
+                exit={{ opacity: 0, y: 24 }}
+                transition={{ type: 'spring', stiffness: 320, damping: 30 }}
                 onClick={(e) => e.stopPropagation()}
-                className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-[#f2e1bb] text-[#002113] rounded-sm shadow-2xl px-8 py-10"
+                className="relative w-full max-w-3xl max-h-[90vh] flex flex-col bg-[#002113] text-white rounded-sm shadow-[0_32px_80px_rgba(0,0,0,0.7)] overflow-hidden"
               >
-                <button
-                  onClick={() => setShowPibModal(false)}
-                  className="absolute top-4 right-5 font-sans text-xs font-bold tracking-widest hover:opacity-70 transition-opacity cursor-pointer text-[#002113]"
-                  aria-label="Close PIB Digest"
-                >
-                  [ X ]
-                </button>
-
-                {pibDigests.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center p-12 text-center">
-                    <Inbox className="w-8 h-8 text-zinc-700 mb-4" />
-                    <p className="text-zinc-400 font-sans text-sm">No PIB Digests available at this time.</p>
+                {/* Masthead Bar */}
+                <div className="flex-shrink-0 flex items-center justify-between px-6 py-3 border-b border-[#e0d0ab]/20 bg-[#001a0e]">
+                  <span className="font-sans text-sm font-black tracking-[0.25em] uppercase text-white">
+                    CIVIL INTEL PIB
+                  </span>
+                  <div className="flex items-center gap-5">
+                    <span className="font-mono text-[10px] tracking-widest uppercase text-[#e0d0ab]/50">
+                      {pibDigests.length > 0 ? `${activeDigestIndex + 1} / ${pibDigests.length}` : ''}
+                    </span>
+                    <button
+                      onClick={() => setShowPibModal(false)}
+                      className="font-sans text-xs font-bold tracking-widest text-[#e0d0ab]/60 hover:text-white transition-colors cursor-pointer"
+                      aria-label="Close PIB Digest"
+                    >
+                      ✕
+                    </button>
                   </div>
-                ) : (
-                  <>
-                    <div className="mb-8 border-b border-zinc-300/30 pb-6 pr-8">
-                      <div className="font-sans text-xs tracking-widest uppercase text-zinc-500 mb-4">Today's Intelligence</div>
-                      <h2 className="text-2xl font-sans font-bold tracking-tight text-[#002113] mb-2">
-                        {pibDigests[activeDigestIndex]?.title || 'PIB Digest'}
-                      </h2>
-                      {pibDigests[activeDigestIndex]?.date && (
-                        <p className="text-xs text-zinc-500 font-mono tracking-wider uppercase">
-                          {new Date(pibDigests[activeDigestIndex].date).toLocaleDateString(undefined, {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                          })}
+                </div>
+
+                {/* Scrollable Body */}
+                <div className="overflow-y-auto flex-1">
+                  {pibDigests.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center p-16 text-center">
+                      <Inbox className="w-8 h-8 text-[#e0d0ab]/30 mb-4" />
+                      <p className="text-[#e0d0ab]/50 font-sans text-sm tracking-widest uppercase">
+                        No digests available yet.
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Hero Header */}
+                      <div className="px-8 pt-8 pb-6">
+                        <p className="font-sans text-[10px] font-semibold tracking-[0.2em] uppercase text-[#e0d0ab] mb-4">
+                          Press Information Bureau
+                          {pibDigests[activeDigestIndex]?.date && (
+                            <>
+                              {' | '}
+                              {new Date(pibDigests[activeDigestIndex].date).toLocaleDateString('en-GB', {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric',
+                              }).toUpperCase()}
+                            </>
+                          )}
                         </p>
-                      )}
-                    </div>
-
-                    <div className="w-full overflow-x-auto">
-                      <ReactMarkdown 
-                        className="prose prose-invert prose-zinc max-w-none font-serif w-full"
-                        remarkPlugins={[remarkGfm]}
-                      >
-                        {pibDigests[activeDigestIndex]?.content || 'No content available.'}
-                      </ReactMarkdown>
-                    </div>
-
-                    {/* The Navigation Dock */}
-                    <div className="mt-10 pt-6 border-t border-[#002113]/20 flex items-center justify-between">
-                      <button
-                        onClick={() => setActiveDigestIndex(Math.max(0, activeDigestIndex - 1))}
-                        disabled={activeDigestIndex === 0}
-                        className="font-sans text-xs font-bold tracking-widest hover:opacity-70 transition-opacity cursor-pointer text-[#002113] disabled:opacity-30 disabled:cursor-not-allowed"
-                      >
-                        [ PREV ]
-                      </button>
-                      
-                      <div className="text-xs font-mono text-[#002113]/50 tracking-widest">
-                        {activeDigestIndex + 1} / {pibDigests.length}
+                        <h2 className="font-serif text-3xl font-bold leading-tight text-white mb-6">
+                          {pibDigests[activeDigestIndex]?.title || 'PIB Digest'}
+                        </h2>
+                        <div className="h-[2px] w-full bg-[#e0d0ab]/40 mb-1" />
+                        <div className="h-px w-full bg-[#e0d0ab]/15 mb-6" />
                       </div>
 
-                      <button
-                        onClick={() => setActiveDigestIndex(Math.min(pibDigests.length - 1, activeDigestIndex + 1))}
-                        disabled={activeDigestIndex === pibDigests.length - 1}
-                        className="font-sans text-xs font-bold tracking-widest hover:opacity-70 transition-opacity cursor-pointer text-[#002113] disabled:opacity-30 disabled:cursor-not-allowed"
-                      >
-                        [ NEXT ]
-                      </button>
-                    </div>
-                  </>
-                )}
+                      {/* Markdown Body */}
+                      <div className="px-8 pb-8 w-full overflow-x-auto">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          className="prose prose-invert max-w-none font-serif
+                            prose-headings:font-sans prose-headings:text-[#e0d0ab] prose-headings:tracking-wide prose-headings:uppercase prose-headings:text-sm prose-headings:font-bold prose-headings:mt-8 prose-headings:mb-3
+                            prose-p:text-zinc-200 prose-p:leading-relaxed prose-p:mb-4
+                            prose-strong:text-[#e0d0ab] prose-strong:font-semibold
+                            prose-li:text-zinc-200 prose-li:leading-relaxed
+                            prose-blockquote:border-l-[#e0d0ab]/50 prose-blockquote:text-zinc-400 prose-blockquote:italic
+                            prose-table:text-sm prose-th:text-[#e0d0ab] prose-th:font-sans prose-th:tracking-wider prose-th:uppercase prose-td:text-zinc-300
+                            prose-hr:border-[#e0d0ab]/20 w-full"
+                        >
+                          {pibDigests[activeDigestIndex]?.content || 'No content available.'}
+                        </ReactMarkdown>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Navigation Dock */}
+                <div className="flex-shrink-0 flex items-center justify-between px-8 py-4 border-t border-[#e0d0ab]/15 bg-[#001a0e]">
+                  <button
+                    onClick={() => setActiveDigestIndex(Math.max(0, activeDigestIndex - 1))}
+                    disabled={activeDigestIndex === 0}
+                    className="font-sans text-[10px] font-black tracking-[0.25em] uppercase text-[#e0d0ab] hover:text-white transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    [ PREV ]
+                  </button>
+                  <div className="font-mono text-[10px] text-[#e0d0ab]/40 tracking-widest">
+                    EDITION {activeDigestIndex + 1} OF {pibDigests.length}
+                  </div>
+                  <button
+                    onClick={() => setActiveDigestIndex(Math.min(pibDigests.length - 1, activeDigestIndex + 1))}
+                    disabled={activeDigestIndex === pibDigests.length - 1}
+                    className="font-sans text-[10px] font-black tracking-[0.25em] uppercase text-[#e0d0ab] hover:text-white transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    [ NEXT ]
+                  </button>
+                </div>
               </motion.div>
             </motion.div>
           )}
