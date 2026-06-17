@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { motion } from 'motion/react';
 import { X, Shield, Loader2, Trophy, Award, TrendingUp, BookOpen } from 'lucide-react';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from 'recharts';
 import InfoTooltip from './InfoTooltip';
 
 interface PublicProfileProps {
@@ -23,6 +24,8 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
   const [dossier, setDossier] = useState<DossierData | null>(null);
   const [dossierState, setDossierState] = useState<'LOADING' | 'EQUIVALENT_EXCHANGE_BLOCKED' | 'TARGET_PRIVATE' | 'PUBLIC_DOSSIER' | 'ERROR'>('LOADING');
   const [error, setError] = useState('');
+  const [radarData, setRadarData] = useState<{domain: string, accuracy: number}[]>([]);
+  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -35,7 +38,7 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
         // Equivalent Exchange Check
         const { data: currentUserProfile, error: profileError } = await supabase
           .from('user_profiles')
-          .select('is_public')
+          .select('is_public, membership_tier')
           .eq('user_id', currentUserId)
           .single();
 
@@ -45,6 +48,8 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
           if (!cancelled) setDossierState('EQUIVALENT_EXCHANGE_BLOCKED');
           return;
         }
+
+        setIsPremium(currentUserProfile?.membership_tier === 'premium');
 
         const { data, error: rpcError } = await supabase.rpc('get_analyst_dossier', {
           target_user_id: analystId,
@@ -64,7 +69,7 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
           setDossierState('PUBLIC_DOSSIER');
           setDossier(dossierData);
           
-          // Log raw payload
+          // Log raw payload and Aggregate
           const { data: rawSessions } = await supabase
             .from('quiz_sessions')
             .select('*')
@@ -76,6 +81,24 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
               score: s.correct_count,
               mode: s.subject_stats ? 'Vanguard' : 'Training'
             })));
+            
+            const domainStats: Record<string, { correct: number; total: number }> = {};
+            rawSessions.forEach(session => {
+              if (session.subject_stats) {
+                Object.entries(session.subject_stats).forEach(([domain, stats]: [string, any]) => {
+                  if (!domainStats[domain]) domainStats[domain] = { correct: 0, total: 0 };
+                  domainStats[domain].correct += stats.correct;
+                  domainStats[domain].total += stats.total;
+                });
+              }
+            });
+
+            const aggregated = Object.entries(domainStats).map(([domain, stats]) => ({
+              domain,
+              accuracy: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0
+            }));
+            
+            setRadarData(aggregated);
           }
         }
 
@@ -235,6 +258,48 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
                     {dossier.average_accuracy != null ? `${dossier.average_accuracy}%` : 'N/A'}
                   </p>
                 </div>
+              </div>
+
+              {/* Advanced Telemetry Section */}
+              <div className="pt-4 border-t border-zinc-800">
+                <div className="flex items-center gap-2 mb-4">
+                  <TrendingUp className="w-4 h-4 text-[#e0d0ab]" />
+                  <h4 className="font-sans font-bold text-sm uppercase tracking-widest text-stone-100">
+                    Advanced Telemetry
+                  </h4>
+                </div>
+
+                {!isPremium ? (
+                  <div className="flex flex-col items-center justify-center p-8 bg-zinc-900/30 border border-zinc-800/60 rounded-sm text-center">
+                    <Shield className="w-8 h-8 text-zinc-600 mb-3" />
+                    <p className="text-xs text-zinc-400 font-sans font-bold uppercase tracking-widest">
+                      Requires Founders Club Clearance
+                    </p>
+                    <p className="text-[10px] text-zinc-600 mt-2 font-mono">
+                      Domain telemetry is restricted.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="p-4 bg-zinc-900/30 border border-zinc-800/60 rounded-sm">
+                    {radarData.length === 0 ? (
+                      <div className="flex items-center justify-center py-12">
+                        <p className="text-xs font-mono text-zinc-500 tracking-widest">
+                          [ INSUFFICIENT DATA TO RENDER RADAR ]
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="w-full">
+                        <ResponsiveContainer width="100%" height={250}>
+                          <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
+                            <PolarGrid stroke="#52525b" />
+                            <PolarAngleAxis dataKey="domain" tick={{ fill: '#a1a1aa', fontSize: 12, fontFamily: 'monospace' }} />
+                            <Radar dataKey="accuracy" stroke="#f2e1bb" fill="#f2e1bb" fillOpacity={0.3} />
+                          </RadarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}
