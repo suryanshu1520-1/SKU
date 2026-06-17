@@ -1312,7 +1312,23 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
         <div className="w-full flex items-center justify-between mb-8">
           {questions.map((q, idx) => {
             const answeredStatus = userAnswers[q.id] !== undefined;
+            const isCorrect = answeredStatus ? userAnswers[q.id] === q.correct_option?.trim() : undefined;
+            const isTimedOut = timeouts[q.id];
             const isCurrent = idx === currentQuestionIndex;
+
+            let dotClass = 'bg-zinc-800 border-zinc-700 hover:bg-zinc-700'; // Default: Unattempted
+            if (isCurrent) {
+              dotClass = 'bg-[#e0d0ab] border-zinc-400';
+            } else if (isTimedOut) {
+              dotClass = 'bg-amber-500/80 border-amber-500 hover:bg-amber-400/80';
+            } else if (answeredStatus) {
+              if (isCorrect) {
+                dotClass = 'bg-emerald-500/80 border-emerald-500 hover:bg-emerald-400/80';
+              } else {
+                dotClass = 'bg-rose-500/80 border-rose-500 hover:bg-rose-400/80';
+              }
+            }
+
             return (
               <div key={idx} className="flex items-center flex-1 last:flex-none">
                 <button
@@ -1321,13 +1337,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
                   title={`Question ${idx + 1}`}
                 >
                   <motion.div
-                    className={`w-2.5 h-2.5 rounded-full border transition-all ${
-                      isCurrent
-                        ? 'bg-[#e0d0ab] border-zinc-400'
-                        : answeredStatus
-                          ? 'bg-emerald-500/80 border-emerald-500'
-                          : 'bg-zinc-800 border-zinc-700 hover:bg-zinc-700'
-                    }`}
+                    className={`w-2.5 h-2.5 rounded-full border transition-all ${dotClass}`}
                     initial={false}
                     animate={{ scale: isCurrent ? 1.3 : 1 }}
                     transition={{ duration: 0.3 }}
