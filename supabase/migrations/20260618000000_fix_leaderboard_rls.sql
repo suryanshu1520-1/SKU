@@ -23,6 +23,7 @@ GRANT SELECT ON public.public_leaderboard TO anon, authenticated;
 DROP POLICY IF EXISTS "Users read own profile" ON public.user_profiles;
 DROP POLICY IF EXISTS "Users read public profiles" ON public.user_profiles;
 
+DROP POLICY IF EXISTS "Users read public profiles and own profile" ON public.user_profiles;
 CREATE POLICY "Users read public profiles and own profile"
   ON public.user_profiles
   FOR SELECT
@@ -34,6 +35,7 @@ CREATE POLICY "Users read public profiles and own profile"
 -- 3. Fix quiz_sessions RLS (restrict to own sessions OR sessions of public users)
 DROP POLICY IF EXISTS "Allow individual user read" ON public.quiz_sessions;
 
+DROP POLICY IF EXISTS "Allow reading own sessions or public sessions" ON public.quiz_sessions;
 CREATE POLICY "Allow reading own sessions or public sessions"
   ON public.quiz_sessions
   FOR SELECT
