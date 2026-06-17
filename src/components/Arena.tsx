@@ -5,6 +5,7 @@ import type { Question } from '../types';
 import { Loader2, Hourglass, ChevronLeft, ChevronRight, Check, Bookmark, BookmarkCheck, Sparkles, ArrowRight, Lock, Crown, Swords, Target, WandSparkles } from 'lucide-react';
 import InfoTooltip from './InfoTooltip';
 import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface ArenaProps {
   onComplete: (stats: { 
@@ -1385,12 +1386,21 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
 
         {/* Query Headline */}
         <div className="text-lg md:text-xl font-serif font-medium leading-relaxed mb-6 text-stone-100">
-          <Markdown components={{
-            p: ({node, ...props}: any) => <p className="mb-4 last:mb-0" {...props} />,
-            ol: ({node, ...props}: any) => <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />,
-            ul: ({node, ...props}: any) => <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />,
-            li: ({node, ...props}: any) => <li className="pl-1 [&>p]:mb-0 [&>p]:mt-0" {...props} />
-          }}>
+          <Markdown 
+            remarkPlugins={[remarkGfm]}
+            components={{
+              p: ({node, ...props}: any) => <p className="mb-4 last:mb-0" {...props} />,
+              ol: ({node, ...props}: any) => <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />,
+              ul: ({node, ...props}: any) => <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />,
+              li: ({node, ...props}: any) => <li className="pl-1 [&>p]:mb-0 [&>p]:mt-0" {...props} />,
+              table: ({node, ...props}: any) => <div className="overflow-x-auto mb-4 border border-zinc-800 rounded-sm"><table className="w-full text-left border-collapse text-sm font-sans" {...props} /></div>,
+              thead: ({node, ...props}: any) => <thead className="border-b border-zinc-800 bg-zinc-900/30" {...props} />,
+              tbody: ({node, ...props}: any) => <tbody className="divide-y divide-zinc-800/50" {...props} />,
+              tr: ({node, ...props}: any) => <tr className="hover:bg-zinc-900/20 transition-colors" {...props} />,
+              th: ({node, ...props}: any) => <th className="px-4 py-2.5 font-sans text-xs uppercase tracking-wider text-zinc-500 font-bold" {...props} />,
+              td: ({node, ...props}: any) => <td className="px-4 py-2.5" {...props} />
+            }}
+          >
             {currentQuestion.question_text}
           </Markdown>
         </div>
@@ -1406,7 +1416,10 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
             >
               <div className="flex items-start">
                 <span className="font-sans font-medium text-xs mr-4 mt-0.5 opacity-50">{key}.</span>
-                <Markdown components={{ p: ({node, ...props}: any) => <span {...props} /> }}>
+                <Markdown 
+                  remarkPlugins={[remarkGfm]}
+                  components={{ p: ({node, ...props}: any) => <span {...props} /> }}
+                >
                   {value as string}
                 </Markdown>
               </div>
