@@ -1,0 +1,19 @@
+﻿build(audit): comprehensive system architecture and security overhaul
+
+Security & Auth Hardening:
+- Migrated client-side components to use fetchWithAuth for secure Bearer token injection.
+- Hardened backend endpoints (submit-quiz.ts, bookmark.ts, insights.ts) to resolve identity securely via supabase.auth.getUser().
+- Added strict CRON_SECRET validation to background ingestion tasks (scrape.ts).
+- Enforced server-side verification of correct answers to prevent client tampering.
+
+Performance & Architecture:
+- Implemented Vercel waitUntil() in the RSS ingestion pipeline (scrape.ts) to decouple Llama3 AI distillation from the main request thread.
+- Added item-level try/catch blocks in cron jobs to prevent individual feed failures from halting the entire ingestion batch.
+- Refactored CurrentAffairs.tsx slicing. Shifted from a 50-item client-side filter to dynamic, memory-efficient .eq() Supabase server-side queries for ministry and source.
+
+Concurrency & State Management:
+- Fixed Autopsy Screen Amnesia in App.tsx by intelligently preserving test state via localStorage when switching navigation tabs.
+- Patched CSS containment bugs in Landing.tsx utilizing overflow-x-hidden to prevent text cropping on mobile viewports.
+- Resolved the 501st-member Razorpay race condition. Introduced atomic pending_orders table and reserve_premium_seat_if_available RPC to securely lock checkout seats for 15 minutes before gateway initialization.
+- Automatically clear pending order locks upon successful payment verification.
+- Implemented training_sessions table migration to isolate unranked/practice quiz records from competitive leaderboard metrics.

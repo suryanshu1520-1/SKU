@@ -3,6 +3,7 @@ import { getCronConfig } from "./config.js";
 import { fetchAndParseRssFeed, extractArticleDescriptionFromUrl } from "./rss.js";
 import { getLlama3Insight } from "./ai.js";
 import { upsertCurrentAffairs } from "./db.js";
+import { waitUntil } from "@vercel/functions";
 
 // Helper to safely extract strings from unpredictable XML-to-JSON parser outputs
 function getStr(val: any): string {
@@ -23,6 +24,16 @@ function getStr(val: any): string {
 }
 
 export default async function handler(req: any, res: any) {
+  // CRON_SECRET validation
+  const authHeader = req.headers['authorization'] || '';
+  if (
+    !authHeader.includes(`Bearer ${process.env.CRON_SECRET}`) &&
+    req.query.cron_secret !== process.env.CRON_SECRET
+  ) {
+    if (res) return res.status(401).json({ error: "Unauthorized" });
+    throw new Error("Unauthorized");
+  }
+
   const config: CronConfig = getCronConfig();
 
   let processedCount = 0;
@@ -91,58 +102,63 @@ export default async function handler(req: any, res: any) {
         }
         // ================================================================
 
-        console.log("[cron][scrape] Sending to AI", {
-          feedUrl,
-          itemTitle,
-          itemUrl
-        });
+        try {
+          const processItem = async () => {
+            console.log("[cron][scrape] Sending to AI", { feedUrl, itemTitle, itemUrl });
 
-        const aiInsight = await getLlama3Insight(extractedDescription, config);
+            const aiInsight = await getLlama3Insight(extractedDescription, config);
 
-        if (!aiInsight || !aiInsight.text) {
-          console.warn("[cron][scrape] filtered: AI returned null (no insight)", { itemUrl });
-          filteredCount++;
-          continue;
+            if (!aiInsight || !aiInsight.text) {
+              console.warn("[cron][scrape] filtered: AI returned null (no insight)", { itemUrl });
+              return;
+            }
+
+            // 1. DYNAMIC SOURCE TAGGING
+            let sourceTag = "RSS";
+            if (itemUrl.includes("livemint.com")) sourceTag = "LIVEMINT";
+            else if (itemUrl.includes("economictimes.indiatimes")) sourceTag = "ECONOMIC TIMES";
+            else if (itemUrl.includes("thehindu.com")) sourceTag = "THE HINDU";
+
+            // 2. DYNAMIC MINISTRY TAGGING
+            let ministryTag = "GENERAL";
+            const textToSearch = (itemTitle + " " + extractedDescription).toUpperCase();
+            
+            if (textToSearch.includes("FINANCE") || textToSearch.includes("ECONOMY") || textToSearch.includes("DEFICIT") || textToSearch.includes("GOLD") || textToSearch.includes("BANK")) {
+                ministryTag = "MINISTRY OF FINANCE";
+            } else if (textToSearch.includes("COMMERCE") || textToSearch.includes("TRADE") || textToSearch.includes("EXPORT") || textToSearch.includes("OIL")) {
+                ministryTag = "MINISTRY OF COMMERCE AND INDUSTRY";
+            } else if (textToSearch.includes("EARTH SCIENCES") || textToSearch.includes("WEATHER") || textToSearch.includes("SOLAR") || textToSearch.includes("RENEWABLE")) {
+                ministryTag = "MINISTRY OF EARTH SCIENCES";
+            } else if (textToSearch.includes("CABINET") || textToSearch.includes("GOVT") || textToSearch.includes("GOVERNMENT")) {
+                ministryTag = "UNION CABINET";
+            }
+
+            // 3. CLEAN BULLET POINT ARRAY MAPPING
+            const insightText = typeof aiInsight.text === "string" ? aiInsight.text : "";
+            const bulletsArray = insightText
+              .split('\n')
+              .map(line => typeof line === "string" ? line.replace(/^[-•*]\s*/, '').trim() : "")
+              .filter(line => line.length > 0);
+
+            // 4. DATABASE PAYLOAD
+            await upsertCurrentAffairs({
+              headline: itemTitle,
+              url: itemUrl,
+              source: sourceTag,
+              ministry: ministryTag,
+              summary: { bullets: bulletsArray }
+            });
+          };
+
+          waitUntil(processItem().catch(err => {
+            console.error("[cron][scrape] Error in background AI processing", itemUrl, err.message);
+          }));
+          
+          processedCount++;
+        } catch (itemErr: any) {
+          console.error("[cron][scrape] Error processing individual item", itemUrl, itemErr.message);
+          errorCount++;
         }
-
-        // 1. DYNAMIC SOURCE TAGGING
-        let sourceTag = "RSS";
-        if (itemUrl.includes("livemint.com")) sourceTag = "LIVEMINT";
-        else if (itemUrl.includes("economictimes.indiatimes")) sourceTag = "ECONOMIC TIMES";
-        else if (itemUrl.includes("thehindu.com")) sourceTag = "THE HINDU";
-
-
-        // 2. DYNAMIC MINISTRY TAGGING
-        let ministryTag = "GENERAL";
-        const textToSearch = (itemTitle + " " + extractedDescription).toUpperCase();
-        
-        if (textToSearch.includes("FINANCE") || textToSearch.includes("ECONOMY") || textToSearch.includes("DEFICIT") || textToSearch.includes("GOLD") || textToSearch.includes("BANK")) {
-            ministryTag = "MINISTRY OF FINANCE";
-        } else if (textToSearch.includes("COMMERCE") || textToSearch.includes("TRADE") || textToSearch.includes("EXPORT") || textToSearch.includes("OIL")) {
-            ministryTag = "MINISTRY OF COMMERCE AND INDUSTRY";
-        } else if (textToSearch.includes("EARTH SCIENCES") || textToSearch.includes("WEATHER") || textToSearch.includes("SOLAR") || textToSearch.includes("RENEWABLE")) {
-            ministryTag = "MINISTRY OF EARTH SCIENCES";
-        } else if (textToSearch.includes("CABINET") || textToSearch.includes("GOVT") || textToSearch.includes("GOVERNMENT")) {
-            ministryTag = "UNION CABINET";
-        }
-
-        // 3. CLEAN BULLET POINT ARRAY MAPPING (defensive: verify string before .split)
-        const insightText = typeof aiInsight.text === "string" ? aiInsight.text : "";
-        const bulletsArray = insightText
-          .split('\n')
-          .map(line => typeof line === "string" ? line.replace(/^[-•*]\s*/, '').trim() : "")
-          .filter(line => line.length > 0);
-
-        // 4. DATABASE PAYLOAD — matches db.ts signature and frontend contract
-        await upsertCurrentAffairs({
-          headline: itemTitle,
-          url: itemUrl,
-          source: sourceTag,
-          ministry: ministryTag,
-          summary: { bullets: bulletsArray }
-        });
-
-        processedCount++;
       }
     } catch (e: any) {
       console.error("[cron][scrape] Error processing feed", feedUrl, e.message);

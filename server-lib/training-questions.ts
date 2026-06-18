@@ -13,9 +13,8 @@ function cleanEnvValue(val: any): string {
 }
 
 const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
-const rawSupabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || 
-  process.env.SUPABASE_ANON_KEY || 
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4bmdmeGFlcmxra2NhY3JiZGdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTY3NDQsImV4cCI6MjA5NTc5Mjc0NH0.G44wtBZZKGPb-ZTX3zaIPCXFcRtPP9Vtv-0saO0dEXE";
+const rawSupabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+if (!rawSupabaseAnonKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
 
 const supabaseAnon = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseAnonKey));
 
@@ -102,13 +101,33 @@ export default async function handler(req: any, res: any) {
     }
 
     let allQuestions = data || [];
+    let isBackfilled = false;
 
     // Shuffle the final set and return
-    const finalQuestions = shuffleArray(allQuestions).slice(0, N);
+    let finalQuestions = shuffleArray(allQuestions).slice(0, N);
+
+    // Proactive backfill if the filtered subjects yield too few questions
+    if (finalQuestions.length < N) {
+      isBackfilled = true;
+      const excludedIds = [...seenIds, ...finalQuestions.map((q: any) => q.id)];
+      let backfillQuery = supabaseAnon
+        .from('static_questions')
+        .select('*');
+        
+      if (excludedIds.length > 0) {
+        backfillQuery = backfillQuery.not('id', 'in', `(${excludedIds.join(',')})`);
+      }
+      
+      const { data: backfillData, error: backfillError } = await backfillQuery.limit(N - finalQuestions.length);
+        
+      if (!backfillError && backfillData) {
+        finalQuestions = [...finalQuestions, ...backfillData];
+      }
+    }
 
     res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=600');
 
-    return res.status(200).json({ questions: finalQuestions });
+    return res.status(200).json({ questions: finalQuestions, isBackfilled });
     } catch (err: any) {
     console.error("[training-questions] Handler error:", err);
     return res.status(500).json({ error: err.message, stack: err.stack || "An unexpected error occurred." });

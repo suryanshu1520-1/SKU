@@ -10,11 +10,11 @@ interface LandingProps {
 
 export default function Landing({ onNavigateArena, onNavigateTracker, onNavigateProfile, onNavigateManifesto }: LandingProps) {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-zinc-950 text-stone-50 font-sans relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center py-12 px-6 bg-zinc-950 text-stone-50 font-sans relative overflow-x-hidden">
       {/* Subtle background grid overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f1f23_1px,transparent_1px),linear-gradient(to_bottom,#1f1f23_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20 pointer-events-none" />
 
-      <div className="w-full max-w-2xl z-10 flex flex-col items-center justify-center min-h-[80vh]">
+      <div className="w-full max-w-2xl z-10 flex flex-col items-center justify-center my-auto">
         {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

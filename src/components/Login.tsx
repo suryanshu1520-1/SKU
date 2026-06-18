@@ -1,3 +1,4 @@
+import { fetchWithAuth } from '../lib/api';
 import { useState } from 'react';
 import { Mail, ArrowRight, Loader2, AlertCircle, Lock, Check, RefreshCw, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -56,7 +57,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto }: LoginPro
       const cleanedEmail = email.toLowerCase().trim();
 
       if (isSignUp) {
-        const response = await fetch('/api/auth/register', {
+        const response = await fetchWithAuth('/api/auth/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

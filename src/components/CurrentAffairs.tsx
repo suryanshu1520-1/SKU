@@ -154,8 +154,15 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
     })();
   }, [userId, savingArticleIds]);
 
-  // Distinct fetch helper - conditionally applies date filters to the Supabase query
-  const fetchPolicyData = async (showSkeleton = true, filterStartDate?: string, filterEndDate?: string, pageIndex = 0) => {
+  // Distinct fetch helper - conditionally applies date and category filters to the Supabase query
+  const fetchPolicyData = async (
+    showSkeleton = true, 
+    filterStartDate?: string, 
+    filterEndDate?: string, 
+    pageIndex = 0,
+    filterMinistry = 'ALL',
+    filterSource = 'ALL'
+  ) => {
     if (showSkeleton && pageIndex === 0) setLoading(true);
     setErrorMsg('');
     try {
@@ -163,6 +170,14 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
         .from('current_affairs')
         .select('*')
         .neq('source', 'PIB_Digest');
+
+      if (filterMinistry !== 'ALL') {
+        query = query.eq('ministry', filterMinistry);
+      }
+      
+      if (filterSource !== 'ALL') {
+        query = query.eq('source', filterSource);
+      }
 
       // Apply server-side date filtering when dates are set
       if (filterStartDate) {
@@ -198,8 +213,11 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
         const uniqueSources = Array.from(new Set(data.map((item: any) => item.source).filter(Boolean))) as string[];
 
         if (pageIndex === 0) {
-          setMinistries(uniqueMinistries.sort());
-          setSources(uniqueSources.sort());
+          if (filterMinistry === 'ALL' && filterSource === 'ALL' && !filterStartDate && !filterEndDate) {
+            // Only overwrite filters if we are doing an unfiltered fetch, otherwise we lose options
+            setMinistries(uniqueMinistries.sort());
+            setSources(uniqueSources.sort());
+          }
         } else {
           setMinistries(prev => Array.from(new Set([...prev, ...uniqueMinistries])).sort());
           setSources(prev => Array.from(new Set([...prev, ...uniqueSources])).sort());
@@ -213,10 +231,10 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
     }
   };
 
-  // Re-fetch when date filters or page changes
+  // Re-fetch when date filters, category filters, or page changes
   useEffect(() => {
-    fetchPolicyData(true, startDate || undefined, endDate || undefined, page);
-  }, [startDate, endDate, page]);
+    fetchPolicyData(true, startDate || undefined, endDate || undefined, page, selectedMinistry, selectedSource);
+  }, [startDate, endDate, page, selectedMinistry, selectedSource]);
 
   // Sync action trigger calling the cooldown-aware endpoint
   const handleSyncFeed = async () => {
@@ -353,12 +371,8 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
     }
   };
 
-  // Client-side ministry & source filters only -- date filtering is now server-side
-  const filteredItems = items.filter(item => {
-    const matchMinistry = selectedMinistry === 'ALL' || item.ministry === selectedMinistry;
-    const matchSource = selectedSource === 'ALL' || item.source === selectedSource;
-    return matchMinistry && matchSource;
-  });
+  // Use server-filtered items directly
+  const filteredItems = items;
 
   const resetFilters = () => {
     setSelectedMinistry('ALL');

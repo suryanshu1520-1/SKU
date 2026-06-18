@@ -1,3 +1,4 @@
+import { fetchWithAuth } from '../lib/api';
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Shield, ArrowRight, X, Crown, Loader2 } from 'lucide-react';
@@ -47,7 +48,7 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
       }
 
       // Step 1: Create Razorpay order via backend
-      const orderRes = await fetch('/api/create-razorpay-order', {
+      const orderRes = await fetchWithAuth('/api/create-razorpay-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: currentUserId }),
@@ -101,7 +102,7 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
         handler: async function (response: any) {
           // Verify payment on the backend
           try {
-            const verifyRes = await fetch('/api/verify-payment', {
+            const verifyRes = await fetchWithAuth('/api/verify-payment', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({

@@ -5,6 +5,7 @@ import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
+import rateLimit from "express-rate-limit";
 import scrapeHandler from "./server-lib/cron/scrape.js";
 import newsdataHandler from "./server-lib/cron/newsdata.js";
 import syncFeedHandler from "./server-lib/sync-feed.js";
@@ -133,6 +134,15 @@ async function startServer() {
     return ai;
   };
 
+  // Rate limiters
+  const registerLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5,
+    message: { error: "Too many registration attempts. Please try again later." },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
   // API routes FIRST
   app.get("/api/cron/scrape", scrapeHandler);
   app.post("/api/cron/scrape", scrapeHandler);
@@ -163,7 +173,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/auth/register", async (req, res) => {
+  app.post("/api/auth/register", registerLimiter, async (req, res) => {
     const { email, password, name } = req.body;
     if (!email || !password) {
       return res.status(400).json({ error: "Email and password are required credentials." });

@@ -35,26 +35,7 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    // ─── STEP 1: Atomically check premium capacity via Supabase RPC ─────────
-    const { data: capacityResult, error: capacityError } = await supabaseServer.rpc(
-      'check_premium_capacity'
-    );
-
-    if (capacityError) {
-      console.error("[razorpay] Premium capacity check RPC failed:", capacityError);
-      return res.status(500).json({ error: "Failed to verify membership capacity." });
-    } else {
-      // Parse the RPC result
-      const capacityInfo = capacityResult as { count: number; hasCapacity: boolean; lockAcquired: boolean };
-      if (!capacityInfo.hasCapacity) {
-        return res.status(403).json({
-          error: "Founders Club is full. The 500-seat capacity has been reached.",
-          capacity: capacityInfo,
-        });
-      }
-    }
-
-    // ─── STEP 2: Check if user is already premium ────────────────────────
+    // ─── STEP 1: Check if user is already premium ────────────────────────
     const { data: userProfile, error: profileError } = await supabaseServer
       .from('user_profiles')
       .select('membership_tier')
@@ -72,7 +53,7 @@ export default async function handler(req: any, res: any) {
       });
     }
 
-    // ─── STEP 3: Initialize Razorpay SDK ─────────────────────────────────
+    // ─── STEP 2: Initialize Razorpay SDK ─────────────────────────────────
     const razorpayKeyId = cleanEnvValue(process.env.RAZORPAY_KEY_ID || '');
     const razorpayKeySecret = cleanEnvValue(process.env.RAZORPAY_KEY_SECRET || '');
 
@@ -86,7 +67,7 @@ export default async function handler(req: any, res: any) {
       key_secret: razorpayKeySecret,
     });
 
-    // ─── STEP 4: Create Razorpay order (₹399 = 39900 paise) ──────────────
+    // ─── STEP 3: Create Razorpay order (₹399 = 39900 paise) ──────────────
     const order = await razorpay.orders.create({
       amount: 39900,
       currency: "INR",
@@ -97,6 +78,19 @@ export default async function handler(req: any, res: any) {
     });
 
     console.log(`[razorpay] Order created: ${order.id} for user ${userId}`);
+
+    // ─── STEP 4: Atomically check premium capacity & reserve seat ─────────
+    const { data: reserved, error: reserveError } = await supabaseServer.rpc(
+      'reserve_premium_seat_if_available',
+      { p_user_id: userId, p_order_id: order.id }
+    );
+
+    if (reserveError || !reserved) {
+      console.error("[razorpay] Premium capacity reservation failed or full:", reserveError);
+      return res.status(403).json({
+        error: "Founders Club is full. The 500-seat capacity has been reached or is currently locked by pending checkouts. Please try again later.",
+      });
+    }
 
     return res.status(200).json({
       order_id: order.id,

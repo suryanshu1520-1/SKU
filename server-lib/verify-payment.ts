@@ -96,6 +96,16 @@ export default async function handler(req: any, res: any) {
       }
     }
 
+    // ─── STEP 3: Clear the pending order lock ─────────────────────────────
+    const { error: lockClearError } = await supabaseServer
+      .from('pending_orders')
+      .delete()
+      .eq('user_id', userId);
+
+    if (lockClearError) {
+      console.warn(`[razorpay-verify] Failed to clear pending order for ${userId}:`, lockClearError);
+    }
+
     console.log(`[razorpay-verify] User ${userId} upgraded to premium successfully (Payment: ${razorpay_payment_id})`);
 
     return res.status(200).json({

@@ -1,3 +1,4 @@
+import { fetchWithAuth } from '../lib/api';
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
@@ -201,7 +202,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
   // Fetch user limits on mount if in intro
   useEffect(() => {
     if (arenaPhase === 'intro' && userId) {
-      fetch(`/api/user-limits?userId=${encodeURIComponent(userId)}`)
+      fetchWithAuth(`/api/user-limits?userId=${encodeURIComponent(userId)}`)
         .then(res => res.json())
         .then(data => {
           if (!data.error) {
@@ -348,7 +349,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/training-questions', {
+      const response = await fetchWithAuth('/api/training-questions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -364,6 +365,15 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
 
       const data = await response.json();
       const questionsList = data.questions || [];
+
+      if (data.isBackfilled) {
+        if (!localStorage.getItem('tark_backfill_seen')) {
+          localStorage.setItem('tark_backfill_seen', 'true');
+          setToastMsg('Note: Insufficient questions in selected subjects. We proactive backfilled your assessment with random questions.');
+        } else {
+          setToastMsg('Proactive Backfill: Assessment padded with random questions.');
+        }
+      }
 
       if (questionsList.length === 0) {
         setErrorMsg('No questions found for the selected subjects.');
@@ -402,7 +412,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
       setErrorMsg('');
       try {
         const url = userId ? `/api/questions?userId=${encodeURIComponent(userId)}` : '/api/questions';
-        const response = await fetch(url);
+        const response = await fetchWithAuth(url);
         if (!response.ok) {
           throw new Error(`Server returned status code ${response.status}`);
         }
@@ -550,7 +560,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
         : currentQuestion.options_matrix;
       const answerStr = optionsStr ? optionsStr[currentQuestion.correct_option] : "Unknown";
 
-      fetch('/api/explanation', {
+      fetchWithAuth('/api/explanation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -680,7 +690,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
 
     try {
       if (isSaved) {
-        const res = await fetch('/api/bookmark', {
+        const res = await fetchWithAuth('/api/bookmark', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -698,7 +708,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
           });
         }
       } else {
-        const res = await fetch('/api/bookmark', {
+        const res = await fetchWithAuth('/api/bookmark', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -795,7 +805,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
     });
 
     try {
-      const response = await fetch('/api/submit-quiz', {
+      const response = await fetchWithAuth('/api/submit-quiz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -893,7 +903,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
     if (cached && cached.userId === userId && cached.savedInsightIds) {
       return;
     }
-    fetch(`/api/bookmark?userId=${encodeURIComponent(userId)}`)
+    fetchWithAuth(`/api/bookmark?userId=${encodeURIComponent(userId)}`)
       .then(res => res.json())
       .then(data => {
         if (data.bookmarks) {

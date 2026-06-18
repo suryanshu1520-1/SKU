@@ -13,9 +13,8 @@ function cleanEnvValue(val: any): string {
 }
 
 const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
-const rawServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  process.env.VITE_SUPABASE_SERVICE_ROLE_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4bmdmeGFlcmxra2NhY3JiZGdjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDIxNjc0NCwiZXhwIjoyMDk1NzkyNzQ0fQ.BY5YQh7nbSUrNZ61nHDIuzOX2P2s3iD3L_s11QHz9mg";
+const rawServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (!rawServiceKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
 
 const supabase = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawServiceKey));
 
@@ -25,82 +24,119 @@ export default async function handler(req: any, res: any) {
     return res.status(200).end();
   }
 
+  // Ensure it's a POST or GET request
+  if (req.method !== 'POST' && req.method !== 'GET') {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
   try {
     // ---- POST: Create or delete a bookmark (upsert logic) ----
     if (req.method === 'POST') {
-      const { userId, questionId, questionText, insightText, action } = req.body || {};
+      const authHeader = req.headers['authorization'] || '';
+      const token = authHeader.replace(/^Bearer\s+/, '').trim();
+      
+      if (!token) {
+        return res.status(401).json({ error: "UNAUTHORIZED", message: "Missing authorization token." });
+      }
+      
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+      
+      if (authError || !user) {
+        return res.status(401).json({ error: "UNAUTHORIZED", message: "Invalid or expired token." });
+      }
+      
+      const userId = user.id;
+      const { questionId, insightText, action, subject_category } = req.body || {};
 
-      if (!userId || !questionId) {
-        return res.status(400).json({ error: "Missing required fields: userId, questionId" });
+      if (!questionId) {
+        return res.status(400).json({ error: "Missing required field: questionId" });
       }
 
-      // If action is 'delete', remove the bookmark
-      if (action === 'delete') {
+      if (action === 'remove') {
         const { error: deleteError } = await supabase
           .from('saved_insights')
           .delete()
           .eq('user_id', userId)
-          .eq('question_id', questionId);
+          .eq('question_id', String(questionId));
 
         if (deleteError) {
-          console.error("Bookmark delete error:", deleteError);
-          return res.status(500).json({ error: "Failed to remove bookmark: " + deleteError.message });
+          console.error("[bookmark] Delete error:", deleteError);
+          return res.status(500).json({ error: deleteError.message });
         }
 
-        return res.status(200).json({ success: true, action: 'deleted' });
+        return res.status(200).json({ bookmarked: false });
+      } else {
+        const { data: existing, error: checkError } = await supabase
+          .from('saved_insights')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('question_id', String(questionId))
+          .maybeSingle();
+
+        if (checkError) {
+          console.error("[bookmark] Check error:", checkError);
+          return res.status(500).json({ error: checkError.message });
+        }
+
+        if (existing) {
+          const { error: deleteError } = await supabase
+            .from('saved_insights')
+            .delete()
+            .eq('id', existing.id);
+
+          if (deleteError) {
+            console.error("[bookmark] Delete error on toggle:", deleteError);
+            return res.status(500).json({ error: deleteError.message });
+          }
+
+          return res.status(200).json({ bookmarked: false });
+        }
+
+        const { error: insertError } = await supabase
+          .from('saved_insights')
+          .insert({
+            user_id: userId,
+            question_id: String(questionId),
+            insight_text: insightText || '',
+            subject_tags: subject_category ? [subject_category] : [],
+          });
+
+        if (insertError) {
+          console.error("[bookmark] Insert error:", insertError);
+          return res.status(500).json({ error: insertError.message });
+        }
+
+        return res.status(200).json({ bookmarked: true });
       }
-
-      // Otherwise, upsert the bookmark (insert or update)
-      if (!questionText || !insightText) {
-        return res.status(400).json({ error: "Missing required fields for save: questionText, insightText" });
-      }
-
-      const { error: upsertError } = await supabase
-        .from('saved_insights')
-        .upsert({
-          user_id: userId,
-          question_id: questionId,
-          question_text: questionText,
-          insight_text: insightText,
-        }, {
-          onConflict: 'user_id, question_id',
-          ignoreDuplicates: false,
-        });
-
-      if (upsertError) {
-        console.error("Bookmark upsert error:", upsertError);
-        return res.status(500).json({ error: "Failed to save bookmark: " + upsertError.message });
-      }
-
-      return res.status(200).json({ success: true, action: 'saved' });
     }
 
     // ---- GET: Fetch all bookmarks for a user ----
     if (req.method === 'GET') {
-      const userId = req.query?.userId;
-
-      if (!userId) {
-        return res.status(400).json({ error: "Missing required query param: userId" });
+      const authHeader = req.headers['authorization'] || '';
+      const token = authHeader.replace(/^Bearer\s+/, '').trim();
+      
+      if (!token) {
+        return res.status(401).json({ error: "UNAUTHORIZED", message: "Missing authorization token." });
       }
+      
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+      
+      if (authError || !user) {
+        return res.status(401).json({ error: "UNAUTHORIZED", message: "Invalid or expired token." });
+      }
+      
+      const userId = user.id;
 
       const { data, error } = await supabase
         .from('saved_insights')
         .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
+        .eq('user_id', userId);
 
-      if (error) {
-        console.error("Bookmark fetch error:", error);
-        return res.status(500).json({ error: "Failed to fetch bookmarks: " + error.message });
-      }
-
-      return res.status(200).json({ bookmarks: data || [] });
+      if (error) return res.status(500).json({ error: error.message });
+      return res.status(200).json(data);
     }
-
-    // ---- Fallback: reject other methods ----
-    return res.status(405).json({ error: "Method not allowed" });
   } catch (err: any) {
-    console.error("Bookmark handler error:", err);
+    console.error("[bookmark] Exception:", err);
     return res.status(500).json({ error: err.message || "An unexpected error occurred." });
   }
 }

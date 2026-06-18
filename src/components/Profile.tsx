@@ -1,3 +1,4 @@
+import { fetchWithAuth } from '../lib/api';
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
@@ -208,7 +209,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
   useEffect(() => {
     if (!userId) return;
     setLoadingSaved(true);
-    fetch(`/api/bookmark?userId=${encodeURIComponent(userId)}`)
+    fetchWithAuth(`/api/bookmark?userId=${encodeURIComponent(userId)}`)
       .then(res => res.json())
       .then(data => {
         if (data.bookmarks) {
@@ -294,7 +295,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
       const insight = savedInsights.find(s => s.id === insightId);
       if (!insight) return;
 
-      const res = await fetch('/api/bookmark', {
+      const res = await fetchWithAuth('/api/bookmark', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

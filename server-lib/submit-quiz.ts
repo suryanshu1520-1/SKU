@@ -61,8 +61,23 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  const authHeader = req.headers['authorization'] || '';
+  const token = authHeader.replace(/^Bearer\s+/, '').trim();
+  
+  if (!token) {
+    return res.status(401).json({ error: "UNAUTHORIZED", message: "Missing authorization token." });
+  }
+  
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+  
+  if (authError || !user) {
+    return res.status(401).json({ error: "UNAUTHORIZED", message: "Invalid or expired token." });
+  }
+
   try {
     const payload: SubmitPayload = req.body;
+    // Override payload.userId with the securely resolved user.id
+    payload.userId = user.id;
 
     if (!payload.userId || !payload.questions || !payload.answers) {
       return res.status(400).json({ error: "Missing required fields: userId, questions, answers" });
@@ -86,19 +101,39 @@ export default async function handler(req: any, res: any) {
       subject_category: string | null;
     }> = [];
 
+    // 0. Fetch correct answers from DB to prevent client spoofing
+    const questionIds = payload.questions.map(q => q.id);
+    const { data: dbQuestions, error: dbError } = await supabase
+      .from('static_questions')
+      .select('id, correct_option, subject_category')
+      .in('id', questionIds);
+
+    if (dbError) {
+      console.error("DB Error fetching static questions:", dbError);
+      return res.status(500).json({ error: "Failed to verify questions against database." });
+    }
+
+    const questionMap = new Map(dbQuestions?.map(q => [String(q.id), q]) || []);
+
     for (const q of payload.questions) {
       const qId = String(q.id);
+      const dbQ = questionMap.get(qId);
+      
       const selected = payload.answers[q.id] || payload.answers[String(q.id)] || null;
       const isTimeout = !!payload.timeouts[q.id] || !!payload.timeouts[String(q.id)];
       const timeSpent = Math.min(60, Math.max(0, payload.timeSpentMap[q.id] || payload.timeSpentMap[String(q.id)] || 0));
-      const subject = q.subject_category || 'CORE';
+      
+      // Use DB subject_category or fallback
+      const subject = dbQ?.subject_category || q.subject_category || 'CORE';
 
       if (!computedSubjectStats[subject]) {
         computedSubjectStats[subject] = { correct: 0, total: 0 };
       }
       computedSubjectStats[subject].total += 1;
       computedTotalTime += timeSpent;
-      const correctOpt = q.correct_option?.trim() || '';
+      
+      // Securely grab correct_option from DB
+      const correctOpt = dbQ?.correct_option?.trim() || '';
 
       let isCorrect: boolean | null = null;
 
@@ -126,7 +161,7 @@ export default async function handler(req: any, res: any) {
         selected_option: selected,
         is_correct: isCorrect,
         time_spent_seconds: timeSpent,
-        subject_category: q.subject_category || null,
+        subject_category: subject,
       });
     }
 
@@ -139,40 +174,64 @@ export default async function handler(req: any, res: any) {
       }
     }
 
-    // 2. Compute percentile BEFORE inserting the session
-    let computedPercentile: number = 0;
-    const { data: pData, error: pError } = await supabase.rpc('get_user_percentile', {
-      target_score: correctCount,
-    });
-    if (!pError && pData !== null) {
-      computedPercentile = Number(pData);
-    } else {
-      console.warn("Percentile fetch warning (expected on first session):", pError);
-    }
-
-    // 3. Insert quiz_session with correct_count / incorrect_count naming, pre-computed percentile, and is_ranked
     const isRanked = payload.isRanked !== undefined ? payload.isRanked : true;
-    const { data: session, error: sessionError } = await supabase
-      .from('quiz_sessions')
-      .insert({
-        user_id: payload.userId,
-        correct_count: correctCount,
-        incorrect_count: incorrectCount,
-        unattempted_count: unattemptedCount,
-        total_time_seconds: computedTotalTime,
-        subject_stats: computedSubjectStats,
-        percentile: computedPercentile,
-        is_ranked: isRanked,
-      })
-      .select('id')
-      .single();
 
-    if (sessionError) {
-      console.error("CRITICAL SUBMISSION DB ERROR:", sessionError);
-      return res.status(500).json({ error: "Database error", details: sessionError.message });
+    // 2. Compute percentile BEFORE inserting the session (ONLY IF RANKED)
+    let computedPercentile: number = 0;
+    if (isRanked) {
+      const { data: pData, error: pError } = await supabase.rpc('get_user_percentile', {
+        target_score: correctCount,
+      });
+      if (!pError && pData !== null) {
+        computedPercentile = Number(pData);
+      } else {
+        console.warn("Percentile fetch warning (expected on first session):", pError);
+      }
     }
 
-    const sessionId = session.id;
+    // 3. Insert into the appropriate session table
+    let sessionId = '';
+    if (isRanked) {
+      const { data: session, error: sessionError } = await supabase
+        .from('quiz_sessions')
+        .insert({
+          user_id: payload.userId,
+          correct_count: correctCount,
+          incorrect_count: incorrectCount,
+          unattempted_count: unattemptedCount,
+          total_time_seconds: computedTotalTime,
+          subject_stats: computedSubjectStats,
+          percentile: computedPercentile,
+          is_ranked: true,
+        })
+        .select('id')
+        .single();
+
+      if (sessionError) {
+        console.error("CRITICAL SUBMISSION DB ERROR:", sessionError);
+        return res.status(500).json({ error: "Database error", details: sessionError.message });
+      }
+      sessionId = session.id;
+    } else {
+      const { data: session, error: sessionError } = await supabase
+        .from('training_sessions')
+        .insert({
+          user_id: payload.userId,
+          correct_count: correctCount,
+          incorrect_count: incorrectCount,
+          unattempted_count: unattemptedCount,
+          total_time_seconds: computedTotalTime,
+          subject_stats: computedSubjectStats,
+        })
+        .select('id')
+        .single();
+
+      if (sessionError) {
+        console.error("CRITICAL SUBMISSION DB ERROR:", sessionError);
+        return res.status(500).json({ error: "Database error", details: sessionError.message });
+      }
+      sessionId = session.id;
+    }
 
     // 4. Batch insert question_attempts with the session_id
     const attemptRowsWithSession = questionAttemptRows.map(row => ({
@@ -180,6 +239,8 @@ export default async function handler(req: any, res: any) {
       session_id: sessionId,
     }));
 
+    // Question attempts aren't strictly linked via foreign key to training_sessions in the schema yet,
+    // but the session_id will correspond to a training_sessions UUID.
     const { error: attemptsError } = await supabase
       .from('question_attempts')
       .insert(attemptRowsWithSession);

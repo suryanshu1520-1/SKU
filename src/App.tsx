@@ -190,6 +190,21 @@ export default function App() {
     setShowManifesto(false);
   };
 
+  const navigateToTab = (tab: 'arena' | 'tracker' | 'profile' | 'leaderboard') => {
+    setActiveTab(tab);
+    if (gameState === 'landing' || gameState === 'login') {
+      if (localStorage.getItem('tark_arena_results')) {
+        setGameState('autopsy');
+      } else {
+        setGameState('arena');
+      }
+    } else if (tab === 'arena' && localStorage.getItem('tark_arena_results')) {
+      setGameState('autopsy');
+    } else if (tab === 'arena') {
+      setGameState('arena');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
@@ -241,7 +256,7 @@ export default function App() {
                  </button>
 
                  <button
-                   onClick={() => { setGameState('arena'); setActiveTab('arena'); }}
+                   onClick={() => navigateToTab('arena')}
                    className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none transition-colors"
                  >
                    {gameState !== 'landing' && activeTab === 'arena' && (
@@ -259,7 +274,7 @@ export default function App() {
                  </button>
 
                  <button
-                   onClick={() => { setGameState('arena'); setActiveTab('tracker'); }}
+                   onClick={() => navigateToTab('tracker')}
                    className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none transition-colors"
                  >
                    {gameState !== 'landing' && activeTab === 'tracker' && (
@@ -277,7 +292,7 @@ export default function App() {
                  </button>
 
                  <button
-                   onClick={() => { setGameState('arena'); setActiveTab('leaderboard'); }}
+                   onClick={() => navigateToTab('leaderboard')}
                    className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none transition-colors"
                  >
                    {gameState !== 'landing' && activeTab === 'leaderboard' && (
@@ -295,7 +310,7 @@ export default function App() {
                  </button>
 
                  <button
-                   onClick={() => { setGameState('arena'); setActiveTab('profile'); }}
+                   onClick={() => navigateToTab('profile')}
                    className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none transition-colors"
                  >
                    {gameState !== 'landing' && activeTab === 'profile' && (
@@ -324,9 +339,9 @@ export default function App() {
 
       {gameState === 'landing' && (
         <Landing 
-          onNavigateArena={() => { setGameState('arena'); setActiveTab('arena'); }}
-          onNavigateTracker={() => { setGameState('arena'); setActiveTab('tracker'); }}
-          onNavigateProfile={() => { setGameState('arena'); setActiveTab('profile'); }}
+          onNavigateArena={() => navigateToTab('arena')}
+          onNavigateTracker={() => navigateToTab('tracker')}
+          onNavigateProfile={() => navigateToTab('profile')}
           onNavigateManifesto={handleNavigateManifesto}
         />
       )}

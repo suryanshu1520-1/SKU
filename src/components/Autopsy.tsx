@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { Loader2, Sparkles } from 'lucide-react';
 import Markdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
+import { supabase } from '../lib/supabase';
 
 interface AutopsyProps {
   stats: { 
@@ -26,17 +27,23 @@ export default function Autopsy({ stats, percentile, onNavigateManifesto, onRetu
   useEffect(() => {
     if (Object.keys(stats.subjectStats || {}).length > 0) {
       setLoadingInsights(true);
-      fetch('/api/insights', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stats })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.insights) setInsights(data.insights);
-      })
-      .catch(err => console.error("Error fetching insights:", err))
-      .finally(() => setLoadingInsights(false));
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        const token = session?.access_token || '';
+        fetch('/api/insights', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+          },
+          body: JSON.stringify({ stats })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.insights) setInsights(data.insights);
+        })
+        .catch(err => console.error("Error fetching insights:", err))
+        .finally(() => setLoadingInsights(false));
+      });
     }
   }, [stats]);
 

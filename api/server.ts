@@ -1,6 +1,7 @@
 import express from "express";
 import { createClient } from "@supabase/supabase-js";
 import { GoogleGenAI } from "@google/genai";
+import rateLimit from "express-rate-limit";
 import bookmarkHandler from "../server-lib/bookmark.js";
 import explanationHandler from "../server-lib/explanation.js";
 import insightsHandler from "../server-lib/insights.js";
@@ -40,6 +41,15 @@ const supabaseAnon = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(r
 const app = express();
 app.use(express.json());
 
+// Rate limiter for registration endpoints
+const registerLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5,
+  message: { error: "Too many registration attempts. Please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Mount route handlers
 app.get("/api/cron/scrape", scrapeHandler);
 app.post("/api/cron/scrape", scrapeHandler);
@@ -74,7 +84,7 @@ app.get("/api/questions/inline", async (req: any, res: any) => {
   }
 });
 
-app.post("/api/auth/register/inline", async (req: any, res: any) => {
+app.post("/api/auth/register/inline", registerLimiter, async (req: any, res: any) => {
   const { email, password, name } = req.body;
   if (!email || !password) return res.status(400).json({ error: "Email and password are required." });
   try {
@@ -149,24 +159,157 @@ app.post("/api/submit-quiz/inline", async (req: any, res: any) => {
     if (!payload.userId || !payload.questions || !payload.answers) {
       return res.status(400).json({ error: "Missing required fields" });
     }
-    const totalQuestions = payload.questions.length;
-    let correctCount = 0, incorrectCount = 0, unattemptedCount = 0;
-    for (const q of payload.questions) {
-      const selected = payload.answers[q.id] || payload.answers[String(q.id)] || null;
-      const correctOpt = q.correct_option?.trim() || '';
-      if (!selected) { unattemptedCount++; }
-      else if (selected === correctOpt) { correctCount++; }
-      else { incorrectCount++; }
+
+    // Extract question IDs from the payload
+    const questionIds = payload.questions.map((q: any) => String(q.id));
+
+    // Fetch correct answers from the database — server-authoritative
+    const { data: dbQuestions, error: fetchError } = await supabaseAnon
+      .from('static_questions')
+      .select('id, correct_option, subject_category')
+      .in('id', questionIds);
+
+    if (fetchError) {
+      console.error("[submit-quiz-inline] Failed to fetch questions:", fetchError);
+      return res.status(500).json({ error: "Failed to verify question answers." });
     }
+
+    // Build a lookup map: questionId -> { correct_option, subject_category }
+    const questionMap: Record<string, { correct_option: string; subject_category: string }> = {};
+    for (const q of dbQuestions || []) {
+      questionMap[String(q.id)] = {
+        correct_option: (q.correct_option || '').trim(),
+        subject_category: q.subject_category || 'CORE',
+      };
+    }
+
+    // Compute scores server-side
+    const totalQuestions = payload.questions.length;
+    let correctCount = 0;
+    let incorrectCount = 0;
+    let unattemptedCount = 0;
+    let computedTotalTime = 0;
+    const computedSubjectStats: Record<string, { correct: number; total: number }> = {};
+
+    for (const q of payload.questions) {
+      const qId = String(q.id);
+      const selected = payload.answers[q.id] || payload.answers[String(q.id)] || null;
+      const dbQuestion = questionMap[qId];
+      const subject = dbQuestion?.subject_category || q.subject_category || 'CORE';
+      const timeSpent = Math.min(60, Math.max(0, payload.timeSpentMap?.[q.id] || payload.timeSpentMap?.[String(q.id)] || 0));
+      const isTimeout = !!payload.timeouts?.[q.id] || !!payload.timeouts?.[String(q.id)];
+
+      if (!computedSubjectStats[subject]) {
+        computedSubjectStats[subject] = { correct: 0, total: 0 };
+      }
+      computedSubjectStats[subject].total += 1;
+      computedTotalTime += timeSpent;
+
+      if (!selected && !isTimeout) {
+        unattemptedCount += 1;
+      } else if (dbQuestion && selected === dbQuestion.correct_option) {
+        correctCount += 1;
+        computedSubjectStats[subject].correct += 1;
+      } else if (selected && selected !== dbQuestion?.correct_option) {
+        incorrectCount += 1;
+      } else if (isTimeout && !selected) {
+        unattemptedCount += 1;
+      } else {
+        unattemptedCount += 1;
+      }
+    }
+
+    // Ensure totals add up
+    if (correctCount + incorrectCount + unattemptedCount !== totalQuestions) {
+      const accounted = correctCount + incorrectCount + unattemptedCount;
+      const diff = totalQuestions - accounted;
+      if (diff > 0) unattemptedCount += diff;
+    }
+
+    // Compute percentile
+    let computedPercentile = 0;
+    const { data: pData, error: pError } = await supabaseServer.rpc('get_user_percentile', {
+      target_score: correctCount,
+    });
+    if (!pError && pData !== null) {
+      computedPercentile = Number(pData);
+    }
+
     const isRanked = payload.isRanked !== undefined ? payload.isRanked : true;
-    const { data: session, error: sessionError } = await supabaseServer.from('quiz_sessions').insert({
-      user_id: payload.userId, correct_count: correctCount, incorrect_count: incorrectCount,
-      unattempted_count: unattemptedCount, total_time_seconds: payload.totalTimeSeconds || 0,
-      subject_stats: payload.subjectStats || {}, percentile: 0, is_ranked: isRanked,
-    }).select('id').single();
-    if (sessionError) return res.status(500).json({ error: "Failed to record session: " + sessionError.message });
-    return res.status(200).json({ sessionId: session.id, stats: { correct: correctCount, incorrect: incorrectCount, unattempted: unattemptedCount } });
+
+    // Insert quiz session with server-computed values
+    const { data: session, error: sessionError } = await supabaseServer
+      .from('quiz_sessions')
+      .insert({
+        user_id: payload.userId,
+        correct_count: correctCount,
+        incorrect_count: incorrectCount,
+        unattempted_count: unattemptedCount,
+        total_time_seconds: computedTotalTime,
+        subject_stats: computedSubjectStats,
+        percentile: computedPercentile,
+        is_ranked: isRanked,
+      })
+      .select('id')
+      .single();
+
+    if (sessionError) {
+      console.error("[submit-quiz-inline] Session insert error:", sessionError);
+      return res.status(500).json({ error: "Failed to record session: " + sessionError.message });
+    }
+
+    const sessionId = session.id;
+
+    // Batch insert question_attempts
+    const attemptRows = payload.questions.map((q: any) => {
+      const qId = String(q.id);
+      const selected = payload.answers[q.id] || payload.answers[String(q.id)] || null;
+      const dbQuestion = questionMap[qId];
+      const isCorrect = selected ? (dbQuestion && selected === dbQuestion.correct_option) : null;
+      const timeSpent = Math.min(60, Math.max(0, payload.timeSpentMap?.[q.id] || payload.timeSpentMap?.[String(q.id)] || 0));
+
+      return {
+        session_id: sessionId,
+        user_id: payload.userId,
+        question_id: qId,
+        selected_option: selected,
+        is_correct: isCorrect,
+        time_spent_seconds: timeSpent,
+        subject_category: dbQuestion?.subject_category || q.subject_category || null,
+      };
+    });
+
+    const { error: attemptsError } = await supabaseServer
+      .from('question_attempts')
+      .insert(attemptRows);
+
+    if (attemptsError) {
+      console.error("[submit-quiz-inline] Attempts insert error:", attemptsError);
+    }
+
+    // If Vanguard (ranked), increment freemium quota
+    if (isRanked) {
+      const { error: rpcError } = await supabaseServer.rpc('increment_vanguard_count', {
+        user_id_param: payload.userId,
+      });
+      if (rpcError) {
+        console.error("[submit-quiz-inline] Failed to increment vanguard limit:", rpcError);
+      }
+    }
+
+    return res.status(200).json({
+      sessionId,
+      percentile: computedPercentile,
+      stats: {
+        correct: correctCount,
+        incorrect: incorrectCount,
+        unattempted: unattemptedCount,
+        totalTimeSeconds: computedTotalTime,
+        subjectStats: computedSubjectStats,
+      },
+    });
   } catch (err: any) {
+    console.error("[submit-quiz-inline] Exception:", err);
     return res.status(500).json({ error: err.message || "An unexpected error occurred." });
   }
 });

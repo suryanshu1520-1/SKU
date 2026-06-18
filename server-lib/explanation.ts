@@ -95,12 +95,19 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { question, answer, questionId, userId } = req.body || {};
+  const { question, answer, questionId } = req.body || {};
 
-  // ─── GUARD: userId is required ───────────────────────────────
-  if (!userId) {
+  const authHeader = req.headers['authorization'] || '';
+  const token = authHeader.replace(/^Bearer\s+/, '').trim();
+  if (!token) {
+    return res.status(401).json({ error: "UNAUTHORIZED", message: "Missing authorization token." });
+  }
+
+  const { data: { user }, error: authError } = await supabaseServer.auth.getUser(token);
+  if (authError || !user) {
     return res.status(401).json({ error: "UNAUTHORIZED", message: "User identification required." });
   }
+  const userId = user.id;
 
   // ─── PRE-FLIGHT: Tier & Autopsy Limit Check ─────────────────
   try {

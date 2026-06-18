@@ -14,6 +14,7 @@ dist/
 build/
 out/
 dist-server/
+coverage/
 
 # Environment files
 .env
@@ -21,6 +22,7 @@ dist-server/
 .env.development.local
 .env.test.local
 .env.production.local
+!.env.example
 
 # Vercel
 .vercel
@@ -29,3 +31,13 @@ dist-server/
 .DS_Store
 .vscode/
 .idea/
+
+# TypeScript
+*.tsbuildinfo
+
+# Cache
+.cache/
+
+# Test artifacts
+test-output.md
+ts_trace.txt
