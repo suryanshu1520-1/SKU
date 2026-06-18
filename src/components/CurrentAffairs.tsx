@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ExternalLink, Filter, RotateCcw, BookOpen, Inbox, RefreshCw, CheckCircle2, AlertCircle, Calendar, Bookmark, X, Share2, Sun, Moon } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeSanitize from 'rehype-sanitize';
 
 interface CurrentAffairsItem {
   id?: string;
@@ -814,6 +815,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                         <div className="multi-column text-on-surface-variant first-p-drop-cap">
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeSanitize]}
                             components={{
                               p: ({ node, ...props }) => <p className="font-serif text-[16px] leading-[1.7] mb-5 text-justify" {...props} />,
                               h1: ({ node, ...props }) => <h1 className="font-serif text-[24px] font-bold text-primary border-b border-primary-container/30 pb-2 mb-4 mt-8 break-inside-avoid" {...props} />,

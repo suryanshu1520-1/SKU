@@ -13,9 +13,8 @@ function cleanEnvValue(val: any): string {
 }
 
 const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
-const rawServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  process.env.VITE_SUPABASE_SERVICE_ROLE_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4bmdmeGFlcmxra2NhY3JiZGdjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDIxNjc0NCwiZXhwIjoyMDk1NzkyNzQ0fQ.BY5YQh7nbSUrNZ61nHDIuzOX2P2s3iD3L_s11QHz9mg";
+const rawServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (!rawServiceKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
 
 const supabase = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawServiceKey));
 
@@ -74,6 +73,8 @@ export default async function handler(req: any, res: any) {
     let correctCount = 0;
     let incorrectCount = 0;
     let unattemptedCount = 0;
+    let computedTotalTime = 0;
+    const computedSubjectStats: Record<string, { correct: number; total: number }> = {};
 
     const questionAttemptRows: Array<{
       session_id: string;
@@ -89,7 +90,14 @@ export default async function handler(req: any, res: any) {
       const qId = String(q.id);
       const selected = payload.answers[q.id] || payload.answers[String(q.id)] || null;
       const isTimeout = !!payload.timeouts[q.id] || !!payload.timeouts[String(q.id)];
-      const timeSpent = payload.timeSpentMap[q.id] || payload.timeSpentMap[String(q.id)] || 0;
+      const timeSpent = Math.min(60, Math.max(0, payload.timeSpentMap[q.id] || payload.timeSpentMap[String(q.id)] || 0));
+      const subject = q.subject_category || 'CORE';
+
+      if (!computedSubjectStats[subject]) {
+        computedSubjectStats[subject] = { correct: 0, total: 0 };
+      }
+      computedSubjectStats[subject].total += 1;
+      computedTotalTime += timeSpent;
       const correctOpt = q.correct_option?.trim() || '';
 
       let isCorrect: boolean | null = null;
@@ -99,6 +107,7 @@ export default async function handler(req: any, res: any) {
         isCorrect = null;
       } else if (selected === correctOpt) {
         correctCount += 1;
+        computedSubjectStats[subject].correct += 1;
         isCorrect = true;
       } else if (selected && selected !== correctOpt) {
         incorrectCount += 1;
@@ -150,8 +159,8 @@ export default async function handler(req: any, res: any) {
         correct_count: correctCount,
         incorrect_count: incorrectCount,
         unattempted_count: unattemptedCount,
-        total_time_seconds: payload.totalTimeSeconds || 0,
-        subject_stats: payload.subjectStats || {},
+        total_time_seconds: computedTotalTime,
+        subject_stats: computedSubjectStats,
         percentile: computedPercentile,
         is_ranked: isRanked,
       })
@@ -198,8 +207,8 @@ export default async function handler(req: any, res: any) {
         correct: correctCount,
         incorrect: incorrectCount,
         unattempted: unattemptedCount,
-        totalTimeSeconds: payload.totalTimeSeconds || 0,
-        subjectStats: payload.subjectStats || {},
+        totalTimeSeconds: computedTotalTime,
+        subjectStats: computedSubjectStats,
       },
     });
   } catch (err: any) {

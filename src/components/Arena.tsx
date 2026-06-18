@@ -6,6 +6,7 @@ import { Loader2, Hourglass, ChevronLeft, ChevronRight, Check, Bookmark, Bookmar
 import InfoTooltip from './InfoTooltip';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeSanitize from 'rehype-sanitize';
 
 interface ArenaProps {
   onComplete: (stats: { 
@@ -1328,6 +1329,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
         <div className="text-lg md:text-xl font-serif font-medium leading-relaxed mb-6 text-stone-100">
           <Markdown 
             remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeSanitize]}
             components={{
               p: ({node, ...props}: any) => <p className="mb-4 last:mb-0" {...props} />,
               ol: ({node, ...props}: any) => <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />,
@@ -1358,6 +1360,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
                 <span className="font-sans font-medium text-xs mr-4 mt-0.5 opacity-50">{key}.</span>
                 <Markdown 
                   remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeSanitize]}
                   components={{ p: ({node, ...props}: any) => <span {...props} /> }}
                 >
                   {value as string}
@@ -1430,7 +1433,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
                   </div>
                 ) : currentExplanation ? (
                    <div className="prose prose-invert prose-p:text-sm prose-li:text-sm prose-p:leading-relaxed prose-li:leading-relaxed max-w-none text-stone-300 font-serif">
-                     <Markdown>{currentExplanation}</Markdown>
+                     <Markdown rehypePlugins={[rehypeSanitize]}>{currentExplanation}</Markdown>
                    </div>
                 ) : (
                   <p className="text-[15px] md:text-base text-stone-300 leading-relaxed font-serif whitespace-pre-wrap">

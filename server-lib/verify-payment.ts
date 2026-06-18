@@ -14,11 +14,8 @@ function cleanEnvValue(val: any): string {
 }
 
 const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
-const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 
-  process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || 
-  process.env.VITE_SUPABASE_ANON_KEY || 
-  process.env.SUPABASE_ANON_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4bmdmeGFlcmxra2NhY3JiZGdjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDIxNjc0NCwiZXhwIjoyMDk1NzkyNzQ0fQ.BY5YQh7nbSUrNZ61nHDIuzOX2P2s3iD3L_s11QHz9mg";
+const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (!rawSupabaseKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
 const supabaseServer = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey));
 
 export default async function handler(req: any, res: any) {
@@ -81,32 +78,10 @@ export default async function handler(req: any, res: any) {
 
     if (upgradeError) {
       console.error("[razorpay-verify] Premium upgrade RPC failed:", upgradeError);
-      // Fall back to direct update with safety check
-      const { count } = await supabaseServer
-        .from('user_profiles')
-        .select('*', { count: 'exact', head: true })
-        .eq('membership_tier', 'premium');
-
-      if (count !== null && count >= 500) {
-        console.error("[razorpay-verify] CAP REACHED during fallback upgrade — refund needed for", razorpay_payment_id);
-        return res.status(403).json({
-          error: "Founders Club is now full. Payment will be refunded. Please contact support.",
-          payment_id: razorpay_payment_id,
-        });
-      }
-
-      const { error: updateError } = await supabaseServer
-        .from('user_profiles')
-        .update({ membership_tier: 'premium' })
-        .eq('user_id', userId);
-
-      if (updateError) {
-        console.error("[razorpay-verify] Fallback profile update error:", updateError);
-        return res.status(500).json({
-          error: "Failed to upgrade membership. Please contact support with payment ID: " + razorpay_payment_id,
-          payment_id: razorpay_payment_id,
-        });
-      }
+      return res.status(500).json({
+        error: "Failed to upgrade membership due to internal capacity check error. Please contact support with payment ID: " + razorpay_payment_id,
+        payment_id: razorpay_payment_id,
+      });
     } else {
       const result = upgradeResult as { success: boolean; reason?: string; alreadyPremium?: boolean };
       if (!result.success) {

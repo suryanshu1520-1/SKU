@@ -68,6 +68,7 @@ AS $$
 DECLARE
   v_count INTEGER;
   v_current_tier TEXT;
+  v_lock_acquired BOOLEAN;
 BEGIN
   -- Check if user is already premium (idempotent)
   SELECT membership_tier INTO v_current_tier
@@ -77,6 +78,9 @@ BEGIN
   IF v_current_tier = 'premium' THEN
     RETURN json_build_object('success', true, 'alreadyPremium', true);
   END IF;
+
+  -- Enforce advisory transaction lock to serialize concurrent upgrade calls
+  PERFORM pg_try_advisory_xact_lock(42);
 
   -- Atomically check cap and upgrade in one transaction
   SELECT COUNT(*) INTO v_count

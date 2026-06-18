@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Loader2, Sparkles } from 'lucide-react';
 import Markdown from 'react-markdown';
+import rehypeSanitize from 'rehype-sanitize';
 
 interface AutopsyProps {
   stats: { 
@@ -214,7 +215,7 @@ export default function Autopsy({ stats, percentile, onNavigateManifesto, onRetu
                     </div>
                   ) : insights?.overallInsights ? (
                     <div className="prose prose-invert prose-p:text-sm prose-li:text-sm prose-p:leading-relaxed prose-li:leading-relaxed max-w-none text-zinc-300 font-serif">
-                      <Markdown>{insights.overallInsights}</Markdown>
+                      <Markdown rehypePlugins={[rehypeSanitize]}>{insights.overallInsights}</Markdown>
                     </div>
                   ) : null}
                 </div>

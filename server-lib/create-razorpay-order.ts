@@ -14,11 +14,8 @@ function cleanEnvValue(val: any): string {
 }
 
 const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
-const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 
-  process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || 
-  process.env.VITE_SUPABASE_ANON_KEY || 
-  process.env.SUPABASE_ANON_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4bmdmeGFlcmxra2NhY3JiZGdjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDIxNjc0NCwiZXhwIjoyMDk1NzkyNzQ0fQ.BY5YQh7nbSUrNZ61nHDIuzOX2P2s3iD3L_s11QHz9mg";
+const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (!rawSupabaseKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
 const supabaseServer = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey));
 
 export default async function handler(req: any, res: any) {
@@ -45,21 +42,7 @@ export default async function handler(req: any, res: any) {
 
     if (capacityError) {
       console.error("[razorpay] Premium capacity check RPC failed:", capacityError);
-      // Fall back to direct count query
-      const { count, error: countError } = await supabaseServer
-        .from('user_profiles')
-        .select('*', { count: 'exact', head: true })
-        .eq('membership_tier', 'premium');
-
-      if (countError) {
-        return res.status(500).json({ error: "Failed to verify membership capacity." });
-      }
-
-      if (count !== null && count >= 500) {
-        return res.status(403).json({
-          error: "Founders Club is full. The 500-seat capacity has been reached."
-        });
-      }
+      return res.status(500).json({ error: "Failed to verify membership capacity." });
     } else {
       // Parse the RPC result
       const capacityInfo = capacityResult as { count: number; hasCapacity: boolean; lockAcquired: boolean };

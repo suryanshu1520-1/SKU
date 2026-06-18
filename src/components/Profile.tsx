@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
 import type { QuizSession, SavedInsight } from '../types';
 import Markdown from 'react-markdown';
+import rehypeSanitize from 'rehype-sanitize';
 import { 
   User, 
   History, 
@@ -770,7 +771,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
                                   CONCEPTUAL INSIGHT - FLASHCARD
                                 </h4>
                                 <div className="prose prose-invert prose-p:text-sm prose-li:text-sm prose-p:leading-relaxed prose-li:leading-relaxed max-w-none text-stone-300 font-serif">
-                                  <Markdown>{insight.insight_text}</Markdown>
+                                  <Markdown rehypePlugins={[rehypeSanitize]}>{insight.insight_text}</Markdown>
                                 </div>
                               </div>
                             </div>
