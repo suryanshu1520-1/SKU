@@ -212,7 +212,9 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
     fetchWithAuth(`/api/bookmark?userId=${encodeURIComponent(userId)}`)
       .then(res => res.json())
       .then(data => {
-        if (data.bookmarks) {
+        if (Array.isArray(data)) {
+          setSavedInsights(data);
+        } else if (data.bookmarks) {
           setSavedInsights(data.bookmarks);
         }
       })
@@ -305,7 +307,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
         }),
       });
       const data = await res.json();
-      if (data.success) {
+      if (res.ok) {
         setSavedInsights(prev => prev.filter(s => s.id !== insightId));
         if (expandedInsightId === insightId) {
           setExpandedInsightId(null);

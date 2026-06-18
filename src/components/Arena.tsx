@@ -699,8 +699,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
             action: 'delete',
           }),
         });
-        const data = await res.json();
-        if (data.success) {
+        if (res.ok) {
           setSavedInsightIds(prev => {
             const next = new Set(prev);
             next.delete(qId);
@@ -719,8 +718,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
             action: 'save',
           }),
         });
-        const data = await res.json();
-        if (data.success) {
+        if (res.ok) {
           setSavedInsightIds(prev => {
             const next = new Set(prev);
             next.add(qId);
@@ -903,10 +901,13 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
     if (cached && cached.userId === userId && cached.savedInsightIds) {
       return;
     }
-    fetchWithAuth(`/api/bookmark?userId=${encodeURIComponent(userId)}`)
+    fetchWithAuth(`/api/bookmark`)
       .then(res => res.json())
       .then(data => {
-        if (data.bookmarks) {
+        if (Array.isArray(data)) {
+          const ids = new Set<string>(data.map((b: any) => String(b.question_id)));
+          setSavedInsightIds(ids);
+        } else if (data.bookmarks) {
           const ids = new Set<string>(data.bookmarks.map((b: any) => String(b.question_id)));
           setSavedInsightIds(ids);
         }
