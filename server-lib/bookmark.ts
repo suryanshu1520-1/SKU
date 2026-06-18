@@ -46,7 +46,7 @@ export default async function handler(req: any, res: any) {
       }
       
       const userId = user.id;
-      const { questionId, insightText, action, subject_category } = req.body || {};
+      const { questionId, questionText, insightText, action } = req.body || {};
 
       if (!questionId) {
         return res.status(400).json({ error: "Missing required field: questionId" });
@@ -97,8 +97,8 @@ export default async function handler(req: any, res: any) {
           .insert({
             user_id: userId,
             question_id: String(questionId),
+            question_text: questionText || 'Untitled Question',
             insight_text: insightText || '',
-            subject_tags: subject_category ? [subject_category] : [],
           });
 
         if (insertError) {
