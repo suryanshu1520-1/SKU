@@ -165,13 +165,16 @@ export default function Leaderboard({ onAnalystClick }: LeaderboardProps) {
                         <div className="flex items-center gap-2">
                           {entry.is_public ? (
                             <span
-                              onClick={() => onAnalystClick(entry.user_id)}
+                              onClick={() => onAnalystClick(entry.id)}
                               className="text-sm text-stone-200 font-medium cursor-pointer hover:text-emerald-400 transition-colors"
                             >
                               {displayName(entry)}
                             </span>
                           ) : (
-                            <span className="text-sm text-stone-200 font-medium inline-flex items-center gap-1.5">
+                            <span 
+                              onClick={() => onAnalystClick(entry.id)}
+                              className="text-sm text-stone-200 font-medium inline-flex items-center gap-1.5 cursor-pointer hover:text-emerald-400 transition-colors"
+                            >
                               {displayName(entry)}
                             </span>
                           )}

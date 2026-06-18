@@ -108,7 +108,8 @@ BEGIN
   END IF;
 
   UPDATE public.user_profiles
-  SET contender_points = 0;
+  SET contender_points = 0
+  WHERE contender_points > 0;
 
   RETURN v_winner_id;
 END;
