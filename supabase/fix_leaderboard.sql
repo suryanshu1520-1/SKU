@@ -8,6 +8,7 @@ DROP VIEW IF EXISTS public.public_leaderboard;
 CREATE VIEW public.public_leaderboard AS
 SELECT
   id,
+  user_id,
   display_name AS name,
   contender_points,
   trophy_count,

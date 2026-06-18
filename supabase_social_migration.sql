@@ -22,6 +22,7 @@ ALTER TABLE public.user_profiles
 CREATE OR REPLACE VIEW public.public_leaderboard AS
 SELECT
   id,
+  user_id,
   display_name AS name,
   contender_points,
   trophy_count,

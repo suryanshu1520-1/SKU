@@ -139,7 +139,7 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
           <h2 className="font-sans font-bold text-xs uppercase tracking-widest text-stone-100">
-            Analyst Dossier
+            Analyst Profile
           </h2>
           <button
             onClick={onClose}
@@ -155,7 +155,7 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
           {dossierState === 'LOADING' && (
             <div className="flex flex-col items-center justify-center py-12 text-zinc-500">
               <Loader2 className="w-5 h-5 animate-spin mb-3" />
-              <p className="text-xs font-mono uppercase tracking-wider">Decrypting dossier...</p>
+              <p className="text-xs font-mono uppercase tracking-wider">Loading profile...</p>
             </div>
           )}
 
@@ -163,7 +163,7 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Shield className="w-10 h-10 text-rose-400/60 mb-3" />
               <p className="text-xs text-rose-400 font-sans">{error}</p>
-              <p className="text-[10px] text-zinc-500 mt-2">Unable to retrieve the dossier.</p>
+              <p className="text-[10px] text-zinc-500 mt-2">Unable to retrieve the profile.</p>
             </div>
           )}
 
@@ -171,10 +171,10 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Shield className="w-12 h-12 text-rose-500/60 mb-4" />
               <p className="text-sm text-stone-200 font-sans leading-relaxed font-bold">
-                CLASSIFIED: You must make your own telemetry public to view competitor dossiers.
+                You must make your own profile public to view other users' stats.
               </p>
               <p className="text-[10px] text-zinc-500 mt-3 uppercase tracking-wider font-mono">
-                Equivalent Exchange Enforced
+                Fair play enforced
               </p>
             </div>
           )}
@@ -183,10 +183,10 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Shield className="w-12 h-12 text-zinc-700 mb-4" />
               <p className="text-sm text-zinc-400 font-sans leading-relaxed font-bold">
-                CLASSIFIED: This Operator has restricted external telemetry.
+                This user has chosen to keep their performance stats private.
               </p>
               <p className="text-[10px] text-zinc-600 mt-3 uppercase tracking-wider font-mono">
-                Operator went dark
+                Private Profile
               </p>
             </div>
           )}
