@@ -249,7 +249,11 @@ export default function Leaderboard({ onAnalystClick }: LeaderboardProps) {
                   <ul className="space-y-2">
                     <li className="flex gap-2">
                       <span className="text-emerald-400 font-bold">•</span>
-                      <span>Score <strong>80% or higher</strong> in a Vanguard Assessment to earn <strong>25 Contender Points (CP)</strong>.</span>
+                      <span><strong>Tactical Yield System:</strong> Earn <strong>+3 CP</strong> for every correct answer, and lose <strong>-1 CP</strong> for every incorrect answer. Unattempted questions yield 0 CP.</span>
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="text-emerald-400 font-bold">•</span>
+                      <span><strong>Vanguard Bonus:</strong> Score <strong>80% or higher</strong> in an assessment to earn a massive <strong>+15 CP bonus</strong>.</span>
                     </li>
                     <li className="flex gap-2">
                       <span className="text-emerald-400 font-bold">•</span>

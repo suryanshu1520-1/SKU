@@ -142,7 +142,7 @@ export default function App() {
     setLoading(false);
   };
 
-  const handleArenaComplete = (stats: { correct: number; incorrect: number; unattempted: number; totalTimeSeconds: number; subjectStats: Record<string, { correct: number; total: number }> }, perc: number) => {
+  const handleArenaComplete = (stats: { correct: number; incorrect: number; unattempted: number; totalTimeSeconds: number; subjectStats: Record<string, { correct: number; total: number }>; isRanked?: boolean }, perc: number) => {
     setArenaStats(stats);
     setPercentile(perc);
     setGameState('autopsy');

@@ -14,6 +14,7 @@ interface ArenaProps {
     unattempted: number;
     totalTimeSeconds: number;
     subjectStats: Record<string, { correct: number; total: number }>;
+    isRanked?: boolean;
   }, percentile: number) => void;
   userId: string;
   onReturnToDashboard?: () => void;
@@ -126,6 +127,7 @@ interface CachedResults {
     unattempted: number;
     totalTimeSeconds: number;
     subjectStats: Record<string, { correct: number; total: number }>;
+    isRanked?: boolean;
   };
   percentile: number;
 }
@@ -820,6 +822,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
           unattempted: result.stats.unattempted,
           totalTimeSeconds: result.stats.totalTimeSeconds,
           subjectStats: result.stats.subjectStats,
+          isRanked: isRanked,
         },
         percentile: result.percentile,
       };
@@ -833,6 +836,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
         unattempted: result.stats.unattempted,
         totalTimeSeconds: result.stats.totalTimeSeconds,
         subjectStats: result.stats.subjectStats,
+        isRanked: isRanked,
       }, result.percentile);
     } catch (err: any) {
       console.error(err);
@@ -846,6 +850,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
           unattempted: unattemptedCount,
           totalTimeSeconds: totalTime,
           subjectStats: finalSubjectStats,
+          isRanked: isRanked,
         },
         percentile: 0,
       };
@@ -859,6 +864,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
         unattempted: unattemptedCount,
         totalTimeSeconds: totalTime,
         subjectStats: finalSubjectStats,
+        isRanked: isRanked,
       }, 0);
     }
   };

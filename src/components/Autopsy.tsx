@@ -10,6 +10,7 @@ interface AutopsyProps {
     unattempted: number;
     totalTimeSeconds?: number;
     subjectStats?: Record<string, { correct: number; total: number }>;
+    isRanked?: boolean;
   };
   percentile: number;
   onNavigateManifesto?: () => void;
@@ -41,6 +42,27 @@ export default function Autopsy({ stats, percentile, onNavigateManifesto }: Auto
   const mins = Math.floor(tts / 60);
   const secs = tts % 60;
   const avgTime = total > 0 ? (tts / total) : 0;
+
+  const isRanked = stats.isRanked === true;
+  const accuracy = total > 0 ? stats.correct / total : 0;
+  
+  let cpEarned = 0;
+  let cpCorrect = 0;
+  let cpPenalty = 0;
+  let cpBonus = 0;
+
+  if (isRanked) {
+    cpCorrect = stats.correct * 3;
+    cpPenalty = stats.incorrect * 1;
+    cpEarned = cpCorrect - cpPenalty;
+    if (accuracy >= 0.8) {
+      cpBonus = 15;
+      cpEarned += 15;
+    }
+    if (cpEarned < 0) {
+      cpEarned = 0;
+    }
+  }
 
   return (
     <div className="min-h-screen bg-zinc-950 text-stone-50 flex flex-col items-center p-6 pb-24 relative overflow-hidden">
@@ -74,7 +96,7 @@ export default function Autopsy({ stats, percentile, onNavigateManifesto }: Auto
           </div>
         </div>
 
-        <div className="border border-zinc-800 bg-zinc-900/30 p-8 text-center rounded-sm mb-12">
+        <div className="border border-zinc-800 bg-zinc-900/30 p-8 text-center rounded-sm mb-8">
           <p className="text-lg font-sans text-zinc-300 leading-relaxed font-medium">
             You processed <span className="text-stone-100">{total}</span> protocols.
             <br className="mt-4" />
@@ -83,6 +105,36 @@ export default function Autopsy({ stats, percentile, onNavigateManifesto }: Auto
             </span>
           </p>
         </div>
+
+        {isRanked && (
+          <div className="border border-[#e0d0ab]/30 bg-[#e0d0ab]/5 p-6 rounded-sm mb-12 text-center">
+            <h3 className="text-[10px] font-sans text-[#e0d0ab] uppercase tracking-widest mb-4 font-bold">Points Yield Breakdown</h3>
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 mb-4">
+              <div className="flex flex-col">
+                <span className="text-xl text-emerald-400 font-mono">+{cpCorrect}</span>
+                <span className="text-[9px] text-zinc-500 uppercase tracking-widest mt-1">From Correct</span>
+              </div>
+              <div className="text-zinc-700 font-mono hidden sm:block">+</div>
+              <div className="flex flex-col">
+                <span className="text-xl text-rose-500 font-mono">-{cpPenalty}</span>
+                <span className="text-[9px] text-zinc-500 uppercase tracking-widest mt-1">Penalty</span>
+              </div>
+              {cpBonus > 0 && (
+                <>
+                  <div className="text-zinc-700 font-mono hidden sm:block">+</div>
+                  <div className="flex flex-col">
+                    <span className="text-xl text-amber-500 font-mono">+{cpBonus}</span>
+                    <span className="text-[9px] text-zinc-500 uppercase tracking-widest mt-1">Vanguard Bonus</span>
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="pt-4 border-t border-[#e0d0ab]/10">
+              <span className="text-stone-300 text-sm">Total Contender Points Earned: </span>
+              <span className="text-2xl font-mono text-[#e0d0ab] font-bold ml-2">{cpEarned} CP</span>
+            </div>
+          </div>
+        )}
 
         {/* Real Performance Metrics */}
         <div className="relative border border-zinc-800 bg-[#0c0c0c] rounded-sm overflow-hidden mt-8">
