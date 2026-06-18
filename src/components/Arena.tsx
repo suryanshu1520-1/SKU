@@ -13,7 +13,7 @@ interface ArenaProps {
     incorrect: number; 
     unattempted: number;
     totalTimeSeconds: number;
-    subjectStats: Record<string, { correct: number; total: number }>;
+    subjectStats: Record<string, { correct: number; total: number; missedQuestions?: string[] }>;
     isRanked?: boolean;
   }, percentile: number) => void;
   userId: string;
@@ -126,7 +126,7 @@ interface CachedResults {
     incorrect: number;
     unattempted: number;
     totalTimeSeconds: number;
-    subjectStats: Record<string, { correct: number; total: number }>;
+    subjectStats: Record<string, { correct: number; total: number; missedQuestions?: string[] }>;
     isRanked?: boolean;
   };
   percentile: number;
@@ -766,7 +766,7 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
     let incorrectCount = 0;
     let unattemptedCount = 0;
     let totalTime = 0;
-    const finalSubjectStats: Record<string, { correct: number; total: number }> = {};
+    const finalSubjectStats: Record<string, { correct: number; total: number; missedQuestions: string[] }> = {};
 
     questions.forEach(q => {
       const selected = userAnswers[q.id];
@@ -775,17 +775,19 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
       const subj = q.subject_category || 'CORE';
 
       if (!finalSubjectStats[subj]) {
-        finalSubjectStats[subj] = { correct: 0, total: 0 };
+        finalSubjectStats[subj] = { correct: 0, total: 0, missedQuestions: [] };
       }
       finalSubjectStats[subj].total += 1;
 
       if (!selected) {
         unattemptedCount += 1;
+        if (q.question_text) finalSubjectStats[subj].missedQuestions.push(q.question_text);
       } else if (isCorrect) {
         correctCount += 1;
         finalSubjectStats[subj].correct += 1;
       } else {
         incorrectCount += 1;
+        if (q.question_text) finalSubjectStats[subj].missedQuestions.push(q.question_text);
       }
 
       totalTime += timeSpentMap[q.id] || 0;

@@ -44,7 +44,7 @@ const supabaseAnon = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(r
 
 // Local file cache disabled to match Vercel serverless behavior
 
-function generateFallbackInsights(stats: any): string {
+function generateFallbackInsights(stats: any): any {
   const correct = stats?.correct || 0;
   const incorrect = stats?.incorrect || 0;
   const unattempted = stats?.unattempted || 0;
@@ -68,11 +68,10 @@ function generateFallbackInsights(stats: any): string {
   if (accuracy > 100) accuracy = 100;
   if (total === 0) accuracy = 0;
   
-  return `### AI-Guided Performance Diagnostics
-  
-- **Priority Mastery Target:** Based on your diagnostic telemetry, your primary focus should be **${poorestSubject}**. The current correct-response ratio here suggests foundational gaps in core concepts—re-evaluating constitutional frameworks will yield your highest margin for improvement.
-- **Cognitive Pacing & Accuracy:** With a derived diagnostic accuracy of **${accuracy.toFixed(1)}%**, your current answering speed is well-calibrated. However, risk-aversion on highly complex protocols must be minimized by eliminating incorrect options first.
-- **Pacing Control:** Leaving **${unattempted}** protocols unattempted limits your points ceiling. Try allocating a hard threshold of 45 seconds per question to ensure you complete the entire set.`;
+  return {
+    overallInsights: `### AI-Guided Performance Diagnostics\n  \n- **Priority Mastery Target:** Based on your diagnostic telemetry, your primary focus should be **${poorestSubject}**. The current correct-response ratio here suggests foundational gaps in core concepts—re-evaluating constitutional frameworks will yield your highest margin for improvement.\n- **Cognitive Pacing & Accuracy:** With a derived diagnostic accuracy of **${accuracy.toFixed(1)}%**, your current answering speed is well-calibrated. However, risk-aversion on highly complex protocols must be minimized by eliminating incorrect options first.\n- **Pacing Control:** Leaving **${unattempted}** protocols unattempted limits your points ceiling. Try allocating a hard threshold of 45 seconds per question to ensure you complete the entire set.`,
+    subjectInsights: {}
+  };
 }
 
 async function generateContentWithRetry(aiClient: any, params: any, maxRetries = 3, initialDelay = 1000) {
@@ -221,9 +220,26 @@ async function startServer() {
 Here is their performance data:
 ${JSON.stringify(stats, null, 2)}
 
-Provide up to 3 bullet points with a brief sentence giving conceptual explanations of the specific subject matter areas they need to focus on, and how they relate or matter. Use an objective, encouraging, and highly intelligent tone. Do not include an intro or outro, just the bullet points in markdown format.`,
+Provide up to 3 bullet points with a brief sentence giving conceptual explanations of the specific subject matter areas they need to focus on, and how they relate or matter. Use an objective, encouraging, and highly intelligent tone. 
+
+You MUST return your response as a JSON object with exactly two keys:
+1. "overallInsights": A markdown string containing the 3 bullet points (no intro/outro).
+2. "subjectInsights": An object mapping each subject name (e.g. "Geography") to a 1-2 sentence personalized feedback string focusing on what they missed (based on the missedQuestions arrays).
+
+Return ONLY valid JSON. Do not wrap in markdown \`\`\`json block.`,
       });
-      res.json({ insights: response.text });
+      
+      try {
+        let text = response.text.trim();
+        if (text.startsWith('\`\`\`json')) text = text.slice(7);
+        if (text.startsWith('\`\`\`')) text = text.slice(3);
+        if (text.endsWith('\`\`\`')) text = text.slice(0, -3);
+        const parsed = JSON.parse(text);
+        res.json({ insights: parsed });
+      } catch (parseErr) {
+        console.warn("Failed to parse Gemini JSON:", response.text);
+        res.json({ insights: { overallInsights: response.text, subjectInsights: {} } });
+      }
     } catch (error: any) {
       console.error("Gemini API Error:", error);
       res.json({ insights: generateFallbackInsights(stats) });

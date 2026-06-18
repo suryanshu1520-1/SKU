@@ -25,7 +25,7 @@ export interface QuizSession {
   incorrect_count: number;
   unattempted_count: number;
   total_time_seconds: number;
-  subject_stats: Record<string, { correct: number; total: number }>;
+  subject_stats: Record<string, { correct: number; total: number; missedQuestions?: string[] }>;
   percentile: number;
   created_at: string;
 }
@@ -62,7 +62,7 @@ export interface SubmitQuizPayload {
     subject_category?: string;
     correct_option?: string;
   }>;
-  subjectStats: Record<string, { correct: number; total: number }>;
+  subjectStats: Record<string, { correct: number; total: number; missedQuestions?: string[] }>;
   totalTimeSeconds: number;
 }
 
@@ -74,6 +74,6 @@ export interface SubmitQuizResponse {
     incorrect: number;
     unattempted: number;
     totalTimeSeconds: number;
-    subjectStats: Record<string, { correct: number; total: number }>;
+    subjectStats: Record<string, { correct: number; total: number; missedQuestions?: string[] }>;
   };
 }

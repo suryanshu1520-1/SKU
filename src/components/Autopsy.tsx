@@ -19,7 +19,7 @@ interface AutopsyProps {
 }
 
 export default function Autopsy({ stats, percentile, onNavigateManifesto, onReturnToDashboard, onDeployNext }: AutopsyProps) {
-  const [insights, setInsights] = useState<string | null>(null);
+  const [insights, setInsights] = useState<{ overallInsights?: string; subjectInsights?: Record<string, string> } | null>(null);
   const [loadingInsights, setLoadingInsights] = useState(false);
 
   useEffect(() => {
@@ -194,7 +194,7 @@ export default function Autopsy({ stats, percentile, onNavigateManifesto, onRetu
                             />
                           </div>
                           <p className="text-[10px] font-sans text-zinc-500 mt-2 tracking-wide font-normal">
-                            {data.correct} out of {data.total} correct. {isWeak ? "Review suggested to build stronger conceptual grasp." : "Solid understanding."}
+                            {data.correct} out of {data.total} correct. {insights?.subjectInsights?.[subj] ? insights.subjectInsights[subj] : (isWeak ? "Review suggested to build stronger conceptual grasp." : "Solid understanding.")}
                           </p>
                         </div>
                       );
@@ -212,11 +212,11 @@ export default function Autopsy({ stats, percentile, onNavigateManifesto, onRetu
                       <Loader2 className="w-4 h-4 animate-spin" />
                       Synthesizing performance feedback...
                     </div>
-                  ) : (
+                  ) : insights?.overallInsights ? (
                     <div className="prose prose-invert prose-p:text-sm prose-li:text-sm prose-p:leading-relaxed prose-li:leading-relaxed max-w-none text-zinc-300 font-serif">
-                      <Markdown>{insights}</Markdown>
+                      <Markdown>{insights.overallInsights}</Markdown>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               )}
 

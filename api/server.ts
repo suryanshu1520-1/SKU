@@ -98,16 +98,37 @@ app.post("/api/insights/inline", async (req: any, res: any) => {
   const { stats } = req.body;
   try {
     if (!process.env.GEMINI_API_KEY) {
-      return res.json({ insights: "### AI-Guided Performance Diagnostics\n\n- **Priority Mastery Target:** Based on your diagnostic telemetry, your primary focus should be the subject with the lowest correct-response ratio.\n- **Cognitive Pacing & Accuracy:** Your current answering speed is well-calibrated, but risk-aversion on complex protocols must be minimized.\n- **Pacing Control:** Try allocating a hard threshold of 45 seconds per question." });
+      return res.json({ 
+        insights: {
+          overallInsights: "### AI-Guided Performance Diagnostics\n\n- **Priority Mastery Target:** Based on your diagnostic telemetry, your primary focus should be the subject with the lowest correct-response ratio.\n- **Cognitive Pacing & Accuracy:** Your current answering speed is well-calibrated, but risk-aversion on complex protocols must be minimized.\n- **Pacing Control:** Try allocating a hard threshold of 45 seconds per question.",
+          subjectInsights: {}
+        }
+      });
     }
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY, httpOptions: { headers: { 'User-Agent': 'aistudio-build' } } });
     const response = await ai.models.generateContent({
       model: "gemini-3.5-flash",
-      contents: `You are an expert tutor. Provide analysis based on: ${JSON.stringify(stats, null, 2)}. Provide up to 3 bullet points.`,
+      contents: `You are an expert tutor. Provide analysis based on: ${JSON.stringify(stats, null, 2)}. Provide up to 3 bullet points.
+      
+You MUST return your response as a JSON object with exactly two keys:
+1. "overallInsights": A markdown string containing the 3 bullet points.
+2. "subjectInsights": An object mapping each subject name to a 1-2 sentence personalized feedback string based on their missed questions.
+
+Return ONLY valid JSON.`,
     });
-    return res.json({ insights: response.text });
+    
+    try {
+      let text = response.text.trim();
+      if (text.startsWith('\`\`\`json')) text = text.slice(7);
+      if (text.startsWith('\`\`\`')) text = text.slice(3);
+      if (text.endsWith('\`\`\`')) text = text.slice(0, -3);
+      const parsed = JSON.parse(text);
+      return res.json({ insights: parsed });
+    } catch (parseErr) {
+      return res.json({ insights: { overallInsights: response.text, subjectInsights: {} } });
+    }
   } catch (error: any) {
-    return res.json({ insights: "AI insights temporarily unavailable." });
+    return res.json({ insights: { overallInsights: "AI insights temporarily unavailable.", subjectInsights: {} } });
   }
 });
 
