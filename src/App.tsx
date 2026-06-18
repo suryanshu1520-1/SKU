@@ -75,8 +75,23 @@ export default function App() {
           const metaName = session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'Candidate';
           setUserName(metaName);
           setUserId(session.user.id);
-          setGameState('landing');
-          setActiveTab('arena');
+          
+          const cachedResultsRaw = localStorage.getItem('tark_arena_results');
+          if (cachedResultsRaw) {
+            try {
+              const parsed = JSON.parse(cachedResultsRaw);
+              setArenaStats(parsed.resultsData);
+              setPercentile(parsed.percentile);
+              setGameState('autopsy');
+              setActiveTab('arena');
+            } catch {
+              setGameState('landing');
+              setActiveTab('arena');
+            }
+          } else {
+            setGameState('landing');
+            setActiveTab('arena');
+          }
         } else {
           const cachedEmail = localStorage.getItem('tark_session_email');
           const cachedName = localStorage.getItem('tark_session_name');
@@ -85,7 +100,23 @@ export default function App() {
             setUserEmail(cachedEmail);
             setUserName(cachedName);
             setUserId(cachedUserId || cachedEmail);
-            setGameState('landing');
+            
+            const cachedResultsRaw = localStorage.getItem('tark_arena_results');
+            if (cachedResultsRaw) {
+              try {
+                const parsed = JSON.parse(cachedResultsRaw);
+                setArenaStats(parsed.resultsData);
+                setPercentile(parsed.percentile);
+                setGameState('autopsy');
+                setActiveTab('arena');
+              } catch {
+                setGameState('landing');
+                setActiveTab('arena');
+              }
+            } else {
+              setGameState('landing');
+              setActiveTab('arena');
+            }
           }
         }
       } catch (err) {
@@ -311,7 +342,21 @@ export default function App() {
           ) : gameState === 'arena' ? (
             <Arena onComplete={handleArenaComplete} userId={userId} onReturnToDashboard={() => setActiveTab('tracker')} onNavigateManifesto={handleNavigateManifesto} />
           ) : (
-            <Autopsy stats={arenaStats} percentile={percentile} />
+            <Autopsy 
+              stats={arenaStats} 
+              percentile={percentile} 
+              onNavigateManifesto={handleNavigateManifesto}
+              onReturnToDashboard={() => {
+                localStorage.removeItem('tark_arena_results');
+                setGameState('arena');
+                setActiveTab('profile');
+              }}
+              onDeployNext={() => {
+                localStorage.removeItem('tark_arena_results');
+                setGameState('arena');
+                setActiveTab('arena');
+              }}
+            />
           )}
         </main>
       )}

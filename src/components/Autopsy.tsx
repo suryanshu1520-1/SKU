@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Sparkles } from 'lucide-react';
 import Markdown from 'react-markdown';
 
 interface AutopsyProps {
@@ -14,9 +14,11 @@ interface AutopsyProps {
   };
   percentile: number;
   onNavigateManifesto?: () => void;
+  onReturnToDashboard?: () => void;
+  onDeployNext?: () => void;
 }
 
-export default function Autopsy({ stats, percentile, onNavigateManifesto }: AutopsyProps) {
+export default function Autopsy({ stats, percentile, onNavigateManifesto, onReturnToDashboard, onDeployNext }: AutopsyProps) {
   const [insights, setInsights] = useState<string | null>(null);
   const [loadingInsights, setLoadingInsights] = useState(false);
 
@@ -220,6 +222,23 @@ export default function Autopsy({ stats, percentile, onNavigateManifesto }: Auto
 
             </div>
           </div>
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
+          <button
+            onClick={onReturnToDashboard}
+            className="inline-flex items-center justify-center gap-2 py-3 px-8 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 font-sans text-xs font-bold uppercase tracking-widest rounded-sm transition-all shadow-lg shadow-[#e0d0ab]/10 cursor-pointer"
+          >
+            Return to Dashboard
+          </button>
+          <button
+            onClick={onDeployNext}
+            className="inline-flex items-center justify-center gap-2 py-3 px-8 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-sans text-xs font-bold uppercase tracking-widest rounded-sm transition-all border border-zinc-800 cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4" />
+            Deploy Next Assessment
+          </button>
         </div>
 
         {/* Founder's Club Bit */}

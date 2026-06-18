@@ -215,8 +215,14 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
   useEffect(() => {
     const cached = loadCachedResults();
     if (cached) {
-      setCachedResults(cached);
-      setArenaPhase('results');
+      onComplete({
+        correct: cached.resultsData.correct,
+        incorrect: cached.resultsData.incorrect,
+        unattempted: cached.resultsData.unattempted,
+        totalTimeSeconds: cached.resultsData.totalTimeSeconds,
+        subjectStats: cached.resultsData.subjectStats,
+        isRanked: cached.resultsData.isRanked,
+      }, cached.percentile);
       return;
     }
 
@@ -1121,90 +1127,6 @@ export default function Arena({ onComplete, userId, onReturnToDashboard, onNavig
             >
               <Target className="w-3.5 h-3.5" />
               Start Training
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ----------------------------------------------------------------
-  // RENDER: RESULTS PHASE
-  // ----------------------------------------------------------------
-  if (arenaPhase === 'results' && cachedResults) {
-    const r = cachedResults.resultsData;
-    const total = r.correct + r.incorrect + r.unattempted;
-    const accuracy = total > 0 ? ((r.correct / total) * 100).toFixed(1) : '0';
-    const isVanguard = Number(accuracy) >= 80 && isRanked;
-    return (
-      <div className="min-h-screen bg-zinc-950 text-stone-50 font-sans flex flex-col items-center justify-center p-6">
-        <div className="w-full max-w-xl text-center">
-          {/* Vanguard Reward Badge */}
-          <AnimatePresence>
-            {isVanguard && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ delay: 0.8, duration: 0.5 }}
-                className="relative overflow-hidden rounded-sm border border-[#e0d0ab]/30 mb-6"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#e0d0ab]/15 to-transparent animate-[glare_2s_ease-in-out_infinite]" />
-                <div className="relative px-4 py-3 bg-[#e0d0ab]/5 text-[#e0d0ab] font-sans font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2">
-                  <Crown className="w-4 h-4" />
-                  Vanguard Threshold Achieved: +25 CP
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <h1 className="text-3xl font-sans font-bold tracking-tight mb-2">Assessment Complete</h1>
-          {isVanguard && (
-            <p className="text-zinc-400 text-xs uppercase tracking-widest mb-8">Vanguard performance recorded</p>
-          )}
-          {!isVanguard && (
-            <p className="text-zinc-500 text-xs uppercase tracking-widest mb-8">Session recorded</p>
-          )}
-
-          <div className="grid grid-cols-3 gap-px bg-zinc-800 border border-zinc-800 mb-8 rounded-sm overflow-hidden">
-            <div className="bg-zinc-950 p-6 flex flex-col items-center justify-center">
-              <span className="text-3xl font-mono font-bold text-emerald-400">{r.correct}</span>
-              <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Correct</span>
-            </div>
-            <div className="bg-zinc-950 p-6 flex flex-col items-center justify-center">
-              <span className="text-3xl font-mono font-bold text-rose-500">{r.incorrect}</span>
-              <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Incorrect</span>
-            </div>
-            <div className="bg-zinc-950 p-6 flex flex-col items-center justify-center">
-              <span className="text-3xl font-mono font-bold text-zinc-400">{r.unattempted}</span>
-              <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Unattempted</span>
-            </div>
-          </div>
-
-          <div className="border border-zinc-800 bg-zinc-900/30 p-6 mb-8 rounded-sm">
-            <p className="text-lg text-zinc-300 font-medium">
-              Accuracy: <span className="text-emerald-400">{accuracy}%</span>
-              <br />
-              <span className="block mt-2 text-base text-zinc-400">
-                Scored higher than <span className="text-[#e0d0ab] font-bold">{cachedResults.percentile}%</span> of the candidate pool
-              </span>
-            </p>
-          </div>
-
-          {/* Navigation Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button
-              onClick={handleReturnToDashboard}
-              className="inline-flex items-center justify-center gap-2 py-3 px-8 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 font-sans text-xs font-bold uppercase tracking-widest rounded-sm transition-all shadow-lg shadow-[#e0d0ab]/10"
-            >
-              Return to Dashboard
-            </button>
-            <button
-              onClick={handleRestart}
-              className="inline-flex items-center justify-center gap-2 py-3 px-8 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-sans text-xs font-bold uppercase tracking-widest rounded-sm transition-all border border-zinc-800"
-            >
-              <Sparkles className="w-4 h-4" />
-              Deploy Next Assessment
             </button>
           </div>
         </div>
