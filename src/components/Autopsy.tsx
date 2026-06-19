@@ -5,6 +5,38 @@ import Markdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 import { supabase } from '../lib/supabase';
 
+function AnimatedNumber({ value, prefix = "" }: { value: number, prefix?: string }) {
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    if (value === 0) {
+      setDisplayValue(0);
+      return;
+    }
+    let startTimestamp: number;
+    const duration = 1500; 
+    let animationFrameId: number;
+
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      const easeProgress = 1 - Math.pow(1 - progress, 3);
+      setDisplayValue(Math.round(easeProgress * value));
+
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(step);
+      }
+    };
+
+    animationFrameId = requestAnimationFrame(step);
+
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [value]);
+
+  return <>{displayValue > 0 ? prefix : ''}{displayValue}</>;
+}
+
+
 interface AutopsyProps {
   stats: { 
     correct: number; 
@@ -121,19 +153,25 @@ export default function Autopsy({ stats, percentile, onNavigateManifesto, onRetu
             <h3 className="text-[10px] font-sans text-[#e0d0ab] uppercase tracking-widest mb-4 font-bold">Points Yield Breakdown</h3>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 mb-4">
               <div className="flex flex-col">
-                <span className="text-xl text-emerald-400 font-mono">+{cpCorrect}</span>
+                <span className="text-xl text-emerald-400 font-mono">
+                  <AnimatedNumber value={cpCorrect} prefix="+" />
+                </span>
                 <span className="text-[9px] text-zinc-500 uppercase tracking-widest mt-1">From Correct</span>
               </div>
               <div className="text-zinc-700 font-mono hidden sm:block">+</div>
               <div className="flex flex-col">
-                <span className="text-xl text-rose-500 font-mono">-{cpPenalty}</span>
+                <span className="text-xl text-rose-500 font-mono">
+                  <AnimatedNumber value={cpPenalty} prefix="-" />
+                </span>
                 <span className="text-[9px] text-zinc-500 uppercase tracking-widest mt-1">Penalty</span>
               </div>
               {cpBonus > 0 && (
                 <>
                   <div className="text-zinc-700 font-mono hidden sm:block">+</div>
                   <div className="flex flex-col">
-                    <span className="text-xl text-amber-500 font-mono">+{cpBonus}</span>
+                    <span className="text-xl text-amber-500 font-mono">
+                      <AnimatedNumber value={cpBonus} prefix="+" />
+                    </span>
                     <span className="text-[9px] text-zinc-500 uppercase tracking-widest mt-1">Vanguard Bonus</span>
                   </div>
                 </>
@@ -141,7 +179,9 @@ export default function Autopsy({ stats, percentile, onNavigateManifesto, onRetu
             </div>
             <div className="pt-4 border-t border-[#e0d0ab]/10">
               <span className="text-stone-300 text-sm">Total Contender Points Earned: </span>
-              <span className="text-2xl font-mono text-[#e0d0ab] font-bold ml-2">{cpEarned} CP</span>
+              <span className="text-2xl font-mono text-[#e0d0ab] font-bold ml-2">
+                <AnimatedNumber value={cpEarned} /> CP
+              </span>
             </div>
           </div>
         )}
@@ -181,7 +221,13 @@ export default function Autopsy({ stats, percentile, onNavigateManifesto, onRetu
                   {(!stats.subjectStats || Object.keys(stats.subjectStats).length === 0) ? (
                     <p className="text-sm font-sans text-zinc-500">Insufficient data.</p>
                   ) : (
-                    Object.entries(stats.subjectStats).map(([subj, data]) => {
+                    Object.entries(stats.subjectStats)
+                      .sort((a, b) => {
+                        const percA = Math.round((a[1].correct / a[1].total) * 100);
+                        const percB = Math.round((b[1].correct / b[1].total) * 100);
+                        return percA - percB;
+                      })
+                      .map(([subj, data]) => {
                       const percentage = Math.round((data.correct / data.total) * 100);
                       const isWeak = percentage < 60;
                       return (
