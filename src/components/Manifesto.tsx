@@ -197,11 +197,7 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
             className="bg-zinc-900/10 border border-zinc-900/60 p-6 md:p-8 rounded-sm"
           >
             <p className="text-sm md:text-base text-zinc-400 leading-relaxed font-sans">
-              The modern internet is loud. EdTech has devolved into an engagement trap,
-              endless notifications, gamified streaks, intrusive ads, and bloated PDFs
-              that waste your most valuable asset: time. We reject this model entirely.
-              Tark was not built to be an &ldquo;app.&rdquo; It was engineered as a high-density,
-              stoic academic instrument.
+              Your time is your most finite resource. Traditional EdTech is built to maximize your screen time through addictive gamification, intrusive ads, and bloated materials. We reject this entirely. Tark is built exclusively to maximize your <span className="text-[#e0d0ab] font-bold">return on time</span>. It is a premium, high-density academic sanctuary designed for those who treat their preparation as a professional pursuit.
             </p>
           </motion.section>
 
@@ -212,13 +208,10 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
             transition={{ duration: 0.5, delay: 0.3 }}
           >
             <h2 className="font-serif text-lg md:text-xl font-bold text-[#e0d0ab] mb-4 tracking-wide">
-              Signal Over Noise
+              The Unfair Advantage
             </h2>
             <p className="text-sm md:text-base text-zinc-400 leading-relaxed font-sans">
-              Government dispatches are buried in political PR and bureaucratic jargon.
-              Our dual-engine ingestion pipeline uses explicit text-gates and AI
-              distillation to strip away the fluff. You don&rsquo;t get the story; you get the
-              raw, metric-dense facts required to clear assessments.
+              While others waste countless hours deciphering bureaucratic jargon and political PR, our intelligence systems do the heavy lifting for you. We instantly distill hundreds of pages of complex government dispatches into ultra-focused, high-yield insights. You bypass the noise entirely and immediately access the exact, metric-dense facts required to conquer your assessments.
             </p>
           </motion.section>
 
@@ -229,12 +222,10 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
             transition={{ duration: 0.5, delay: 0.45 }}
           >
             <h2 className="font-serif text-lg md:text-xl font-bold text-[#e0d0ab] mb-4 tracking-wide">
-              Brutal Efficiency
+              An Ad-Free Sanctuary
             </h2>
             <p className="text-sm md:text-base text-zinc-400 leading-relaxed font-sans">
-              No ads. No colorful mascots. No psychological manipulation. We enforce a
-              strict minimal UI so your brain can focus entirely on retention and rigorous
-              testing in the Analytical Arena.
+              Tark is engineered to cultivate deep work. You will never see an advertisement, a pop-up, or a colorful mascot demanding your attention. We provide a pristine, minimal environment so your brain can deploy 100% of its cognitive capacity toward retention and rigorous testing in the Analytical Arena.
             </p>
           </motion.section>
 
@@ -245,13 +236,10 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
             transition={{ duration: 0.5, delay: 0.6 }}
           >
             <h2 className="font-serif text-lg md:text-xl font-bold text-[#e0d0ab] mb-4 tracking-wide">
-              The Founders Pact
+              The Founders Club Guarantee
             </h2>
             <p className="text-sm md:text-base text-zinc-400 leading-relaxed font-sans">
-              Tark is independent. We are not backed by venture capital forcing us to sell
-              your attention. To guarantee our server infrastructure remains lightning-fast
-              and our AI endpoints remain stable, premium access is strictly capped at a
-              500-User Founders Club. Once the cap is reached, the gates close.
+              Because we refuse to monetize your attention, Tark is proudly independent and exclusively member-supported. Your membership directly funds a lightning-fast, premium experience with zero compromises. To guarantee unparalleled quality and stability, access is strictly capped at 500 Founders Club members. When you join, you are investing in an elite instrument built specifically for your success.
             </p>
           </motion.section>
 
