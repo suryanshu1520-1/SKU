@@ -7,11 +7,12 @@ import { supabase } from '../lib/supabase';
 interface LoginProps {
   onAuthenticated: (email: string, name: string, uuid?: string) => void;
   onNavigateManifesto?: () => void;
+  onNavigateLegal?: (type: 'privacy' | 'terms' | 'refund') => void;
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export default function Login({ onAuthenticated, onNavigateManifesto }: LoginProps) {
+export default function Login({ onAuthenticated, onNavigateManifesto, onNavigateLegal }: LoginProps) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -405,6 +406,17 @@ export default function Login({ onAuthenticated, onNavigateManifesto }: LoginPro
               </button>
             </div>
           )}
+
+          {/* Legal Links */}
+          <div className="text-center mt-6 pt-6 border-t border-zinc-900/50">
+            <div className="flex items-center justify-center gap-4 text-[9px] font-mono text-zinc-600 uppercase tracking-widest">
+              <button onClick={() => onNavigateLegal?.('terms')} className="hover:text-zinc-400 transition-colors">Terms</button>
+              <span>&bull;</span>
+              <button onClick={() => onNavigateLegal?.('privacy')} className="hover:text-zinc-400 transition-colors">Privacy</button>
+              <span>&bull;</span>
+              <button onClick={() => onNavigateLegal?.('refund')} className="hover:text-zinc-400 transition-colors">Refunds</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -6,9 +6,10 @@ interface LandingProps {
   onNavigateTracker: () => void;
   onNavigateProfile: () => void;
   onNavigateManifesto?: () => void;
+  onNavigateLegal?: (type: 'privacy' | 'terms' | 'refund') => void;
 }
 
-export default function Landing({ onNavigateArena, onNavigateTracker, onNavigateProfile, onNavigateManifesto }: LandingProps) {
+export default function Landing({ onNavigateArena, onNavigateTracker, onNavigateProfile, onNavigateManifesto, onNavigateLegal }: LandingProps) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center py-12 px-6 bg-zinc-950 text-stone-50 font-sans relative overflow-x-hidden">
       {/* Subtle background grid overlay */}
@@ -94,6 +95,13 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
           <p className="text-[10px] font-sans text-zinc-600 uppercase tracking-widest">
             TARK 1.0 IS AN AD-FREE INITIATIVE FOREVER.
           </p>
+          <div className="flex items-center justify-center gap-4 text-[10px] font-sans text-zinc-600 uppercase tracking-widest">
+            <button onClick={() => onNavigateLegal?.('terms')} className="hover:text-zinc-400 transition-colors">Terms</button>
+            <span>&bull;</span>
+            <button onClick={() => onNavigateLegal?.('privacy')} className="hover:text-zinc-400 transition-colors">Privacy Policy</button>
+            <span>&bull;</span>
+            <button onClick={() => onNavigateLegal?.('refund')} className="hover:text-zinc-400 transition-colors">Refunds</button>
+          </div>
         </div>
       </div>
     </div>

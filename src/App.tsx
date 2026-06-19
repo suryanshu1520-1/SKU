@@ -10,6 +10,7 @@ import Profile from './components/Profile';
 import Leaderboard from './components/Leaderboard';
 import PublicProfile from './components/PublicProfile';
 import PasswordReset from './components/PasswordReset';
+import LegalModal, { LegalDocumentType } from './components/LegalModal';
 import { supabase } from './lib/supabase';
 import { Loader2, Trophy, Swords, Globe, User, House } from 'lucide-react';
 // @ts-ignore
@@ -29,6 +30,7 @@ export default function App() {
 
   // Manifesto modal overlay state
   const [showManifesto, setShowManifesto] = useState(false);
+  const [legalDocumentType, setLegalDocumentType] = useState<LegalDocumentType | null>(null);
 
   const [arenaStats, setArenaStats] = useState({
     correct: 0,
@@ -131,8 +133,23 @@ export default function App() {
 
   // Listen for password recovery events from Supabase
   useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
-      console.log("[Tark Auth] Event:", event, "Hash:", window.location.hash);
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("[Tark Auth] Event:", event, "Hash:", window.location.hash, "Session:", !!session);
+      
+      if (session?.user) {
+        const matchedEmail = session.user.email || '';
+        const matchedName = session.user.user_metadata?.name || matchedEmail.split('@')[0] || 'Candidate';
+        const matchedUserId = session.user.id;
+        
+        setUserEmail(matchedEmail);
+        setUserName(matchedName);
+        setUserId(matchedUserId);
+        
+        localStorage.setItem('tark_session_email', matchedEmail);
+        localStorage.setItem('tark_session_name', matchedName);
+        localStorage.setItem('tark_session_user_id', matchedUserId);
+      }
+
       if (event === 'PASSWORD_RECOVERY' ||
           (event === 'SIGNED_IN' && (window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery')))) {
         setShowPasswordReset(true);
@@ -334,7 +351,11 @@ export default function App() {
 
       {/* Screen Routing */}
       {gameState === 'login' && (
-        <Login onAuthenticated={handleAuthenticated} onNavigateManifesto={handleNavigateManifesto} />
+        <Login 
+          onAuthenticated={handleAuthenticated} 
+          onNavigateManifesto={handleNavigateManifesto} 
+          onNavigateLegal={(type) => setLegalDocumentType(type)}
+        />
       )}
 
       {gameState === 'landing' && (
@@ -343,6 +364,7 @@ export default function App() {
           onNavigateTracker={() => navigateToTab('tracker')}
           onNavigateProfile={() => navigateToTab('profile')}
           onNavigateManifesto={handleNavigateManifesto}
+          onNavigateLegal={(type) => setLegalDocumentType(type)}
         />
       )}
 
@@ -415,6 +437,24 @@ export default function App() {
               onNavigateSignup={() => { setShowManifesto(false); }}
               onClose={() => setShowManifesto(false)}
               userId={userId}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Legal Modal Overlay */}
+      <AnimatePresence>
+        {legalDocumentType && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/90 backdrop-blur-sm flex justify-center items-start pt-4 md:pt-12"
+          >
+            <LegalModal
+              documentType={legalDocumentType}
+              onClose={() => setLegalDocumentType(null)}
             />
           </motion.div>
         )}
