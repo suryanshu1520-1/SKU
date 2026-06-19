@@ -16,6 +16,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
 
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
@@ -66,6 +67,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
           body: JSON.stringify({
             email: cleanedEmail,
             password: password,
+            name: name,
           }),
         });
 
@@ -200,7 +202,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
 
           <div className="mt-10 pt-6 border-t border-zinc-950/15">
             <p className="font-sans text-sm text-zinc-700">
-              15 free AI insights included upon registration.
+              We know how much you hate logins, please refer to our "privacy" section to read EXACTLY why we need you to sign in.
             </p>
           </div>
         </div>
@@ -301,6 +303,35 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                 </>
               ) : (
                 <>
+                  {/* Name Input */}
+                  <AnimatePresence>
+                    {isSignUp && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden mb-4"
+                      >
+                        <div>
+                          <label htmlFor="name-input" className="block text-[9px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">Full Name</label>
+                          <div className="relative">
+                            <input
+                              id="name-input"
+                              name="name"
+                              type="text"
+                              required={isSignUp}
+                              className="block w-full px-3 py-2.5 border border-zinc-900 rounded-sm bg-zinc-950/80 text-stone-100 placeholder-zinc-700 focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50 focus:border-[#e0d0ab]/50 text-xs font-sans transition-all"
+                              placeholder="Your full name"
+                              value={name}
+                              onChange={(e) => setName(e.target.value)}
+                              disabled={status === 'loading'}
+                            />
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   {/* Email Input */}
                   <div>
                     <label htmlFor="email-input" className="block text-[9px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">Email Address</label>

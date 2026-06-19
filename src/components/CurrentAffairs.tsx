@@ -68,6 +68,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
   const [isLightMode, setIsLightMode] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
@@ -393,14 +394,18 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
       {/* Sidebar Filters */}
       <div className="w-full md:w-64 shrink-0 bg-zinc-900/10 border border-zinc-900 p-6 self-start rounded-sm">
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-900">
+        <div 
+          className={`flex items-center justify-between pb-4 cursor-pointer transition-colors hover:text-white group ${isFiltersOpen ? 'mb-6 border-b border-zinc-900' : ''}`}
+          onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+        >
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-zinc-500" />
-            <h3 className="font-sans font-semibold text-xs uppercase tracking-widest text-[#e0d0ab]">Filters</h3>
+            <Filter className="w-4 h-4 text-zinc-500 group-hover:text-zinc-300 transition-colors" />
+            <h3 className="font-sans font-semibold text-xs uppercase tracking-widest text-[#e0d0ab] group-hover:text-white transition-colors">Filters</h3>
           </div>
           {(selectedMinistry !== 'ALL' || selectedSource !== 'ALL') && (
             <button
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 setSelectedMinistry('ALL');
                 setSelectedSource('ALL');
                 setStartDate('');
@@ -415,6 +420,16 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
             </button>
           )}
         </div>
+
+        <AnimatePresence>
+          {isFiltersOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+              className="overflow-hidden"
+            >
 
         {/* Ministry Filter */}
         <div className="mb-6">
@@ -525,9 +540,12 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
             })}
           </div>
         </div>
+        </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* PIB Digest Trigger Button */}
-        <div className="mt-8 pt-6 border-t border-zinc-900">
+        <div className={`border-t border-zinc-900 ${isFiltersOpen ? 'mt-8 pt-6' : 'pt-4'}`}>
           <button
             onClick={() => setShowPibModal(true)}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-zinc-900/40 hover:bg-zinc-900 border border-zinc-800 hover:border-[#e0d0ab]/50 text-stone-300 hover:text-[#e0d0ab] rounded-sm transition-all focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50 shadow-sm cursor-pointer"
@@ -542,29 +560,24 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
       <div className="flex-1 min-w-0">
 
         {/* Sleek Action Header banner */}
-        <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-zinc-900 pb-6">
-          <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-zinc-900 border border-zinc-800 text-[11px] font-sans font-bold tracking-wider uppercase text-[#e0d0ab] rounded-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Administrative Intelligence Feed
+        <div className="mb-8 flex flex-col justify-between items-start gap-4 border-b border-zinc-900 pb-6">
+          <div className="space-y-3 w-full">
+            <div className="flex items-center flex-wrap gap-4">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-zinc-900 border border-zinc-800 text-[11px] font-sans font-bold tracking-wider uppercase text-[#e0d0ab] rounded-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Administrative Intelligence Feed
+              </div>
+              <div className="flex items-center gap-1.5 text-[10px] font-sans font-bold tracking-[0.15em] uppercase text-zinc-600 select-none">
+                <RefreshCw className="w-3 h-3 opacity-50" />
+                <span>Autonomously synced 3x daily</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <h2 className="text-2xl font-sans font-bold tracking-tight text-white">Tark Current Affairs</h2>
             </div>
-            <p className="text-zinc-500 text-xs font-sans">High-signal, verified policy briefs processed straight from administrative press channels.</p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-            {/* Passive Auto-Sync Indicator */}
-            <div className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-sans font-bold tracking-[0.2em] uppercase text-zinc-600 select-none">
-              <RefreshCw className="w-3 h-3 opacity-50" />
-              <span>Autonomously synced 3x daily</span>
-            </div>
-
-            <div className="flex items-center justify-center gap-1.5 text-stone-200 text-xs font-sans bg-zinc-900/30 border border-zinc-900 px-3 py-2 rounded-sm select-none">
-              <BookOpen className="w-3.5 h-3.5 text-[#e0d0ab]" />
-              <span>Showing <strong className="text-[#e0d0ab] font-bold">{filteredItems.length}</strong> Polities</span>
-            </div>
+            <p className="text-zinc-500 text-xs font-sans max-w-3xl leading-relaxed">
+              High-signal, verified executive summaries processed straight from administrative press channels.
+            </p>
           </div>
         </div>
 
