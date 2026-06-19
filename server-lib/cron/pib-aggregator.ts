@@ -193,6 +193,7 @@ async function scrapeArticleBody(url: string): Promise<string> {
 
     // Broad semantic selectors for the main article wrapper
     const selectors = [
+      ".elementor-widget-theme-post-content",
       ".entry-content",
       ".td-post-content",
       ".post-content",
@@ -509,12 +510,14 @@ async function main() {
     process.exit(0);
   }
 
-  console.log(`[pib-aggregator] Found ${newArticles.length} new articles to process.`);
+  // The user requested to process only ONE article per run to ensure maximum quality and avoid overwhelming Llama
+  const articlesToProcess = newArticles.slice(0, 1);
+  console.log(`[pib-aggregator] Found ${newArticles.length} new articles. Processing the latest 1 to ensure highest digest quality.`);
 
-  // Step 2 & 3: Process each new article individually
+  // Step 2 & 3: Process the single new article
   let successCount = 0;
 
-  for (const article of newArticles) {
+  for (const article of articlesToProcess) {
     const body = await scrapeArticleBody(article.url);
     if (!body) {
       continue;

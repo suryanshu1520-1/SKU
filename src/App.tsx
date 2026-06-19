@@ -77,7 +77,7 @@ export default function App() {
           const metaName = session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'Candidate';
           setUserName(metaName);
           setUserId(session.user.id);
-          
+
           const cachedResultsRaw = localStorage.getItem('tark_arena_results');
           if (cachedResultsRaw) {
             try {
@@ -102,7 +102,7 @@ export default function App() {
             setUserEmail(cachedEmail);
             setUserName(cachedName);
             setUserId(cachedUserId || cachedEmail);
-            
+
             const cachedResultsRaw = localStorage.getItem('tark_arena_results');
             if (cachedResultsRaw) {
               try {
@@ -135,23 +135,23 @@ export default function App() {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("[Tark Auth] Event:", event, "Hash:", window.location.hash, "Session:", !!session);
-      
+
       if (session?.user) {
         const matchedEmail = session.user.email || '';
         const matchedName = session.user.user_metadata?.name || matchedEmail.split('@')[0] || 'Candidate';
         const matchedUserId = session.user.id;
-        
+
         setUserEmail(matchedEmail);
         setUserName(matchedName);
         setUserId(matchedUserId);
-        
+
         localStorage.setItem('tark_session_email', matchedEmail);
         localStorage.setItem('tark_session_name', matchedName);
         localStorage.setItem('tark_session_user_id', matchedUserId);
       }
 
       if (event === 'PASSWORD_RECOVERY' ||
-          (event === 'SIGNED_IN' && (window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery')))) {
+        (event === 'SIGNED_IN' && (window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery')))) {
         setShowPasswordReset(true);
       }
     });
@@ -253,96 +253,96 @@ export default function App() {
             {/* Navigation Tabs - Animated Pill */}
             <nav className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               <LayoutGroup>
-                 <button
-                   onClick={handleNavigateHome}
-                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
-                   title="Home"
-                 >
-                   {gameState === 'landing' && (
-                     <motion.div
-                       layoutId="active-nav-pill"
-                       className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
-                       transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                     />
-                   )}
-                   <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState === 'landing' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
-                     <House className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${gameState !== 'landing' ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
-                     <span className="hidden sm:inline">Home</span>
-                     <span className="sm:hidden">Home</span>
-                   </span>
-                 </button>
+                <button
+                  onClick={handleNavigateHome}
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
+                  title="Home"
+                >
+                  {gameState === 'landing' && (
+                    <motion.div
+                      layoutId="active-nav-pill"
+                      className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
+                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState === 'landing' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
+                    <House className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${gameState !== 'landing' ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
+                    <span className="hidden sm:inline">Home</span>
+                    <span className="sm:hidden">Home</span>
+                  </span>
+                </button>
 
-                 <button
-                   onClick={() => navigateToTab('arena')}
-                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
-                 >
-                   {gameState !== 'landing' && activeTab === 'arena' && (
-                     <motion.div
-                       layoutId="active-nav-pill"
-                       className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
-                       transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                     />
-                   )}
-                   <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'arena' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
-                     <Swords className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'arena') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
-                     <span className="hidden sm:inline">Test Arena</span>
-                     <span className="sm:hidden">Arena</span>
-                   </span>
-                 </button>
+                <button
+                  onClick={() => navigateToTab('arena')}
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
+                >
+                  {gameState !== 'landing' && activeTab === 'arena' && (
+                    <motion.div
+                      layoutId="active-nav-pill"
+                      className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
+                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'arena' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
+                    <Swords className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'arena') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
+                    <span className="hidden sm:inline">Test Arena</span>
+                    <span className="sm:hidden">Arena</span>
+                  </span>
+                </button>
 
-                 <button
-                   onClick={() => navigateToTab('tracker')}
-                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
-                 >
-                   {gameState !== 'landing' && activeTab === 'tracker' && (
-                     <motion.div
-                       layoutId="active-nav-pill"
-                       className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
-                       transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                     />
-                   )}
-                   <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'tracker' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
-                     <Globe className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'tracker') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
-                     <span className="hidden sm:inline">Policy Tracker</span>
-                     <span className="sm:hidden">Tracker</span>
-                   </span>
-                 </button>
+                <button
+                  onClick={() => navigateToTab('tracker')}
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
+                >
+                  {gameState !== 'landing' && activeTab === 'tracker' && (
+                    <motion.div
+                      layoutId="active-nav-pill"
+                      className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
+                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'tracker' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
+                    <Globe className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'tracker') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
+                    <span className="hidden sm:inline">Policy Tracker</span>
+                    <span className="sm:hidden">Tracker</span>
+                  </span>
+                </button>
 
-                 <button
-                   onClick={() => navigateToTab('leaderboard')}
-                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
-                 >
-                   {gameState !== 'landing' && activeTab === 'leaderboard' && (
-                     <motion.div
-                       layoutId="active-nav-pill"
-                       className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
-                       transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                     />
-                   )}
-                   <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'leaderboard' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
-                     <Trophy className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'leaderboard') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
-                     <span className="hidden sm:inline">Leaderboard</span>
-                     <span className="sm:hidden">Rank</span>
-                   </span>
-                 </button>
+                <button
+                  onClick={() => navigateToTab('leaderboard')}
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
+                >
+                  {gameState !== 'landing' && activeTab === 'leaderboard' && (
+                    <motion.div
+                      layoutId="active-nav-pill"
+                      className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
+                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'leaderboard' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
+                    <Trophy className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'leaderboard') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
+                    <span className="hidden sm:inline">Leaderboard</span>
+                    <span className="sm:hidden">Rank</span>
+                  </span>
+                </button>
 
-                 <button
-                   onClick={() => navigateToTab('profile')}
-                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
-                 >
-                   {gameState !== 'landing' && activeTab === 'profile' && (
-                     <motion.div
-                       layoutId="active-nav-pill"
-                       className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
-                       transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                     />
-                   )}
-                   <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'profile' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
-                     <User className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'profile') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
-                     <span className="hidden sm:inline">Profile & History</span>
-                     <span className="sm:hidden">Profile</span>
-                   </span>
-                 </button>
+                <button
+                  onClick={() => navigateToTab('profile')}
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
+                >
+                  {gameState !== 'landing' && activeTab === 'profile' && (
+                    <motion.div
+                      layoutId="active-nav-pill"
+                      className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
+                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'profile' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
+                    <User className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'profile') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
+                    <span className="hidden sm:inline">Profile & History</span>
+                    <span className="sm:hidden">Profile</span>
+                  </span>
+                </button>
               </LayoutGroup>
             </nav>
           </div>
@@ -351,15 +351,15 @@ export default function App() {
 
       {/* Screen Routing */}
       {gameState === 'login' && (
-        <Login 
-          onAuthenticated={handleAuthenticated} 
-          onNavigateManifesto={handleNavigateManifesto} 
+        <Login
+          onAuthenticated={handleAuthenticated}
+          onNavigateManifesto={handleNavigateManifesto}
           onNavigateLegal={(type) => setLegalDocumentType(type)}
         />
       )}
 
       {gameState === 'landing' && (
-        <Landing 
+        <Landing
           onNavigateArena={() => navigateToTab('arena')}
           onNavigateTracker={() => navigateToTab('tracker')}
           onNavigateProfile={() => navigateToTab('profile')}
@@ -379,9 +379,9 @@ export default function App() {
           ) : gameState === 'arena' ? (
             <Arena onComplete={handleArenaComplete} userId={userId} onReturnToDashboard={() => setActiveTab('tracker')} onNavigateManifesto={handleNavigateManifesto} />
           ) : (
-            <Autopsy 
-              stats={arenaStats} 
-              percentile={percentile} 
+            <Autopsy
+              stats={arenaStats}
+              percentile={percentile}
               onNavigateManifesto={handleNavigateManifesto}
               onReturnToDashboard={() => {
                 localStorage.removeItem('tark_arena_results');
