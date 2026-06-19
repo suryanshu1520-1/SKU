@@ -23,7 +23,7 @@ dotenv.config();
 // ============================================================
 const SCRAPE_TIMEOUT_MS = 10_000;
 const MAX_ARTICLES = 5;
-const LLM_INPUT_CHAR_LIMIT = 3000;
+const LLM_INPUT_CHAR_LIMIT = 50000; // Increased significantly to allow full article processing
 
 const LUKMAAN_PIB_INDEX_URL = "https://blog.lukmaanias.com/category/pib-summary/";
 const INSIGHTS_IAS_FALLBACK_URL = "https://www.insightsonindia.com/current-affairs/daily-current-affairs/";
@@ -406,15 +406,13 @@ async function upsertDigest(
 ): Promise<{ ok: boolean; errorMessage?: string }> {
   const supabase = getSupabaseClient();
 
-  // Build a stable, unique URL for the PIB digest entry
-  // This prevents duplicates when the same date's digest is re-processed
-  const digestUrl = `pib-digest://${digest.date}`;
-
+  // Use the actual source URL as the stable, unique URL
+  // This ensures we don't duplicate articles and can check against source URLs
   const row = {
     title: digest.title,
     date: digest.date.includes("T") ? digest.date.split("T")[0] : digest.date,
     content: digest.content,
-    url: digestUrl,
+    url: sourceUrl,
     created_at: new Date().toISOString(),
   };
 
@@ -440,6 +438,26 @@ async function upsertDigest(
     console.error(`[pib-aggregator] Supabase connection error: ${e?.message ?? String(e)}`);
     return { ok: false, errorMessage: e?.message ?? String(e) };
   }
+}
+
+// ============================================================
+// DATABASE: Check if article is already processed
+// ============================================================
+async function isArticleProcessed(url: string): Promise<boolean> {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from("pib_digests")
+    .select("url")
+    .eq("url", url)
+    .single();
+
+  if (error && error.code !== "PGRST116") {
+    // PGRST116 is "No rows found"
+    console.warn(`[pib-aggregator] DB check error for ${url}: ${error.message}`);
+    return false; // Assume not processed to avoid skipping on transient errors
+  }
+
+  return !!data;
 }
 
 // ============================================================
@@ -477,54 +495,69 @@ async function main() {
     process.exit(1);
   }
 
-  // Step 2: Scrape full article bodies
-  const rawTexts: string[] = [];
-
+  // Filter out already processed articles
+  const newArticles = [];
   for (const article of articleLinks) {
-    const body = await scrapeArticleBody(article.url);
-    if (body) {
-      rawTexts.push(`[${article.title}]\n${body}`);
+    const processed = await isArticleProcessed(article.url);
+    if (!processed) {
+      newArticles.push(article);
     }
-    // Polite delay between requests
-    await new Promise((r) => setTimeout(r, 1500));
   }
 
-  if (rawTexts.length === 0) {
-    console.error("[pib-aggregator] No article bodies extracted. Exiting.");
+  if (newArticles.length === 0) {
+    console.log("[pib-aggregator] No new PIB summaries released. Exiting silently.");
+    process.exit(0);
+  }
+
+  console.log(`[pib-aggregator] Found ${newArticles.length} new articles to process.`);
+
+  // Step 2 & 3: Process each new article individually
+  let successCount = 0;
+
+  for (const article of newArticles) {
+    const body = await scrapeArticleBody(article.url);
+    if (!body) {
+      continue;
+    }
+
+    const rawText = `[${article.title}]\n${body}`;
+    const digest = await transformWithLlama(rawText);
+
+    if (!digest) {
+      console.error(`[pib-aggregator] LLM transformation failed for: ${article.url}`);
+      continue;
+    }
+
+    // Log the parsed digest for review
+    console.log("\n" + "=".repeat(60));
+    console.log(`PARSED DIGEST: ${article.title}`);
+    console.log("=".repeat(60));
+    console.log(`Title: ${digest.title}`);
+    console.log(`Date:  ${digest.date}`);
+    console.log(`Content length: ${digest.content.length} chars`);
+    console.log("=".repeat(60));
+    console.log(digest.content.substring(0, 500) + "...\n(truncated for logs)");
+    console.log("=".repeat(60));
+
+    // Step 4: Upsert to Supabase
+    const result = await upsertDigest(digest, article.url);
+
+    if (!result.ok) {
+      console.error(`[pib-aggregator] Database write failed for ${article.url}: ${result.errorMessage}`);
+    } else {
+      successCount++;
+    }
+
+    // Polite delay between processing articles
+    await new Promise((r) => setTimeout(r, 2000));
+  }
+
+  if (successCount === 0) {
+    console.error("\n[pib-aggregator] Pipeline finished but no articles were successfully processed.");
     process.exit(1);
   }
 
-  console.log(`[pib-aggregator] Successfully scraped ${rawTexts.length} articles`);
-
-  // Step 3: Concatenate and send to Llama 3.1
-  const combinedRawText = rawTexts.join("\n\n---\n\n");
-  const digest = await transformWithLlama(combinedRawText);
-
-  if (!digest) {
-    console.error("[pib-aggregator] LLM transformation failed or JSON parsing failed. Exiting.");
-    process.exit(1);
-  }
-
-  // Log the parsed digest for review
-  console.log("\n" + "=".repeat(60));
-  console.log("PARSED DIGEST:");
-  console.log("=".repeat(60));
-  console.log(`Title: ${digest.title}`);
-  console.log(`Date:  ${digest.date}`);
-  console.log(`Content length: ${digest.content.length} chars`);
-  console.log("=".repeat(60));
-  console.log(digest.content);
-  console.log("=".repeat(60));
-
-  // Step 4: Upsert to Supabase
-  const result = await upsertDigest(digest, articleLinks[0]?.url || "");
-
-  if (!result.ok) {
-    console.error(`[pib-aggregator] Database write failed: ${result.errorMessage}`);
-    process.exit(1);
-  }
-
-  console.log("\n[pib-aggregator] Pipeline complete. Digest inserted into Supabase pib_digests table.");
+  console.log(`\n[pib-aggregator] Pipeline complete. ${successCount} digests inserted into Supabase pib_digests table.`);
   process.exit(0);
 }
 
