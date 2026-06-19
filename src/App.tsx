@@ -255,18 +255,18 @@ export default function App() {
               <LayoutGroup>
                  <button
                    onClick={handleNavigateHome}
-                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none transition-colors"
+                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
                    title="Home"
                  >
                    {gameState === 'landing' && (
                      <motion.div
                        layoutId="active-nav-pill"
-                       className="absolute inset-0 bg-zinc-100 rounded-sm z-0"
+                       className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                      />
                    )}
-                   <span className={`relative z-10 flex items-center gap-1.5 ${gameState === 'landing' ? 'text-zinc-950' : 'text-zinc-400'}`}>
-                     <House className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                   <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState === 'landing' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
+                     <House className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${gameState !== 'landing' ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
                      <span className="hidden sm:inline">Home</span>
                      <span className="sm:hidden">Home</span>
                    </span>
@@ -274,17 +274,17 @@ export default function App() {
 
                  <button
                    onClick={() => navigateToTab('arena')}
-                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none transition-colors"
+                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
                  >
                    {gameState !== 'landing' && activeTab === 'arena' && (
                      <motion.div
                        layoutId="active-nav-pill"
-                       className="absolute inset-0 bg-zinc-100 rounded-sm z-0"
+                       className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                      />
                    )}
-                   <span className={`relative z-10 flex items-center gap-1.5 ${gameState !== 'landing' && activeTab === 'arena' ? 'text-zinc-950' : 'text-zinc-400'}`}>
-                     <Swords className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                   <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'arena' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
+                     <Swords className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'arena') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
                      <span className="hidden sm:inline">Test Arena</span>
                      <span className="sm:hidden">Arena</span>
                    </span>
@@ -292,17 +292,17 @@ export default function App() {
 
                  <button
                    onClick={() => navigateToTab('tracker')}
-                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none transition-colors"
+                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
                  >
                    {gameState !== 'landing' && activeTab === 'tracker' && (
                      <motion.div
                        layoutId="active-nav-pill"
-                       className="absolute inset-0 bg-zinc-100 rounded-sm z-0"
+                       className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                      />
                    )}
-                   <span className={`relative z-10 flex items-center gap-1.5 ${gameState !== 'landing' && activeTab === 'tracker' ? 'text-zinc-950' : 'text-zinc-400'}`}>
-                     <Globe className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                   <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'tracker' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
+                     <Globe className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'tracker') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
                      <span className="hidden sm:inline">Policy Tracker</span>
                      <span className="sm:hidden">Tracker</span>
                    </span>
@@ -310,17 +310,17 @@ export default function App() {
 
                  <button
                    onClick={() => navigateToTab('leaderboard')}
-                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none transition-colors"
+                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
                  >
                    {gameState !== 'landing' && activeTab === 'leaderboard' && (
                      <motion.div
                        layoutId="active-nav-pill"
-                       className="absolute inset-0 bg-zinc-100 rounded-sm z-0"
+                       className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                      />
                    )}
-                   <span className={`relative z-10 flex items-center gap-1.5 ${gameState !== 'landing' && activeTab === 'leaderboard' ? 'text-zinc-950' : 'text-zinc-400'}`}>
-                     <Trophy className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                   <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'leaderboard' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
+                     <Trophy className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'leaderboard') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
                      <span className="hidden sm:inline">Leaderboard</span>
                      <span className="sm:hidden">Rank</span>
                    </span>
@@ -328,17 +328,17 @@ export default function App() {
 
                  <button
                    onClick={() => navigateToTab('profile')}
-                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none transition-colors"
+                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
                  >
                    {gameState !== 'landing' && activeTab === 'profile' && (
                      <motion.div
                        layoutId="active-nav-pill"
-                       className="absolute inset-0 bg-zinc-100 rounded-sm z-0"
+                       className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                      />
                    )}
-                   <span className={`relative z-10 flex items-center gap-1.5 ${gameState !== 'landing' && activeTab === 'profile' ? 'text-zinc-950' : 'text-zinc-400'}`}>
-                     <User className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                   <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'profile' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
+                     <User className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'profile') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
                      <span className="hidden sm:inline">Profile & History</span>
                      <span className="sm:hidden">Profile</span>
                    </span>
