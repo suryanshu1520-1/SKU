@@ -395,13 +395,12 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                   </button>
 
                   {/* Google Sign In */}
-                  <div className="relative my-4">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-zinc-800/60"></div>
+                  <div className="flex items-center my-4">
+                    <div className="flex-1 border-t border-zinc-800/60"></div>
+                    <div className="px-3 text-[9px] font-mono uppercase tracking-widest text-zinc-500">
+                      Or continue with
                     </div>
-                    <div className="relative flex justify-center text-[9px] font-mono uppercase tracking-widest">
-                      <span className="bg-[#1f1f23] px-2 text-zinc-500">Or continue with</span>
-                    </div>
+                    <div className="flex-1 border-t border-zinc-800/60"></div>
                   </div>
 
                   <button
