@@ -145,23 +145,23 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-zinc-950 text-stone-50 font-sans relative overflow-hidden">
-      {/* Left Panel - Value Proposition (hidden on mobile) */}
-      <div className="hidden md:flex md:w-1/2 bg-[#e0d0ab] items-center justify-center p-12 relative overflow-hidden">
+      {/* Left Panel - Value Proposition */}
+      <div className="flex flex-col md:flex-row md:w-1/2 bg-[#e0d0ab] items-center justify-center p-6 py-8 md:p-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#072e63_1px,transparent_1px),linear-gradient(to_bottom,#072e63_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-5 pointer-events-none" />
-        <div className="max-w-md z-10 flex flex-col min-h-[60vh] justify-between">
+        <div className="max-w-md z-10 flex flex-col min-h-0 md:min-h-[60vh] justify-center md:justify-between w-full">
           <div>
-            <div className="w-12 h-12 rounded-sm bg-zinc-950/10 flex items-center justify-center mb-8">
+            <div className="hidden md:flex w-12 h-12 rounded-sm bg-zinc-950/10 items-center justify-center mb-8">
               <Sparkles className="w-6 h-6 text-zinc-950" />
             </div>
 
-            <h2 className="font-serif text-3xl md:text-4xl font-bold text-zinc-950 leading-tight mb-4">
+            <h2 className="font-serif text-2xl md:text-4xl font-bold text-zinc-950 leading-tight mb-2 md:mb-4">
               Absolute focus. Rigorous assessment.
             </h2>
-            <p className="font-sans text-zinc-800 text-sm leading-relaxed mb-10">
+            <p className="font-sans text-zinc-800 text-sm leading-relaxed mb-0 md:mb-10">
               Tark is a pristine environment designed to test your retention and eliminate noise.
             </p>
 
-            <div className="space-y-6">
+            <div className="hidden md:block space-y-6">
               <motion.div
                 initial={{ opacity: 0, x: -16 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -200,7 +200,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
             </div>
           </div>
 
-          <div className="mt-10 pt-6 border-t border-zinc-950/15">
+          <div className="hidden md:block mt-10 pt-6 border-t border-zinc-950/15">
             <p className="font-sans text-sm text-zinc-700">
               We know how much you hate logins, please refer to our "privacy" section to read EXACTLY why we need you to sign in.
             </p>
@@ -209,7 +209,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
       </div>
 
       {/* Right Panel - Auth Form */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 relative">
+      <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-12 relative">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f1f23_1px,transparent_1px),linear-gradient(to_bottom,#1f1f23_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20 pointer-events-none" />
 
         <div className="w-full max-w-sm z-10">
@@ -233,7 +233,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
             <motion.form
               key={forgotPasswordMode ? "forgot-form" : isSignUp ? "signup-form" : "signin-form"}
               onSubmit={forgotPasswordMode ? handleForgotPassword : handleAuthentication}
-              className="space-y-4 bg-zinc-900/10 border border-zinc-900/60 p-6 rounded-sm shadow-xl"
+              className="space-y-4 bg-zinc-900/10 border border-zinc-900/60 p-4 md:p-6 rounded-sm shadow-xl"
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
@@ -257,7 +257,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                           <input
                             type="email"
                             required
-                            className="block w-full pl-10 pr-3 py-2.5 border border-zinc-900 rounded-sm bg-zinc-950/80 text-stone-100 placeholder-zinc-700 focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50 focus:border-[#e0d0ab]/50 text-xs font-sans transition-all"
+                            className="block w-full pl-10 pr-3 py-2.5 border border-zinc-900 rounded-sm bg-zinc-950/80 text-stone-100 placeholder-zinc-700 focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50 focus:border-[#e0d0ab]/50 text-[16px] md:text-xs font-sans transition-all"
                             placeholder="candidate@domain.com"
                             value={forgotEmail}
                             onChange={(e) => setForgotEmail(e.target.value)}
@@ -269,7 +269,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                       <button
                         type="submit"
                         disabled={status === 'loading'}
-                        className="w-full flex items-center justify-center py-2.5 px-4 border border-zinc-800 rounded-sm text-xs font-semibold uppercase tracking-wider text-zinc-950 bg-stone-100 hover:bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-550 focus:ring-offset-zinc-950 disabled:opacity-50 transition-colors group cursor-pointer"
+                        className="w-full flex items-center justify-center min-h-[44px] md:min-h-0 py-2.5 px-4 border border-zinc-800 rounded-sm text-xs font-semibold uppercase tracking-wider text-zinc-950 bg-stone-100 hover:bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-550 focus:ring-offset-zinc-950 disabled:opacity-50 transition-colors group cursor-pointer"
                       >
                         {status === 'loading' ? (
                           <span className="flex items-center gap-2">
@@ -320,7 +320,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                               name="name"
                               type="text"
                               required={isSignUp}
-                              className="block w-full px-3 py-2.5 border border-zinc-900 rounded-sm bg-zinc-950/80 text-stone-100 placeholder-zinc-700 focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50 focus:border-[#e0d0ab]/50 text-xs font-sans transition-all"
+                              className="block w-full px-3 py-2.5 border border-zinc-900 rounded-sm bg-zinc-950/80 text-stone-100 placeholder-zinc-700 focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50 focus:border-[#e0d0ab]/50 text-[16px] md:text-xs font-sans transition-all"
                               placeholder="Your full name"
                               value={name}
                               onChange={(e) => setName(e.target.value)}
@@ -344,7 +344,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                         name="email"
                         type="email"
                         required
-                        className="block w-full pl-10 pr-10 py-2.5 border border-zinc-900 rounded-sm bg-zinc-950/80 text-stone-100 placeholder-zinc-700 focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50 focus:border-[#e0d0ab]/50 text-xs font-sans transition-all"
+                        className="block w-full pl-10 pr-10 py-2.5 border border-zinc-900 rounded-sm bg-zinc-950/80 text-stone-100 placeholder-zinc-700 focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50 focus:border-[#e0d0ab]/50 text-[16px] md:text-xs font-sans transition-all"
                         placeholder="candidate@domain.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -371,7 +371,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                         type="password"
                         required
                         minLength={6}
-                        className="block w-full pl-10 pr-3 py-2.5 border border-zinc-900 rounded-sm bg-zinc-950/80 text-stone-100 placeholder-zinc-700 focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50 focus:border-[#e0d0ab]/50 text-xs font-sans transition-all"
+                        className="block w-full pl-10 pr-3 py-2.5 border border-zinc-900 rounded-sm bg-zinc-950/80 text-stone-100 placeholder-zinc-700 focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50 focus:border-[#e0d0ab]/50 text-[16px] md:text-xs font-sans transition-all"
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
@@ -405,7 +405,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                   <button
                     type="submit"
                     disabled={status === 'loading'}
-                    className="w-full flex items-center justify-center py-2.5 px-4 border border-zinc-800 rounded-sm text-xs font-semibold uppercase tracking-wider text-zinc-950 bg-stone-100 hover:bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-550 focus:ring-offset-zinc-950 disabled:opacity-50 transition-colors group cursor-pointer"
+                    className="w-full flex items-center justify-center min-h-[44px] md:min-h-0 py-2.5 px-4 border border-zinc-800 rounded-sm text-xs font-semibold uppercase tracking-wider text-zinc-950 bg-stone-100 hover:bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-550 focus:ring-offset-zinc-950 disabled:opacity-50 transition-colors group cursor-pointer"
                   >
                     {status === 'loading' ? (
                       <span className="flex items-center gap-2">
@@ -438,7 +438,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                     type="button"
                     onClick={handleGoogleSignIn}
                     disabled={status === 'loading'}
-                    className="w-full flex items-center justify-center py-2.5 px-4 border border-zinc-800 rounded-sm text-xs font-semibold uppercase tracking-wider text-stone-100 bg-zinc-950/50 hover:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-550 focus:ring-offset-zinc-950 disabled:opacity-50 transition-colors group cursor-pointer"
+                    className="w-full flex items-center justify-center min-h-[44px] md:min-h-0 py-2.5 px-4 border border-zinc-800 rounded-sm text-xs font-semibold uppercase tracking-wider text-stone-100 bg-zinc-950/50 hover:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-550 focus:ring-offset-zinc-950 disabled:opacity-50 transition-colors group cursor-pointer"
                   >
                     <svg className="w-3.5 h-3.5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
