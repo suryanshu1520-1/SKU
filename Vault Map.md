@@ -51,7 +51,8 @@ Welcome to the **Tark 1.0 (SKU)** Obsidian Knowledge Hub. This vault is organize
 - **[[docs/architecture|System Architecture]]**: Full tier breakdown (Vite/React 19, Express/Vercel serverless, Supabase Postgres).
 - **[[docs/database-schema|Database Schema & Models]]**: PostgreSQL tables, RLS security policies, and migration history.
 - **[[docs/api-reference|API Reference]]**: Endpoints for quiz submission, Razorpay checkout, insights, and background cron workers.
-- **[[docs/ingestion-pipeline|Ingestion & Distillation Pipeline]]**: Automated RSS scraping, Cheerio sanitization, and LLM synthesis.
+- **[[docs/ingestion-pipeline|Ingestion & Distillation Pipeline]]**: The four parallel `current_affairs` ingestion paths and their divergent quality bars (rewritten 2026-08-18 after a direct code audit).
+- **[[docs/news-feed-quality-roadmap|News Feed Quality Roadmap]]**: Consolidation plan, PIB-in-the-autonomous-path, world coverage, dedup, and significance ranking.
 - **[[docs/monetization-tiers|Monetization & Concurrency Controls]]**: Freemium quotas, Razorpay payments, and 15-minute seat locking.
 
 ---

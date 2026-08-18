@@ -29,6 +29,7 @@ tags:
 - [[docs/database-schema|Database Schema, Tables & RLS Policies]]
 - [[docs/api-reference|API Reference & Endpoints]]
 - [[docs/ingestion-pipeline|Ingestion & Distillation Pipeline]]
+- [[docs/news-feed-quality-roadmap|News Feed Quality Roadmap]]
 - [[docs/monetization-tiers|Monetization & Concurrency Controls]]
 
 ---

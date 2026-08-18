@@ -1,7 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
-import { ExternalLink, Filter, RotateCcw, BookOpen, Inbox, RefreshCw, CheckCircle2, AlertCircle, Calendar, Bookmark, X, Share2, Sun, Moon } from 'lucide-react';
+import {
+  ExternalLink,
+  Filter,
+  RotateCcw,
+  BookOpen,
+  Inbox,
+  RefreshCw,
+  Calendar,
+  Bookmark,
+  X,
+  Share2,
+  Sun,
+  Moon,
+  Search,
+  SlidersHorizontal,
+  Clock,
+  Sparkles,
+  Shield,
+  Layers,
+  ArrowUpRight,
+  ChevronRight,
+  FileText,
+  CheckCircle2,
+  AlertCircle
+} from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
@@ -31,6 +55,15 @@ interface CurrentAffairsProps {
   userId: string;
 }
 
+const CATEGORY_TABS = [
+  { id: 'ALL', label: 'All Signals' },
+  { id: 'Governance', label: 'Cabinet & Policy', keywords: ['Cabinet', 'Prime Minister', 'Home Affairs', 'Law', 'Personnel', 'Parliament', 'Governance'] },
+  { id: 'Economy', label: 'Economy & Trade', keywords: ['Finance', 'Commerce', 'RBI', 'Corporate Affairs', 'NITI Aayog', 'Revenue', 'Economy'] },
+  { id: 'Environment', label: 'Environment & Climate', keywords: ['Environment', 'Forest', 'Climate', 'Renewable', 'Earth Sciences', 'Agriculture', 'Water'] },
+  { id: 'SciTech', label: 'Science & Defence', keywords: ['Defence', 'Space', 'ISRO', 'Atomic Energy', 'Electronics', 'IT', 'Science', 'Technology'] },
+  { id: 'Social', label: 'Social Justice & Health', keywords: ['Health', 'Education', 'Social Justice', 'Women', 'Child', 'Tribal', 'Rural'] },
+];
+
 export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
   const [items, setItems] = useState<CurrentAffairsItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,35 +73,36 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
   const [syncCooldown, setSyncCooldown] = useState(0);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const PAGE_SIZE = 50;
+  const PAGE_SIZE = 45;
 
-  // Bookmark state
-  const [savedArticleIds, setSavedArticleIds] = useState<Set<string>>(new Set());
-  const [savingArticleIds, setSavingArticleIds] = useState<Set<string>>(new Set());
-  const [toastMsg, setToastMsg] = useState('');
-
-  // Filtering States
+  // Search & Filter State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategoryTab, setActiveCategoryTab] = useState('ALL');
   const [selectedMinistry, setSelectedMinistry] = useState<string>('ALL');
   const [selectedSource, setSelectedSource] = useState<string>('ALL');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
-  const [dateError, setDateError] = useState('');
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
-  // Available filter options gathered from data
+  // Available options
   const [ministries, setMinistries] = useState<string[]>([]);
   const [sources, setSources] = useState<string[]>([]);
 
-  // Background sync processing toast state
+  // Bookmarking State
+  const [savedArticleIds, setSavedArticleIds] = useState<Set<string>>(new Set());
+  const [savingArticleIds, setSavingArticleIds] = useState<Set<string>>(new Set());
+  const [toastMsg, setToastMsg] = useState('');
   const [showBackgroundToast, setShowBackgroundToast] = useState(false);
 
-  // PIB Digest modal state
+  // Active Dossier Modal
+  const [selectedDossier, setSelectedDossier] = useState<CurrentAffairsItem | null>(null);
+
+  // PIB Digest Modal State
   const [showPibModal, setShowPibModal] = useState(false);
   const [pibDigests, setPibDigests] = useState<PibDigestItem[]>([]);
   const [activeDigestIndex, setActiveDigestIndex] = useState(0);
-
   const [isLightMode, setIsLightMode] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
@@ -79,7 +113,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
     setScrollProgress(progress);
   };
 
-  // Fetch PIB digests when modal is opened
+  // Fetch PIB digests
   useEffect(() => {
     if (!showPibModal) return;
     (async () => {
@@ -94,38 +128,31 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
     })();
   }, [showPibModal]);
 
-  // Auto-dismiss toast
+  // Toast Auto-dismiss
   useEffect(() => {
     if (!toastMsg) return;
     const t = setTimeout(() => setToastMsg(''), 4000);
     return () => clearTimeout(t);
   }, [toastMsg]);
 
-  // Auto-dismiss background sync toast
   useEffect(() => {
     if (!showBackgroundToast) return;
     const t = setTimeout(() => setShowBackgroundToast(false), 5000);
     return () => clearTimeout(t);
   }, [showBackgroundToast]);
 
-  // Cooldown countdown interval
+  // Cooldown countdown
   useEffect(() => {
     if (syncCooldown <= 0) return;
     const interval = setInterval(() => {
-      setSyncCooldown(prev => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          return 0;
-        }
-        return prev - 1;
-      });
+      setSyncCooldown((prev) => (prev <= 1 ? 0 : prev - 1));
     }, 1000);
     return () => clearInterval(interval);
   }, [syncCooldown]);
 
-  // Fetch saved article IDs on mount
+  // Fetch saved bookmarks
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || userId === 'guest') return;
     (async () => {
       try {
         const { data, error } = await supabase
@@ -133,33 +160,20 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
           .select('article_id')
           .eq('user_id', userId);
 
-        if (error) {
-          console.warn("Failed to fetch saved articles:", error);
-          return;
-        }
-
-        if (data) {
-          setSavedArticleIds(prev => {
-            const next = new Set(data.map(row => row.article_id));
-            // Preserve optimistically saving items
-            savingArticleIds.forEach(id => {
-              if (prev.has(id)) next.add(id);
-              else next.delete(id);
-            });
-            return next;
-          });
+        if (!error && data) {
+          setSavedArticleIds(new Set(data.map((row) => row.article_id)));
         }
       } catch (err) {
-        console.warn("Error fetching saved article IDs:", err);
+        console.warn('Error fetching saved article IDs:', err);
       }
     })();
-  }, [userId, savingArticleIds]);
+  }, [userId]);
 
-  // Distinct fetch helper - conditionally applies date and category filters to the Supabase query
+  // Primary Data Fetcher
   const fetchPolicyData = async (
-    showSkeleton = true, 
-    filterStartDate?: string, 
-    filterEndDate?: string, 
+    showSkeleton = true,
+    filterStartDate?: string,
+    filterEndDate?: string,
     pageIndex = 0,
     filterMinistry = 'ALL',
     filterSource = 'ALL'
@@ -175,17 +189,13 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
       if (filterMinistry !== 'ALL') {
         query = query.eq('ministry', filterMinistry);
       }
-      
       if (filterSource !== 'ALL') {
         query = query.eq('source', filterSource);
       }
-
-      // Apply server-side date filtering when dates are set
       if (filterStartDate) {
         query = query.gte('created_at', filterStartDate);
       }
       if (filterEndDate) {
-        // Add one day so the end date is inclusive through midnight
         const endInclusive = new Date(filterEndDate);
         endInclusive.setDate(endInclusive.getDate() + 1);
         query = query.lt('created_at', endInclusive.toISOString().split('T')[0]);
@@ -196,48 +206,41 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
       const { data, error } = await query.order('created_at', { ascending: false }).range(from, to);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       if (data) {
         if (pageIndex === 0) {
           setItems(data);
         } else {
-          setItems(prev => [...prev, ...data]);
+          setItems((prev) => [...prev, ...data]);
         }
-        
+
         setHasMore(data.length === PAGE_SIZE);
 
-        // Extract unique ministries and sources for the filters
         const uniqueMinistries = Array.from(new Set(data.map((item: any) => item.ministry).filter(Boolean))) as string[];
         const uniqueSources = Array.from(new Set(data.map((item: any) => item.source).filter(Boolean))) as string[];
 
-        if (pageIndex === 0) {
-          if (filterMinistry === 'ALL' && filterSource === 'ALL' && !filterStartDate && !filterEndDate) {
-            // Only overwrite filters if we are doing an unfiltered fetch, otherwise we lose options
-            setMinistries(uniqueMinistries.sort());
-            setSources(uniqueSources.sort());
-          }
+        if (pageIndex === 0 && filterMinistry === 'ALL' && filterSource === 'ALL' && !filterStartDate && !filterEndDate) {
+          setMinistries(uniqueMinistries.sort());
+          setSources(uniqueSources.sort());
         } else {
-          setMinistries(prev => Array.from(new Set([...prev, ...uniqueMinistries])).sort());
-          setSources(prev => Array.from(new Set([...prev, ...uniqueSources])).sort());
+          setMinistries((prev) => Array.from(new Set([...prev, ...uniqueMinistries])).sort());
+          setSources((prev) => Array.from(new Set([...prev, ...uniqueSources])).sort());
         }
       }
     } catch (err: any) {
-      console.error("Error fetching current affairs:", err);
-      setErrorMsg(err.message || "Failed to load policy tracking feed.");
+      console.error('Error fetching current affairs:', err);
+      setErrorMsg(err.message || 'Failed to load policy tracking feed.');
     } finally {
       if (pageIndex === 0 || showSkeleton) setLoading(false);
     }
   };
 
-  // Re-fetch when date filters, category filters, or page changes
   useEffect(() => {
     fetchPolicyData(true, startDate || undefined, endDate || undefined, page, selectedMinistry, selectedSource);
   }, [startDate, endDate, page, selectedMinistry, selectedSource]);
 
-  // Sync action trigger calling the cooldown-aware endpoint
+  // Sync Feed Handler
   const handleSyncFeed = async () => {
     if (syncCooldown > 0 || syncing) return;
     setSyncing(true);
@@ -246,125 +249,86 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
     try {
       const response = await fetch('/api/sync-feed', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ userId })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
       });
       const data = await response.json();
 
       if (response.status === 429) {
-        // Cooldown active
-        const remaining = data.remaining || 300;
-        setSyncCooldown(remaining);
-        setErrorMsg(data.message || `Sync cooldown active. Please wait.`);
+        setSyncCooldown(data.remaining || 300);
+        setErrorMsg(data.message || 'Sync cooldown active.');
         return;
       }
-
       if (response.status === 202) {
-        // Background ingestion dispatched -- do not block with spinner
         setShowBackgroundToast(true);
         setSyncSuccess(true);
-        // Reload data after a short delay so ingested items appear
         setTimeout(() => fetchPolicyData(false), 10000);
         setTimeout(() => setSyncSuccess(null), 5000);
         return;
       }
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Server encountered an error while executing news extraction.');
-      }
+      if (!response.ok) throw new Error(data.error || 'Sync error.');
 
       setSyncSuccess(true);
-
-      // Reload details bypassing heavy spinner
       await fetchPolicyData(false);
-
-      setTimeout(() => {
-        setSyncSuccess(null);
-      }, 5000);
-
+      setTimeout(() => setSyncSuccess(null), 5000);
     } catch (err: any) {
-      console.error("Manual policy sync exception:", err);
-      setErrorMsg(err.message || "Could not reach news scraper service. Check connection.");
+      console.error('Manual sync error:', err);
+      setErrorMsg(err.message || 'Scraper unreachable.');
     } finally {
       setSyncing(false);
     }
   };
 
-  // Bookmark toggle with optimistic UI
+  // Toggle Bookmark
   const toggleBookmark = async (articleId: string) => {
     if (!articleId) return;
+    if (!userId || userId === 'guest') {
+      setToastMsg('Please sign in to save intelligence briefs to your profile.');
+      return;
+    }
 
     const isSaved = savedArticleIds.has(articleId);
-
-    // Resolve the actual auth UUID to ensure RLS compatibility
     let resolvedUserId = userId;
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.id) {
-        resolvedUserId = session.user.id;
-      }
+      if (session?.user?.id) resolvedUserId = session.user.id;
     } catch {
-      // Fall back to prop userId
+      // fallback
     }
 
-    // Optimistic toggle
-    setSavedArticleIds(prev => {
+    // Optimistic Update
+    setSavedArticleIds((prev) => {
       const next = new Set(prev);
-      if (isSaved) {
-        next.delete(articleId);
-      } else {
-        next.add(articleId);
-      }
+      if (isSaved) next.delete(articleId);
+      else next.add(articleId);
       return next;
     });
 
-    setSavingArticleIds(prev => {
-      const next = new Set(prev);
-      next.add(articleId);
-      return next;
-    });
+    setSavingArticleIds((prev) => new Set(prev).add(articleId));
 
     try {
       if (isSaved) {
-        const { error } = await supabase
+        await supabase
           .from('saved_articles')
           .delete()
           .eq('user_id', resolvedUserId)
           .eq('article_id', articleId);
-
-        if (error) throw error;
       } else {
-        const { error } = await supabase
+        await supabase
           .from('saved_articles')
           .insert({ user_id: resolvedUserId, article_id: articleId });
-
-        if (error) {
-          console.error("Supabase insert error:", error);
-          throw error;
-        }
-
-        // First-time save onboarding toast
-        if (!localStorage.getItem('tark_first_save_seen')) {
-          localStorage.setItem('tark_first_save_seen', 'true');
-          setToastMsg('Saved! You can view your saved insights and articles in your Profile section.');
-        }
+        setToastMsg('Saved to your Profile Ledger.');
       }
     } catch (err) {
-      console.error("Bookmark toggle error:", err);
-      // Revert optimistic update on error
-      setSavedArticleIds(prev => {
+      console.error('Bookmark error:', err);
+      setSavedArticleIds((prev) => {
         const next = new Set(prev);
-        if (isSaved) {
-          next.add(articleId);
-        } else {
-          next.delete(articleId);
-        }
+        if (isSaved) next.add(articleId);
+        else next.delete(articleId);
         return next;
       });
     } finally {
-      setSavingArticleIds(prev => {
+      setSavingArticleIds((prev) => {
         const next = new Set(prev);
         next.delete(articleId);
         return next;
@@ -372,527 +336,805 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
     }
   };
 
-  // Use server-filtered items directly
-  const filteredItems = items;
+  // Filter & Search computation
+  const displayedItems = useMemo(() => {
+    let list = items;
 
-  const resetFilters = () => {
+    // Category Tab Filtering
+    if (activeCategoryTab !== 'ALL') {
+      const tab = CATEGORY_TABS.find((t) => t.id === activeCategoryTab);
+      if (tab?.keywords) {
+        list = list.filter((item) =>
+          tab.keywords.some(
+            (kw) =>
+              item.ministry?.toLowerCase().includes(kw.toLowerCase()) ||
+              item.headline?.toLowerCase().includes(kw.toLowerCase())
+          )
+        );
+      }
+    }
+
+    // Search Query Filtering
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (item) =>
+          item.headline?.toLowerCase().includes(q) ||
+          item.ministry?.toLowerCase().includes(q) ||
+          item.source?.toLowerCase().includes(q) ||
+          item.summary?.bullets?.some((b) => b.toLowerCase().includes(q))
+      );
+    }
+
+    return list;
+  }, [items, activeCategoryTab, searchQuery]);
+
+  const leadItem = displayedItems[0] || null;
+  const standardItems = displayedItems.slice(1);
+
+  const activeFilterCount =
+    (selectedMinistry !== 'ALL' ? 1 : 0) +
+    (selectedSource !== 'ALL' ? 1 : 0) +
+    (startDate || endDate ? 1 : 0);
+
+  const resetAllFilters = () => {
     setSelectedMinistry('ALL');
     setSelectedSource('ALL');
     setStartDate('');
     setEndDate('');
-    setDateError('');
-  };
-
-  const formatCooldown = (seconds: number): string => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    setActiveCategoryTab('ALL');
+    setSearchQuery('');
+    setPage(0);
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-stone-150 p-4 md:p-8 flex flex-col md:flex-row gap-6">
-
-      {/* Sidebar Filters */}
-      <div className="w-full md:w-64 shrink-0 bg-zinc-900/10 border border-zinc-900 p-6 self-start rounded-sm">
-        <div 
-          className={`flex items-center justify-between pb-4 cursor-pointer transition-colors hover:text-white group ${isFiltersOpen ? 'mb-6 border-b border-zinc-900' : ''}`}
-          onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-        >
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-zinc-500 group-hover:text-zinc-300 transition-colors" />
-            <h3 className="font-sans font-semibold text-xs uppercase tracking-widest text-[#e0d0ab] group-hover:text-white transition-colors">Filters</h3>
+    <div className="w-full min-h-screen text-stone-100 font-sans pb-24">
+      
+      {/* ── Editorial Masthead Header ── */}
+      <div className="border-b border-zinc-800/80 pb-8 mb-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#e0d0ab] font-bold">
+                Government Policy Intelligence &bull; Daily Gazette
+              </span>
+            </div>
+            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">
+              The Daily Brief <span className="font-serif font-normal text-[#e0d0ab] text-2xl sm:text-3xl">| दैनिक नीति संकेत</span>
+            </h1>
+            <p className="text-zinc-400 text-xs sm:text-sm font-sans mt-2 max-w-2xl leading-relaxed">
+              Continuous, high-signal distillation of press releases, cabinet decisions, and gazette notifications stripped of bureaucratic filler for UPSC CSE and State PSCs.
+            </p>
           </div>
-          {(selectedMinistry !== 'ALL' || selectedSource !== 'ALL') && (
+
+          {/* Quick Actions Bar */}
+          <div className="flex items-center gap-3 shrink-0">
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedMinistry('ALL');
-                setSelectedSource('ALL');
-                setStartDate('');
-                setEndDate('');
-                setPage(0);
-              }}
-              className="text-[#e0d0ab] hover:text-white transition-colors flex items-center gap-1 text-[10px] uppercase font-mono tracking-wider cursor-pointer"
-              id="reset-filters"
+              onClick={() => setShowPibModal(true)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-[#e0d0ab]/60 text-zinc-200 hover:text-[#e0d0ab] rounded-sm text-xs font-mono font-semibold transition-all shadow-sm cursor-pointer"
             >
-              <RotateCcw className="w-3 h-3" />
-              Reset
+              <BookOpen className="w-4 h-4 text-[#e0d0ab]" />
+              <span>PIB Gazette Dossiers</span>
             </button>
-          )}
+
+            <button
+              onClick={handleSyncFeed}
+              disabled={syncing || syncCooldown > 0}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 rounded-sm text-xs font-mono font-bold uppercase tracking-wider transition-all disabled:opacity-50 cursor-pointer shadow-md shadow-[#e0d0ab]/10"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
+              <span>{syncing ? 'Syncing...' : syncCooldown > 0 ? `${syncCooldown}s` : 'Fetch Live'}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Search & Horizontal Category Filter Tabs ── */}
+      <div className="space-y-4 mb-8">
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+          
+          {/* Category Tabs */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 lg:pb-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {CATEGORY_TABS.map((tab) => {
+              const isActive = activeCategoryTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveCategoryTab(tab.id)}
+                  className={`px-3.5 py-1.5 rounded-sm text-xs font-mono tracking-wide whitespace-nowrap transition-all cursor-pointer border ${
+                    isActive
+                      ? 'bg-[#e0d0ab] text-zinc-950 font-bold border-[#e0d0ab] shadow-sm'
+                      : 'bg-zinc-900/60 text-zinc-400 border-zinc-800/80 hover:text-stone-200 hover:border-zinc-700'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Search Input & Deep Filter Toggle */}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1 lg:w-72">
+              <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search policy briefs, ministries, keywords..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-1.5 bg-zinc-900/90 border border-zinc-800 rounded-sm text-xs font-sans text-stone-200 placeholder-zinc-500 focus:outline-none focus:border-[#e0d0ab]/60 focus:ring-1 focus:ring-[#e0d0ab]/30"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            <button
+              onClick={() => setIsFilterDrawerOpen(!isFilterDrawerOpen)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm border text-xs font-mono font-medium transition-all cursor-pointer ${
+                activeFilterCount > 0 || isFilterDrawerOpen
+                  ? 'bg-zinc-900 border-[#e0d0ab]/60 text-[#e0d0ab]'
+                  : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-stone-200'
+              }`}
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <span>Filters</span>
+              {activeFilterCount > 0 && (
+                <span className="w-4 h-4 rounded-full bg-[#e0d0ab] text-zinc-950 font-bold text-[9px] flex items-center justify-center ml-0.5">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
 
+        {/* Expandable Refined Filter Tray */}
         <AnimatePresence>
-          {isFiltersOpen && (
+          {isFilterDrawerOpen && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2, ease: "easeInOut" }}
-              className="overflow-hidden"
+              className="overflow-hidden bg-zinc-900/40 border border-zinc-800/80 rounded-sm p-4 backdrop-blur-md"
             >
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
+                <div>
+                  <label className="block text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold mb-1.5">
+                    Ministry / Department
+                  </label>
+                  <select
+                    value={selectedMinistry}
+                    onChange={(e) => setSelectedMinistry(e.target.value)}
+                    className="w-full px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-sm text-xs font-sans text-stone-200 focus:outline-none focus:border-[#e0d0ab]"
+                  >
+                    <option value="ALL">All Ministries ({items.length})</option>
+                    {ministries.map((min) => (
+                      <option key={min} value={min}>
+                        {min}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-        {/* Ministry Filter */}
-        <div className="mb-6">
-          <label className="block text-[9px] font-mono uppercase tracking-widest text-zinc-500 font-bold mb-2.5">
-            Government Ministries
-          </label>
-          <div className="space-y-1 max-h-56 overflow-y-auto pr-1 custom-scrollbar">
-            <button
-              onClick={() => setSelectedMinistry('ALL')}
-              className={`w-full text-left px-2.5 py-2 text-xs font-sans transition-colors rounded-sm flex items-center justify-between cursor-pointer ${selectedMinistry === 'ALL'
-                  ? 'bg-zinc-900 text-stone-150 font-medium border border-zinc-800'
-                  : 'text-zinc-550 hover:text-stone-300 hover:bg-zinc-900/40'
-                }`}
-            >
-              <span className="truncate">All Departments</span>
-              <span className="text-[10px] opacity-60">({items.length})</span>
-            </button>
-            {ministries.map(min => {
-              const count = items.filter(i => i.ministry === min).length;
-              return (
-                <button
-                  key={min}
-                  onClick={() => setSelectedMinistry(min)}
-                  className={`w-full text-left px-2.5 py-2 text-xs font-sans transition-colors rounded-sm flex items-center justify-between cursor-pointer ${selectedMinistry === min
-                      ? 'bg-zinc-900 text-stone-150 font-medium border border-[#e0d0ab]/30'
-                      : 'text-zinc-550 hover:text-stone-300 hover:bg-zinc-900/40'
-                    }`}
-                >
-                  <span className="truncate" title={min}>{min}</span>
-                  <span className="text-[10px] opacity-60">({count})</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+                <div>
+                  <label className="block text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold mb-1.5">
+                    Verified Source
+                  </label>
+                  <select
+                    value={selectedSource}
+                    onChange={(e) => setSelectedSource(e.target.value)}
+                    className="w-full px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-sm text-xs font-sans text-stone-200 focus:outline-none focus:border-[#e0d0ab]"
+                  >
+                    <option value="ALL">All Sources ({sources.length})</option>
+                    {sources.map((src) => (
+                      <option key={src} value={src}>
+                        {src}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-        {/* Date Range Filter */}
-        <div className="mb-6">
-          <label className="block text-[9px] font-mono uppercase tracking-widest text-zinc-500 font-bold mb-2.5">
-            <Calendar className="w-3 h-3 inline mr-1.5" />
-            Date Range
-          </label>
-          <div className="space-y-2">
-            <div>
-              <span className="block text-[8px] font-mono text-zinc-600 uppercase tracking-wider mb-1">From</span>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => { setStartDate(e.target.value); setPage(0); }}
-                className="w-full px-2.5 py-1.5 text-[11px] font-sans bg-zinc-900 border border-zinc-800 rounded-sm text-zinc-300 focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50 focus:border-[#e0d0ab]/50 [color-scheme:dark]"
-              />
-            </div>
-            <div>
-              <span className="block text-[8px] font-mono text-zinc-600 uppercase tracking-wider mb-1">To</span>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => { setEndDate(e.target.value); setPage(0); }}
-                className="w-full px-2.5 py-1.5 text-[11px] font-sans bg-zinc-900 border border-zinc-800 rounded-sm text-zinc-300 focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50 focus:border-[#e0d0ab]/50 [color-scheme:dark]"
-              />
-            </div>
-            {(startDate || endDate) && (
-              <button
-                onClick={() => {
-                  setStartDate('');
-                  setEndDate('');
-                  setPage(0);
-                }}
-                className="w-full text-left text-[9px] text-zinc-600 hover:text-rose-400 transition-colors font-mono uppercase tracking-wider pt-1"
-              >
-                Clear dates
-              </button>
-            )}
-          </div>
-        </div>
+                <div>
+                  <label className="block text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold mb-1.5">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-sm text-xs font-sans text-stone-200 [color-scheme:dark]"
+                  />
+                </div>
 
-        {/* Source Filter */}
-        <div>
-          <label className="block text-[9px] font-mono uppercase tracking-widest text-zinc-500 font-bold mb-2.5">
-            Publication Source
-          </label>
-          <div className="space-y-1">
-            <button
-              onClick={() => setSelectedSource('ALL')}
-              className={`w-full text-left px-2.5 py-2 text-xs font-sans transition-colors rounded-sm flex items-center justify-between cursor-pointer ${selectedSource === 'ALL'
-                  ? 'bg-zinc-900 text-stone-150 font-medium border border-zinc-800'
-                  : 'text-zinc-550 hover:text-stone-300 hover:bg-zinc-900/40'
-                }`}
-            >
-              <span>All Sources</span>
-              <span className="text-[10px] opacity-60">({items.length})</span>
-            </button>
-            {sources.map(src => {
-              const count = items.filter(i => i.source === src).length;
-              return (
-                <button
-                  key={src}
-                  onClick={() => setSelectedSource(src)}
-                  className={`w-full text-left px-2.5 py-2 text-xs font-sans transition-colors rounded-sm flex items-center justify-between cursor-pointer ${selectedSource === src
-                      ? 'bg-zinc-900 text-stone-150 font-medium border border-[#e0d0ab]/30'
-                      : 'text-zinc-550 hover:text-stone-300 hover:bg-zinc-900/40'
-                    }`}
-                >
-                  <span className="truncate">{src}</span>
-                  <span className="text-[10px] opacity-60">({count})</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        </motion.div>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <label className="block text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold mb-1.5">
+                      End Date
+                    </label>
+                    <input
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="w-full px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-sm text-xs font-sans text-stone-200 [color-scheme:dark]"
+                    />
+                  </div>
+                  {activeFilterCount > 0 && (
+                    <button
+                      onClick={resetAllFilters}
+                      className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-sm text-xs font-mono flex items-center gap-1 shrink-0 cursor-pointer"
+                      title="Reset all filters"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>Reset</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </motion.div>
           )}
         </AnimatePresence>
-
-        {/* PIB Digest Trigger Button */}
-        <div className={`border-t border-zinc-900 ${isFiltersOpen ? 'mt-8 pt-6' : 'pt-4'}`}>
-          <button
-            onClick={() => setShowPibModal(true)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-zinc-900/40 hover:bg-zinc-900 border border-zinc-800 hover:border-[#e0d0ab]/50 text-stone-300 hover:text-[#e0d0ab] rounded-sm transition-all focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50 shadow-sm cursor-pointer"
-          >
-            <BookOpen className="w-4 h-4" />
-            <span className="text-xs font-sans font-bold tracking-wider uppercase">PIB Digests</span>
-          </button>
-        </div>
       </div>
 
-      {/* Main Dashboard Feed */}
-      <div className="flex-1 min-w-0">
-
-        {/* Sleek Action Header banner */}
-        <div className="mb-8 flex flex-col justify-between items-start gap-4 border-b border-zinc-900 pb-6">
-          <div className="space-y-3 w-full">
-            <div className="flex items-center flex-wrap gap-4">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-zinc-900 border border-zinc-800 text-[11px] font-sans font-bold tracking-wider uppercase text-[#e0d0ab] rounded-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Administrative Intelligence Feed
-              </div>
-              <div className="flex items-center gap-1.5 text-[10px] font-sans font-bold tracking-[0.15em] uppercase text-zinc-600 select-none">
-                <RefreshCw className="w-3 h-3 opacity-50" />
-                <span>Autonomously synced 3x daily</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <h2 className="text-2xl font-sans font-bold tracking-tight text-white">Tark Current Affairs</h2>
-            </div>
-            <p className="text-zinc-500 text-xs font-sans max-w-3xl leading-relaxed">
-              High-signal, verified executive summaries processed straight from administrative press channels.
-            </p>
+      {/* ── Error Banner ── */}
+      {errorMsg && (
+        <div className="mb-6 p-4 bg-rose-950/20 border border-rose-800/40 text-rose-300 text-xs rounded-sm flex items-start gap-3">
+          <AlertCircle className="w-4 h-4 text-rose-400 mt-0.5 shrink-0" />
+          <div>
+            <h5 className="font-bold">Sync Advisory</h5>
+            <p className="opacity-90">{errorMsg}</p>
           </div>
         </div>
+      )}
 
-        {errorMsg && (
-          <div className="mb-6 p-4 bg-rose-950/10 border border-rose-950/40 text-rose-400 text-xs rounded-sm flex items-start gap-3">
-            <AlertCircle className="w-4 h-4 text-rose-500 mt-0.5 shrink-0" />
-            <div className="space-y-1">
-              <h5 className="font-bold">Sync Error</h5>
-              <p className="opacity-90 leading-relaxed">{errorMsg}</p>
+      {/* ── Loading Skeleton ── */}
+      {loading ? (
+        <div className="space-y-6">
+          {/* Hero skeleton */}
+          <div className="p-8 bg-zinc-900/20 border border-zinc-800 rounded-sm animate-pulse space-y-4">
+            <div className="h-4 w-32 bg-zinc-800 rounded" />
+            <div className="h-8 w-3/4 bg-zinc-800 rounded" />
+            <div className="space-y-2 pt-2">
+              <div className="h-3.5 w-full bg-zinc-800/60 rounded" />
+              <div className="h-3.5 w-5/6 bg-zinc-800/60 rounded" />
             </div>
           </div>
-        )}
-
-        {loading ? (
-          /* Skeleton Feed */
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 animate-fade-in">
-            {[1, 2, 3].map(n => (
-              <div key={n} className="bg-zinc-900/10 border border-zinc-905 p-6 space-y-4 rounded-sm animate-pulse">
-                <div className="flex items-center gap-3">
-                  <div className="h-4 w-28 bg-zinc-900 rounded-sm"></div>
-                  <div className="h-4 w-12 bg-zinc-900 rounded-sm"></div>
-                </div>
-                <div className="h-6 w-3/4 bg-zinc-900 rounded-sm"></div>
-                <div className="space-y-2">
-                  <div className="h-3.5 w-full bg-zinc-900/55 rounded-sm"></div>
-                  <div className="h-3.5 w-5/6 bg-zinc-900/55 rounded-sm"></div>
-                  <div className="h-3.5 w-4/5 bg-zinc-900/55 rounded-sm"></div>
-                </div>
+          {/* List skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[1, 2, 3, 4].map((n) => (
+              <div key={n} className="p-5 bg-zinc-900/10 border border-zinc-800/60 rounded-sm animate-pulse space-y-3">
+                <div className="h-3.5 w-24 bg-zinc-800 rounded" />
+                <div className="h-5 w-4/5 bg-zinc-800 rounded" />
+                <div className="h-3 w-full bg-zinc-800/50 rounded" />
               </div>
             ))}
           </div>
-        ) : filteredItems.length === 0 ? (
-          /* Sleek Empty State */
-          <div className="flex flex-col items-center justify-center p-14 border border-dashed border-zinc-850 text-center rounded-sm bg-zinc-900/5">
-            <Inbox className="w-9 h-9 text-zinc-700 mb-4" />
-            <h4 className="text-xs uppercase font-mono tracking-wider font-bold text-stone-200 mb-1">Policy brief index empty</h4>
-            <p className="text-zinc-500 text-sm max-w-md mx-auto leading-relaxed">
-              No daily updates ingested under these parameters. The system autonomously synchronizes the latest high-signal press items 3 times a day. Check back later.
-            </p>
-          </div>
-        ) : (
-          /* Grid/List of Curated Items */
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            <AnimatePresence mode="popLayout">
-              {filteredItems.map((item, idx) => {
-                const bullets = item.summary?.bullets || [];
-                const articleId = item.id || '';
+        </div>
+      ) : displayedItems.length === 0 ? (
+        /* ── Empty State ── */
+        <div className="flex flex-col items-center justify-center p-16 border border-dashed border-zinc-800 rounded-sm bg-zinc-900/10 text-center">
+          <Inbox className="w-10 h-10 text-zinc-600 mb-3" />
+          <h3 className="font-mono text-sm font-bold uppercase tracking-wider text-stone-200 mb-1">
+            No Dispatches Ingested For Selected Parameters
+          </h3>
+          <p className="text-zinc-500 text-xs max-w-md mx-auto mb-4">
+            Try adjusting your search keywords, switching category tabs, or clearing your date filters.
+          </p>
+          <button
+            onClick={resetAllFilters}
+            className="px-4 py-2 bg-zinc-900 border border-zinc-700 text-[#e0d0ab] text-xs font-mono rounded-sm hover:border-[#e0d0ab] transition-all cursor-pointer"
+          >
+            Clear All Filters
+          </button>
+        </div>
+      ) : (
+        /* ── Editorial Content Stream ── */
+        <div className="space-y-8">
+          
+          {/* 1. LEAD STORY (HERO DISPATCH) */}
+          {leadItem && (
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-gradient-to-br from-zinc-900/50 via-zinc-900/30 to-zinc-950 border border-zinc-800 hover:border-[#e0d0ab]/50 rounded-sm p-6 sm:p-8 relative overflow-hidden transition-all shadow-xl backdrop-blur-sm group"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="px-2.5 py-0.5 bg-[#e0d0ab] text-zinc-950 text-[10px] font-mono font-bold uppercase tracking-widest rounded-sm">
+                    LEAD SIGNAL
+                  </span>
+                  <span className="px-2 py-0.5 bg-zinc-800 text-[#e0d0ab] text-[10px] font-mono uppercase tracking-wider rounded-sm border border-zinc-700">
+                    {leadItem.ministry}
+                  </span>
+                  <span className="text-zinc-500 text-[10px] font-mono uppercase">
+                    {leadItem.source}
+                  </span>
+                </div>
+
+                {leadItem.created_at && (
+                  <span className="text-[11px] font-mono text-zinc-400 flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-zinc-500" />
+                    {new Date(leadItem.created_at).toLocaleDateString('en-GB', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
+                    })}
+                  </span>
+                )}
+              </div>
+
+              {/* Lead Headline */}
+              <h2
+                onClick={() => setSelectedDossier(leadItem)}
+                className="font-serif text-xl sm:text-2xl md:text-3xl font-bold text-white group-hover:text-[#e0d0ab] transition-colors leading-tight mb-4 cursor-pointer"
+              >
+                {leadItem.headline}
+              </h2>
+
+              {/* Curated Bullets */}
+              {leadItem.summary?.bullets && leadItem.summary.bullets.length > 0 && (
+                <div className="space-y-2 mb-6 max-w-4xl">
+                  {leadItem.summary.bullets.slice(0, 3).map((bullet, idx) => (
+                    <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-zinc-300 font-sans leading-relaxed">
+                      <span className="text-[#e0d0ab] font-bold mt-0.5 select-none">&bull;</span>
+                      <p>{bullet}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Footer Actions */}
+              <div className="flex items-center justify-between pt-4 border-t border-zinc-800/80">
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => toggleBookmark(leadItem.id || '')}
+                    disabled={savingArticleIds.has(leadItem.id || '')}
+                    className={`inline-flex items-center gap-1.5 text-xs font-mono font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
+                      savedArticleIds.has(leadItem.id || '')
+                        ? 'text-emerald-400 hover:text-emerald-300'
+                        : 'text-zinc-400 hover:text-[#e0d0ab]'
+                    }`}
+                  >
+                    <Bookmark
+                      className={`w-4 h-4 ${
+                        savedArticleIds.has(leadItem.id || '') ? 'fill-emerald-400 text-emerald-400' : 'text-current'
+                      }`}
+                    />
+                    <span>{savedArticleIds.has(leadItem.id || '') ? 'Saved to Ledger' : 'Save Brief'}</span>
+                  </button>
+
+                  <button
+                    onClick={() => setSelectedDossier(leadItem)}
+                    className="text-xs font-mono text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1"
+                  >
+                    <span>Read Full Dossier</span>
+                    <ChevronRight className="w-3.5 h-3.5 text-[#e0d0ab]" />
+                  </button>
+                </div>
+
+                {leadItem.url && (
+                  <a
+                    href={leadItem.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs font-mono text-[#e0d0ab] hover:underline cursor-pointer"
+                  >
+                    <span>Gov Source</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </a>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {/* 2. CHRONOLOGICAL GAZETTE FEED */}
+          <div>
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-3 mb-6">
+              <h3 className="font-mono text-xs uppercase tracking-widest text-[#e0d0ab] font-bold flex items-center gap-2">
+                <Layers className="w-3.5 h-3.5" />
+                Chronological Policy Dispatches ({displayedItems.length})
+              </h3>
+              <span className="text-[10px] font-mono text-zinc-500">
+                Page {page + 1} &bull; Sorted by Recency
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {standardItems.map((item, idx) => {
+                const articleId = item.id || `item-${idx}`;
                 const isSaved = savedArticleIds.has(articleId);
-                const isSaving = savingArticleIds.has(articleId);
 
                 return (
                   <motion.div
-                    key={item.id || idx}
-                    initial={{ opacity: 0, y: 12 }}
+                    key={articleId}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -12 }}
-                    className="bg-zinc-900/15 hover:bg-zinc-900/35 border border-zinc-900 p-5 transition-all duration-300 ease-out rounded-sm hover:border-[#e0d0ab]/35 hover:-translate-y-1 hover:shadow-[0_12px_24px_rgba(0,0,0,0.6)] flex flex-col justify-between group relative"
+                    transition={{ duration: 0.3, delay: Math.min(idx * 0.03, 0.3) }}
+                    className="bg-zinc-900/25 hover:bg-zinc-900/50 border border-zinc-800/80 hover:border-[#e0d0ab]/40 p-5 rounded-sm flex flex-col justify-between transition-all duration-200 group backdrop-blur-sm"
                   >
                     <div>
-                      {/* Badge Meta Stack */}
-                      <div className="flex items-center gap-2 mb-3.5 flex-wrap">
-                        <span className="px-2 py-0.5 text-[10px] uppercase tracking-wider font-sans font-semibold bg-zinc-900 text-[#e0d0ab] rounded-sm border border-zinc-800">
+                      {/* Meta Tags */}
+                      <div className="flex items-center justify-between gap-2 mb-3">
+                        <span className="px-2 py-0.5 bg-zinc-800/90 text-[#e0d0ab] text-[10px] font-mono uppercase tracking-wider rounded-sm border border-zinc-700/60 truncate max-w-[200px]">
                           {item.ministry}
                         </span>
-                        <span className="px-2 py-0.5 text-[10px] uppercase tracking-wider font-sans font-semibold bg-zinc-950 text-zinc-400 rounded-sm border border-zinc-900">
-                          {item.source}
-                        </span>
+                        {item.created_at && (
+                          <span className="text-[10px] font-mono text-zinc-500">
+                            {new Date(item.created_at).toLocaleDateString('en-GB', {
+                              day: '2-digit',
+                              month: 'short',
+                            })}
+                          </span>
+                        )}
                       </div>
 
-                      {/* Headline PROMINENT */}
-                      <h3 className="text-sm font-sans font-extrabold text-[#e0d0ab] group-hover:text-white transition-colors leading-snug tracking-tight mb-3">
+                      {/* Headline */}
+                      <h4
+                        onClick={() => setSelectedDossier(item)}
+                        className="font-serif text-sm font-bold text-stone-100 group-hover:text-[#e0d0ab] transition-colors leading-snug mb-3 cursor-pointer"
+                      >
                         {item.headline}
-                      </h3>
+                      </h4>
 
-                      {/* Curated SUMMARY - 3 Bullet policy summaries nicely spaced */}
-                      {bullets.length > 0 && (
-                        <div className="pl-3 border-l border-[#e0d0ab]/20 space-y-2 mb-5">
-                          {bullets.map((bullet, bIdx) => (
-                            <div key={bIdx} className="flex gap-2 text-[11px] text-stone-300 leading-relaxed font-sans">
-                              <span className="text-[#e0d0ab] font-bold select-none">•</span>
-                              <p>{bullet}</p>
-                            </div>
+                      {/* Summary bullets */}
+                      {item.summary?.bullets && item.summary.bullets.length > 0 && (
+                        <ul className="space-y-1.5 mb-4">
+                          {item.summary.bullets.slice(0, 2).map((b, bIdx) => (
+                            <li key={bIdx} className="text-xs text-zinc-400 font-sans leading-relaxed flex items-start gap-2">
+                              <span className="text-[#e0d0ab] font-bold mt-0.5 select-none">•</span>
+                              <span className="line-clamp-2">{b}</span>
+                            </li>
                           ))}
-                        </div>
+                        </ul>
                       )}
                     </div>
 
-                    {/* Action Footer: Bookmark + External Link */}
-                    <div className="flex items-center justify-between pt-3 border-t border-zinc-900/40">
-                      {/* Bookmark Icon */}
+                    {/* Action Bar */}
+                    <div className="flex items-center justify-between pt-3 border-t border-zinc-800/60 text-xs font-mono">
                       <button
                         onClick={() => toggleBookmark(articleId)}
-                        disabled={isSaving}
-                        className={`inline-flex items-center gap-1 text-[10px] font-sans font-bold uppercase tracking-wider transition-colors cursor-pointer ${isSaved
-                            ? 'text-emerald-400 hover:text-emerald-300'
-                            : 'text-zinc-500 hover:text-[#e0d0ab]'
-                          } disabled:opacity-50`}
-                        title={isSaved ? 'Remove bookmark' : 'Bookmark this article'}
+                        disabled={savingArticleIds.has(articleId)}
+                        className={`inline-flex items-center gap-1 font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
+                          isSaved ? 'text-emerald-400' : 'text-zinc-500 hover:text-[#e0d0ab]'
+                        }`}
                       >
-                        <Bookmark
-                          className={`w-3.5 h-3.5 transition-all ${isSaved ? 'fill-emerald-500 text-emerald-500' : 'text-current'
-                            }`}
-                        />
+                        <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-emerald-400' : ''}`} />
                         <span>{isSaved ? 'Saved' : 'Save'}</span>
                       </button>
 
-                      {/* External Link */}
-                      {item.url && (
-                        <a
-                          href={item.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-[10px] font-sans font-bold uppercase tracking-wider text-[#e0d0ab]/90 hover:text-white transition-colors cursor-pointer"
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => setSelectedDossier(item)}
+                          className="text-zinc-400 hover:text-stone-100 transition-colors cursor-pointer"
                         >
-                          Access Original release
-                          <ExternalLink className="w-3 h-3 text-[#e0d0ab]/90" />
-                        </a>
-                      )}
+                          Dossier
+                        </button>
+                        {item.url && (
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#e0d0ab] hover:underline flex items-center gap-0.5 cursor-pointer"
+                          >
+                            <span>Source</span>
+                            <ArrowUpRight className="w-3 h-3" />
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </motion.div>
                 );
               })}
-            </AnimatePresence>
+            </div>
           </div>
-        )}
 
-        {/* Deep Archive Pagination */}
-        {!loading && hasMore && filteredItems.length > 0 && (
-          <div className="flex justify-center mt-12 mb-8 border-t border-zinc-900 pt-12">
-            <button
-              onClick={() => setPage(prev => prev + 1)}
-              className="px-8 py-4 bg-zinc-950 border-2 border-zinc-800 text-stone-300 font-sans font-bold text-xs uppercase tracking-[0.2em] hover:bg-zinc-900 hover:border-[#e0d0ab] hover:text-[#e0d0ab] transition-all cursor-pointer shadow-[0_0_15px_rgba(0,0,0,0.5)]"
-            >
-              [ Retrieve Older Dispatches ]
-            </button>
-          </div>
-        )}
-
-        {/* Toast Notifications */}
-        <AnimatePresence>
-          {toastMsg && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] px-6 py-3 bg-zinc-900 border border-zinc-700/60 rounded-sm shadow-2xl"
-            >
-              <p className="text-xs text-stone-200 font-sans whitespace-nowrap">
-                {toastMsg}
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Background Sync Toast: shown when 202 Accepted returned */}
-        <AnimatePresence>
-          {showBackgroundToast && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[300] px-6 py-3 bg-zinc-900 border border-emerald-800/60 rounded-sm shadow-2xl"
-            >
-              <p className="text-xs text-emerald-300 font-sans whitespace-nowrap flex items-center gap-2">
-                <RefreshCw className="w-3 h-3 animate-spin text-emerald-400" />
-                Extraction initialized. Updates will pop live in your ledger momentarily.
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        {/* PIB Digest Modal */}
-        <AnimatePresence>
-          {showPibModal && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowPibModal(false)}
-              className="fixed inset-0 z-[500] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
-            >
-              <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 24 }}
-                transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-                onClick={(e) => e.stopPropagation()}
-                className={`relative w-full max-w-4xl max-h-[90vh] flex flex-col bg-surface text-on-surface rounded-sm shadow-[0_32px_80px_rgba(0,0,0,0.7)] overflow-hidden ${isLightMode ? 'light-theme' : ''}`}
+          {/* ── Pagination ── */}
+          {hasMore && (
+            <div className="flex justify-center pt-8">
+              <button
+                onClick={() => setPage((prev) => prev + 1)}
+                className="px-8 py-3 bg-zinc-900 border border-zinc-800 hover:border-[#e0d0ab] text-stone-200 hover:text-[#e0d0ab] text-xs font-mono uppercase tracking-widest rounded-sm transition-all shadow-md cursor-pointer"
               >
-                {/* Masthead Bar */}
-                <div className="flex-shrink-0 flex flex-col border-b border-primary-container/20 bg-surface-dim relative">
-                  <div className="flex items-center justify-between px-6 py-3">
-                    <span className="font-mono text-sm font-bold tracking-[0.25em] uppercase text-on-surface">
-                      CIVIL INTEL PIB
+                [ Retrieve Older Dispatches ]
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Detailed Intelligence Dossier Modal (Slide-Over) ── */}
+      <AnimatePresence>
+        {selectedDossier && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedDossier(null)}
+            className="fixed inset-0 z-[500] bg-black/80 backdrop-blur-sm flex justify-end"
+          >
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-2xl h-full bg-zinc-950 border-l border-zinc-800 p-6 sm:p-8 overflow-y-auto flex flex-col justify-between shadow-2xl"
+            >
+              <div className="space-y-6">
+                {/* Modal Top Bar */}
+                <div className="flex items-center justify-between pb-4 border-b border-zinc-800">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-[#e0d0ab] font-bold">
+                      Intelligence Dossier
                     </span>
-                    <div className="flex items-center gap-5">
-                      <span className="font-mono text-[10px] tracking-widest uppercase text-primary-container/70 hidden sm:inline-block">
-                        {pibDigests.length > 0 ? `${activeDigestIndex + 1} / ${pibDigests.length}` : ''}
-                      </span>
-                      <button
-                        onClick={() => setIsLightMode(!isLightMode)}
-                        className="text-primary-container/60 hover:text-on-surface transition-colors cursor-pointer"
-                        aria-label="Toggle Theme"
-                      >
-                        {isLightMode ? <Moon size={16} /> : <Sun size={16} />}
-                      </button>
-                      <button className="text-primary-container/60 hover:text-on-surface transition-colors cursor-pointer" aria-label="Share">
-                        <Share2 size={16} />
-                      </button>
-                      <button
-                        onClick={() => setShowPibModal(false)}
-                        className="font-mono text-xs font-bold tracking-widest text-primary-container/60 hover:text-on-surface transition-colors cursor-pointer"
-                        aria-label="Close PIB Digest"
-                      >
-                        ✕
-                      </button>
-                    </div>
                   </div>
-                  {/* Reading Progress Bar */}
-                  <div className="absolute bottom-0 left-0 w-full h-[2px] bg-primary-container/10">
-                    <div
-                      className="h-full bg-primary transition-all duration-150 ease-out"
-                      style={{ width: `${scrollProgress}%` }}
-                    />
-                  </div>
+                  <button
+                    onClick={() => setSelectedDossier(null)}
+                    className="p-1.5 text-zinc-500 hover:text-stone-100 transition-colors bg-zinc-900 rounded-sm cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
 
-                {/* Scrollable Body */}
-                <div className="overflow-y-auto flex-1 custom-scrollbar" onScroll={handleScroll}>
-                  {pibDigests.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center p-16 text-center">
-                      <Inbox className="w-8 h-8 text-primary-container/30 mb-4" />
-                      <p className="text-primary-container/50 font-sans text-sm tracking-widest uppercase">
-                        No digests available yet.
-                      </p>
-                    </div>
-                  ) : (
-                    <>
-                      {/* Hero Header */}
-                      <div className="px-8 pt-10 pb-6 text-center border-b border-primary-container/10">
-                        <p className="font-mono text-[10px] font-medium tracking-[0.15em] uppercase text-primary-container mb-4">
-                          Press Information Bureau
-                          {pibDigests[activeDigestIndex]?.date && (
-                            <>
-                              {' | '}
-                              {new Date(pibDigests[activeDigestIndex].date).toLocaleDateString('en-GB', {
-                                day: '2-digit',
-                                month: 'short',
-                                year: 'numeric',
-                              }).toUpperCase()}
-                            </>
-                          )}
-                        </p>
-                        <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-on-surface mb-8 max-w-3xl mx-auto">
-                          {pibDigests[activeDigestIndex]?.title || 'PIB Digest'}
-                        </h2>
-                        <div className="h-[2px] w-full max-w-xl mx-auto bg-primary-container/40 mb-1" />
-                        <div className="h-px w-full max-w-xl mx-auto bg-primary-container/15" />
-                      </div>
-
-                      {/* Markdown Body */}
-                      <div className="px-8 py-10 w-full">
-                        <div className="multi-column text-on-surface-variant first-p-drop-cap">
-                          <ReactMarkdown
-                            remarkPlugins={[remarkGfm]}
-                            rehypePlugins={[rehypeSanitize]}
-                            components={{
-                              p: ({ node, ...props }) => <p className="font-serif text-[16px] leading-[1.7] mb-5 text-justify" {...props} />,
-                              h1: ({ node, ...props }) => <h1 className="font-serif text-[24px] font-bold text-primary border-b border-primary-container/30 pb-2 mb-4 mt-8 break-inside-avoid" {...props} />,
-                              h2: ({ node, ...props }) => <h2 className="font-serif text-[20px] font-bold text-primary border-b border-primary-container/20 pb-2 mb-4 mt-6 break-inside-avoid" {...props} />,
-                              h3: ({ node, ...props }) => <h3 className="font-serif text-[18px] font-bold text-on-surface mb-3 mt-6 break-inside-avoid" {...props} />,
-                              h4: ({ node, ...props }) => <h4 className="font-serif text-[16px] font-bold text-on-surface mb-2 mt-4 break-inside-avoid" {...props} />,
-                              ul: ({ node, ...props }) => <ul className="font-serif list-square pl-5 mb-6 mt-2 text-[15px] leading-[1.7]" {...props} />,
-                              ol: ({ node, ...props }) => <ol className="font-serif list-decimal pl-5 mb-6 mt-2 text-[15px] leading-[1.7]" {...props} />,
-                              li: ({ node, ...props }) => <li className="mb-2 pl-1" {...props} />,
-                              strong: ({ node, ...props }) => <strong className="text-primary font-semibold" {...props} />,
-                              blockquote: ({ node, ...props }) => <blockquote className="font-serif border-l-[3px] border-primary-container/50 pl-4 py-1 italic my-6 text-on-surface-variant break-inside-avoid" {...props} />,
-                              table: ({ node, ...props }) => <div className="overflow-x-auto w-full mb-8 border border-primary-container/30 break-inside-avoid shadow-sm"><table className="w-full font-mono text-[11px] md:text-[12px] border-collapse bg-surface-dim/30" {...props} /></div>,
-                              thead: ({ node, ...props }) => <thead className="bg-surface-container-highest" {...props} />,
-                              th: ({ node, ...props }) => <th className="font-mono text-primary-container font-bold uppercase tracking-widest border border-primary-container/30 p-3 text-left" {...props} />,
-                              td: ({ node, ...props }) => <td className="font-mono border border-primary-container/20 p-3" {...props} />,
-                            }}
-                          >
-                            {pibDigests[activeDigestIndex]?.content || 'No content available.'}
-                          </ReactMarkdown>
-                        </div>
-                      </div>
-                    </>
+                {/* Metadata Pills */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2.5 py-1 bg-zinc-900 text-[#e0d0ab] text-xs font-mono font-semibold rounded-sm border border-zinc-800">
+                    {selectedDossier.ministry}
+                  </span>
+                  <span className="px-2.5 py-1 bg-zinc-900 text-zinc-400 text-xs font-mono rounded-sm border border-zinc-800">
+                    {selectedDossier.source}
+                  </span>
+                  {selectedDossier.created_at && (
+                    <span className="text-xs font-mono text-zinc-500">
+                      {new Date(selectedDossier.created_at).toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </span>
                   )}
                 </div>
 
-                {/* Navigation Dock */}
-                <div className="flex-shrink-0 flex items-center justify-between px-8 py-4 border-t border-primary-container/20 bg-surface-dim">
-                  <button
-                    onClick={() => setActiveDigestIndex(Math.max(0, activeDigestIndex - 1))}
-                    disabled={activeDigestIndex === 0}
-                    className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase text-primary-container hover:text-on-surface transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    [ PREV ]
-                  </button>
-                  <div className="font-mono text-[10px] text-primary-container/50 tracking-widest">
-                    EDITION {activeDigestIndex + 1} OF {pibDigests.length}
+                {/* Title */}
+                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white leading-tight">
+                  {selectedDossier.headline}
+                </h2>
+
+                {/* Structured Synthesis */}
+                <div className="space-y-4 pt-2">
+                  <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[#e0d0ab]">
+                    Key Policy Vectors & Exam Insights
+                  </h4>
+                  <div className="space-y-3 pl-3 border-l-2 border-[#e0d0ab]/30">
+                    {selectedDossier.summary?.bullets?.map((bullet, idx) => (
+                      <p key={idx} className="text-sm text-zinc-300 font-sans leading-relaxed">
+                        {bullet}
+                      </p>
+                    ))}
                   </div>
-                  <button
-                    onClick={() => setActiveDigestIndex(Math.min(pibDigests.length - 1, activeDigestIndex + 1))}
-                    disabled={activeDigestIndex === pibDigests.length - 1}
-                    className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase text-primary-container hover:text-on-surface transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    [ NEXT ]
-                  </button>
                 </div>
-              </motion.div>
+
+                {/* UPSC Syllabus Alignment Hint */}
+                <div className="p-4 bg-zinc-900/40 border border-zinc-800 rounded-sm space-y-1">
+                  <span className="text-[10px] font-mono uppercase text-[#e0d0ab] font-bold">
+                    Examination Context
+                  </span>
+                  <p className="text-xs text-zinc-400 font-sans leading-relaxed">
+                    Relevant for GS Paper II (Governance & Constitutional Framework) and Prelims Current Affairs. Recommended for revision before Mock Tests.
+                  </p>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="flex items-center justify-between pt-6 mt-8 border-t border-zinc-800">
+                <button
+                  onClick={() => toggleBookmark(selectedDossier.id || '')}
+                  className={`inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider px-4 py-2 rounded-sm border transition-all cursor-pointer ${
+                    savedArticleIds.has(selectedDossier.id || '')
+                      ? 'border-emerald-500/60 bg-emerald-500/10 text-emerald-300'
+                      : 'border-zinc-800 bg-zinc-900 text-zinc-300 hover:border-[#e0d0ab]'
+                  }`}
+                >
+                  <Bookmark className={`w-3.5 h-3.5 ${savedArticleIds.has(selectedDossier.id || '') ? 'fill-emerald-400' : ''}`} />
+                  <span>{savedArticleIds.has(selectedDossier.id || '') ? 'Saved to Profile' : 'Save Dossier'}</span>
+                </button>
+
+                {selectedDossier.url && (
+                  <a
+                    href={selectedDossier.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#e0d0ab] text-zinc-950 font-mono text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-stone-100 transition-all cursor-pointer"
+                  >
+                    <span>Read Original Gazette</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                )}
+              </div>
             </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── PIB Digest Newspaper Modal ── */}
+      <AnimatePresence>
+        {showPibModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowPibModal(false)}
+            className="fixed inset-0 z-[600] flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 24 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`relative w-full max-w-4xl max-h-[90vh] flex flex-col bg-surface text-on-surface rounded-sm shadow-2xl overflow-hidden ${
+                isLightMode ? 'light-theme' : ''
+              }`}
+            >
+              {/* Masthead Bar */}
+              <div className="flex-shrink-0 flex flex-col border-b border-primary-container/20 bg-surface-dim relative">
+                <div className="flex items-center justify-between px-6 py-3.5">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-primary" />
+                    <span className="font-mono text-sm font-bold tracking-[0.25em] uppercase text-on-surface">
+                      PIB GAZETTE DOSSIER
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="font-mono text-[10px] tracking-widest uppercase text-primary-container/70 hidden sm:inline-block">
+                      {pibDigests.length > 0 ? `${activeDigestIndex + 1} / ${pibDigests.length}` : ''}
+                    </span>
+                    <button
+                      onClick={() => setIsLightMode(!isLightMode)}
+                      className="text-primary-container/60 hover:text-on-surface transition-colors cursor-pointer"
+                      title="Toggle Light / Dark reading mode"
+                    >
+                      {isLightMode ? <Moon size={16} /> : <Sun size={16} />}
+                    </button>
+                    <button
+                      onClick={() => setShowPibModal(false)}
+                      className="font-mono text-xs font-bold tracking-widest text-primary-container/60 hover:text-on-surface transition-colors cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+                {/* Reading Progress */}
+                <div className="absolute bottom-0 left-0 w-full h-[2px] bg-primary-container/10">
+                  <div
+                    className="h-full bg-primary transition-all duration-150 ease-out"
+                    style={{ width: `${scrollProgress}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Scrollable Newspaper Body */}
+              <div className="overflow-y-auto flex-1 custom-scrollbar" onScroll={handleScroll}>
+                {pibDigests.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center p-16 text-center">
+                    <Inbox className="w-8 h-8 text-primary-container/30 mb-4" />
+                    <p className="text-primary-container/50 font-sans text-sm tracking-widest uppercase">
+                      No PIB digests ingested yet.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="px-8 pt-10 pb-6 text-center border-b border-primary-container/10">
+                      <p className="font-mono text-[10px] font-medium tracking-[0.15em] uppercase text-primary-container mb-3">
+                        Press Information Bureau &bull; Government of India
+                        {pibDigests[activeDigestIndex]?.date && (
+                          <>
+                            {' | '}
+                            {new Date(pibDigests[activeDigestIndex].date).toLocaleDateString('en-GB', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric',
+                            }).toUpperCase()}
+                          </>
+                        )}
+                      </p>
+                      <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-on-surface mb-6 max-w-3xl mx-auto">
+                        {pibDigests[activeDigestIndex]?.title || 'Daily PIB Digest'}
+                      </h2>
+                      <div className="h-[2px] w-full max-w-md mx-auto bg-primary-container/40 mb-1" />
+                    </div>
+
+                    <div className="px-8 py-10 w-full">
+                      <div className="multi-column text-on-surface-variant first-p-drop-cap">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          rehypePlugins={[rehypeSanitize]}
+                          components={{
+                            p: ({ node, ...props }) => <p className="font-serif text-[15px] leading-[1.7] mb-5 text-justify" {...props} />,
+                            h1: ({ node, ...props }) => <h1 className="font-serif text-[22px] font-bold text-primary border-b border-primary-container/30 pb-2 mb-4 mt-6 break-inside-avoid" {...props} />,
+                            h2: ({ node, ...props }) => <h2 className="font-serif text-[18px] font-bold text-primary border-b border-primary-container/20 pb-2 mb-4 mt-5 break-inside-avoid" {...props} />,
+                            h3: ({ node, ...props }) => <h3 className="font-serif text-[16px] font-bold text-on-surface mb-2 mt-4 break-inside-avoid" {...props} />,
+                            ul: ({ node, ...props }) => <ul className="font-serif list-square pl-5 mb-5 mt-2 text-[14px] leading-[1.7]" {...props} />,
+                            ol: ({ node, ...props }) => <ol className="font-serif list-decimal pl-5 mb-5 mt-2 text-[14px] leading-[1.7]" {...props} />,
+                            li: ({ node, ...props }) => <li className="mb-2 pl-1" {...props} />,
+                            strong: ({ node, ...props }) => <strong className="text-primary font-semibold" {...props} />,
+                            blockquote: ({ node, ...props }) => <blockquote className="font-serif border-l-[3px] border-primary-container/50 pl-4 py-1 italic my-5 text-on-surface-variant break-inside-avoid" {...props} />,
+                            table: ({ node, ...props }) => <div className="overflow-x-auto w-full mb-6 border border-primary-container/30 break-inside-avoid shadow-sm"><table className="w-full font-mono text-[11px] border-collapse bg-surface-dim/30" {...props} /></div>,
+                            thead: ({ node, ...props }) => <thead className="bg-surface-container-highest" {...props} />,
+                            th: ({ node, ...props }) => <th className="font-mono text-primary-container font-bold uppercase tracking-widest border border-primary-container/30 p-2.5 text-left" {...props} />,
+                            td: ({ node, ...props }) => <td className="font-mono border border-primary-container/20 p-2.5" {...props} />,
+                          }}
+                        >
+                          {pibDigests[activeDigestIndex]?.content || 'No content available.'}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Navigation Dock */}
+              <div className="flex-shrink-0 flex items-center justify-between px-8 py-3.5 border-t border-primary-container/20 bg-surface-dim">
+                <button
+                  onClick={() => setActiveDigestIndex(Math.max(0, activeDigestIndex - 1))}
+                  disabled={activeDigestIndex === 0}
+                  className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase text-primary-container hover:text-on-surface transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  [ &larr; PREVIOUS EDITION ]
+                </button>
+                <div className="font-mono text-[10px] text-primary-container/60 tracking-widest">
+                  EDITION {activeDigestIndex + 1} OF {pibDigests.length}
+                </div>
+                <button
+                  onClick={() => setActiveDigestIndex(Math.min(pibDigests.length - 1, activeDigestIndex + 1))}
+                  disabled={activeDigestIndex === pibDigests.length - 1}
+                  className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase text-primary-container hover:text-on-surface transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  [ NEXT EDITION &rarr; ]
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Toast Notifications ── */}
+      <AnimatePresence>
+        {toastMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[700] px-6 py-3 bg-zinc-900 border border-zinc-700/80 rounded-sm shadow-2xl"
+          >
+            <p className="text-xs text-stone-200 font-sans whitespace-nowrap">{toastMsg}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Background Sync Toast */}
+      <AnimatePresence>
+        {showBackgroundToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[700] px-6 py-3 bg-zinc-900 border border-emerald-800/80 rounded-sm shadow-2xl"
+          >
+            <p className="text-xs text-emerald-300 font-sans whitespace-nowrap flex items-center gap-2">
+              <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-400" />
+              <span>Scraper dispatched. New intelligence signals will populate momentarily.</span>
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }
