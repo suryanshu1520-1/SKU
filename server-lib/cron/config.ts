@@ -35,9 +35,10 @@ export function getCronConfig(): CronConfig {
   // 1. Fetch from Environment Variables first
   let feeds = splitList(env("FEEDS") || env("RSS_FEEDS") || "");
 
-  // 2. If the array is empty, force the fallback URLs
+  // 2. If the array is empty, force the fallback URLs (including direct PIB primary source)
   if (feeds.length === 0) {
     feeds = [
+      "https://pib.gov.in/RssFeed.aspx?PingID=1",
       "https://economictimes.indiatimes.com/news/economy/policy/rssfeeds/2142142220.cms",
       "https://www.livemint.com/rss/economy",
       "https://www.thehindu.com/news/national/feeder/default.rss"

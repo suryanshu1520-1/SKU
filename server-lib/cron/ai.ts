@@ -40,17 +40,14 @@ function normalizeToThreeBullets(raw: string): string {
     }
   }
 
-  // Phase 4: Force exactly 3 elements
-  while (flattened.length < 3) {
-    flattened.push("Additional context pending.");
-  }
+  // Phase 4: Cap to max 3 elements cleanly without fake padding
   if (flattened.length > 3) {
     // Merge surplus lines into the 3rd element
     const extra = flattened.splice(2, flattened.length - 2);
     flattened[2] = extra.join("; ");
   }
 
-  return flattened.join("\n");
+  return flattened.filter(Boolean).join("\n");
 }
 
 function clampText(input: string, maxChars: number): string {
