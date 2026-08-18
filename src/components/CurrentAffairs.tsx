@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, LayoutGroup, useReducedMotion, useMotionValue, useTransform, animate, type PanInfo } from 'motion/react';
 import {
   ExternalLink,
   Filter,
@@ -22,6 +22,7 @@ import {
   Layers,
   ArrowUpRight,
   ChevronRight,
+  ChevronLeft,
   FileText,
   CheckCircle2,
   AlertCircle
@@ -54,6 +55,15 @@ interface PibDigestItem {
 interface CurrentAffairsProps {
   userId: string;
 }
+
+// Slide-and-fade variants for the PIB edition carousel, keyed by swipe/nav direction.
+// Standard Framer Motion carousel pattern: each exiting child keeps the `custom` value
+// it was rendered with, so it exits toward the side it came from.
+const editionVariants = {
+  enter: (direction: number) => ({ x: direction >= 0 ? 48 : -48, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (direction: number) => ({ x: direction >= 0 ? -48 : 48, opacity: 0 }),
+};
 
 const CATEGORY_TABS = [
   { id: 'ALL', label: 'All Signals' },
@@ -103,6 +113,11 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
   const [activeDigestIndex, setActiveDigestIndex] = useState(0);
   const [isLightMode, setIsLightMode] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [dragDirection, setDragDirection] = useState(0); // -1 prev, 1 next, drives peek direction
+  const editionDragX = useMotionValue(0);
+  const readerBodyRef = useRef<HTMLDivElement>(null);
+
+  const prefersReducedMotion = useReducedMotion();
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
@@ -112,6 +127,55 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
     const progress = maxScroll > 0 ? (target.scrollTop / maxScroll) * 100 : 0;
     setScrollProgress(progress);
   };
+
+  // Navigate to a specific PIB edition with directional awareness (drives the peek-card lean)
+  // and reset the reading-progress + scroll position of the new edition's body.
+  const goToEdition = useCallback((nextIndex: number) => {
+    setActiveDigestIndex((prev) => {
+      const clamped = Math.max(0, Math.min(pibDigests.length - 1, nextIndex));
+      if (clamped === prev) return prev;
+      setDragDirection(clamped > prev ? 1 : -1);
+      return clamped;
+    });
+    setScrollProgress(0);
+    requestAnimationFrame(() => {
+      readerBodyRef.current?.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+    });
+  }, [pibDigests.length]);
+
+  // Committed on drag release: a fast flick or a long-enough drag both count as a page turn.
+  const handleEditionDragEnd = (_e: unknown, info: PanInfo) => {
+    const SWIPE_DISTANCE = 90;
+    const SWIPE_VELOCITY = 500;
+    if (info.offset.x < -SWIPE_DISTANCE || info.velocity.x < -SWIPE_VELOCITY) {
+      goToEdition(activeDigestIndex + 1);
+    } else if (info.offset.x > SWIPE_DISTANCE || info.velocity.x > SWIPE_VELOCITY) {
+      goToEdition(activeDigestIndex - 1);
+    } else {
+      // Not enough commitment — spring back to center.
+      animate(editionDragX, 0, { type: 'spring', stiffness: 400, damping: 40 });
+    }
+  };
+
+  // Rough reading-time estimate for the active digest — reinforces "return on time" in-product.
+  const activeDigestReadMinutes = useMemo(() => {
+    const content = pibDigests[activeDigestIndex]?.content || '';
+    const words = content.trim().split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.round(words / 200));
+  }, [pibDigests, activeDigestIndex]);
+
+  // Keyboard arrow navigation for the digest reader (desktop/accessibility —
+  // the drag gesture above only serves touch/mouse-drag).
+  useEffect(() => {
+    if (!showPibModal) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') goToEdition(activeDigestIndex + 1);
+      else if (e.key === 'ArrowLeft') goToEdition(activeDigestIndex - 1);
+      else if (e.key === 'Escape') setShowPibModal(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [showPibModal, activeDigestIndex, goToEdition]);
 
   // Fetch PIB digests
   useEffect(() => {
@@ -410,22 +474,28 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
           {/* Quick Actions Bar */}
           <div className="flex items-center gap-3 shrink-0">
-            <button
+            <motion.button
               onClick={() => setShowPibModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-[#e0d0ab]/60 text-zinc-200 hover:text-[#e0d0ab] rounded-sm text-xs font-mono font-semibold transition-all shadow-sm cursor-pointer"
+              whileHover={prefersReducedMotion ? undefined : { y: -2 }}
+              whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-[#e0d0ab]/60 text-zinc-200 hover:text-[#e0d0ab] rounded-sm text-xs font-mono font-semibold shadow-sm cursor-pointer"
             >
               <BookOpen className="w-4 h-4 text-[#e0d0ab]" />
               <span>PIB Gazette Dossiers</span>
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
               onClick={handleSyncFeed}
               disabled={syncing || syncCooldown > 0}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 rounded-sm text-xs font-mono font-bold uppercase tracking-wider transition-all disabled:opacity-50 cursor-pointer shadow-md shadow-[#e0d0ab]/10"
+              whileHover={prefersReducedMotion ? undefined : { y: -2 }}
+              whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 rounded-sm text-xs font-mono font-bold uppercase tracking-wider disabled:opacity-50 cursor-pointer shadow-md shadow-[#e0d0ab]/10"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
               <span>{syncing ? 'Syncing...' : syncCooldown > 0 ? `${syncCooldown}s` : 'Fetch Live'}</span>
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
@@ -434,25 +504,34 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
       <div className="space-y-4 mb-8">
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
           
-          {/* Category Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 lg:pb-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            {CATEGORY_TABS.map((tab) => {
-              const isActive = activeCategoryTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveCategoryTab(tab.id)}
-                  className={`px-3.5 py-1.5 rounded-sm text-xs font-mono tracking-wide whitespace-nowrap transition-all cursor-pointer border ${
-                    isActive
-                      ? 'bg-[#e0d0ab] text-zinc-950 font-bold border-[#e0d0ab] shadow-sm'
-                      : 'bg-zinc-900/60 text-zinc-400 border-zinc-800/80 hover:text-stone-200 hover:border-zinc-700'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
+          {/* Category Tabs — animated sliding pill instead of an instant color swap */}
+          <LayoutGroup id="ca-category-tabs">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-2 lg:pb-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {CATEGORY_TABS.map((tab) => {
+                const isActive = activeCategoryTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveCategoryTab(tab.id)}
+                    className={`relative px-3.5 py-1.5 rounded-sm text-xs font-mono tracking-wide whitespace-nowrap transition-colors cursor-pointer border ${
+                      isActive ? 'border-transparent' : 'bg-zinc-900/60 border-zinc-800/80 hover:border-zinc-700'
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.span
+                        layoutId="ca-category-active-pill"
+                        className="absolute inset-0 bg-[#e0d0ab] border border-[#e0d0ab] rounded-sm shadow-sm"
+                        transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', bounce: 0.2, duration: 0.5 }}
+                      />
+                    )}
+                    <span className={`relative z-10 ${isActive ? 'text-zinc-950 font-bold' : 'text-zinc-400 hover:text-stone-200'}`}>
+                      {tab.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </LayoutGroup>
 
           {/* Search Input & Deep Filter Toggle */}
           <div className="flex items-center gap-2">
@@ -641,7 +720,9 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gradient-to-br from-zinc-900/50 via-zinc-900/30 to-zinc-950 border border-zinc-800 hover:border-[#e0d0ab]/50 rounded-sm p-6 sm:p-8 relative overflow-hidden transition-all shadow-xl backdrop-blur-sm group"
+              whileHover={prefersReducedMotion ? undefined : { y: -3 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+              className="bg-gradient-to-br from-zinc-900/50 via-zinc-900/30 to-zinc-950 border border-zinc-800 hover:border-[#e0d0ab]/50 rounded-sm p-6 sm:p-8 relative overflow-hidden shadow-xl backdrop-blur-sm group"
             >
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -668,13 +749,15 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                 )}
               </div>
 
-              {/* Lead Headline */}
-              <h2
+              {/* Lead Headline — shares a layoutId with the dossier modal's title so opening it
+                  morphs the text directly into place instead of two disconnected fades. */}
+              <motion.h2
+                layoutId={`dossier-headline-${leadItem.id}`}
                 onClick={() => setSelectedDossier(leadItem)}
                 className="font-serif text-xl sm:text-2xl md:text-3xl font-bold text-white group-hover:text-[#e0d0ab] transition-colors leading-tight mb-4 cursor-pointer"
               >
                 {leadItem.headline}
-              </h2>
+              </motion.h2>
 
               {/* Curated Bullets */}
               {leadItem.summary?.bullets && leadItem.summary.bullets.length > 0 && (
@@ -691,22 +774,31 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               {/* Footer Actions */}
               <div className="flex items-center justify-between pt-4 border-t border-zinc-800/80">
                 <div className="flex items-center gap-4">
-                  <button
+                  <motion.button
                     onClick={() => toggleBookmark(leadItem.id || '')}
                     disabled={savingArticleIds.has(leadItem.id || '')}
+                    whileTap={prefersReducedMotion ? undefined : { scale: 0.8 }}
                     className={`inline-flex items-center gap-1.5 text-xs font-mono font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
                       savedArticleIds.has(leadItem.id || '')
                         ? 'text-emerald-400 hover:text-emerald-300'
                         : 'text-zinc-400 hover:text-[#e0d0ab]'
                     }`}
                   >
-                    <Bookmark
-                      className={`w-4 h-4 ${
-                        savedArticleIds.has(leadItem.id || '') ? 'fill-emerald-400 text-emerald-400' : 'text-current'
-                      }`}
-                    />
+                    <motion.span
+                      key={savedArticleIds.has(leadItem.id || '') ? 'on' : 'off'}
+                      initial={prefersReducedMotion ? undefined : { scale: 0.6 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                      className="inline-flex"
+                    >
+                      <Bookmark
+                        className={`w-4 h-4 ${
+                          savedArticleIds.has(leadItem.id || '') ? 'fill-emerald-400 text-emerald-400' : 'text-current'
+                        }`}
+                      />
+                    </motion.span>
                     <span>{savedArticleIds.has(leadItem.id || '') ? 'Saved to Ledger' : 'Save Brief'}</span>
-                  </button>
+                  </motion.button>
 
                   <button
                     onClick={() => setSelectedDossier(leadItem)}
@@ -754,8 +846,10 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                     key={articleId}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: Math.min(idx * 0.03, 0.3) }}
-                    className="bg-zinc-900/25 hover:bg-zinc-900/50 border border-zinc-800/80 hover:border-[#e0d0ab]/40 p-5 rounded-sm flex flex-col justify-between transition-all duration-200 group backdrop-blur-sm"
+                    whileHover={prefersReducedMotion ? undefined : { y: -4, scale: 1.012 }}
+                    whileTap={prefersReducedMotion ? undefined : { scale: 0.985 }}
+                    transition={{ delay: Math.min(idx * 0.03, 0.3), type: 'spring', stiffness: 340, damping: 30 }}
+                    className="bg-zinc-900/25 hover:bg-zinc-900/50 border border-zinc-800/80 hover:border-[#e0d0ab]/40 p-5 rounded-sm flex flex-col justify-between transition-colors duration-200 group backdrop-blur-sm"
                   >
                     <div>
                       {/* Meta Tags */}
@@ -773,13 +867,14 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                         )}
                       </div>
 
-                      {/* Headline */}
-                      <h4
+                      {/* Headline — shares a layoutId with the dossier modal title (see lead story) */}
+                      <motion.h4
+                        layoutId={`dossier-headline-${articleId}`}
                         onClick={() => setSelectedDossier(item)}
                         className="font-serif text-sm font-bold text-stone-100 group-hover:text-[#e0d0ab] transition-colors leading-snug mb-3 cursor-pointer"
                       >
                         {item.headline}
-                      </h4>
+                      </motion.h4>
 
                       {/* Summary bullets */}
                       {item.summary?.bullets && item.summary.bullets.length > 0 && (
@@ -796,16 +891,25 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
                     {/* Action Bar */}
                     <div className="flex items-center justify-between pt-3 border-t border-zinc-800/60 text-xs font-mono">
-                      <button
+                      <motion.button
                         onClick={() => toggleBookmark(articleId)}
                         disabled={savingArticleIds.has(articleId)}
+                        whileTap={prefersReducedMotion ? undefined : { scale: 0.8 }}
                         className={`inline-flex items-center gap-1 font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
                           isSaved ? 'text-emerald-400' : 'text-zinc-500 hover:text-[#e0d0ab]'
                         }`}
                       >
-                        <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-emerald-400' : ''}`} />
+                        <motion.span
+                          key={isSaved ? 'on' : 'off'}
+                          initial={prefersReducedMotion ? undefined : { scale: 0.6 }}
+                          animate={{ scale: 1 }}
+                          transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                          className="inline-flex"
+                        >
+                          <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-emerald-400' : ''}`} />
+                        </motion.span>
                         <span>{isSaved ? 'Saved' : 'Save'}</span>
-                      </button>
+                      </motion.button>
 
                       <div className="flex items-center gap-3">
                         <button
@@ -901,10 +1005,13 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                   )}
                 </div>
 
-                {/* Title */}
-                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white leading-tight">
+                {/* Title — morphs in from whichever card/hero headline was clicked via the shared layoutId */}
+                <motion.h2
+                  layoutId={`dossier-headline-${selectedDossier.id}`}
+                  className="font-serif text-2xl sm:text-3xl font-bold text-white leading-tight"
+                >
                   {selectedDossier.headline}
-                </h2>
+                </motion.h2>
 
                 {/* Structured Synthesis */}
                 <div className="space-y-4 pt-2">
@@ -973,9 +1080,9 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
             className="fixed inset-0 z-[600] flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
           >
             <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 24 }}
+              initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.96 }}
               transition={{ type: 'spring', stiffness: 320, damping: 30 }}
               onClick={(e) => e.stopPropagation()}
               className={`relative w-full max-w-4xl max-h-[90vh] flex flex-col bg-surface text-on-surface rounded-sm shadow-2xl overflow-hidden ${
@@ -992,22 +1099,42 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                     </span>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="font-mono text-[10px] tracking-widest uppercase text-primary-container/70 hidden sm:inline-block">
-                      {pibDigests.length > 0 ? `${activeDigestIndex + 1} / ${pibDigests.length}` : ''}
-                    </span>
-                    <button
+                    {pibDigests.length > 0 && (
+                      <span className="font-mono text-[10px] tracking-widest uppercase text-primary-container/70 hidden sm:inline-flex items-center gap-2">
+                        <span>{activeDigestIndex + 1} / {pibDigests.length}</span>
+                        <span className="w-1 h-1 rounded-full bg-primary-container/40" />
+                        <span className="inline-flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {activeDigestReadMinutes} min read
+                        </span>
+                      </span>
+                    )}
+                    <motion.button
+                      whileTap={prefersReducedMotion ? undefined : { scale: 0.85, rotate: 25 }}
                       onClick={() => setIsLightMode(!isLightMode)}
                       className="text-primary-container/60 hover:text-on-surface transition-colors cursor-pointer"
                       title="Toggle Light / Dark reading mode"
                     >
-                      {isLightMode ? <Moon size={16} /> : <Sun size={16} />}
-                    </button>
-                    <button
+                      <AnimatePresence mode="wait" initial={false}>
+                        <motion.span
+                          key={isLightMode ? 'moon' : 'sun'}
+                          initial={prefersReducedMotion ? undefined : { rotate: -90, opacity: 0 }}
+                          animate={{ rotate: 0, opacity: 1 }}
+                          exit={prefersReducedMotion ? undefined : { rotate: 90, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="inline-flex"
+                        >
+                          {isLightMode ? <Moon size={16} /> : <Sun size={16} />}
+                        </motion.span>
+                      </AnimatePresence>
+                    </motion.button>
+                    <motion.button
+                      whileTap={prefersReducedMotion ? undefined : { scale: 0.85 }}
                       onClick={() => setShowPibModal(false)}
                       className="font-mono text-xs font-bold tracking-widest text-primary-container/60 hover:text-on-surface transition-colors cursor-pointer"
                     >
                       ✕
-                    </button>
+                    </motion.button>
                   </div>
                 </div>
                 {/* Reading Progress */}
@@ -1019,8 +1146,14 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                 </div>
               </div>
 
-              {/* Scrollable Newspaper Body */}
-              <div className="overflow-y-auto flex-1 custom-scrollbar" onScroll={handleScroll}>
+              {/* Scrollable, swipeable Newspaper Body — drag left/right (touch or mouse) to turn
+                  editions, exactly like flicking through a physical gazette; arrow keys and the
+                  PREV/NEXT dock below cover keyboard and desktop-pointer users. */}
+              <div
+                ref={readerBodyRef}
+                className="overflow-y-auto overflow-x-hidden flex-1 custom-scrollbar relative"
+                onScroll={handleScroll}
+              >
                 {pibDigests.length === 0 ? (
                   <div className="flex flex-col items-center justify-center p-16 text-center">
                     <Inbox className="w-8 h-8 text-primary-container/30 mb-4" />
@@ -1029,75 +1162,123 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                     </p>
                   </div>
                 ) : (
-                  <>
-                    <div className="px-8 pt-10 pb-6 text-center border-b border-primary-container/10">
-                      <p className="font-mono text-[10px] font-medium tracking-[0.15em] uppercase text-primary-container mb-3">
-                        Press Information Bureau &bull; Government of India
-                        {pibDigests[activeDigestIndex]?.date && (
-                          <>
-                            {' | '}
-                            {new Date(pibDigests[activeDigestIndex].date).toLocaleDateString('en-GB', {
-                              day: '2-digit',
-                              month: 'short',
-                              year: 'numeric',
-                            }).toUpperCase()}
-                          </>
-                        )}
-                      </p>
-                      <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-on-surface mb-6 max-w-3xl mx-auto">
-                        {pibDigests[activeDigestIndex]?.title || 'Daily PIB Digest'}
-                      </h2>
-                      <div className="h-[2px] w-full max-w-md mx-auto bg-primary-container/40 mb-1" />
-                    </div>
-
-                    <div className="px-8 py-10 w-full">
-                      <div className="multi-column text-on-surface-variant first-p-drop-cap">
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm]}
-                          rehypePlugins={[rehypeSanitize]}
-                          components={{
-                            p: ({ node, ...props }) => <p className="font-serif text-[15px] leading-[1.7] mb-5 text-justify" {...props} />,
-                            h1: ({ node, ...props }) => <h1 className="font-serif text-[22px] font-bold text-primary border-b border-primary-container/30 pb-2 mb-4 mt-6 break-inside-avoid" {...props} />,
-                            h2: ({ node, ...props }) => <h2 className="font-serif text-[18px] font-bold text-primary border-b border-primary-container/20 pb-2 mb-4 mt-5 break-inside-avoid" {...props} />,
-                            h3: ({ node, ...props }) => <h3 className="font-serif text-[16px] font-bold text-on-surface mb-2 mt-4 break-inside-avoid" {...props} />,
-                            ul: ({ node, ...props }) => <ul className="font-serif list-square pl-5 mb-5 mt-2 text-[14px] leading-[1.7]" {...props} />,
-                            ol: ({ node, ...props }) => <ol className="font-serif list-decimal pl-5 mb-5 mt-2 text-[14px] leading-[1.7]" {...props} />,
-                            li: ({ node, ...props }) => <li className="mb-2 pl-1" {...props} />,
-                            strong: ({ node, ...props }) => <strong className="text-primary font-semibold" {...props} />,
-                            blockquote: ({ node, ...props }) => <blockquote className="font-serif border-l-[3px] border-primary-container/50 pl-4 py-1 italic my-5 text-on-surface-variant break-inside-avoid" {...props} />,
-                            table: ({ node, ...props }) => <div className="overflow-x-auto w-full mb-6 border border-primary-container/30 break-inside-avoid shadow-sm"><table className="w-full font-mono text-[11px] border-collapse bg-surface-dim/30" {...props} /></div>,
-                            thead: ({ node, ...props }) => <thead className="bg-surface-container-highest" {...props} />,
-                            th: ({ node, ...props }) => <th className="font-mono text-primary-container font-bold uppercase tracking-widest border border-primary-container/30 p-2.5 text-left" {...props} />,
-                            td: ({ node, ...props }) => <td className="font-mono border border-primary-container/20 p-2.5" {...props} />,
-                          }}
-                        >
-                          {pibDigests[activeDigestIndex]?.content || 'No content available.'}
-                        </ReactMarkdown>
+                  <AnimatePresence mode="popLayout" custom={dragDirection} initial={false}>
+                    <motion.div
+                      key={activeDigestIndex}
+                      custom={dragDirection}
+                      variants={prefersReducedMotion ? undefined : editionVariants}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                      transition={{ x: { type: 'spring', stiffness: 320, damping: 34 }, opacity: { duration: 0.15 } }}
+                      drag={pibDigests.length > 1 ? 'x' : false}
+                      dragDirectionLock
+                      dragConstraints={{ left: 0, right: 0 }}
+                      dragElastic={0.55}
+                      style={{ x: editionDragX }}
+                      onDragEnd={handleEditionDragEnd}
+                      className="cursor-grab active:cursor-grabbing"
+                    >
+                      <div className="px-8 pt-10 pb-6 text-center border-b border-primary-container/10">
+                        <p className="font-mono text-[10px] font-medium tracking-[0.15em] uppercase text-primary-container mb-3">
+                          Press Information Bureau &bull; Government of India
+                          {pibDigests[activeDigestIndex]?.date && (
+                            <>
+                              {' | '}
+                              {new Date(pibDigests[activeDigestIndex].date).toLocaleDateString('en-GB', {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric',
+                              }).toUpperCase()}
+                            </>
+                          )}
+                        </p>
+                        <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight text-on-surface mb-6 max-w-3xl mx-auto">
+                          {pibDigests[activeDigestIndex]?.title || 'Daily PIB Digest'}
+                        </h2>
+                        <div className="h-[2px] w-full max-w-md mx-auto bg-primary-container/40 mb-1" />
                       </div>
-                    </div>
-                  </>
+
+                      <div className="px-8 py-10 w-full">
+                        <div className="multi-column text-on-surface-variant first-p-drop-cap">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeSanitize]}
+                            components={{
+                              p: ({ node, ...props }) => <p className="font-serif text-[15px] leading-[1.7] mb-5 text-justify" {...props} />,
+                              h1: ({ node, ...props }) => <h1 className="font-serif text-[22px] font-bold text-primary border-b border-primary-container/30 pb-2 mb-4 mt-6 break-inside-avoid" {...props} />,
+                              h2: ({ node, ...props }) => <h2 className="font-serif text-[18px] font-bold text-primary border-b border-primary-container/20 pb-2 mb-4 mt-5 break-inside-avoid" {...props} />,
+                              h3: ({ node, ...props }) => <h3 className="font-serif text-[16px] font-bold text-on-surface mb-2 mt-4 break-inside-avoid" {...props} />,
+                              ul: ({ node, ...props }) => <ul className="font-serif list-square pl-5 mb-5 mt-2 text-[14px] leading-[1.7]" {...props} />,
+                              ol: ({ node, ...props }) => <ol className="font-serif list-decimal pl-5 mb-5 mt-2 text-[14px] leading-[1.7]" {...props} />,
+                              li: ({ node, ...props }) => <li className="mb-2 pl-1" {...props} />,
+                              strong: ({ node, ...props }) => <strong className="text-primary font-semibold" {...props} />,
+                              blockquote: ({ node, ...props }) => <blockquote className="font-serif border-l-[3px] border-primary-container/50 pl-4 py-1 italic my-5 text-on-surface-variant break-inside-avoid" {...props} />,
+                              table: ({ node, ...props }) => <div className="overflow-x-auto w-full mb-6 border border-primary-container/30 break-inside-avoid shadow-sm"><table className="w-full font-mono text-[11px] border-collapse bg-surface-dim/30" {...props} /></div>,
+                              thead: ({ node, ...props }) => <thead className="bg-surface-container-highest" {...props} />,
+                              th: ({ node, ...props }) => <th className="font-mono text-primary-container font-bold uppercase tracking-widest border border-primary-container/30 p-2.5 text-left" {...props} />,
+                              td: ({ node, ...props }) => <td className="font-mono border border-primary-container/20 p-2.5" {...props} />,
+                            }}
+                          >
+                            {pibDigests[activeDigestIndex]?.content || 'No content available.'}
+                          </ReactMarkdown>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
                 )}
               </div>
 
+              {/* Edition dot navigator — animated active pill, tap to jump directly to an edition.
+                  Capped to a reasonable count so a deep archive doesn't produce an unbounded row. */}
+              {pibDigests.length > 1 && pibDigests.length <= 12 && (
+                <LayoutGroup id="pib-edition-dots">
+                  <div className="flex-shrink-0 flex items-center justify-center gap-1.5 px-4 py-2.5 border-t border-primary-container/10 bg-surface-dim">
+                    {pibDigests.map((d, i) => (
+                      <button
+                        key={d.id}
+                        onClick={() => goToEdition(i)}
+                        aria-label={`Go to edition ${i + 1}`}
+                        className="relative w-6 h-3 flex items-center justify-center cursor-pointer"
+                      >
+                        {i === activeDigestIndex ? (
+                          <motion.span
+                            layoutId="pib-edition-active-dot"
+                            className="absolute inset-x-0 h-1.5 rounded-full bg-primary"
+                            transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', bounce: 0.3, duration: 0.4 }}
+                          />
+                        ) : (
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary-container/30 hover:bg-primary-container/50 transition-colors" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </LayoutGroup>
+              )}
+
               {/* Navigation Dock */}
               <div className="flex-shrink-0 flex items-center justify-between px-8 py-3.5 border-t border-primary-container/20 bg-surface-dim">
-                <button
-                  onClick={() => setActiveDigestIndex(Math.max(0, activeDigestIndex - 1))}
+                <motion.button
+                  whileTap={prefersReducedMotion || activeDigestIndex === 0 ? undefined : { scale: 0.94, x: -2 }}
+                  onClick={() => goToEdition(activeDigestIndex - 1)}
                   disabled={activeDigestIndex === 0}
-                  className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase text-primary-container hover:text-on-surface transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+                  className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase text-primary-container hover:text-on-surface transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer inline-flex items-center gap-1"
                 >
-                  [ &larr; PREVIOUS EDITION ]
-                </button>
+                  <ChevronLeft className="w-3 h-3" />
+                  PREVIOUS EDITION
+                </motion.button>
                 <div className="font-mono text-[10px] text-primary-container/60 tracking-widest">
                   EDITION {activeDigestIndex + 1} OF {pibDigests.length}
                 </div>
-                <button
-                  onClick={() => setActiveDigestIndex(Math.min(pibDigests.length - 1, activeDigestIndex + 1))}
+                <motion.button
+                  whileTap={prefersReducedMotion || activeDigestIndex === pibDigests.length - 1 ? undefined : { scale: 0.94, x: 2 }}
+                  onClick={() => goToEdition(activeDigestIndex + 1)}
                   disabled={activeDigestIndex === pibDigests.length - 1}
-                  className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase text-primary-container hover:text-on-surface transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+                  className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase text-primary-container hover:text-on-surface transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer inline-flex items-center gap-1"
                 >
-                  [ NEXT EDITION &rarr; ]
-                </button>
+                  NEXT EDITION
+                  <ChevronRight className="w-3 h-3" />
+                </motion.button>
               </div>
             </motion.div>
           </motion.div>
