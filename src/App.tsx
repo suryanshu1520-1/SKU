@@ -12,16 +12,14 @@ import PublicProfile from './components/PublicProfile';
 import PasswordReset from './components/PasswordReset';
 import LegalModal, { LegalDocumentType } from './components/LegalModal';
 import { supabase } from './lib/supabase';
-import { Loader2, Trophy, Swords, Globe, User, House } from 'lucide-react';
-// @ts-ignore
-import logoUrl from './assets/logo.png';
+import { Loader2, Trophy, Swords, Globe, User, House, LogIn } from 'lucide-react';
 
 export default function App() {
   const [userEmail, setUserEmail] = useState<string>('');
   const [userName, setUserName] = useState<string>('');
   const [userId, setUserId] = useState<string>('');
   const [loading, setLoading] = useState(true);
-  const [gameState, setGameState] = useState<'login' | 'landing' | 'arena' | 'autopsy'>('login');
+  const [gameState, setGameState] = useState<'login' | 'landing' | 'arena' | 'autopsy'>('landing');
 
   const [activeTab, setActiveTab] = useState<'arena' | 'tracker' | 'profile' | 'leaderboard'>('arena');
 
@@ -45,7 +43,6 @@ export default function App() {
   useEffect(() => {
     async function restoreSession() {
       const isRecovery = window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery');
-      console.log("[Tark Auth] Hash:", window.location.hash, "Search:", window.location.search, "isRecovery:", isRecovery);
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
@@ -65,7 +62,6 @@ export default function App() {
         }
         if (session?.user) {
           if (isRecovery) {
-            // Block redirect - stay on login screen, mount password reset overlay
             setShowPasswordReset(true);
             setUserEmail(session.user.email || '');
             setUserId(session.user.id);
@@ -119,6 +115,9 @@ export default function App() {
               setGameState('landing');
               setActiveTab('arena');
             }
+          } else {
+            // Cold visitor defaults to landing
+            setGameState('landing');
           }
         }
       } catch (err) {
@@ -134,8 +133,6 @@ export default function App() {
   // Listen for password recovery events from Supabase
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("[Tark Auth] Event:", event, "Hash:", window.location.hash, "Session:", !!session);
-
       if (session?.user) {
         const matchedEmail = session.user.email || '';
         const matchedName = session.user.user_metadata?.name || matchedEmail.split('@')[0] || 'Candidate';
@@ -186,7 +183,7 @@ export default function App() {
     setUserEmail('');
     setUserName('');
     setUserId('');
-    setGameState('login');
+    setGameState('landing');
     setLoading(false);
   };
 
@@ -208,6 +205,10 @@ export default function App() {
   };
 
   const navigateToTab = (tab: 'arena' | 'tracker' | 'profile' | 'leaderboard') => {
+    if (tab === 'profile' && !userEmail) {
+      setGameState('login');
+      return;
+    }
     setActiveTab(tab);
     if (gameState === 'landing' || gameState === 'login') {
       if (localStorage.getItem('tark_arena_results')) {
@@ -232,30 +233,37 @@ export default function App() {
 
   return (
     <div className="bg-zinc-950 min-h-screen relative font-sans text-stone-100 selection:bg-[#e0d0ab] selection:text-zinc-950">
-      {/* Unified Frosted Header Bar - visible after login */}
-      {userEmail && gameState !== 'login' && (
+      {/* Unified Frosted Header Bar */}
+      {gameState !== 'login' && (
         <header className="fixed top-0 left-0 w-full z-50 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-900">
           <div className="flex flex-col md:flex-row md:items-center justify-between px-4 py-3 md:px-8 gap-3 md:gap-0">
-            {/* Brand Logo */}
-            <motion.h1
-              layoutId="brand-header-h1"
-              className="font-serif text-base md:text-xl font-bold tracking-wider text-[#e0d0ab] cursor-default select-none whitespace-nowrap drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] shrink-0"
-              transition={{
-                type: "spring",
-                stiffness: 140,
-                damping: 18,
-                mass: 0.8
-              }}
-            >
-              Tark 1.0 | तर्क 1.0
-            </motion.h1>
+            {/* Brand Logo & Mobile Action */}
+            <div className="flex items-center justify-between w-full md:w-auto">
+              <motion.h1
+                layoutId="brand-header-h1"
+                onClick={handleNavigateHome}
+                className="font-serif text-base md:text-xl font-bold tracking-wider text-[#e0d0ab] cursor-pointer select-none whitespace-nowrap drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] shrink-0"
+              >
+                Tark | तर्क
+              </motion.h1>
+
+              {!userEmail && (
+                <button
+                  onClick={() => setGameState('login')}
+                  className="md:hidden flex items-center gap-1 px-3 py-1 bg-zinc-900 border border-zinc-800 text-[#e0d0ab] rounded-sm text-xs font-mono"
+                >
+                  <LogIn className="w-3.5 h-3.5" />
+                  Sign In
+                </button>
+              )}
+            </div>
 
             {/* Navigation Tabs - Animated Pill */}
             <nav className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               <LayoutGroup>
                 <button
                   onClick={handleNavigateHome}
-                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group cursor-pointer"
                   title="Home"
                 >
                   {gameState === 'landing' && (
@@ -274,7 +282,7 @@ export default function App() {
 
                 <button
                   onClick={() => navigateToTab('arena')}
-                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group cursor-pointer"
                 >
                   {gameState !== 'landing' && activeTab === 'arena' && (
                     <motion.div
@@ -292,7 +300,7 @@ export default function App() {
 
                 <button
                   onClick={() => navigateToTab('tracker')}
-                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group cursor-pointer"
                 >
                   {gameState !== 'landing' && activeTab === 'tracker' && (
                     <motion.div
@@ -303,14 +311,14 @@ export default function App() {
                   )}
                   <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'tracker' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
                     <Globe className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'tracker') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
-                    <span className="hidden sm:inline">Policy Tracker</span>
-                    <span className="sm:hidden">Tracker</span>
+                    <span className="hidden sm:inline">Daily Brief</span>
+                    <span className="sm:hidden">Brief</span>
                   </span>
                 </button>
 
                 <button
                   onClick={() => navigateToTab('leaderboard')}
-                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group cursor-pointer"
                 >
                   {gameState !== 'landing' && activeTab === 'leaderboard' && (
                     <motion.div
@@ -328,7 +336,7 @@ export default function App() {
 
                 <button
                   onClick={() => navigateToTab('profile')}
-                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group"
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group cursor-pointer"
                 >
                   {gameState !== 'landing' && activeTab === 'profile' && (
                     <motion.div
@@ -339,11 +347,21 @@ export default function App() {
                   )}
                   <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'profile' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
                     <User className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'profile') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
-                    <span className="hidden sm:inline">Profile & History</span>
-                    <span className="sm:hidden">Profile</span>
+                    <span className="hidden sm:inline">{userEmail ? 'Profile & History' : 'Sign In'}</span>
+                    <span className="sm:hidden">{userEmail ? 'Profile' : 'Sign In'}</span>
                   </span>
                 </button>
               </LayoutGroup>
+
+              {!userEmail && (
+                <button
+                  onClick={() => setGameState('login')}
+                  className="hidden md:inline-flex items-center gap-1.5 ml-2 px-3.5 py-1.5 bg-zinc-900 border border-zinc-800 text-[#e0d0ab] hover:border-[#e0d0ab]/50 rounded-sm text-xs font-mono transition-all cursor-pointer"
+                >
+                  <LogIn className="w-3.5 h-3.5" />
+                  Sign In
+                </button>
+              )}
             </nav>
           </div>
         </header>
@@ -368,16 +386,21 @@ export default function App() {
         />
       )}
 
-      {gameState !== 'login' && gameState !== 'landing' && userEmail && (
+      {gameState !== 'login' && gameState !== 'landing' && (
         <main className="pt-28 md:pt-24 pb-12 w-full max-w-7xl mx-auto px-4 md:px-8">
-          {activeTab === 'profile' ? (
+          {activeTab === 'profile' && userEmail ? (
             <Profile userEmail={userEmail} userId={userId} userName={userName} onLogout={handleLogout} />
           ) : activeTab === 'leaderboard' ? (
             <Leaderboard onAnalystClick={setViewingAnalystId} />
           ) : activeTab === 'tracker' ? (
-            <CurrentAffairs userId={userId} />
+            <CurrentAffairs userId={userId || 'guest'} />
           ) : gameState === 'arena' ? (
-            <Arena onComplete={handleArenaComplete} userId={userId} onReturnToDashboard={() => setActiveTab('tracker')} onNavigateManifesto={handleNavigateManifesto} />
+            <Arena
+              onComplete={handleArenaComplete}
+              userId={userId || 'guest'}
+              onReturnToDashboard={() => setActiveTab('tracker')}
+              onNavigateManifesto={handleNavigateManifesto}
+            />
           ) : (
             <Autopsy
               stats={arenaStats}
@@ -386,7 +409,7 @@ export default function App() {
               onReturnToDashboard={() => {
                 localStorage.removeItem('tark_arena_results');
                 setGameState('arena');
-                setActiveTab('profile');
+                setActiveTab(userEmail ? 'profile' : 'tracker');
               }}
               onDeployNext={() => {
                 localStorage.removeItem('tark_arena_results');
@@ -422,7 +445,7 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Manifesto Modal Overlay - rendered as z-50 overlay to preserve base routing state */}
+      {/* Manifesto Modal Overlay */}
       <AnimatePresence>
         {showManifesto && (
           <motion.div
@@ -434,7 +457,7 @@ export default function App() {
           >
             <Manifesto
               onNavigateArena={() => { setGameState('arena'); setActiveTab('arena'); setShowManifesto(false); }}
-              onNavigateSignup={() => { setShowManifesto(false); }}
+              onNavigateSignup={() => { setShowManifesto(false); setGameState('login'); }}
               onClose={() => setShowManifesto(false)}
               userId={userId}
             />

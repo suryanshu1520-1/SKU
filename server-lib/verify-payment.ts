@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import crypto from "crypto";
+import * as crypto from "crypto";
 
 function cleanEnvValue(val: any): string {
   if (typeof val !== 'string') return '';

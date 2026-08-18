@@ -1,0 +1,16 @@
+{
+  "userIgnoreFilters": [
+    "node_modules",
+    "dist",
+    ".vercel",
+    ".git",
+    "scratch",
+    "package-lock.json",
+    "tsconfig.tsbuildinfo",
+    ".env",
+    ".env.local"
+  ],
+  "showLineNumber": true,
+  "useTab": false,
+  "tabSize": 2
+}

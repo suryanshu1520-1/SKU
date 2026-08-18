@@ -1,5 +1,11 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ArrowRight, Target, Brain, Shield, Sparkles } from 'lucide-react';
+import { ArrowRight, Target, Brain, Shield, Sparkles, CheckCircle2, Lock, Flame, Trophy, Compass, Layers } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+import InteractiveBackground from './InteractiveBackground';
+import TiltCard from './TiltCard';
+import DiagnosticPreview from './DiagnosticPreview';
+import SyllabusMatrix from './SyllabusMatrix';
 
 interface LandingProps {
   onNavigateArena: () => void;
@@ -9,100 +15,211 @@ interface LandingProps {
   onNavigateLegal?: (type: 'privacy' | 'terms' | 'refund') => void;
 }
 
-export default function Landing({ onNavigateArena, onNavigateTracker, onNavigateProfile, onNavigateManifesto, onNavigateLegal }: LandingProps) {
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center py-12 px-6 bg-zinc-950 text-stone-50 font-sans relative overflow-x-hidden">
-      {/* Subtle background grid overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f1f23_1px,transparent_1px),linear-gradient(to_bottom,#1f1f23_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20 pointer-events-none" />
+interface SeatCountData {
+  max_capacity: number;
+  claimed_seats: number;
+  remaining_seats: number;
+}
 
-      <div className="w-full max-w-2xl z-10 flex flex-col items-center justify-center my-auto">
-        {/* Hero Section */}
+export default function Landing({ onNavigateArena, onNavigateTracker, onNavigateProfile, onNavigateManifesto, onNavigateLegal }: LandingProps) {
+  const [seatData, setSeatData] = useState<SeatCountData | null>(null);
+
+  useEffect(() => {
+    async function fetchSeats() {
+      try {
+        const { data, error } = await supabase.rpc('get_available_seat_count');
+        if (!error && data) {
+          setSeatData(data as SeatCountData);
+        }
+      } catch (e) {
+        console.warn('Could not load live seat count:', e);
+      }
+    }
+    fetchSeats();
+  }, []);
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-start pt-24 pb-16 px-4 md:px-8 bg-zinc-950 text-stone-50 font-sans relative overflow-x-hidden">
+      
+      {/* Interactive Constellation & Mouse Spotlight Canvas */}
+      <InteractiveBackground />
+
+      {/* Subtle background grid overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f1f23_1px,transparent_1px),linear-gradient(to_bottom,#1f1f23_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_40%,#000_70%,transparent_100%)] opacity-20 pointer-events-none z-0" />
+
+      <div className="w-full max-w-5xl z-10 flex flex-col items-center justify-start space-y-12">
+        
+        {/* Provable Scarcity & Operational Status Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-wrap items-center justify-center gap-2.5"
+        >
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-zinc-900/90 border border-zinc-800/80 rounded-sm text-[10px] font-mono uppercase tracking-widest text-zinc-300 backdrop-blur-md shadow-xl">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span>FOUNDERS CLUB:</span>
+            <span className="text-[#e0d0ab] font-bold">
+              {seatData ? `${seatData.claimed_seats} / ${seatData.max_capacity}` : 'Capped at 500'} Seats Claimed
+            </span>
+            <span className="text-zinc-500 hidden sm:inline">&bull; 15-Min Lock &bull; Lifetime</span>
+          </div>
+
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900/60 border border-zinc-800/80 rounded-sm text-[10px] font-mono uppercase tracking-wider text-zinc-400 backdrop-blur-md">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+            <span>1,720+ Items Synced</span>
+          </div>
+        </motion.div>
+
+        {/* Hero Section with Spatial Depth */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-center mb-12"
+          className="text-center max-w-3xl mx-auto"
         >
-          <h1 className="font-serif text-4xl md:text-5xl font-bold tracking-widest text-[#e0d0ab] drop-shadow-[0_0_15px_rgba(224,208,171,0.25)] mb-6 select-none">
-            Tark 1.0 | तर्क 1.0
+          <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#e0d0ab] drop-shadow-[0_0_25px_rgba(224,208,171,0.2)] mb-4 select-none leading-tight">
+            The War on Noise.
           </h1>
-          <p className="text-zinc-400 text-sm md:text-base font-sans max-w-lg mx-auto leading-relaxed">
-            Assess. Analyze. Track.
+          <p className="text-zinc-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6 text-[#e0d0ab]/90">
+            Assess. Analyze. Track. &bull; Tark | तर्क
+          </p>
+          <p className="text-zinc-300 text-sm sm:text-base md:text-lg font-sans max-w-2xl mx-auto leading-relaxed">
+            You have one exam date and a syllabus that never stops expanding. Somewhere in it is the topic that fails you. Tark exists to find it before the examiner does.
           </p>
         </motion.div>
 
-        {/* Capability Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full mb-12">
-          <motion.button
-            onClick={onNavigateArena}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-zinc-900/30 border border-zinc-800/60 p-6 rounded-sm hover:border-emerald-500/40 transition-all group cursor-pointer text-left hover:bg-zinc-900/50 hover:scale-[1.02] active:scale-[0.98]"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-zinc-800 rounded-sm group-hover:bg-emerald-500/10 transition-colors">
-                <Brain className="w-5 h-5 text-emerald-400" />
-              </div>
-              <h3 className="text-xs uppercase tracking-widest font-bold text-zinc-300 group-hover:text-emerald-300 transition-colors">
-                Analytical Arena
-              </h3>
-            </div>
-            <p className="text-zinc-500 text-xs leading-relaxed font-sans">
-              Time-bound multi-subject assessments with real-time feedback, conceptual insights, and performance analytics. Each session tests your reasoning under pressure.
-            </p>
-          </motion.button>
-
-          <motion.button
-            onClick={onNavigateTracker}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="bg-zinc-900/30 border border-zinc-800/60 p-6 rounded-sm hover:border-[#e0d0ab]/40 transition-all group cursor-pointer text-left hover:bg-zinc-900/50 hover:scale-[1.02] active:scale-[0.98]"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-zinc-800 rounded-sm group-hover:bg-[#e0d0ab]/10 transition-colors">
-                <Shield className="w-5 h-5 text-[#e0d0ab]" />
-              </div>
-              <h3 className="text-xs uppercase tracking-widest font-bold text-zinc-300 group-hover:text-[#e0d0ab] transition-colors">
-                Policy Tracker
-              </h3>
-            </div>
-            <p className="text-zinc-500 text-xs leading-relaxed font-sans">
-              Curated administrative intelligence feed. Track high-signal policy briefs, ministry updates, and governance developments from verified press channels.
-            </p>
-          </motion.button>
-        </div>
-
-        {/* Main CTA - Read the Manifesto */}
+        {/* Primary Action Buttons */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
         >
           <button
+            onClick={onNavigateArena}
+            className="w-full sm:w-auto group inline-flex items-center justify-center gap-2.5 py-3.5 px-8 bg-[#e0d0ab] text-zinc-950 font-sans text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-stone-100 transition-all shadow-xl shadow-[#e0d0ab]/10 hover:shadow-[#e0d0ab]/20 cursor-pointer"
+          >
+            <Brain className="w-4 h-4" />
+            Take a Diagnostic Test — No Signup Required
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </button>
+
+          <button
             onClick={onNavigateManifesto}
-            className="group inline-flex items-center gap-2 py-3 px-8 bg-[#e0d0ab] text-zinc-950 font-sans text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-stone-100 transition-all shadow-lg shadow-[#e0d0ab]/10 hover:shadow-[#e0d0ab]/20"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 py-3.5 px-6 border border-zinc-800 text-zinc-300 font-sans text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-zinc-900/60 hover:text-[#e0d0ab] hover:border-zinc-700 transition-all cursor-pointer backdrop-blur-sm"
           >
             <Target className="w-4 h-4" />
             Read the Manifesto
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </motion.div>
 
-        {/* Footer */}
-        <div className="mt-12 text-center space-y-4">
-          <p className="text-[10px] font-sans text-zinc-600 uppercase tracking-widest">
-            TARK 1.0 IS AN AD-FREE INITIATIVE FOREVER.
+        {/* Interactive Diagnostic Preview Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="w-full max-w-3xl"
+        >
+          <DiagnosticPreview onLaunchFullArena={onNavigateArena} />
+        </motion.div>
+
+        {/* 3D Interactive Capability Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+          <TiltCard
+            onClick={onNavigateArena}
+            className="bg-zinc-900/30 border border-zinc-800/80 p-6 rounded-sm hover:border-emerald-500/40 transition-all cursor-pointer group backdrop-blur-md"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2.5 bg-zinc-800/80 rounded-sm group-hover:bg-emerald-500/10 transition-colors">
+                <Brain className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div>
+                <h3 className="text-xs uppercase tracking-widest font-bold text-zinc-200 group-hover:text-emerald-300 transition-colors font-mono">
+                  Analytical Arena & Autopsy
+                </h3>
+                <span className="text-[10px] font-mono text-zinc-500">+2.00 / -0.66 Negative Marking</span>
+              </div>
+            </div>
+            <p className="text-zinc-400 text-xs leading-relaxed font-sans mb-4">
+              Timed, high-stakes examination environment built to test reasoning under genuine exam pressure. Every session concludes with an AI-driven conceptual autopsy pinpointing subject-level leakages.
+            </p>
+            <div className="flex items-center gap-2 text-emerald-400 text-xs font-mono group-hover:translate-x-1 transition-transform">
+              <span>Enter Arena</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          </TiltCard>
+
+          <TiltCard
+            onClick={onNavigateTracker}
+            className="bg-zinc-900/30 border border-zinc-800/80 p-6 rounded-sm hover:border-[#e0d0ab]/40 transition-all cursor-pointer group backdrop-blur-md"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2.5 bg-zinc-800/80 rounded-sm group-hover:bg-[#e0d0ab]/10 transition-colors">
+                <Shield className="w-5 h-5 text-[#e0d0ab]" />
+              </div>
+              <div>
+                <h3 className="text-xs uppercase tracking-widest font-bold text-zinc-200 group-hover:text-[#e0d0ab] transition-colors font-mono">
+                  The Daily Brief & Policy Signal
+                </h3>
+                <span className="text-[10px] font-mono text-zinc-500">Continuous PIB & Gazette Ingestion</span>
+              </div>
+            </div>
+            <p className="text-zinc-400 text-xs leading-relaxed font-sans mb-4">
+              Every PIB release, cabinet decision, and governance gazette distilled by our AI into high-yield, 4-minute analytical briefs. Read the signal, filter by ministry, and prove your retention.
+            </p>
+            <div className="flex items-center gap-2 text-[#e0d0ab] text-xs font-mono group-hover:translate-x-1 transition-transform">
+              <span>Explore Intelligence</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          </TiltCard>
+        </div>
+
+        {/* Syllabus Matrix Visualizer */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.35 }}
+          className="w-full"
+        >
+          <SyllabusMatrix onSelectDomain={() => {}} />
+        </motion.div>
+
+        {/* Proof Section - Zero-Trust Integrity */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.45 }}
+          className="w-full bg-zinc-900/20 border border-zinc-800/60 p-6 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left backdrop-blur-sm shadow-xl"
+        >
+          <div className="space-y-1">
+            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[#e0d0ab]">
+              No Guesswork. Zero Client-Side Answer Trust.
+            </h4>
+            <p className="text-zinc-400 text-xs font-sans max-w-xl">
+              1,720+ UPSC & State PSC standard items. Server-evaluated scoring ensures answer keys remain hidden until test completion. Double-spend prevention locks seat reservations atomically.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0 text-emerald-400 font-mono text-xs font-semibold px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded-sm">
+            <CheckCircle2 className="w-4 h-4" />
+            <span>Integrity Verified</span>
+          </div>
+        </motion.div>
+
+        {/* Footer & Pledges */}
+        <div className="w-full pt-8 text-center space-y-4 border-t border-zinc-900">
+          <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest">
+            No ads. No affiliate links. No sponsored content. Ever.
           </p>
-          <div className="flex items-center justify-center gap-4 text-[10px] font-sans text-zinc-600 uppercase tracking-widest">
-            <button onClick={() => onNavigateLegal?.('terms')} className="hover:text-zinc-400 transition-colors">Terms</button>
+          <div className="flex items-center justify-center gap-4 text-[10px] font-mono text-zinc-400 uppercase tracking-wider">
+            <button onClick={() => onNavigateLegal?.('terms')} className="hover:text-[#e0d0ab] transition-colors cursor-pointer">Terms</button>
             <span>&bull;</span>
-            <button onClick={() => onNavigateLegal?.('privacy')} className="hover:text-zinc-400 transition-colors">Privacy Policy</button>
+            <button onClick={() => onNavigateLegal?.('privacy')} className="hover:text-[#e0d0ab] transition-colors cursor-pointer">Privacy Policy</button>
             <span>&bull;</span>
-            <button onClick={() => onNavigateLegal?.('refund')} className="hover:text-zinc-400 transition-colors">Refunds</button>
+            <button onClick={() => onNavigateLegal?.('refund')} className="hover:text-[#e0d0ab] transition-colors cursor-pointer">Refunds</button>
           </div>
         </div>
+
       </div>
     </div>
   );

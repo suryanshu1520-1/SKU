@@ -1,0 +1,1410 @@
+/* ==========================================================================
+   Retro Relay — an Obsidian theme
+   Warm paper light scheme, graphite dark, terminal-adjacent monospace.
+
+   Structure of this file
+     1.  Style Settings schema (optional plugin integration)
+     2.  Shared tokens — fonts, radii, spacing, motion
+     3.  Palette — dark
+     4.  Palette — light
+     5.  Typography & headings
+     6.  Links, tags, marks
+     7.  Workspace chrome — titlebar, tabs, sidebar, nav
+     8.  Code — inline and blocks
+     9.  Callouts
+     10. Tables
+     11. Blockquotes, rules, lists, checkboxes
+     12. Graph view
+     13. Controls — buttons, inputs, toggles, modals, search
+     14. Scrollbars
+     15. Accessibility
+     16. Print
+
+   Every colour lives in section 3 or 4. To re-skin the theme, change those
+   two blocks and nothing else — sections 5 onward only reference tokens.
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. Style Settings schema
+   Read by the optional "Style Settings" community plugin. Without the plugin
+   the theme uses the defaults below and this comment is simply ignored.
+   ========================================================================== */
+
+/* @settings
+
+name: Retro Relay
+id: retro-relay
+settings:
+    -
+        id: rr-a11y-heading
+        title: Readability and accessibility
+        type: heading
+        level: 2
+        collapsed: true
+    -
+        id: rr-underline-links
+        title: Always underline links
+        description: Links stay distinguishable without relying on colour alone (WCAG 1.4.1).
+        type: class-toggle
+        default: false
+    -
+        id: rr-high-contrast
+        title: Increase contrast
+        description: Raises text and border contrast in both colour schemes.
+        type: class-toggle
+        default: false
+    -
+        id: rr-no-motion
+        title: Disable animations
+        description: Removes transitions and animations. Applied automatically when your system requests reduced motion.
+        type: class-toggle
+        default: false
+    -
+        id: rr-readable-font
+        title: Dyslexia-friendly body font
+        description: Switches body text to OpenDyslexic or Atkinson Hyperlegible when installed on your system.
+        type: class-toggle
+        default: false
+    -
+        id: rr-font-size
+        title: Body font size
+        type: variable-number-slider
+        default: 16
+        min: 12
+        max: 24
+        step: 1
+        format: px
+    -
+        id: rr-line-height
+        title: Body line height
+        type: variable-number-slider
+        default: 1.6
+        min: 1.2
+        max: 2.2
+        step: 0.05
+    -
+        id: rr-measure
+        title: Readable line length
+        description: Maximum width of the text column.
+        type: variable-number-slider
+        default: 42
+        min: 30
+        max: 90
+        step: 1
+        format: rem
+    -
+        id: rr-colour-heading
+        title: Colour
+        type: heading
+        level: 2
+        collapsed: true
+    -
+        id: rr-accent
+        title: Accent colour
+        type: variable-themed-color
+        format: hex
+        opacity: false
+        default-light: '#9E4C0C'
+        default-dark: '#F0A055'
+    -
+        id: rr-plain-tables
+        title: Plain table rows
+        description: Turns off the alternating row shading, which is on by default.
+        type: class-toggle
+        default: false
+    -
+        id: rr-scanlines
+        title: Subtle scanline texture on headings
+        description: A restrained nod to CRT displays. Off by default.
+        type: class-toggle
+        default: false
+    -
+        id: rr-no-spectrum
+        title: Hide the spectrum bar
+        description: Removes the chromatic band along the top edge of the window.
+        type: class-toggle
+        default: false
+    -
+        id: rr-spectrum-bars
+        title: Hard-edged spectrum bar
+        description: Discrete broadcast colour bars instead of a smooth blend. Reads more like VHS, especially on a taller band.
+        type: class-toggle
+        default: false
+    -
+        id: rr-spectrum-height
+        title: Spectrum bar height
+        description: The band overlays the top edge, so past roughly 10px it starts to crowd the tab strip.
+        type: variable-number-slider
+        default: 6
+        min: 2
+        max: 12
+        step: 1
+        format: px
+    -
+        id: rr-clouds-strong
+        title: Stronger atmospheric wash
+        description: Deepens the cloud field in the dark scheme. Faint text such as code comments drops from 3.8:1 to about 3.2:1 — still above its 3.0 target, but with far less margin.
+        type: class-toggle
+        default: false
+    -
+        id: rr-graph-heading
+        title: Graph view
+        type: heading
+        level: 2
+        collapsed: true
+    -
+        id: rr-no-graph-plate
+        title: Hide the orbital plate
+        description: Removes the coloured orbits, reticle and star glow behind the graph.
+        type: class-toggle
+        default: false
+    -
+        id: rr-graph-orbit-opacity
+        title: Orbit and reticle strength
+        description: Faint by default. The graph is rarely centred in its pane, so strong rings read as a misaligned target rather than a system.
+        type: variable-number-slider
+        default: 0.12
+        min: 0
+        max: 0.6
+        step: 0.01
+    -
+        id: rr-graph-core-opacity
+        title: Star glow strength
+        type: variable-number-slider
+        default: 0.05
+        min: 0
+        max: 0.4
+        step: 0.01
+*/
+
+
+/* ==========================================================================
+   2. Shared tokens
+   ========================================================================== */
+
+body {
+  /* Font stacks. All local — the theme never fetches a remote font, so it
+     works offline and leaks nothing. */
+  --rr-font-mono: 'Iosevka', 'JetBrains Mono', 'IBM Plex Mono', 'SF Mono',
+                  'Cascadia Mono', 'Roboto Mono', ui-monospace, monospace;
+  --rr-font-serif: 'Iowan Old Style', 'Charter', 'Bitstream Charter',
+                   'Palatino Linotype', 'Book Antiqua', Georgia, serif;
+  --rr-font-ui: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI',
+                Roboto, ui-sans-serif, sans-serif;
+
+  --font-text-theme: var(--rr-font-serif);
+  --font-interface-theme: var(--rr-font-ui);
+  --font-monospace-theme: var(--rr-font-mono);
+
+  /* Overridable by Style Settings */
+  --rr-font-size: 16px;
+  --rr-line-height: 1.6;
+  --rr-measure: 42rem;
+
+  --font-text-size: var(--rr-font-size);
+  --line-height-normal: var(--rr-line-height);
+  --file-line-width: var(--rr-measure);
+
+  /* Geometry — slightly squared off, in keeping with the era */
+  --radius-s: 3px;
+  --radius-m: 4px;
+  --radius-l: 6px;
+  --radius-xl: 8px;
+
+  --border-width: 1px;
+  --rr-border-width-strong: 2px;
+
+  /* Spectrum bar — the chromatic band along the top edge of the window.
+     Composed entirely of palette tokens, so it re-tints with the colour
+     scheme and with a custom accent rather than needing its own colours.
+
+     Two treatments. The smooth gradient is the default. The hard-edged
+     variant is the one that reads as VHS: broadcast colour bars were
+     discrete fields, never a blend, and the eye picks that up immediately at
+     any band height. Hard stops are written as duplicated positions rather
+     than Images-4 double-position syntax — same result, no compat surprises. */
+  --rr-spectrum-height: 6px;
+  --rr-spectrum: linear-gradient(
+    90deg,
+    var(--rr-purple) 0%,
+    var(--rr-magenta) 17%,
+    var(--rr-red) 33%,
+    var(--rr-accent) 50%,
+    var(--rr-yellow) 67%,
+    var(--rr-teal) 84%,
+    var(--rr-blue) 100%
+  );
+  --rr-spectrum-bars: linear-gradient(
+    90deg,
+    var(--rr-purple) 0%,
+    var(--rr-purple) 14.28%,
+    var(--rr-magenta) 14.28%,
+    var(--rr-magenta) 28.57%,
+    var(--rr-red) 28.57%,
+    var(--rr-red) 42.85%,
+    var(--rr-accent) 42.85%,
+    var(--rr-accent) 57.14%,
+    var(--rr-yellow) 57.14%,
+    var(--rr-yellow) 71.42%,
+    var(--rr-teal) 71.42%,
+    var(--rr-teal) 85.71%,
+    var(--rr-blue) 85.71%,
+    var(--rr-blue) 100%
+  );
+
+  /* Graph plate — see section 12. Kept low deliberately, and lower than it
+     first shipped: a force-directed layout puts its node mass off-centre, and
+     the user pans and zooms freely on top of that, so the plate is almost
+     never aligned with the graph. At a stronger setting the concentric rings
+     read as a misaligned target; this faint they read as texture and the graph
+     stays the subject. The star glow is the element that most implies a centre
+     the graph does not actually have, so it is the fainter of the two. */
+  --rr-graph-orbit-opacity: 0.12;
+  --rr-graph-core-opacity: 0.05;
+
+  /* Atmospheric wash on the workspace ground. `none` by default; the dark
+     scheme fills it in. Declared here so every rule that layers it can use
+     `background-image: var(--rr-clouds)` unconditionally — a scheme-only
+     token would make the whole declaration invalid in the other scheme. */
+  --rr-clouds: none;
+
+  /* Motion */
+  --rr-transition: 120ms ease-out;
+
+  --tab-radius-active: var(--radius-m);
+  --tab-curve: 0px;
+}
+
+
+/* ==========================================================================
+   3. Palette — dark
+   Graphite ground, warm paper text, amber accent.
+   ========================================================================== */
+
+.theme-dark {
+  /* Ground — graphite, with a slight cool cast. Warm paper ink sits on top of
+     it rather than a cool grey: the contrast of warm ink against cool ground
+     is what keeps this recognisably the same theme as the light scheme. */
+  --rr-bg-0: #121417;
+  --rr-bg-1: #191C20;
+  --rr-bg-2: #21252A;
+  --rr-bg-3: #2C3137;
+  --rr-border: #3A4046;
+  --rr-border-strong: #4E555D;
+
+  /* Ink */
+  --rr-ink: #F2E9D8;
+  --rr-ink-muted: #BCAE97;
+  --rr-ink-faint: #8A7C68;
+
+  /* Hues */
+  --rr-accent: #F0A055;
+  --rr-accent-strong: #FFBC7D;
+  --rr-teal: #62C3B2;
+  --rr-blue: #7FB4E3;
+  --rr-green: #94C47B;
+  --rr-yellow: #EBCB5E;
+  --rr-red: #E88A82;
+  --rr-magenta: #E491AE;
+  --rr-purple: #BBA0D8;
+
+  /* Cloud field: lighter wisps and darker pools over the --rr-bg-1 ground,
+     drawn from the ground tokens themselves so the wash re-derives if the
+     palette is re-skinned.
+
+     Amplitude is capped at --rr-bg-2 rather than --rr-bg-3 on purpose. The
+     contrast gate only tests flat token pairs, so the wash has to be checked
+     by hand: at bg-3 the tightest pair (faint code-comment text over the
+     lightest point of a blob) came out at 3.22:1 against a 3.0 target. At
+     bg-2 it is 3.79:1. The visual difference between the two is barely
+     perceptible; the margin difference is not.
+
+     Built from gradients rather than an SVG turbulence filter. Turbulence
+     gives truer cloud noise, but it repaints across the full workspace and
+     that is a cost paid on every frame in an editor. */
+  --rr-clouds:
+    radial-gradient(62% 46% at 16% 10%, var(--rr-bg-2) 0%, transparent 70%),
+    radial-gradient(48% 38% at 84% 6%, var(--rr-bg-2) 0%, transparent 66%),
+    radial-gradient(72% 55% at 72% 80%, var(--rr-bg-2) 0%, transparent 72%),
+    radial-gradient(46% 36% at 26% 90%, var(--rr-bg-0) 0%, transparent 68%);
+
+  color-scheme: dark;
+
+  --background-primary: var(--rr-bg-1);
+  --background-primary-alt: var(--rr-bg-2);
+  --background-secondary: var(--rr-bg-0);
+  --background-secondary-alt: var(--rr-bg-0);
+
+  --background-modifier-border: var(--rr-border);
+  --background-modifier-border-hover: var(--rr-border-strong);
+  --background-modifier-border-focus: var(--rr-accent);
+  --background-modifier-hover: rgba(240, 160, 85, 0.10);
+  --background-modifier-active-hover: rgba(240, 160, 85, 0.16);
+  --background-modifier-form-field: var(--rr-bg-0);
+  --background-modifier-success: rgba(148, 196, 123, 0.25);
+  --background-modifier-error: rgba(232, 138, 130, 0.25);
+  --background-modifier-error-hover: rgba(232, 138, 130, 0.35);
+
+  --text-normal: var(--rr-ink);
+  --text-muted: var(--rr-ink-muted);
+  --text-faint: var(--rr-ink-faint);
+  --text-on-accent: #121417;
+  --text-error: var(--rr-red);
+  --text-success: var(--rr-green);
+  --text-warning: var(--rr-yellow);
+  --text-accent: var(--rr-accent);
+  --text-accent-hover: var(--rr-accent-strong);
+  --text-selection: rgba(240, 160, 85, 0.24);
+  --text-highlight-bg: rgba(235, 203, 94, 0.30);
+  --text-highlight-bg-active: rgba(235, 203, 94, 0.45);
+
+  --interactive-normal: var(--rr-bg-2);
+  --interactive-hover: var(--rr-bg-3);
+  --interactive-accent: var(--rr-accent);
+  --interactive-accent-hover: var(--rr-accent-strong);
+
+  --divider-color: var(--rr-border);
+  --hr-color: var(--rr-border);
+  --indentation-guide-color: rgba(242, 233, 216, 0.10);
+  --indentation-guide-color-active: rgba(242, 233, 216, 0.22);
+
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb-bg: var(--rr-border);
+  --scrollbar-active-thumb-bg: var(--rr-border-strong);
+
+  --shadow-s: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-l: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+
+
+/* ==========================================================================
+   4. Palette — light
+   Warm paper ground, deep brown ink, burnt-amber accent.
+   ========================================================================== */
+
+.theme-light {
+  /* Ground */
+  --rr-bg-0: #EFE6D3;
+  --rr-bg-1: #FAF4E6;
+  --rr-bg-2: #F2EADA;
+  --rr-bg-3: #E7DBC4;
+  --rr-border: #D2C3A6;
+  --rr-border-strong: #B3A183;
+
+  /* Ink */
+  --rr-ink: #2A2118;
+  --rr-ink-muted: #5E5142;
+  --rr-ink-faint: #85765F;
+
+  /* Hues — darkened so they hold AA contrast against paper */
+  --rr-accent: #9E4C0C;
+  --rr-accent-strong: #7D3A07;
+  --rr-teal: #0F6A5E;
+  --rr-blue: #1F5E96;
+  --rr-green: #3F6B2B;
+  --rr-yellow: #7A5B0B;
+  --rr-red: #A32C25;
+  --rr-magenta: #9A3159;
+  --rr-purple: #5F4491;
+
+  color-scheme: light;
+
+  --background-primary: var(--rr-bg-1);
+  --background-primary-alt: var(--rr-bg-2);
+  --background-secondary: var(--rr-bg-0);
+  --background-secondary-alt: var(--rr-bg-0);
+
+  --background-modifier-border: var(--rr-border);
+  --background-modifier-border-hover: var(--rr-border-strong);
+  --background-modifier-border-focus: var(--rr-accent);
+  --background-modifier-hover: rgba(158, 76, 12, 0.09);
+  --background-modifier-active-hover: rgba(158, 76, 12, 0.15);
+  --background-modifier-form-field: #FFFDF6;
+  --background-modifier-success: rgba(63, 107, 43, 0.18);
+  --background-modifier-error: rgba(163, 44, 37, 0.16);
+  --background-modifier-error-hover: rgba(163, 44, 37, 0.26);
+
+  --text-normal: var(--rr-ink);
+  --text-muted: var(--rr-ink-muted);
+  --text-faint: var(--rr-ink-faint);
+  --text-on-accent: #FFFDF6;
+  --text-error: var(--rr-red);
+  --text-success: var(--rr-green);
+  --text-warning: var(--rr-yellow);
+  --text-accent: var(--rr-accent);
+  --text-accent-hover: var(--rr-accent-strong);
+  --text-selection: rgba(158, 76, 12, 0.20);
+  --text-highlight-bg: rgba(235, 190, 60, 0.42);
+  --text-highlight-bg-active: rgba(235, 190, 60, 0.60);
+
+  --interactive-normal: var(--rr-bg-2);
+  --interactive-hover: var(--rr-bg-3);
+  --interactive-accent: var(--rr-accent);
+  --interactive-accent-hover: var(--rr-accent-strong);
+
+  --divider-color: var(--rr-border);
+  --hr-color: var(--rr-border);
+  --indentation-guide-color: rgba(42, 33, 24, 0.12);
+  --indentation-guide-color-active: rgba(42, 33, 24, 0.26);
+
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb-bg: var(--rr-border);
+  --scrollbar-active-thumb-bg: var(--rr-border-strong);
+
+  --shadow-s: 0 1px 2px rgba(42, 33, 24, 0.12);
+  --shadow-l: 0 8px 24px rgba(42, 33, 24, 0.18);
+}
+
+
+/* ==========================================================================
+   5. Typography & headings
+   Headings step down in weight rather than shouting in colour, so the
+   hierarchy survives greyscale and colour-blind viewing.
+   ========================================================================== */
+
+body {
+  --h1-size: 1.85em;
+  --h2-size: 1.5em;
+  --h3-size: 1.28em;
+  --h4-size: 1.12em;
+  --h5-size: 1em;
+  --h6-size: 0.92em;
+
+  --h1-weight: 700;
+  --h2-weight: 700;
+  --h3-weight: 600;
+  --h4-weight: 600;
+  --h5-weight: 600;
+  --h6-weight: 600;
+
+  --h1-color: var(--rr-accent);
+  --h2-color: var(--text-normal);
+  --h3-color: var(--text-normal);
+  --h4-color: var(--text-normal);
+  --h5-color: var(--text-muted);
+  --h6-color: var(--text-muted);
+
+  --heading-formatting: var(--text-faint);
+
+  --bold-weight: 700;
+  --bold-color: var(--text-normal);
+  --italic-color: var(--text-normal);
+}
+
+.markdown-rendered h1,
+.markdown-rendered h2,
+.HyperMD-header-1,
+.HyperMD-header-2 {
+  letter-spacing: -0.01em;
+}
+
+/* A hairline under H2 gives long notes a scannable spine. */
+.markdown-rendered h2 {
+  padding-bottom: 0.24em;
+  border-bottom: var(--border-width) solid var(--background-modifier-border);
+}
+
+/* H6 as a small-caps label — reads as metadata, not as a heading. */
+.markdown-rendered h6 {
+  font-family: var(--rr-font-mono);
+  font-size: 0.8em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-muted);
+}
+
+/* Optional CRT texture, off unless enabled in Style Settings. */
+body.rr-scanlines .markdown-rendered h1 {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 3px,
+    rgba(127, 127, 127, 0.10) 3px 4px
+  );
+  background-clip: text;
+}
+
+
+/* ==========================================================================
+   6. Links, tags, marks
+   ========================================================================== */
+
+body {
+  --link-color: var(--rr-accent);
+  --link-color-hover: var(--rr-accent-strong);
+  --link-external-color: var(--rr-teal);
+  --link-external-color-hover: var(--rr-accent-strong);
+  --link-unresolved-color: var(--rr-red);
+  --link-unresolved-opacity: 1;
+  --link-unresolved-decoration-style: dotted;
+  --link-decoration: none;
+  --link-decoration-hover: underline;
+  --link-external-decoration: none;
+  --link-external-decoration-hover: underline;
+}
+
+/* Unresolved links carry a dotted underline as well as a colour, so a
+   broken link is still visible without colour perception. */
+.internal-link.is-unresolved {
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+}
+
+body {
+  --tag-size: 0.82em;
+  --tag-color: var(--rr-teal);
+  --tag-background: rgba(98, 195, 178, 0.12);
+  --tag-background-hover: rgba(98, 195, 178, 0.22);
+  --tag-border-color: rgba(98, 195, 178, 0.35);
+  --tag-border-width: 1px;
+  --tag-padding-x: 0.5em;
+  --tag-padding-y: 0.16em;
+  --tag-radius: var(--radius-s);
+}
+
+.theme-light {
+  --tag-background: rgba(15, 106, 94, 0.10);
+  --tag-background-hover: rgba(15, 106, 94, 0.18);
+  --tag-border-color: rgba(15, 106, 94, 0.30);
+}
+
+a.tag {
+  font-family: var(--rr-font-mono);
+  font-weight: 500;
+}
+
+mark,
+.markdown-rendered mark {
+  border-radius: var(--radius-s);
+  padding: 0.06em 0.14em;
+  color: var(--text-normal);
+}
+
+
+/* ==========================================================================
+   7. Workspace chrome
+   ========================================================================== */
+
+body {
+  --titlebar-background: var(--background-secondary);
+  --titlebar-background-focused: var(--background-secondary);
+  --titlebar-text-color: var(--text-muted);
+  --titlebar-text-color-focused: var(--text-normal);
+
+  --tab-text-color: var(--text-faint);
+  --tab-text-color-active: var(--text-normal);
+  --tab-text-color-focused-active: var(--text-normal);
+  --tab-background-active: var(--background-primary);
+  --tab-outline-color: var(--background-modifier-border);
+  --tab-outline-width: 1px;
+
+  --nav-item-color: var(--text-muted);
+  --nav-item-color-hover: var(--text-normal);
+  --nav-item-color-active: var(--text-normal);
+  --nav-item-background-hover: var(--background-modifier-hover);
+  --nav-item-background-active: var(--background-modifier-active-hover);
+  --nav-item-weight-active: 600;
+  --nav-indentation-guide-width: 1px;
+
+  --icon-color: var(--text-muted);
+  --icon-color-hover: var(--text-normal);
+  --icon-color-active: var(--rr-accent);
+  --icon-opacity: 1;
+  --icon-opacity-hover: 1;
+  --icon-stroke-width: 1.75px;
+
+  --status-bar-background: var(--background-secondary);
+  --status-bar-text-color: var(--text-faint);
+  --status-bar-border-width: 1px;
+  --status-bar-border-color: var(--background-modifier-border);
+
+  --embed-border-left: var(--rr-border-width-strong) solid var(--rr-accent);
+  --embed-padding: 0 0 0 1em;
+}
+
+/* Spectrum bar. Sits on the window's top edge, above the titlebar and tab
+   strip, spanning the full width. Purely decorative — it carries no state,
+   and `pointer-events: none` leaves the frameless-window drag and resize
+   region behind it fully usable. Static, so reduced-motion does not apply. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: var(--rr-spectrum-height);
+  background: var(--rr-spectrum);
+  /* Chrome tier — above the titlebar and tab strip, below popovers, modals
+     and menus. The literal fallback matches Obsidian's own value, so the bar
+     is not left at `auto` if that variable is ever renamed. */
+  z-index: var(--layer-status-bar, 15);
+  pointer-events: none;
+}
+
+body.rr-no-spectrum::before {
+  content: none;
+}
+
+body.rr-spectrum-bars::before {
+  background: var(--rr-spectrum-bars);
+}
+
+/* The top chrome reads as terminal furniture under the bar: the theme's own
+   monospace, tracked out a little. Deliberately not uppercased — tab labels
+   are note titles, and caps cost scanability on long ones. */
+.workspace-tab-header-inner-title,
+.titlebar-inner .titlebar-text,
+.view-header-title {
+  font-family: var(--rr-font-mono);
+  font-size: 0.84em;
+  letter-spacing: 0.04em;
+}
+
+/* The active tab gets an accent rule on top — position is legible without
+   depending on the subtle background difference alone. */
+.workspace-tab-header.is-active::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: var(--rr-accent);
+}
+
+.workspace-tab-header {
+  position: relative;
+}
+
+.status-bar {
+  font-family: var(--rr-font-mono);
+  font-size: 0.78em;
+}
+
+/* Vault name as a small terminal label. */
+.workspace-drawer-vault-name,
+.nav-folder-title {
+  font-family: var(--rr-font-ui);
+}
+
+/* Atmospheric wash on the pane grounds. Applied here rather than to `body`,
+   because Obsidian paints every leaf with an opaque ground and a body-level
+   image would never surface. Left unscoped: `--rr-clouds` is `none` outside
+   the dark scheme, so the token decides where this applies.
+
+   Not `background-attachment: fixed` — a fixed background forces a repaint on
+   every scroll, and the pane does not scroll anyway; the editor inside it
+   does. So the wash already holds still while text moves over it. */
+.workspace-leaf-content {
+  background-image: var(--rr-clouds);
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+
+/* ==========================================================================
+   8. Code — inline and blocks
+   ========================================================================== */
+
+body {
+  --code-size: 0.88em;
+  --code-background: var(--rr-bg-0);
+  --code-normal: var(--rr-ink);
+  --code-comment: var(--rr-ink-faint);
+  --code-keyword: var(--rr-magenta);
+  --code-function: var(--rr-blue);
+  --code-string: var(--rr-green);
+  --code-property: var(--rr-teal);
+  --code-value: var(--rr-yellow);
+  --code-operator: var(--rr-accent);
+  --code-tag: var(--rr-purple);
+  --code-important: var(--rr-red);
+  --code-punctuation: var(--rr-ink-muted);
+}
+
+.theme-light {
+  --code-background: #F4EDDC;
+}
+
+/* Inline code — bordered chip so it reads as code even in greyscale. */
+:not(pre) > code {
+  font-family: var(--rr-font-mono);
+  background: var(--code-background);
+  border: var(--border-width) solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  padding: 0.1em 0.34em;
+  color: var(--rr-accent);
+}
+
+.theme-light :not(pre) > code {
+  color: var(--rr-accent-strong);
+}
+
+/* Fenced blocks — flush border, monospace, generous padding. */
+.markdown-rendered pre,
+.cm-s-obsidian .HyperMD-codeblock-bg {
+  background: var(--code-background);
+  border: var(--border-width) solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+}
+
+/* `position: relative` is the containing block for the language badge and the
+   copy button below. Set unconditionally rather than via `pre:has(> code…)`,
+   which costs a broad selector invalidation for no behavioural difference. */
+.markdown-rendered pre {
+  padding: 0.9em 1em;
+  overflow-x: auto;
+  position: relative;
+}
+
+.markdown-rendered pre > code {
+  font-family: var(--rr-font-mono);
+  font-size: var(--code-size);
+  line-height: 1.55;
+  tab-size: 2;
+}
+
+/* Language badge on hover, drawn from the info string. */
+.markdown-rendered pre > code[class*='language-']::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0.4em;
+  right: 0.6em;
+  font-family: var(--rr-font-mono);
+  font-size: 0.72em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  opacity: 0;
+  transition: opacity var(--rr-transition);
+}
+
+.markdown-rendered pre:hover > code[class*='language-']::before {
+  opacity: 1;
+}
+
+/* Copy button — visible affordance rather than a ghost. */
+.markdown-rendered pre .copy-code-button {
+  background: var(--interactive-normal);
+  border: var(--border-width) solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  font-family: var(--rr-font-ui);
+  font-size: 0.74em;
+}
+
+.markdown-rendered pre .copy-code-button:hover {
+  background: var(--interactive-hover);
+  color: var(--text-normal);
+}
+
+
+/* ==========================================================================
+   9. Callouts
+   Each type carries an icon *and* a colour, never colour alone.
+   ========================================================================== */
+
+.callout {
+  --callout-padding: 0.85em 1em;
+  --callout-radius: var(--radius-m);
+  --callout-blend-mode: normal;
+  border: var(--border-width) solid rgba(var(--callout-color), 0.35);
+  border-left: var(--rr-border-width-strong) solid rgb(var(--callout-color));
+  background: rgba(var(--callout-color), 0.10);
+}
+
+.callout-title {
+  font-family: var(--rr-font-ui);
+  font-weight: 650;
+  letter-spacing: 0.005em;
+  padding: 0;
+  gap: 0.5em;
+}
+
+.callout-title-inner {
+  color: rgb(var(--callout-color));
+}
+
+.theme-light .callout-title-inner {
+  color: var(--text-normal);
+}
+
+.callout-icon .svg-icon {
+  color: rgb(var(--callout-color));
+}
+
+.callout-content {
+  margin-top: 0.45em;
+}
+
+/* Type colours. Aliases share a value so every Obsidian callout keyword
+   resolves to something intentional. */
+.callout[data-callout='note']            { --callout-color: 127, 180, 227; }
+.callout[data-callout='abstract'],
+.callout[data-callout='summary'],
+.callout[data-callout='tldr']            { --callout-color: 98, 195, 178; }
+.callout[data-callout='info']            { --callout-color: 127, 180, 227; }
+.callout[data-callout='todo']            { --callout-color: 140, 172, 210; }
+.callout[data-callout='tip'],
+.callout[data-callout='hint'],
+.callout[data-callout='important']       { --callout-color: 98, 195, 178; }
+.callout[data-callout='success'],
+.callout[data-callout='check'],
+.callout[data-callout='done']            { --callout-color: 148, 196, 123; }
+.callout[data-callout='question'],
+.callout[data-callout='help'],
+.callout[data-callout='faq']             { --callout-color: 235, 203, 94; }
+.callout[data-callout='warning'],
+.callout[data-callout='caution'],
+.callout[data-callout='attention']       { --callout-color: 240, 160, 85; }
+.callout[data-callout='failure'],
+.callout[data-callout='fail'],
+.callout[data-callout='missing']         { --callout-color: 209, 122, 116; }
+.callout[data-callout='danger'],
+.callout[data-callout='error']           { --callout-color: 232, 138, 130; }
+.callout[data-callout='bug']             { --callout-color: 228, 145, 174; }
+.callout[data-callout='example']         { --callout-color: 187, 160, 216; }
+.callout[data-callout='quote'],
+.callout[data-callout='cite']            { --callout-color: 188, 174, 151; }
+
+/* Light mode needs darker fills to keep title text at AA on paper. */
+.theme-light .callout[data-callout='note'],
+.theme-light .callout[data-callout='info']            { --callout-color: 31, 94, 150; }
+.theme-light .callout[data-callout='abstract'],
+.theme-light .callout[data-callout='summary'],
+.theme-light .callout[data-callout='tldr'],
+.theme-light .callout[data-callout='tip'],
+.theme-light .callout[data-callout='hint'],
+.theme-light .callout[data-callout='important']       { --callout-color: 15, 106, 94; }
+.theme-light .callout[data-callout='todo']            { --callout-color: 45, 84, 132; }
+.theme-light .callout[data-callout='success'],
+.theme-light .callout[data-callout='check'],
+.theme-light .callout[data-callout='done']            { --callout-color: 63, 107, 43; }
+.theme-light .callout[data-callout='question'],
+.theme-light .callout[data-callout='help'],
+.theme-light .callout[data-callout='faq']             { --callout-color: 122, 91, 11; }
+.theme-light .callout[data-callout='warning'],
+.theme-light .callout[data-callout='caution'],
+.theme-light .callout[data-callout='attention']       { --callout-color: 158, 76, 12; }
+.theme-light .callout[data-callout='failure'],
+.theme-light .callout[data-callout='fail'],
+.theme-light .callout[data-callout='missing'],
+.theme-light .callout[data-callout='danger'],
+.theme-light .callout[data-callout='error']           { --callout-color: 163, 44, 37; }
+.theme-light .callout[data-callout='bug']             { --callout-color: 154, 49, 89; }
+.theme-light .callout[data-callout='example']         { --callout-color: 95, 68, 145; }
+.theme-light .callout[data-callout='quote'],
+.theme-light .callout[data-callout='cite']            { --callout-color: 94, 81, 66; }
+
+
+/* ==========================================================================
+   10. Tables
+   ========================================================================== */
+
+body {
+  --table-background: transparent;
+  --table-border-width: 1px;
+  --table-border-color: var(--background-modifier-border);
+  --table-white-space: normal;
+  --table-header-background: var(--rr-bg-2);
+  --table-header-background-hover: var(--rr-bg-3);
+  --table-header-border-color: var(--background-modifier-border);
+  --table-header-color: var(--text-normal);
+  --table-header-weight: 650;
+  --table-row-background-hover: var(--background-modifier-hover);
+  --table-row-alt-background: transparent;
+  --table-row-border-color: var(--background-modifier-border);
+  --table-column-alt-background: transparent;
+  --table-cell-padding: 0.42em 0.7em;
+}
+
+.markdown-rendered table {
+  border-collapse: collapse;
+  border: var(--table-border-width) solid var(--table-border-color);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  font-size: 0.94em;
+}
+
+.markdown-rendered thead th {
+  font-family: var(--rr-font-ui);
+  text-align: left;
+  border-bottom: var(--rr-border-width-strong) solid var(--background-modifier-border);
+}
+
+/* Zebra striping is on by default, so it works without the Style Settings
+   plugin installed. The optional toggle turns it off rather than on. */
+.markdown-rendered tbody tr:nth-child(even) {
+  background: var(--rr-bg-2);
+}
+
+body.rr-plain-tables .markdown-rendered tbody tr:nth-child(even) {
+  background: transparent;
+}
+
+.markdown-rendered tbody tr:hover {
+  background: var(--table-row-background-hover);
+}
+
+/* Figures line up column-to-column with tabular figures. Applied to every
+   cell: CSS cannot tell a numeric column from a textual one, and tabular
+   figures are harmless in prose. Column alignment stays with the author —
+   Markdown's `|---:|` syntax already emits `text-align`. */
+.markdown-rendered th,
+.markdown-rendered td {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tables must scroll inside their own box, never widen the note. */
+.markdown-rendered .table-wrapper,
+.markdown-rendered .markdown-preview-sizer > table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+
+/* ==========================================================================
+   11. Blockquotes, rules, lists, checkboxes
+   ========================================================================== */
+
+body {
+  --blockquote-border-thickness: var(--rr-border-width-strong);
+  --blockquote-border-color: var(--rr-accent);
+  --blockquote-font-style: normal;
+  --blockquote-color: var(--text-muted);
+  --blockquote-background-color: transparent;
+}
+
+.markdown-rendered blockquote {
+  padding-left: 1em;
+  margin-left: 0;
+}
+
+.markdown-rendered hr {
+  border: none;
+  border-top: var(--border-width) solid var(--hr-color);
+  margin: 2em 0;
+}
+
+body {
+  --list-indent: 1.6em;
+  --list-spacing: 0.12em;
+  --list-marker-color: var(--rr-accent);
+  --list-marker-color-hover: var(--rr-accent-strong);
+  --list-marker-color-collapsed: var(--rr-accent-strong);
+  --list-bullet-size: 4px;
+
+  --checkbox-radius: var(--radius-s);
+  --checkbox-size: 15px;
+  --checkbox-color: var(--rr-accent);
+  --checkbox-color-hover: var(--rr-accent-strong);
+  --checkbox-border-color: var(--rr-border-strong);
+  --checkbox-border-color-hover: var(--rr-accent);
+  --checkbox-marker-color: var(--text-on-accent);
+  --checklist-done-color: var(--text-faint);
+  --checklist-done-decoration: line-through;
+}
+
+
+/* ==========================================================================
+   12. Graph view
+   Local and global graph, both colour schemes. Node fill separates by kind
+   (note / tag / attachment / unresolved) rather than by hue alone — sizes
+   and the focus ring carry the same information.
+   ========================================================================== */
+
+.theme-dark {
+  --graph-line: rgba(188, 174, 151, 0.28);
+  --graph-node: #F2E9D8;
+  --graph-node-focused: #F0A055;
+  --graph-node-tag: #62C3B2;
+  --graph-node-attachment: #BBA0D8;
+  --graph-node-unresolved: rgba(232, 138, 130, 0.65);
+}
+
+.theme-light {
+  --graph-line: rgba(94, 81, 66, 0.28);
+  --graph-node: #3A2E22;
+  --graph-node-focused: #9E4C0C;
+  --graph-node-tag: #0F6A5E;
+  --graph-node-attachment: #5F4491;
+  --graph-node-unresolved: rgba(163, 44, 37, 0.55);
+}
+
+/* Graph canvas sits on the paper/ground colour rather than pure black. */
+/* Split into longhands so the cloud wash can layer over the ground colour.
+   The `background` shorthand would reset the image on every scheme. */
+.graph-view.color-fill,
+.workspace-leaf-content[data-type='graph'] .view-content,
+.workspace-leaf-content[data-type='localgraph'] .view-content {
+  background-color: var(--background-primary);
+  background-image: var(--rr-clouds);
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+
+/* --- Orbital plate -------------------------------------------------------
+   Chart furniture for the graph: a star glow at the centre, coloured orbits
+   stepping outward, and a reticle across the middle — the instrument plate an
+   astronomical chart is drawn on.
+
+   It is fixed to the viewport, not to the nodes, and that is a limitation
+   worth naming rather than hiding. Graph layout is force-directed physics
+   inside a WebGL canvas; CSS cannot read or place node positions, so it
+   cannot put notes onto orbits. What it can do is give them a chart to drift
+   across. Both layers sit above the canvas with `pointer-events: none`, so
+   pan, zoom and node dragging are untouched, and so the plate shows whether
+   or not the canvas paints an opaque background of its own.
+
+   Orbit radii step unevenly — tight inside, wider out — because evenly spaced
+   rings read as a target, not a system. */
+
+.workspace-leaf-content[data-type='graph'] .view-content,
+.workspace-leaf-content[data-type='localgraph'] .view-content {
+  position: relative;
+}
+
+/* The star. A warm core rather than a hard disc — it reads as the thing the
+   orbits belong to without competing with a focused node. */
+.workspace-leaf-content[data-type='graph'] .view-content::before,
+.workspace-leaf-content[data-type='localgraph'] .view-content::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--rr-graph-core-opacity);
+  background: radial-gradient(
+    circle closest-side at 50% 50%,
+    var(--rr-accent-strong) 0%,
+    var(--rr-accent) 18%,
+    transparent 80%
+  );
+}
+
+/* Orbits and reticle. One hue per orbit, drawn from the same spectrum as the
+   top bar, so the graph and the window chrome speak the same language. */
+.workspace-leaf-content[data-type='graph'] .view-content::after,
+.workspace-leaf-content[data-type='localgraph'] .view-content::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--rr-graph-orbit-opacity);
+  background-image:
+    /* reticle — horizontal, then vertical hairline */
+    linear-gradient(var(--rr-border-strong), var(--rr-border-strong)),
+    linear-gradient(var(--rr-border-strong), var(--rr-border-strong)),
+    /* Orbits, innermost first. `closest-side` ties the radii to the pane's
+       shorter edge; the default `farthest-corner` scales them to the diagonal,
+       which pushes the outer orbits off a wide pane so they read as stray arcs
+       instead of a system. */
+    radial-gradient(
+      circle closest-side at 50% 50%,
+      transparent 12%,
+      var(--rr-teal) 12%,
+      var(--rr-teal) calc(12% + 1px),
+      transparent calc(12% + 1px),
+      transparent 20%,
+      var(--rr-purple) 20%,
+      var(--rr-purple) calc(20% + 1px),
+      transparent calc(20% + 1px),
+      transparent 30%,
+      var(--rr-accent) 30%,
+      var(--rr-accent) calc(30% + 1px),
+      transparent calc(30% + 1px),
+      transparent 43%,
+      var(--rr-yellow) 43%,
+      var(--rr-yellow) calc(43% + 1px),
+      transparent calc(43% + 1px),
+      transparent 58%,
+      var(--rr-magenta) 58%,
+      var(--rr-magenta) calc(58% + 1px),
+      transparent calc(58% + 1px),
+      transparent 76%,
+      var(--rr-blue) 76%,
+      var(--rr-blue) calc(76% + 1px),
+      transparent calc(76% + 1px)
+    );
+  background-repeat: no-repeat;
+  background-size: 100% 1px, 1px 100%, 100% 100%;
+  background-position: center, center, center;
+}
+
+body.rr-no-graph-plate .workspace-leaf-content[data-type='graph'] .view-content::before,
+body.rr-no-graph-plate .workspace-leaf-content[data-type='graph'] .view-content::after,
+body.rr-no-graph-plate .workspace-leaf-content[data-type='localgraph'] .view-content::before,
+body.rr-no-graph-plate .workspace-leaf-content[data-type='localgraph'] .view-content::after {
+  content: none;
+}
+
+/* Controls panel — same chrome language as the rest of the theme. */
+.graph-controls {
+  background: var(--background-secondary);
+  border: var(--border-width) solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  box-shadow: var(--shadow-s);
+}
+
+.graph-controls .tree-item-self {
+  font-family: var(--rr-font-ui);
+}
+
+
+/* ==========================================================================
+   13. Controls — buttons, inputs, toggles, modals, search
+   ========================================================================== */
+
+button,
+.clickable-icon {
+  font-family: var(--rr-font-ui);
+  transition: background var(--rr-transition), color var(--rr-transition);
+}
+
+button:not(.clickable-icon) {
+  border: var(--border-width) solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+}
+
+button.mod-cta {
+  border-color: transparent;
+  font-weight: 600;
+}
+
+input[type='text'],
+input[type='search'],
+input[type='number'],
+textarea,
+select {
+  font-family: var(--rr-font-ui);
+  background: var(--background-modifier-form-field);
+  border: var(--border-width) solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+}
+
+body {
+  --input-height: 30px;
+  --toggle-thumb-color: var(--text-on-accent);
+  --toggle-border-width: 1px;
+
+  --modal-background: var(--background-primary);
+  --modal-border-color: var(--background-modifier-border);
+  --modal-border-width: var(--border-width);
+  --modal-radius: var(--radius-l);
+
+  --prompt-border-width: var(--border-width);
+  --prompt-border-color: var(--background-modifier-border);
+
+  --search-result-background: var(--background-primary);
+  --search-clear-button-color: var(--text-muted);
+}
+
+.suggestion-item.is-selected,
+.prompt-results .suggestion-item.is-selected {
+  background: var(--background-modifier-active-hover);
+}
+
+/* Search match highlight keeps its own background so hits stay findable. */
+.search-result-file-matched-text {
+  background: var(--text-highlight-bg);
+  color: var(--text-normal);
+  border-radius: 2px;
+}
+
+
+/* ==========================================================================
+   14. Scrollbars
+   ========================================================================== */
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-bg);
+  border-radius: 6px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-active-thumb-bg);
+  background-clip: content-box;
+}
+
+
+/* ==========================================================================
+   15. Accessibility
+   ========================================================================== */
+
+/* Visible keyboard focus everywhere. Obsidian's default focus treatment is
+   easy to lose against a warm ground, so this is deliberately explicit. */
+:focus-visible {
+  outline: var(--rr-border-width-strong) solid var(--rr-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-s);
+}
+
+/* Never remove the ring for mouse users without restoring it for keyboards. */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+a:focus-visible,
+.clickable-icon:focus-visible,
+.nav-file-title:focus-visible,
+.workspace-tab-header:focus-visible {
+  outline: var(--rr-border-width-strong) solid var(--rr-accent);
+  outline-offset: 2px;
+}
+
+/* Option: underline every link, so link-ness is not colour-only. */
+body.rr-underline-links a,
+body.rr-underline-links .internal-link,
+body.rr-underline-links .external-link {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Option: raised contrast. Pushes ink toward the extremes and firms up
+   borders — useful in bright rooms and for low-vision users. */
+body.rr-high-contrast.theme-dark {
+  --rr-ink: #FFFAF0;
+  --rr-ink-muted: #D6C9B2;
+  --rr-ink-faint: #A2937C;
+  --rr-border: #5E666E;
+  --rr-border-strong: #7A838C;
+  --rr-bg-1: #101317;
+  --rr-bg-0: #0A0C0E;
+}
+
+body.rr-high-contrast.theme-light {
+  --rr-ink: #1A1410;
+  --rr-ink-muted: #443A2E;
+  --rr-ink-faint: #635641;
+  --rr-border: #A38F70;
+  --rr-border-strong: #7D6A4E;
+  --rr-bg-1: #FFFCF3;
+}
+
+body.rr-high-contrast .markdown-rendered h2 {
+  border-bottom-width: var(--rr-border-width-strong);
+}
+
+/* Option: dyslexia-friendly body text. Falls back cleanly when neither
+   font is installed. */
+body.rr-readable-font {
+  --font-text-theme: 'OpenDyslexic', 'Atkinson Hyperlegible', 'Verdana',
+                     var(--rr-font-ui);
+  --rr-line-height: 1.75;
+  letter-spacing: 0.012em;
+  word-spacing: 0.06em;
+}
+
+/* Honour the system preference, and offer a manual switch for people whose
+   OS setting does not match their need.
+
+   Two layers. The variables cover the theme's own motion and Obsidian core's,
+   with no override needed. The universal rule exists only to catch animations
+   declared by community plugins, whose selectors and specificity are unknown
+   ahead of time — nothing but `!important` reliably beats them. The theme
+   linter flags that, and it stays: a vestibular trigger is a worse outcome
+   than a lint warning. Duration alone is enough, so `animation-iteration-count`
+   and a `*`-wide `scroll-behavior` are gone — the latter only ever applied to
+   scroll containers anyway, and is set on the root below instead. */
+@media (prefers-reduced-motion: reduce) {
+  body {
+    --rr-transition: 0s;
+    --anim-duration-superfast: 0s;
+    --anim-duration-fast: 0s;
+    --anim-duration-moderate: 0s;
+    --anim-duration-slow: 0s;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+body.rr-no-motion {
+  --rr-transition: 0s;
+  --anim-duration-superfast: 0s;
+  --anim-duration-fast: 0s;
+  --anim-duration-moderate: 0s;
+  --anim-duration-slow: 0s;
+  scroll-behavior: auto;
+}
+
+body.rr-no-motion *,
+body.rr-no-motion *::before,
+body.rr-no-motion *::after {
+  animation-duration: 0.001ms !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* Option: a deeper atmospheric wash, for anyone who wants the atmosphere more
+   than the margin. Same four blobs as the default in section 3, with the
+   brightest lifted to --rr-bg-3 and held a little further before they fade.
+   That takes faint code-comment text from 3.79:1 to about 3.22:1 — still past
+   its 3.0 target, but the headroom is most of what is spent. Kept out of the
+   palette block so section 3 stays the single place colours are declared. */
+body.rr-clouds-strong.theme-dark {
+  --rr-clouds:
+    radial-gradient(66% 50% at 16% 10%, var(--rr-bg-3) 0%, transparent 74%),
+    radial-gradient(52% 42% at 84% 6%, var(--rr-bg-3) 0%, transparent 70%),
+    radial-gradient(76% 58% at 72% 80%, var(--rr-bg-2) 0%, transparent 76%),
+    radial-gradient(50% 40% at 26% 90%, var(--rr-bg-0) 0%, transparent 72%);
+}
+
+/* Respect a system request for more contrast without any manual toggle. */
+@media (prefers-contrast: more) {
+  .theme-dark {
+    --rr-ink: #FFFAF0;
+    --rr-border: #5E666E;
+  }
+  .theme-light {
+    --rr-ink: #1A1410;
+    --rr-border: #A38F70;
+  }
+}
+
+
+/* ==========================================================================
+   16. Print
+   Ink-frugal: paper ground, black text, visible link targets.
+   ========================================================================== */
+
+@media print {
+  body {
+    --background-primary: #FFFFFF;
+    --background-primary-alt: #FFFFFF;
+    --text-normal: #000000;
+    --text-muted: #333333;
+  }
+
+  /* `page-break-inside` rather than `break-inside`: the legacy alias is what
+     Chromium implements completely for paged media, and it avoids the
+     multicolumn-fragmentation compat warning the modern property raises. */
+  .markdown-rendered pre,
+  .markdown-rendered table,
+  .callout {
+    page-break-inside: avoid;
+  }
+
+  .markdown-rendered a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.8em;
+    color: #444444;
+  }
+}
