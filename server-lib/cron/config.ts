@@ -41,7 +41,9 @@ export function getCronConfig(): CronConfig {
       "https://pib.gov.in/RssFeed.aspx?PingID=1",
       "https://economictimes.indiatimes.com/news/economy/policy/rssfeeds/2142142220.cms",
       "https://www.livemint.com/rss/economy",
-      "https://www.thehindu.com/news/national/feeder/default.rss"
+      "https://www.thehindu.com/news/national/feeder/default.rss",
+      "https://prsindia.org/feed.xml",
+      "https://news.un.org/feed/subscribe/en/news/all/rss.xml"
     ];
   }
 
