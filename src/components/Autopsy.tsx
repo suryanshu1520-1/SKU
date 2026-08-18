@@ -1,46 +1,15 @@
-import { useEffect, useState } from 'react';
-import { motion } from 'motion/react';
-import { Loader2, Sparkles } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
+import { Loader2, Sparkles, Shield, Trophy, Clock, CheckCircle2, XCircle, HelpCircle, ArrowRight } from 'lucide-react';
 import Markdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 import { supabase } from '../lib/supabase';
-
-function AnimatedNumber({ value, prefix = "" }: { value: number, prefix?: string }) {
-  const [displayValue, setDisplayValue] = useState(0);
-
-  useEffect(() => {
-    if (value === 0) {
-      setDisplayValue(0);
-      return;
-    }
-    let startTimestamp: number;
-    const duration = 1500; 
-    let animationFrameId: number;
-
-    const step = (timestamp: number) => {
-      if (!startTimestamp) startTimestamp = timestamp;
-      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-      const easeProgress = 1 - Math.pow(1 - progress, 3);
-      setDisplayValue(Math.round(easeProgress * value));
-
-      if (progress < 1) {
-        animationFrameId = requestAnimationFrame(step);
-      }
-    };
-
-    animationFrameId = requestAnimationFrame(step);
-
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [value]);
-
-  return <>{displayValue > 0 ? prefix : ''}{displayValue}</>;
-}
-
+import { AnimatedNumber, AccuracyBar, StatCard } from './shared';
 
 interface AutopsyProps {
-  stats: { 
-    correct: number; 
-    incorrect: number; 
+  stats: {
+    correct: number;
+    incorrect: number;
     unattempted: number;
     totalTimeSeconds?: number;
     subjectStats?: Record<string, { correct: number; total: number }>;
@@ -52,9 +21,16 @@ interface AutopsyProps {
   onDeployNext?: () => void;
 }
 
-export default function Autopsy({ stats, percentile, onNavigateManifesto, onReturnToDashboard, onDeployNext }: AutopsyProps) {
+export default function Autopsy({
+  stats,
+  percentile,
+  onNavigateManifesto,
+  onReturnToDashboard,
+  onDeployNext,
+}: AutopsyProps) {
   const [insights, setInsights] = useState<{ overallInsights?: string; subjectInsights?: Record<string, string> } | null>(null);
   const [loadingInsights, setLoadingInsights] = useState(false);
+  const prefersReduced = useReducedMotion();
 
   useEffect(() => {
     if (Object.keys(stats.subjectStats || {}).length > 0) {
@@ -63,18 +39,18 @@ export default function Autopsy({ stats, percentile, onNavigateManifesto, onRetu
         const token = session?.access_token || '';
         fetch('/api/insights', {
           method: 'POST',
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
-            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
-          body: JSON.stringify({ stats })
+          body: JSON.stringify({ stats }),
         })
-        .then(res => res.json())
-        .then(data => {
-          if (data.insights) setInsights(data.insights);
-        })
-        .catch(err => console.error("Error fetching insights:", err))
-        .finally(() => setLoadingInsights(false));
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.insights) setInsights(data.insights);
+          })
+          .catch((err) => console.error('Error fetching insights:', err))
+          .finally(() => setLoadingInsights(false));
       });
     }
   }, [stats]);
@@ -83,11 +59,11 @@ export default function Autopsy({ stats, percentile, onNavigateManifesto, onRetu
   const tts = stats.totalTimeSeconds || 0;
   const mins = Math.floor(tts / 60);
   const secs = tts % 60;
-  const avgTime = total > 0 ? (tts / total) : 0;
+  const avgTime = total > 0 ? tts / total : 0;
 
   const isRanked = stats.isRanked === true;
   const accuracy = total > 0 ? stats.correct / total : 0;
-  
+
   let cpEarned = 0;
   let cpCorrect = 0;
   let cpPenalty = 0;
@@ -106,219 +82,311 @@ export default function Autopsy({ stats, percentile, onNavigateManifesto, onRetu
     }
   }
 
-  return (
-    <div className="min-h-screen bg-zinc-950 text-stone-50 flex flex-col items-center p-6 pb-24 relative overflow-hidden">
-      
-      {/* Background decoration */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900/40 via-zinc-950 to-zinc-950 -z-10 pointer-events-none" />
+  const isHighPerformer = percentile >= 75 || accuracy >= 0.7;
 
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+  return (
+    <div className="min-h-screen text-stone-100 flex flex-col items-center p-4 sm:p-6 pb-24 relative overflow-hidden font-sans">
+      
+      {/* Subtle background gradient */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900/30 via-zinc-950 to-zinc-950 -z-10 pointer-events-none" />
+
+      <motion.div
+        initial={prefersReduced ? undefined : { opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full max-w-xl mt-12 md:mt-24"
+        className="w-full max-w-2xl mt-8 sm:mt-16 space-y-8"
       >
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-sans font-bold tracking-tight mb-2">Performance Analytics</h1>
-          <p className="text-zinc-500 font-sans text-xs uppercase tracking-widest">Post-Session Analysis</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-zinc-800 border border-zinc-800 mb-8 rounded-sm overflow-hidden">
-          <div className="bg-zinc-950 p-6 flex flex-col items-center justify-center">
-            <span className="text-4xl font-sans font-medium mb-1 text-emerald-400">{stats.correct}</span>
-            <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-widest">Correct</span>
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-[#e0d0ab]">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            Session Autopsy & Diagnostics
           </div>
-          <div className="bg-zinc-950 p-6 flex flex-col items-center justify-center">
-            <span className="text-4xl font-sans font-medium mb-1 text-rose-500">{stats.incorrect}</span>
-            <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-widest">Incorrect</span>
-          </div>
-          <div className="bg-zinc-950 p-6 flex flex-col items-center justify-center">
-            <span className="text-4xl font-sans font-medium mb-1 text-zinc-400">{stats.unattempted}</span>
-            <span className="text-[10px] font-sans text-zinc-500 uppercase tracking-widest">Unattempted</span>
-          </div>
-        </div>
-
-        <div className="border border-zinc-800 bg-zinc-900/30 p-8 text-center rounded-sm mb-8">
-          <p className="text-lg font-sans text-zinc-300 leading-relaxed font-medium">
-            You processed <span className="text-stone-100">{total}</span> protocols.
-            <br className="mt-4" />
-            <span className="block mt-4 text-emerald-400 text-xl font-sans">
-              You scored higher than {percentile}% of the candidate pool.
-            </span>
+          <h1 className="font-serif text-3xl sm:text-4xl font-bold text-white tracking-tight">
+            Performance Autopsy
+          </h1>
+          <p className="text-xs font-mono uppercase tracking-widest text-zinc-400">
+            {isRanked ? 'Vanguard Competitive Protocol' : 'Unranked Diagnostics Arena'} &bull; {total} Questions Evaluated
           </p>
         </div>
 
+        {/* 1. Headline Stats Grid (Animated Count-Up) */}
+        <motion.div
+          initial={prefersReduced ? undefined : { opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="grid grid-cols-3 gap-3 bg-zinc-900/30 border border-zinc-800 p-3 sm:p-4 rounded-sm"
+        >
+          <div className="p-4 bg-zinc-950/80 border border-zinc-800/80 rounded-sm flex flex-col items-center justify-center text-center">
+            <div className="flex items-center gap-1 text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-bold mb-1">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Correct</span>
+            </div>
+            <span className="text-3xl sm:text-4xl font-mono font-bold text-emerald-400">
+              <AnimatedNumber value={stats.correct} />
+            </span>
+            <span className="text-[10px] font-mono text-zinc-500 mt-1">
+              +{stats.correct * 2.0} Marks
+            </span>
+          </div>
+
+          <div className="p-4 bg-zinc-950/80 border border-zinc-800/80 rounded-sm flex flex-col items-center justify-center text-center">
+            <div className="flex items-center gap-1 text-[10px] font-mono uppercase tracking-widest text-rose-400 font-bold mb-1">
+              <XCircle className="w-3.5 h-3.5" />
+              <span>Incorrect</span>
+            </div>
+            <span className="text-3xl sm:text-4xl font-mono font-bold text-rose-400">
+              <AnimatedNumber value={stats.incorrect} />
+            </span>
+            <span className="text-[10px] font-mono text-zinc-500 mt-1">
+              -{(stats.incorrect * 0.66).toFixed(2)} Penalty
+            </span>
+          </div>
+
+          <div className="p-4 bg-zinc-950/80 border border-zinc-800/80 rounded-sm flex flex-col items-center justify-center text-center">
+            <div className="flex items-center gap-1 text-[10px] font-mono uppercase tracking-widest text-zinc-400 font-bold mb-1">
+              <HelpCircle className="w-3.5 h-3.5" />
+              <span>Unattempted</span>
+            </div>
+            <span className="text-3xl sm:text-4xl font-mono font-bold text-zinc-300">
+              <AnimatedNumber value={stats.unattempted} />
+            </span>
+            <span className="text-[10px] font-mono text-zinc-500 mt-1">
+              0.00 Net
+            </span>
+          </div>
+        </motion.div>
+
+        {/* 2. Percentile Standing Banner */}
+        <motion.div
+          initial={prefersReduced ? undefined : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className={`p-6 sm:p-8 rounded-sm border text-center relative overflow-hidden backdrop-blur-sm ${
+            isHighPerformer
+              ? 'bg-gradient-to-b from-zinc-900/60 to-zinc-950 border-[#0194a8]/50 shadow-lg shadow-[#0194a8]/10'
+              : 'bg-zinc-900/40 border-zinc-800'
+          }`}
+        >
+          <div className="space-y-2 max-w-lg mx-auto">
+            <p className="text-xs font-mono uppercase tracking-widest text-zinc-400">
+              Cohort Standing & Mastery Index
+            </p>
+            <h3 className="font-serif text-xl sm:text-2xl font-bold text-white">
+              Higher than{' '}
+              <span className="text-[#e0d0ab] font-mono">
+                <AnimatedNumber value={percentile} suffix="%" />
+              </span>{' '}
+              of candidate submissions.
+            </h3>
+            <p className="text-xs font-sans text-zinc-400 leading-relaxed pt-1">
+              {percentile >= 80
+                ? 'Exceptional precision. You have cleared the Vanguard benchmark for elite accuracy.'
+                : percentile >= 50
+                ? 'Competitive baseline achieved. Strengthening subject focus areas will accelerate percentile growth.'
+                : 'Diagnostic completed. Review conceptual insights below to eliminate repeat errors.'}
+            </p>
+          </div>
+        </motion.div>
+
+        {/* 3. Contender Points Yield Breakdown (Ranked only) */}
         {isRanked && (
-          <div className="border border-[#e0d0ab]/30 bg-[#e0d0ab]/5 p-6 rounded-sm mb-12 text-center">
-            <h3 className="text-[10px] font-sans text-[#e0d0ab] uppercase tracking-widest mb-4 font-bold">Points Yield Breakdown</h3>
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 mb-4">
-              <div className="flex flex-col">
-                <span className="text-xl text-emerald-400 font-mono">
+          <motion.div
+            initial={prefersReduced ? undefined : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.25 }}
+            className="border border-[#e0d0ab]/30 bg-[#e0d0ab]/5 p-6 rounded-sm text-center space-y-4"
+          >
+            <div className="flex items-center justify-center gap-2">
+              <Trophy className="w-4 h-4 text-[#e0d0ab]" />
+              <h3 className="text-xs font-mono text-[#e0d0ab] uppercase tracking-widest font-bold">
+                Contender Points Yield
+              </h3>
+            </div>
+
+            <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-10 py-2">
+              <div className="flex flex-col items-center">
+                <span className="text-xl sm:text-2xl font-mono text-emerald-400 font-bold">
                   <AnimatedNumber value={cpCorrect} prefix="+" />
                 </span>
-                <span className="text-[9px] text-zinc-500 uppercase tracking-widest mt-1">From Correct</span>
+                <span className="text-[9px] font-mono text-zinc-400 uppercase tracking-widest mt-1">
+                  Correct (+3 CP)
+                </span>
               </div>
-              <div className="text-zinc-700 font-mono hidden sm:block">+</div>
-              <div className="flex flex-col">
-                <span className="text-xl text-rose-500 font-mono">
+
+              <span className="text-zinc-600 font-mono text-lg select-none">&minus;</span>
+
+              <div className="flex flex-col items-center">
+                <span className="text-xl sm:text-2xl font-mono text-rose-400 font-bold">
                   <AnimatedNumber value={cpPenalty} prefix="-" />
                 </span>
-                <span className="text-[9px] text-zinc-500 uppercase tracking-widest mt-1">Penalty</span>
+                <span className="text-[9px] font-mono text-zinc-400 uppercase tracking-widest mt-1">
+                  Penalty (-1 CP)
+                </span>
               </div>
+
               {cpBonus > 0 && (
                 <>
-                  <div className="text-zinc-700 font-mono hidden sm:block">+</div>
-                  <div className="flex flex-col">
-                    <span className="text-xl text-amber-500 font-mono">
+                  <span className="text-zinc-600 font-mono text-lg select-none">+</span>
+                  <div className="flex flex-col items-center">
+                    <span className="text-xl sm:text-2xl font-mono text-[#e0d0ab] font-bold">
                       <AnimatedNumber value={cpBonus} prefix="+" />
                     </span>
-                    <span className="text-[9px] text-zinc-500 uppercase tracking-widest mt-1">Vanguard Bonus</span>
+                    <span className="text-[9px] font-mono text-zinc-400 uppercase tracking-widest mt-1">
+                      80%+ Bonus
+                    </span>
                   </div>
                 </>
               )}
             </div>
-            <div className="pt-4 border-t border-[#e0d0ab]/10">
-              <span className="text-stone-300 text-sm">Total Contender Points Earned: </span>
-              <span className="text-2xl font-mono text-[#e0d0ab] font-bold ml-2">
+
+            <div className="pt-4 border-t border-[#e0d0ab]/15 flex items-center justify-center gap-2">
+              <span className="text-xs font-mono text-stone-300 uppercase tracking-wider">
+                Total Net Yield:
+              </span>
+              <span className="text-2xl font-mono text-[#e0d0ab] font-bold">
                 <AnimatedNumber value={cpEarned} /> CP
               </span>
             </div>
-          </div>
+          </motion.div>
         )}
 
-        {/* Real Performance Metrics */}
-        <div className="relative border border-zinc-800 bg-[#0c0c0c] rounded-sm overflow-hidden mt-8">
-          
-          <div className="p-8 pb-12 space-y-12 transition-all">
-            <div className="text-center">
-              <h2 className="text-xl font-sans font-medium text-stone-100 mb-2">Metrics</h2>
-              <p className="text-xs font-sans text-zinc-500 uppercase tracking-widest">Detailed Insights</p>
+        {/* 4. Execution Telemetry & Detailed Subject Breakdown */}
+        <motion.div
+          initial={prefersReduced ? undefined : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+          className="border border-zinc-800 bg-zinc-900/30 p-6 sm:p-8 rounded-sm space-y-8"
+        >
+          {/* Execution Time Telemetry */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-[#0194a8]" />
+              <h4 className="font-mono text-xs uppercase tracking-widest text-[#e0d0ab] font-bold">
+                Execution Pace Telemetry
+              </h4>
             </div>
-            
-            <div className="space-y-8">
-              {/* Total Time */}
-              <div className="flex flex-col gap-4">
-                <h3 className="text-[10px] font-sans text-zinc-500 uppercase tracking-widest">Execution Time</h3>
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm bg-zinc-900/40 border border-zinc-800/50 p-4 rounded-md gap-4">
-                  <span className="text-stone-300 font-sans font-medium text-2xl">
-                    {mins > 0 ? `${mins}m ` : ''}{secs.toFixed(1)}s
-                  </span>
-                  <div className="flex flex-col sm:items-end">
-                    <span className="text-zinc-400 font-sans font-medium text-lg">
-                      {avgTime.toFixed(1)}s
-                    </span>
-                    <span className="text-zinc-500 font-sans uppercase tracking-widest text-[9px]">
-                      Avg. per query
-                    </span>
-                  </div>
-                </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="p-4 bg-zinc-950/80 border border-zinc-800 rounded-sm">
+                <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest block mb-1">
+                  Total Active Time
+                </span>
+                <span className="text-2xl font-mono font-bold text-stone-100">
+                  {mins > 0 ? `${mins}m ` : ''}{secs.toFixed(1)}s
+                </span>
               </div>
 
-              {/* Subject Accuracy */}
-              <div>
-                <h3 className="text-[10px] font-sans text-zinc-500 uppercase tracking-widest mb-4">Subject Areas</h3>
-                <div className="space-y-6">
-                  {(!stats.subjectStats || Object.keys(stats.subjectStats).length === 0) ? (
-                    <p className="text-sm font-sans text-zinc-500">Insufficient data.</p>
-                  ) : (
-                    Object.entries(stats.subjectStats)
-                      .sort((a, b) => {
-                        const percA = Math.round((a[1].correct / a[1].total) * 100);
-                        const percB = Math.round((b[1].correct / b[1].total) * 100);
-                        return percA - percB;
-                      })
-                      .map(([subj, data]) => {
-                      const percentage = Math.round((data.correct / data.total) * 100);
-                      const isWeak = percentage < 60;
-                      return (
-                        <div key={subj}>
-                          <div className="flex justify-between items-center text-xs mb-2 font-sans font-medium">
-                            <span className="text-zinc-300">
-                              {subj}
-                              {isWeak && <span className="ml-3 text-stone-100 bg-zinc-800 border border-zinc-700 px-2 py-0.5 rounded text-[9px] uppercase tracking-widest font-normal">Focus Area</span>}
-                            </span>
-                            <span className="text-stone-100 font-sans">{percentage}%</span>
-                          </div>
-                          <div className="w-full bg-zinc-900/50 border border-zinc-800/50 h-2 rounded-full overflow-hidden">
-                            <motion.div 
-                              className={`h-full ${isWeak ? 'bg-amber-500/60' : 'bg-emerald-500/60'}`} 
-                              initial={{ width: 0 }}
-                              animate={{ width: `${percentage}%` }}
-                              transition={{ duration: 1.2, ease: [0.25, 1, 0.5, 1] }}
-                            />
-                          </div>
-                          <p className="text-[10px] font-sans text-zinc-500 mt-2 tracking-wide font-normal">
-                            {data.correct} out of {data.total} correct. {insights?.subjectInsights?.[subj] ? insights.subjectInsights[subj] : (isWeak ? "Review suggested to build stronger conceptual grasp." : "Solid understanding.")}
-                          </p>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
+              <div className="p-4 bg-zinc-950/80 border border-zinc-800 rounded-sm">
+                <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest block mb-1">
+                  Average Pace Per Query
+                </span>
+                <span className="text-2xl font-mono font-bold text-[#0194a8]">
+                  {avgTime.toFixed(1)}s
+                </span>
               </div>
-
-              {/* Subjective Insights */}
-              {(loadingInsights || insights) && (
-                <div className="pt-8 border-t border-zinc-800/50">
-                  <h3 className="text-[10px] font-sans text-zinc-500 uppercase tracking-widest mb-4">Subjective Feedback</h3>
-                  {loadingInsights ? (
-                    <div className="flex items-center gap-2 text-sm text-zinc-500">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Synthesizing performance feedback...
-                    </div>
-                  ) : insights?.overallInsights ? (
-                    <div className="prose prose-invert prose-p:text-sm prose-li:text-sm prose-p:leading-relaxed prose-li:leading-relaxed max-w-none text-zinc-300 font-serif">
-                      <Markdown rehypePlugins={[rehypeSanitize]}>{insights.overallInsights}</Markdown>
-                    </div>
-                  ) : null}
-                </div>
-              )}
-
             </div>
           </div>
-        </div>
 
-        {/* Navigation Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
+          {/* Subject Area Accuracy Bars */}
+          <div className="space-y-4 pt-4 border-t border-zinc-800">
+            <div className="flex items-center justify-between">
+              <h4 className="font-mono text-xs uppercase tracking-widest text-[#e0d0ab] font-bold">
+                Domain Mastery Breakdown
+              </h4>
+              <span className="text-[10px] font-mono text-zinc-500">
+                Sorted by Need of Focus
+              </span>
+            </div>
+
+            {!stats.subjectStats || Object.keys(stats.subjectStats).length === 0 ? (
+              <p className="text-xs font-mono text-zinc-500">
+                No subject-level telemetry recorded for this assessment.
+              </p>
+            ) : (
+              <div className="space-y-5">
+                {Object.entries(stats.subjectStats)
+                  .sort((a, b) => {
+                    const percA = Math.round((a[1].correct / a[1].total) * 100);
+                    const percB = Math.round((b[1].correct / b[1].total) * 100);
+                    return percA - percB;
+                  })
+                  .map(([subj, data], sIdx) => {
+                    const percentage = Math.round((data.correct / data.total) * 100);
+                    return (
+                      <AccuracyBar
+                        key={subj}
+                        label={subj}
+                        accuracy={percentage}
+                        correctCount={data.correct}
+                        totalCount={data.total}
+                        delay={sIdx * 0.1}
+                      />
+                    );
+                  })}
+              </div>
+            )}
+          </div>
+
+          {/* Subjective AI Autopsy Feedback */}
+          {(loadingInsights || insights) && (
+            <div className="pt-6 border-t border-zinc-800 space-y-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#e0d0ab]" />
+                <h4 className="font-mono text-xs uppercase tracking-widest text-[#e0d0ab] font-bold">
+                  Conceptual Autopsy Synthesis
+                </h4>
+              </div>
+
+              {loadingInsights ? (
+                <div className="flex items-center gap-2.5 text-xs text-zinc-400 font-mono py-4">
+                  <Loader2 className="w-4 h-4 animate-spin text-[#0194a8]" />
+                  <span>Synthesizing conceptual diagnostic feedback...</span>
+                </div>
+              ) : insights?.overallInsights ? (
+                <div className="prose prose-invert prose-p:text-xs sm:prose-p:text-sm prose-li:text-xs sm:prose-li:text-sm prose-p:leading-relaxed max-w-none text-zinc-300 font-serif bg-zinc-950/60 p-5 rounded-sm border border-zinc-800/80">
+                  <Markdown rehypePlugins={[rehypeSanitize]}>{insights.overallInsights}</Markdown>
+                </div>
+              ) : null}
+            </div>
+          )}
+        </motion.div>
+
+        {/* 5. Navigation Actions */}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
           <button
             onClick={onReturnToDashboard}
-            className="inline-flex items-center justify-center gap-2 py-3 px-8 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 font-sans text-xs font-bold uppercase tracking-widest rounded-sm transition-all shadow-lg shadow-[#e0d0ab]/10 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 py-3 px-8 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 font-mono text-xs font-bold uppercase tracking-wider rounded-sm transition-all shadow-md shadow-[#e0d0ab]/10 cursor-pointer"
           >
             Return to Dashboard
           </button>
           <button
             onClick={onDeployNext}
-            className="inline-flex items-center justify-center gap-2 py-3 px-8 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-sans text-xs font-bold uppercase tracking-widest rounded-sm transition-all border border-zinc-800 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 py-3 px-8 bg-zinc-900 hover:bg-zinc-800 text-stone-200 hover:text-[#e0d0ab] border border-zinc-800 hover:border-[#0194a8] font-mono text-xs font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer"
           >
-            <Sparkles className="w-4 h-4" />
-            Deploy Next Assessment
+            <Sparkles className="w-4 h-4 text-[#0194a8]" />
+            <span>Deploy Next Protocol</span>
           </button>
         </div>
 
-        {/* Founder's Club Bit */}
-        <div className="mt-12 w-full max-w-xl mx-auto backdrop-blur-md bg-zinc-900/40 border border-zinc-800/50 rounded-sm p-8 text-center shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#e0d0ab]/20 to-transparent" />
-          <h3 className="text-lg font-sans font-semibold text-[#e0d0ab] mb-4">Unlock The Network</h3>
-          <p className="text-sm font-sans text-stone-300 mb-6 leading-relaxed">
-            TARK is an ad-free initiative, forever. Secure Founder Status to unlock global rankings, peer-to-peer combat, direct dev communication, and personalized feedback for rapid growth in our paid package.
-          </p>
-          <button 
-            onClick={onNavigateManifesto}
-            className="w-full sm:w-auto inline-block py-3 px-6 rounded-sm text-sm font-sans font-medium text-zinc-950 bg-[#e0d0ab] hover:bg-stone-100 focus:outline-none transition-all shadow-[0_0_20px_rgba(224,208,171,0.1)] hover:shadow-[0_0_30px_rgba(224,208,171,0.3)] mb-8 cursor-pointer uppercase tracking-widest font-bold"
-          >
-            Secure Founder Status
-          </button>
-          <div className="pt-6 border-t border-zinc-800/50">
-            <p className="text-sm font-sans text-zinc-300 leading-relaxed max-w-md mx-auto italic">
-              "I built this platform to test the absolute limits of true prep and your knowledge horizons. Founder Status gives you direct access. If you see a flaw in the system, I want to hear from you. - Your Architect."
-            </p>
-            <a 
-              href="mailto:tark.feed26@gmail.com"
-              className="mt-4 inline-block text-xs font-sans text-zinc-500 hover:text-white underline underline-offset-4"
-            >
-              tark.feed26@gmail.com
-            </a>
+        {/* 6. Founders Club Invitation Card */}
+        <div className="backdrop-blur-md bg-zinc-900/30 border border-zinc-800/80 rounded-sm p-6 sm:p-8 text-center space-y-4 relative overflow-hidden">
+          <div className="flex items-center justify-center gap-2">
+            <Shield className="w-5 h-5 text-[#e0d0ab]" />
+            <h3 className="font-serif text-lg font-bold text-white">
+              Founders Club Clearance
+            </h3>
           </div>
+          <p className="text-xs font-sans text-zinc-400 leading-relaxed max-w-md mx-auto">
+            Tark is an ad-free, zero-noise testing arena. Secure your lifetime Founders Seat to unlock global leaderboard telemetry, unlimited mock sessions, and direct access.
+          </p>
+          <button
+            onClick={onNavigateManifesto}
+            className="inline-flex items-center gap-2 px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-[#e0d0ab] hover:text-white border border-[#e0d0ab]/40 hover:border-[#e0d0ab] text-xs font-mono font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer"
+          >
+            <span>Review Founders Charter</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
         </div>
 
       </motion.div>

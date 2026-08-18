@@ -54,6 +54,9 @@ Welcome to the **Tark 1.0 (SKU)** Obsidian Knowledge Hub. This vault is organize
 - **[[docs/ingestion-pipeline|Ingestion & Distillation Pipeline]]**: The four parallel `current_affairs` ingestion paths and their divergent quality bars (rewritten 2026-08-18 after a direct code audit).
 - **[[docs/news-feed-quality-roadmap|News Feed Quality Roadmap]]**: Consolidation plan, PIB-in-the-autonomous-path, world coverage, dedup, and significance ranking.
 - **[[docs/monetization-tiers|Monetization & Concurrency Controls]]**: Freemium quotas, Razorpay payments, and 15-minute seat locking.
+- **[[docs/ui-revamp-masterplan|🎨 UI Revamp Master Plan]]**: The Naval-Instrument north star (navy/teal/gold), foundation fixes, per-surface specs, and sub-agent execution structure (delegated to Anti-G).
+- **[[docs/live-site-critique|Live-Site Design Critique]]**: Pixel-grounded walkthrough of the rendered product (Landing, Daily Brief, Leaderboard, Sign In verified).
+- **[[docs/handoffs/tark-ui-revamp-handoff|↳ Anti-G Handoff — UI Revamp]]**: Skills playbook, guardrails, and Framer MCP usage for the execution agent (canonical copy in `.agents/inbox/`).
 
 ---
 

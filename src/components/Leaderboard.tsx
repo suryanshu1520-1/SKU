@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { motion, AnimatePresence } from 'motion/react';
-import { Trophy, Shield, Loader2, Award, X, Info } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import { Trophy, Shield, Loader2, Award, X, Info, Crown, Medal, Flame } from 'lucide-react';
+import { Modal, EmptyState } from './shared';
 
 interface LeaderboardEntry {
   id: string;
@@ -14,13 +15,15 @@ interface LeaderboardEntry {
 
 interface LeaderboardProps {
   onAnalystClick: (userId: string) => void;
+  currentUserId?: string;
 }
 
-export default function Leaderboard({ onAnalystClick }: LeaderboardProps) {
+export default function Leaderboard({ onAnalystClick, currentUserId }: LeaderboardProps) {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const prefersReduced = useReducedMotion();
 
   useEffect(() => {
     let cancelled = false;
@@ -36,9 +39,7 @@ export default function Leaderboard({ onAnalystClick }: LeaderboardProps) {
 
         if (cancelled) return;
 
-        if (fetchError) {
-          throw fetchError;
-        }
+        if (fetchError) throw fetchError;
 
         setEntries((data as LeaderboardEntry[]) || []);
       } catch (err: any) {
@@ -61,233 +62,262 @@ export default function Leaderboard({ onAnalystClick }: LeaderboardProps) {
   }, []);
 
   const displayName = (entry: LeaderboardEntry): string => {
-    return entry.name || 'Anonymous Analyst';
+    return entry.name || 'Anonymous Candidate';
   };
 
-  const renderPodiumStyle = (rank: number) => {
-    if (rank === 1) return 'text-yellow-500/90';
-    if (rank === 2) return 'text-zinc-400';
-    if (rank === 3) return 'text-amber-700/80';
-    return 'text-stone-100';
+  const top3 = entries.slice(0, 3);
+  const regularEntries = entries.slice(3);
+
+  const getRankBadge = (rank: number) => {
+    if (rank === 1) return { color: 'text-[#e0d0ab] border-[#e0d0ab]/40 bg-[#e0d0ab]/10', label: '1ST', icon: Trophy };
+    if (rank === 2) return { color: 'text-stone-300 border-stone-400/40 bg-stone-400/10', label: '2ND', icon: Medal };
+    if (rank === 3) return { color: 'text-amber-500 border-amber-600/40 bg-amber-600/10', label: '3RD', icon: Medal };
+    return { color: 'text-zinc-500 border-zinc-800 bg-zinc-900', label: `${rank}`, icon: null };
   };
 
   return (
-    <div className="min-h-[85vh] bg-zinc-950 text-stone-100 p-4 md:p-8 max-w-4xl mx-auto flex flex-col gap-8 font-sans animate-fade-in">
-
-      {/* Header */}
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-zinc-800 rounded-sm">
-            <Trophy className="w-5 h-5 text-[#e0d0ab]" />
+    <div className="w-full max-w-4xl mx-auto space-y-8 font-sans pb-24">
+      
+      {/* Header Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-zinc-800 pb-6">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="w-2 h-2 rounded-full bg-[#e0d0ab] animate-pulse" />
+            <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#e0d0ab] font-bold">
+              Cohort Telemetry & Rank Order
+            </span>
           </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h1 className="font-sans font-bold text-lg uppercase tracking-widest text-stone-100">
-                Tark Vanguard
-              </h1>
-              <button
-                onClick={() => setShowInfoModal(true)}
-                className="p-1 text-zinc-500 hover:text-[#e0d0ab] transition-colors cursor-pointer"
-                title="How leaderboard works"
-              >
-                <Info className="w-4 h-4" />
-              </button>
-            </div>
-            <p className="text-[10px] font-mono text-zinc-500 mt-0.5 leading-relaxed">
-              Resets Sundays at 14:00 IST
-            </p>
-          </div>
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            Vanguard Arena Leaderboard
+          </h1>
+          <p className="text-xs font-mono text-zinc-400 mt-1">
+            Weekly ranked reset every Sunday at 14:00 IST &bull; Zero-Trust Server Verified
+          </p>
         </div>
+
+        <button
+          onClick={() => setShowInfoModal(true)}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 border border-zinc-800 hover:border-[#0194a8] text-zinc-300 hover:text-[#e0d0ab] rounded-sm text-xs font-mono transition-all self-start sm:self-auto cursor-pointer"
+        >
+          <Info className="w-3.5 h-3.5 text-[#0194a8]" />
+          <span>Scoring Rules</span>
+        </button>
       </div>
 
       {/* Loading State */}
       {loading && (
-        <div className="flex flex-col items-center justify-center py-24 text-zinc-500">
-          <Loader2 className="w-5 h-5 animate-spin mb-3" />
-          <p className="text-xs font-mono uppercase tracking-wider">Loading contenders...</p>
+        <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
+          <Loader2 className="w-6 h-6 animate-spin text-[#0194a8] mb-3" />
+          <p className="text-xs font-mono uppercase tracking-wider">Syncing cohort telemetry...</p>
         </div>
       )}
 
       {/* Error State */}
       {!loading && error && (
-        <div className="flex flex-col items-center justify-center py-24 text-center">
-          <Shield className="w-10 h-10 text-rose-400/60 mb-3" />
-          <p className="text-xs text-rose-400 font-sans">{error}</p>
-          <p className="text-[10px] text-zinc-500 mt-2">Unable to retrieve the leaderboard.</p>
+        <div className="p-6 bg-rose-950/20 border border-rose-800/40 text-rose-300 rounded-sm text-center">
+          <Shield className="w-8 h-8 text-rose-400 mx-auto mb-2" />
+          <p className="text-xs font-sans font-bold">{error}</p>
         </div>
       )}
 
       {/* Empty State */}
       {!loading && !error && entries.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-24 text-center">
-          <Shield className="w-12 h-12 text-zinc-700 mb-4" />
-          <p className="text-sm text-zinc-400 font-sans leading-relaxed">
-            The ledger is clean. Take an assessment to secure your rank.
-          </p>
-          <p className="text-[10px] text-zinc-600 mt-3 uppercase tracking-wider font-mono">
-            A new week begins. Claim the Vanguard.
-          </p>
-        </div>
+        <EmptyState
+          icon={Trophy}
+          title="The Vanguard Ledger is Clean"
+          description="A new assessment cycle has begun. Deploy an assessment in the Arena to establish your rank."
+        />
       )}
 
-      {/* Leaderboard Table */}
+      {/* Podium & Leaderboard Content */}
       {!loading && !error && entries.length > 0 && (
-        <div className="bg-zinc-900/10 border border-zinc-800 rounded-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse font-sans">
-              <thead>
-                <tr className="border-b border-zinc-800 text-zinc-500 text-[9px] uppercase tracking-widest font-bold">
-                  <th className="py-3 px-4 w-12">RANK</th>
-                  <th className="py-3 px-4">CONTENDER</th>
-                  <th className="py-3 px-4 text-right">POINTS</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800/60 text-xs">
-                {entries.map((entry, index) => {
-                  const rank = index + 1;
-                  const pointColor = renderPodiumStyle(rank);
-                  const showTrophy = entry.trophy_count > 0;
+        <div className="space-y-8">
+          
+          {/* Top 3 Contender Podium */}
+          {top3.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+              {top3.map((entry, idx) => {
+                const rank = idx + 1;
+                const badge = getRankBadge(rank);
+                const isCurrentUser = currentUserId && entry.user_id === currentUserId;
 
-                  return (
-                    <tr
-                      key={entry.id}
-                      className="hover:bg-zinc-900/30 text-stone-300 transition-colors"
-                    >
-                      {/* Rank */}
-                      <td className="py-4 px-4">
-                        <span className={`font-mono font-bold text-sm ${pointColor}`}>
-                          {rank}
+                return (
+                  <motion.div
+                    key={entry.id}
+                    initial={prefersReduced ? undefined : { opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: idx * 0.1 }}
+                    whileHover={prefersReduced ? undefined : { y: -3 }}
+                    onClick={() => onAnalystClick(entry.user_id)}
+                    className={`relative p-5 rounded-sm border flex flex-col justify-between transition-all cursor-pointer backdrop-blur-sm ${
+                      rank === 1
+                        ? 'bg-gradient-to-b from-zinc-900/60 via-zinc-900/40 to-zinc-950 border-[#e0d0ab]/50 shadow-lg shadow-[#e0d0ab]/10 order-first sm:order-2 sm:-translate-y-2'
+                        : rank === 2
+                        ? 'bg-zinc-900/30 border-zinc-800 hover:border-stone-400/40 order-2 sm:order-1'
+                        : 'bg-zinc-900/30 border-zinc-800 hover:border-amber-600/40 order-3'
+                    } ${isCurrentUser ? 'ring-1 ring-[#0194a8]' : ''}`}
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <span className={`px-2 py-0.5 rounded-sm border text-[10px] font-mono font-bold ${badge.color}`}>
+                        {badge.label}
+                      </span>
+                      {entry.trophy_count > 0 && (
+                        <span className="inline-flex items-center gap-1 text-xs text-[#e0d0ab] font-mono">
+                          <Trophy className="w-3.5 h-3.5 fill-[#e0d0ab]/20" />
+                          <span>{entry.trophy_count}</span>
                         </span>
-                      </td>
+                      )}
+                    </div>
 
-                      {/* Contender Name + Trophy Accolades */}
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-2">
-                          {entry.is_public ? (
-                            <span
-                              onClick={() => onAnalystClick(entry.user_id)}
-                              className="text-sm text-stone-200 font-medium cursor-pointer hover:text-emerald-400 transition-colors"
-                            >
+                    <div className="space-y-1">
+                      <h3 className="font-serif text-base font-bold text-stone-100 group-hover:text-[#e0d0ab] transition-colors truncate">
+                        {displayName(entry)}
+                      </h3>
+                      <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
+                        {isCurrentUser ? 'You (Current Session)' : 'Verified Contender'}
+                      </p>
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between">
+                      <span className="text-[10px] font-mono text-zinc-500 uppercase">Points</span>
+                      <span className="font-mono text-xl font-bold text-[#e0d0ab]">
+                        {entry.contender_points} CP
+                      </span>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Full Contender Ledger Table */}
+          <div className="bg-zinc-900/20 border border-zinc-800 rounded-sm overflow-hidden backdrop-blur-sm">
+            <div className="px-5 py-3 border-b border-zinc-800 bg-zinc-900/40 flex items-center justify-between">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-[#e0d0ab] font-bold">
+                Complete Cohort Table ({entries.length} Contenders)
+              </span>
+              <span className="text-[10px] font-mono text-zinc-500">
+                Click any row for detailed telemetry
+              </span>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-zinc-800 text-zinc-500 text-[10px] font-mono uppercase tracking-widest font-bold">
+                    <th className="py-3 px-5 w-16">Rank</th>
+                    <th className="py-3 px-5">Candidate</th>
+                    <th className="py-3 px-5 text-center">Trophies</th>
+                    <th className="py-3 px-5 text-right">Contender Points</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-800/60 font-sans text-xs">
+                  {entries.map((entry, index) => {
+                    const rank = index + 1;
+                    const isCurrentUser = currentUserId && entry.user_id === currentUserId;
+
+                    return (
+                      <motion.tr
+                        key={entry.id}
+                        initial={prefersReduced ? undefined : { opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.2, delay: Math.min(index * 0.02, 0.3) }}
+                        onClick={() => onAnalystClick(entry.user_id)}
+                        className={`hover:bg-zinc-900/50 text-stone-300 transition-colors cursor-pointer group ${
+                          isCurrentUser ? 'bg-[#0194a8]/10' : ''
+                        }`}
+                      >
+                        {/* Rank */}
+                        <td className="py-3.5 px-5 font-mono">
+                          <span
+                            className={`font-bold ${
+                              rank === 1
+                                ? 'text-[#e0d0ab]'
+                                : rank === 2
+                                ? 'text-stone-300'
+                                : rank === 3
+                                ? 'text-amber-500'
+                                : 'text-zinc-500'
+                            }`}
+                          >
+                            #{rank}
+                          </span>
+                        </td>
+
+                        {/* Name */}
+                        <td className="py-3.5 px-5">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-stone-200 group-hover:text-[#e0d0ab] transition-colors">
                               {displayName(entry)}
+                            </span>
+                            {isCurrentUser && (
+                              <span className="px-1.5 py-0.2 bg-[#0194a8]/20 border border-[#0194a8]/40 text-[#0194a8] text-[9px] font-mono font-bold uppercase rounded-sm">
+                                You
+                              </span>
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Trophies */}
+                        <td className="py-3.5 px-5 text-center">
+                          {entry.trophy_count > 0 ? (
+                            <span className="inline-flex items-center gap-1 text-[#e0d0ab] font-mono text-xs">
+                              <Trophy className="w-3.5 h-3.5 fill-[#e0d0ab]/20" />
+                              <span>{entry.trophy_count}</span>
                             </span>
                           ) : (
-                            <span 
-                              onClick={() => onAnalystClick(entry.user_id)}
-                              className="text-sm text-stone-200 font-medium inline-flex items-center gap-1.5 cursor-pointer hover:text-emerald-400 transition-colors"
-                            >
-                              {displayName(entry)}
-                            </span>
+                            <span className="text-zinc-600 font-mono">&mdash;</span>
                           )}
-                          {showTrophy && (
-                            <span className="inline-flex items-center gap-1 text-[#e0d0ab]">
-                              <Trophy className="w-3.5 h-3.5 fill-[#e0d0ab]/20" />
-                              {entry.trophy_count > 1 && (
-                                <span className="text-[9px] font-mono text-zinc-400">
-                                  x{entry.trophy_count}
-                                </span>
-                              )}
-                            </span>
-                          )}
-                        </div>
-                      </td>
+                        </td>
 
-                      {/* Points */}
-                      <td className="py-4 px-4 text-right">
-                        <span className={`font-mono font-bold text-sm ${pointColor}`}>
-                          {entry.contender_points}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        {/* Points */}
+                        <td className="py-3.5 px-5 text-right font-mono font-bold text-stone-100 group-hover:text-[#e0d0ab] transition-colors">
+                          {entry.contender_points} CP
+                        </td>
+                      </motion.tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Footer note */}
-      {!loading && !error && entries.length > 0 && (
-        <div className="flex items-center justify-center gap-2 text-[10px] text-zinc-600 font-mono uppercase tracking-wider">
-          <Award className="w-3 h-3" />
-          Top contender each Sunday earns a trophy.
+      {/* Scoring Rules Modal */}
+      <Modal
+        isOpen={showInfoModal}
+        onClose={() => setShowInfoModal(false)}
+        title="Vanguard Scoring & Point Mechanics"
+        subtitle="Zero-Trust Competitive Protocol Rules"
+      >
+        <div className="space-y-4 text-xs text-zinc-300 leading-relaxed font-sans">
+          <div className="p-4 bg-zinc-900/60 border border-zinc-800 rounded-sm space-y-3">
+            <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-[#e0d0ab]">
+              Tactical Yield Calculations
+            </h4>
+            <ul className="space-y-2 text-zinc-300">
+              <li className="flex items-start gap-2">
+                <span className="text-emerald-400 font-bold mt-0.5">&bull;</span>
+                <span><strong>Correct Assessment Item:</strong> Earn <strong>+3 CP</strong> for every validated correct response.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-rose-400 font-bold mt-0.5">&bull;</span>
+                <span><strong>Incorrect Response Penalty:</strong> Incur <strong>-1 CP</strong> penalty for false submissions.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-[#0194a8] font-bold mt-0.5">&bull;</span>
+                <span><strong>Vanguard Benchmark Bonus:</strong> Attain <strong>80% or higher accuracy</strong> to secure a <strong>+25 CP bonus</strong>.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-[#e0d0ab] font-bold mt-0.5">&bull;</span>
+                <span><strong>Weekly Reset:</strong> Leaderboard resets every <strong>Sunday at 14:00 IST</strong>. Highest ranking candidate earns a permanent Vanguard Trophy.</span>
+              </li>
+            </ul>
+          </div>
         </div>
-      )}
+      </Modal>
 
-      {/* Info Modal */}
-      <AnimatePresence>
-        {showInfoModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm"
-            onClick={() => setShowInfoModal(false)}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-zinc-950 border border-zinc-800 p-8 md:p-10 rounded-sm max-w-md w-full shadow-2xl"
-            >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xs uppercase tracking-widest font-bold text-stone-200">
-                  Vanguard Leaderboard
-                </h2>
-                <button
-                  onClick={() => setShowInfoModal(false)}
-                  className="p-1 text-zinc-500 hover:text-stone-200 transition-colors cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="space-y-4 text-xs text-zinc-300 leading-relaxed font-sans">
-                <div className="bg-zinc-900/50 border border-zinc-800/60 p-4 rounded-sm">
-                  <p className="font-bold text-[#e0d0ab] text-[10px] uppercase tracking-widest mb-2">
-                    How Contender Points Work
-                  </p>
-                  <ul className="space-y-2">
-                    <li className="flex gap-2">
-                      <span className="text-emerald-400 font-bold">•</span>
-                      <span><strong>Tactical Yield System:</strong> Earn <strong>+3 CP</strong> for every correct answer, and lose <strong>-1 CP</strong> for every incorrect answer. Unattempted questions yield 0 CP.</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="text-emerald-400 font-bold">•</span>
-                      <span><strong>Vanguard Bonus:</strong> Score <strong>80% or higher</strong> in an assessment to earn a massive <strong>+15 CP bonus</strong>.</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="text-emerald-400 font-bold">•</span>
-                      <span>Only <strong>ranked Vanguard Assessments</strong> award CP. Training Ground sessions do not count.</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="text-emerald-400 font-bold">•</span>
-                      <span>The leaderboard <strong>resets every Sunday at 14:00 IST</strong>. All CP are reset to zero.</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="text-emerald-400 font-bold">•</span>
-                      <span>The contender with the <strong>highest CP at reset</strong> earns the <strong>Vanguard Trophy</strong> and appears on the board with their trophy count.</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="text-emerald-400 font-bold">•</span>
-                      <span>Multiple weeks of dominance are tracked via the trophy count.</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setShowInfoModal(false)}
-                className="mt-6 w-full flex items-center justify-center gap-2 py-2.5 px-6 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded-sm transition-all"
-              >
-                Got it
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

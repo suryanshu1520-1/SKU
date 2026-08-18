@@ -67,6 +67,17 @@
   --color-white: #e0d0ab;
   --color-black: #0e577a;
 
+  /* ── Ground Truth Semantic Tokens (Naval Instrument) ── */
+  --ground: #072e63;
+  --surface: #136c99;
+  --surface-elevated: #1b85b8;
+  --accent-teal: #0194a8;
+  --ink-gold: #e0d0ab;
+  --ink-sand: #c8b998;
+  --ink-muted: #a69a7f;
+  --integrity: #34d399;
+  --penalty: #e14e4e;
+
   /* ── PIB Dossier semantic tokens ── */
   --color-surface: #002113;
   --color-surface-dim: #001a0e;
@@ -78,9 +89,30 @@
   --color-primary-container: #e0d0ab;
 }
 
+:root {
+  --color-ground: #072e63;
+  --color-surface-base: #136c99;
+  --color-accent-teal: #0194a8;
+  --color-ink-gold: #e0d0ab;
+  --color-ink-sand: #c8b998;
+  --color-ink-muted: #a69a7f;
+  --color-integrity: #34d399;
+  --color-penalty: #e14e4e;
+}
+
 body {
   background-color: #072e63;
   color: #e0d0ab;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
 }
 
 @keyframes glare {

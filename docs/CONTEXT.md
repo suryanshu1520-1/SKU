@@ -17,6 +17,10 @@ This directory holds the authoritative technical documentation, architectural as
 | [`ingestion-pipeline.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/docs/ingestion-pipeline.md) | The four parallel `current_affairs` ingestion paths, their divergent quality bars, and the shared Gradio/Llama dependency | `server-lib/cron/`, `server-lib/internal/`, `server-lib/sync-feed.ts`, `scripts/run-scraper.ts` |
 | [`news-feed-quality-roadmap.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/docs/news-feed-quality-roadmap.md) | How to make the current-affairs feed exceptional: consolidation, PIB-in-the-autonomous-path, world coverage, dedup, significance ranking | `server-lib/cron/pipeline.ts`, `server-lib/internal/worker.ts` |
 | [`monetization-tiers.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/docs/monetization-tiers.md) | Freemium quotas, Razorpay checkout, 15-min seat reservation locks | `server-lib/create-razorpay-order.ts`, `server-lib/verify-payment.ts` |
+| [`design-system.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/docs/design-system.md) | Existing aesthetic identity, Antigravity spatial components, color/type tokens | `src/components/InteractiveBackground.tsx`, `TiltCard.tsx`, `src/index.css` |
+| [`ui-revamp-masterplan.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/docs/ui-revamp-masterplan.md) | Exhaustive full-platform UI revamp spec: north star, foundation fixes, per-surface specs, sub-agent execution (delegated to Anti-G) | All of `src/components/`, `src/index.css` |
+| [`live-site-critique.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/docs/live-site-critique.md) | Pixel-grounded critique of the rendered product (verified navy/teal/gold identity, live per-screen findings) | Rendered app at `tarkv1.vercel.app` |
+| [`handoffs/tark-ui-revamp-handoff.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/docs/handoffs/tark-ui-revamp-handoff.md) | Anti-G execution handoff: skills playbook, guardrails, Framer MCP (canonical in `.agents/inbox/`) | — |
 
 ## Reading Guidelines
 

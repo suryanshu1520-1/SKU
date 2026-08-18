@@ -31,6 +31,10 @@ tags:
 - [[docs/ingestion-pipeline|Ingestion & Distillation Pipeline]]
 - [[docs/news-feed-quality-roadmap|News Feed Quality Roadmap]]
 - [[docs/monetization-tiers|Monetization & Concurrency Controls]]
+- [[docs/design-system|Design System & Motion Graphics]]
+- [[docs/ui-revamp-masterplan|🎨 UI Revamp Master Plan]] ← active
+- [[docs/live-site-critique|↳ Live-Site Design Critique (pixel-grounded)]]
+- [[docs/handoffs/tark-ui-revamp-handoff|↳ Anti-G Handoff: UI Revamp]]
 
 ---
 

@@ -4,17 +4,31 @@
     "type": "split",
     "children": [
       {
-        "id": "d89c3b36eeee5a8d",
+        "id": "460458b854f327bf",
         "type": "tabs",
         "children": [
           {
-            "id": "0d6f9e6fb711ce10",
+            "id": "ffa17002e039fa96",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Graph view"
+              "type": "markdown",
+              "state": {
+                "file": "docs/ui-revamp-masterplan.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "ui-revamp-masterplan"
             }
           }
         ]
@@ -79,7 +93,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "right": {
     "id": "23b55361269e2484",
@@ -95,6 +110,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "docs/ui-revamp-masterplan.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -181,24 +197,36 @@
       "bases:Create new base": false
     }
   },
-  "active": "aeaf6434715f4bb8",
+  "active": "ffa17002e039fa96",
   "lastOpenFiles": [
+    "dist/assets/merriweather-latin-ext-300-normal-Cq4DOWc3.woff",
+    "dist/assets/merriweather-vietnamese-700-normal-Bp6kWjW5.woff2",
+    "dist/assets/merriweather-vietnamese-700-italic-Y3g3C9Eb.woff2",
+    "dist/assets/merriweather-vietnamese-700-normal-C7_HxHBa.woff",
+    "dist/assets/merriweather-vietnamese-700-italic-CfpPXaL8.woff",
+    "dist/assets/merriweather-vietnamese-400-normal-hNacsVs_.woff2",
+    "dist/assets/merriweather-vietnamese-300-normal-DJNUJcJP.woff2",
+    "dist/assets/merriweather-vietnamese-400-normal-Dh8WVvgZ.woff",
+    "dist/assets/merriweather-vietnamese-300-normal-DV_C-MGO.woff",
+    "dist/assets/merriweather-vietnamese-300-italic-DP2LFpTd.woff",
+    "dist/assets/merriweather-vietnamese-300-italic-BOEbu2YM.woff2",
+    "dist/favicon.svg",
+    "public/favicon.svg",
+    "docs/ui-revamp-masterplan.md",
+    "docs/live-site-critique.md",
+    "docs/handoffs/tark-ui-revamp-handoff.md",
+    "docs/design-system.md",
+    "map/objects/ingestion-pipeline.md",
+    "map/effects/CONTEXT.md",
+    "map/objects/gamification-leaderboard.md",
+    "map/objects/_index.md",
+    "map/objects/arena-ui.md",
+    "map/processes/_index.md",
     "Untitled 2.canvas",
     "strategy/brand-review.md",
     "map/processes/quiz-submission-scoring.md",
-    "dist/server.cjs.map",
-    "dist/server.cjs",
-    "dist/assets/merriweather-vietnamese-700-italic-CfpPXaL8.woff",
-    "dist/assets/merriweather-cyrillic-700-normal-CHCcU-4a.woff",
-    "dist/assets/inter-vietnamese-500-normal-mJboJaSs.woff",
-    "dist/assets/merriweather-vietnamese-700-normal-C7_HxHBa.woff",
-    "dist/assets/merriweather-cyrillic-ext-700-normal-DoooT6Vg.woff",
-    "dist/assets/merriweather-latin-400-normal-CvqO63Ah.woff",
-    "dist/assets/merriweather-latin-ext-300-normal-Cq4DOWc3.woff",
-    "dist/assets/merriweather-latin-ext-400-normal-CLqijLtt.woff",
     "docs/next-phase-roadmap.md",
     "docs/news-feed-quality-roadmap.md",
-    "docs/design-system.md",
     "Vault Map.md",
     "strategy/landing-page-copy.md",
     "strategy/roadmap-synthesis.md",
@@ -211,15 +239,6 @@
     "docs/architecture.md",
     "docs/security-and-performance-audit.md",
     "docs/codebase-assessment.md",
-    "Untitled.canvas",
-    "map/processes/unranked-training-practice.md",
-    "Home.md",
-    "map/effects/CONTEXT.md",
-    "map/processes/checkout-seat-reservation.md",
-    "map/processes/daily-pib-ingestion.md",
-    "map/processes/_index.md",
-    "map/processes/CONTEXT.md",
-    "map/objects/arena-ui.md",
-    "map/objects/gamification-leaderboard.md"
+    "Untitled.canvas"
   ]
 }

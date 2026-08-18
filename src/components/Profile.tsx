@@ -1,24 +1,21 @@
-import { fetchWithAuth } from '../lib/api';
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import type { QuizSession, SavedInsight } from '../types';
 import Markdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
-import { 
-  User, 
-  History, 
-  Clock, 
-  TrendingUp, 
-  LogOut, 
-  CheckCircle2, 
-  XCircle, 
-  AlertCircle, 
-  Inbox, 
-  Calendar,
+import {
+  User,
+  History,
+  Clock,
+  TrendingUp,
+  LogOut,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  Inbox,
   Award,
   Bookmark,
-  BookmarkCheck,
   ChevronDown,
   ChevronUp,
   Trash2,
@@ -28,12 +25,16 @@ import {
   Check,
   X,
   Download,
-  Crown,
+  Shield,
   Eye,
   EyeOff,
-  ExternalLink
+  ExternalLink,
+  Sparkles,
+  Layers,
 } from 'lucide-react';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
 import InfoTooltip from './InfoTooltip';
+import { StatCard, EmptyState, SkeletonCard } from './shared';
 
 interface ProfileProps {
   userEmail: string;
@@ -67,7 +68,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
   const [nameError, setNameError] = useState('');
   const nameInputRef = useRef<HTMLInputElement>(null);
 
-  // Membership tier for export gating
+  // Membership tier
   const [membershipTier, setMembershipTier] = useState<string | null>(null);
   const [loadingTier, setLoadingTier] = useState(true);
   const [exportToast, setExportToast] = useState('');
@@ -82,15 +83,17 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
   const [expandedInsightId, setExpandedInsightId] = useState<string | null>(null);
   const [deletingInsightId, setDeletingInsightId] = useState<string | null>(null);
 
-  // View mode toggle: insights vs articles
+  // View mode toggle
   const [viewMode, setViewMode] = useState<'insights' | 'articles'>('insights');
 
-  // Saved articles state (Policy Tracker bookmarks)
+  // Saved articles state
   const [savedArticles, setSavedArticles] = useState<SavedArticle[]>([]);
   const [loadingArticles, setLoadingArticles] = useState(false);
   const [removingArticleId, setRemovingArticleId] = useState<string | null>(null);
 
-  // Fetch membership tier and is_public status on mount
+  const prefersReduced = useReducedMotion();
+
+  // Fetch membership tier and is_public status
   useEffect(() => {
     if (!userId) return;
     (async () => {
@@ -108,7 +111,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
           }
         }
       } catch (err) {
-        console.warn("Failed to fetch profile data:", err);
+        console.warn('Failed to fetch profile data:', err);
       } finally {
         setLoadingTier(false);
       }
@@ -128,7 +131,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
       if (error) throw error;
       setIsPublic(newValue);
     } catch (err) {
-      console.warn("Failed to update profile visibility:", err);
+      console.warn('Failed to update profile visibility:', err);
     } finally {
       setSavingVisibility(false);
     }
@@ -141,6 +144,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
     return () => clearTimeout(t);
   }, [exportToast]);
 
+  // Fetch Quiz History
   useEffect(() => {
     async function fetchQuizHistory() {
       const identifier = userId || userEmail;
@@ -149,560 +153,422 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
       setErrorMsg('');
 
       try {
-        let queryVal = identifier;
-        
-        // If identifier is an email but we also have a valid session with a UUID, let's query with the UUID!
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user && queryVal === userEmail) {
-          queryVal = session.user.id;
-        }
-
-        // Query from quiz_sessions instead of arena_sessions (fixes Requirement D)
-        const { data, error } = await supabase
+        let query = supabase
           .from('quiz_sessions')
           .select('*')
-          .eq('user_id', queryVal);
+          .order('created_at', { ascending: false });
 
-        if (error) {
-          // Fallback with the other identifier
-          const fallbackVal = queryVal === session?.user?.id ? userEmail : session?.user?.id;
-          if (fallbackVal) {
-            const { data: fbData, error: fbError } = await supabase
-              .from('quiz_sessions')
-              .select('*')
-              .eq('user_id', fallbackVal);
-            
-            if (!fbError && fbData) {
-              const sorted = [...fbData].sort((a, b) => {
-                const dateA = new Date(a.created_at || 0).getTime();
-                const dateB = new Date(b.created_at || 0).getTime();
-                return dateB - dateA;
-              });
-              setHistory(sorted as QuizSession[]);
-              return;
-            }
-          }
-          throw error;
+        if (userId) {
+          query = query.eq('user_id', userId);
+        } else {
+          query = query.eq('user_email', userEmail);
         }
 
-        if (data) {
-          // Sort descending by date
-          const sorted = [...data].sort((a, b) => {
-            const dateA = new Date(a.created_at || 0).getTime();
-            const dateB = new Date(b.created_at || 0).getTime();
-            return dateB - dateA;
-          });
-          setHistory(sorted as QuizSession[]);
-        }
+        const { data, error } = await query;
+        if (error) throw error;
+        setHistory(data || []);
       } catch (err: any) {
-        console.error("Error loading quiz history:", err);
-        setErrorMsg("Failed to synchronize with your attempt record hierarchy.");
+        console.error('Failed to fetch history:', err);
+        setErrorMsg('Failed to load session history.');
       } finally {
         setLoading(false);
       }
     }
 
     fetchQuizHistory();
-  }, [userEmail, userId]);
+  }, [userId, userEmail]);
 
-  // Fetch saved insights (Requirement A - Bookmark Engine)
-  useEffect(() => {
+  // Fetch Saved Insights
+  const fetchSavedInsights = async () => {
     if (!userId) return;
     setLoadingSaved(true);
-    fetchWithAuth(`/api/bookmark?userId=${encodeURIComponent(userId)}`)
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setSavedInsights(data);
-        } else if (data.bookmarks) {
-          setSavedInsights(data.bookmarks);
-        }
-      })
-      .catch(err => console.warn("Failed to fetch saved insights:", err))
-      .finally(() => setLoadingSaved(false));
-  }, [userId]);
-
-  // Fetch saved articles when viewMode changes to 'articles'
-  useEffect(() => {
-    if (!userId || viewMode !== 'articles') return;
-    (async () => {
-      setLoadingArticles(true);
-      try {
-        const { data, error } = await supabase
-          .from('saved_articles')
-          .select(`
-            id,
-            article_id,
-            created_at,
-            current_affairs!inner (
-              id,
-              headline,
-              url,
-              source,
-              ministry,
-              created_at
-            )
-          `)
-          .eq('user_id', userId)
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.warn("Failed to fetch saved articles:", error);
-          return;
-        }
-
-        if (data) {
-          setSavedArticles(data as unknown as SavedArticle[]);
-        }
-      } catch (err) {
-        console.warn("Error fetching saved articles:", err);
-      } finally {
-        setLoadingArticles(false);
-      }
-    })();
-  }, [userId, viewMode]);
-
-  // Derived stats
-  const totalAttempts = history.length;
-  const lastAttempt = history[0] || null;
-  const averageCorrect = totalAttempts > 0 
-    ? (history.reduce((sum, item) => sum + (item.correct_count || 0), 0) / totalAttempts).toFixed(1)
-    : '0.0';
-
-  const bestScore = totalAttempts > 0
-    ? Math.max(...history.map(item => item.correct_count || 0))
-    : 0;
-
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return 'N/A';
     try {
-      const date = new Date(dateStr);
-      return date.toLocaleDateString(undefined, { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    } catch {
-      return 'Recent';
+      const { data, error } = await supabase
+        .from('saved_insights')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setSavedInsights(data || []);
+    } catch (err) {
+      console.error('Error fetching bookmarks:', err);
+    } finally {
+      setLoadingSaved(false);
     }
   };
 
-  // Delete bookmark handler (for insights)
+  // Fetch Saved Articles
+  const fetchSavedArticles = async () => {
+    if (!userId) return;
+    setLoadingArticles(true);
+    try {
+      const { data, error } = await supabase
+        .from('saved_articles')
+        .select('id, article_id, created_at, current_affairs(*)')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      const validArticles = (data || []).filter((item: any) => item.current_affairs != null) as SavedArticle[];
+      setSavedArticles(validArticles);
+    } catch (err) {
+      console.error('Error fetching saved articles:', err);
+    } finally {
+      setLoadingArticles(false);
+    }
+  };
+
+  useEffect(() => {
+    if (viewMode === 'insights') fetchSavedInsights();
+    else if (viewMode === 'articles') fetchSavedArticles();
+  }, [userId, viewMode]);
+
+  // Delete Bookmark
   const deleteBookmark = async (insightId: string) => {
     setDeletingInsightId(insightId);
     try {
-      // Find the insight to get its question_id
-      const insight = savedInsights.find(s => s.id === insightId);
-      if (!insight) return;
-
-      const res = await fetchWithAuth('/api/bookmark', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId,
-          questionId: insight.question_id,
-          action: 'delete',
-        }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setSavedInsights(prev => prev.filter(s => s.id !== insightId));
-        if (expandedInsightId === insightId) {
-          setExpandedInsightId(null);
-        }
-      }
+      const { error } = await supabase.from('saved_insights').delete().eq('id', insightId);
+      if (error) throw error;
+      setSavedInsights((prev) => prev.filter((item) => item.id !== insightId));
     } catch (err) {
-      console.error("Delete bookmark error:", err);
+      console.error('Error deleting bookmark:', err);
     } finally {
       setDeletingInsightId(null);
     }
   };
 
-  // Remove saved article
-  const removeSavedArticle = async (savedArticleId: string) => {
-    setRemovingArticleId(savedArticleId);
+  // Remove Saved Article
+  const removeSavedArticle = async (savedId: string) => {
+    setRemovingArticleId(savedId);
     try {
-      const { error } = await supabase
-        .from('saved_articles')
-        .delete()
-        .eq('id', savedArticleId)
-        .eq('user_id', userId);
-
+      const { error } = await supabase.from('saved_articles').delete().eq('id', savedId);
       if (error) throw error;
-
-      setSavedArticles(prev => prev.filter(a => a.id !== savedArticleId));
+      setSavedArticles((prev) => prev.filter((item) => item.id !== savedId));
     } catch (err) {
-      console.error("Failed to remove saved article:", err);
+      console.error('Error removing saved article:', err);
     } finally {
       setRemovingArticleId(null);
     }
   };
 
-  // Toggle expand insight card
-  const toggleExpand = (id: string) => {
-    setExpandedInsightId(prev => prev === id ? null : id);
-  };
+  // CSV Export
+  const handleExportClick = () => {
+    const isPro = membershipTier === 'pro' || membershipTier === 'premium';
+    if (!isPro) {
+      setExportToast('Upgrade to Founders Club to export full CSV analytical logs.');
+      return;
+    }
+    if (history.length === 0) return;
 
-  // CSV Export utility
-  const exportToCSV = () => {
-    if (!history || history.length === 0) return;
-    const headers = "Date,Correct,Incorrect,Unattempted,Total Time (s),Percentile\n";
-    const rows = history.map(s => {
-      const date = s.created_at ? new Date(s.created_at).toISOString().split('T')[0] : 'N/A';
-      return `${date},${s.correct_count},${s.incorrect_count},${s.unattempted_count},${s.total_time_seconds},${s.percentile}`;
-    }).join("\n");
-    const csvContent = headers + rows;
+    const headers = ['Attempt ID', 'Date', 'Correct', 'Incorrect', 'Unattempted', 'Total', 'Accuracy %', 'Mode'];
+    const rows = history.map((h, i) => {
+      const total = h.correct_count + h.incorrect_count + h.unattempted_count;
+      const acc = total > 0 ? ((h.correct_count / total) * 100).toFixed(1) : '0';
+      const mode = h.subject_stats ? 'Vanguard Ranked' : 'Training Ground';
+      return [
+        h.id || `LOG-${i + 1}`,
+        new Date(h.created_at).toISOString(),
+        h.correct_count,
+        h.incorrect_count,
+        h.unattempted_count,
+        total,
+        acc,
+        mode,
+      ];
+    });
+
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Tark_Diagnostic_Report_${new Date().toISOString().split('T')[0]}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `tark-analytics-export-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setExportToast('Analytical history exported to CSV.');
   };
 
-  const handleExportClick = () => {
-    if (membershipTier === 'premium') {
-      exportToCSV();
-    } else {
-      setExportToast('Upgrade to Founders Club to export diagnostic data.');
-    }
+  // Computed Aggregates
+  const totalAttempts = history.length;
+  const lastAttempt = history[0] || null;
+
+  const averageAccuracy = useMemo(() => {
+    if (history.length === 0) return 0;
+    const totalAccuracy = history.reduce((acc, h) => {
+      const tot = h.correct_count + h.incorrect_count + h.unattempted_count;
+      return acc + (tot > 0 ? (h.correct_count / tot) * 100 : 0);
+    }, 0);
+    return Math.round(totalAccuracy / history.length);
+  }, [history]);
+
+  const bestScore = useMemo(() => {
+    if (history.length === 0) return 0;
+    return Math.max(...history.map((h) => h.correct_count));
+  }, [history]);
+
+  // Chart Time Series Data
+  const chartData = useMemo(() => {
+    return [...history]
+      .reverse()
+      .slice(-12)
+      .map((h, idx) => {
+        const tot = h.correct_count + h.incorrect_count + h.unattempted_count;
+        const acc = tot > 0 ? Math.round((h.correct_count / tot) * 100) : 0;
+        return {
+          session: `#${idx + 1}`,
+          accuracy: acc,
+          correct: h.correct_count,
+          date: new Date(h.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }),
+        };
+      });
+  }, [history]);
+
+  const formatDate = (iso: string) => {
+    return new Date(iso).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
   };
+
+  const isPro = membershipTier === 'pro' || membershipTier === 'premium';
 
   return (
-    <div className="min-h-[85vh] bg-zinc-950 text-stone-100 p-4 md:p-8 max-w-6xl mx-auto flex flex-col gap-8 font-sans animate-fade-in">
+    <div className="w-full max-w-5xl mx-auto space-y-8 font-sans pb-24 text-stone-100">
       
-      {/* Upper Grid: Profile info, Last Quiz, Averages */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
-        {/* Profile Card */}
-        <div id="profile-info-card" className="bg-zinc-900/30 border border-zinc-800 p-6 flex flex-col justify-between rounded-sm">
+      {/* 1. Header Profile Banner */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 bg-zinc-900/30 border border-zinc-800 rounded-sm backdrop-blur-sm">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-sm">
+            <User className="w-8 h-8 text-[#e0d0ab]" />
+          </div>
           <div>
-            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-zinc-800">
-              <div className="p-2.5 bg-zinc-800 rounded-sm">
-                <User className="w-5 h-5 text-[#e0d0ab]" />
-              </div>
-              <div>
-                <h3 className="font-sans font-bold text-xs uppercase tracking-widest text-zinc-400">Account Identity</h3>
-                <p className="text-stone-300 text-[10px] font-mono leading-none mt-0.5">AUTHENTICATED</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="block text-[9px] uppercase tracking-widest text-[#e0d0ab]/70 font-bold mb-1">CANDIDATE NAME</span>
-                  {!editingName && (
-                    <button
-                      onClick={() => {
-                        setEditNameValue(localUserName);
-                        setEditingName(true);
-                        setNameError('');
-                        setTimeout(() => nameInputRef.current?.focus(), 50);
-                      }}
-                      className="p-1 text-zinc-600 hover:text-[#e0d0ab] transition-colors"
-                      title="Edit display name"
-                    >
-                      <Pencil className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
-                {editingName ? (
-                  <div className="flex items-center gap-2">
-                    <input
-                      ref={nameInputRef}
-                      type="text"
-                      value={editNameValue}
-                      onChange={(e) => setEditNameValue(e.target.value)}
-                      onKeyDown={async (e) => {
-                        if (e.key === 'Escape') {
-                          setEditingName(false);
-                          setNameError('');
-                        } else if (e.key === 'Enter') {
-                          e.preventDefault();
-                          if (!editNameValue.trim()) {
-                            setNameError('Name cannot be empty');
-                            return;
-                          }
-                          setSavingName(true);
-                          setNameError('');
-                          try {
-                            const { error } = await supabase.auth.updateUser({ data: { name: editNameValue.trim() } });
-                            if (error) throw error;
-                            setLocalUserName(editNameValue.trim());
-                            setEditingName(false);
-                          } catch (err: any) {
-                            setNameError(err.message || 'Failed to update name');
-                          } finally {
-                            setSavingName(false);
-                          }
-                        }
-                      }}
-                      className="flex-1 bg-zinc-900 border border-zinc-700 rounded-sm px-3 py-1.5 text-sm text-stone-50 font-bold focus:outline-none focus:ring-1 focus:ring-[#e0d0ab]/50"
-                    />
-                    <button
-                      onClick={async () => {
-                        if (!editNameValue.trim()) {
-                          setNameError('Name cannot be empty');
-                          return;
-                        }
-                        setSavingName(true);
-                        setNameError('');
-                        try {
-                          const { error } = await supabase.auth.updateUser({ data: { name: editNameValue.trim() } });
-                          if (error) throw error;
+            <div className="flex items-center gap-2">
+              {editingName ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    ref={nameInputRef}
+                    type="text"
+                    value={editNameValue}
+                    onChange={(e) => setEditNameValue(e.target.value)}
+                    className="px-2 py-1 bg-zinc-950 border border-zinc-700 rounded-sm text-sm font-bold text-white focus:outline-none focus:border-[#e0d0ab]"
+                  />
+                  <button
+                    onClick={async () => {
+                      if (!editNameValue.trim()) return;
+                      setSavingName(true);
+                      try {
+                        const { error } = await supabase.auth.updateUser({ data: { name: editNameValue.trim() } });
+                        if (!error) {
                           setLocalUserName(editNameValue.trim());
                           setEditingName(false);
-                        } catch (err: any) {
-                          setNameError(err.message || 'Failed to update name');
-                        } finally {
-                          setSavingName(false);
                         }
-                      }}
-                      disabled={savingName}
-                      className="p-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-sm hover:bg-emerald-500/30 transition-colors disabled:opacity-40"
-                      title="Save"
-                    >
-                      {savingName ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setEditingName(false);
-                        setNameError('');
-                      }}
-                      disabled={savingName}
-                      className="p-1.5 text-zinc-500 hover:text-rose-400 transition-colors disabled:opacity-40"
-                      title="Cancel"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ) : (
-                  <p className="text-xl font-bold text-stone-50 tracking-tight">{localUserName || "Anonymous Professional"}</p>
-                )}
-                {nameError && (
-                  <p className="text-[10px] text-rose-400 mt-1">{nameError}</p>
-                )}
-              </div>
-              <div>
-                <span className="block text-[9px] uppercase tracking-widest text-zinc-500 font-medium mb-1">EMAIL ADDRESS</span>
-                <p className="text-sm text-zinc-300 font-mono select-all truncate">{userEmail}</p>
-              </div>
-              <div>
-                <span className="block text-[9px] uppercase tracking-widest text-zinc-500 font-medium mb-1">MEMBERSHIP</span>
-                {loadingTier ? (
-                  <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-zinc-800/50 text-zinc-500 rounded-sm text-[10px] uppercase font-bold tracking-widest border border-zinc-800/40">
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    Loading...
-                  </div>
-                ) : membershipTier === 'premium' ? (
-                  <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-cyan-500/10 text-cyan-400 font-semibold rounded-sm text-[10px] uppercase tracking-widest border border-cyan-500/30 drop-shadow-[0_0_8px_rgba(34,211,238,0.6)] animate-pulse">
-                    <Crown className="w-3.5 h-3.5" />
-                    Premium Member
-                  </div>
-                ) : (
-                  <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-[#e0d0ab]/10 text-[#e0d0ab] rounded-sm text-[10px] uppercase font-bold tracking-widest border border-[#e0d0ab]/20">
-                    <Award className="w-3.5 h-3.5" />
-                    Standard Candidate
-                  </div>
-                )}
-              </div>
-              <div>
-                <span className="block text-[9px] uppercase tracking-widest text-zinc-500 font-medium mb-1">PROFILE VISIBILITY</span>
-                <button
-                  onClick={handleToggleVisibility}
-                  disabled={savingVisibility}
-                  className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-sm text-xs font-semibold uppercase tracking-wider border transition-all ${
-                    isPublic
-                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20'
-                      : 'bg-zinc-900/50 text-zinc-500 border-zinc-800/60 hover:border-zinc-700/60'
-                  } disabled:opacity-40 cursor-pointer`}
-                >
-                  <span className="flex items-center gap-2">
-                    {savingVisibility ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : isPublic ? (
-                      <Eye className="w-4 h-4" />
-                    ) : (
-                      <EyeOff className="w-4 h-4" />
-                    )}
-                    {isPublic ? 'Make Profile Private' : 'Make Profile Public'}
-                  </span>
-                  <span className={`text-[8px] font-mono px-1.5 py-0.5 rounded-sm ${
-                    isPublic
-                      ? 'bg-emerald-500/20 text-emerald-400'
-                      : 'bg-zinc-800 text-zinc-500'
-                  }`}>
-                    {isPublic ? 'PUBLIC' : 'PRIVATE'}
-                  </span>
-                </button>
-              </div>
+                      } finally {
+                        setSavingName(false);
+                      }
+                    }}
+                    className="p-1.5 bg-[#e0d0ab] text-zinc-950 rounded-sm cursor-pointer"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => setEditingName(false)}
+                    className="p-1.5 bg-zinc-800 text-zinc-400 rounded-sm cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <h1 className="font-serif text-xl sm:text-2xl font-bold text-white">
+                    {localUserName || 'Anonymous Candidate'}
+                  </h1>
+                  <button
+                    onClick={() => {
+                      setEditNameValue(localUserName);
+                      setEditingName(true);
+                      setTimeout(() => nameInputRef.current?.focus(), 50);
+                    }}
+                    className="p-1 text-zinc-500 hover:text-[#e0d0ab] transition-colors cursor-pointer"
+                    title="Edit display name"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
 
-          <button 
-            onClick={onLogout}
-            className="mt-8 w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-stone-200 hover:border-zinc-700 transition-all rounded-sm text-xs font-semibold uppercase tracking-wider"
-            id="logout-button"
+            <p className="text-xs font-mono text-zinc-400 mt-0.5">{userEmail}</p>
+          </div>
+        </div>
+
+        {/* Action Pills: Tier Badge + Privacy Toggle + Logout */}
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Membership Badge */}
+          {isPro ? (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#e0d0ab]/15 border border-[#e0d0ab]/40 text-[#e0d0ab] rounded-sm text-xs font-mono font-bold uppercase tracking-wider shadow-sm shadow-[#e0d0ab]/10">
+              <Shield className="w-3.5 h-3.5 text-[#e0d0ab]" />
+              <span>Founders Club</span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 border border-zinc-800 text-zinc-400 rounded-sm text-xs font-mono uppercase tracking-wider">
+              <Award className="w-3.5 h-3.5 text-zinc-500" />
+              <span>Standard Tier</span>
+            </div>
+          )}
+
+          {/* Visibility Toggle */}
+          <button
+            onClick={handleToggleVisibility}
+            disabled={savingVisibility}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm border text-xs font-mono font-medium transition-all cursor-pointer ${
+              isPublic
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-stone-200'
+            }`}
+            title="Toggle public telemetry sharing on Vanguard Leaderboard"
           >
-            <LogOut className="w-4 h-4" />
-            Terminate Session
+            {isPublic ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+            <span>{isPublic ? 'Public Ledger' : 'Private'}</span>
           </button>
-        </div>
 
-        {/* Last Quiz Score Panel */}
-        <div id="last-quiz-score-card" className="bg-zinc-900/30 border border-zinc-800 p-6 flex flex-col justify-between rounded-sm">
-          <div>
-            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-zinc-800">
-              <div className="p-2.5 bg-zinc-800 rounded-sm">
-                <Clock className="w-5 h-5 text-[#e0d0ab]" />
-              </div>
-              <div>
-                <h3 className="font-sans font-bold text-xs uppercase tracking-widest text-zinc-400">Tactical Baseline</h3>
-                <p className="text-stone-300 text-[10px] font-mono leading-none mt-0.5">LAST ATTEMPT</p>
-              </div>
-            </div>
-
-            {lastAttempt ? (
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-zinc-900/50 border border-zinc-800/60 p-3 rounded-sm">
-                    <span className="block text-[9px] uppercase tracking-widest text-zinc-500 mb-1">CORRECT</span>
-                    <p className="text-3xl font-mono font-bold text-emerald-400">{lastAttempt.correct_count}</p>
-                  </div>
-                  <div className="bg-zinc-900/50 border border-zinc-800/60 p-3 rounded-sm">
-                    <span className="block text-[9px] uppercase tracking-widest text-zinc-500 mb-1">INCORRECT</span>
-                    <p className="text-3xl font-mono font-bold text-rose-400">{lastAttempt.incorrect_count}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between px-4 py-3 bg-zinc-900/40 border border-zinc-800/80 rounded-sm">
-                  <span className="text-xs text-zinc-400">Unanswered</span>
-                  <span className="text-sm font-mono font-bold text-zinc-300">{lastAttempt.unattempted_count}</span>
-                </div>
-                
-                <p className="text-[10px] font-mono text-zinc-500 text-right">
-                  Recorded: {formatDate(lastAttempt.created_at)}
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-48 text-center text-zinc-500">
-                <AlertCircle className="w-8 h-8 opacity-40 mb-3" />
-                <p className="text-xs">No attempts registered for this account.</p>
-                <p className="text-[10px] uppercase tracking-wider text-[#e0d0ab] mt-2 font-semibold">Ready to begin initial assessment.</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Global Averages Panel */}
-        <div id="average-stats-card" className="bg-zinc-900/30 border border-zinc-800 p-6 flex flex-col justify-between rounded-sm">
-          <div>
-            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-zinc-800">
-              <div className="p-2.5 bg-zinc-800 rounded-sm">
-                <TrendingUp className="w-5 h-5 text-[#e0d0ab]" />
-              </div>
-              <div>
-                <h3 className="font-sans font-bold text-xs uppercase tracking-widest text-zinc-400">Performance Summary</h3>
-                <p className="text-stone-300 text-[10px] font-mono leading-none mt-0.5">AGGREGATED ANALYTICS</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between py-2 border-b border-zinc-800/40">
-                <span className="text-xs text-zinc-400">Total Attempts</span>
-                <span className="text-sm font-mono font-bold text-stone-100">{totalAttempts}</span>
-              </div>
-              <div className="flex items-center justify-between py-2 border-b border-zinc-800/40">
-                <span className="text-xs text-zinc-400 inline-flex items-center gap-1.5">
-                  Mean Score
-                  <InfoTooltip text="Earn 25 CP per Vanguard Assessment by breaching the 80% accuracy threshold." />
-                </span>
-                <span className="text-sm font-mono font-bold text-emerald-400">{averageCorrect} <span className="text-[10px] text-zinc-500">/ 25</span></span>
-              </div>
-              <div className="flex items-center justify-between py-2 border-b border-zinc-800/40">
-                <span className="text-xs text-zinc-400">Best Score</span>
-                <span className="text-sm font-mono font-bold text-[#e0d0ab]">{bestScore} <span className="text-[10px] text-zinc-500">/ 25</span></span>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-6 p-4 bg-zinc-900/40 border border-zinc-800/50 rounded-sm text-[10px] leading-relaxed text-zinc-500">
-            Analytics aggregated from real-time database transactions.
-          </div>
+          {/* Logout */}
+          <button
+            onClick={onLogout}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-rose-950/30 border border-zinc-800 hover:border-rose-700/50 text-zinc-400 hover:text-rose-300 rounded-sm text-xs font-mono transition-all cursor-pointer"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Sign Out</span>
+          </button>
         </div>
       </div>
 
-      {/* Saved Information Section - moved ABOVE Previous Attempts */}
-      <div id="saved-information-section" className="bg-zinc-900/10 border border-zinc-800 p-6 rounded-sm">
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-800">
-          <div className="flex items-center gap-2">
-            <Bookmark className="w-4.5 h-4.5 text-[#e0d0ab]" />
-            <h3 className="font-sans font-bold text-xs uppercase tracking-widest text-zinc-400">Saved Information</h3>
-            {viewMode === 'insights' && savedInsights.length > 0 && (
-              <span className="text-[10px] font-mono text-zinc-500 ml-2">
-                ({savedInsights.length})
-              </span>
-            )}
-            {viewMode === 'articles' && savedArticles.length > 0 && (
-              <span className="text-[10px] font-mono text-zinc-500 ml-2">
-                ({savedArticles.length})
-              </span>
-            )}
-          </div>
-        </div>
+      {/* 2. Top-Level Analytical Stat Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard
+          label="Total Assessments"
+          value={totalAttempts}
+          icon={Layers}
+          accentColor="text-stone-100"
+          subtext="Processed quiz sessions"
+          delay={0.05}
+        />
+        <StatCard
+          label="Cohort Mean Accuracy"
+          value={averageAccuracy}
+          suffix="%"
+          icon={TrendingUp}
+          accentColor={averageAccuracy >= 70 ? 'text-emerald-400' : 'text-[#0194a8]'}
+          subtext="Average accuracy across attempts"
+          delay={0.1}
+        />
+        <StatCard
+          label="Peak Query Yield"
+          value={bestScore}
+          suffix=" / 25"
+          icon={Award}
+          accentColor="text-[#e0d0ab]"
+          subtext="Highest single-session score"
+          delay={0.15}
+        />
+      </div>
 
-        {/* View Mode Toggle - Animated Pill */}
-        <div className="flex items-center gap-2 mb-6">
-          <div className="relative flex bg-zinc-900/60 border border-zinc-800 rounded-full p-0.5">
-            <div
-              className={`absolute top-0.5 bottom-0.5 w-1/2 bg-[#e0d0ab] rounded-full transition-transform duration-300 ease-in-out ${
-                viewMode === 'articles' ? 'translate-x-full' : 'translate-x-0'
-              }`}
-            />
+      {/* 3. Performance Trend AreaChart */}
+      {chartData.length > 1 && (
+        <motion.div
+          initial={prefersReduced ? undefined : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="p-6 bg-zinc-900/30 border border-zinc-800 rounded-sm space-y-4 backdrop-blur-sm"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-[#0194a8]" />
+              <h3 className="font-mono text-xs uppercase tracking-widest text-[#e0d0ab] font-bold">
+                Accuracy Trajectory (Last {chartData.length} Attempts)
+              </h3>
+            </div>
+            <span className="text-[10px] font-mono text-zinc-500">
+              Benchmark Target: 80% Vanguard
+            </span>
+          </div>
+
+          <div className="w-full h-48 sm:h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorAcc" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#0194a8" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#0194a8" stopOpacity={0.0} />
+                  </linearGradient>
+                </defs>
+                <XAxis dataKey="session" stroke="#52525b" tick={{ fill: '#a69a7f', fontSize: 10, fontFamily: 'monospace' }} />
+                <YAxis domain={[0, 100]} stroke="#52525b" tick={{ fill: '#a69a7f', fontSize: 10, fontFamily: 'monospace' }} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#072e63', borderColor: '#0194a8', borderRadius: '2px', fontSize: '11px', color: '#e0d0ab', fontFamily: 'monospace' }}
+                  formatter={(val: any) => [`${val}% Accuracy`, 'Score']}
+                  labelFormatter={(lbl: any) => `Session ${lbl}`}
+                />
+                <Area type="monotone" dataKey="accuracy" stroke="#0194a8" strokeWidth={2} fillOpacity={1} fill="url(#colorAcc)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
+      )}
+
+      {/* 4. Bookmarks Section (Saved Insights & Articles) */}
+      <div className="p-6 bg-zinc-900/20 border border-zinc-800 rounded-sm space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-4">
+          <div className="flex items-center gap-2">
+            <Bookmark className="w-4 h-4 text-[#e0d0ab]" />
+            <h3 className="font-mono text-xs uppercase tracking-widest text-[#e0d0ab] font-bold">
+              Candidate Knowledge Dossier
+            </h3>
+          </div>
+
+          {/* View Mode Toggle Pill */}
+          <div className="flex items-center gap-1.5 p-0.5 bg-zinc-900 border border-zinc-800 rounded-sm self-start sm:self-auto">
             <button
               onClick={() => setViewMode('insights')}
-              className="relative z-10 px-4 py-1.5 text-[10px] font-sans font-bold uppercase tracking-widest rounded-full transition-colors duration-200 cursor-pointer"
-              style={{
-                color: viewMode === 'insights' ? '#072e63' : '#a1a1aa'
-              }}
+              className={`px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer ${
+                viewMode === 'insights'
+                  ? 'bg-[#e0d0ab] text-zinc-950 shadow-sm'
+                  : 'text-zinc-400 hover:text-stone-200'
+              }`}
             >
-              Saved Insights
+              Saved Insights ({savedInsights.length})
             </button>
             <button
               onClick={() => setViewMode('articles')}
-              className="relative z-10 px-4 py-1.5 text-[10px] font-sans font-bold uppercase tracking-widest rounded-full transition-colors duration-200 cursor-pointer"
-              style={{
-                color: viewMode === 'articles' ? '#072e63' : '#a1a1aa'
-              }}
+              className={`px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer ${
+                viewMode === 'articles'
+                  ? 'bg-[#e0d0ab] text-zinc-950 shadow-sm'
+                  : 'text-zinc-400 hover:text-stone-200'
+              }`}
             >
-              Saved Articles
+              Saved Dispatches ({savedArticles.length})
             </button>
           </div>
         </div>
 
-        {/* Saved Insights View */}
+        {/* Insights View */}
         {viewMode === 'insights' && (
-          <>
+          <div>
             {loadingSaved ? (
-              <div className="py-12 flex items-center justify-center text-zinc-500">
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                <span className="animate-pulse text-xs font-mono">LOADING SAVED INSIGHTS...</span>
+              <div className="py-8 flex items-center justify-center text-zinc-500 font-mono text-xs">
+                <Loader2 className="w-4 h-4 animate-spin text-[#0194a8] mr-2" />
+                <span>Loading saved conceptual flashcards...</span>
               </div>
             ) : savedInsights.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-center text-zinc-600">
-                <BookOpen className="w-10 h-10 opacity-30 mb-3" />
-                <p className="text-xs">No insights bookmarked yet.</p>
-                <p className="text-[10px] text-zinc-500 mt-1 uppercase tracking-tighter">
-                  Complete quiz questions and use the bookmark button to save AI-driven conceptual insights.
-                </p>
-              </div>
+              <EmptyState
+                icon={BookOpen}
+                title="No Insights Bookmarked"
+                description="During mock test autopsies, click the bookmark icon on conceptual feedback to save high-yield flashcards here."
+              />
             ) : (
-              <div className={`grid grid-cols-1 ${expandedInsightId ? '' : 'md:grid-cols-2'} gap-4`}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {savedInsights.map((insight) => {
                   const isExpanded = expandedInsightId === insight.id;
                   const isDeleting = deletingInsightId === insight.id;
@@ -710,103 +576,75 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
                   return (
                     <motion.div
                       key={insight.id}
-                      layout
-                      className="bg-zinc-900/40 border border-zinc-800/70 rounded-sm overflow-hidden transition-all hover:border-zinc-700/80"
+                      className="bg-zinc-900/40 border border-zinc-800 hover:border-[#0194a8]/50 rounded-sm p-4 flex flex-col justify-between transition-all"
                     >
-                      {/* Card Header - Always visible */}
                       <div
-                        onClick={() => toggleExpand(insight.id)}
-                        className="p-4 cursor-pointer flex items-start justify-between gap-3"
+                        onClick={() => setExpandedInsightId(isExpanded ? null : insight.id)}
+                        className="cursor-pointer space-y-2"
                       >
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[11px] font-sans text-stone-200 leading-relaxed h-auto">
-                            {insight.question_text}
-                          </p>
-                          <p className="text-[9px] font-mono text-zinc-500 mt-2">
-                            Saved: {formatDate(insight.created_at)}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteBookmark(insight.id);
-                            }}
-                            disabled={isDeleting}
-                            className="p-1.5 rounded-sm text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all disabled:opacity-30"
-                            title="Remove bookmark"
-                          >
-                            {isDeleting ? (
-                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            ) : (
-                              <Trash2 className="w-3.5 h-3.5" />
-                            )}
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleExpand(insight.id);
-                            }}
-                            className="p-1.5 rounded-sm text-zinc-500 hover:text-[#e0d0ab] hover:bg-[#e0d0ab]/5 transition-all"
-                          >
-                            {isExpanded ? (
-                              <ChevronUp className="w-3.5 h-3.5" />
-                            ) : (
-                              <ChevronDown className="w-3.5 h-3.5" />
-                            )}
-                          </button>
-                        </div>
+                        <p className="text-xs font-sans text-stone-200 leading-relaxed line-clamp-2">
+                          {insight.question_text}
+                        </p>
+                        <p className="text-[10px] font-mono text-zinc-500">
+                          Saved on {formatDate(insight.created_at)}
+                        </p>
                       </div>
 
-                      {/* Expandable Flashcard Content */}
                       <AnimatePresence>
                         {isExpanded && (
                           <motion.div
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: 'auto', opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.2, ease: 'easeInOut' }}
-                            className="overflow-hidden"
+                            className="overflow-hidden pt-3 mt-3 border-t border-zinc-800"
                           >
-                            <div className="px-4 pb-4 pt-0 border-t border-zinc-800/50">
-                              <div className="mt-3 p-4 bg-zinc-900/60 border border-zinc-800/60 rounded-sm">
-                                <h4 className="font-sans font-bold text-[9px] uppercase tracking-widest text-[#e0d0ab]/70 mb-3">
-                                  CONCEPTUAL INSIGHT - FLASHCARD
-                                </h4>
-                                <div className="prose prose-invert prose-p:text-sm prose-li:text-sm prose-p:leading-relaxed prose-li:leading-relaxed max-w-none text-stone-300 font-serif">
-                                  <Markdown rehypePlugins={[rehypeSanitize]}>{insight.insight_text}</Markdown>
-                                </div>
-                              </div>
+                            <div className="prose prose-invert prose-p:text-xs prose-li:text-xs max-w-none text-zinc-300 font-serif">
+                              <Markdown rehypePlugins={[rehypeSanitize]}>{insight.insight_text}</Markdown>
                             </div>
                           </motion.div>
                         )}
                       </AnimatePresence>
+
+                      <div className="flex items-center justify-between pt-3 mt-3 border-t border-zinc-800/60 text-xs font-mono">
+                        <button
+                          onClick={() => setExpandedInsightId(isExpanded ? null : insight.id)}
+                          className="text-[#0194a8] hover:text-[#e0d0ab] transition-colors cursor-pointer"
+                        >
+                          {isExpanded ? 'Collapse Flashcard' : 'Read Insight'}
+                        </button>
+                        <button
+                          onClick={() => deleteBookmark(insight.id)}
+                          disabled={isDeleting}
+                          className="text-zinc-500 hover:text-rose-400 transition-colors p-1 cursor-pointer"
+                          title="Delete bookmark"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </motion.div>
                   );
                 })}
               </div>
             )}
-          </>
+          </div>
         )}
 
-        {/* Saved Articles View */}
+        {/* Articles View */}
         {viewMode === 'articles' && (
-          <>
+          <div>
             {loadingArticles ? (
-              <div className="py-12 flex items-center justify-center text-zinc-500">
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                <span className="animate-pulse text-xs font-mono">LOADING SAVED ARTICLES...</span>
+              <div className="py-8 flex items-center justify-center text-zinc-500 font-mono text-xs">
+                <Loader2 className="w-4 h-4 animate-spin text-[#0194a8] mr-2" />
+                <span>Loading saved policy signals...</span>
               </div>
             ) : savedArticles.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-center text-zinc-600">
-                <BookOpen className="w-10 h-10 opacity-30 mb-3" />
-                <p className="text-xs">No articles bookmarked yet.</p>
-                <p className="text-[10px] text-zinc-500 mt-1 uppercase tracking-tighter">
-                  Browse the Policy Tracker feed and bookmark articles to build your dossier.
-                </p>
-              </div>
+              <EmptyState
+                icon={Bookmark}
+                title="No Dispatches Bookmarked"
+                description="Browse The Daily Brief and save important cabinet releases and policy dispatches to your ledger."
+              />
             ) : (
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {savedArticles.map((saved) => {
                   const article = saved.current_affairs;
                   const isRemoving = removingArticleId === saved.id;
@@ -814,47 +652,42 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
                   return (
                     <div
                       key={saved.id}
-                      className="flex items-center justify-between gap-4 p-4 bg-zinc-900/30 border border-zinc-800/60 rounded-sm hover:bg-zinc-900/50 transition-colors"
+                      className="p-4 bg-zinc-900/40 border border-zinc-800 hover:border-[#0194a8]/50 rounded-sm flex flex-col justify-between transition-all"
                     >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="px-1.5 py-0.5 text-[8px] uppercase tracking-wider font-sans font-semibold bg-zinc-900 text-[#e0d0ab] rounded-sm border border-zinc-800">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="px-2 py-0.5 text-[9px] font-mono uppercase font-bold bg-zinc-900 text-[#e0d0ab] border border-zinc-800 rounded-sm">
                             {article.ministry}
                           </span>
-                          <span className="text-[8px] font-mono text-zinc-500">
+                          <span className="text-[9px] font-mono text-zinc-500">
                             {article.source}
                           </span>
                         </div>
-                        <p className="text-xs font-sans font-semibold text-stone-200 truncate">
+                        <h4 className="font-serif text-xs font-bold text-stone-100 leading-snug line-clamp-2">
                           {article.headline}
-                        </p>
-                        <p className="text-[9px] font-mono text-zinc-500 mt-1">
-                          Saved: {formatDate(saved.created_at)}
-                        </p>
+                        </h4>
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        {article.url && (
+
+                      <div className="flex items-center justify-between pt-3 mt-3 border-t border-zinc-800/60 text-xs font-mono">
+                        {article.url ? (
                           <a
                             href={article.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-2 text-zinc-500 hover:text-[#e0d0ab] hover:bg-[#e0d0ab]/5 transition-all rounded-sm"
-                            title="Open original article"
+                            className="text-[#0194a8] hover:text-[#e0d0ab] flex items-center gap-1 cursor-pointer"
                           >
-                            <ExternalLink className="w-4 h-4" />
+                            <span>Gov Source</span>
+                            <ExternalLink className="w-3 h-3" />
                           </a>
-                        )}
+                        ) : <span />}
+
                         <button
                           onClick={() => removeSavedArticle(saved.id)}
                           disabled={isRemoving}
-                          className="p-2 text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all rounded-sm disabled:opacity-30 cursor-pointer"
+                          className="text-zinc-500 hover:text-rose-400 transition-colors p-1 cursor-pointer"
                           title="Remove bookmark"
                         >
-                          {isRemoving ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="w-4 h-4" />
-                          )}
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
@@ -862,99 +695,85 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
                 })}
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
 
-      {/* Lower Section: Previous Attempts */}
-      <div id="quiz-history-section" className="bg-zinc-900/10 border border-zinc-800 p-6 rounded-sm">
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-800">
+      {/* 5. Previous Attempts Table */}
+      <div className="p-6 bg-zinc-900/20 border border-zinc-800 rounded-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
           <div className="flex items-center gap-2">
-            <History className="w-4.5 h-4.5 text-[#e0d0ab]" />
-            <h3 className="font-sans font-bold text-xs uppercase tracking-widest text-zinc-400">Previous Attempts</h3>
+            <History className="w-4 h-4 text-[#e0d0ab]" />
+            <h3 className="font-mono text-xs uppercase tracking-widest text-[#e0d0ab] font-bold">
+              Historical Assessment Ledger ({history.length})
+            </h3>
           </div>
-          {/* CSV Export Button */}
+
           <button
             onClick={handleExportClick}
             disabled={history.length === 0 || loadingTier}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-[9px] uppercase font-bold tracking-widest rounded-sm border transition-all ${
-              membershipTier === 'premium'
-                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20 cursor-pointer'
-                : 'bg-zinc-900/30 text-zinc-600 border-zinc-800/40 opacity-50 cursor-not-allowed'
-            } disabled:opacity-40 disabled:cursor-not-allowed`}
-            title={membershipTier === 'premium' ? 'Export CSV' : 'Upgrade to Founders Club to export'}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider rounded-sm border transition-all cursor-pointer ${
+              isPro
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20'
+                : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-zinc-300'
+            }`}
           >
             <Download className="w-3 h-3" />
-            {membershipTier === 'premium' ? 'Export CSV' : 'Export Locked'}
-            {membershipTier === 'premium' && <Crown className="w-3 h-3 text-emerald-400" />}
+            <span>{isPro ? 'Export CSV' : 'Export CSV (Pro)'}</span>
           </button>
         </div>
 
         {loading ? (
-          <div className="py-12 flex items-center justify-center text-zinc-500">
-            <span className="animate-pulse text-xs font-mono">LOADING ATTEMPTS...</span>
-          </div>
+          <SkeletonCard variant="feed" count={3} />
         ) : errorMsg ? (
-          <div className="py-8 text-center text-rose-400 text-xs font-sans">
-            {errorMsg}
-          </div>
+          <p className="text-xs text-rose-400 font-mono py-4 text-center">{errorMsg}</p>
         ) : history.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center text-zinc-600">
-            <Inbox className="w-10 h-10 opacity-30 mb-3" />
-            <p className="text-xs">No prior attempts recorded for this account.</p>
-            <p className="text-[10px] text-zinc-500 mt-1 uppercase tracking-tighter">Enter the Test Arena to register your first record.</p>
-          </div>
+          <EmptyState
+            icon={History}
+            title="No Prior Assessments Recorded"
+            description="Take your first timed mock exam in the Arena to log your baseline."
+          />
         ) : (
-          <div className="overflow-x-auto max-h-96 overflow-y-auto">
+          <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse font-sans">
               <thead>
-                <tr className="border-b border-zinc-900 text-zinc-500 text-[9px] uppercase tracking-widest font-bold">
-                  <th className="py-3 px-4 sticky top-0 bg-zinc-950">ATTEMPT ID</th>
-                  <th className="py-3 px-4 sticky top-0 bg-zinc-950">DATE</th>
-                  <th className="py-3 px-4 sticky top-0 bg-zinc-950">SCORE</th>
-                  <th className="py-3 px-4 sticky top-0 bg-zinc-950">ACCURACY</th>
+                <tr className="border-b border-zinc-800 text-zinc-500 text-[10px] font-mono uppercase tracking-widest font-bold">
+                  <th className="py-3 px-4">Session ID</th>
+                  <th className="py-3 px-4">Date</th>
+                  <th className="py-3 px-4">Mode</th>
+                  <th className="py-3 px-4 text-right">Accuracy</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-900 text-xs">
+              <tbody className="divide-y divide-zinc-800/60 text-xs">
                 {history.map((attempt, index) => {
-                  const totalCount = (attempt.correct_count || 0) + (attempt.incorrect_count || 0) + (attempt.unattempted_count || 0);
+                  const totalCount = attempt.correct_count + attempt.incorrect_count + attempt.unattempted_count;
                   const maxPossible = totalCount > 0 ? totalCount : 25;
-                  const ratio = ((attempt.correct_count / maxPossible) * 100).toFixed(0);
-                  const isExcellent = Number(ratio) >= 70;
-                  const isPass = Number(ratio) >= 40;
+                  const ratio = Math.round((attempt.correct_count / maxPossible) * 100);
+                  const isExcellent = ratio >= 70;
+                  const isPass = ratio >= 40;
 
                   return (
-                    <tr key={attempt.id || index} className="hover:bg-zinc-900/30 text-stone-300 transition-colors">
-                      <td className="py-4 px-4 font-mono text-zinc-500 text-[10px]/none uppercase">
+                    <tr key={attempt.id || index} className="hover:bg-zinc-900/40 text-stone-300 transition-colors">
+                      <td className="py-3.5 px-4 font-mono text-zinc-500 text-[11px] uppercase">
                         AT-{attempt.id ? attempt.id.substring(0, 8) : `LOG${history.length - index}`}
                       </td>
-                      <td className="py-4 px-4 font-mono text-[11px] text-zinc-400">
+                      <td className="py-3.5 px-4 font-mono text-zinc-400 text-[11px]">
                         {formatDate(attempt.created_at)}
                       </td>
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-mono text-stone-100 font-bold">{attempt.correct_count}</span>
-                          <span className="text-zinc-600 font-mono">/</span>
-                          <span className="text-zinc-500 font-mono text-[10px]">{maxPossible}</span>
-                          <span className="text-[10px] text-zinc-500 font-mono ml-1">({ratio}%)</span>
-                        </div>
+                      <td className="py-3.5 px-4 font-mono text-[11px] text-zinc-400">
+                        {attempt.subject_stats ? 'Vanguard Ranked' : 'Training Ground'}
                       </td>
-                      <td className="py-4 px-4">
-                        <span className={`inline-flex items-center gap-1 text-[9px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-sm ${
-                          isExcellent
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                            : isPass
-                              ? 'bg-amber-500/10 text-[#e0d0ab] border border-amber-500/20'
-                              : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                        }`}>
-                          {isExcellent ? (
-                            <CheckCircle2 className="w-3 h-3" />
-                          ) : isPass ? (
-                            <CheckCircle2 className="w-3 h-3" />
-                          ) : (
-                            <XCircle className="w-3 h-3" />
-                          )}
-                          {isExcellent ? 'ADVANCED' : isPass ? 'ADEQUATE' : 'MARGINAL'}
+                      <td className="py-3.5 px-4 text-right">
+                        <span
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-sm font-mono font-bold text-[10px] uppercase ${
+                            isExcellent
+                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                              : isPass
+                              ? 'bg-[#0194a8]/10 text-[#0194a8] border border-[#0194a8]/30'
+                              : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                          }`}
+                        >
+                          {attempt.correct_count}/{maxPossible} ({ratio}%)
                         </span>
                       </td>
                     </tr>
@@ -966,21 +785,20 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
         )}
       </div>
 
-      {/* Export Toast Notification */}
+      {/* Export Toast */}
       <AnimatePresence>
         {exportToast && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] px-6 py-3 bg-zinc-900 border border-zinc-700/60 rounded-sm shadow-2xl"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] px-6 py-3 bg-zinc-900 border border-zinc-700/80 rounded-sm shadow-2xl"
           >
-            <p className="text-xs text-stone-200 font-sans whitespace-nowrap">
-              {exportToast}
-            </p>
+            <p className="text-xs text-stone-200 font-sans whitespace-nowrap">{exportToast}</p>
           </motion.div>
         )}
       </AnimatePresence>
+
     </div>
   );
 }
