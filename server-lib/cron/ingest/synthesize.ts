@@ -15,6 +15,7 @@
 
 import { llmGenerate } from "../../llm.js";
 import type { SourceLang } from "./types.js";
+import { segmentSpans, verifyClaim, groundingScore, type VerifiedClaim } from "./verify.js";
 
 const EN_SYSTEM = [
   "You are a policy summarizer for UPSC/civil-services aspirants.",
@@ -63,11 +64,47 @@ const HI_STRUCTURED_SYSTEM = [
   "- If not exam-relevant or if purely ceremonial, respond with exactly: {\"relevance\": \"NULL\"} or NULL.",
 ].join("\n");
 
+const EN_GROUNDED_SYSTEM = [
+  "You are a policy analyst and exam intelligence distiller for UPSC Civil Services aspirants.",
+  "The source is given as NUMBERED sentences. Judge UPSC relevance as for a Vision IAS / InsightsIAS compilation; routine crime, local incidents, accidents, non-major sports, celebrity, market moves and corporate results are NOT relevant → return NULL.",
+  "If and only if UPSC-relevant, distill into structured JSON matching this schema:",
+  "{",
+  '  "bullets": [{ "text": string, "spans": number[] }], // 1-3 compact factual sentences; `spans` lists the indices of the numbered source sentences each bullet is derived from.',
+  '  "syllabus_tags": string[], // 1-3 from: ["GS1 Society", "GS1 Geography", "GS1 History & Culture", "GS2 Polity", "GS2 Governance", "GS2 Social Justice", "GS2 International Relations", "GS3 Economy", "GS3 Environment & Ecology", "GS3 Science & Tech", "GS3 Internal Security", "GS3 Disaster Management"]',
+  '  "prelims_pointer": string,',
+  '  "mains_pointer": string',
+  "}",
+  "HARD GROUNDING RULE: every figure, percentage, currency amount, date/year and acronym in a bullet MUST appear in its cited source sentences. If you cannot ground a fact in a specific numbered sentence, omit that fact or that bullet. Never introduce facts absent from the cited sentences.",
+  "If not UPSC-relevant, respond with exactly: NULL.",
+].join("\n");
+
+const HI_GROUNDED_SYSTEM = [
+  "You are a policy analyst and exam intelligence distiller for UPSC Civil Services aspirants.",
+  "The source is an Indian GOVERNMENT press release in HINDI, given as NUMBERED sentences. Read the Hindi accurately and write the distillation in clear ENGLISH.",
+  "Judge UPSC relevance; ceremonial greetings, tributes or protocol notices without policy substance are NOT relevant → return NULL.",
+  "If and only if UPSC-relevant, produce structured JSON matching this schema:",
+  "{",
+  '  "bullets": [{ "text": string, "spans": number[] }], // 1-3 compact English sentences; `spans` = indices of the numbered Hindi source sentences each bullet is derived from.',
+  '  "syllabus_tags": string[], // 1-3 relevant UPSC syllabus tags',
+  '  "prelims_pointer": string,',
+  '  "mains_pointer": string',
+  "}",
+  "HARD GROUNDING RULE: preserve scheme names, figures, dates and acronyms exactly; every such fact in a bullet MUST appear in its cited source sentences. Omit any fact you cannot ground. Never invent details.",
+  "If not exam-relevant or purely ceremonial, respond with exactly: NULL.",
+].join("\n");
+
 export type StructuredSynthesis = {
   bullets: string[];
   tags: string[];
   prelims: string;
   mains: string;
+};
+
+/** StructuredSynthesis + span-anchored, cite-or-drop verified claims (the ledger). */
+export type GroundedSynthesis = StructuredSynthesis & {
+  claims: VerifiedClaim[];
+  /** Fraction of produced bullets that passed the deterministic fact check (0..1). */
+  grounding: number;
 };
 
 /**
@@ -246,4 +283,95 @@ export async function synthesizeStructured(params: {
   }
 
   return null;
+}
+
+/**
+ * Span-anchored distillation with cite-or-drop verification (the evidence ledger).
+ *
+ * Segments the body into numbered sentences, asks the model to cite the span(s)
+ * behind each bullet, then deterministically verifies every significant fact
+ * against the cited spans (verify.ts). Unverifiable bullets are DROPPED.
+ *
+ * Returns null when there is no groundable text, nothing survives cite-or-drop,
+ * or no syllabus tag applies — the caller (orchestrator) then falls back to the
+ * ungrounded synthesizeStructured() so the edition is never starved.
+ */
+export async function synthesizeGrounded(params: {
+  title: string;
+  body: string;
+  lang?: SourceLang;
+}): Promise<GroundedSynthesis | null> {
+  const { title, body, lang = "en" } = params;
+  const spans = segmentSpans(clamp(body, 6000));
+  if (spans.length === 0) return null;
+
+  const system = lang === "hi" ? HI_GROUNDED_SYSTEM : EN_GROUNDED_SYSTEM;
+  const numbered = spans.map((s, i) => `[${i}] ${s.text}`).join("\n");
+  const prompt = [`Headline: ${title}`, "", "Numbered source sentences:", numbered].join("\n");
+
+  let result;
+  try {
+    result = await llmGenerate({ system, prompt, temperature: 0.2, json: true });
+  } catch (err: any) {
+    console.error(`[ingest][llm] grounded synthesis error: ${err?.message ?? err}`);
+    return null;
+  }
+  if (!result?.text) return null;
+
+  const raw = result.text.trim();
+  const upper = raw.toUpperCase();
+  if (upper === "NULL" || upper.startsWith("NULL") || upper.includes('"RELEVANCE": "NULL"')) {
+    return null;
+  }
+
+  const parsed = parseJsonSafe(raw);
+  if (!parsed || typeof parsed !== "object") return null;
+  if (parsed.relevance === "NULL" || parsed.relevance === null) return null;
+
+  const rawBullets = Array.isArray(parsed.bullets) ? parsed.bullets : [];
+  const claims: VerifiedClaim[] = [];
+  for (const b of rawBullets) {
+    const text = (typeof b === "string" ? b : b?.text ? String(b.text) : "")
+      .trim()
+      .replace(/^[-•*]+\s+/, "")
+      .replace(/^#{1,6}\s+/, "")
+      .trim();
+    if (!text) continue;
+    const spanNums: unknown[] = Array.isArray(b?.spans) ? b.spans : [];
+    const spanIds = spanNums
+      .map((n) => `s${Number(n)}`)
+      .filter((id) => spans.some((s) => s.id === id));
+    claims.push(verifyClaim(text, spanIds, spans));
+  }
+
+  const kept = claims.filter((c) => c.verified);
+  if (kept.length === 0) return null; // cite-or-drop killed everything → caller falls back
+
+  const rawTags = Array.isArray(parsed.syllabus_tags)
+    ? parsed.syllabus_tags
+    : Array.isArray(parsed.tags)
+    ? parsed.tags
+    : [];
+  const tags = rawTags.map((t: any) => String(t).trim()).filter(Boolean).slice(0, 3);
+  if (tags.length === 0) return null;
+
+  const prelims =
+    typeof parsed.prelims_pointer === "string"
+      ? parsed.prelims_pointer.trim()
+      : typeof parsed.prelims === "string"
+      ? parsed.prelims.trim()
+      : "";
+  const mains =
+    typeof parsed.mains_pointer === "string"
+      ? parsed.mains_pointer.trim()
+      : typeof parsed.mains === "string"
+      ? parsed.mains.trim()
+      : "";
+
+  // grounding = kept/total across ALL produced bullets (honest drop-rate gauge).
+  const grounding = groundingScore(claims);
+  console.log(
+    `[ingest][llm] grounded (${kept.length}/${claims.length} bullets, ${tags.join(", ")}) via ${result.provider}/${result.model}`
+  );
+  return { bullets: kept.map((c) => c.text), tags, prelims, mains, claims: kept, grounding };
 }

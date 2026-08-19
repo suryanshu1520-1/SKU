@@ -20,11 +20,13 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { getSources } from "./sources.js";
-import { synthesizeStructured } from "./synthesize.js";
+import { synthesizeStructured, synthesizeGrounded } from "./synthesize.js";
+import type { VerifiedClaim } from "./verify.js";
 import { deriveMinistry, isExcluded, policyConfidence } from "./classify.js";
 import { getEmbedder, cosine } from "./embeddings.js";
 import { clusterCandidates, makeStory, storyCentroid, embedText } from "./cluster.js";
 import { scoreStory } from "./significance.js";
+import { findContestedClaims } from "./contested.js";
 import { generateMcq } from "./mcq.js";
 import { upsertMcq } from "./mcq-db.js";
 import { upsertCurrentAffairs } from "../db.js";
@@ -317,16 +319,27 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
     let tags: string[] = [];
     let prelims = "";
     let mains = "";
+    let claims: Array<VerifiedClaim & { source: string; url: string }> = [];
+    let grounding: number | undefined;
 
     if (lead.preSummarized && lead.bullets?.length) {
       bullets = lead.bullets;
       tags = lead.tier === "world" ? ["GS2 International Relations"] : ["GS2 Governance"];
     } else {
-      const structured = await synthesizeStructured({
+      // Cite-or-drop first; fall back to ungrounded structured so the edition is
+      // never starved when a source resists span-anchoring.
+      const grounded = await synthesizeGrounded({
         title: lead.headline,
         body: lead.body,
         lang: lead.lang,
       });
+      const structured =
+        grounded ??
+        (await synthesizeStructured({
+          title: lead.headline,
+          body: lead.body,
+          lang: lead.lang,
+        }));
       if (!structured || !structured.bullets.length || !structured.tags.length) {
         result.filtered++;
         continue;
@@ -335,6 +348,10 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
       tags = structured.tags;
       prelims = structured.prelims;
       mains = structured.mains;
+      if (grounded) {
+        claims = grounded.claims.map((c) => ({ ...c, source: lead.source, url: lead.url }));
+        grounding = grounded.grounding;
+      }
     }
 
     const finalSignificance = scoreStory(story, { tags });
@@ -377,6 +394,8 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
       }
     }
 
+    const contested = findContestedClaims(story);
+
     // Build enriched summary payload conforming to the shared contract
     const summary = {
       bullets,
@@ -388,6 +407,11 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
       cluster_size,
       edition_date: editionDate,
       has_quiz: hasQuiz,
+      // Evidence-span ledger (additive): span-anchored, cite-or-drop claims +
+      // the per-brief grounding gauge. Present only when grounding succeeded.
+      ...(claims.length ? { claims } : {}),
+      ...(grounding !== undefined ? { grounding } : {}),
+      ...(contested ? { contested } : {}),
     };
 
     const upsert = await upsertCurrentAffairs({

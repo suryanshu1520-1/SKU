@@ -4,6 +4,8 @@ status: verified 2026-08-18
 universe: live
 ---
 
+> **Correction (2026-08-19, post-P2):** The "four parallel `current_affairs` paths" described in §3 are **superseded** — P2 consolidated them into ONE module, [`server-lib/cron/ingest/`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/server-lib/cron/ingest) (`runIngest()`, three tiers: gather → cluster → synthesize). Relevance/testability now lives in the new [[syllabus-testability-graph]] subsystem. Read §3 below as historical, not current.
+
 # Object: Ingestion Pipeline (`current_affairs`, `pib_digests`, RSS Scrapers, LLM Distillation)
 
 ## 1. What It Is

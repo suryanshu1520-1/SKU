@@ -12,14 +12,59 @@ import {
   X,
   BrainCircuit,
   ChevronRight,
+  ShieldCheck,
 } from 'lucide-react';
 
 const ACCENT = '#e0d0ab';
+
+// A per-bullet verified-source anchor (the "Naval Instrument" trust surface).
+// Reveals the verbatim cited source sentence(s) on hover/focus — the evidence
+// behind the claim. Renders nothing for ungrounded bullets (graceful).
+function SourceAnchor({ claim }: { claim: VerifiedClaim }) {
+  if (!claim?.quotes?.length) return null;
+  return (
+    <span className="relative inline-block group/src align-super">
+      <button
+        type="button"
+        aria-label={`Source: ${claim.source}`}
+        className="ml-0.5 inline-flex items-center text-[#e0d0ab]/70 hover:text-[#e0d0ab] focus:text-[#e0d0ab] outline-none cursor-help"
+      >
+        <ShieldCheck className="w-2.5 h-2.5" />
+      </button>
+      <span className="pointer-events-none absolute left-0 bottom-full z-30 mb-1.5 w-72 max-w-[80vw] origin-bottom-left scale-95 opacity-0 transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/src:opacity-100 group-hover/src:scale-100 group-focus-within/src:opacity-100 group-focus-within/src:scale-100">
+        <span className="block rounded-sm border border-zinc-700/80 bg-zinc-900 p-2.5 shadow-[0_12px_32px_-12px_rgba(0,0,0,0.7),inset_0_1px_0_rgba(255,255,255,0.05)]">
+          <span className="mb-1.5 flex items-center gap-1 text-[8px] font-bold uppercase tracking-widest text-[#e0d0ab]/80">
+            <ShieldCheck className="w-2.5 h-2.5" /> Grounded in {claim.source}
+          </span>
+          {claim.quotes.map((q, i) => (
+            <span
+              key={i}
+              className="mb-1 block border-l-2 border-[#e0d0ab]/40 pl-2 text-[11px] italic leading-snug text-zinc-300 last:mb-0"
+            >
+              &ldquo;{q}&rdquo;
+            </span>
+          ))}
+        </span>
+      </span>
+    </span>
+  );
+}
 
 // ============================================================
 // Types — the extended `summary` jsonb contract (P4/P5).
 // `.bullets` stays primary; the rest is additive metadata.
 // ============================================================
+// A span-anchored, cite-or-drop verified claim (evidence-span ledger).
+interface VerifiedClaim {
+  text: string;
+  spanIds: string[];
+  quotes: string[]; // verbatim source sentences — the trust-UI hover payload
+  facts: string[];
+  claimType: 'numeric' | 'context';
+  verified: boolean;
+  source: string;
+  url: string;
+}
 interface EditionSummary {
   bullets: string[];
   significance?: number;
@@ -30,6 +75,8 @@ interface EditionSummary {
   cluster_size?: number;
   edition_date?: string;
   has_quiz?: boolean;
+  claims?: VerifiedClaim[]; // additive — present when synthesis was span-grounded
+  grounding?: number; // 0..1 fraction of bullets that passed the fact check
 }
 interface EditionItem {
   id?: string;
@@ -284,6 +331,14 @@ export default function DailyEdition({ userId }: DailyEditionProps) {
                         <Layers className="w-2.5 h-2.5" />+{corroboration} source{corroboration > 1 ? 's' : ''}
                       </span>
                     )}
+                    {typeof s.grounding === 'number' && (
+                      <span
+                        className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-[#e0d0ab]/10 text-[#e0d0ab] text-[9px] font-semibold uppercase tracking-wider rounded-sm border border-[#e0d0ab]/20"
+                        title={`${Math.round(s.grounding * 100)}% of bullets grounded in cited primary sources`}
+                      >
+                        <ShieldCheck className="w-2.5 h-2.5" />{Math.round(s.grounding * 100)}% grounded
+                      </span>
+                    )}
                     {(s.tags || []).slice(0, 3).map((t) => (
                       <span key={t} className="px-1.5 py-0.5 bg-[#e0d0ab]/10 text-[#e0d0ab] text-[9px] font-semibold uppercase tracking-wider rounded-sm">
                         {t}
@@ -296,14 +351,20 @@ export default function DailyEdition({ userId }: DailyEditionProps) {
                     {item.headline}
                   </h3>
 
-                  {/* Bullets */}
+                  {/* Bullets — each carries a verified-source anchor when grounded */}
                   <div className="space-y-1.5 mb-3">
-                    {(s.bullets || []).slice(0, 3).map((b, i) => (
-                      <div key={i} className="flex items-start gap-2 text-xs text-zinc-300 leading-relaxed">
-                        <span className="text-[#e0d0ab] font-bold mt-0.5 select-none">&bull;</span>
-                        <p>{b}</p>
-                      </div>
-                    ))}
+                    {(s.bullets || []).slice(0, 3).map((b, i) => {
+                      const claim = (s.claims || []).find((c) => c.text === b);
+                      return (
+                        <div key={i} className="flex items-start gap-2 text-xs text-zinc-300 leading-relaxed">
+                          <span className="text-[#e0d0ab] font-bold mt-0.5 select-none">&bull;</span>
+                          <p>
+                            {b}
+                            {claim && <SourceAnchor claim={claim} />}
+                          </p>
+                        </div>
+                      );
+                    })}
                   </div>
 
                   {/* Prelims / Mains pointers */}
