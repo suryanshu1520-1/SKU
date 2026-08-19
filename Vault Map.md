@@ -105,3 +105,17 @@ The System Map allows agents and humans to audit domain nouns, system movements,
 - `#map/processes` — Verified system workflows and transactional movements.
 - `#map/effects` — Change-impact and ripple matrices.
 - `#system` — Root contracts and setup configuration.
+
+
+---
+
+## 🔬 Engine Research (raw inputs, 2026-08-19)
+
+Deep-research reports on the flip-the-script $0 current-affairs intelligence engine. Start at the map of content: [[engine-research-moc]].
+
+- [[engine-research-claude]] — Claude (invert-the-pipeline, govt-data spine)
+- [[engine-research-codex]] — Codex (evidence-first event ledger, cite-or-drop)
+- [[engine-research-gemini-v1]] — Gemini V1 (deterministic ingestion, MinHash-LSH)
+- [[engine-research-gemini-v2]] — Gemini V2 (engineering blueprint w/ formulas)
+
+Status: **unsynthesized raw inputs** for the upcoming innovation session. Companion to [[news-intelligence-architecture]]. (Folder `docs/research/` is kept local/unpushed per `@repo-hygiene`.)

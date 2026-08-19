@@ -1,0 +1,2194 @@
+[
+  {
+    "nodeId": "GS3.SCI.IT_COMP",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.RESOURCES",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.CAPITAL_MKT",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "PRE.SCI.CHEM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.SEC.TERROR",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.IND_PHYS",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ENV.BIODIVERSITY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "PRE.SCI.CHEM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "PRE.SCI.BIO",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.IR.UN_REFORM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.CONSTITUTION",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ENV.CLIMATE",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.IR.MULTILATERAL",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.AGRI.CROPPING",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.IR.MULTILATERAL",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.ANCIENT",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.HUMAN",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.ANCIENT",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.MONETARY",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.GEOMORPH",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.IR.NEIGHBOURHOOD",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ENV.CLIMATE",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.CONSTITUTION",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.FEDERALISM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.SCI.SPACE",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.JUDICIARY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.GOV.TRANSPARENCY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.SCI.IT_COMP",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.FEDERALISM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.CONSTITUTION",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.AGRI.PDS",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.CONSTITUTION",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.INDUSTRY",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ENV.GOVERNANCE",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.GOV.TRANSPARENCY",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.SEC.BORDER",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.HUMAN",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.CLIMATE",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "PRE.SCI.BIO",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.INDUSTRY",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.CUL.ARCH",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.FUND_RIGHTS",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.ANCIENT",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.SCI.SPACE",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.UNION_EXEC",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.SCI.SPACE",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.CUL.PERFORM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.AGRI_GEO",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.RESOURCES",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.ANCIENT",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.SCI.SPACE",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.INDUSTRY",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.RESOURCES",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.SOC.POPULATION",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.DIS.FRAMEWORK",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.JUDICIARY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.FUND_RIGHTS",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "PRE.SCI.PHYS",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.MEDIEVAL",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "PRE.SCI.BIO",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "PRE.SCI.CHEM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ENV.ECOLOGY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.JUDICIARY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.INFRA",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.CUL.ARCH",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.MONETARY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.FUND_RIGHTS",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.MEDIEVAL",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.CUL.PERFORM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.MEDIEVAL",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.CONST_BODIES",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.CUL.PERFORM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.CUL.PAINT_CRAFT",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.CUL.PERFORM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.MEDIEVAL",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.SCI.IT_COMP",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ENV.GOVERNANCE",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.PARLIAMENT",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.CUL.PERFORM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.SOC.FEATURES",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.ANCIENT",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.UNION_EXEC",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ENV.ECOLOGY",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.IND_PHYS",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.SCI.SPACE",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ENV.FORESTS",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ENV.WETLANDS",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.CONST_BODIES",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ENV.POLLUTION",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ENV.GOVERNANCE",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ENV.GOVERNANCE",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.SEC.TERROR",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.IND_PHYS",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ENV.BIODIVERSITY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.CONST_BODIES",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.CONST_BODIES",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.ANCIENT",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.SEC.TERROR",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.IND_PHYS",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.CLIMATE",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.CONST_BODIES",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ENV.GOVERNANCE",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.OCEAN",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.OCEAN",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.IR.UN_REFORM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.IR.MULTILATERAL",
+    "tier": "B",
+    "year": 1995,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.CONST_BODIES",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.MONETARY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.AGRI.CROPPING",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.MONETARY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.CAPITAL_MKT",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.MONETARY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.MONETARY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.MONETARY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.JUDICIARY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.CONST_BODIES",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.JUDICIARY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.TAXATION",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.UNION_EXEC",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.UNION_EXEC",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.CONST_BODIES",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.FUND_RIGHTS",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.CONST_BODIES",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.IR.NEIGHBOURHOOD",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.FEDERALISM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.NON_CONST",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.IR.UN_REFORM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.IR.UN_REFORM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.IR.NEIGHBOURHOOD",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.IR.MULTILATERAL",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.IR.MULTILATERAL",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.IR.NEIGHBOURHOOD",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.CONST_BODIES",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.CONST_BODIES",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.SCI.DEFENCE",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.CONST_BODIES",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.SCI.NUCLEAR",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.SCI.SPACE",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "PRE.SCI.DISEASE",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.TAXATION",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.MONETARY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.SCI.IT_COMP",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.PARLIAMENT",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.UNION_EXEC",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.INFRA",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.HUMAN",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.FEDERALISM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ENV.GOVERNANCE",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.POST_INDEP",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.FEDERALISM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.TAXATION",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.UNION_EXEC",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.GOV.TRANSPARENCY",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.UNION_EXEC",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.GEOMORPH",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.FEDERALISM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.TAXATION",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.ANCIENT",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.UNION_EXEC",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.SOC.POPULATION",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.IND_PHYS",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.DIS.HAZARDS",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.INVESTMENT",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.IND_PHYS",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.CONSTITUTION",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "PRE.SCI.BIO",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.JUDICIARY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.FUND_RIGHTS",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.UNION_EXEC",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.MONETARY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.CUL.ARCH",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.UNION_EXEC",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ENV.FORESTS",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.PARLIAMENT",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ENV.POLLUTION",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.SEC.TERROR",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.ANCIENT",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.CUL.PERFORM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.MEDIEVAL",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.CUL.PERFORM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.SOC.POVERTY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.SOC.POVERTY",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.RESOURCES",
+    "tier": "B",
+    "year": 2024,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.SCI.SPACE",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.FEDERALISM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.AGRI_GEO",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.MEDIEVAL",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.CONSTITUTION",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.CUL.PERFORM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.GEO.RESOURCES",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.CUL.PERFORM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.SOC.POPULATION",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.ANCIENT",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ECO.MONETARY",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.ENV.WETLANDS",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS3.AGRI.PROCESSING",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS1.HIS.FREEDOM",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  },
+  {
+    "nodeId": "GS2.POL.UNION_EXEC",
+    "tier": "B",
+    "year": 2025,
+    "paper": "PRELIMS",
+    "marks": 2,
+    "weight": 0.5
+  }
+]

@@ -89,6 +89,10 @@ docs/handoffs/
 *-handoff.md
 *.handoff.md
 
+# ── Internal research (strategic deep-research inputs — kept local, not public) ──
+# Lives in the Obsidian vault for reference/synthesis; not pushed to the public repo.
+docs/research/
+
 # ── Scratch & verification throwaways (probes, dry-runs, temp tsconfigs) ──
 _scratch/
 *.probe.mjs
