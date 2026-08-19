@@ -42,7 +42,7 @@ async function backfill() {
         text: b,
         spanIds: [`s${idx * 2}`, `s${idx * 2 + 1}`],
         quotes: [
-          `Official Gazette Statement (${row.source}): "${b.slice(0, 160)}..."`
+          `Primary Source Excerpt (${row.source}): "${b.slice(0, 160)}..."`
         ],
         facts: facts.length ? facts : ['Policy Resolution', `${row.source} Bulletin`],
         claimType: 'numeric' as const,

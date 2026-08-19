@@ -47,7 +47,7 @@ Competitive examinations like the UPSC Civil Services require deep conceptual re
 
 **Tark 1.0** is built on three core design tenets:
 1. **Low-Cortisol, Sterile Interface**: High-contrast, typography-first, distraction-free aesthetic with zero ads, clickbait, or sensory overload.
-2. **Zero-Cost Anti-Hallucination**: Deterministic sentence-level evidence anchoring (`verify.ts`) ensuring every factual claim is anchored directly in primary government gazettes (PIB, PRS, RBI, Supreme Court).
+2. **Zero-Cost Anti-Hallucination**: Deterministic sentence-level evidence anchoring (`verify.ts`) ensuring every factual claim is anchored directly in primary government documents and statutory sources (PIB, PRS, RBI, Supreme Court).
 3. **Immediate Diagnostic Feedback**: High-stakes timed test simulations accompanied by deep question-level autopsy analysis, subject radar diagnostics, and AI-driven conceptual explanations.
 
 ---
@@ -57,7 +57,7 @@ Competitive examinations like the UPSC Civil Services require deep conceptual re
 ```mermaid
 flowchart TB
     subgraph INGESTION ["1. Ingestion & Scraping Layer (server-lib/cron/)"]
-        PIB["PIB Gazette Scraper<br/>(Hindi + English)"]
+        PIB["PIB Ingestion Engine<br/>(Hindi + English)"]
         PRS["PRS Legislative<br/>Research Scraper"]
         RBI["RBI & Livemint<br/>Economic Feeds"]
         RSS["Tier 1 / Tier 2 RSS Feeds<br/>(The Hindu, Indian Express)"]
@@ -117,7 +117,7 @@ flowchart TB
 - **Finite, Significance-Ranked Feed**: Delivers a curated 5–10 brief executive daily edition scored across governance impact, constitutional relevance, and economic magnitude.
 - **Syllabus Tagging**: Structured categorization conforming directly to UPSC GS Paper 1, 2, 3, 4, and Optional subjects.
 - **Prelims & Mains Vectors**: Every brief features a concrete Prelims Fact pointer and an analytical Mains Perspective statement.
-- **Gazette Archive & Signal Explorer**: Deep search and ministry/source filtering across historical gazette dispatches.
+- **Policy Dispatches & Signal Explorer**: Deep search and ministry/source filtering across historical policy dispatches.
 
 ### 2. Trust UI & Deterministic Verification Ledger
 - **Evidence-Span Ledger (`verify.ts`)**: Sentence-segments bodies into stable span IDs (`s0, s1, ...`). Synthesized bullets must cite valid spans and contain verbatim numeric and factual tokens. Bullets failing verification are deterministically dropped.
@@ -127,7 +127,7 @@ flowchart TB
   - Cited evidence span IDs (`s2, s3`)
   - Verbatim excerpt from the primary source document
   - Extracted Facts Ledger (`7.6`, `2021`, `8.6`, `2022`)
-  - Direct hyperlink to the original government gazette
+  - Direct hyperlink to the original primary source
 - **Full Brief Dossier Modal**: Comprehensive slide-over dossier with full synthesis, evidence provenance, and reading time metrics.
 
 ### 3. Analytical Test Arena & Autopsy Engine

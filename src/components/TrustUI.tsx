@@ -148,7 +148,7 @@ export function SourceAnchor({ claim }: { claim: VerifiedClaim }) {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-[10px] font-mono text-[#e0d0ab] hover:underline"
                   >
-                    <span>View Primary Gazette</span>
+                    <span>View Primary Source</span>
                     <ExternalLink className="w-2.5 h-2.5" />
                   </a>
                 </div>
@@ -271,7 +271,7 @@ export function ContestedCard({ contested }: { contested?: ContestedClaim }) {
       {/* Analytical Note */}
       <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
         <AlertTriangle className="w-3 h-3 text-amber-400 shrink-0" />
-        <span>UPSC Strategy: When sources differ, cite the primary gazette figure with secondary wire context.</span>
+        <span>UPSC Strategy: When sources differ, cite the primary government figure with secondary wire context.</span>
       </div>
     </div>
   );

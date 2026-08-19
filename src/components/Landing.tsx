@@ -175,11 +175,11 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
                 <h3 className="font-serif text-lg font-bold tracking-tight text-zinc-100 group-hover:text-[#e0d0ab] transition-colors">
                   The Daily Brief
                 </h3>
-                <span className="text-[10px] font-sans text-zinc-500">PIB &amp; gazette, distilled daily</span>
+                <span className="text-[10px] font-sans text-zinc-500">PIB &amp; policy dispatches, distilled daily</span>
               </div>
             </div>
             <p className="text-zinc-400 text-xs leading-relaxed font-sans mb-4">
-              Every PIB release, cabinet decision, and governance gazette distilled by our AI into high-yield, 4-minute analytical briefs. Read the signal, filter by ministry, and prove your retention.
+              Every PIB release, cabinet decision, and policy dispatch distilled by our AI into high-yield, 4-minute analytical briefs. Read the signal, filter by ministry, and prove your retention.
             </p>
             <div className="flex items-center gap-2 text-[#e0d0ab] text-xs font-sans group-hover:translate-x-1 transition-transform">
               <span>Explore Intelligence</span>

@@ -488,7 +488,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               The Daily Brief <span className="font-serif font-normal text-[#e0d0ab] text-2xl sm:text-3xl">| दैनिक नीति संकेत</span>
             </h1>
             <p className="text-zinc-400 text-xs sm:text-sm font-sans mt-2 max-w-2xl leading-relaxed">
-              Every press release, cabinet decision, and gazette notification that matters, distilled into a few honest minutes for UPSC and State PSC prep.
+              Every press release, cabinet decision, and policy notification that matters, distilled into a few honest minutes for UPSC and State PSC prep.
             </p>
           </div>
 
@@ -540,10 +540,10 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
           <div>
             <h3 className="font-serif text-base font-bold text-stone-100 flex items-center gap-2">
               <Layers className="w-4 h-4 text-[#e0d0ab]" />
-              <span>Gazette Archive & Signal Explorer</span>
+              <span>Policy Dispatches & Signal Explorer</span>
             </h3>
             <p className="text-xs text-zinc-500 font-sans">
-              Search historical gazettes, filter by ministry, or browse verified policy dispatches.
+              Search policy dispatches, filter by ministry, or browse verified intelligence.
             </p>
           </div>
         </div>
@@ -1164,7 +1164,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#e0d0ab] text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-stone-100 transition-all cursor-pointer"
                   >
-                    <span>Read Original Gazette</span>
+                    <span>Read Primary Source</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 )}
@@ -1200,7 +1200,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-primary" />
                     <span className="font-serif text-sm font-bold tracking-tight uppercase text-on-surface">
-                      PIB Gazette Dossier
+                      PIB Intelligence Digest
                     </span>
                   </div>
                   <div className="flex items-center gap-4 font-sans">
@@ -1252,7 +1252,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               </div>
 
               {/* Scrollable, swipeable Newspaper Body — drag left/right (touch or mouse) to turn
-                  editions, exactly like flicking through a physical gazette; arrow keys and the
+                  editions, exactly like turning through a physical brief; arrow keys and the
                   PREV/NEXT dock below cover keyboard and desktop-pointer users. */}
               <div
                 ref={readerBodyRef}
