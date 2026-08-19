@@ -802,7 +802,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               {leadItem.summary?.bullets && leadItem.summary.bullets.length > 0 && (
                 <div className="space-y-2 mb-4 max-w-4xl">
                   {leadItem.summary.bullets.slice(0, 3).map((bullet, idx) => {
-                    const claim = (leadItem.summary?.claims || []).find((c) => c.text === bullet);
+                    const claim = (leadItem.summary?.claims || []).find((c) => c.text?.trim() === bullet?.trim()) || (leadItem.summary?.claims || [])[idx];
                     return (
                       <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-zinc-300 font-sans leading-relaxed">
                         <span className="text-[#e0d0ab] font-bold mt-0.5 select-none">&bull;</span>
@@ -931,7 +931,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                       {item.summary?.bullets && item.summary.bullets.length > 0 && (
                         <ul className="space-y-1.5 mb-3">
                           {item.summary.bullets.slice(0, 2).map((b, bIdx) => {
-                            const claim = (item.summary?.claims || []).find((c) => c.text === b);
+                            const claim = (item.summary?.claims || []).find((c) => c.text?.trim() === b?.trim()) || (item.summary?.claims || [])[bIdx];
                             return (
                               <li key={bIdx} className="text-xs text-zinc-400 font-sans leading-relaxed flex items-start gap-2">
                                 <span className="text-[#e0d0ab] font-bold mt-0.5 select-none">•</span>
@@ -1093,7 +1093,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                   </div>
                   <div className="space-y-3 pl-3 border-l-2 border-[#e0d0ab]/30">
                     {selectedDossier.summary?.bullets?.map((bullet, idx) => {
-                      const claim = (selectedDossier.summary?.claims || []).find((c) => c.text === bullet);
+                      const claim = (selectedDossier.summary?.claims || []).find((c) => c.text?.trim() === bullet?.trim()) || (selectedDossier.summary?.claims || [])[idx];
                       return (
                         <p key={idx} className="text-sm text-zinc-300 font-sans leading-relaxed">
                           {bullet}

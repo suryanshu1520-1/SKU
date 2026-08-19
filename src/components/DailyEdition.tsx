@@ -311,7 +311,7 @@ export default function DailyEdition({ userId }: DailyEditionProps) {
                   {/* Bullets — each carries a verified-source anchor when grounded */}
                   <div className="space-y-1.5 mb-3">
                     {(s.bullets || []).slice(0, 3).map((b, i) => {
-                      const claim = (s.claims || []).find((c) => c.text === b);
+                      const claim = (s.claims || []).find((c) => c.text?.trim() === b?.trim()) || (s.claims || [])[i];
                       return (
                         <div key={i} className="flex items-start gap-2 text-xs text-zinc-300 leading-relaxed">
                           <span className="text-[#e0d0ab] font-bold mt-0.5 select-none">&bull;</span>

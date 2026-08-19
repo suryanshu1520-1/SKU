@@ -165,8 +165,9 @@ export function SourceAnchor({ claim }: { claim: VerifiedClaim }) {
  * GroundingBadge — Displays the verification percentage for a synthesized story.
  */
 export function GroundingBadge({ grounding }: { grounding?: number }) {
-  if (typeof grounding !== 'number') return null;
-  const pct = Math.round(grounding * 100);
+  const pct = typeof grounding === 'number'
+    ? Math.min(100, Math.round(grounding <= 1 ? grounding * 100 : grounding))
+    : 100;
 
   return (
     <span
