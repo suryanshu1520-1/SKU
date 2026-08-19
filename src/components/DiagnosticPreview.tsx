@@ -71,11 +71,11 @@ export default function DiagnosticPreview({ onLaunchFullArena }: DiagnosticPrevi
       <div className="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-zinc-800/60">
         <div className="flex items-center gap-2">
           <Brain className="w-4 h-4 text-[#e0d0ab]" />
-          <span className="text-[10px] font-mono uppercase tracking-widest text-[#e0d0ab] font-bold">
+          <h3 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
             Interactive Diagnostic Preview
-          </span>
+          </h3>
         </div>
-        <span className="text-[10px] font-mono text-zinc-500 uppercase">
+        <span className="text-[10px] font-sans text-zinc-400 uppercase tracking-wider">
           {q.subject}
         </span>
       </div>
@@ -138,16 +138,16 @@ export default function DiagnosticPreview({ onLaunchFullArena }: DiagnosticPrevi
                 : 'bg-zinc-900 border-zinc-800 text-zinc-300'
             }`}
           >
-            <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase font-bold mb-1">
+            <div className="flex items-center gap-1.5 font-sans text-[11px] font-bold mb-1">
               {isCorrect ? (
                 <>
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-emerald-400">Correct (+2.00) &bull; Accurate Reasoning</span>
+                  <span className="text-emerald-400">Correct <span className="font-mono">(+2.00)</span> &bull; Accurate Reasoning</span>
                 </>
               ) : (
                 <>
                   <XCircle className="w-3.5 h-3.5 text-rose-400" />
-                  <span className="text-rose-400">Incorrect (-0.66) &bull; Conceptual Autopsy</span>
+                  <span className="text-rose-400">Incorrect <span className="font-mono">(-0.66)</span> &bull; Conceptual Autopsy</span>
                 </>
               )}
             </div>
@@ -161,22 +161,22 @@ export default function DiagnosticPreview({ onLaunchFullArena }: DiagnosticPrevi
         {hasAnswered ? (
           <button
             onClick={handleNext}
-            className="inline-flex items-center gap-1.5 text-xs font-mono text-[#e0d0ab] hover:underline cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs font-sans text-[#e0d0ab] hover:underline cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            Try Next Question ({currentIndex + 1}/{SAMPLE_QUESTIONS.length})
+            Try Next Question <span className="font-mono">({currentIndex + 1}/{SAMPLE_QUESTIONS.length})</span>
           </button>
         ) : (
-          <span className="text-[10px] font-mono text-zinc-500">
-            Select an option to trigger zero-trust evaluation
+          <span className="text-[10px] font-sans text-zinc-500">
+            Select an option to evaluate
           </span>
         )}
 
         <button
           onClick={onLaunchFullArena}
-          className="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#e0d0ab] text-zinc-950 text-[10px] font-mono uppercase font-bold tracking-wider rounded-sm hover:bg-stone-100 transition-all cursor-pointer"
+          className="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#e0d0ab] text-zinc-950 text-[10px] font-sans uppercase font-bold tracking-wider rounded-sm hover:bg-stone-100 transition-all cursor-pointer"
         >
-          <span>Launch Full 10-Q Arena</span>
+          <span>Launch Full Arena</span>
           <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
         </button>
       </div>

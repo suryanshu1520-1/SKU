@@ -193,7 +193,7 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="mb-12"
         >
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-sm text-[9px] uppercase font-mono text-zinc-400 tracking-widest mb-4 select-none">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-sm text-[10px] uppercase font-sans font-medium text-zinc-400 tracking-wider mb-4 select-none">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             CORE PHILOSOPHY
           </div>
@@ -202,7 +202,7 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
             THE TARK MANIFESTO
           </h1>
 
-          <p className="text-xs uppercase tracking-[0.25em] text-zinc-400 font-mono">
+          <p className="text-xs uppercase tracking-[0.25em] text-zinc-400 font-sans">
             The War on Noise &bull; Return on Time
           </p>
         </motion.div>
@@ -215,7 +215,7 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
           className="mb-10 p-4 bg-zinc-900/40 border border-[#e0d0ab]/30 rounded-sm flex items-center justify-between gap-4"
         >
           <div className="space-y-0.5">
-            <p className="text-[10px] font-mono uppercase text-[#e0d0ab] font-bold tracking-wider">
+            <p className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold tracking-wider">
               Founders Club &bull; Strictly Capped Capacity
             </p>
             <p className="text-xs text-zinc-300 font-sans">

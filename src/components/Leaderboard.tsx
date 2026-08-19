@@ -79,25 +79,25 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
     <div className="w-full max-w-4xl mx-auto space-y-8 font-sans pb-24">
       
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-zinc-800 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-zinc-800 pb-6 font-sans">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="w-2 h-2 rounded-full bg-[#e0d0ab] animate-pulse" />
-            <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#e0d0ab] font-bold">
+            <span className="text-[10px] font-sans uppercase tracking-wider text-[#e0d0ab] font-medium">
               This Week's Ranking
             </span>
           </div>
           <h1 className="font-serif text-2xl sm:text-3xl font-bold text-white tracking-tight">
             Tark Rankings
           </h1>
-          <p className="text-xs font-mono text-zinc-400 mt-1">
+          <p className="text-xs font-sans text-zinc-400 mt-1">
             Resets every Sunday at 14:00 IST &bull; scored server-side
           </p>
         </div>
 
         <button
           onClick={() => setShowInfoModal(true)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 border border-zinc-800 hover:border-[#0194a8] text-zinc-300 hover:text-[#e0d0ab] rounded-sm text-xs font-mono transition-all self-start sm:self-auto cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 border border-zinc-800 hover:border-[#0194a8] text-zinc-300 hover:text-[#e0d0ab] rounded-sm text-xs font-sans font-medium transition-all self-start sm:self-auto cursor-pointer"
         >
           <Info className="w-3.5 h-3.5 text-[#0194a8]" />
           <span>Scoring Rules</span>
@@ -106,9 +106,9 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
 
       {/* Loading State */}
       {loading && (
-        <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
+        <div className="flex flex-col items-center justify-center py-20 text-zinc-500 font-sans">
           <Loader2 className="w-6 h-6 animate-spin text-[#0194a8] mb-3" />
-          <p className="text-xs font-mono uppercase tracking-wider">Loading rankings...</p>
+          <p className="text-xs font-sans uppercase tracking-wider">Loading rankings...</p>
         </div>
       )}
 
@@ -131,7 +131,7 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
 
       {/* Podium & Leaderboard Content */}
       {!loading && !error && entries.length > 0 && (
-        <div className="space-y-8">
+        <div className="space-y-8 font-sans">
           
           {/* Top 3 Contender Podium */}
           {top3.length > 0 && (
@@ -158,13 +158,13 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
                     } ${isCurrentUser ? 'ring-1 ring-[#0194a8]' : ''}`}
                   >
                     <div className="flex items-center justify-between gap-2 mb-3">
-                      <span className={`px-2 py-0.5 rounded-sm border text-[10px] font-mono font-bold ${badge.color}`}>
+                      <span className={`px-2 py-0.5 rounded-sm border text-[10px] font-sans font-bold ${badge.color}`}>
                         {badge.label}
                       </span>
                       {entry.trophy_count > 0 && (
-                        <span className="inline-flex items-center gap-1 text-xs text-[#e0d0ab] font-mono">
+                        <span className="inline-flex items-center gap-1 text-xs text-[#e0d0ab]">
                           <Trophy className="w-3.5 h-3.5 fill-[#e0d0ab]/20" />
-                          <span>{entry.trophy_count}</span>
+                          <span className="font-mono">{entry.trophy_count}</span>
                         </span>
                       )}
                     </div>
@@ -173,13 +173,13 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
                       <h3 className="font-serif text-base font-bold text-stone-100 group-hover:text-[#e0d0ab] transition-colors truncate">
                         {displayName(entry)}
                       </h3>
-                      <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
+                      <p className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">
                         {isCurrentUser ? 'You (Current Session)' : 'Ranked Aspirant'}
                       </p>
                     </div>
 
                     <div className="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between">
-                      <span className="text-[10px] font-mono text-zinc-500 uppercase">Points</span>
+                      <span className="text-[10px] font-sans text-zinc-500 uppercase">Points</span>
                       <span className="font-mono text-xl font-bold text-[#e0d0ab]">
                         {entry.contender_points} CP
                       </span>
@@ -193,18 +193,18 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
           {/* Full Contender Ledger Table */}
           <div className="bg-zinc-900/20 border border-zinc-800 rounded-sm overflow-hidden backdrop-blur-sm">
             <div className="px-5 py-3 border-b border-zinc-800 bg-zinc-900/40 flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-[#e0d0ab] font-bold">
-                All Ranked Aspirants ({entries.length})
-              </span>
-              <span className="text-[10px] font-mono text-zinc-500">
-                Click any row for detailed telemetry
+              <h3 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
+                All Ranked Aspirants <span className="font-mono">({entries.length})</span>
+              </h3>
+              <span className="text-[10px] font-sans text-zinc-500">
+                Click any row for full stats
               </span>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-zinc-800 text-zinc-500 text-[10px] font-mono uppercase tracking-widest font-bold">
+                  <tr className="border-b border-zinc-800 text-zinc-500 text-[10px] font-sans uppercase tracking-wider font-bold">
                     <th className="py-3 px-5 w-16">Rank</th>
                     <th className="py-3 px-5">Candidate</th>
                     <th className="py-3 px-5 text-center">Trophies</th>
@@ -251,7 +251,7 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
                               {displayName(entry)}
                             </span>
                             {isCurrentUser && (
-                              <span className="px-1.5 py-0.2 bg-[#0194a8]/20 border border-[#0194a8]/40 text-[#0194a8] text-[9px] font-mono font-bold uppercase rounded-sm">
+                              <span className="px-1.5 py-0.2 bg-[#0194a8]/20 border border-[#0194a8]/40 text-[#0194a8] text-[9px] font-sans font-bold uppercase rounded-sm">
                                 You
                               </span>
                             )}
@@ -288,12 +288,12 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
       <Modal
         isOpen={showInfoModal}
         onClose={() => setShowInfoModal(false)}
-        title="How Ranking Vanguard Scoring & Point Mechanics Points Work"
+        title="How Ranking & Points Work"
         subtitle="Zero-Trust Competitive Protocol Rules"
       >
         <div className="space-y-4 text-xs text-zinc-300 leading-relaxed font-sans">
           <div className="p-4 bg-zinc-900/60 border border-zinc-800 rounded-sm space-y-3">
-            <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-[#e0d0ab]">
+            <h4 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
               Tactical Yield Calculations
             </h4>
             <ul className="space-y-2 text-zinc-300">
@@ -307,11 +307,11 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-[#0194a8] font-bold mt-0.5">&bull;</span>
-                <span><strong>Vanguard Benchmark Bonus:</strong> Attain <strong>80% or higher accuracy</strong> to secure a <strong>+25 CP bonus</strong>.</span>
+                <span><strong>Accuracy Bonus:</strong> Attain <strong>80% or higher accuracy</strong> to secure a <strong>+25 CP bonus</strong>.</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-[#e0d0ab] font-bold mt-0.5">&bull;</span>
-                <span><strong>Weekly Reset:</strong> Leaderboard resets every <strong>Sunday at 14:00 IST</strong>. Highest ranking candidate earns a permanent Vanguard Trophy.</span>
+                <span><strong>Weekly Reset:</strong> Leaderboard resets every <strong>Sunday at 14:00 IST</strong>. Highest ranking candidate earns a permanent Trophy.</span>
               </li>
             </ul>
           </div>

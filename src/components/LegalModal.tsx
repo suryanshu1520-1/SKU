@@ -36,12 +36,12 @@ export default function LegalModal({ documentType, onClose }: LegalModalProps) {
 function PrivacyPolicy() {
   return (
     <div className="space-y-6 text-zinc-400 font-sans text-sm leading-relaxed">
-      <div className="flex items-center gap-2 text-[#e0d0ab] font-mono text-xs uppercase tracking-wider">
+      <div className="flex items-center gap-2 text-[#e0d0ab] font-sans text-xs uppercase tracking-wider font-medium">
         <Shield className="w-4 h-4 text-emerald-400" />
         Legal &bull; Tark Trust Charter
       </div>
       <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#e0d0ab] mb-6 tracking-tight">Privacy Policy</h1>
-      <p className="font-mono text-xs text-zinc-400">Effective Date: 2026-08-18 &bull; Platform: Tark (तर्क)</p>
+      <p className="font-sans text-xs text-zinc-400">Effective Date: 2026-08-18 &bull; Platform: Tark (तर्क)</p>
 
       <p>Tark is committed to maintaining an ad-free, noise-free, zero-tracker environment for high-stakes competitive examination preparation. This document details our data handling standards.</p>
 
@@ -54,7 +54,7 @@ function PrivacyPolicy() {
       </ul>
 
       <h2 className="font-serif font-bold text-base text-zinc-200 mt-8 mb-3">2. ZERO DATA MONETIZATION PLEDGE</h2>
-      <p>We do not sell candidate data, serve targeted ads, or share test performance metrics with third-party recruiters or commercial data aggregators. All platform telemetry is used strictly to power your test analysis, diagnostic feedback, and leaderboard ranking.</p>
+      <p>We do not sell candidate data, serve targeted ads, or share test performance metrics with third-party recruiters or commercial data aggregators. All usage data is used strictly to power your test analysis, diagnostic feedback, and leaderboard ranking.</p>
 
       <h2 className="font-serif font-bold text-base text-zinc-200 mt-8 mb-3">3. SECURITY & RETENTION</h2>
       <p>User records are stored in PostgreSQL with strict Row Level Security (RLS). You may request the permanent export or deletion of your account and test history at any time by contacting our support desk.</p>
@@ -68,12 +68,12 @@ function PrivacyPolicy() {
 function TermsAndConditions() {
   return (
     <div className="space-y-6 text-zinc-400 font-sans text-sm leading-relaxed">
-      <div className="flex items-center gap-2 text-[#e0d0ab] font-mono text-xs uppercase tracking-wider">
+      <div className="flex items-center gap-2 text-[#e0d0ab] font-sans text-xs uppercase tracking-wider font-medium">
         <Shield className="w-4 h-4 text-emerald-400" />
         Legal &bull; Terms of Service
       </div>
       <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#e0d0ab] mb-6 tracking-tight">Terms & Conditions</h1>
-      <p className="font-mono text-xs text-zinc-400">Effective Date: 2026-08-18 &bull; Platform: Tark (तर्क)</p>
+      <p className="font-sans text-xs text-zinc-400">Effective Date: 2026-08-18 &bull; Platform: Tark (तर्क)</p>
 
       <h2 className="font-serif font-bold text-base text-zinc-200 mt-8 mb-3">1. PLATFORM INTEGRITY</h2>
       <p>Tark provides competitive test simulation and current affairs intelligence. You agree not to scrape, automatedly harvest questions, exploit server endpoints, or circumvent rate-limiting barriers.</p>
@@ -90,12 +90,12 @@ function TermsAndConditions() {
 function RefundPolicy() {
   return (
     <div className="space-y-6 text-zinc-400 font-sans text-sm leading-relaxed">
-      <div className="flex items-center gap-2 text-[#e0d0ab] font-mono text-xs uppercase tracking-wider">
+      <div className="flex items-center gap-2 text-[#e0d0ab] font-sans text-xs uppercase tracking-wider font-medium">
         <Shield className="w-4 h-4 text-emerald-400" />
         Legal &bull; Refund & Cancellation Policy
       </div>
       <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#e0d0ab] mb-6 tracking-tight">Refund Policy</h1>
-      <p className="font-mono text-xs text-zinc-400">Effective Date: 2026-08-18 &bull; Platform: Tark (तर्क)</p>
+      <p className="font-sans text-xs text-zinc-400">Effective Date: 2026-08-18 &bull; Platform: Tark (तर्क)</p>
 
       <h2 className="font-serif font-bold text-base text-zinc-200 mt-8 mb-3">1. DIGITAL ACCESS & SEAT INVENTORY</h2>
       <p>Due to the immediate provisioning of lifetime access and the hard capacity cap (500 seats), all Founders Club sales are final once digital access is granted.</p>

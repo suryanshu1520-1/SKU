@@ -265,7 +265,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
     const rows = history.map((h, i) => {
       const total = h.correct_count + h.incorrect_count + h.unattempted_count;
       const acc = total > 0 ? ((h.correct_count / total) * 100).toFixed(1) : '0';
-      const mode = h.subject_stats ? 'Vanguard Ranked' : 'Training Ground';
+      const mode = h.subject_stats ? 'Ranked' : 'Training Ground';
       return [
         h.id || `LOG-${i + 1}`,
         new Date(h.created_at).toISOString(),
@@ -400,20 +400,20 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
               )}
             </div>
 
-            <p className="text-xs font-mono text-zinc-400 mt-0.5">{userEmail}</p>
+            <p className="text-xs font-sans text-zinc-400 mt-0.5">{userEmail}</p>
           </div>
         </div>
 
         {/* Action Pills: Tier Badge + Privacy Toggle + Logout */}
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap font-sans">
           {/* Membership Badge */}
           {isPro ? (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#e0d0ab]/15 border border-[#e0d0ab]/40 text-[#e0d0ab] rounded-sm text-xs font-mono font-bold uppercase tracking-wider shadow-sm shadow-[#e0d0ab]/10">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#e0d0ab]/15 border border-[#e0d0ab]/40 text-[#e0d0ab] rounded-sm text-xs font-sans font-bold uppercase tracking-wider shadow-sm shadow-[#e0d0ab]/10">
               <Shield className="w-3.5 h-3.5 text-[#e0d0ab]" />
               <span>Founders Club</span>
             </div>
           ) : (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 border border-zinc-800 text-zinc-400 rounded-sm text-xs font-mono uppercase tracking-wider">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 border border-zinc-800 text-zinc-400 rounded-sm text-xs font-sans uppercase tracking-wider">
               <Award className="w-3.5 h-3.5 text-zinc-500" />
               <span>Standard Tier</span>
             </div>
@@ -423,12 +423,12 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
           <button
             onClick={handleToggleVisibility}
             disabled={savingVisibility}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm border text-xs font-mono font-medium transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm border text-xs font-sans font-medium transition-all cursor-pointer ${
               isPublic
                 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
                 : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-stone-200'
             }`}
-            title="Toggle public telemetry sharing on Vanguard Leaderboard"
+            title="Show your profile on the leaderboard"
           >
             {isPublic ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
             <span>{isPublic ? 'Public Ledger' : 'Private'}</span>
@@ -437,7 +437,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
           {/* Logout */}
           <button
             onClick={onLogout}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-rose-950/30 border border-zinc-800 hover:border-rose-700/50 text-zinc-400 hover:text-rose-300 rounded-sm text-xs font-mono transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-rose-950/30 border border-zinc-800 hover:border-rose-700/50 text-zinc-400 hover:text-rose-300 rounded-sm text-xs font-sans transition-all cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>
@@ -486,12 +486,12 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-[#0194a8]" />
-              <h3 className="font-mono text-xs uppercase tracking-widest text-[#e0d0ab] font-bold">
-                Accuracy Trajectory (Last {chartData.length} Attempts)
+              <h3 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
+                Accuracy Trajectory (Last <span className="font-mono">{chartData.length}</span> Attempts)
               </h3>
             </div>
-            <span className="text-[10px] font-mono text-zinc-500">
-              Benchmark Target: 80% Vanguard
+            <span className="text-[10px] font-sans text-zinc-500">
+              Benchmark Target: 80%
             </span>
           </div>
 
@@ -523,34 +523,32 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-4">
           <div className="flex items-center gap-2">
             <Bookmark className="w-4 h-4 text-[#e0d0ab]" />
-            {/* Section titles use the serif display voice, not mono-uppercase (which
-                is now reserved for numbers/tags). Humanised copy, not "dossier". */}
             <h3 className="font-serif text-lg tracking-tight text-[#e0d0ab] font-bold">
               Saved for Later
             </h3>
           </div>
 
           {/* View Mode Toggle Pill */}
-          <div className="flex items-center gap-1.5 p-0.5 bg-zinc-900 border border-zinc-800 rounded-sm self-start sm:self-auto">
+          <div className="flex items-center gap-1.5 p-0.5 bg-zinc-900 border border-zinc-800 rounded-sm self-start sm:self-auto font-sans">
             <button
               onClick={() => setViewMode('insights')}
-              className={`px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer ${
+              className={`px-3 py-1 text-[10px] font-sans font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer ${
                 viewMode === 'insights'
                   ? 'bg-[#e0d0ab] text-zinc-950 shadow-sm'
                   : 'text-zinc-400 hover:text-stone-200'
               }`}
             >
-              Saved Insights ({savedInsights.length})
+              Saved Insights <span className="font-mono">({savedInsights.length})</span>
             </button>
             <button
               onClick={() => setViewMode('articles')}
-              className={`px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer ${
+              className={`px-3 py-1 text-[10px] font-sans font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer ${
                 viewMode === 'articles'
                   ? 'bg-[#e0d0ab] text-zinc-950 shadow-sm'
                   : 'text-zinc-400 hover:text-stone-200'
               }`}
             >
-              Saved Dispatches ({savedArticles.length})
+              Saved Dispatches <span className="font-mono">({savedArticles.length})</span>
             </button>
           </div>
         </div>
@@ -559,7 +557,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
         {viewMode === 'insights' && (
           <div>
             {loadingSaved ? (
-              <div className="py-8 flex items-center justify-center text-zinc-500 font-mono text-xs">
+              <div className="py-8 flex items-center justify-center text-zinc-500 font-sans text-xs">
                 <Loader2 className="w-4 h-4 animate-spin text-[#0194a8] mr-2" />
                 <span>Loading saved conceptual flashcards...</span>
               </div>
@@ -587,8 +585,8 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
                         <p className="text-xs font-sans text-stone-200 leading-relaxed line-clamp-2">
                           {insight.question_text}
                         </p>
-                        <p className="text-[10px] font-mono text-zinc-500">
-                          Saved on {formatDate(insight.created_at)}
+                        <p className="text-[10px] font-sans text-zinc-500">
+                          Saved on <span className="font-mono">{formatDate(insight.created_at)}</span>
                         </p>
                       </div>
 
@@ -607,7 +605,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
                         )}
                       </AnimatePresence>
 
-                      <div className="flex items-center justify-between pt-3 mt-3 border-t border-zinc-800/60 text-xs font-mono">
+                      <div className="flex items-center justify-between pt-3 mt-3 border-t border-zinc-800/60 text-xs font-sans">
                         <button
                           onClick={() => setExpandedInsightId(isExpanded ? null : insight.id)}
                           className="text-[#0194a8] hover:text-[#e0d0ab] transition-colors cursor-pointer"
@@ -635,7 +633,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
         {viewMode === 'articles' && (
           <div>
             {loadingArticles ? (
-              <div className="py-8 flex items-center justify-center text-zinc-500 font-mono text-xs">
+              <div className="py-8 flex items-center justify-center text-zinc-500 font-sans text-xs">
                 <Loader2 className="w-4 h-4 animate-spin text-[#0194a8] mr-2" />
                 <span>Loading saved policy signals...</span>
               </div>
@@ -657,11 +655,11 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
                       className="p-4 bg-zinc-900/40 border border-zinc-800 hover:border-[#0194a8]/50 rounded-sm flex flex-col justify-between transition-all"
                     >
                       <div className="space-y-2">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="px-2 py-0.5 text-[9px] font-mono uppercase font-bold bg-zinc-900 text-[#e0d0ab] border border-zinc-800 rounded-sm">
+                        <div className="flex items-center gap-2 flex-wrap font-sans">
+                          <span className="px-2 py-0.5 text-[9px] font-sans uppercase font-bold bg-zinc-900 text-[#e0d0ab] border border-zinc-800 rounded-sm">
                             {article.ministry}
                           </span>
-                          <span className="text-[9px] font-mono text-zinc-500">
+                          <span className="text-[9px] font-sans text-zinc-500">
                             {article.source}
                           </span>
                         </div>
@@ -670,7 +668,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
                         </h4>
                       </div>
 
-                      <div className="flex items-center justify-between pt-3 mt-3 border-t border-zinc-800/60 text-xs font-mono">
+                      <div className="flex items-center justify-between pt-3 mt-3 border-t border-zinc-800/60 text-xs font-sans">
                         {article.url ? (
                           <a
                             href={article.url}
@@ -702,19 +700,19 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
       </div>
 
       {/* 5. Previous Attempts Table */}
-      <div className="p-6 bg-zinc-900/20 border border-zinc-800 rounded-sm space-y-4">
+      <div className="p-6 bg-zinc-900/20 border border-zinc-800 rounded-sm space-y-4 font-sans">
         <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
           <div className="flex items-center gap-2">
             <History className="w-4 h-4 text-[#e0d0ab]" />
-            <h3 className="font-mono text-xs uppercase tracking-widest text-[#e0d0ab] font-bold">
-              Historical Assessment Ledger ({history.length})
+            <h3 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
+              Historical Assessment Ledger <span className="font-mono">({history.length})</span>
             </h3>
           </div>
 
           <button
             onClick={handleExportClick}
             disabled={history.length === 0 || loadingTier}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider rounded-sm border transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-sans font-bold uppercase tracking-wider rounded-sm border transition-all cursor-pointer ${
               isPro
                 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20'
                 : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-zinc-300'
@@ -728,7 +726,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
         {loading ? (
           <SkeletonCard variant="feed" count={3} />
         ) : errorMsg ? (
-          <p className="text-xs text-rose-400 font-mono py-4 text-center">{errorMsg}</p>
+          <p className="text-xs text-rose-400 font-sans py-4 text-center">{errorMsg}</p>
         ) : history.length === 0 ? (
           <EmptyState
             icon={History}
@@ -739,7 +737,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse font-sans">
               <thead>
-                <tr className="border-b border-zinc-800 text-zinc-500 text-[10px] font-mono uppercase tracking-widest font-bold">
+                <tr className="border-b border-zinc-800 text-zinc-500 text-[10px] font-sans uppercase tracking-wider font-bold">
                   <th className="py-3 px-4">Session ID</th>
                   <th className="py-3 px-4">Date</th>
                   <th className="py-3 px-4">Mode</th>
@@ -762,8 +760,8 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
                       <td className="py-3.5 px-4 font-mono text-zinc-400 text-[11px]">
                         {formatDate(attempt.created_at)}
                       </td>
-                      <td className="py-3.5 px-4 font-mono text-[11px] text-zinc-400">
-                        {attempt.subject_stats ? 'Vanguard Ranked' : 'Training Ground'}
+                      <td className="py-3.5 px-4 font-sans text-zinc-300 text-[11px]">
+                        {attempt.subject_stats ? 'Ranked' : 'Training Ground'}
                       </td>
                       <td className="py-3.5 px-4 text-right">
                         <span

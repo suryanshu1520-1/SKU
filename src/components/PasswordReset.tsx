@@ -87,7 +87,7 @@ export default function PasswordReset({ onClose }: PasswordResetProps) {
             <form onSubmit={handleUpdatePassword} className="w-full space-y-4">
               {/* New Password */}
               <div className="text-left">
-                <label className="block text-[9px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">
+                <label className="block text-[10px] font-sans uppercase tracking-wider text-zinc-400 mb-1.5 font-medium">
                   New Password
                 </label>
                 <div className="relative">
@@ -117,7 +117,7 @@ export default function PasswordReset({ onClose }: PasswordResetProps) {
 
               {/* Confirm Password */}
               <div className="text-left">
-                <label className="block text-[9px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">
+                <label className="block text-[10px] font-sans uppercase tracking-wider text-zinc-400 mb-1.5 font-medium">
                   Confirm New Password
                 </label>
                 <div className="relative">
@@ -165,7 +165,7 @@ export default function PasswordReset({ onClose }: PasswordResetProps) {
               <button
                 type="button"
                 onClick={onClose}
-                className="text-[10px] text-zinc-600 hover:text-zinc-400 uppercase tracking-wider font-mono transition-colors"
+                className="text-[10px] text-zinc-500 hover:text-zinc-300 uppercase tracking-wider font-sans transition-colors"
               >
                 Cancel
               </button>

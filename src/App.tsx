@@ -250,7 +250,7 @@ export default function App() {
               {!userEmail && (
                 <button
                   onClick={() => setGameState('login')}
-                  className="md:hidden flex items-center gap-1 px-3 py-1 bg-zinc-900 border border-zinc-800 text-[#e0d0ab] rounded-sm text-xs font-mono"
+                  className="md:hidden flex items-center gap-1 px-3 py-1 bg-zinc-900 border border-zinc-800 text-[#e0d0ab] rounded-sm text-xs font-sans font-medium"
                 >
                   <LogIn className="w-3.5 h-3.5" />
                   Sign In
@@ -360,7 +360,7 @@ export default function App() {
               {!userEmail && (
                 <button
                   onClick={() => setGameState('login')}
-                  className="hidden md:inline-flex items-center gap-1.5 ml-2 px-3.5 py-1.5 bg-zinc-900 border border-zinc-800 text-[#e0d0ab] hover:border-[#e0d0ab]/50 rounded-sm text-xs font-mono transition-all cursor-pointer"
+                  className="hidden md:inline-flex items-center gap-1.5 ml-2 px-3.5 py-1.5 bg-zinc-900 border border-zinc-800 text-[#e0d0ab] hover:border-[#e0d0ab]/50 rounded-sm text-xs font-sans font-medium transition-all cursor-pointer"
                 >
                   <LogIn className="w-3.5 h-3.5" />
                   Sign In

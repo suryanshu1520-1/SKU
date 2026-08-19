@@ -30,7 +30,7 @@ export function EmptyState({
       <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-full mb-3.5">
         <Icon className="w-6 h-6 text-zinc-500" />
       </div>
-      <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-stone-200 mb-1.5">
+      <h4 className="font-serif text-sm font-bold tracking-tight text-stone-200 mb-1.5">
         {title}
       </h4>
       {description && (
@@ -41,7 +41,7 @@ export function EmptyState({
       {actionText && onAction && (
         <button
           onClick={onAction}
-          className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-[#0194a8] text-[#e0d0ab] text-xs font-mono font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer shadow-sm"
+          className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-[#0194a8] text-[#e0d0ab] text-xs font-sans font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer shadow-sm"
         >
           {actionText}
         </button>

@@ -379,7 +379,7 @@ export default function Arena({
       if (data.isBackfilled) {
         if (!localStorage.getItem('tark_backfill_seen')) {
           localStorage.setItem('tark_backfill_seen', 'true');
-          setToastMsg('Diagnostic notice: Additional questions backfilled to meet protocol target.');
+          setToastMsg('Diagnostic notice: Additional questions added to complete your set.');
         }
       }
 
@@ -829,7 +829,7 @@ export default function Arena({
       <div className="w-full max-w-2xl mx-auto font-sans flex flex-col items-center justify-center p-4 sm:p-6 min-h-[75vh]">
         
         {/* Pre-Flight Tag */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-sm text-[10px] uppercase font-mono text-[#e0d0ab] tracking-widest mb-6">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-sm text-[10px] uppercase font-sans font-medium text-[#e0d0ab] tracking-wider mb-6">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           <span>Analytical Test Arena</span>
         </div>
@@ -839,15 +839,15 @@ export default function Arena({
           animate={{ opacity: 1, y: 0 }}
           className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-white mb-2 text-center"
         >
-          Select Assessment Protocol
+          Choose Your Test
         </motion.h1>
-        <p className="text-xs font-mono text-zinc-400 mb-8 text-center max-w-md">
+        <p className="text-xs font-sans text-zinc-400 mb-8 text-center max-w-md">
           Time-bound competitive testing with zero-trust server evaluation and negative marking.
         </p>
 
         {/* Protocol Option Cards */}
         <div className="w-full space-y-4">
-          {/* 1. Vanguard Ranked Assessment */}
+          {/* 1. Ranked Test */}
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
@@ -862,18 +862,18 @@ export default function Arena({
             <div className="flex-1 space-y-1">
               <div className="flex items-center justify-between">
                 <h3 className="font-serif text-base font-bold text-stone-100 group-hover:text-[#e0d0ab] transition-colors">
-                  Vanguard Ranked Assessment
+                  Ranked Test
                 </h3>
-                <span className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-mono font-bold uppercase rounded-sm">
-                  Ranked + CP
+                <span className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-sans font-bold uppercase rounded-sm">
+                  Ranked + Points
                 </span>
               </div>
               <p className="text-xs font-sans text-zinc-400 leading-relaxed">
-                25 multi-domain questions &bull; 20s per question &bull; Negative marking (+2 / -0.66) &bull; Yields Contender Points.
+                25 multi-domain questions &bull; 20s per question &bull; Negative marking (+2 / -0.66) &bull; Earns Rank Points.
               </p>
               {userLimits && userLimits.tier !== 'premium' && (
-                <p className="text-[10px] font-mono text-[#e0d0ab] pt-1">
-                  Daily Free Clearance: {Math.min(userLimits.vanguardUsed + 1, 3)} of 3 completed
+                <p className="text-[10px] font-sans text-[#e0d0ab] pt-1">
+                  Free tests today: {Math.min(userLimits.vanguardUsed + 1, 3)} of 3 completed
                 </p>
               )}
             </div>
@@ -896,7 +896,7 @@ export default function Arena({
                 <h3 className="font-serif text-base font-bold text-stone-100 group-hover:text-[#e0d0ab] transition-colors">
                   The Training Ground
                 </h3>
-                <span className="px-2 py-0.5 bg-zinc-800 border border-zinc-700 text-zinc-300 text-[10px] font-mono font-bold uppercase rounded-sm">
+                <span className="px-2 py-0.5 bg-zinc-800 border border-zinc-700 text-zinc-300 text-[10px] font-sans font-bold uppercase rounded-sm">
                   Unranked
                 </span>
               </div>
@@ -911,42 +911,42 @@ export default function Arena({
         <Modal
           isOpen={showPreflightModal}
           onClose={() => setShowPreflightModal(false)}
-          title="Pre-Flight Protocol Briefing"
-          subtitle="Vanguard Timed Examination Session"
+          title="Before You Begin"
+          subtitle="Timed ranked test"
         >
           <div className="space-y-5 font-sans">
             <div className="p-4 bg-zinc-900/70 border border-zinc-800 rounded-sm space-y-2">
-              <p className="text-xs font-mono uppercase tracking-widest text-[#e0d0ab] font-bold">
-                Operational Invariant
-              </p>
+              <h4 className="font-serif text-xs font-bold text-[#e0d0ab]">
+                Focus Rule
+              </h4>
               <p className="text-sm font-serif italic text-stone-200 leading-relaxed">
                 "{motivation}"
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 text-xs font-mono">
+            <div className="grid grid-cols-2 gap-3 text-xs font-sans">
               <div className="p-3 bg-zinc-900/40 border border-zinc-800 rounded-sm">
-                <span className="text-[10px] text-zinc-500 uppercase block mb-0.5">Length</span>
-                <span className="font-bold text-stone-200">25 Questions</span>
+                <span className="text-[10px] text-zinc-500 uppercase block mb-0.5 font-medium">Length</span>
+                <span className="font-bold text-stone-200"><span className="font-mono">25</span> Questions</span>
               </div>
               <div className="p-3 bg-zinc-900/40 border border-zinc-800 rounded-sm">
-                <span className="text-[10px] text-zinc-500 uppercase block mb-0.5">Pacing</span>
-                <span className="font-bold text-stone-200">20s Per Question</span>
+                <span className="text-[10px] text-zinc-500 uppercase block mb-0.5 font-medium">Pacing</span>
+                <span className="font-bold text-stone-200"><span className="font-mono">20s</span> Per Question</span>
               </div>
             </div>
 
             <div className="flex gap-3 pt-2">
               <button
                 onClick={() => setShowPreflightModal(false)}
-                className="flex-1 py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 font-mono text-xs font-bold uppercase rounded-sm transition-all cursor-pointer"
+                className="flex-1 py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 font-sans text-xs font-medium uppercase rounded-sm transition-all cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleReady}
-                className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 font-mono text-xs font-bold uppercase rounded-sm transition-all shadow-md shadow-[#e0d0ab]/10 cursor-pointer"
+                className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 font-sans text-xs font-bold uppercase rounded-sm transition-all shadow-md shadow-[#e0d0ab]/10 cursor-pointer"
               >
-                <span>Deploy Arena</span>
+                <span>Enter Arena</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -965,7 +965,7 @@ export default function Arena({
 
     return (
       <div className="w-full max-w-2xl mx-auto font-sans p-4 sm:p-6 space-y-6">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-sm text-[10px] uppercase font-mono text-[#e0d0ab] tracking-widest">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-sm text-[10px] uppercase font-sans font-medium text-[#e0d0ab] tracking-wider">
           <Target className="w-3 h-3 text-[#e0d0ab]" />
           <span>Training Ground Configuration</span>
         </div>
@@ -975,12 +975,12 @@ export default function Arena({
         {/* Subject Selection */}
         <div className="p-6 bg-zinc-900/30 border border-zinc-800 rounded-sm space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-mono text-xs uppercase tracking-widest text-[#e0d0ab] font-bold">
+            <h3 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
               Select Focus Subjects ({selectedSubjects.size} Selected)
             </h3>
             <button
               onClick={() => setSelectedSubjects(new Set(allSubjects))}
-              className="text-[10px] font-mono text-[#0194a8] hover:text-[#e0d0ab] transition-colors cursor-pointer"
+              className="text-[10px] font-sans text-[#0194a8] hover:text-[#e0d0ab] transition-colors cursor-pointer"
             >
               Select All
             </button>
@@ -991,9 +991,9 @@ export default function Arena({
               <button
                 key={subject}
                 onClick={() => toggleSubject(subject)}
-                className={`px-3 py-1.5 text-xs font-mono uppercase font-bold rounded-sm border transition-all cursor-pointer ${
+                className={`px-3 py-1.5 text-xs font-sans font-medium rounded-sm border transition-all cursor-pointer ${
                   selectedSubjects.has(subject)
-                    ? 'bg-[#e0d0ab] text-zinc-950 border-[#e0d0ab]'
+                    ? 'bg-[#e0d0ab] text-zinc-950 border-[#e0d0ab] font-bold'
                     : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-stone-200'
                 }`}
               >
@@ -1005,21 +1005,21 @@ export default function Arena({
 
         {/* Question Count Selection */}
         <div className="p-6 bg-zinc-900/30 border border-zinc-800 rounded-sm space-y-4">
-          <h3 className="font-mono text-xs uppercase tracking-widest text-[#e0d0ab] font-bold">
-            Assessment Question Target
+          <h3 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
+            Question Target
           </h3>
           <div className="grid grid-cols-3 gap-3">
             {lengthOptions.map((count) => (
               <button
                 key={count}
                 onClick={() => setTrainingLength(count)}
-                className={`py-3 text-sm font-mono font-bold uppercase rounded-sm border transition-all cursor-pointer ${
+                className={`py-3 text-sm font-sans font-bold uppercase rounded-sm border transition-all cursor-pointer ${
                   trainingLength === count
                     ? 'bg-[#0194a8] text-white border-[#0194a8]'
                     : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-stone-200'
                 }`}
               >
-                {count} Questions
+                <span className="font-mono">{count}</span> Questions
               </button>
             ))}
           </div>
@@ -1032,14 +1032,14 @@ export default function Arena({
               setShowTrainingSetup(false);
               setArenaPhase('intro');
             }}
-            className="flex-1 py-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-mono text-xs font-bold uppercase rounded-sm transition-all cursor-pointer"
+            className="flex-1 py-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-sans text-xs font-medium uppercase rounded-sm transition-all cursor-pointer"
           >
             Back
           </button>
           <button
             onClick={startTraining}
             disabled={selectedSubjects.size === 0}
-            className="flex-1 inline-flex items-center justify-center gap-2 py-3 bg-[#e0d0ab] hover:bg-stone-100 disabled:opacity-40 text-zinc-950 font-mono text-xs font-bold uppercase rounded-sm transition-all cursor-pointer"
+            className="flex-1 inline-flex items-center justify-center gap-2 py-3 bg-[#e0d0ab] hover:bg-stone-100 disabled:opacity-40 text-zinc-950 font-sans text-xs font-bold uppercase rounded-sm transition-all cursor-pointer"
           >
             <Target className="w-4 h-4" />
             <span>Launch Training Ground</span>
@@ -1054,24 +1054,24 @@ export default function Arena({
   // ----------------------------------------------------------------
   if (isLoading) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center text-zinc-500 font-mono text-xs gap-3">
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-zinc-500 font-sans text-xs gap-3">
         <Loader2 className="w-6 h-6 text-[#0194a8] animate-spin" />
-        <span>Initializing tactical examination state...</span>
+        <span>Initializing examination state...</span>
       </div>
     );
   }
 
   if (errorMsg) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center font-sans">
         <AlertTriangle className="w-10 h-10 text-rose-400 mb-3" />
-        <p className="text-sm font-mono text-rose-400 font-bold">{errorMsg}</p>
+        <p className="text-sm font-sans text-rose-400 font-bold">{errorMsg}</p>
         <button
           onClick={() => {
             setErrorMsg('');
             setArenaPhase('intro');
           }}
-          className="mt-4 px-4 py-2 bg-zinc-900 border border-zinc-800 text-[#e0d0ab] font-mono text-xs uppercase rounded-sm"
+          className="mt-4 px-4 py-2 bg-zinc-900 border border-zinc-800 text-[#e0d0ab] font-sans text-xs uppercase rounded-sm cursor-pointer hover:bg-zinc-800 transition-colors"
         >
           Return to Selection
         </button>
@@ -1109,12 +1109,12 @@ export default function Arena({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[500] bg-black/90 backdrop-blur-md flex items-center justify-center"
+            className="fixed inset-0 z-[500] bg-black/90 backdrop-blur-md flex items-center justify-center font-sans"
           >
             <div className="text-center space-y-3">
               <h2 className="font-serif text-2xl font-bold text-[#e0d0ab]">Resuming Assessment</h2>
               <p className="text-6xl font-mono font-bold text-white">{resumeCountdown}</p>
-              <p className="text-xs font-mono uppercase tracking-widest text-zinc-400">Restoring active session state...</p>
+              <p className="text-xs font-sans uppercase tracking-widest text-zinc-400">Restoring active session state...</p>
             </div>
           </motion.div>
         )}
@@ -1124,17 +1124,17 @@ export default function Arena({
       <div className="flex items-center justify-between gap-4 border-b border-zinc-800 pb-4 mb-6">
         <div className="flex items-center gap-3">
           <span
-            className={`px-2.5 py-1 rounded-sm text-[10px] font-mono font-bold uppercase tracking-wider border ${
+            className={`px-2.5 py-1 rounded-sm text-[10px] font-sans font-bold uppercase tracking-wider border ${
               isRanked
                 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
                 : 'bg-[#e0d0ab]/10 border-[#e0d0ab]/30 text-[#e0d0ab]'
             }`}
           >
-            {isRanked ? 'Vanguard Ranked' : 'Training Ground'}
+            {isRanked ? 'Ranked' : 'Practice'}
           </span>
 
-          <span className="text-xs font-mono text-zinc-400">
-            Question {currentQuestionIndex + 1} of {questions.length}
+          <span className="text-xs font-sans text-zinc-400">
+            Question <span className="font-mono">{currentQuestionIndex + 1}</span> of <span className="font-mono">{questions.length}</span>
           </span>
         </div>
 
@@ -1176,14 +1176,14 @@ export default function Arena({
               </div>
             </div>
           ) : (
-            <span className="text-[11px] font-mono text-zinc-500">
-              {isTimeout ? 'Timed Out' : `${timeSpentMap[currentQuestionId] || 0}s elapsed`}
+            <span className="text-[11px] font-sans text-zinc-500">
+              {isTimeout ? 'Timed Out' : <><span className="font-mono">{timeSpentMap[currentQuestionId] || 0}s</span> elapsed</>}
             </span>
           )}
 
           <button
             onClick={() => setShowAbandonModal(true)}
-            className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 hover:text-rose-400 transition-colors cursor-pointer"
+            className="text-[10px] font-sans uppercase tracking-wider text-zinc-500 hover:text-rose-400 transition-colors cursor-pointer"
           >
             Abandon
           </button>
@@ -1235,11 +1235,11 @@ export default function Arena({
         >
           {/* Question Metadata Tags */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="px-2.5 py-0.5 text-[9px] font-mono uppercase tracking-wider font-bold bg-zinc-900 text-[#e0d0ab] border border-zinc-800 rounded-sm">
+            <span className="px-2.5 py-0.5 text-[9px] font-sans uppercase tracking-wider font-bold bg-zinc-900 text-[#e0d0ab] border border-zinc-800 rounded-sm">
               {currentQuestion.subject_category || 'CORE DOMAIN'}
             </span>
             {currentQuestion.exam_origin_tag && (
-              <span className="px-2.5 py-0.5 text-[9px] font-mono text-zinc-400 border border-zinc-800 rounded-sm">
+              <span className="px-2.5 py-0.5 text-[9px] font-sans text-zinc-400 border border-zinc-800 rounded-sm">
                 {currentQuestion.exam_origin_tag}
               </span>
             )}
@@ -1309,7 +1309,7 @@ export default function Arena({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-[#e0d0ab]" />
-                    <h4 className="font-mono text-xs uppercase tracking-widest text-[#e0d0ab] font-bold">
+                    <h4 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
                       Conceptual Synthesis
                     </h4>
                   </div>
@@ -1317,7 +1317,7 @@ export default function Arena({
                   <button
                     onClick={toggleBookmark}
                     disabled={isBookmarkLoading || isLoadingExplanation}
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono font-bold uppercase rounded-sm border transition-all cursor-pointer ${
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-sans font-bold uppercase rounded-sm border transition-all cursor-pointer ${
                       isBookmarked
                         ? 'bg-[#e0d0ab]/15 text-[#e0d0ab] border-[#e0d0ab]/40'
                         : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-stone-200'
@@ -1330,14 +1330,14 @@ export default function Arena({
                     ) : (
                       <Bookmark className="w-3 h-3" />
                     )}
-                    <span>{isBookmarked ? 'Saved to Dossier' : 'Bookmark'}</span>
+                    <span>{isBookmarked ? 'Saved' : 'Save'}</span>
                   </button>
                 </div>
 
                 {isLoadingExplanation && !currentExplanation ? (
-                  <div className="p-4 bg-zinc-950/60 border border-zinc-800 rounded-sm flex items-center gap-2 text-xs font-mono text-zinc-400">
+                  <div className="p-4 bg-zinc-950/60 border border-zinc-800 rounded-sm flex items-center gap-2 text-xs font-sans text-zinc-400">
                     <Loader2 className="w-4 h-4 animate-spin text-[#0194a8]" />
-                    <span>Synthesizing zero-trust explanation...</span>
+                    <span>Synthesizing explanation...</span>
                   </div>
                 ) : currentExplanation ? (
                   <div className="p-5 bg-zinc-950/60 border border-zinc-800 rounded-sm prose prose-invert prose-p:text-xs sm:prose-p:text-sm max-w-none text-zinc-300 font-serif leading-relaxed">
@@ -1345,7 +1345,7 @@ export default function Arena({
                   </div>
                 ) : (
                   <div className="p-4 bg-zinc-950/60 border border-zinc-800 rounded-sm text-xs font-sans text-zinc-400">
-                    {currentQuestion.conceptual_explanation || 'No architectural notes provided for this query.'}
+                    {currentQuestion.conceptual_explanation || 'No explanation available for this question yet.'}
                   </div>
                 )}
               </motion.div>
@@ -1357,7 +1357,7 @@ export default function Arena({
             <button
               onClick={handlePrevious}
               disabled={currentQuestionIndex === 0}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 disabled:opacity-30 border border-zinc-800 text-zinc-300 font-mono text-xs font-bold uppercase rounded-sm transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 disabled:opacity-30 border border-zinc-800 text-zinc-300 font-sans text-xs font-medium uppercase rounded-sm transition-all cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4" />
               <span>Previous</span>
@@ -1367,7 +1367,7 @@ export default function Arena({
               <button
                 onClick={handleLock}
                 disabled={!pendingAnswersMap[currentQuestionId]}
-                className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#e0d0ab] hover:bg-stone-100 disabled:opacity-40 text-zinc-950 font-mono text-xs font-bold uppercase tracking-wider rounded-sm transition-all shadow-md shadow-[#e0d0ab]/10 cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#e0d0ab] hover:bg-stone-100 disabled:opacity-40 text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded-sm transition-all shadow-md shadow-[#e0d0ab]/10 cursor-pointer"
               >
                 <Lock className="w-4 h-4" />
                 <span>Lock Answer</span>
@@ -1375,7 +1375,7 @@ export default function Arena({
             ) : (
               <button
                 onClick={handleNext}
-                className="inline-flex items-center gap-2 px-6 py-2.5 bg-emerald-400 hover:bg-emerald-300 text-zinc-950 font-mono text-xs font-bold uppercase tracking-wider rounded-sm transition-all shadow-md shadow-emerald-400/10 cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-2.5 bg-emerald-400 hover:bg-emerald-300 text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded-sm transition-all shadow-md shadow-emerald-400/10 cursor-pointer"
               >
                 {currentQuestionIndex < questions.length - 1 ? (
                   <>
@@ -1403,18 +1403,18 @@ export default function Arena({
       >
         <div className="space-y-4 font-sans">
           <p className="text-xs text-zinc-400 leading-relaxed">
-            Exiting the arena now will reset your active session. This protocol run will not be recorded on the Vanguard Leaderboard.
+            Exiting the arena now will reset your active session. This run will not be recorded on the leaderboard.
           </p>
           <div className="flex gap-3 pt-2">
             <button
               onClick={() => setShowAbandonModal(false)}
-              className="flex-1 py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-mono text-xs font-bold uppercase rounded-sm transition-all cursor-pointer"
+              className="flex-1 py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-sans text-xs font-medium uppercase rounded-sm transition-all cursor-pointer"
             >
               Resume Test
             </button>
             <button
               onClick={handleConfirmAbandon}
-              className="flex-1 py-2.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-mono text-xs font-bold uppercase rounded-sm transition-all cursor-pointer"
+              className="flex-1 py-2.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-sans text-xs font-medium uppercase rounded-sm transition-all cursor-pointer"
             >
               Confirm Exit
             </button>
@@ -1429,7 +1429,7 @@ export default function Arena({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[500] px-5 py-2.5 bg-zinc-900 border border-zinc-700 rounded-sm shadow-2xl font-mono text-xs text-stone-200"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[500] px-5 py-2.5 bg-zinc-900 border border-zinc-700 rounded-sm shadow-2xl font-sans text-xs text-stone-200"
           >
             {toastMsg}
           </motion.div>

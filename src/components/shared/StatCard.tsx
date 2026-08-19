@@ -46,7 +46,7 @@ export function StatCard({
       } ${className}`}
     >
       <div className="flex items-center justify-between gap-2 mb-2.5">
-        <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 font-bold group-hover:text-zinc-300 transition-colors">
+        <span className="text-[10px] font-sans uppercase tracking-wider text-zinc-400 font-bold group-hover:text-zinc-300 transition-colors">
           {label}
         </span>
         {Icon && <Icon className={`w-4 h-4 ${accentColor} opacity-80 group-hover:opacity-100 transition-opacity`} />}

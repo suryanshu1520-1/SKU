@@ -87,13 +87,13 @@ export default function SyllabusMatrix({ onSelectDomain }: SyllabusMatrixProps) 
             How Prelims marks split across subjects, and how many questions we have ready in each.
           </p>
         </div>
-        <span className="text-[10px] font-mono px-2.5 py-1 bg-zinc-800 text-emerald-400 border border-zinc-700 rounded-sm hidden sm:inline">
-          100% Prelims Aligned
+        <span className="text-[10px] font-sans px-2.5 py-1 bg-zinc-800 text-emerald-400 border border-zinc-700 rounded-sm hidden sm:inline">
+          <span className="font-mono">100%</span> Prelims Aligned
         </span>
       </div>
 
       {/* Grid of Domain Selectors */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 mb-6 font-sans">
         {SYLLABUS_DOMAINS.map((domain) => {
           const Icon = domain.icon;
           const isActive = domain.id === activeDomain;
@@ -118,8 +118,8 @@ export default function SyllabusMatrix({ onSelectDomain }: SyllabusMatrixProps) 
                 <span className="text-[9px] font-mono text-zinc-400">{domain.weightage}</span>
               </div>
               <div>
-                <p className="text-[11px] font-mono font-semibold truncate">{domain.name}</p>
-                <p className="text-[9px] font-mono text-zinc-400">{domain.questionsCount} items</p>
+                <p className="text-[11px] font-sans font-semibold truncate">{domain.name}</p>
+                <p className="text-[9px] font-sans text-zinc-400"><span className="font-mono">{domain.questionsCount}</span> items</p>
               </div>
             </motion.button>
           );
@@ -132,15 +132,15 @@ export default function SyllabusMatrix({ onSelectDomain }: SyllabusMatrixProps) 
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+        className="p-4 bg-zinc-900/50 border border-zinc-800 rounded-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-sans"
       >
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 font-sans">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono font-bold text-[#e0d0ab]">{selected.name}</span>
-            <span className="text-[10px] font-mono text-zinc-500">&bull; Approx. {selected.weightage} of Prelims Score</span>
+            <span className="text-xs font-sans font-bold text-[#e0d0ab]">{selected.name}</span>
+            <span className="text-[10px] font-sans text-zinc-500">&bull; Approx. <span className="font-mono">{selected.weightage}</span> of Prelims Score</span>
           </div>
           <div className="flex flex-wrap items-center gap-1.5 pt-1">
-            <span className="text-[10px] font-mono text-zinc-500">High-Yield Foci:</span>
+            <span className="text-[10px] font-sans text-zinc-500">High-Yield Foci:</span>
             {selected.highYieldTopics.map((topic, i) => (
               <span
                 key={i}
@@ -152,8 +152,8 @@ export default function SyllabusMatrix({ onSelectDomain }: SyllabusMatrixProps) 
           </div>
         </div>
 
-        <div className="shrink-0 font-mono text-xs text-zinc-400 flex items-center gap-1">
-          <span>{selected.questionsCount} Questions Ready</span>
+        <div className="shrink-0 font-sans text-xs text-zinc-400 flex items-center gap-1">
+          <span><span className="font-mono">{selected.questionsCount}</span> Questions Ready</span>
           <ArrowUpRight className="w-3.5 h-3.5 text-[#e0d0ab]" />
         </div>
       </motion.div>

@@ -28,18 +28,18 @@ export function AccuracyBar({
   };
 
   return (
-    <div className={`space-y-1.5 ${className}`}>
-      <div className="flex items-center justify-between text-xs font-mono">
+    <div className={`space-y-1.5 ${className} font-sans`}>
+      <div className="flex items-center justify-between text-xs">
         <span className="text-stone-300 font-medium truncate max-w-[220px]" title={label}>
           {label}
         </span>
         <div className="flex items-center gap-2">
           {totalCount !== undefined && correctCount !== undefined && (
-            <span className="text-[10px] text-zinc-500">
+            <span className="text-[10px] font-mono text-zinc-500">
               ({correctCount}/{totalCount})
             </span>
           )}
-          <span className={`font-bold ${clampedAccuracy >= 70 ? 'text-emerald-400' : clampedAccuracy >= 40 ? 'text-[#0194a8]' : 'text-rose-400'}`}>
+          <span className={`font-mono font-bold ${clampedAccuracy >= 70 ? 'text-emerald-400' : clampedAccuracy >= 40 ? 'text-[#0194a8]' : 'text-rose-400'}`}>
             {clampedAccuracy}%
           </span>
         </div>

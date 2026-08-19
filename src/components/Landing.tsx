@@ -56,7 +56,7 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
           transition={{ duration: 0.5 }}
           className="flex flex-wrap items-center justify-center gap-2.5"
         >
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-zinc-900/90 border border-zinc-800/80 rounded-sm text-[10px] font-mono uppercase tracking-widest text-zinc-300 backdrop-blur-md shadow-xl">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-zinc-900/90 border border-zinc-800/80 rounded-sm text-[10px] font-sans uppercase tracking-widest text-zinc-300 backdrop-blur-md shadow-xl">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             <span>FOUNDERS CLUB:</span>
             <span className="text-[#e0d0ab] font-bold">
@@ -71,7 +71,7 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
             <span className="text-zinc-500 hidden sm:inline">&bull; 15-Min Lock &bull; Lifetime</span>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900/60 border border-zinc-800/80 rounded-sm text-[10px] font-mono uppercase tracking-wider text-zinc-400 backdrop-blur-md">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900/60 border border-zinc-800/80 rounded-sm text-[10px] font-sans uppercase tracking-wider text-zinc-400 backdrop-blur-md">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
             <span>1,720+ Items Synced</span>
           </div>
@@ -87,7 +87,7 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
           <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#e0d0ab] drop-shadow-[0_0_25px_rgba(224,208,171,0.2)] mb-4 select-none leading-tight">
             The War on Noise.
           </h1>
-          <p className="text-xs sm:text-sm font-mono tracking-[0.35em] uppercase mb-6 text-[#e0d0ab]/80">
+          <p className="text-xs sm:text-sm font-sans tracking-[0.35em] uppercase mb-6 text-[#e0d0ab]/80">
             Assess. Analyze. Track.
           </p>
           <p className="text-zinc-300 text-sm sm:text-base md:text-lg font-sans max-w-2xl mx-auto leading-relaxed">
@@ -148,16 +148,16 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
                 <Brain className="w-5 h-5 text-emerald-400" />
               </div>
               <div>
-                <h3 className="text-xs uppercase tracking-widest font-bold text-zinc-200 group-hover:text-emerald-300 transition-colors font-mono">
-                  Analytical Arena & Autopsy
+                <h3 className="font-serif text-lg font-bold tracking-tight text-zinc-100 group-hover:text-emerald-300 transition-colors">
+                  The Arena & Autopsy
                 </h3>
-                <span className="text-[10px] font-mono text-zinc-500">+2.00 / -0.66 Negative Marking</span>
+                <span className="text-[10px] font-sans text-zinc-500">+2.00 / -0.66 negative marking</span>
               </div>
             </div>
             <p className="text-zinc-400 text-xs leading-relaxed font-sans mb-4">
               Timed, high-stakes examination environment built to test reasoning under genuine exam pressure. Every session concludes with an AI-driven conceptual autopsy pinpointing subject-level leakages.
             </p>
-            <div className="flex items-center gap-2 text-emerald-400 text-xs font-mono group-hover:translate-x-1 transition-transform">
+            <div className="flex items-center gap-2 text-emerald-400 text-xs font-sans group-hover:translate-x-1 transition-transform">
               <span>Enter Arena</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </div>
@@ -172,16 +172,16 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
                 <Shield className="w-5 h-5 text-[#e0d0ab]" />
               </div>
               <div>
-                <h3 className="text-xs uppercase tracking-widest font-bold text-zinc-200 group-hover:text-[#e0d0ab] transition-colors font-mono">
-                  The Daily Brief & Policy Signal
+                <h3 className="font-serif text-lg font-bold tracking-tight text-zinc-100 group-hover:text-[#e0d0ab] transition-colors">
+                  The Daily Brief
                 </h3>
-                <span className="text-[10px] font-mono text-zinc-500">Continuous PIB & Gazette Ingestion</span>
+                <span className="text-[10px] font-sans text-zinc-500">PIB &amp; gazette, distilled daily</span>
               </div>
             </div>
             <p className="text-zinc-400 text-xs leading-relaxed font-sans mb-4">
               Every PIB release, cabinet decision, and governance gazette distilled by our AI into high-yield, 4-minute analytical briefs. Read the signal, filter by ministry, and prove your retention.
             </p>
-            <div className="flex items-center gap-2 text-[#e0d0ab] text-xs font-mono group-hover:translate-x-1 transition-transform">
+            <div className="flex items-center gap-2 text-[#e0d0ab] text-xs font-sans group-hover:translate-x-1 transition-transform">
               <span>Explore Intelligence</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </div>
@@ -206,14 +206,14 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
           className="w-full bg-zinc-900/20 border border-zinc-800/60 p-6 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left backdrop-blur-sm shadow-xl"
         >
           <div className="space-y-1">
-            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[#e0d0ab]">
+            <h4 className="text-xs font-sans font-bold uppercase tracking-wider text-[#e0d0ab]">
               No Guesswork. Zero Client-Side Answer Trust.
             </h4>
             <p className="text-zinc-400 text-xs font-sans max-w-xl">
               1,720+ UPSC & State PSC standard items. Server-evaluated scoring ensures answer keys remain hidden until test completion. Double-spend prevention locks seat reservations atomically.
             </p>
           </div>
-          <div className="flex items-center gap-2 shrink-0 text-emerald-400 font-mono text-xs font-semibold px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded-sm">
+          <div className="flex items-center gap-2 shrink-0 text-emerald-400 font-sans text-xs font-semibold px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded-sm">
             <CheckCircle2 className="w-4 h-4" />
             <span>Integrity Verified</span>
           </div>
@@ -221,10 +221,10 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
 
         {/* Footer & Pledges */}
         <div className="w-full pt-8 text-center space-y-4 border-t border-zinc-900">
-          <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest">
+          <p className="text-[11px] font-sans text-zinc-400 uppercase tracking-widest">
             No ads. No affiliate links. No sponsored content. Ever.
           </p>
-          <div className="flex items-center justify-center gap-4 text-[10px] font-mono text-zinc-400 uppercase tracking-wider">
+          <div className="flex items-center justify-center gap-4 text-[10px] font-sans text-zinc-400 uppercase tracking-wider">
             <button onClick={() => onNavigateLegal?.('terms')} className="hover:text-[#e0d0ab] transition-colors cursor-pointer">Terms</button>
             <span>&bull;</span>
             <button onClick={() => onNavigateLegal?.('privacy')} className="hover:text-[#e0d0ab] transition-colors cursor-pointer">Privacy Policy</button>

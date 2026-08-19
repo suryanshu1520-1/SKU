@@ -98,15 +98,15 @@ export default function Autopsy({
       >
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-[#e0d0ab]">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-sm text-[10px] font-sans font-medium uppercase tracking-wider text-[#e0d0ab]">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Session Autopsy & Diagnostics
+            Your results
           </div>
           <h1 className="font-serif text-3xl sm:text-4xl font-bold text-white tracking-tight">
             Performance Autopsy
           </h1>
-          <p className="text-xs font-mono uppercase tracking-widest text-zinc-400">
-            {isRanked ? 'Vanguard Competitive Protocol' : 'Unranked Diagnostics Arena'} &bull; {total} Questions Evaluated
+          <p className="text-xs font-sans uppercase tracking-wider text-zinc-400">
+            {isRanked ? 'Ranked test' : 'Practice test'} &bull; <span className="font-mono">{total}</span> Questions Evaluated
           </p>
         </div>
 
@@ -115,44 +115,44 @@ export default function Autopsy({
           initial={prefersReduced ? undefined : { opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="grid grid-cols-3 gap-3 bg-zinc-900/30 border border-zinc-800 p-3 sm:p-4 rounded-sm"
+          className="grid grid-cols-3 gap-3 bg-zinc-900/30 border border-zinc-800 p-3 sm:p-4 rounded-sm font-sans"
         >
           <div className="p-4 bg-zinc-950/80 border border-zinc-800/80 rounded-sm flex flex-col items-center justify-center text-center">
-            <div className="flex items-center gap-1 text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-bold mb-1">
+            <div className="flex items-center gap-1 text-[10px] font-sans uppercase tracking-wider text-emerald-400 font-bold mb-1">
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>Correct</span>
             </div>
             <span className="text-3xl sm:text-4xl font-mono font-bold text-emerald-400">
               <AnimatedNumber value={stats.correct} />
             </span>
-            <span className="text-[10px] font-mono text-zinc-500 mt-1">
-              +{stats.correct * 2.0} Marks
+            <span className="text-[10px] font-sans text-zinc-500 mt-1">
+              <span className="font-mono">+{stats.correct * 2.0}</span> Marks
             </span>
           </div>
 
           <div className="p-4 bg-zinc-950/80 border border-zinc-800/80 rounded-sm flex flex-col items-center justify-center text-center">
-            <div className="flex items-center gap-1 text-[10px] font-mono uppercase tracking-widest text-rose-400 font-bold mb-1">
+            <div className="flex items-center gap-1 text-[10px] font-sans uppercase tracking-wider text-rose-400 font-bold mb-1">
               <XCircle className="w-3.5 h-3.5" />
               <span>Incorrect</span>
             </div>
             <span className="text-3xl sm:text-4xl font-mono font-bold text-rose-400">
               <AnimatedNumber value={stats.incorrect} />
             </span>
-            <span className="text-[10px] font-mono text-zinc-500 mt-1">
-              -{(stats.incorrect * 0.66).toFixed(2)} Penalty
+            <span className="text-[10px] font-sans text-zinc-500 mt-1">
+              <span className="font-mono">-{(stats.incorrect * 0.66).toFixed(2)}</span> Penalty
             </span>
           </div>
 
           <div className="p-4 bg-zinc-950/80 border border-zinc-800/80 rounded-sm flex flex-col items-center justify-center text-center">
-            <div className="flex items-center gap-1 text-[10px] font-mono uppercase tracking-widest text-zinc-400 font-bold mb-1">
+            <div className="flex items-center gap-1 text-[10px] font-sans uppercase tracking-wider text-zinc-400 font-bold mb-1">
               <HelpCircle className="w-3.5 h-3.5" />
               <span>Unattempted</span>
             </div>
             <span className="text-3xl sm:text-4xl font-mono font-bold text-zinc-300">
               <AnimatedNumber value={stats.unattempted} />
             </span>
-            <span className="text-[10px] font-mono text-zinc-500 mt-1">
-              0.00 Net
+            <span className="text-[10px] font-sans text-zinc-500 mt-1">
+              <span className="font-mono">0.00</span> Net
             </span>
           </div>
         </motion.div>
@@ -168,9 +168,9 @@ export default function Autopsy({
               : 'bg-zinc-900/40 border-zinc-800'
           }`}
         >
-          <div className="space-y-2 max-w-lg mx-auto">
-            <p className="text-xs font-mono uppercase tracking-widest text-zinc-400">
-              Cohort Standing & Mastery Index
+          <div className="space-y-2 max-w-lg mx-auto font-sans">
+            <p className="text-xs font-sans uppercase tracking-wider text-zinc-400 font-medium">
+              Where you stand
             </p>
             <h3 className="font-serif text-xl sm:text-2xl font-bold text-white">
               Higher than{' '}
@@ -181,7 +181,7 @@ export default function Autopsy({
             </h3>
             <p className="text-xs font-sans text-zinc-400 leading-relaxed pt-1">
               {percentile >= 80
-                ? 'Exceptional precision. You have cleared the Vanguard benchmark for elite accuracy.'
+                ? 'Exceptional precision. You have cleared the benchmark for top accuracy.'
                 : percentile >= 50
                 ? 'Competitive baseline achieved. Strengthening subject focus areas will accelerate percentile growth.'
                 : 'Diagnostic completed. Review conceptual insights below to eliminate repeat errors.'}
@@ -189,18 +189,18 @@ export default function Autopsy({
           </div>
         </motion.div>
 
-        {/* 3. Contender Points Yield Breakdown (Ranked only) */}
+        {/* 3. Rank Points Yield Breakdown (Ranked only) */}
         {isRanked && (
           <motion.div
             initial={prefersReduced ? undefined : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.25 }}
-            className="border border-[#e0d0ab]/30 bg-[#e0d0ab]/5 p-6 rounded-sm text-center space-y-4"
+            className="border border-[#e0d0ab]/30 bg-[#e0d0ab]/5 p-6 rounded-sm text-center space-y-4 font-sans"
           >
             <div className="flex items-center justify-center gap-2">
               <Trophy className="w-4 h-4 text-[#e0d0ab]" />
-              <h3 className="text-xs font-mono text-[#e0d0ab] uppercase tracking-widest font-bold">
-                Contender Points Yield
+              <h3 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
+                Rank Points Yield
               </h3>
             </div>
 
@@ -209,7 +209,7 @@ export default function Autopsy({
                 <span className="text-xl sm:text-2xl font-mono text-emerald-400 font-bold">
                   <AnimatedNumber value={cpCorrect} prefix="+" />
                 </span>
-                <span className="text-[9px] font-mono text-zinc-400 uppercase tracking-widest mt-1">
+                <span className="text-[10px] font-sans text-zinc-400 uppercase tracking-wider mt-1">
                   Correct (+3 CP)
                 </span>
               </div>
@@ -220,7 +220,7 @@ export default function Autopsy({
                 <span className="text-xl sm:text-2xl font-mono text-rose-400 font-bold">
                   <AnimatedNumber value={cpPenalty} prefix="-" />
                 </span>
-                <span className="text-[9px] font-mono text-zinc-400 uppercase tracking-widest mt-1">
+                <span className="text-[10px] font-sans text-zinc-400 uppercase tracking-wider mt-1">
                   Penalty (-1 CP)
                 </span>
               </div>
@@ -232,7 +232,7 @@ export default function Autopsy({
                     <span className="text-xl sm:text-2xl font-mono text-[#e0d0ab] font-bold">
                       <AnimatedNumber value={cpBonus} prefix="+" />
                     </span>
-                    <span className="text-[9px] font-mono text-zinc-400 uppercase tracking-widest mt-1">
+                    <span className="text-[10px] font-sans text-zinc-400 uppercase tracking-wider mt-1">
                       80%+ Bonus
                     </span>
                   </div>
@@ -241,7 +241,7 @@ export default function Autopsy({
             </div>
 
             <div className="pt-4 border-t border-[#e0d0ab]/15 flex items-center justify-center gap-2">
-              <span className="text-xs font-mono text-stone-300 uppercase tracking-wider">
+              <span className="text-xs font-sans text-stone-300 uppercase tracking-wider">
                 Total Net Yield:
               </span>
               <span className="text-2xl font-mono text-[#e0d0ab] font-bold">
@@ -256,20 +256,20 @@ export default function Autopsy({
           initial={prefersReduced ? undefined : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.3 }}
-          className="border border-zinc-800 bg-zinc-900/30 p-6 sm:p-8 rounded-sm space-y-8"
+          className="border border-zinc-800 bg-zinc-900/30 p-6 sm:p-8 rounded-sm space-y-8 font-sans"
         >
           {/* Execution Time Telemetry */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-[#0194a8]" />
-              <h4 className="font-mono text-xs uppercase tracking-widest text-[#e0d0ab] font-bold">
+              <h4 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
                 Execution Pace Telemetry
               </h4>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="p-4 bg-zinc-950/80 border border-zinc-800 rounded-sm">
-                <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest block mb-1">
+                <span className="text-[10px] font-sans text-zinc-400 uppercase tracking-wider block mb-1">
                   Total Active Time
                 </span>
                 <span className="text-2xl font-mono font-bold text-stone-100">
@@ -278,8 +278,8 @@ export default function Autopsy({
               </div>
 
               <div className="p-4 bg-zinc-950/80 border border-zinc-800 rounded-sm">
-                <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest block mb-1">
-                  Average Pace Per Query
+                <span className="text-[10px] font-sans text-zinc-400 uppercase tracking-wider block mb-1">
+                  Average Pace Per Question
                 </span>
                 <span className="text-2xl font-mono font-bold text-[#0194a8]">
                   {avgTime.toFixed(1)}s
@@ -291,17 +291,17 @@ export default function Autopsy({
           {/* Subject Area Accuracy Bars */}
           <div className="space-y-4 pt-4 border-t border-zinc-800">
             <div className="flex items-center justify-between">
-              <h4 className="font-mono text-xs uppercase tracking-widest text-[#e0d0ab] font-bold">
+              <h4 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
                 Domain Mastery Breakdown
               </h4>
-              <span className="text-[10px] font-mono text-zinc-500">
+              <span className="text-[10px] font-sans text-zinc-500">
                 Sorted by Need of Focus
               </span>
             </div>
 
             {!stats.subjectStats || Object.keys(stats.subjectStats).length === 0 ? (
-              <p className="text-xs font-mono text-zinc-500">
-                No subject-level telemetry recorded for this assessment.
+              <p className="text-xs font-sans text-zinc-500">
+                No subject breakdown for this test.
               </p>
             ) : (
               <div className="space-y-5">
@@ -333,13 +333,13 @@ export default function Autopsy({
             <div className="pt-6 border-t border-zinc-800 space-y-3">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-[#e0d0ab]" />
-                <h4 className="font-mono text-xs uppercase tracking-widest text-[#e0d0ab] font-bold">
+                <h4 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
                   Conceptual Autopsy Synthesis
                 </h4>
               </div>
 
               {loadingInsights ? (
-                <div className="flex items-center gap-2.5 text-xs text-zinc-400 font-mono py-4">
+                <div className="flex items-center gap-2.5 text-xs text-zinc-400 font-sans py-4">
                   <Loader2 className="w-4 h-4 animate-spin text-[#0194a8]" />
                   <span>Synthesizing conceptual diagnostic feedback...</span>
                 </div>
@@ -353,16 +353,16 @@ export default function Autopsy({
         </motion.div>
 
         {/* 5. Navigation Actions */}
-        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2 font-sans">
           <button
             onClick={onReturnToDashboard}
-            className="inline-flex items-center justify-center gap-2 py-3 px-8 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 font-mono text-xs font-bold uppercase tracking-wider rounded-sm transition-all shadow-md shadow-[#e0d0ab]/10 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 py-3 px-8 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded-sm transition-all shadow-md shadow-[#e0d0ab]/10 cursor-pointer"
           >
             Return to Dashboard
           </button>
           <button
             onClick={onDeployNext}
-            className="inline-flex items-center justify-center gap-2 py-3 px-8 bg-zinc-900 hover:bg-zinc-800 text-stone-200 hover:text-[#e0d0ab] border border-zinc-800 hover:border-[#0194a8] font-mono text-xs font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 py-3 px-8 bg-zinc-900 hover:bg-zinc-800 text-stone-200 hover:text-[#e0d0ab] border border-zinc-800 hover:border-[#0194a8] font-sans text-xs font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer"
           >
             <Sparkles className="w-4 h-4 text-[#0194a8]" />
             <span>Take Another Test</span>
@@ -370,7 +370,7 @@ export default function Autopsy({
         </div>
 
         {/* 6. Founders Club Invitation Card */}
-        <div className="backdrop-blur-md bg-zinc-900/30 border border-zinc-800/80 rounded-sm p-6 sm:p-8 text-center space-y-4 relative overflow-hidden">
+        <div className="backdrop-blur-md bg-zinc-900/30 border border-zinc-800/80 rounded-sm p-6 sm:p-8 text-center space-y-4 relative overflow-hidden font-sans">
           <div className="flex items-center justify-center gap-2">
             <Shield className="w-5 h-5 text-[#e0d0ab]" />
             <h3 className="font-serif text-lg font-bold text-white">
@@ -382,7 +382,7 @@ export default function Autopsy({
           </p>
           <button
             onClick={onNavigateManifesto}
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-[#e0d0ab] hover:text-white border border-[#e0d0ab]/40 hover:border-[#e0d0ab] text-xs font-mono font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-[#e0d0ab] hover:text-white border border-[#e0d0ab]/40 hover:border-[#e0d0ab] text-xs font-sans font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer"
           >
             <span>Review Founders Charter</span>
             <ArrowRight className="w-3.5 h-3.5" />

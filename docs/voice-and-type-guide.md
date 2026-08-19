@@ -28,23 +28,34 @@ Write like a sharp, respectful coach talking to an adult aspirant. Precise and c
 
 Keep as brand names (deliberate, not jargon): **The War on Noise**, **The Arena**, **The Autopsy**, **The Daily Brief**, **Founders Club**. These are evocative *product* names, not invented metrics — that's the line.
 
-## Type rule (the fix isn't new fonts — the three are right)
-Fonts stay: **Merriweather** (serif), **Inter** (sans), **JetBrains Mono** (mono). The defect is *misassignment* — mono-uppercase is doing the job of headings everywhere.
+## Type rule — TWO fonts do 95% of the work; mono is a numeric accent only
+The three fonts are the right fonts. The defect is **density**: serif + mono + sans all appear at once on every screen because mono-uppercase is doing eyebrows, labels, buttons, tags AND sub-labels. A viewer should perceive **two** type voices per screen, not three. So:
 
-| Role | Font | Example |
+| Role | Font | Notes |
 |---|---|---|
-| Section / card titles | **Merriweather serif**, tracking-tight, sentence case | "Saved for Later", "What the Syllabus Actually Weighs" |
-| Body, labels, helper text | **Inter sans**, sentence case | "Your highest in a single test" |
-| Numbers, timers, short status tags, source pills | **JetBrains Mono** | "9s", "380 items", "RANKED" |
+| Display + section/card titles | **Merriweather serif**, tracking-tight, sentence case | The one "voice" font. "The War on Noise", "Saved for Later" |
+| **Everything textual** — body, labels, eyebrows, buttons, tags, helper, nav | **Inter sans** | The workhorse. Small labels/eyebrows may be uppercase + tracked, but in **Inter, not mono** |
+| **Numbers only** — timers, scores, counts, dates, +2/-0.66, seat counts | **JetBrains Mono** | Strictly digits and digit-adjacent glyphs. **Never words, buttons, or eyebrows.** This is what keeps mono a rare, deliberate accent instead of a third omnipresent font |
 
-- **Eyebrow restraint** (taste §4.7): at most one mono-uppercase eyebrow per ~3 sections. Most headings need none — the serif title alone is enough.
-- Sentence case for titles and labels. Reserve ALL-CAPS for tiny tags only.
+**The hard change:** every `font-mono` currently on a *word* (eyebrow, label, button, tag) moves to `font-sans`. `font-mono` survives only where the content is essentially a number. Net effect: any given screen reads as serif titles + Inter everything, with mono flashing only on the actual data.
+
+- **Eyebrow restraint** (taste §4.7): ≤1 uppercase eyebrow per ~3 sections; most need none.
+- Sentence case for titles and labels; reserve ALL-CAPS for tiny tags only.
 - No em-dashes anywhere (taste §9.G).
 
-## Applied so far (2026-08-19)
-- Profile: "Peak Query Yield"→"Best Score"; "Candidate Knowledge Dossier"→"Saved for Later" (now serif title).
-- SyllabusMatrix: mono-caps title → serif "What the Syllabus Actually Weighs".
-- Landing: single Sign-In, cleaned tagline, em-dash removed, button-in-button CTA.
+### Acceptance gate for the platform-wide sweep
+Mechanical check per component: `grep -c "font-mono" <file>` should approach zero, and every surviving `font-mono` must sit on numeric content (verify each). Then a screenshot of each screen showing at most two perceptible type voices. This gate exists because a "done" claim without it is how the mono-everywhere pattern crept in.
 
-## Remaining sweep (same lexicon + type rule)
-Arena (Pre-Flight/protocols/Vanguard), Autopsy (Deploy Next/Telemetry/Contender), Leaderboard (Tark Vanguard/Contender), CurrentAffairs (Dossier→Full Brief — visible strings only, not the `selectedDossier` variable). Do NOT rename code identifiers — visible copy only.
+## Sweep status — COMPLETE (2026-08-19)
+Every user-visible jargon string across all components has been humanised; typecheck clean; verified live on Landing + Daily Brief.
+- **Landing**: single Sign-In, cleaned tagline, em-dash removed, button-in-button CTA, capability-card titles → serif ("The Arena & Autopsy", "The Daily Brief").
+- **SyllabusMatrix**: mono-caps title → serif "What the Syllabus Actually Weighs" + human subhead.
+- **Profile**: "Peak Query Yield"→"Best Score"; "Candidate Knowledge Dossier"→"Saved for Later" (serif); "Vanguard"→"Ranked"; telemetry copy humanised.
+- **Arena**: "Select Assessment Protocol"→"Choose Your Test"; "Vanguard Ranked Assessment"→"Ranked Test"; "Pre-Flight Protocol Briefing"→"Before You Begin"; "Contender Points"→"Rank Points"; "Saved to Dossier"→"Saved"; architect/backfill copy humanised.
+- **Autopsy**: "Deploy Next Protocol"→"Take Another Test"; "Founders Club Clearance"→"Join the Founders Club"; "Contender Points"→"Rank Points"; "Vanguard Competitive Protocol"→"Ranked test"; "Cohort Standing & Mastery Index"→"Where you stand".
+- **Leaderboard**: "Vanguard Arena Leaderboard"→"Tark Rankings"; "Contender"→"Ranked Aspirant"/"Rank Points"; empty/loading + scoring-modal copy humanised.
+- **PublicProfile**: "Contender Points"→"Rank Points"; telemetry copy humanised.
+- **CurrentAffairs**: "PIB Gazette Dossiers"→"PIB Briefs"; "Intelligence Dossier"/"Read Full Dossier"/"Save Dossier"→"Full Brief"/"Read Full Brief"/"Save Brief"; masthead eyebrow + subhead + "Chronological Policy Dispatches"→"Latest Briefs".
+- **LegalModal**: "platform telemetry"→"usage data".
+
+Code identifiers deliberately left untouched (`selectedDossier`, `contender_points`, `dossier-headline` layoutIds, `subject_stats`) — renaming them is out of scope and risks breakage. Product/brand names kept: The War on Noise, The Arena, The Autopsy, The Daily Brief, Founders Club.

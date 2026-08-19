@@ -249,7 +249,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                   ) : (
                     <>
                       <div>
-                        <label className="block text-[9px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">Registered Email</label>
+                        <label className="block text-[10px] font-sans uppercase tracking-wider text-zinc-400 mb-1.5 font-medium">Registered Email</label>
                         <div className="relative">
                           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                             <Mail className="h-4 w-4 text-zinc-600" />
@@ -269,7 +269,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                       <button
                         type="submit"
                         disabled={status === 'loading'}
-                        className="w-full flex items-center justify-center min-h-[44px] md:min-h-0 py-2.5 px-4 border border-zinc-800 rounded-sm text-xs font-semibold uppercase tracking-wider text-zinc-950 bg-stone-100 hover:bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-550 focus:ring-offset-zinc-950 disabled:opacity-50 transition-colors group cursor-pointer"
+                        className="w-full flex items-center justify-center min-h-[44px] md:min-h-0 py-2.5 px-4 border border-zinc-800 rounded-sm text-xs font-semibold uppercase tracking-wider text-zinc-950 bg-stone-100 hover:bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-550 focus:ring-offset-zinc-950 disabled:opacity-50 transition-colors group cursor-pointer font-sans"
                       >
                         {status === 'loading' ? (
                           <span className="flex items-center gap-2">
@@ -295,7 +295,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                         setForgotSent(false);
                         setStatus('idle');
                       }}
-                      className="text-[10px] text-zinc-400 hover:text-stone-200 transition-colors font-mono uppercase tracking-widest"
+                      className="text-[10px] text-zinc-400 hover:text-stone-200 transition-colors font-sans uppercase tracking-wider"
                     >
                       Back to Sign In
                     </button>
@@ -313,7 +313,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                         className="overflow-hidden mb-4"
                       >
                         <div>
-                          <label htmlFor="name-input" className="block text-[9px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">Full Name</label>
+                          <label htmlFor="name-input" className="block text-[10px] font-sans uppercase tracking-wider text-zinc-400 mb-1.5 font-medium">Full Name</label>
                           <div className="relative">
                             <input
                               id="name-input"
@@ -334,7 +334,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
 
                   {/* Email Input */}
                   <div>
-                    <label htmlFor="email-input" className="block text-[9px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">Email Address</label>
+                    <label htmlFor="email-input" className="block text-[10px] font-sans uppercase tracking-wider text-zinc-400 mb-1.5 font-medium">Email Address</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                         <Mail className="h-4 w-4 text-zinc-600" />
@@ -360,7 +360,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
 
                   {/* Password Input */}
                   <div>
-                    <label htmlFor="password-input" className="block text-[9px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">Password</label>
+                    <label htmlFor="password-input" className="block text-[10px] font-sans uppercase tracking-wider text-zinc-400 mb-1.5 font-medium">Password</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                         <Lock className="h-4 w-4 text-zinc-600" />
@@ -379,7 +379,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                       />
                     </div>
                     <div className="flex items-center justify-between mt-1">
-                      <p className="text-[8px] font-mono text-zinc-600 uppercase tracking-wider">Minimum 6 characters</p>
+                      <p className="text-[9px] font-sans text-zinc-500">Minimum 6 characters</p>
                       <button
                         type="button"
                         onClick={() => {
@@ -388,7 +388,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                           setErrorMsg('');
                           setForgotSent(false);
                         }}
-                        className="text-[8px] text-zinc-600 hover:text-[#e0d0ab] transition-colors font-mono uppercase tracking-wider"
+                        className="text-[9px] text-zinc-500 hover:text-[#e0d0ab] transition-colors font-sans"
                       >
                         Forgot password?
                       </button>
@@ -405,7 +405,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                   <button
                     type="submit"
                     disabled={status === 'loading'}
-                    className="w-full flex items-center justify-center min-h-[44px] md:min-h-0 py-2.5 px-4 border border-zinc-800 rounded-sm text-xs font-semibold uppercase tracking-wider text-zinc-950 bg-stone-100 hover:bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-550 focus:ring-offset-zinc-950 disabled:opacity-50 transition-colors group cursor-pointer"
+                    className="w-full flex items-center justify-center min-h-[44px] md:min-h-0 py-2.5 px-4 border border-zinc-800 rounded-sm text-xs font-semibold uppercase tracking-wider text-zinc-950 bg-stone-100 hover:bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-550 focus:ring-offset-zinc-950 disabled:opacity-50 transition-colors group cursor-pointer font-sans"
                   >
                     {status === 'loading' ? (
                       <span className="flex items-center gap-2">
@@ -428,7 +428,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                   {/* Google Sign In */}
                   <div className="flex items-center my-4">
                     <div className="flex-1 border-t border-zinc-800/60"></div>
-                    <div className="px-3 text-[9px] font-mono uppercase tracking-widest text-zinc-500">
+                    <div className="px-3 text-[10px] font-sans uppercase tracking-wider text-zinc-500 font-medium">
                       Or continue with
                     </div>
                     <div className="flex-1 border-t border-zinc-800/60"></div>
@@ -438,7 +438,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                     type="button"
                     onClick={handleGoogleSignIn}
                     disabled={status === 'loading'}
-                    className="w-full flex items-center justify-center min-h-[44px] md:min-h-0 py-2.5 px-4 border border-zinc-800 rounded-sm text-xs font-semibold uppercase tracking-wider text-stone-100 bg-zinc-950/50 hover:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-550 focus:ring-offset-zinc-950 disabled:opacity-50 transition-colors group cursor-pointer"
+                    className="w-full flex items-center justify-center min-h-[44px] md:min-h-0 py-2.5 px-4 border border-zinc-800 rounded-sm text-xs font-semibold uppercase tracking-wider text-stone-100 bg-zinc-950/50 hover:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-550 focus:ring-offset-zinc-950 disabled:opacity-50 transition-colors group cursor-pointer font-sans"
                   >
                     <svg className="w-3.5 h-3.5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -457,7 +457,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                         setIsSignUp(!isSignUp);
                         setErrorMsg('');
                       }}
-                      className="text-[10px] text-zinc-400 hover:text-stone-200 transition-colors font-mono uppercase tracking-widest"
+                      className="text-[10px] text-zinc-400 hover:text-stone-200 transition-colors font-sans uppercase tracking-wider"
                       disabled={status === 'loading'}
                     >
                       {isSignUp ? "Already have an account? Sign In" : "New here? Enroll an account"}
@@ -473,7 +473,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
             <div className="text-center mt-6">
               <button
                 onClick={onNavigateManifesto}
-                className="text-[10px] text-zinc-600 hover:text-[#e0d0ab] transition-colors font-mono uppercase tracking-widest"
+                className="text-[10px] text-zinc-500 hover:text-[#e0d0ab] transition-colors font-sans uppercase tracking-wider"
               >
                 Read the Manifesto
               </button>
@@ -482,12 +482,12 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
 
           {/* Legal Links */}
           <div className="text-center mt-6 pt-6 border-t border-zinc-900/50">
-            <div className="flex items-center justify-center gap-4 text-[9px] font-mono text-zinc-600 uppercase tracking-widest">
-              <button onClick={() => onNavigateLegal?.('terms')} className="hover:text-zinc-400 transition-colors">Terms</button>
+            <div className="flex items-center justify-center gap-4 text-[10px] font-sans text-zinc-500 uppercase tracking-wider">
+              <button onClick={() => onNavigateLegal?.('terms')} className="hover:text-zinc-300 transition-colors">Terms</button>
               <span>&bull;</span>
-              <button onClick={() => onNavigateLegal?.('privacy')} className="hover:text-zinc-400 transition-colors">Privacy</button>
+              <button onClick={() => onNavigateLegal?.('privacy')} className="hover:text-zinc-300 transition-colors">Privacy</button>
               <span>&bull;</span>
-              <button onClick={() => onNavigateLegal?.('refund')} className="hover:text-zinc-400 transition-colors">Refunds</button>
+              <button onClick={() => onNavigateLegal?.('refund')} className="hover:text-zinc-300 transition-colors">Refunds</button>
             </div>
           </div>
         </div>

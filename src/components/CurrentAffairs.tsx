@@ -460,29 +460,29 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#e0d0ab] font-bold">
-                Government Policy Intelligence &bull; Daily Gazette
+              <span className="text-[10px] font-sans uppercase tracking-wider text-[#e0d0ab] font-medium">
+                Today's Policy &amp; Governance
               </span>
             </div>
             <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">
               The Daily Brief <span className="font-serif font-normal text-[#e0d0ab] text-2xl sm:text-3xl">| दैनिक नीति संकेत</span>
             </h1>
             <p className="text-zinc-400 text-xs sm:text-sm font-sans mt-2 max-w-2xl leading-relaxed">
-              Continuous, high-signal distillation of press releases, cabinet decisions, and gazette notifications stripped of bureaucratic filler for UPSC CSE and State PSCs.
+              Every press release, cabinet decision, and gazette notification that matters, distilled into a few honest minutes for UPSC and State PSC prep.
             </p>
           </div>
 
           {/* Quick Actions Bar */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-3 shrink-0 font-sans">
             <motion.button
               onClick={() => setShowPibModal(true)}
               whileHover={prefersReducedMotion ? undefined : { y: -2 }}
               whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-[#e0d0ab]/60 text-zinc-200 hover:text-[#e0d0ab] rounded-sm text-xs font-mono font-semibold shadow-sm cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-[#e0d0ab]/60 text-zinc-200 hover:text-[#e0d0ab] rounded-sm text-xs font-sans font-semibold shadow-sm cursor-pointer"
             >
               <BookOpen className="w-4 h-4 text-[#e0d0ab]" />
-              <span>PIB Gazette Dossiers</span>
+              <span>PIB Briefs</span>
             </motion.button>
 
             <motion.button
@@ -491,7 +491,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               whileHover={prefersReducedMotion ? undefined : { y: -2 }}
               whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 rounded-sm text-xs font-mono font-bold uppercase tracking-wider disabled:opacity-50 cursor-pointer shadow-md shadow-[#e0d0ab]/10"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 rounded-sm text-xs font-sans font-bold uppercase tracking-wider disabled:opacity-50 cursor-pointer shadow-md shadow-[#e0d0ab]/10"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
               <span>{syncing ? 'Syncing...' : syncCooldown > 0 ? `${syncCooldown}s` : 'Fetch Live'}</span>
@@ -501,7 +501,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
       </div>
 
       {/* ── Search & Horizontal Category Filter Tabs ── */}
-      <div className="space-y-4 mb-8">
+      <div className="space-y-4 mb-8 font-sans">
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
           
           {/* Category Tabs — animated sliding pill instead of an instant color swap */}
@@ -513,7 +513,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                   <button
                     key={tab.id}
                     onClick={() => setActiveCategoryTab(tab.id)}
-                    className={`relative px-3.5 py-1.5 rounded-sm text-xs font-mono tracking-wide whitespace-nowrap transition-colors cursor-pointer border ${
+                    className={`relative px-3.5 py-1.5 rounded-sm text-xs font-sans font-medium tracking-wide whitespace-nowrap transition-colors cursor-pointer border ${
                       isActive ? 'border-transparent' : 'bg-zinc-900/60 border-zinc-800/80 hover:border-zinc-700'
                     }`}
                   >
@@ -556,7 +556,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
             <button
               onClick={() => setIsFilterDrawerOpen(!isFilterDrawerOpen)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm border text-xs font-mono font-medium transition-all cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm border text-xs font-sans font-medium transition-all cursor-pointer ${
                 activeFilterCount > 0 || isFilterDrawerOpen
                   ? 'bg-zinc-900 border-[#e0d0ab]/60 text-[#e0d0ab]'
                   : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-stone-200'
@@ -580,11 +580,11 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden bg-zinc-900/40 border border-zinc-800/80 rounded-sm p-4 backdrop-blur-md"
+              className="overflow-hidden bg-zinc-900/40 border border-zinc-800/80 rounded-sm p-4 backdrop-blur-md font-sans"
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
                 <div>
-                  <label className="block text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold mb-1.5">
+                  <label className="block text-[10px] font-sans uppercase tracking-wider text-zinc-400 font-bold mb-1.5">
                     Ministry / Department
                   </label>
                   <select
@@ -602,7 +602,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold mb-1.5">
+                  <label className="block text-[10px] font-sans uppercase tracking-wider text-zinc-400 font-bold mb-1.5">
                     Verified Source
                   </label>
                   <select
@@ -620,7 +620,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold mb-1.5">
+                  <label className="block text-[10px] font-sans uppercase tracking-wider text-zinc-400 font-bold mb-1.5">
                     Start Date
                   </label>
                   <input
@@ -633,7 +633,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
                 <div className="flex items-center gap-2">
                   <div className="flex-1">
-                    <label className="block text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold mb-1.5">
+                    <label className="block text-[10px] font-sans uppercase tracking-wider text-zinc-400 font-bold mb-1.5">
                       End Date
                     </label>
                     <input
@@ -646,7 +646,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                   {activeFilterCount > 0 && (
                     <button
                       onClick={resetAllFilters}
-                      className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-sm text-xs font-mono flex items-center gap-1 shrink-0 cursor-pointer"
+                      className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-sm text-xs font-sans flex items-center gap-1 shrink-0 cursor-pointer"
                       title="Reset all filters"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
@@ -662,7 +662,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
       {/* ── Error Banner ── */}
       {errorMsg && (
-        <div className="mb-6 p-4 bg-rose-950/20 border border-rose-800/40 text-rose-300 text-xs rounded-sm flex items-start gap-3">
+        <div className="mb-6 p-4 bg-rose-950/20 border border-rose-800/40 text-rose-300 text-xs rounded-sm flex items-start gap-3 font-sans">
           <AlertCircle className="w-4 h-4 text-rose-400 mt-0.5 shrink-0" />
           <div>
             <h5 className="font-bold">Sync Advisory</h5>
@@ -696,9 +696,9 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
         </div>
       ) : displayedItems.length === 0 ? (
         /* ── Empty State ── */
-        <div className="flex flex-col items-center justify-center p-16 border border-dashed border-zinc-800 rounded-sm bg-zinc-900/10 text-center">
+        <div className="flex flex-col items-center justify-center p-16 border border-dashed border-zinc-800 rounded-sm bg-zinc-900/10 text-center font-sans">
           <Inbox className="w-10 h-10 text-zinc-600 mb-3" />
-          <h3 className="font-mono text-sm font-bold uppercase tracking-wider text-stone-200 mb-1">
+          <h3 className="font-serif text-sm font-bold tracking-tight text-stone-200 mb-1">
             No Dispatches Ingested For Selected Parameters
           </h3>
           <p className="text-zinc-500 text-xs max-w-md mx-auto mb-4">
@@ -706,7 +706,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
           </p>
           <button
             onClick={resetAllFilters}
-            className="px-4 py-2 bg-zinc-900 border border-zinc-700 text-[#e0d0ab] text-xs font-mono rounded-sm hover:border-[#e0d0ab] transition-all cursor-pointer"
+            className="px-4 py-2 bg-zinc-900 border border-zinc-700 text-[#e0d0ab] text-xs font-sans rounded-sm hover:border-[#e0d0ab] transition-all cursor-pointer"
           >
             Clear All Filters
           </button>
@@ -722,17 +722,17 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               animate={{ opacity: 1, y: 0 }}
               whileHover={prefersReducedMotion ? undefined : { y: -3 }}
               transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-              className="bg-gradient-to-br from-zinc-900/50 via-zinc-900/30 to-zinc-950 border border-zinc-800 hover:border-[#e0d0ab]/50 rounded-sm p-6 sm:p-8 relative overflow-hidden shadow-xl backdrop-blur-sm group"
+              className="bg-gradient-to-br from-zinc-900/50 via-zinc-900/30 to-zinc-950 border border-zinc-800 hover:border-[#e0d0ab]/50 rounded-sm p-6 sm:p-8 relative overflow-hidden shadow-xl backdrop-blur-sm group font-sans"
             >
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="px-2.5 py-0.5 bg-[#e0d0ab] text-zinc-950 text-[10px] font-mono font-bold uppercase tracking-widest rounded-sm">
+                <div className="flex items-center gap-2 flex-wrap font-sans">
+                  <span className="px-2.5 py-0.5 bg-[#e0d0ab] text-zinc-950 text-[10px] font-sans font-bold uppercase tracking-wider rounded-sm">
                     LEAD SIGNAL
                   </span>
-                  <span className="px-2 py-0.5 bg-zinc-800 text-[#e0d0ab] text-[10px] font-mono uppercase tracking-wider rounded-sm border border-zinc-700">
+                  <span className="px-2 py-0.5 bg-zinc-800 text-[#e0d0ab] text-[10px] font-sans uppercase tracking-wider rounded-sm border border-zinc-700">
                     {leadItem.ministry}
                   </span>
-                  <span className="text-zinc-500 text-[10px] font-mono uppercase">
+                  <span className="text-zinc-500 text-[10px] font-sans uppercase">
                     {leadItem.source}
                   </span>
                 </div>
@@ -772,13 +772,13 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               )}
 
               {/* Footer Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-zinc-800/80">
+              <div className="flex items-center justify-between pt-4 border-t border-zinc-800/80 font-sans">
                 <div className="flex items-center gap-4">
                   <motion.button
                     onClick={() => toggleBookmark(leadItem.id || '')}
                     disabled={savingArticleIds.has(leadItem.id || '')}
                     whileTap={prefersReducedMotion ? undefined : { scale: 0.8 }}
-                    className={`inline-flex items-center gap-1.5 text-xs font-mono font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
+                    className={`inline-flex items-center gap-1.5 text-xs font-sans font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
                       savedArticleIds.has(leadItem.id || '')
                         ? 'text-emerald-400 hover:text-emerald-300'
                         : 'text-zinc-400 hover:text-[#e0d0ab]'
@@ -802,9 +802,9 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
                   <button
                     onClick={() => setSelectedDossier(leadItem)}
-                    className="text-xs font-mono text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1"
+                    className="text-xs font-sans text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1"
                   >
-                    <span>Read Full Dossier</span>
+                    <span>Read Full Brief</span>
                     <ChevronRight className="w-3.5 h-3.5 text-[#e0d0ab]" />
                   </button>
                 </div>
@@ -814,7 +814,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                     href={leadItem.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-mono text-[#e0d0ab] hover:underline cursor-pointer"
+                    className="inline-flex items-center gap-1 text-xs font-sans text-[#e0d0ab] hover:underline cursor-pointer"
                   >
                     <span>Gov Source</span>
                     <ArrowUpRight className="w-3.5 h-3.5" />
@@ -826,17 +826,17 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
           {/* 2. CHRONOLOGICAL GAZETTE FEED */}
           <div>
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3 mb-6">
-              <h3 className="font-mono text-xs uppercase tracking-widest text-[#e0d0ab] font-bold flex items-center gap-2">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-3 mb-6 font-sans">
+              <h3 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab] flex items-center gap-2">
                 <Layers className="w-3.5 h-3.5" />
-                Chronological Policy Dispatches ({displayedItems.length})
+                <span>Latest Briefs <span className="font-mono">({displayedItems.length})</span></span>
               </h3>
-              <span className="text-[10px] font-mono text-zinc-500">
-                Page {page + 1} &bull; Sorted by Recency
+              <span className="text-[10px] font-sans text-zinc-500">
+                Page <span className="font-mono">{page + 1}</span> &bull; Sorted by Recency
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 font-sans">
               {standardItems.map((item, idx) => {
                 const articleId = item.id || `item-${idx}`;
                 const isSaved = savedArticleIds.has(articleId);
@@ -853,8 +853,8 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                   >
                     <div>
                       {/* Meta Tags */}
-                      <div className="flex items-center justify-between gap-2 mb-3">
-                        <span className="px-2 py-0.5 bg-zinc-800/90 text-[#e0d0ab] text-[10px] font-mono uppercase tracking-wider rounded-sm border border-zinc-700/60 truncate max-w-[200px]">
+                      <div className="flex items-center justify-between gap-2 mb-3 font-sans">
+                        <span className="px-2 py-0.5 bg-zinc-800/90 text-[#e0d0ab] text-[10px] font-sans uppercase tracking-wider rounded-sm border border-zinc-700/60 truncate max-w-[200px]">
                           {item.ministry}
                         </span>
                         {item.created_at && (
@@ -890,7 +890,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                     </div>
 
                     {/* Action Bar */}
-                    <div className="flex items-center justify-between pt-3 border-t border-zinc-800/60 text-xs font-mono">
+                    <div className="flex items-center justify-between pt-3 border-t border-zinc-800/60 text-xs font-sans">
                       <motion.button
                         onClick={() => toggleBookmark(articleId)}
                         disabled={savingArticleIds.has(articleId)}
@@ -916,7 +916,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                           onClick={() => setSelectedDossier(item)}
                           className="text-zinc-400 hover:text-stone-100 transition-colors cursor-pointer"
                         >
-                          Dossier
+                          Full Brief
                         </button>
                         {item.url && (
                           <a
@@ -939,10 +939,10 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
           {/* ── Pagination ── */}
           {hasMore && (
-            <div className="flex justify-center pt-8">
+            <div className="flex justify-center pt-8 font-sans">
               <button
                 onClick={() => setPage((prev) => prev + 1)}
-                className="px-8 py-3 bg-zinc-900 border border-zinc-800 hover:border-[#e0d0ab] text-stone-200 hover:text-[#e0d0ab] text-xs font-mono uppercase tracking-widest rounded-sm transition-all shadow-md cursor-pointer"
+                className="px-8 py-3 bg-zinc-900 border border-zinc-800 hover:border-[#e0d0ab] text-stone-200 hover:text-[#e0d0ab] text-xs font-sans font-bold uppercase tracking-wider rounded-sm transition-all shadow-md cursor-pointer"
               >
                 [ Retrieve Older Dispatches ]
               </button>
@@ -951,7 +951,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
         </div>
       )}
 
-      {/* ── Detailed Intelligence Dossier Modal (Slide-Over) ── */}
+      {/* ── Full Brief Slide-Over (Slide-Over) ── */}
       <AnimatePresence>
         {selectedDossier && (
           <motion.div
@@ -959,7 +959,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSelectedDossier(null)}
-            className="fixed inset-0 z-[500] bg-black/80 backdrop-blur-sm flex justify-end"
+            className="fixed inset-0 z-[500] bg-black/80 backdrop-blur-sm flex justify-end font-sans"
           >
             <motion.div
               initial={{ x: '100%' }}
@@ -971,11 +971,11 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
             >
               <div className="space-y-6">
                 {/* Modal Top Bar */}
-                <div className="flex items-center justify-between pb-4 border-b border-zinc-800">
+                <div className="flex items-center justify-between pb-4 border-b border-zinc-800 font-sans">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-[#e0d0ab] font-bold">
-                      Intelligence Dossier
+                    <span className="text-[10px] font-sans uppercase tracking-wider text-[#e0d0ab] font-medium">
+                      Full Brief
                     </span>
                   </div>
                   <button
@@ -987,11 +987,11 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                 </div>
 
                 {/* Metadata Pills */}
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="px-2.5 py-1 bg-zinc-900 text-[#e0d0ab] text-xs font-mono font-semibold rounded-sm border border-zinc-800">
+                <div className="flex flex-wrap items-center gap-2 font-sans">
+                  <span className="px-2.5 py-1 bg-zinc-900 text-[#e0d0ab] text-xs font-sans font-semibold rounded-sm border border-zinc-800">
                     {selectedDossier.ministry}
                   </span>
-                  <span className="px-2.5 py-1 bg-zinc-900 text-zinc-400 text-xs font-mono rounded-sm border border-zinc-800">
+                  <span className="px-2.5 py-1 bg-zinc-900 text-zinc-400 text-xs font-sans rounded-sm border border-zinc-800">
                     {selectedDossier.source}
                   </span>
                   {selectedDossier.created_at && (
@@ -1014,8 +1014,8 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                 </motion.h2>
 
                 {/* Structured Synthesis */}
-                <div className="space-y-4 pt-2">
-                  <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[#e0d0ab]">
+                <div className="space-y-4 pt-2 font-sans">
+                  <h4 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
                     Key Policy Vectors & Exam Insights
                   </h4>
                   <div className="space-y-3 pl-3 border-l-2 border-[#e0d0ab]/30">
@@ -1028,8 +1028,8 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                 </div>
 
                 {/* UPSC Syllabus Alignment Hint */}
-                <div className="p-4 bg-zinc-900/40 border border-zinc-800 rounded-sm space-y-1">
-                  <span className="text-[10px] font-mono uppercase text-[#e0d0ab] font-bold">
+                <div className="p-4 bg-zinc-900/40 border border-zinc-800 rounded-sm space-y-1 font-sans">
+                  <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold">
                     Examination Context
                   </span>
                   <p className="text-xs text-zinc-400 font-sans leading-relaxed">
@@ -1039,17 +1039,17 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               </div>
 
               {/* Modal Footer */}
-              <div className="flex items-center justify-between pt-6 mt-8 border-t border-zinc-800">
+              <div className="flex items-center justify-between pt-6 mt-8 border-t border-zinc-800 font-sans">
                 <button
                   onClick={() => toggleBookmark(selectedDossier.id || '')}
-                  className={`inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider px-4 py-2 rounded-sm border transition-all cursor-pointer ${
+                  className={`inline-flex items-center gap-2 text-xs font-sans font-bold uppercase tracking-wider px-4 py-2 rounded-sm border transition-all cursor-pointer ${
                     savedArticleIds.has(selectedDossier.id || '')
                       ? 'border-emerald-500/60 bg-emerald-500/10 text-emerald-300'
                       : 'border-zinc-800 bg-zinc-900 text-zinc-300 hover:border-[#e0d0ab]'
                   }`}
                 >
                   <Bookmark className={`w-3.5 h-3.5 ${savedArticleIds.has(selectedDossier.id || '') ? 'fill-emerald-400' : ''}`} />
-                  <span>{savedArticleIds.has(selectedDossier.id || '') ? 'Saved to Profile' : 'Save Dossier'}</span>
+                  <span>{savedArticleIds.has(selectedDossier.id || '') ? 'Saved to Profile' : 'Save Brief'}</span>
                 </button>
 
                 {selectedDossier.url && (
@@ -1057,7 +1057,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                     href={selectedDossier.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#e0d0ab] text-zinc-950 font-mono text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-stone-100 transition-all cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#e0d0ab] text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-stone-100 transition-all cursor-pointer"
                   >
                     <span>Read Original Gazette</span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -1077,7 +1077,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowPibModal(false)}
-            className="fixed inset-0 z-[600] flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
+            className="fixed inset-0 z-[600] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 font-sans"
           >
             <motion.div
               initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 24, scale: 0.96 }}
@@ -1091,21 +1091,21 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
             >
               {/* Masthead Bar */}
               <div className="flex-shrink-0 flex flex-col border-b border-primary-container/20 bg-surface-dim relative">
-                <div className="flex items-center justify-between px-6 py-3.5">
+                <div className="flex items-center justify-between px-6 py-3.5 font-sans">
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-primary" />
-                    <span className="font-mono text-sm font-bold tracking-[0.25em] uppercase text-on-surface">
-                      PIB GAZETTE DOSSIER
+                    <span className="font-serif text-sm font-bold tracking-tight uppercase text-on-surface">
+                      PIB Gazette Dossier
                     </span>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 font-sans">
                     {pibDigests.length > 0 && (
-                      <span className="font-mono text-[10px] tracking-widest uppercase text-primary-container/70 hidden sm:inline-flex items-center gap-2">
-                        <span>{activeDigestIndex + 1} / {pibDigests.length}</span>
+                      <span className="text-[10px] uppercase text-primary-container/70 hidden sm:inline-flex items-center gap-2">
+                        <span className="font-mono">{activeDigestIndex + 1} / {pibDigests.length}</span>
                         <span className="w-1 h-1 rounded-full bg-primary-container/40" />
-                        <span className="inline-flex items-center gap-1">
+                        <span className="inline-flex items-center gap-1 font-sans">
                           <Clock className="w-3 h-3" />
-                          {activeDigestReadMinutes} min read
+                          <span className="font-mono">{activeDigestReadMinutes}</span> min read
                         </span>
                       </span>
                     )}
@@ -1131,7 +1131,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                     <motion.button
                       whileTap={prefersReducedMotion ? undefined : { scale: 0.85 }}
                       onClick={() => setShowPibModal(false)}
-                      className="font-mono text-xs font-bold tracking-widest text-primary-container/60 hover:text-on-surface transition-colors cursor-pointer"
+                      className="font-sans text-xs font-bold text-primary-container/60 hover:text-on-surface transition-colors cursor-pointer"
                     >
                       ✕
                     </motion.button>
@@ -1177,19 +1177,21 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                       dragElastic={0.55}
                       style={{ x: editionDragX }}
                       onDragEnd={handleEditionDragEnd}
-                      className="cursor-grab active:cursor-grabbing"
+                      className="cursor-grab active:cursor-grabbing font-sans"
                     >
                       <div className="px-8 pt-10 pb-6 text-center border-b border-primary-container/10">
-                        <p className="font-mono text-[10px] font-medium tracking-[0.15em] uppercase text-primary-container mb-3">
+                        <p className="font-sans text-[10px] font-medium tracking-[0.15em] uppercase text-primary-container mb-3">
                           Press Information Bureau &bull; Government of India
                           {pibDigests[activeDigestIndex]?.date && (
                             <>
                               {' | '}
-                              {new Date(pibDigests[activeDigestIndex].date).toLocaleDateString('en-GB', {
-                                day: '2-digit',
-                                month: 'short',
-                                year: 'numeric',
-                              }).toUpperCase()}
+                              <span className="font-mono">
+                                {new Date(pibDigests[activeDigestIndex].date).toLocaleDateString('en-GB', {
+                                  day: '2-digit',
+                                  month: 'short',
+                                  year: 'numeric',
+                                }).toUpperCase()}
+                              </span>
                             </>
                           )}
                         </p>
@@ -1215,8 +1217,8 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                               strong: ({ node, ...props }) => <strong className="text-primary font-semibold" {...props} />,
                               blockquote: ({ node, ...props }) => <blockquote className="font-serif border-l-[3px] border-primary-container/50 pl-4 py-1 italic my-5 text-on-surface-variant break-inside-avoid" {...props} />,
                               table: ({ node, ...props }) => <div className="overflow-x-auto w-full mb-6 border border-primary-container/30 break-inside-avoid shadow-sm"><table className="w-full font-mono text-[11px] border-collapse bg-surface-dim/30" {...props} /></div>,
-                              thead: ({ node, ...props }) => <thead className="bg-surface-container-highest" {...props} />,
-                              th: ({ node, ...props }) => <th className="font-mono text-primary-container font-bold uppercase tracking-widest border border-primary-container/30 p-2.5 text-left" {...props} />,
+                              thead: ({ node, ...props }) => <thead className="bg-surface-container-highest font-sans" {...props} />,
+                              th: ({ node, ...props }) => <th className="font-sans text-primary-container font-bold uppercase tracking-wider border border-primary-container/30 p-2.5 text-left text-[11px]" {...props} />,
                               td: ({ node, ...props }) => <td className="font-mono border border-primary-container/20 p-2.5" {...props} />,
                             }}
                           >
@@ -1233,7 +1235,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                   Capped to a reasonable count so a deep archive doesn't produce an unbounded row. */}
               {pibDigests.length > 1 && pibDigests.length <= 12 && (
                 <LayoutGroup id="pib-edition-dots">
-                  <div className="flex-shrink-0 flex items-center justify-center gap-1.5 px-4 py-2.5 border-t border-primary-container/10 bg-surface-dim">
+                  <div className="flex-shrink-0 flex items-center justify-center gap-1.5 px-4 py-2.5 border-t border-primary-container/10 bg-surface-dim font-sans">
                     {pibDigests.map((d, i) => (
                       <button
                         key={d.id}
@@ -1257,24 +1259,24 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               )}
 
               {/* Navigation Dock */}
-              <div className="flex-shrink-0 flex items-center justify-between px-8 py-3.5 border-t border-primary-container/20 bg-surface-dim">
+              <div className="flex-shrink-0 flex items-center justify-between px-8 py-3.5 border-t border-primary-container/20 bg-surface-dim font-sans">
                 <motion.button
                   whileTap={prefersReducedMotion || activeDigestIndex === 0 ? undefined : { scale: 0.94, x: -2 }}
                   onClick={() => goToEdition(activeDigestIndex - 1)}
                   disabled={activeDigestIndex === 0}
-                  className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase text-primary-container hover:text-on-surface transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer inline-flex items-center gap-1"
+                  className="font-sans text-[10px] font-bold tracking-wider uppercase text-primary-container hover:text-on-surface transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer inline-flex items-center gap-1"
                 >
                   <ChevronLeft className="w-3 h-3" />
                   PREVIOUS EDITION
                 </motion.button>
-                <div className="font-mono text-[10px] text-primary-container/60 tracking-widest">
-                  EDITION {activeDigestIndex + 1} OF {pibDigests.length}
+                <div className="font-sans text-[10px] text-primary-container/60 tracking-wider">
+                  EDITION <span className="font-mono">{activeDigestIndex + 1}</span> OF <span className="font-mono">{pibDigests.length}</span>
                 </div>
                 <motion.button
                   whileTap={prefersReducedMotion || activeDigestIndex === pibDigests.length - 1 ? undefined : { scale: 0.94, x: 2 }}
                   onClick={() => goToEdition(activeDigestIndex + 1)}
                   disabled={activeDigestIndex === pibDigests.length - 1}
-                  className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase text-primary-container hover:text-on-surface transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer inline-flex items-center gap-1"
+                  className="font-sans text-[10px] font-bold tracking-wider uppercase text-primary-container hover:text-on-surface transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer inline-flex items-center gap-1"
                 >
                   NEXT EDITION
                   <ChevronRight className="w-3 h-3" />
