@@ -78,3 +78,24 @@ $RECYCLE.BIN/
 *~
 *.tmp
 *.bak
+
+# ── Agent handoffs, briefs & inboxes (internal orchestration — NEVER public) ──
+# Cross-agent task briefs (Claude ⇄ Antigravity) are internal process artifacts.
+# They can contain roadmaps, credentials for tests, or candid security notes.
+# NOTE: .agents/skills/ (installed agent skills) stays tracked — only the
+# inbox (handoffs) and standalone *-handoff.md files are excluded.
+docs/handoffs/
+.agents/inbox/
+*-handoff.md
+*.handoff.md
+
+# ── Scratch & verification throwaways (probes, dry-runs, temp tsconfigs) ──
+_scratch/
+*.probe.mjs
+*-probe.mjs
+*-probe.ts
+*-dryrun.ts
+*-dryrun.mjs
+*.dryrun.*
+cluster-test.ts
+tsconfig.verify*.json

@@ -88,8 +88,10 @@ export const SIGNAL_KEYWORDS: string[] = [
  *   2. Corroboration boost (0-24 pts) — 6 pts per distinct corroborating outlet, up to 4
  *   3. High-signal keyword density (0-20 pts) — scaled by unique keyword occurrences
  *   4. Source tier bonus (0-6 pts) — primary +6, world +3, wire 0
+ *   5. Syllabus relevance penalty: If tags are explicitly passed and empty,
+ *      the score is hard-floored (capped at 20) regardless of authority.
  */
-export function scoreStory(story: Story): number {
+export function scoreStory(story: Story, opts?: { tags?: string[] }): number {
   if (!story || !story.lead) return 0;
 
   const lead = story.lead;
@@ -121,6 +123,13 @@ export function scoreStory(story: Story): number {
     tierBonus = 3;
   }
 
-  const rawTotal = authorityScore + corroborationScore + keywordScore + tierBonus;
+  let rawTotal = authorityScore + corroborationScore + keywordScore + tierBonus;
+
+  // Hard penalty if tags are explicitly provided and empty (untagged noise/tribute)
+  if (opts?.tags !== undefined && opts.tags.length === 0) {
+    rawTotal = Math.min(20, rawTotal * 0.35);
+  }
+
   return Math.max(0, Math.min(100, Math.round(rawTotal)));
 }
+

@@ -32,13 +32,14 @@ function hash(s: string): string {
 function rssSource(opts: {
   id: string;
   label: string;
-  feedUrl: string;
+  feedUrl: string | string[];
   tier: SourceAdapter["tier"];
   lang?: SourceAdapter["lang"];
   enabled?: boolean;
   selectors?: string[];
   minBodyChars?: number;
 }): SourceAdapter {
+  const urls = Array.isArray(opts.feedUrl) ? opts.feedUrl : [opts.feedUrl];
   return {
     id: opts.id,
     label: opts.label,
@@ -46,7 +47,20 @@ function rssSource(opts: {
     lang: opts.lang ?? "en",
     enabled: opts.enabled ?? true,
     minBodyChars: opts.minBodyChars,
-    discover: () => fetchFeed(opts.feedUrl),
+    discover: async () => {
+      const all: RawRef[] = [];
+      const seen = new Set<string>();
+      for (const u of urls) {
+        const items = await fetchFeed(u);
+        for (const item of items) {
+          if (item.url && !seen.has(item.url)) {
+            seen.add(item.url);
+            all.push(item);
+          }
+        }
+      }
+      return all;
+    },
     extract: async (ref) => {
       const body = await extractFromUrl(ref.url, opts.selectors ?? []);
       // Resilience: if the page fetch is thin but the feed carried full content
@@ -124,7 +138,7 @@ const PRS: SourceAdapter = {
 };
 
 // ============================================================
-// Wikipedia Current Events Portal — pre-summarized, sourced world spine
+// Wikipedia Current Events Portal — disabled (non-UPSC raw journalism)
 // ============================================================
 const WORLD_SIGNAL =
   /\b(india|united nations|\bun\b|unesco|unhrc|security council|treaty|summit|g20|g7|brics|election|parliament|economy|gdp|inflation|central bank|imf|world bank|\bwho\b|climate|court|supreme|war|ceasefire|sanction|tariff|trade|agreement|nuclear|missile|coup|president|prime minister|foreign|diplomat|border|refugee)\b/i;
@@ -134,7 +148,7 @@ const WIKIPEDIA: SourceAdapter = {
   label: "Wikipedia Current Events",
   tier: "world",
   lang: "en",
-  enabled: true,
+  enabled: false, // Disabled: raw global news, not UPSC-tailored IR.
   preSummarized: true,
   discover: async () => {
     const raw = await fetchText(
@@ -201,12 +215,9 @@ export const SOURCES: SourceAdapter[] = [
     label: "UN News",
     feedUrl: "https://news.un.org/feed/subscribe/en/news/all/rss.xml",
     tier: "world",
-    // Disabled: news.un.org is unreachable/blocked from our runners (verified
-    // 2026-08-19 — all feed variants time out). Wikipedia Current Events covers
-    // the world spine. Re-enable once a reachable feed URL is confirmed.
     enabled: false,
   }),
-  // --- Wire (demoted to headline-pointers; mostly self-drop at the gate) ---
+  // --- Wire (scoped strictly to policy / analysis / sci-tech sections) ---
   rssSource({
     id: "INDIAN EXPRESS",
     label: "Indian Express Explained",
@@ -215,9 +226,14 @@ export const SOURCES: SourceAdapter[] = [
   }),
   rssSource({
     id: "THE HINDU",
-    label: "The Hindu",
-    feedUrl: "https://www.thehindu.com/news/national/feeder/default.rss",
+    label: "The Hindu Editorial & Policy",
+    feedUrl: [
+      "https://www.thehindu.com/opinion/editorial/feeder/default.rss",
+      "https://www.thehindu.com/sci-tech/feeder/default.rss",
+      "https://www.thehindu.com/business/Economy/feeder/default.rss",
+    ],
     tier: "wire",
+    selectors: [".article-body", "#content-body", ".article", "article"],
   }),
   rssSource({
     id: "BUSINESS STANDARD",

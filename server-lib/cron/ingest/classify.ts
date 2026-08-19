@@ -81,7 +81,7 @@ export function deriveMinistry(text: string, fallback = "Government of India"): 
 // Hard exclusion filter (zero-cost pre-filter)
 // ------------------------------------------------------------
 const EXCLUDE_KEYWORDS = [
-  "MURDER", "RAPE", "ACCIDENT", "ASSAULT", "ARRESTED", "DIED", "DEATH",
+  "MURDER", "RAPE", "ACCIDENT", "ASSAULT", "ARRESTED", "ARREST", "DIED", "DEATH",
   "CREMATED", "CELEBRITY", "CINEMA", "FILM", "BOLLYWOOD", "CRIME",
   "AQUAPLANING", "OBITUARY", "OBIT", "FUNERAL", "VIP PASS", "CONCERT",
   "FESTIVAL", "TRAFFIC JAM", "ROAD CLOSURE", "NEIGHBOURHOOD",
@@ -89,6 +89,11 @@ const EXCLUDE_KEYWORDS = [
   "ROBBERY", "KIDNAP", "MOLESTATION", "CORRUPTION CASE", "SCAM",
   "SENSEX", "NIFTY", "MUTUAL FUND", "D-STREET", "WALL STREET",
   "STOCK MARKET", "FLEXICAP", "MULTICAP", "DATING APP", "VIRAL",
+  "DETAINED", "CLASH", "ENCOUNTER", "PROTEST", "RALLY", "ROAD ACCIDENT",
+  "FIRE BREAKS", "FIRE IN", "RESCUE", "HYPERLOCAL", "BOARD RESULT",
+  "RECRUITMENT", "HOROSCOPE", "STAMPEDE", "MANHANDLED", "PAPER LEAK",
+  "DIGITAL ARREST", "RAT POISON", "SMUGGLING", "KILLED", "GAS LEAK",
+  "BLAST", "EXPLOSION", "COLLISION",
 ];
 
 /** True if the item is obvious noise and should be dropped pre-LLM. */

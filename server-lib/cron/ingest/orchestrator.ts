@@ -327,7 +327,7 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
         body: lead.body,
         lang: lead.lang,
       });
-      if (!structured || !structured.bullets.length) {
+      if (!structured || !structured.bullets.length || !structured.tags.length) {
         result.filtered++;
         continue;
       }
@@ -336,6 +336,8 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
       prelims = structured.prelims;
       mains = structured.mains;
     }
+
+    const finalSignificance = scoreStory(story, { tags });
 
     const ministry = deriveMinistry(
       `${lead.headline} ${lead.body.slice(0, 400)}`,
@@ -378,7 +380,7 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
     // Build enriched summary payload conforming to the shared contract
     const summary = {
       bullets,
-      significance,
+      significance: finalSignificance,
       tags,
       prelims,
       mains,

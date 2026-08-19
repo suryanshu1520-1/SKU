@@ -35,31 +35,32 @@ const HI_SYSTEM = [
 
 const EN_STRUCTURED_SYSTEM = [
   "You are a policy analyst and exam intelligence distiller for UPSC Civil Services aspirants.",
-  "Distill the provided news article into structured JSON for exam revision.",
-  "Required JSON schema:",
+  "Decide if this item belongs in a UPSC Civil Services current-affairs compilation (the kind Vision IAS / InsightsIAS / ForumIAS publish monthly). It qualifies ONLY if it maps to a General Studies syllabus node (GS1 society/geography/culture/history; GS2 polity/governance/IR/social-justice/schemes/health/education; GS3 economy/environment/science-tech/security/disaster). Routine crime, local incidents, protests or arrests as events, accidents, non-major sports, celebrity, stock-market moves, and corporate results are NOT UPSC-relevant → return NULL.",
+  "If and only if the item is UPSC-relevant, distill it into structured JSON matching this schema:",
   "{",
   '  "bullets": string[], // 1 to 3 compact, information-dense, factual sentences without markdown markers (-, *, #). Never pad to 3.',
-  '  "syllabus_tags": string[], // 0 to 3 relevant UPSC syllabus tags, e.g. ["GS2 Polity", "GS3 Economy", "GS3 Environment", "GS2 International Relations", "GS3 Science & Tech", "GS2 Governance"]',
+  '  "syllabus_tags": string[], // 1 to 3 relevant UPSC syllabus tags from: ["GS1 Society", "GS1 Geography", "GS1 History & Culture", "GS2 Polity", "GS2 Governance", "GS2 Social Justice", "GS2 International Relations", "GS3 Economy", "GS3 Environment & Ecology", "GS3 Science & Tech", "GS3 Internal Security", "GS3 Disaster Management"]',
   '  "prelims_pointer": string, // A single concise pointer highlighting key factual/constitutional/statutory/metric data for Prelims, or empty string if none.',
   '  "mains_pointer": string // A single concise pointer highlighting analytical significance, policy vector, or administrative impact for Mains, or empty string if none.',
   "}",
   "Guidelines:",
   "- Strictly factual; no padding, no extrapolation.",
-  "- FIRST judge exam-relevance: If this is retail stock tips, local crime, celebrity gossip, or corporate noise with no UPSC relevance, respond with exactly: {\"relevance\": \"NULL\"} or NULL.",
+  "- If not UPSC-relevant or if no syllabus tag applies, respond with exactly: {\"relevance\": \"NULL\"} or NULL.",
 ].join("\n");
 
 const HI_STRUCTURED_SYSTEM = [
   "You are a policy analyst and exam intelligence distiller for UPSC Civil Services aspirants.",
-  "The source text below is an Indian GOVERNMENT press release in HINDI. Read the Hindi text accurately and generate the structured distillation in clear ENGLISH.",
-  "Required JSON schema:",
+  "The source text below is an Indian GOVERNMENT press release in HINDI. Read the Hindi text accurately and judge UPSC relevance.",
+  "Decide if this item belongs in a UPSC Civil Services compilation. It qualifies ONLY if it maps to a General Studies syllabus node (GS1 society/geography/culture; GS2 polity/governance/IR/social-justice/schemes; GS3 economy/environment/science-tech/security). Ceremonial greetings, tributes, protocol notices without policy substance, or local events are NOT UPSC-relevant → return NULL.",
+  "If and only if UPSC-relevant, generate the structured distillation in clear ENGLISH matching this schema:",
   "{",
   '  "bullets": string[], // 1 to 3 compact, information-dense English sentences preserving scheme names, metrics, and dates.',
-  '  "syllabus_tags": string[], // 0 to 3 relevant UPSC syllabus tags, e.g. ["GS2 Governance", "GS3 Agriculture"]',
+  '  "syllabus_tags": string[], // 1 to 3 relevant UPSC syllabus tags e.g. ["GS2 Governance", "GS3 Agriculture", "GS2 Social Justice"]',
   '  "prelims_pointer": string, // Key factual/constitutional/statutory data for Prelims, in English, or empty string.',
   '  "mains_pointer": string // Analytical/policy impact pointer for Mains, in English, or empty string.',
   "}",
   "Guidelines:",
-  "- FIRST judge exam-relevance: If this is purely ceremonial greeting, condolence, or protocol notice with no policy substance, respond with: {\"relevance\": \"NULL\"} or NULL.",
+  "- If not exam-relevant or if purely ceremonial, respond with exactly: {\"relevance\": \"NULL\"} or NULL.",
 ].join("\n");
 
 export type StructuredSynthesis = {
@@ -170,7 +171,9 @@ export async function synthesize(params: {
 /**
  * Distill an item into structured exam intelligence:
  * bullets + syllabus tags + prelims pointer + mains pointer.
- * Falls back to synthesize() if JSON parsing fails.
+ *
+ * HARD RELEVANCE GATE:
+ * Must return at least one valid UPSC syllabus tag, otherwise returns null.
  */
 export async function synthesizeStructured(params: {
   title: string;
@@ -218,6 +221,12 @@ export async function synthesizeStructured(params: {
           .filter(Boolean)
           .slice(0, 3);
 
+        // Hard requirement: at least one syllabus tag must be returned
+        if (tags.length === 0) {
+          console.log(`[ingest][llm] rejected (no syllabus tags returned): ${title.slice(0, 60)}`);
+          return null;
+        }
+
         const prelims = typeof parsed.prelims_pointer === "string"
           ? parsed.prelims_pointer.trim()
           : typeof parsed.prelims === "string"
@@ -230,22 +239,10 @@ export async function synthesizeStructured(params: {
           ? parsed.mains.trim()
           : "";
 
-        console.log(`[ingest][llm] structured distillation via ${result.provider}/${result.model}`);
+        console.log(`[ingest][llm] structured distillation (${tags.join(", ")}) via ${result.provider}/${result.model}`);
         return { bullets, tags, prelims, mains };
       }
     }
-  }
-
-  // Fallback: regular synthesis
-  console.log(`[ingest][llm] structured JSON failed/empty, attempting standard fallback for: ${title.slice(0, 50)}`);
-  const fallbackBullets = await synthesize({ title, body, lang });
-  if (fallbackBullets && fallbackBullets.length > 0) {
-    return {
-      bullets: fallbackBullets,
-      tags: [],
-      prelims: "",
-      mains: "",
-    };
   }
 
   return null;
