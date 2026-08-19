@@ -365,7 +365,7 @@ export default function Autopsy({
             className="inline-flex items-center justify-center gap-2 py-3 px-8 bg-zinc-900 hover:bg-zinc-800 text-stone-200 hover:text-[#e0d0ab] border border-zinc-800 hover:border-[#0194a8] font-mono text-xs font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer"
           >
             <Sparkles className="w-4 h-4 text-[#0194a8]" />
-            <span>Deploy Next Protocol</span>
+            <span>Take Another Test</span>
           </button>
         </div>
 
@@ -374,11 +374,11 @@ export default function Autopsy({
           <div className="flex items-center justify-center gap-2">
             <Shield className="w-5 h-5 text-[#e0d0ab]" />
             <h3 className="font-serif text-lg font-bold text-white">
-              Founders Club Clearance
+              Join the Founders Club
             </h3>
           </div>
           <p className="text-xs font-sans text-zinc-400 leading-relaxed max-w-md mx-auto">
-            Tark is an ad-free, zero-noise testing arena. Secure your lifetime Founders Seat to unlock global leaderboard telemetry, unlimited mock sessions, and direct access.
+            Tark is an ad-free, zero-noise testing arena. Take a lifetime Founders Seat to unlock the global leaderboard, unlimited mock tests, and direct access to the team.
           </p>
           <button
             onClick={onNavigateManifesto}

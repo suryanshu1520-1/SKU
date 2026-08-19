@@ -12,11 +12,19 @@ function cleanEnvValue(val: any): string {
   return cleaned.trim();
 }
 
-const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
-const rawSupabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
-if (!rawSupabaseAnonKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
-
-const supabaseAnon = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseAnonKey));
+// Lazy singleton. Reading env at CALL time (not module-load time) avoids a
+// crash-on-import when this module is pulled in before dotenv.config() has run
+// (ESM resolves imports before the importing file's body executes). Previously
+// the module threw at import, taking the whole dev server down.
+let _supabaseAnon: ReturnType<typeof createClient> | null = null;
+function getSupabaseAnon() {
+  if (_supabaseAnon) return _supabaseAnon;
+  const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
+  const anonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+  if (!anonKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase anon key missing.");
+  _supabaseAnon = createClient(cleanEnvValue(url), cleanEnvValue(anonKey));
+  return _supabaseAnon;
+}
 
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
@@ -54,7 +62,7 @@ export default async function handler(req: any, res: any) {
     // Fetch previously attempted question IDs to exclude
     let seenIds: string[] = [];
     try {
-      const { data: attemptedQuestions, error: attemptError } = await supabaseAnon
+      const { data: attemptedQuestions, error: attemptError } = await getSupabaseAnon()
         .from('question_attempts')
         .select('question_id')
         .eq('user_id', userId);
@@ -83,7 +91,7 @@ export default async function handler(req: any, res: any) {
     }
 
     // Single query for all requested subjects
-    let query = supabaseAnon
+    let query = getSupabaseAnon()
       .from('static_questions')
       .select('*')
       .in('subject_category', subjects);
@@ -110,7 +118,7 @@ export default async function handler(req: any, res: any) {
     if (finalQuestions.length < N) {
       isBackfilled = true;
       const excludedIds = [...seenIds, ...finalQuestions.map((q: any) => q.id)];
-      let backfillQuery = supabaseAnon
+      let backfillQuery = getSupabaseAnon()
         .from('static_questions')
         .select('*');
         

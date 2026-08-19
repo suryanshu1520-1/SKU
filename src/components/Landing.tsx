@@ -60,7 +60,13 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             <span>FOUNDERS CLUB:</span>
             <span className="text-[#e0d0ab] font-bold">
-              {seatData ? `${seatData.claimed_seats} / ${seatData.max_capacity}` : 'Capped at 500'} Seats Claimed
+              {/* Don't broadcast "0 claimed" — it reads as no traction. Show the honest
+                  cohort framing until claims are non-trivial, then the real count. */}
+              {seatData
+                ? (seatData.claimed_seats >= 25
+                    ? `${seatData.claimed_seats} / ${seatData.max_capacity} Seats Claimed`
+                    : `${seatData.max_capacity} Lifetime Founding Seats`)
+                : '500 Lifetime Founding Seats'}
             </span>
             <span className="text-zinc-500 hidden sm:inline">&bull; 15-Min Lock &bull; Lifetime</span>
           </div>
@@ -81,8 +87,8 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
           <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#e0d0ab] drop-shadow-[0_0_25px_rgba(224,208,171,0.2)] mb-4 select-none leading-tight">
             The War on Noise.
           </h1>
-          <p className="text-zinc-400 text-xs sm:text-sm font-mono tracking-widest uppercase mb-6 text-[#e0d0ab]/90">
-            Assess. Analyze. Track. &bull; Tark | तर्क
+          <p className="text-xs sm:text-sm font-mono tracking-[0.35em] uppercase mb-6 text-[#e0d0ab]/80">
+            Assess. Analyze. Track.
           </p>
           <p className="text-zinc-300 text-sm sm:text-base md:text-lg font-sans max-w-2xl mx-auto leading-relaxed">
             You have one exam date and a syllabus that never stops expanding. Somewhere in it is the topic that fails you. Tark exists to find it before the examiner does.
@@ -96,18 +102,25 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
           transition={{ duration: 0.5, delay: 0.15 }}
           className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
         >
+          {/* Primary CTA — button-in-button: trailing arrow nested in its own chip,
+              spring cubic-bezier, tactile active-press. Kept in the brand's sharp
+              rounded-sm geometry (not high-end's default pill) per shape-consistency. */}
           <button
             onClick={onNavigateArena}
-            className="w-full sm:w-auto group inline-flex items-center justify-center gap-2.5 py-3.5 px-8 bg-[#e0d0ab] text-zinc-950 font-sans text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-stone-100 transition-all shadow-xl shadow-[#e0d0ab]/10 hover:shadow-[#e0d0ab]/20 cursor-pointer"
+            className="w-full sm:w-auto group inline-flex items-center justify-between gap-3 py-3 pl-6 pr-3 bg-[#e0d0ab] text-zinc-950 font-sans text-xs font-bold uppercase tracking-widest rounded-sm shadow-xl shadow-[#e0d0ab]/10 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:shadow-[#e0d0ab]/25 active:scale-[0.98] cursor-pointer"
           >
-            <Brain className="w-4 h-4" />
-            Take a Diagnostic Test — No Signup Required
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <span className="inline-flex items-center gap-2">
+              <Brain className="w-4 h-4" />
+              Take a Diagnostic Test
+            </span>
+            <span className="inline-flex items-center justify-center w-7 h-7 rounded-sm bg-zinc-950/10 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-0.5 group-hover:bg-zinc-950/15">
+              <ArrowRight className="w-3.5 h-3.5" />
+            </span>
           </button>
 
           <button
             onClick={onNavigateManifesto}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 py-3.5 px-6 border border-zinc-800 text-zinc-300 font-sans text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-zinc-900/60 hover:text-[#e0d0ab] hover:border-zinc-700 transition-all cursor-pointer backdrop-blur-sm"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 py-3.5 px-6 border border-zinc-800 text-zinc-300 font-sans text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-zinc-900/60 hover:text-[#e0d0ab] hover:border-zinc-700 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98] cursor-pointer backdrop-blur-sm"
           >
             <Target className="w-4 h-4" />
             Read the Manifesto

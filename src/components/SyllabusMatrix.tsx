@@ -78,12 +78,13 @@ export default function SyllabusMatrix({ onSelectDomain }: SyllabusMatrixProps) 
         <div>
           <div className="flex items-center gap-2">
             <BookOpen className="w-4 h-4 text-[#e0d0ab]" />
-            <h3 className="text-xs font-mono uppercase tracking-widest text-[#e0d0ab] font-bold">
-              UPSC Syllabus Matrix & Item Coverage
+            {/* Serif display voice for the section title (was mono-uppercase). */}
+            <h3 className="font-serif text-lg tracking-tight text-[#e0d0ab] font-bold">
+              What the Syllabus Actually Weighs
             </h3>
           </div>
-          <p className="text-zinc-500 text-[11px] font-sans mt-0.5">
-            Real-time coverage breakdown across 1,720+ active assessment items
+          <p className="text-zinc-400 text-xs font-sans mt-1">
+            How Prelims marks split across subjects, and how many questions we have ready in each.
           </p>
         </div>
         <span className="text-[10px] font-mono px-2.5 py-1 bg-zinc-800 text-emerald-400 border border-zinc-700 rounded-sm hidden sm:inline">

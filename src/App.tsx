@@ -334,23 +334,27 @@ export default function App() {
                   </span>
                 </button>
 
-                <button
-                  onClick={() => navigateToTab('profile')}
-                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group cursor-pointer"
-                >
-                  {gameState !== 'landing' && activeTab === 'profile' && (
-                    <motion.div
-                      layoutId="active-nav-pill"
-                      className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
-                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                    />
-                  )}
-                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'profile' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
-                    <User className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'profile') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
-                    <span className="hidden sm:inline">{userEmail ? 'Profile & History' : 'Sign In'}</span>
-                    <span className="sm:hidden">{userEmail ? 'Profile' : 'Sign In'}</span>
-                  </span>
-                </button>
+                {/* Profile tab only exists when signed in — logged-out users get the
+                    dedicated Sign In button below, so there is one sign-in affordance, not two. */}
+                {userEmail && (
+                  <button
+                    onClick={() => navigateToTab('profile')}
+                    className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group cursor-pointer"
+                  >
+                    {gameState !== 'landing' && activeTab === 'profile' && (
+                      <motion.div
+                        layoutId="active-nav-pill"
+                        className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
+                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'profile' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
+                      <User className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'profile') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
+                      <span className="hidden sm:inline">Profile & History</span>
+                      <span className="sm:hidden">Profile</span>
+                    </span>
+                  </button>
+                )}
               </LayoutGroup>
 
               {!userEmail && (

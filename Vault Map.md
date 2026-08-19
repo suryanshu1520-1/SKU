@@ -53,6 +53,8 @@ Welcome to the **Tark 1.0 (SKU)** Obsidian Knowledge Hub. This vault is organize
 - **[[docs/api-reference|API Reference]]**: Endpoints for quiz submission, Razorpay checkout, insights, and background cron workers.
 - **[[docs/ingestion-pipeline|Ingestion & Distillation Pipeline]]**: The four parallel `current_affairs` ingestion paths and their divergent quality bars (rewritten 2026-08-18 after a direct code audit).
 - **[[docs/news-feed-quality-roadmap|News Feed Quality Roadmap]]**: Consolidation plan, PIB-in-the-autonomous-path, world coverage, dedup, and significance ranking.
+- **[[docs/news-intelligence-architecture|News Intelligence Architecture (Zero-Budget)]]**: Multi-provider LLM abstraction (`llm.ts`), in-memory cosine deduplication, and finite daily editions.
+- **[[docs/voice-and-type-guide|Voice & Type Guide]]**: Humanized lexicon standards, anti-jargon rules, and typography font-assignment hierarchy.
 - **[[docs/monetization-tiers|Monetization & Concurrency Controls]]**: Freemium quotas, Razorpay payments, and 15-minute seat locking.
 - **[[docs/ui-revamp-masterplan|🎨 UI Revamp Master Plan]]**: The Naval-Instrument north star (navy/teal/gold), foundation fixes, per-surface specs, and sub-agent execution structure (delegated to Anti-G).
 - **[[docs/live-site-critique|Live-Site Design Critique]]**: Pixel-grounded walkthrough of the rendered product (Landing, Daily Brief, Leaderboard, Sign In verified).

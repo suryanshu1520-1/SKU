@@ -1,4 +1,4 @@
-import { Client } from "@gradio/client";
+import { llmGenerate } from "../llm.js";
 import type { CronConfig } from "./config.js"; // Kept the .js for Vercel ESM
 
 export type AiInsight = {
@@ -6,33 +6,35 @@ export type AiInsight = {
 };
 
 /**
- * STRICT 3-ELEMENT NORMALIZER
+ * HONEST BULLET NORMALIZER
  * - Strips markdown bullet markers (-, *, •, #, ##)
  * - Removes section header lines (e.g. "Facts:", "Metrics:", "Outlays:")
  * - Flattens sub-bullets (indented lines) into their parent via "; "
- * - Forces output to exactly 3 elements joined by "\n"
+ * - Returns 1–3 REAL bullets. It never pads to a fixed count with placeholder
+ *   text — a story with one honest bullet is better than three where one is fake.
+ *   (The previous version injected "Additional context pending." to force exactly
+ *   three, which leaked fabricated bullets onto live cards. See
+ *   docs/news-intelligence-architecture.md.)
  */
-function normalizeToThreeBullets(raw: string): string {
+function normalizeBullets(raw: string): string {
   const s = raw.trim();
   if (!s) return "";
 
-  // Split into lines and clean each
   const lines = s.split("\n").map((l) => l.trim()).filter(Boolean);
 
-  // Phase 1: Strip all markdown bullet markers from line starts
-  const stripped = lines.map((line) =>
-    line.replace(/^[-•*#]+\s+/, "").replace(/^#{1,6}\s+/, "").trim()
-  ).filter(Boolean);
+  // Phase 1: strip markdown bullet / heading markers from line starts
+  const stripped = lines
+    .map((line) => line.replace(/^[-•*]+\s+/, "").replace(/^#{1,6}\s+/, "").trim())
+    .filter(Boolean);
 
-  // Phase 2: Remove any line that is purely a section header
-  const headerPattern = /^(Facts|Metrics|Outlays|Key Points|Summary|Details|Action Items|Background|Introduction|Conclusion|Overview|Highlights):?\s*$/i;
+  // Phase 2: drop lines that are purely a section header
+  const headerPattern =
+    /^(Facts|Metrics|Outlays|Key Points|Summary|Details|Action Items|Background|Introduction|Conclusion|Overview|Highlights):?\s*$/i;
   const noHeaders = stripped.filter((line) => !headerPattern.test(line));
 
-  // Phase 3: Flatten sub-bullets into parent bullets
+  // Phase 3: flatten indented continuation lines into the previous bullet
   const flattened: string[] = [];
   for (const line of noHeaders) {
-    // If line starts with indentation-like structure (2+ spaces then marker or text),
-    // treat it as a continuation of the previous bullet
     if (flattened.length > 0 && /^\s{2,}/.test(line)) {
       flattened[flattened.length - 1] += "; " + line.replace(/^\s{2,}/, "").trim();
     } else {
@@ -40,73 +42,71 @@ function normalizeToThreeBullets(raw: string): string {
     }
   }
 
-  // Phase 4: Cap to max 3 elements cleanly without fake padding
+  // Phase 4: cap at 3, but do NOT pad. Merge any surplus into the 3rd bullet
+  // so nothing is lost, but never invent bullets to hit a count.
   if (flattened.length > 3) {
-    // Merge surplus lines into the 3rd element
     const extra = flattened.splice(2, flattened.length - 2);
     flattened[2] = extra.join("; ");
   }
 
-  return flattened.filter(Boolean).join("\n");
+  return flattened.join("\n");
 }
 
 function clampText(input: string, maxChars: number): string {
   return input.length <= maxChars ? input : input.slice(0, maxChars);
 }
 
+const SYSTEM_PROMPT = [
+  "You are a policy summarizer for UPSC/civil-services aspirants.",
+  "Return 1 to 3 compact, standalone, information-dense sentences, one per line (prefer 3 only when the content genuinely supports it — never pad).",
+  "Do NOT use any markdown markers (-, *, •, #, ##, etc.). Do NOT use section headers like 'Facts:', 'Metrics:', 'Outlays:'.",
+  "When 3 lines are warranted: Line 1 = the core factual announcement or decision; Line 2 = quantitative metrics, fiscal figures, or scale; Line 3 = implementation details, timeline, or administrative context.",
+  "FIRST, silently evaluate: does this content describe a systemic public administrative action, macro-economic shift, regulatory overhaul, or international agreement relevant to India? If it is retail stock advice, mutual-fund tips, local accidents, corporate HR lawsuits, or celebrity news, return exactly the word: NULL.",
+].join("\n");
+
+/**
+ * Distill a policy/news item into honest, exam-relevant bullets.
+ *
+ * Now routed through the multi-provider llm.ts (Gemini → Groq) instead of the
+ * dead Hugging Face Gradio Space. Same return contract as before so every
+ * caller (pipeline.ts, scrape.ts, internal/worker.ts) works unchanged.
+ * The `config` argument is retained for signature compatibility.
+ */
 export async function getLlama3Insight(
   policyText: string,
-  config: CronConfig
+  _config: CronConfig
 ): Promise<AiInsight | null> {
-  const promptText = [
-    "You are a policy summarizer. Return exactly 3 compact standalone sentences, one per line.",
-    "Do NOT use any markdown markers (-, *, •, #, ##, etc.). Do NOT use section headers like 'Facts:', 'Metrics:', 'Outlays:'.",
-    "Each of the 3 lines must be a complete, information-dense sentence covering the policy content.",
-    "",
-    "Line 1: Core factual announcement or decision.",
-    "Line 2: Quantitative metrics, fiscal figures, or scale.",
-    "Line 3: Implementation details, timeline, or administrative context.",
-    "",
-    "FIRST, silently evaluate: does this content describe a systemic public administrative action, macro-economic shift, regulatory overhaul, or international trade agreement? If the content is about retail stock market advice, mutual funds, local accidents, corporate HR lawsuits, or celebrity news, return exactly the word: NULL. If YES, proceed with the 3-sentence summary as instructed above.",
-    "",
-    "Policy text:",
-    clampText(policyText, 2000),
-  ].join("\n");
+  const prompt = ["Policy text:", clampText(policyText, 2000)].join("\n");
 
   try {
-    const hfToken = (globalThis as any)?.process?.env?.HF_ACCESS_TOKEN || "";
-    const client = await Client.connect("SKU1/meta-llama-Llama-3.1-8B-Instruct", hfToken ? { hf_token: hfToken } as any : undefined);
-    
-    // 2. Exact match to your Python params: message="...", api_name="/chat_fn"
-    const result = await client.predict("/chat_fn", {
-      message: promptText
+    const result = await llmGenerate({
+      system: SYSTEM_PROMPT,
+      prompt,
+      temperature: 0.3,
     });
 
-    // 3. Gradio returns the output payload inside the 'data' array
-    const aiResult = (result as any).data?.[0];
-    
-    if (!aiResult) {
-      console.warn("[cron][ai] Gradio returned empty result");
+    if (!result || !result.text) {
+      console.warn("[cron][ai] All LLM providers returned empty/unavailable");
       return null;
     }
 
-    const rawText = typeof aiResult === "string" ? aiResult : JSON.stringify(aiResult);
-    const trimmed = rawText.trim().toUpperCase();
-    
-    // TIER 2: AI self-classification null check
+    const trimmed = result.text.trim().toUpperCase();
+
+    // AI self-classification: non-policy content
     if (trimmed === "NULL" || trimmed.startsWith("NULL")) {
       console.warn("[cron][ai] AI returned NULL (self-classified as non-policy)");
       return null;
     }
 
-    const text = normalizeToThreeBullets(rawText);
-    
+    const text = normalizeBullets(result.text);
+
     if (text.length > 10) {
+      console.log(`[cron][ai] Distilled via ${result.provider}/${result.model}`);
       return { text };
     }
   } catch (error: any) {
-    console.error(`[cron][ai] Gradio connection failed: ${error.message}`);
+    console.error(`[cron][ai] LLM distillation failed: ${error?.message ?? String(error)}`);
   }
-  
+
   return null;
 }

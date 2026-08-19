@@ -11,7 +11,7 @@
 
 import { gotScraping } from "got-scraping";
 import * as cheerio from "cheerio";
-import { Client } from "@gradio/client";
+import { llmGenerate } from "../llm.js";
 import { createClient } from "@supabase/supabase-js";
 import WebSocket from 'ws';
 import dotenv from "dotenv";
@@ -359,41 +359,28 @@ function parseLlmJson(raw: string): DigestPayload | null {
 }
 
 async function transformWithLlama(rawText: string): Promise<DigestPayload | null> {
-  console.log("[pib-aggregator] Connecting to Llama 3.1 8B-Instruct Gradio space...");
-
-  const promptPayload = [
-    EDITORIAL_SYSTEM_PROMPT,
-    "",
-    "Raw policy text to transform:",
-    clampText(rawText, LLM_INPUT_CHAR_LIMIT),
-  ].join("\n");
+  console.log("[pib-aggregator] Distilling digest via multi-provider LLM (Gemini → Groq)...");
 
   try {
-    const hfToken = process.env.HF_ACCESS_TOKEN || "";
-    const client = await Client.connect(
-      "SKU1/meta-llama-Llama-3.1-8B-Instruct",
-      hfToken ? ({ hf_token: hfToken } as any) : undefined
-    );
-
-    console.log("[pib-aggregator] Sending text to Llama 3.1 for editorial formatting...");
-
-    const result = await client.predict("/chat_fn", {
-      message: promptPayload,
+    // Routed through the resilient multi-provider layer instead of the dead
+    // Hugging Face Gradio Space. json:true asks the provider for a JSON object;
+    // parseLlmJson still defensively repairs code fences / triple-quotes / etc.
+    const result = await llmGenerate({
+      system: EDITORIAL_SYSTEM_PROMPT,
+      prompt: ["Raw policy text to transform:", clampText(rawText, LLM_INPUT_CHAR_LIMIT)].join("\n"),
+      temperature: 0.3,
+      json: true,
     });
 
-    const aiResult = (result as any).data?.[0];
-
-    if (!aiResult) {
-      console.warn("[pib-aggregator] Gradio returned empty result");
+    if (!result || !result.text) {
+      console.warn("[pib-aggregator] All LLM providers returned empty/unavailable");
       return null;
     }
 
-    const outputText = typeof aiResult === "string" ? aiResult : JSON.stringify(aiResult);
-    console.log(`[pib-aggregator] LLM returned ${outputText.length} chars`);
-
-    return parseLlmJson(outputText);
+    console.log(`[pib-aggregator] LLM (${result.provider}/${result.model}) returned ${result.text.length} chars`);
+    return parseLlmJson(result.text);
   } catch (error: any) {
-    console.error(`[pib-aggregator] Llama 3.1 connection failed: ${error.message}`);
+    console.error(`[pib-aggregator] LLM distillation failed: ${error?.message ?? String(error)}`);
     return null;
   }
 }

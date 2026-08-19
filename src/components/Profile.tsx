@@ -465,12 +465,12 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
           delay={0.1}
         />
         <StatCard
-          label="Peak Query Yield"
+          label="Best Score"
           value={bestScore}
           suffix=" / 25"
           icon={Award}
           accentColor="text-[#e0d0ab]"
-          subtext="Highest single-session score"
+          subtext="Your highest in a single test"
           delay={0.15}
         />
       </div>
@@ -523,8 +523,10 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-4">
           <div className="flex items-center gap-2">
             <Bookmark className="w-4 h-4 text-[#e0d0ab]" />
-            <h3 className="font-mono text-xs uppercase tracking-widest text-[#e0d0ab] font-bold">
-              Candidate Knowledge Dossier
+            {/* Section titles use the serif display voice, not mono-uppercase (which
+                is now reserved for numbers/tags). Humanised copy, not "dossier". */}
+            <h3 className="font-serif text-lg tracking-tight text-[#e0d0ab] font-bold">
+              Saved for Later
             </h3>
           </div>
 

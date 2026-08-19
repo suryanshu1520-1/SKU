@@ -84,14 +84,14 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
           <div className="flex items-center gap-2 mb-2">
             <span className="w-2 h-2 rounded-full bg-[#e0d0ab] animate-pulse" />
             <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#e0d0ab] font-bold">
-              Cohort Telemetry & Rank Order
+              This Week's Ranking
             </span>
           </div>
           <h1 className="font-serif text-2xl sm:text-3xl font-bold text-white tracking-tight">
-            Vanguard Arena Leaderboard
+            Tark Rankings
           </h1>
           <p className="text-xs font-mono text-zinc-400 mt-1">
-            Weekly ranked reset every Sunday at 14:00 IST &bull; Zero-Trust Server Verified
+            Resets every Sunday at 14:00 IST &bull; scored server-side
           </p>
         </div>
 
@@ -108,7 +108,7 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
       {loading && (
         <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
           <Loader2 className="w-6 h-6 animate-spin text-[#0194a8] mb-3" />
-          <p className="text-xs font-mono uppercase tracking-wider">Syncing cohort telemetry...</p>
+          <p className="text-xs font-mono uppercase tracking-wider">Loading rankings...</p>
         </div>
       )}
 
@@ -124,8 +124,8 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
       {!loading && !error && entries.length === 0 && (
         <EmptyState
           icon={Trophy}
-          title="The Vanguard Ledger is Clean"
-          description="A new assessment cycle has begun. Deploy an assessment in the Arena to establish your rank."
+          title="No rankings yet this week"
+          description="A new assessment cycle has begun. Take a ranked test in the Arena to claim your spot."
         />
       )}
 
@@ -174,7 +174,7 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
                         {displayName(entry)}
                       </h3>
                       <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
-                        {isCurrentUser ? 'You (Current Session)' : 'Verified Contender'}
+                        {isCurrentUser ? 'You (Current Session)' : 'Ranked Aspirant'}
                       </p>
                     </div>
 
@@ -194,7 +194,7 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
           <div className="bg-zinc-900/20 border border-zinc-800 rounded-sm overflow-hidden backdrop-blur-sm">
             <div className="px-5 py-3 border-b border-zinc-800 bg-zinc-900/40 flex items-center justify-between">
               <span className="text-[10px] font-mono uppercase tracking-widest text-[#e0d0ab] font-bold">
-                Complete Cohort Table ({entries.length} Contenders)
+                All Ranked Aspirants ({entries.length})
               </span>
               <span className="text-[10px] font-mono text-zinc-500">
                 Click any row for detailed telemetry
@@ -208,7 +208,7 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
                     <th className="py-3 px-5 w-16">Rank</th>
                     <th className="py-3 px-5">Candidate</th>
                     <th className="py-3 px-5 text-center">Trophies</th>
-                    <th className="py-3 px-5 text-right">Contender Points</th>
+                    <th className="py-3 px-5 text-right">Rank Points</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/60 font-sans text-xs">
@@ -288,7 +288,7 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
       <Modal
         isOpen={showInfoModal}
         onClose={() => setShowInfoModal(false)}
-        title="Vanguard Scoring & Point Mechanics"
+        title="How Ranking Vanguard Scoring & Point Mechanics Points Work"
         subtitle="Zero-Trust Competitive Protocol Rules"
       >
         <div className="space-y-4 text-xs text-zinc-300 leading-relaxed font-sans">
