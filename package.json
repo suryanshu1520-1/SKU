@@ -17,7 +17,7 @@
     "lint:web": "tsc --noEmit",
     "lint:api": "tsc -p api/tsconfig.json --noEmit",
     "lint": "npm run lint:web && npm run lint:api",
-    "test": "tsx --test test/rebase.test.ts"
+    "test": "tsx --test scripts/test-rebase-contract.ts"
   },
   "dependencies": {
     "@fontsource/inter": "^5.2.8",

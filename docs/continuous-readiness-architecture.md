@@ -204,10 +204,11 @@ Rebase v1 is not complete until all are true:
 
 As of 2026-08-20:
 
-- ✅ Core and Proof-of-Omission migrations are drafted locally, not applied.
+- ⚠️ Three Rebase migrations are checked in, but live application is unverified and the static review of `dc70b7e` says **do not apply as-is**.
 - ✅ Rebase frontend and strict runtime contract are built behind a fail-closed fallback.
 - ✅ Unproven legacy trust badges are quarantined in the UI.
-- ⏳ Backend ingestion, atomic recording, API routes, live migration application, remediation audit, and Supabase verification are assigned to Antigravity in [[handoffs/rebase-v1-antigravity]].
+- ⚠️ Antigravity's first backend draft landed in `dc70b7e`; ledger history, run ordering, patch-bounded acknowledgement, decimal verification, and test isolation remain release blockers.
+- ⏳ Backend correction, live migration application, remediation audit, and Supabase verification remain assigned to Antigravity in [[handoffs/rebase-v1-antigravity]].
 
 ## See also
 

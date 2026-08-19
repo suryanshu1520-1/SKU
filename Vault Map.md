@@ -61,7 +61,7 @@ Welcome to the **Tark 1.0 (SKU)** Obsidian Knowledge Hub. This vault is organize
 - **[[docs/live-site-critique|Live-Site Design Critique]]**: Pixel-grounded walkthrough of the rendered product (Landing, Daily Brief, Leaderboard, Sign In verified).
 - **[[docs/handoffs/tark-ui-revamp-handoff|↳ Anti-G Handoff — UI Revamp]]**: Skills playbook, guardrails, and Framer MCP usage for the execution agent (canonical copy in `.agents/inbox/`).
 - **[[docs/handoffs/p4-p5-backend-antigravity|↳ Anti-G Handoff — P4/P5 Ingestion Engine]]**: Significance scoring, structured synthesis, auto-MCQ generation, and database contracts.
-- **[[docs/handoffs/rebase-v1-antigravity|↳ Anti-G Handoff — Rebase v1 Backend]]**: Live trust-data audit, Supabase migrations, numeric learn/replace ledger, authenticated patch API, and acceptance gates.
+- **[[docs/handoffs/rebase-v1-antigravity|↳ Anti-G Handoff — Rebase v1 Backend]]**: `dc70b7e` post-delivery blockers, live trust-data audit, corrected Supabase ledger, patch-bounded acknowledgement, and acceptance gates.
 
 ---
 

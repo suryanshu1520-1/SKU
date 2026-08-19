@@ -13,7 +13,7 @@ export interface VerifiedClaim {
   verified: boolean;
   source: string;
   url: string;
-  verificationMethod?: 'live_cite_or_drop_v1';
+  verification_method?: 'live_cite_or_drop_v1';
 }
 
 export interface ContestedSide {
@@ -59,7 +59,7 @@ export function SourceAnchor({ claim }: { claim: VerifiedClaim }) {
   // backfill script; only live cite-or-drop claims may display a trust anchor.
   if (
     !claim?.verified ||
-    claim.verificationMethod !== 'live_cite_or_drop_v1' ||
+    claim.verification_method !== 'live_cite_or_drop_v1' ||
     !claim.quotes?.length
   ) return null;
 

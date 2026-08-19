@@ -38,7 +38,7 @@ tags:
 - [[docs/ui-revamp-masterplan|🎨 UI Revamp Master Plan]] ← active
 - [[docs/live-site-critique|↳ Live-Site Design Critique (pixel-grounded)]]
 - [[docs/handoffs/tark-ui-revamp-handoff|↳ Anti-G Handoff: UI Revamp]]
-- [[docs/handoffs/rebase-v1-antigravity|↳ Anti-G Handoff: Rebase v1 Backend]]
+- [[docs/handoffs/rebase-v1-antigravity|↳ Anti-G Handoff: Rebase v1 Backend]] — `dc70b7e` is blocked after audit; do not apply as-is
 
 ---
 

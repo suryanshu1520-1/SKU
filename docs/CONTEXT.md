@@ -24,7 +24,7 @@ This directory holds the authoritative technical documentation, architectural as
 | [`ui-revamp-masterplan.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/docs/ui-revamp-masterplan.md) | Exhaustive full-platform UI revamp spec: north star, foundation fixes, per-surface specs, sub-agent execution (delegated to Anti-G) | All of `src/components/`, `src/index.css` |
 | [`live-site-critique.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/docs/live-site-critique.md) | Pixel-grounded critique of the rendered product (verified navy/teal/gold identity, live per-screen findings) | Rendered app at `tarkv1.vercel.app` |
 | [`handoffs/tark-ui-revamp-handoff.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/docs/handoffs/tark-ui-revamp-handoff.md) | Anti-G execution handoff: skills playbook, guardrails, Framer MCP (canonical in `.agents/inbox/`) | — |
-| [`handoffs/rebase-v1-antigravity.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/docs/handoffs/rebase-v1-antigravity.md) | Anti-G backend handoff: live trust audit, migrations, atomic claim recording, authenticated Rebase API, tests | Supabase MCP, `server-lib/cron/ingest/`, both server mounts |
+| [`handoffs/rebase-v1-antigravity.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/docs/handoffs/rebase-v1-antigravity.md) | Anti-G backend handoff and `dc70b7e` blocker audit: live trust audit, corrected ledger, patch-bounded API, isolated tests | Supabase MCP, `server-lib/cron/ingest/`, both server mounts |
 
 ## Reading Guidelines
 

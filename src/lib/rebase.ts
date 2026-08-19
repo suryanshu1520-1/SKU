@@ -66,6 +66,14 @@ function isSequence(value: unknown): value is string {
   return typeof value === 'string' && /^\d+$/.test(value);
 }
 
+function isNonZeroUuid(value: unknown): value is string {
+  return (
+    typeof value === 'string' &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value) &&
+    value !== '00000000-0000-0000-0000-000000000000'
+  );
+}
+
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every(isNonEmptyString);
 }
@@ -85,8 +93,8 @@ function isPatchItem(value: unknown): value is RebasePatchItem {
   if (!isRecord(value)) return false;
   if (value.action !== 'learn' && value.action !== 'replace') return false;
   if (
-    !isNonEmptyString(value.mutationId) ||
-    !isNonEmptyString(value.claimId) ||
+    !isNonZeroUuid(value.mutationId) ||
+    !isNonZeroUuid(value.claimId) ||
     !isNonEmptyString(value.currentText) ||
     !isNonEmptyString(value.currentValue) ||
     !isNonEmptyString(value.reason) ||
@@ -118,7 +126,7 @@ function isPatchItem(value: unknown): value is RebasePatchItem {
 export function isRebasePatch(value: unknown): value is RebasePatch {
   if (!isRecord(value) || value.schemaVersion !== 1) return false;
   if (
-    !isNonEmptyString(value.patchId) ||
+    !isNonZeroUuid(value.patchId) ||
     !isRecord(value.fromCheckpoint) ||
     !isSequence(value.fromCheckpoint.sequence) ||
     (value.fromCheckpoint.verifiedThrough !== null && !isIsoTimestamp(value.fromCheckpoint.verifiedThrough)) ||
@@ -150,12 +158,17 @@ export function isRebasePatch(value: unknown): value is RebasePatch {
   }
   if (!value.items.every(isPatchItem)) return false;
 
+  const fromSequence = BigInt(value.fromCheckpoint.sequence);
+  const throughSequence = BigInt(value.throughSequence);
+  if (throughSequence < fromSequence) return false;
+
   const mutationIds = new Set(value.items.map((item) => item.mutationId));
   if (mutationIds.size !== value.items.length) return false;
   if (value.counts.learn !== value.items.filter((item) => item.action === 'learn').length) return false;
   if (value.counts.replace !== value.items.filter((item) => item.action === 'replace').length) return false;
   if (value.status === 'changes' && value.items.length === 0) return false;
-  if (value.status === 'empty' && value.items.length !== 0) return false;
+  if (value.status === 'changes' && throughSequence === fromSequence) return false;
+  if (value.status === 'empty' && (value.items.length !== 0 || value.hasMore || throughSequence !== fromSequence)) return false;
   return true;
 }
 
