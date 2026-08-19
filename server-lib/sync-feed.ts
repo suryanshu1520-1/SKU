@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { waitUntil } from "@vercel/functions";
+import { getSources } from "./cron/ingest/sources.js";
 
 function cleanEnvValue(val: any): string {
   if (typeof val !== 'string') return '';
@@ -22,16 +23,9 @@ const supabase = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSe
 
 const COOLDOWN_SECONDS = 300; // 5 minutes user-level throttle
 
-// 7 target sources for the adaptive scraper engine
-const ALL_SOURCES = [
-  "PIB",
-  "ECONOMIC TIMES",
-  "LIVEMINT",
-  "THE HINDU",
-  "RBI",
-  "INDIAN EXPRESS",
-  "BUSINESS STANDARD"
-];
+// Dispatchable sources — derived from the unified ingest registry so this can
+// never drift from what the worker can actually process (P2 consolidation).
+const ALL_SOURCES = getSources().map((s) => s.id);
 
 export default async function handler(req: any, res: any) {
   if (req.method === 'OPTIONS') {

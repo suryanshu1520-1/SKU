@@ -5,7 +5,7 @@ export async function upsertCurrentAffairs(params: {
   headline: string;
   url: string;
   ministry: string;
-  summary: { bullets: string[] };
+  summary: { bullets: string[]; [k: string]: unknown };
 }): Promise<{ ok: boolean; errorMessage?: string }> {
   const { source, headline, url, ministry, summary } = params;
 

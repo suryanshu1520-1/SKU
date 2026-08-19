@@ -91,7 +91,10 @@ async function geminiGenerate(params: LlmParams): Promise<LlmResult> {
 // ============================================================
 // Provider: Groq (fallback; OpenAI-compatible REST, no SDK needed)
 // ============================================================
-const GROQ_MODELS = (env("GROQ_MODELS") || "llama-3.3-70b-versatile,llama-3.1-8b-instant")
+// Verified live 2026-08-19: the older llama-3.x Groq slugs now 404
+// (model_not_found) on current accounts; the openai/gpt-oss-* models are the
+// available free-tier chat models. Kept env-overridable via GROQ_MODELS.
+const GROQ_MODELS = (env("GROQ_MODELS") || "openai/gpt-oss-120b,openai/gpt-oss-20b,llama-3.3-70b-versatile")
   .split(",").map((s) => s.trim()).filter(Boolean);
 
 async function groqGenerate(params: LlmParams): Promise<LlmResult> {

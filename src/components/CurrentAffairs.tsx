@@ -30,6 +30,7 @@ import {
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
+import DailyEdition from './DailyEdition';
 
 interface CurrentAffairsItem {
   id?: string;
@@ -670,6 +671,10 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
           </div>
         </div>
       )}
+
+      {/* ── Daily Edition (P5): finite, significance-ranked front page.
+           Self-hides until the P4 backend writes summary.significance. ── */}
+      <DailyEdition userId={userId} />
 
       {/* ── Loading Skeleton ── */}
       {loading ? (

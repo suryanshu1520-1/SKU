@@ -11,6 +11,7 @@ Agent-to-agent handoff mailbox for the Tark project. Sits alongside the shared `
 ## Completed
 
 - [`tark-typography-sweep-handoff.md`](tark-typography-sweep-handoff.md) → **Anti-G** — platform-wide mono→sans type-hierarchy sweep, completed and verified. Status: `done` (2026-08-19).
+- [`p4-p5-backend-antigravity.md`](p4-p5-backend-antigravity.md) → **Anti-G** — P4 + P5 backend (significance scoring, structured synthesis, auto-MCQs, Supabase migration). Status: `done` (2026-08-19).
 
 ## Open
 

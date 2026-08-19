@@ -59,6 +59,7 @@ Welcome to the **Tark 1.0 (SKU)** Obsidian Knowledge Hub. This vault is organize
 - **[[docs/ui-revamp-masterplan|🎨 UI Revamp Master Plan]]**: The Naval-Instrument north star (navy/teal/gold), foundation fixes, per-surface specs, and sub-agent execution structure (delegated to Anti-G).
 - **[[docs/live-site-critique|Live-Site Design Critique]]**: Pixel-grounded walkthrough of the rendered product (Landing, Daily Brief, Leaderboard, Sign In verified).
 - **[[docs/handoffs/tark-ui-revamp-handoff|↳ Anti-G Handoff — UI Revamp]]**: Skills playbook, guardrails, and Framer MCP usage for the execution agent (canonical copy in `.agents/inbox/`).
+- **[[docs/handoffs/p4-p5-backend-antigravity|↳ Anti-G Handoff — P4/P5 Ingestion Engine]]**: Significance scoring, structured synthesis, auto-MCQ generation, and database contracts.
 
 ---
 

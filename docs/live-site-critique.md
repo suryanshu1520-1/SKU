@@ -1,4 +1,4 @@
-# Tark — Live-Site Design Critique (pixel-grounded)
+    # Tark — Live-Site Design Critique (pixel-grounded)
 
 > 2026-08-19. Done the right way this time: walked the **actually rendered** product at `https://tarkv1.vercel.app` through the `design:design-critique` + `design-taste-frontend` lenses, not the code (the `@theme` remap makes class names lie — see [[ui-revamp-masterplan]] §2.1). Surfaces captured live: Landing, Daily Brief, Leaderboard (empty), Sign In, **Profile & History, Arena, Autopsy** (7 of 8 verified after sign-in). Only **PublicProfile** remains unreachable (opens from a Leaderboard analyst; the board is empty). This is the ground-truth companion to the master plan's §4.
 
