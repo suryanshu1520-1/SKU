@@ -31,6 +31,13 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import DailyEdition from './DailyEdition';
+import {
+  SourceAnchor,
+  GroundingBadge,
+  ContestedCard,
+  type VerifiedClaim,
+  type ContestedClaim,
+} from './TrustUI';
 
 interface CurrentAffairsItem {
   id?: string;
@@ -40,6 +47,17 @@ interface CurrentAffairsItem {
   url: string;
   summary: {
     bullets: string[];
+    significance?: number;
+    tags?: string[];
+    prelims?: string;
+    mains?: string;
+    sources?: string[];
+    cluster_size?: number;
+    edition_date?: string;
+    has_quiz?: boolean;
+    claims?: VerifiedClaim[];
+    grounding?: number;
+    contested?: ContestedClaim;
   };
   created_at?: string;
 }
@@ -734,12 +752,13 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                   <span className="px-2.5 py-0.5 bg-[#e0d0ab] text-zinc-950 text-[10px] font-sans font-bold uppercase tracking-wider rounded-sm">
                     LEAD SIGNAL
                   </span>
-                  <span className="px-2 py-0.5 bg-zinc-800 text-[#e0d0ab] text-[10px] font-sans uppercase tracking-wider rounded-sm border border-zinc-700">
+                  <span className="px-2.5 py-0.5 bg-zinc-800 text-[#e0d0ab] text-[10px] font-sans uppercase tracking-wider rounded-sm border border-zinc-700">
                     {leadItem.ministry}
                   </span>
                   <span className="text-zinc-500 text-[10px] font-sans uppercase">
                     {leadItem.source}
                   </span>
+                  <GroundingBadge grounding={leadItem.summary?.grounding} />
                 </div>
 
                 {leadItem.created_at && (
@@ -766,15 +785,24 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
               {/* Curated Bullets */}
               {leadItem.summary?.bullets && leadItem.summary.bullets.length > 0 && (
-                <div className="space-y-2 mb-6 max-w-4xl">
-                  {leadItem.summary.bullets.slice(0, 3).map((bullet, idx) => (
-                    <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-zinc-300 font-sans leading-relaxed">
-                      <span className="text-[#e0d0ab] font-bold mt-0.5 select-none">&bull;</span>
-                      <p>{bullet}</p>
-                    </div>
-                  ))}
+                <div className="space-y-2 mb-4 max-w-4xl">
+                  {leadItem.summary.bullets.slice(0, 3).map((bullet, idx) => {
+                    const claim = (leadItem.summary?.claims || []).find((c) => c.text === bullet);
+                    return (
+                      <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-zinc-300 font-sans leading-relaxed">
+                        <span className="text-[#e0d0ab] font-bold mt-0.5 select-none">&bull;</span>
+                        <p>
+                          {bullet}
+                          {claim && <SourceAnchor claim={claim} />}
+                        </p>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
+
+              {/* Contested claim comparison */}
+              <ContestedCard contested={leadItem.summary?.contested} />
 
               {/* Footer Actions */}
               <div className="flex items-center justify-between pt-4 border-t border-zinc-800/80 font-sans">
@@ -859,9 +887,12 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                     <div>
                       {/* Meta Tags */}
                       <div className="flex items-center justify-between gap-2 mb-3 font-sans">
-                        <span className="px-2 py-0.5 bg-zinc-800/90 text-[#e0d0ab] text-[10px] font-sans uppercase tracking-wider rounded-sm border border-zinc-700/60 truncate max-w-[200px]">
-                          {item.ministry}
-                        </span>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="px-2 py-0.5 bg-zinc-800/90 text-[#e0d0ab] text-[10px] font-sans uppercase tracking-wider rounded-sm border border-zinc-700/60 truncate max-w-[180px]">
+                            {item.ministry}
+                          </span>
+                          <GroundingBadge grounding={item.summary?.grounding} />
+                        </div>
                         {item.created_at && (
                           <span className="text-[10px] font-mono text-zinc-500">
                             {new Date(item.created_at).toLocaleDateString('en-GB', {
@@ -883,15 +914,24 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
                       {/* Summary bullets */}
                       {item.summary?.bullets && item.summary.bullets.length > 0 && (
-                        <ul className="space-y-1.5 mb-4">
-                          {item.summary.bullets.slice(0, 2).map((b, bIdx) => (
-                            <li key={bIdx} className="text-xs text-zinc-400 font-sans leading-relaxed flex items-start gap-2">
-                              <span className="text-[#e0d0ab] font-bold mt-0.5 select-none">•</span>
-                              <span className="line-clamp-2">{b}</span>
-                            </li>
-                          ))}
+                        <ul className="space-y-1.5 mb-3">
+                          {item.summary.bullets.slice(0, 2).map((b, bIdx) => {
+                            const claim = (item.summary?.claims || []).find((c) => c.text === b);
+                            return (
+                              <li key={bIdx} className="text-xs text-zinc-400 font-sans leading-relaxed flex items-start gap-2">
+                                <span className="text-[#e0d0ab] font-bold mt-0.5 select-none">•</span>
+                                <span className="line-clamp-2">
+                                  {b}
+                                  {claim && <SourceAnchor claim={claim} />}
+                                </span>
+                              </li>
+                            );
+                          })}
                         </ul>
                       )}
+
+                      {/* Contested claim comparison */}
+                      <ContestedCard contested={item.summary?.contested} />
                     </div>
 
                     {/* Action Bar */}
@@ -999,6 +1039,12 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                   <span className="px-2.5 py-1 bg-zinc-900 text-zinc-400 text-xs font-sans rounded-sm border border-zinc-800">
                     {selectedDossier.source}
                   </span>
+                  <GroundingBadge grounding={selectedDossier.summary?.grounding} />
+                  {(selectedDossier.summary?.tags || []).map((t) => (
+                    <span key={t} className="px-2 py-0.5 bg-[#e0d0ab]/10 text-[#e0d0ab] text-[10px] font-sans font-semibold uppercase tracking-wider rounded-sm border border-[#e0d0ab]/20">
+                      {t}
+                    </span>
+                  ))}
                   {selectedDossier.created_at && (
                     <span className="text-xs font-mono text-zinc-500">
                       {new Date(selectedDossier.created_at).toLocaleDateString('en-GB', {
@@ -1020,27 +1066,66 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
                 {/* Structured Synthesis */}
                 <div className="space-y-4 pt-2 font-sans">
-                  <h4 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
-                    Key Policy Vectors & Exam Insights
-                  </h4>
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
+                      Key Policy Vectors & Exam Insights
+                    </h4>
+                    {typeof selectedDossier.summary?.grounding === 'number' && (
+                      <span className="text-[10px] font-mono text-zinc-500">
+                        Evidence Ledger Verified
+                      </span>
+                    )}
+                  </div>
                   <div className="space-y-3 pl-3 border-l-2 border-[#e0d0ab]/30">
-                    {selectedDossier.summary?.bullets?.map((bullet, idx) => (
-                      <p key={idx} className="text-sm text-zinc-300 font-sans leading-relaxed">
-                        {bullet}
-                      </p>
-                    ))}
+                    {selectedDossier.summary?.bullets?.map((bullet, idx) => {
+                      const claim = (selectedDossier.summary?.claims || []).find((c) => c.text === bullet);
+                      return (
+                        <p key={idx} className="text-sm text-zinc-300 font-sans leading-relaxed">
+                          {bullet}
+                          {claim && <SourceAnchor claim={claim} />}
+                        </p>
+                      );
+                    })}
                   </div>
                 </div>
 
-                {/* UPSC Syllabus Alignment Hint */}
-                <div className="p-4 bg-zinc-900/40 border border-zinc-800 rounded-sm space-y-1 font-sans">
-                  <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold">
-                    Examination Context
-                  </span>
-                  <p className="text-xs text-zinc-400 font-sans leading-relaxed">
-                    Relevant for GS Paper II (Governance & Constitutional Framework) and Prelims Current Affairs. Recommended for revision before Mock Tests.
-                  </p>
-                </div>
+                {/* Contested Claim Disagreement (if present) */}
+                <ContestedCard contested={selectedDossier.summary?.contested} />
+
+                {/* Examination Context & Pointers */}
+                {(selectedDossier.summary?.prelims || selectedDossier.summary?.mains) ? (
+                  <div className="space-y-2.5 font-sans pt-2">
+                    {selectedDossier.summary.prelims && (
+                      <div className="p-3 bg-zinc-900/60 border border-zinc-800 rounded-sm space-y-1">
+                        <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold flex items-center gap-1">
+                          <Zap className="w-3 h-3 text-[#e0d0ab]" /> Prelims Pointer
+                        </span>
+                        <p className="text-xs text-zinc-300 font-sans leading-relaxed">
+                          {selectedDossier.summary.prelims}
+                        </p>
+                      </div>
+                    )}
+                    {selectedDossier.summary.mains && (
+                      <div className="p-3 bg-zinc-900/60 border border-zinc-800 rounded-sm space-y-1">
+                        <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold flex items-center gap-1">
+                          <ChevronRight className="w-3 h-3 text-[#e0d0ab]" /> Mains Perspective
+                        </span>
+                        <p className="text-xs text-zinc-300 font-sans leading-relaxed">
+                          {selectedDossier.summary.mains}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-4 bg-zinc-900/40 border border-zinc-800 rounded-sm space-y-1 font-sans">
+                    <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold">
+                      Examination Context
+                    </span>
+                    <p className="text-xs text-zinc-400 font-sans leading-relaxed">
+                      Relevant for GS Paper II / III (Governance & Economic Framework) and Prelims Current Affairs. Recommended for revision before Mock Tests.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Modal Footer */}
