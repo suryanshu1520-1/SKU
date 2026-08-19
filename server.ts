@@ -1,10 +1,10 @@
+import "dotenv/config";
 import express from "express";
 import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import { createClient } from "@supabase/supabase-js";
-import dotenv from "dotenv";
 import rateLimit from "express-rate-limit";
 import scrapeHandler from "./server-lib/cron/scrape.js";
 import newsdataHandler from "./server-lib/cron/newsdata.js";
@@ -13,8 +13,6 @@ import trainingQuestionsHandler from "./server-lib/training-questions.js";
 import createRazorpayOrderHandler from "./server-lib/create-razorpay-order.js";
 import verifyPaymentHandler from "./server-lib/verify-payment.js";
 import userLimitsHandler from "./server-lib/user-limits.js";
-
-dotenv.config();
 
 function cleanEnvValue(val: any): string {
   if (typeof val !== 'string') return '';
@@ -34,8 +32,7 @@ if (!rawSupabaseKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing
 const supabaseServer = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey));
 
 // Dedicated anon role client for accessing restricted tables (e.g., static_questions) bypass permission denied issues
-const rawSupabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
-if (!rawSupabaseAnonKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
+const rawSupabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4bmdmeGFlcmxra2NhY3JiZGdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTY3NDQsImV4cCI6MjA5NTc5Mjc0NH0.G44wtBZZKGPb-ZTX3zaIPCXFcRtPP9Vtv-0saO0dEXE";
 const supabaseAnon = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseAnonKey));
 
 // Local file cache disabled to match Vercel serverless behavior

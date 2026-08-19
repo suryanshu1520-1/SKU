@@ -58,7 +58,7 @@ export function SourceAnchor({ claim }: { claim: VerifiedClaim }) {
   return (
     <span
       ref={anchorRef}
-      className="relative inline-block align-super select-none z-10"
+      className="relative inline-flex items-center align-middle select-none mx-1 z-10"
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
     >
@@ -69,11 +69,11 @@ export function SourceAnchor({ claim }: { claim: VerifiedClaim }) {
           setOpen((prev) => !prev);
         }}
         aria-label={`Verified source: ${claim.source}`}
-        title={`Grounded in ${claim.source}`}
-        className={`ml-1 inline-flex items-center justify-center w-3.5 h-3.5 rounded-full transition-all cursor-pointer ${
+        title={`Grounded in ${claim.source} (Click to inspect evidence)`}
+        className={`inline-flex items-center justify-center w-4 h-4 rounded-full transition-all cursor-pointer ${
           open
             ? 'bg-[#e0d0ab] text-zinc-950 shadow-[0_0_8px_rgba(224,208,171,0.5)]'
-            : 'text-[#e0d0ab]/70 hover:text-[#e0d0ab] bg-[#e0d0ab]/10 hover:bg-[#e0d0ab]/20'
+            : 'text-[#e0d0ab]/80 hover:text-[#e0d0ab] bg-[#e0d0ab]/10 hover:bg-[#e0d0ab]/20 border border-[#e0d0ab]/20'
         }`}
       >
         <ShieldCheck className="w-2.5 h-2.5" />
@@ -82,25 +82,34 @@ export function SourceAnchor({ claim }: { claim: VerifiedClaim }) {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: 6, scale: 0.95 }}
+            initial={{ opacity: 0, y: 4, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 4, scale: 0.96 }}
             transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
             onClick={(e) => e.stopPropagation()}
             className="absolute left-0 bottom-full mb-2 w-80 max-w-[85vw] z-50 origin-bottom-left"
           >
-            <div className="rounded-sm border border-[#e0d0ab]/30 bg-zinc-950/95 backdrop-blur-md p-3 shadow-[0_16px_36px_-10px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)]">
+            <div className="rounded-sm border border-[#e0d0ab]/30 bg-zinc-950/95 backdrop-blur-md p-3 shadow-[0_16px_36px_-10px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] font-sans">
               {/* Header */}
               <div className="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-zinc-800">
                 <div className="flex items-center gap-1.5 text-[9px] font-mono font-bold uppercase tracking-wider text-[#e0d0ab]">
                   <ShieldCheck className="w-3 h-3 text-[#e0d0ab]" />
                   <span>Grounded in {claim.source}</span>
                 </div>
-                {claim.spanIds?.length > 0 && (
-                  <span className="text-[8px] font-mono text-zinc-500 bg-zinc-900 px-1 py-0.5 rounded border border-zinc-800">
-                    {claim.spanIds.join(', ')}
-                  </span>
-                )}
+                <div className="flex items-center gap-1.5">
+                  {claim.spanIds?.length > 0 && (
+                    <span className="text-[8px] font-mono text-zinc-500 bg-zinc-900 px-1 py-0.5 rounded border border-zinc-800">
+                      {claim.spanIds.join(', ')}
+                    </span>
+                  )}
+                  <button
+                    onClick={() => setOpen(false)}
+                    className="text-zinc-500 hover:text-white text-xs px-1 cursor-pointer"
+                    title="Close"
+                  >
+                    &times;
+                  </button>
+                </div>
               </div>
 
               {/* Verbatim Quotes */}

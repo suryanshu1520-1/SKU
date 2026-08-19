@@ -25,7 +25,8 @@ import {
   ChevronLeft,
   FileText,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Zap
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -519,6 +520,35 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
         </div>
       </div>
 
+      {/* ── Error Banner ── */}
+      {errorMsg && (
+        <div className="mb-6 p-4 bg-rose-950/20 border border-rose-800/40 text-rose-300 text-xs rounded-sm flex items-start gap-3 font-sans">
+          <AlertCircle className="w-4 h-4 text-rose-400 mt-0.5 shrink-0" />
+          <div>
+            <h5 className="font-bold">Sync Advisory</h5>
+            <p className="opacity-90">{errorMsg}</p>
+          </div>
+        </div>
+      )}
+
+      {/* ── Daily Edition (P5): finite, significance-ranked front page. ── */}
+      <DailyEdition userId={userId} />
+
+      {/* ── Archive & Signal Explorer Section ── */}
+      <div className="pt-8 border-t border-zinc-800/80 mb-6 font-sans">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h3 className="font-serif text-base font-bold text-stone-100 flex items-center gap-2">
+              <Layers className="w-4 h-4 text-[#e0d0ab]" />
+              <span>Gazette Archive & Signal Explorer</span>
+            </h3>
+            <p className="text-xs text-zinc-500 font-sans">
+              Search historical gazettes, filter by ministry, or browse verified policy dispatches.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* ── Search & Horizontal Category Filter Tabs ── */}
       <div className="space-y-4 mb-8 font-sans">
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
@@ -678,21 +708,6 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
           )}
         </AnimatePresence>
       </div>
-
-      {/* ── Error Banner ── */}
-      {errorMsg && (
-        <div className="mb-6 p-4 bg-rose-950/20 border border-rose-800/40 text-rose-300 text-xs rounded-sm flex items-start gap-3 font-sans">
-          <AlertCircle className="w-4 h-4 text-rose-400 mt-0.5 shrink-0" />
-          <div>
-            <h5 className="font-bold">Sync Advisory</h5>
-            <p className="opacity-90">{errorMsg}</p>
-          </div>
-        </div>
-      )}
-
-      {/* ── Daily Edition (P5): finite, significance-ranked front page.
-           Self-hides until the P4 backend writes summary.significance. ── */}
-      <DailyEdition userId={userId} />
 
       {/* ── Loading Skeleton ── */}
       {loading ? (

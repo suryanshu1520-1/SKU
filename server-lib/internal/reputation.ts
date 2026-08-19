@@ -1,9 +1,15 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.SUPABASE_URL ?? "https://ixngfxaerlkkcacrbdgc.supabase.co";
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+let _supabase: ReturnType<typeof createClient> | null = null;
 
-const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
+function getSupabase() {
+  if (!_supabase) {
+    const supabaseUrl = process.env.SUPABASE_URL ?? "https://ixngfxaerlkkcacrbdgc.supabase.co";
+    const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+    _supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
+  }
+  return _supabase;
+}
 
 /**
  * Calls the update_source_reputation PostgreSQL function to record
@@ -19,7 +25,7 @@ export async function callUpdateSourceReputation(
   latency: number
 ): Promise<void> {
   try {
-    const { error } = await supabase.rpc('update_source_reputation', {
+    const { error } = await (getSupabase() as any).rpc('update_source_reputation', {
       p_source_id: sourceId,
       p_is_success: isSuccess,
       p_latency: Math.round(latency)
