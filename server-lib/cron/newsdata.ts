@@ -10,6 +10,15 @@ export default async function handler(req: any, res: any) {
     return res.status(200).end();
   }
 
+  const authHeader = req.headers["authorization"] || "";
+  if (
+    !authHeader.includes(`Bearer ${process.env.CRON_SECRET}`) &&
+    req.query?.cron_secret !== process.env.CRON_SECRET
+  ) {
+    if (res) return res.status(401).json({ error: "Unauthorized" });
+    throw new Error("Unauthorized");
+  }
+
   try {
     console.log("[newsdata] Triggering unified pipeline...");
     const result = await runPolicyPipeline();

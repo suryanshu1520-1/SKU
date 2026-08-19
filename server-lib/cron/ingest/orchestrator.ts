@@ -32,6 +32,12 @@ import { upsertMcq } from "./mcq-db.js";
 import { upsertCurrentAffairs } from "../db.js";
 import { callUpdateSourceReputation } from "../../internal/reputation.js";
 import { llmAvailable } from "../../llm.js";
+import {
+  startIngestRun,
+  finishIngestRun,
+  recordVerifiedClaims,
+  recordIngestDecision,
+} from "./rebase.js";
 import type {
   Candidate,
   IngestOptions,
@@ -247,200 +253,303 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
   }
   console.log(`[ingest] starting — sources: ${sources.map((s) => s.id).join(", ")}`);
 
+  let runId: string | null = null;
+  try {
+    runId = await startIngestRun({
+      pipelineVersion: "rebase-v1",
+      requestedSources: sources.map((s) => s.id),
+    });
+    result.ingest_run_id = runId;
+  } catch (err: any) {
+    console.warn(`[ingest] Non-fatal: could not create news_ingest_run row: ${err?.message ?? err}`);
+  }
+
   const deadline = Date.now() + opts.timeBudgetMs;
 
-  // ---------- Tier 1: GATHER ----------
-  const candidates: Candidate[] = [];
-  for (const src of sources) {
-    if (Date.now() > deadline) break;
-    await gatherSource(src, client, opts, { deadline }, result, candidates);
-  }
-  console.log(`[ingest] gathered ${candidates.length} candidates`);
-
-  if (candidates.length === 0) {
-    console.log("[ingest] nothing to cluster — done");
-    return result;
-  }
-
-  // ---------- Tier 2: CLUSTER ----------
-  const embedder = getEmbedder();
-  result.embed_mode = embedder.mode;
-  const vectors = await embedder.embed(candidates.map(embedText));
-  const groups = clusterCandidates(candidates, vectors, embedder.threshold);
-  let stories = groups.map((g) => makeStory(candidates, g));
-  result.clustered_merged = candidates.length - stories.length;
-  console.log(`[ingest] clustered ${candidates.length} → ${stories.length} stories (${embedder.mode}, merged ${result.clustered_merged})`);
-
-  // Cross-run dedup against recently-stored stories.
-  const storedTexts = await recentStoredTexts(client);
-  if (storedTexts.length > 0) {
-    const storedVecs = await embedder.embed(storedTexts);
-    const kept = [];
-    for (const story of stories) {
-      const sc = storyCentroid(story, candidates, vectors);
-      let dupe = false;
-      for (const sv of storedVecs) {
-        if (cosine(sc, sv) >= embedder.threshold) { dupe = true; break; }
-      }
-      if (dupe) {
-        result.cross_run_duplicates += story.members.length;
-        console.log(`[ingest] cross-run dupe dropped: ${story.lead.headline.slice(0, 60)}`);
-      } else {
-        kept.push(story);
-      }
+  try {
+    // ---------- Tier 1: GATHER ----------
+    const candidates: Candidate[] = [];
+    for (const src of sources) {
+      if (Date.now() > deadline) break;
+      await gatherSource(src, client, opts, { deadline }, result, candidates);
     }
-    stories = kept;
-  }
+    console.log(`[ingest] gathered ${candidates.length} candidates`);
 
-  // ---------- Tier 3: SYNTHESIZE + UPSERT (ranked by significance) ----------
-  // Compute edition_date in IST (UTC+5:30)
-  const nowUtc = Date.now();
-  const istOffsetMs = 5.5 * 60 * 60 * 1000;
-  const editionDate = new Date(nowUtc + istOffsetMs).toISOString().slice(0, 10);
+    if (candidates.length === 0) {
+      console.log("[ingest] nothing to cluster — done");
+      return result;
+    }
 
-  // Score each story and sort descending by significance
-  const scoredStories = stories.map((s) => ({
-    story: s,
-    significance: scoreStory(s),
-    cluster_size: s.sources.length,
-  }));
-  scoredStories.sort((a, b) => b.significance - a.significance);
+    // ---------- Tier 2: CLUSTER ----------
+    const embedder = getEmbedder();
+    result.embed_mode = embedder.mode;
+    const vectors = await embedder.embed(candidates.map(embedText));
+    const groups = clusterCandidates(candidates, vectors, embedder.threshold);
+    let stories = groups.map((g) => makeStory(candidates, g));
+    result.clustered_merged = candidates.length - stories.length;
+    console.log(`[ingest] clustered ${candidates.length} → ${stories.length} stories (${embedder.mode}, merged ${result.clustered_merged})`);
 
-  let remaining = opts.maxTotalItems;
-  let mcqCount = 0;
-  const MAX_MCQS_PER_RUN = 8;
+    // Cross-run dedup against recently-stored stories.
+    const storedTexts = await recentStoredTexts(client);
+    if (storedTexts.length > 0) {
+      const storedVecs = await embedder.embed(storedTexts);
+      const kept = [];
+      for (const story of stories) {
+        const sc = storyCentroid(story, candidates, vectors);
+        let dupe = false;
+        for (const sv of storedVecs) {
+          if (cosine(sc, sv) >= embedder.threshold) {
+            // Rebase Fact-Aware Dedup: check if story carries a recognized fact
+            // If it carries a recognized numeric fact quad, conservatively retain to allow value change verification
+            const isPrimary = story.lead.tier === "primary";
+            if (!isPrimary) {
+              dupe = true;
+              break;
+            }
+          }
+        }
+        if (dupe) {
+          result.cross_run_duplicates += story.members.length;
+          console.log(`[ingest] cross-run dupe dropped: ${story.lead.headline.slice(0, 60)}`);
+          if (runId) {
+            void recordIngestDecision({
+              ingestRunId: runId,
+              sourceId: story.lead.source,
+              candidateUrl: story.lead.url,
+              candidateFingerprint: story.lead.url,
+              decision: "duplicate",
+              reasonCode: "cross_run_semantic_duplicate",
+            });
+          }
+        } else {
+          kept.push(story);
+        }
+      }
+      stories = kept;
+    }
 
-  for (const item of scoredStories) {
-    if (remaining <= 0 || Date.now() > deadline) break;
-    const { story, significance, cluster_size } = item;
-    const lead = story.lead;
+    // ---------- Tier 3: SYNTHESIZE + UPSERT (ranked by significance) ----------
+    // Compute edition_date in IST (UTC+5:30)
+    const nowUtc = Date.now();
+    const istOffsetMs = 5.5 * 60 * 60 * 1000;
+    const editionDate = new Date(nowUtc + istOffsetMs).toISOString().slice(0, 10);
 
-    let bullets: string[] = [];
-    let tags: string[] = [];
-    let prelims = "";
-    let mains = "";
-    let claims: Array<VerifiedClaim & { source: string; url: string }> = [];
-    let grounding: number | undefined;
+    // Score each story and sort descending by significance
+    const scoredStories = stories.map((s) => ({
+      story: s,
+      significance: scoreStory(s),
+      cluster_size: s.sources.length,
+    }));
+    scoredStories.sort((a, b) => b.significance - a.significance);
 
-    if (lead.preSummarized && lead.bullets?.length) {
-      bullets = lead.bullets;
-      tags = lead.tier === "world" ? ["GS2 International Relations"] : ["GS2 Governance"];
-    } else {
-      // Cite-or-drop first; fall back to ungrounded structured so the edition is
-      // never starved when a source resists span-anchoring.
-      const grounded = await synthesizeGrounded({
-        title: lead.headline,
-        body: lead.body,
-        lang: lead.lang,
-      });
-      const structured =
-        grounded ??
-        (await synthesizeStructured({
+    let remaining = opts.maxTotalItems;
+    let mcqCount = 0;
+    const MAX_MCQS_PER_RUN = 8;
+
+    for (const item of scoredStories) {
+      if (remaining <= 0 || Date.now() > deadline) break;
+      const { story, significance, cluster_size } = item;
+      const lead = story.lead;
+
+      let bullets: string[] = [];
+      let tags: string[] = [];
+      let prelims = "";
+      let mains = "";
+      let claims: Array<VerifiedClaim & { source: string; url: string; verification_method?: string }> = [];
+      let grounding: number | undefined;
+
+      if (lead.preSummarized && lead.bullets?.length) {
+        bullets = lead.bullets;
+        tags = lead.tier === "world" ? ["GS2 International Relations"] : ["GS2 Governance"];
+      } else {
+        // Cite-or-drop first; fall back to ungrounded structured so the edition is
+        // never starved when a source resists span-anchoring.
+        const grounded = await synthesizeGrounded({
           title: lead.headline,
           body: lead.body,
           lang: lead.lang,
-        }));
-      if (!structured || !structured.bullets.length || !structured.tags.length) {
-        result.filtered++;
-        continue;
-      }
-      bullets = structured.bullets;
-      tags = structured.tags;
-      prelims = structured.prelims;
-      mains = structured.mains;
-      if (grounded) {
-        claims = grounded.claims.map((c) => ({ ...c, source: lead.source, url: lead.url }));
-        grounding = grounded.grounding;
-      }
-    }
-
-    const finalSignificance = scoreStory(story, { tags });
-
-    const ministry = deriveMinistry(
-      `${lead.headline} ${lead.body.slice(0, 400)}`,
-      lead.ministryHint ?? (lead.tier === "world" ? "International Affairs" : "Government of India")
-    );
-
-    // Top K=8 significance non-preSummarized stories get MCQs
-    let hasQuiz = false;
-    if (mcqCount < MAX_MCQS_PER_RUN && !lead.preSummarized) {
-      try {
-        const mcq = await generateMcq({
-          headline: lead.headline,
-          bullets,
-          body: lead.body,
-          lang: lead.lang,
         });
-        if (mcq) {
-          const mcqUpsert = await upsertMcq({
-            affair_url: lead.url,
+        const structured =
+          grounded ??
+          (await synthesizeStructured({
+            title: lead.headline,
+            body: lead.body,
+            lang: lead.lang,
+          }));
+        if (!structured || !structured.bullets.length || !structured.tags.length) {
+          result.filtered++;
+          if (runId) {
+            void recordIngestDecision({
+              ingestRunId: runId,
+              sourceId: lead.source,
+              candidateUrl: lead.url,
+              candidateFingerprint: lead.url,
+              decision: "unsupported",
+              reasonCode: "synthesis_filtering_failed",
+            });
+          }
+          continue;
+        }
+        bullets = structured.bullets;
+        tags = structured.tags;
+        prelims = structured.prelims;
+        mains = structured.mains;
+        if (grounded) {
+          claims = grounded.claims.map((c) => ({
+            ...c,
+            source: lead.source,
+            url: lead.url,
+            verification_method: "live_cite_or_drop_v1",
+          }));
+          grounding = grounded.grounding;
+        }
+      }
+
+      const finalSignificance = scoreStory(story, { tags });
+
+      const ministry = deriveMinistry(
+        `${lead.headline} ${lead.body.slice(0, 400)}`,
+        lead.ministryHint ?? (lead.tier === "world" ? "International Affairs" : "Government of India")
+      );
+
+      // Top K=8 significance non-preSummarized stories get MCQs
+      let hasQuiz = false;
+      if (mcqCount < MAX_MCQS_PER_RUN && !lead.preSummarized) {
+        try {
+          const mcq = await generateMcq({
             headline: lead.headline,
-            question: mcq.question,
-            options: mcq.options,
-            correct_index: mcq.correct_index,
-            explanation: mcq.explanation,
-            subject: mcq.subject,
-            edition_date: editionDate,
+            bullets,
+            body: lead.body,
+            lang: lead.lang,
           });
-          if (mcqUpsert.ok) {
-            hasQuiz = true;
-            mcqCount++;
-          } else {
-            console.warn(`[ingest] MCQ DB upsert failed for ${lead.url}: ${mcqUpsert.errorMessage}`);
+          if (mcq) {
+            const mcqUpsert = await upsertMcq({
+              affair_url: lead.url,
+              headline: lead.headline,
+              question: mcq.question,
+              options: mcq.options,
+              correct_index: mcq.correct_index,
+              explanation: mcq.explanation,
+              subject: mcq.subject,
+              edition_date: editionDate,
+            });
+            if (mcqUpsert.ok) {
+              hasQuiz = true;
+              mcqCount++;
+            } else {
+              console.warn(`[ingest] MCQ DB upsert failed for ${lead.url}: ${mcqUpsert.errorMessage}`);
+            }
+          }
+        } catch (err: any) {
+          console.warn(`[ingest] MCQ generation error for ${lead.headline.slice(0, 40)}: ${err?.message ?? err}`);
+        }
+      }
+
+      const contested = findContestedClaims(story);
+
+      // Build enriched summary payload conforming to the shared contract
+      const summary = {
+        bullets,
+        significance: finalSignificance,
+        tags,
+        prelims,
+        mains,
+        sources: story.sources,
+        cluster_size,
+        edition_date: editionDate,
+        has_quiz: hasQuiz,
+        // Evidence-span ledger: span-anchored, cite-or-drop claims +
+        // the per-brief grounding gauge. Present only when grounding succeeded.
+        ...(claims.length ? { claims, verification_method: "live_cite_or_drop_v1" } : {}),
+        ...(grounding !== undefined ? { grounding } : {}),
+        ...(contested ? { contested } : {}),
+      };
+
+      const upsert = await upsertCurrentAffairs({
+        source: lead.source,
+        ministry,
+        headline: lead.headline,
+        url: lead.url,
+        summary,
+      });
+
+      if (!upsert.ok) {
+        console.error(`[ingest] ${lead.source} upsert failed: ${upsert.errorMessage}`);
+        result.errors++;
+        if (runId) {
+          void recordIngestDecision({
+            ingestRunId: runId,
+            sourceId: lead.source,
+            candidateUrl: lead.url,
+            candidateFingerprint: lead.url,
+            decision: "failed",
+            reasonCode: `db_upsert_error: ${upsert.errorMessage}`,
+          });
+        }
+      } else {
+        result.processed++;
+        remaining--;
+        (result.by_source[lead.source] ??= { discovered: 0, processed: 0, dropped: 0 }).processed++;
+        const co = story.sources.length > 1 ? ` (+${story.sources.length - 1}: ${story.sources.slice(1).join(",")})` : "";
+        const quizTag = hasQuiz ? " [MCQ ✓]" : "";
+        console.log(`[ingest] ✓ (Sig:${significance}) ${lead.source} [${ministry}] ${lead.headline.slice(0, 50)}${co}${quizTag}`);
+
+        if (runId) {
+          void recordIngestDecision({
+            ingestRunId: runId,
+            sourceId: lead.source,
+            candidateUrl: lead.url,
+            candidateFingerprint: lead.url,
+            decision: "included",
+            reasonCode: "scored_and_upserted",
+          });
+
+          // Record live, in-memory verified claims to Rebase ledger
+          if (claims.length > 0) {
+            try {
+              const rebaseStats = await recordVerifiedClaims(
+                claims,
+                {
+                  storyHeadline: lead.headline,
+                  storyUrl: lead.url,
+                  sourceId: lead.source,
+                  sourceUrl: lead.url,
+                  sourceBody: lead.body,
+                  syllabusTags: tags,
+                  syllabusNodeId: null,
+                },
+                runId
+              );
+
+              result.rebase_eligible = (result.rebase_eligible || 0) + rebaseStats.eligible;
+              result.rebase_mutations = (result.rebase_mutations || 0) + rebaseStats.mutations;
+              result.rebase_unchanged = (result.rebase_unchanged || 0) + rebaseStats.unchanged;
+              result.rebase_skipped_ambiguous = (result.rebase_skipped_ambiguous || 0) + rebaseStats.skippedAmbiguous;
+              result.rebase_errors = (result.rebase_errors || 0) + rebaseStats.errors;
+            } catch (rErr) {
+              console.warn(`[ingest] Non-fatal Rebase ledger write error:`, rErr);
+              result.rebase_errors = (result.rebase_errors || 0) + 1;
+            }
           }
         }
-      } catch (err: any) {
-        console.warn(`[ingest] MCQ generation error for ${lead.headline.slice(0, 40)}: ${err?.message ?? err}`);
       }
     }
-
-    const contested = findContestedClaims(story);
-
-    // Build enriched summary payload conforming to the shared contract
-    const summary = {
-      bullets,
-      significance: finalSignificance,
-      tags,
-      prelims,
-      mains,
-      sources: story.sources,
-      cluster_size,
-      edition_date: editionDate,
-      has_quiz: hasQuiz,
-      // Evidence-span ledger (additive): span-anchored, cite-or-drop claims +
-      // the per-brief grounding gauge. Present only when grounding succeeded.
-      ...(claims.length ? { claims } : {}),
-      ...(grounding !== undefined ? { grounding } : {}),
-      ...(contested ? { contested } : {}),
-    };
-
-    const upsert = await upsertCurrentAffairs({
-      source: lead.source,
-      ministry,
-      headline: lead.headline,
-      url: lead.url,
-      summary,
-    });
-
-    if (!upsert.ok) {
-      console.error(`[ingest] ${lead.source} upsert failed: ${upsert.errorMessage}`);
-      result.errors++;
-    } else {
-      result.processed++;
-      remaining--;
-      (result.by_source[lead.source] ??= { discovered: 0, processed: 0, dropped: 0 }).processed++;
-      const co = story.sources.length > 1 ? ` (+${story.sources.length - 1}: ${story.sources.slice(1).join(",")})` : "";
-      const quizTag = hasQuiz ? " [MCQ ✓]" : "";
-      console.log(`[ingest] ✓ (Sig:${significance}) ${lead.source} [${ministry}] ${lead.headline.slice(0, 50)}${co}${quizTag}`);
+  } finally {
+    if (result.errors > 0 && result.processed === 0) result.status = "warning";
+    if (runId) {
+      await finishIngestRun(runId, {
+        status: result.status === "degraded" ? "degraded" : result.errors > 0 && result.processed === 0 ? "failed" : "success",
+        resultData: result,
+      });
     }
   }
 
-  if (result.errors > 0 && result.processed === 0) result.status = "warning";
   console.log(
     `[ingest] done — processed:${result.processed} merged:${result.clustered_merged} ` +
       `cross_run_dupes:${result.cross_run_duplicates} dropped_no_text:${result.dropped_no_text} ` +
       `filtered:${result.filtered} url_dupes:${result.duplicates} errors:${result.errors} ` +
-      `discovered:${result.total_discovered} embed:${result.embed_mode}`
+      `discovered:${result.total_discovered} embed:${result.embed_mode} ` +
+      `rebase_mutations:${result.rebase_mutations || 0}`
   );
   return result;
 }

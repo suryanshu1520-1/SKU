@@ -13,6 +13,7 @@ export interface VerifiedClaim {
   verified: boolean;
   source: string;
   url: string;
+  verificationMethod?: 'live_cite_or_drop_v1';
 }
 
 export interface ContestedSide {
@@ -28,6 +29,7 @@ export interface ContestedClaim {
   period: string;
   sides: [ContestedSide, ContestedSide, ...ContestedSide[]];
   nodeId?: string;
+  verificationMethod?: 'live_contested_v1';
 }
 
 /**
@@ -53,7 +55,13 @@ export function SourceAnchor({ claim }: { claim: VerifiedClaim }) {
     };
   }, [open]);
 
-  if (!claim?.quotes?.length) return null;
+  // Fail closed. Legacy rows were once stamped with synthetic quotes by a
+  // backfill script; only live cite-or-drop claims may display a trust anchor.
+  if (
+    !claim?.verified ||
+    claim.verificationMethod !== 'live_cite_or_drop_v1' ||
+    !claim.quotes?.length
+  ) return null;
 
   return (
     <span
@@ -164,10 +172,24 @@ export function SourceAnchor({ claim }: { claim: VerifiedClaim }) {
 /**
  * GroundingBadge — Displays the verification percentage for a synthesized story.
  */
-export function GroundingBadge({ grounding }: { grounding?: number }) {
-  const pct = typeof grounding === 'number'
-    ? Math.min(100, Math.round(grounding <= 1 ? grounding * 100 : grounding))
-    : 100;
+export function GroundingBadge({
+  grounding,
+  verificationMethod,
+}: {
+  grounding?: number;
+  verificationMethod?: 'live_cite_or_drop_v1';
+}) {
+  // Missing provenance is unknown, not 100%. Values outside 0..1 are legacy
+  // corruption and must never be normalized into a reassuring badge.
+  if (
+    verificationMethod !== 'live_cite_or_drop_v1' ||
+    typeof grounding !== 'number' ||
+    !Number.isFinite(grounding) ||
+    grounding < 0 ||
+    grounding > 1
+  ) return null;
+
+  const pct = Math.round(grounding * 100);
 
   return (
     <span
@@ -190,7 +212,13 @@ export function GroundingBadge({ grounding }: { grounding?: number }) {
  * ContestedCard — Analytical two-column comparison when primary sources disagree.
  */
 export function ContestedCard({ contested }: { contested?: ContestedClaim }) {
-  if (!contested?.sides || contested.sides.length < 2) return null;
+  // The existing detector is not yet cite-or-drop grounded. Hide both legacy
+  // showcase data and raw-span disagreements until the backend emits provenance.
+  if (
+    contested?.verificationMethod !== 'live_contested_v1' ||
+    !contested.sides ||
+    contested.sides.length < 2
+  ) return null;
 
   const [sideA, sideB] = contested.sides;
 

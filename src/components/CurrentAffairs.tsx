@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
+import { fetchWithAuth } from '../lib/api';
 import { motion, AnimatePresence, LayoutGroup, useReducedMotion, useMotionValue, useTransform, animate, type PanInfo } from 'motion/react';
 import {
   ExternalLink,
@@ -32,6 +33,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import DailyEdition from './DailyEdition';
+import RebaseEdition from './RebaseEdition';
 import {
   SourceAnchor,
   GroundingBadge,
@@ -58,6 +60,7 @@ interface CurrentAffairsItem {
     has_quiz?: boolean;
     claims?: VerifiedClaim[];
     grounding?: number;
+    verification_method?: 'live_cite_or_drop_v1';
     contested?: ContestedClaim;
   };
   created_at?: string;
@@ -101,6 +104,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
   const [syncSuccess, setSyncSuccess] = useState<boolean | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [syncCooldown, setSyncCooldown] = useState(0);
+  const [editionRefreshKey, setEditionRefreshKey] = useState(0);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const PAGE_SIZE = 45;
@@ -331,10 +335,9 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
     setSyncSuccess(null);
     setErrorMsg('');
     try {
-      const response = await fetch('/api/sync-feed', {
+      const response = await fetchWithAuth('/api/sync-feed', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
       });
       const data = await response.json();
 
@@ -346,7 +349,9 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
       if (response.status === 202) {
         setShowBackgroundToast(true);
         setSyncSuccess(true);
-        setTimeout(() => fetchPolicyData(false), 10000);
+        setTimeout(() => {
+          void fetchPolicyData(false).finally(() => setEditionRefreshKey((key) => key + 1));
+        }, 10000);
         setTimeout(() => setSyncSuccess(null), 5000);
         return;
       }
@@ -354,6 +359,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
       setSyncSuccess(true);
       await fetchPolicyData(false);
+      setEditionRefreshKey((key) => key + 1);
       setTimeout(() => setSyncSuccess(null), 5000);
     } catch (err: any) {
       console.error('Manual sync error:', err);
@@ -531,8 +537,12 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
         </div>
       )}
 
-      {/* ── Daily Edition (P5): finite, significance-ranked front page. ── */}
-      <DailyEdition userId={userId} />
+      {/* Rebase fails closed to the proven Daily Edition until its API contract is live. */}
+      <RebaseEdition
+        userId={userId}
+        refreshKey={editionRefreshKey}
+        fallback={<DailyEdition userId={userId} />}
+      />
 
       {/* ── Archive & Signal Explorer Section ── */}
       <div className="pt-8 border-t border-zinc-800/80 mb-6 font-sans">
@@ -773,7 +783,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                   <span className="text-zinc-500 text-[10px] font-sans uppercase">
                     {leadItem.source}
                   </span>
-                  <GroundingBadge grounding={leadItem.summary?.grounding} />
+                  <GroundingBadge grounding={leadItem.summary?.grounding} verificationMethod={leadItem.summary?.verification_method} />
                 </div>
 
                 {leadItem.created_at && (
@@ -906,7 +916,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                           <span className="px-2 py-0.5 bg-zinc-800/90 text-[#e0d0ab] text-[10px] font-sans uppercase tracking-wider rounded-sm border border-zinc-700/60 truncate max-w-[180px]">
                             {item.ministry}
                           </span>
-                          <GroundingBadge grounding={item.summary?.grounding} />
+                          <GroundingBadge grounding={item.summary?.grounding} verificationMethod={item.summary?.verification_method} />
                         </div>
                         {item.created_at && (
                           <span className="text-[10px] font-mono text-zinc-500">
@@ -1054,7 +1064,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                   <span className="px-2.5 py-1 bg-zinc-900 text-zinc-400 text-xs font-sans rounded-sm border border-zinc-800">
                     {selectedDossier.source}
                   </span>
-                  <GroundingBadge grounding={selectedDossier.summary?.grounding} />
+                  <GroundingBadge grounding={selectedDossier.summary?.grounding} verificationMethod={selectedDossier.summary?.verification_method} />
                   {(selectedDossier.summary?.tags || []).map((t) => (
                     <span key={t} className="px-2 py-0.5 bg-[#e0d0ab]/10 text-[#e0d0ab] text-[10px] font-sans font-semibold uppercase tracking-wider rounded-sm border border-[#e0d0ab]/20">
                       {t}

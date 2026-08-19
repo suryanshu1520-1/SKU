@@ -127,4 +127,10 @@ export type IngestResult = {
   by_source: Record<string, SourceStat>;
   /** Which embedding mode Tier 2 used this run. */
   embed_mode?: "gemini" | "local";
+  ingest_run_id?: string;
+  rebase_eligible?: number;
+  rebase_mutations?: number;
+  rebase_unchanged?: number;
+  rebase_skipped_ambiguous?: number;
+  rebase_errors?: number;
 };

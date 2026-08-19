@@ -31,12 +31,14 @@ tags:
 - [[docs/ingestion-pipeline|Ingestion & Distillation Pipeline]]
 - [[docs/news-feed-quality-roadmap|News Feed Quality Roadmap]]
 - [[docs/news-intelligence-architecture|News Intelligence Architecture (Zero-Budget)]]
+- [[docs/continuous-readiness-architecture|Continuous Readiness / Tark Rebase]] ← active product north star
 - [[docs/voice-and-type-guide|Voice & Type Guide (Lexicon & Typography)]]
 - [[docs/monetization-tiers|Monetization & Concurrency Controls]]
 - [[docs/design-system|Design System & Motion Graphics]]
 - [[docs/ui-revamp-masterplan|🎨 UI Revamp Master Plan]] ← active
 - [[docs/live-site-critique|↳ Live-Site Design Critique (pixel-grounded)]]
 - [[docs/handoffs/tark-ui-revamp-handoff|↳ Anti-G Handoff: UI Revamp]]
+- [[docs/handoffs/rebase-v1-antigravity|↳ Anti-G Handoff: Rebase v1 Backend]]
 
 ---
 

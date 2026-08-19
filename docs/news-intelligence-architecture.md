@@ -1,5 +1,9 @@
 # Tark Daily Briefs — Intelligence Engine Architecture (Zero-Budget)
 
+> **North-star update, 2026-08-20:** The first-source pipeline and Daily Edition described here are now the ingestion substrate and compatibility surface for [[continuous-readiness-architecture|Continuous Readiness / Tark Rebase]]. A finite ranked digest is no longer the category claim.
+>
+> **Implementation boundary:** Rebase backend execution, live Supabase application, and data remediation are assigned to [[handoffs/rebase-v1-antigravity]].
+
 > 2026-08-19. The complete re-architecture of Daily Briefs from a coaching-digest scraper into a first-source intelligence engine — **built entirely on free tiers, no paid infrastructure**. Supersedes the interim audit in [[news-feed-quality-roadmap]]. Decisions locked with the owner; re-solved for a strict $0 budget (no Supabase Pro).
 
 ## The reframe
@@ -11,7 +15,7 @@ Every component must run on a free tier. This is not a limitation to apologize f
 | Concern | Free-tier solution | Why it fits |
 |---|---|---|
 | Text generation | **Gemini free tier** (primary) + **Groq free tier** (fallback) — the multi-provider `llm.ts` | Daily batch of ~10 syntheses is far under free RPD limits |
-| Embeddings / clustering | **Gemini free embedding model** (`text-embedding-004`) + **in-memory cosine** | ~40 items/day → pairwise cosine in JS is trivial; **pgvector/Supabase Pro NOT needed** — that's only for querying millions of vectors at scale |
+| Embeddings / clustering | **Gemini free embedding model** (`gemini-embedding-001`, 768 dimensions) + **in-memory cosine** | ~40 items/day → pairwise cosine in JS is trivial; **pgvector/Supabase Pro NOT needed** — that's only for querying millions of vectors at scale |
 | Database | **Supabase free tier** (500 MB) | Text stories + optional embeddings-as-`jsonb` are tiny at this volume |
 | Scheduler | **GitHub Actions** (free minutes) — already runs 3×/day | Sidesteps the Vercel Hobby "cron once/day" cap entirely |
 | Hosting/API | **Vercel Hobby** | Serves the app + on-demand sync; the heavy pipeline runs on GitHub Actions, not Vercel cron |
@@ -152,7 +156,7 @@ The orchestrator now runs in three tiers:
 - **Tier 3 SYNTHESIZE** — synthesize **once per story** from the lead's body (not once per source), then upsert the lead.
 
 ### New modules
-- `ingest/embeddings.ts` — **pluggable embedder**: Gemini `text-embedding-004` (free, semantic, threshold 0.82) when `GEMINI_API_KEY` is set; a local hashed bag-of-words embedder (offline, $0, threshold 0.62) otherwise. Clustering never depends on an API and never blocks ingest.
+- `ingest/embeddings.ts` — **pluggable embedder**: Gemini `gemini-embedding-001` at 768 dimensions (free, semantic; threshold still requires recalibration) when `GEMINI_API_KEY` is set; a local hashed bag-of-words embedder (offline, $0, threshold 0.62) otherwise. Clustering never depends on an API and never blocks ingest.
 - `ingest/cluster.ts` — `clusterCandidates` (greedy centroid), `makeStory` (authority-ranked), `storyCentroid` (cross-run dedup), plus the source `AUTHORITY` map (PIB 100 > RBI 96 > PRS 92 > Wikipedia 60 > wires).
 
 ### Metrics added to `IngestResult` / the `/api/cron/newsdata` response

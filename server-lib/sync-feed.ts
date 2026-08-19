@@ -33,15 +33,19 @@ export default async function handler(req: any, res: any) {
     return res.status(200).end();
   }
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  const authHeader = req.headers['authorization'] || '';
+  const token = authHeader.replace(/^Bearer\s+/, '').trim();
+
+  if (!token) {
+    return res.status(401).json({ error: 'UNAUTHORIZED', message: 'Missing authorization token.' });
   }
 
-  const { userId } = req.body || {};
-
-  if (!userId) {
-    return res.status(400).json({ error: 'Missing required field: userId' });
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+  if (authError || !user) {
+    return res.status(401).json({ error: 'UNAUTHORIZED', message: 'Invalid or expired session token.' });
   }
+
+  const userId = user.id;
 
   // Zero-Wait Dispatcher: return 202 BEFORE any heavy I/O
   res.status(202).json({

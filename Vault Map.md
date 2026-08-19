@@ -54,12 +54,14 @@ Welcome to the **Tark 1.0 (SKU)** Obsidian Knowledge Hub. This vault is organize
 - **[[docs/ingestion-pipeline|Ingestion & Distillation Pipeline]]**: The four parallel `current_affairs` ingestion paths and their divergent quality bars (rewritten 2026-08-18 after a direct code audit).
 - **[[docs/news-feed-quality-roadmap|News Feed Quality Roadmap]]**: Consolidation plan, PIB-in-the-autonomous-path, world coverage, dedup, and significance ranking.
 - **[[docs/news-intelligence-architecture|News Intelligence Architecture (Zero-Budget)]]**: Multi-provider LLM abstraction (`llm.ts`), in-memory cosine deduplication, and finite daily editions.
+- **[[docs/continuous-readiness-architecture|Continuous Readiness / Tark Rebase]]**: **Active product north star** — proof-carrying claim versions, minimal knowledge patches, learner checkpoints, and Proof of Omission.
 - **[[docs/voice-and-type-guide|Voice & Type Guide]]**: Humanized lexicon standards, anti-jargon rules, and typography font-assignment hierarchy.
 - **[[docs/monetization-tiers|Monetization & Concurrency Controls]]**: Freemium quotas, Razorpay payments, and 15-minute seat locking.
 - **[[docs/ui-revamp-masterplan|🎨 UI Revamp Master Plan]]**: The Naval-Instrument north star (navy/teal/gold), foundation fixes, per-surface specs, and sub-agent execution structure (delegated to Anti-G).
 - **[[docs/live-site-critique|Live-Site Design Critique]]**: Pixel-grounded walkthrough of the rendered product (Landing, Daily Brief, Leaderboard, Sign In verified).
 - **[[docs/handoffs/tark-ui-revamp-handoff|↳ Anti-G Handoff — UI Revamp]]**: Skills playbook, guardrails, and Framer MCP usage for the execution agent (canonical copy in `.agents/inbox/`).
 - **[[docs/handoffs/p4-p5-backend-antigravity|↳ Anti-G Handoff — P4/P5 Ingestion Engine]]**: Significance scoring, structured synthesis, auto-MCQ generation, and database contracts.
+- **[[docs/handoffs/rebase-v1-antigravity|↳ Anti-G Handoff — Rebase v1 Backend]]**: Live trust-data audit, Supabase migrations, numeric learn/replace ledger, authenticated patch API, and acceptance gates.
 
 ---
 
@@ -84,12 +86,14 @@ The System Map allows agents and humans to audit domain nouns, system movements,
 - **[[map/objects/subscription-and-orders|Subscription & Orders]]**: Razorpay checkout, 15-min seat reservation locks (`pending_orders`).
 - **[[map/objects/gamification-leaderboard|Gamification & Leaderboard]]**: Leaderboard views (`public_leaderboard`), XP points, streaks, percentiles.
 - **[[map/objects/arena-ui|Arena UI]]**: Test-taking arena, question palette, autopsy review dashboard.
+- **[[map/objects/continuous-readiness-ledger|Continuous Readiness Ledger]]**: Canonical verified claims, immutable versions, mutation sequence, omission decisions, and user checkpoints.
 
 ### System Verbs (`processes/`)
 - **[[map/processes/quiz-submission-scoring|Quiz Submission & Scoring]]**: Step-by-step grading and streak update flow.
 - **[[map/processes/daily-pib-ingestion|Daily PIB & News Ingestion]]**: Cron-triggered RSS fetching and AI synthesis.
 - **[[map/processes/checkout-seat-reservation|Checkout & Seat Reservation]]**: Atomic seat reservation and payment verification.
 - **[[map/processes/unranked-training-practice|Unranked Training Practice]]**: Practice quiz flow isolated from competitive stats.
+- **[[map/processes/rebase-claim-mutation|Rebase Claim Mutation]]**: Live evidence → canonical fact → learn/replace mutation → monotonic learner checkpoint.
 
 ### Impact Matrix (`effects/`)
 - **[[map/effects/CONTEXT|Change-Impact Matrix]]**: Matrix defining which cards to open and what a change hits vs. does not hit.
@@ -118,4 +122,4 @@ Deep-research reports on the flip-the-script $0 current-affairs intelligence eng
 - [[engine-research-gemini-v1]] — Gemini V1 (deterministic ingestion, MinHash-LSH)
 - [[engine-research-gemini-v2]] — Gemini V2 (engineering blueprint w/ formulas)
 
-Status: **unsynthesized raw inputs** for the upcoming innovation session. Companion to [[news-intelligence-architecture]]. (Folder `docs/research/` is kept local/unpushed per `@repo-hygiene`.)
+Status: **synthesized on 2026-08-20** into [[docs/continuous-readiness-architecture|Continuous Readiness / Tark Rebase]]. The raw reports remain the evidence base. (Folder `docs/research/` is kept local/unpushed per `@repo-hygiene`.)

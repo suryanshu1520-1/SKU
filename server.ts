@@ -13,6 +13,7 @@ import trainingQuestionsHandler from "./server-lib/training-questions.js";
 import createRazorpayOrderHandler from "./server-lib/create-razorpay-order.js";
 import verifyPaymentHandler from "./server-lib/verify-payment.js";
 import userLimitsHandler from "./server-lib/user-limits.js";
+import { handleGetRebase, handlePostRebaseAck } from "./server-lib/rebase.js";
 
 function cleanEnvValue(val: any): string {
   if (typeof val !== 'string') return '';
@@ -150,6 +151,8 @@ async function startServer() {
   app.post("/api/training-questions", trainingQuestionsHandler);
   app.post("/api/create-razorpay-order", createRazorpayOrderHandler);
   app.post("/api/verify-payment", verifyPaymentHandler);
+  app.get("/api/rebase", handleGetRebase);
+  app.post("/api/rebase/ack", handlePostRebaseAck);
 
   app.get("/api/questions", async (req, res) => {
     try {

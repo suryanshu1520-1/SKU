@@ -40,6 +40,7 @@ interface EditionSummary {
   has_quiz?: boolean;
   claims?: VerifiedClaim[]; // additive — present when synthesis was span-grounded
   grounding?: number; // 0..1 fraction of bullets that passed the fact check
+  verification_method?: 'live_cite_or_drop_v1';
   contested?: ContestedClaim; // additive — present when independent sources contradict
 }
 interface EditionItem {
@@ -295,7 +296,7 @@ export default function DailyEdition({ userId }: DailyEditionProps) {
                         <Layers className="w-2.5 h-2.5" />+{corroboration} source{corroboration > 1 ? 's' : ''}
                       </span>
                     )}
-                    <GroundingBadge grounding={s.grounding} />
+                    <GroundingBadge grounding={s.grounding} verificationMethod={s.verification_method} />
                     {(s.tags || []).slice(0, 3).map((t) => (
                       <span key={t} className="px-1.5 py-0.5 bg-[#e0d0ab]/10 text-[#e0d0ab] text-[9px] font-semibold uppercase tracking-wider rounded-sm">
                         {t}

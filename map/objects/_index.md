@@ -9,3 +9,4 @@
 | [`gamification-leaderboard.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/map/objects/gamification-leaderboard.md) | `live` | `verified 2026-08-18` | XP points, daily streaks, percentile rankings, and leaderboard views |
 | [`arena-ui.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/map/objects/arena-ui.md) | `live` | `verified 2026-08-18` | Timed test arena, question palette, autopsy review, and tab preservation |
 | [`syllabus-testability-graph.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/map/objects/syllabus-testability-graph.md) | `live` | `verified 2026-08-19` | Syllabus node graph + two-axis (frequency×drought) testability prior, relevance gate, backtest |
+| [`continuous-readiness-ledger.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/map/objects/continuous-readiness-ledger.md) | `planned` | `drafted 2026-08-20` | Versioned verified numeric claims, learn/replace mutations, omission ledger, and user checkpoints |

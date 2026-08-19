@@ -1,5 +1,7 @@
 # News Feed Quality Roadmap — Making Current Affairs Exceptional
 
+> **Historical plan.** Pipeline consolidation and quality work from this note have largely landed. The active product north star is now [[continuous-readiness-architecture|Continuous Readiness / Tark Rebase]]; [[news-intelligence-architecture]] remains the current ingestion reference.
+
 > Generated: 2026-08-18. Companion to the rewritten [`ingestion-pipeline.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/docs/ingestion-pipeline.md) — read that first for how the system actually works today. This document proposes how to make it excellent, while keeping the existing [`CurrentAffairs.tsx`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/src/components/CurrentAffairs.tsx) presentation (ministry/source-tagged cards, 3-bullet summaries, filters, bookmarking) unchanged. Scope is the `current_affairs` feed only — the PIB aggregator (`pib-aggregator.ts` → `pib_digests`) is explicitly out of scope per direction.
 
 ## The Core Finding
