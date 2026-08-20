@@ -331,6 +331,10 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
   // Sync Feed Handler
   const handleSyncFeed = async () => {
     if (syncCooldown > 0 || syncing) return;
+    if (!userId || userId === 'guest') {
+      setErrorMsg('Please sign in to trigger live intelligence ingestion.');
+      return;
+    }
     setSyncing(true);
     setSyncSuccess(null);
     setErrorMsg('');
@@ -341,6 +345,10 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
       });
       const data = await response.json();
 
+      if (response.status === 401) {
+        setErrorMsg('Please sign in to trigger live intelligence ingestion.');
+        return;
+      }
       if (response.status === 429) {
         setSyncCooldown(data.remaining || 300);
         setErrorMsg(data.message || 'Sync cooldown active.');

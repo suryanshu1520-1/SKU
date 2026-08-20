@@ -18,6 +18,8 @@ const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL
 // SECURITY: never hardcode the service_role key. Sourced from env only.
 const rawServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ||
   process.env.VITE_SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.SUPABASE_ANON_KEY ||
+  process.env.VITE_SUPABASE_ANON_KEY ||
   "";
 
 const supabase = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawServiceKey));

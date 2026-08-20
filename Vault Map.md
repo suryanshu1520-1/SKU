@@ -55,6 +55,8 @@ Welcome to the **Tark 1.0 (SKU)** Obsidian Knowledge Hub. This vault is organize
 - **[[docs/news-feed-quality-roadmap|News Feed Quality Roadmap]]**: Consolidation plan, PIB-in-the-autonomous-path, world coverage, dedup, and significance ranking.
 - **[[docs/news-intelligence-architecture|News Intelligence Architecture (Zero-Budget)]]**: Multi-provider LLM abstraction (`llm.ts`), in-memory cosine deduplication, and finite daily editions.
 - **[[docs/continuous-readiness-architecture|Continuous Readiness / Tark Rebase]]**: **Active product north star** — proof-carrying claim versions, minimal knowledge patches, learner checkpoints, and Proof of Omission.
+- **[[docs/research/tark-2.0-architectural-blueprint|Tark 2.0 Architectural Blueprint: Continuous Readiness & Humanities Engine]]**: **180-Day Master Architecture Blueprint** — synthesizes Rebase with (1) Humanities Learning Engine (Matuschak Mnemonic Medium, scrollytelling), (2) Temporal Intelligence Observatory (EBKT-EI epistemic invalidation, contested claims), and (3) Growth Engine (SEO ISR digest permalinks, coverage ledger, B2B academy portal).
+- **[[docs/research/tark-2.0-rd-pipeline|⚙️ Tark 2.0 R&D Pipeline & Execution Architecture]]**: **The execution counterpart — authoritative on cost, sequencing and formulas.** A code-audited reality gate, the G0–G6 quality-gate model, the Confidence Ledger (evidence discipline applied to our own roadmap), six falsifiable experiments with pre-committed kill criteria, honest solo-operator capacity math, and the named cut list. *(Local-only, per `@repo-hygiene`.)*
 - **[[docs/voice-and-type-guide|Voice & Type Guide]]**: Humanized lexicon standards, anti-jargon rules, and typography font-assignment hierarchy.
 - **[[docs/monetization-tiers|Monetization & Concurrency Controls]]**: Freemium quotas, Razorpay payments, and 15-minute seat locking.
 - **[[docs/ui-revamp-masterplan|🎨 UI Revamp Master Plan]]**: The Naval-Instrument north star (navy/teal/gold), foundation fixes, per-surface specs, and sub-agent execution structure (delegated to Anti-G).
@@ -104,22 +106,26 @@ The System Map allows agents and humans to audit domain nouns, system movements,
 
 - `#hub` — Root portals and orientation indexes.
 - `#docs` — Technical architecture, assessments, and reference manuals.
+- `#research` — Deep-research reports, MOCs, and architectural blueprints.
+- `#rd-pipeline` — Execution plans carrying quality gates, falsifiable experiments, and capacity models.
 - `#strategy` — Non-technical product, brand, growth, and SEO strategy.
 - `#map/objects` — Verified domain nouns and data structures.
 - `#map/processes` — Verified system workflows and transactional movements.
 - `#map/effects` — Change-impact and ripple matrices.
 - `#system` — Root contracts and setup configuration.
-
+- `#tark-2.0` — Next-generation continuous readiness, humanities learning engine, and temporal observatory.
 
 ---
 
-## 🔬 Engine Research (raw inputs, 2026-08-19)
+## 🔬 Engine Research & Architecture Blueprints
 
-Deep-research reports on the flip-the-script $0 current-affairs intelligence engine. Start at the map of content: [[engine-research-moc]].
+Deep-research reports on the intelligence engine and Tark 2.0 system expansion. Start at the map of content: **[[docs/research/engine-research-moc|Engine Research MOC]]**.
 
-- [[engine-research-claude]] — Claude (invert-the-pipeline, govt-data spine)
-- [[engine-research-codex]] — Codex (evidence-first event ledger, cite-or-drop)
-- [[engine-research-gemini-v1]] — Gemini V1 (deterministic ingestion, MinHash-LSH)
-- [[engine-research-gemini-v2]] — Gemini V2 (engineering blueprint w/ formulas)
+- **[[docs/research/tark-2.0-architectural-blueprint|Tark 2.0 Master Architecture Blueprint]]** — Gemini Deep Research (Humanities Engine, Temporal Observatory, Growth Flywheel, 180-day build plan)
+- **[[docs/research/tark-2.0-rd-pipeline|⚙️ Tark 2.0 R&D Pipeline]]** — the execution plan: reality gate, quality gates, experiments, capacity math, cut list *(read after the blueprint; authoritative where the two disagree)*
+- [[docs/research/engine-research-claude|Claude]] — Invert-the-pipeline, govt-data spine, PYQ testability prior
+- [[docs/research/engine-research-codex|Codex]] — Evidence-first event ledger, cite-or-drop contract
+- [[docs/research/engine-research-gemini-v1|Gemini V1]] — Deterministic ingestion, MinHash-LSH, Groq grounding
+- [[docs/research/engine-research-gemini-v2|Gemini V2]] — Engineering blueprint with formulas (340-node syllabus tree)
 
-Status: **synthesized on 2026-08-20** into [[docs/continuous-readiness-architecture|Continuous Readiness / Tark Rebase]]. The raw reports remain the evidence base. (Folder `docs/research/` is kept local/unpushed per `@repo-hygiene`.)
+Status: **Synthesized into active architecture** via [[docs/continuous-readiness-architecture|Continuous Readiness / Tark Rebase]] and [[docs/research/tark-2.0-architectural-blueprint|Tark 2.0 Blueprint]]. (Folder `docs/research/` is kept local/unpushed per `@repo-hygiene`.)

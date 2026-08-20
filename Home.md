@@ -3,6 +3,7 @@ tags:
   - hub
   - home
   - tark-1.0
+  - tark-2.0
 ---
 
 # 🏛️ Tark 1.0 — Command Center
@@ -32,6 +33,8 @@ tags:
 - [[docs/news-feed-quality-roadmap|News Feed Quality Roadmap]]
 - [[docs/news-intelligence-architecture|News Intelligence Architecture (Zero-Budget)]]
 - [[docs/continuous-readiness-architecture|Continuous Readiness / Tark Rebase]] ← active product north star
+- [[docs/research/tark-2.0-architectural-blueprint|Tark 2.0 Architectural Blueprint (Continuous Readiness & Humanities)]] ← 180-day master roadmap
+- [[docs/research/engine-research-moc|↳ Engine Research MOC (Claude, Codex, Gemini V1/V2, Deep Research)]]
 - [[docs/voice-and-type-guide|Voice & Type Guide (Lexicon & Typography)]]
 - [[docs/monetization-tiers|Monetization & Concurrency Controls]]
 - [[docs/design-system|Design System & Motion Graphics]]

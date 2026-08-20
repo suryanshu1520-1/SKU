@@ -213,6 +213,7 @@ As of 2026-08-20:
 ## See also
 
 - [[news-intelligence-architecture]] — ingestion substrate and Daily Edition compatibility layer
+- [[research/tark-2.0-architectural-blueprint|Tark 2.0 Architectural Blueprint]] — 180-day master architecture integrating Rebase with Humanities & Temporal engines
 - [[news-feed-quality-roadmap]] — historical consolidation roadmap
 - [[../map/objects/continuous-readiness-ledger]] — system-map noun card
 - [[../map/processes/rebase-claim-mutation]] — system-map workflow
