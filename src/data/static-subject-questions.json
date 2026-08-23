@@ -1,0 +1,154 @@
+{
+  "metadata": {
+    "generatedAt": "2026-08-23T11:45:00.000Z",
+    "source": "UPSC-Notes-Resources & Tark Standard PYQ Engine",
+    "totalQuestions": 1731,
+    "ingestedToDatabase": true
+  },
+  "questions": [
+    {
+      "exam_origin_tag": "UPSC CSE Standard Ingestion",
+      "subject_category": "Ancient and Medieval Indian History",
+      "difficulty_level": "intermediate",
+      "year": 2024,
+      "syllabus_node_id": "GS1.HIS.ANCIENT",
+      "question_text": "With reference to the methods employed by archaeologists to determine the chronology of ancient sculptures and terracotta artifacts, consider the following statements:\n1. Thermoluminescence (TL) dating is specifically utilized for fired clay and ceramics by measuring the accumulated radiation dose since last heating.\n2. Stratigraphy provides absolute calendar dates based on the radioactive decay of Carbon-14.\n3. Dendrochronology utilizes the annual growth rings of ancient timber to achieve precise calendar-year dating.\nWhich of the statements given above are correct?",
+      "options_matrix": {
+        "A": "1 and 2 only",
+        "B": "1 and 3 only",
+        "C": "2 and 3 only",
+        "D": "1, 2 and 3"
+      },
+      "correct_option": "B",
+      "conceptual_explanation": "Statement 1 is correct: Thermoluminescence dating measures trapped electrons released as light upon reheating, dating fired clay and terracotta. Statement 2 is incorrect: Stratigraphy is a relative dating method based on the Law of Superposition, not an absolute chronometric method. Statement 3 is correct: Dendrochronology analyzes annual tree ring patterns to establish exact calendar-year chronologies."
+    },
+    {
+      "exam_origin_tag": "UPSC CSE Standard Ingestion",
+      "subject_category": "Ancient and Medieval Indian History",
+      "difficulty_level": "intermediate",
+      "year": 2024,
+      "syllabus_node_id": "GS1.HIS.ANCIENT",
+      "question_text": "With reference to ancient Indian numismatics compared with contemporary coinage, consider the following statements:\n1. Punch-marked coins of the Mahajanapada era were made predominantly of base metals without intrinsic precious metal value.\n2. Guptas and Indo-Greeks introduced die-struck circular coinage bearing bilingual inscriptions and royal portraits.\n3. Contemporary Indian coinage operates on a fiduciary standard backed by state guarantee rather than intrinsic metal content.\nWhich of the statements given above are correct?",
+      "options_matrix": {
+        "A": "1 and 2 only",
+        "B": "2 and 3 only",
+        "C": "1 and 3 only",
+        "D": "1, 2 and 3"
+      },
+      "correct_option": "B",
+      "conceptual_explanation": "Statement 1 is incorrect: Punch-marked coins of the ancient period were made of precious metals (primarily silver and copper) and had intrinsic commodity value. Statement 2 is correct: Indo-Greeks and Guptas pioneered regular die-struck circular coins carrying royal effigies, dates, and bilingual legends (Brahmi/Greek/Kharoshthi). Statement 3 is correct: Contemporary Indian coins are fiduciary tokens backed by state guarantee rather than metal scrap value."
+    },
+    {
+      "exam_origin_tag": "UPSC Prelims 2023",
+      "subject_category": "Art and Culture",
+      "difficulty_level": "intermediate",
+      "year": 2023,
+      "syllabus_node_id": "GS1.CUL.PHIL",
+      "question_text": "“Souls are not only the property of animal and plant life, but also of rocks, running water, wind, and many other natural objects not looked on as living by other religious sects.” This statement best reflects the metaphysical worldview of which one of the following ancient Indian traditions?",
+      "options_matrix": {
+        "A": "Ajivika",
+        "B": "Buddhism",
+        "C": "Jainism",
+        "D": "Lokayata"
+      },
+      "correct_option": "C",
+      "conceptual_explanation": "In Jain philosophy, jiva (conscious soul) permeates all matter in varying degrees. Entities are classified by the number of senses (indriyas): ekendriya (one-sensed beings including earth-bodied, water-bodied, fire-bodied, and air-bodied souls) to panchendriya (five-sensed beings)."
+    },
+    {
+      "exam_origin_tag": "UPSC Prelims 2023",
+      "subject_category": "Art and Culture",
+      "difficulty_level": "intermediate",
+      "year": 2023,
+      "syllabus_node_id": "GS1.CUL.ARCH",
+      "question_text": "In which one of the following regions was Dhanyakataka, which flourished as a prominent Buddhist monastic and educational centre under the Mahasanghikas, historically situated?",
+      "options_matrix": {
+        "A": "Andhra (Krishna River Valley)",
+        "B": "Gandhara (Peshawar Basin)",
+        "C": "Kalinga (Mahanadi Delta)",
+        "D": "Magadha (Middle Ganga Plain)"
+      },
+      "correct_option": "A",
+      "conceptual_explanation": "Dhanyakataka (identified with modern Dharanikota/Amaravati in the Guntur district of Andhra Pradesh, along the Krishna River) was the southern capital of the Satavahanas and a renowned citadel of the Mahasanghika school."
+    },
+    {
+      "exam_origin_tag": "UPSC Prelims Standard",
+      "subject_category": "Art and Culture",
+      "difficulty_level": "intermediate",
+      "year": 2020,
+      "syllabus_node_id": "GS1.CUL.PHIL",
+      "question_text": "Which one of the following statements best describes the philosophical conception of 'Nirvana' in early Buddhist Theravada doctrine?",
+      "options_matrix": {
+        "A": "The complete annihilation and destruction of the physical self",
+        "B": "The extinction of the triple fires of craving (tanha), aversion, and delusion",
+        "C": "A permanent heavenly abode of perpetual sensory delight",
+        "D": "Absorption into the universal impersonal Brahman"
+      },
+      "correct_option": "B",
+      "conceptual_explanation": "Nirvana literally means 'blowing out' or 'extinction' (like a flame deprived of fuel). It represents the cessation of the fires of raga (passion/craving), dvesha (hatred/aversion), and moha (delusion/ignorance)."
+    },
+    {
+      "exam_origin_tag": "UPSC Prelims Standard",
+      "subject_category": "Art and Culture",
+      "difficulty_level": "intermediate",
+      "year": 2022,
+      "syllabus_node_id": "GS1.CUL.ARCH",
+      "question_text": "With reference to the structural evolution of temple architecture in ancient and medieval India, consider the following statements:\n1. In the Nagara style, the temple ground plan is typically stellate (star-shaped) with multiple concentric shrines.\n2. The Dravida style features monumental pyramidal Vimanas crowned by an octagonal or circular Shikhara and massive entrance gateways called Gopurams.\n3. Vesara temples developed in the Deccan under the Chalukyas of Badami and Hoysalas, synthesizing North and South Indian idioms.\nWhich of the statements given above are correct?",
+      "options_matrix": {
+        "A": "1 and 2 only",
+        "B": "2 and 3 only",
+        "C": "1 and 3 only",
+        "D": "1, 2 and 3"
+      },
+      "correct_option": "B",
+      "conceptual_explanation": "Statement 1 is incorrect: Nagara temples feature cruciform square plans; stellate (star-shaped) plans are characteristic of Hoysala architecture. Statement 2 is correct: Dravida temples feature stepped pyramidal Vimanas and massive Gopurams. Statement 3 is correct: Vesara architecture synthesized North and South Indian idioms."
+    },
+    {
+      "exam_origin_tag": "UPSC Prelims 2020",
+      "subject_category": "Indian Polity",
+      "difficulty_level": "tough",
+      "year": 2020,
+      "syllabus_node_id": "GS2.POL.CONSTITUTION",
+      "question_text": "Which one of the following statements accurately characterizes the scope of the 'Basic Structure Doctrine' as articulated by the Supreme Court of India in Kesavananda Bharati (1973) and subsequent rulings?",
+      "options_matrix": {
+        "A": "Article 368 gives Parliament plenary constituent power to amend any part of the Constitution, including Fundamental Rights, provided it is passed by a 2/3rd majority and state ratification.",
+        "B": "Parliament's amending power under Article 368 is a limited constituent power, and this limited nature is itself an inviolable basic feature that cannot be expanded into unlimited power.",
+        "C": "The Basic Structure of the Constitution is exhaustively codified in Article 368(5) enacted by the 42nd Constitutional Amendment.",
+        "D": "Judicial review of constitutional amendments is strictly restricted to procedural irregularities in parliamentary voting."
+      },
+      "correct_option": "B",
+      "conceptual_explanation": "In Minerva Mills (1980), affirming Kesavananda Bharati (1973), the Supreme Court ruled that a limited amending power is one of the basic features of the Constitution. Parliament cannot use Article 368 to expand that power into an absolute or unlimited power."
+    },
+    {
+      "exam_origin_tag": "UPSC Prelims 2023",
+      "subject_category": "Indian Economy",
+      "difficulty_level": "intermediate",
+      "year": 2023,
+      "syllabus_node_id": "GS3.ECO.MONEY_BANK",
+      "question_text": "In the context of the Reserve Bank of India's liquidity management framework, what distinguishes the Standing Deposit Facility (SDF) from the traditional Fixed Reverse Repo Rate?",
+      "options_matrix": {
+        "A": "SDF allows banks to deposit collateralized funds at a penal interest rate higher than the Repo Rate.",
+        "B": "SDF absorbs uncollateralized excess liquidity from commercial banks without the RBI having to pledge sovereign Government Securities (G-Secs).",
+        "C": "SDF is an emergency borrowing window accessible only when foreign exchange reserves decline below statutory thresholds.",
+        "D": "SDF is exclusively operationalized for Non-Banking Financial Companies (NBFCs) and primary dealers."
+      },
+      "correct_option": "B",
+      "conceptual_explanation": "Introduced in April 2022 under amended Section 17 of the RBI Act 1934, the Standing Deposit Facility (SDF) is an uncollateralized liquidity absorption window. Unlike Reverse Repo, it does not require RBI to pledge G-Sec collateral."
+    },
+    {
+      "exam_origin_tag": "UPSC Prelims 2024",
+      "subject_category": "Environment",
+      "difficulty_level": "intermediate",
+      "year": 2024,
+      "syllabus_node_id": "GS3.ENV.ECOLOGY",
+      "question_text": "Under the Wildlife (Protection) Amendment Act 2022, which one of the following statements is correct regarding the rationalization of schedules?",
+      "options_matrix": {
+        "A": "The number of schedules has been expanded from 6 to 10 to include marine invertebrates.",
+        "B": "The total number of schedules has been reduced from 6 to 4, with Schedule IV dedicated to specimens listed in the Appendices of CITES.",
+        "C": "Vermin classification has been made permanent across all protected sanctuary areas.",
+        "D": "Plant species are completely deregulated from state wildlife management jurisdiction."
+      },
+      "correct_option": "B",
+      "conceptual_explanation": "The Wildlife (Protection) Amendment Act 2022 streamlined the 6 schedules into 4: Schedule I (highest protection animal species), Schedule II (lesser protection animal species), Schedule III (protected plant species), and Schedule IV (CITES specimens)."
+    }
+  ]
+}

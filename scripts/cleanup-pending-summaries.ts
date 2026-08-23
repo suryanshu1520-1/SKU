@@ -30,7 +30,7 @@ async function cleanupPending() {
     const rawString = JSON.stringify(row).toLowerCase();
     const bullets: string[] = row.summary?.bullets || [];
     const hasPendingBullet = bullets.some((b) => b.toLowerCase().includes('summary pending') || b.toLowerCase().includes('pending summary'));
-    
+
     if (rawString.includes('summary pending') || rawString.includes('pending summary') || hasPendingBullet) {
       targetIds.push(row.id);
       if (row.url) targetUrls.push(row.url);

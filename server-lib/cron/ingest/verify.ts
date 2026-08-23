@@ -89,19 +89,64 @@ export function extractFacts(text: string): string[] {
     const hasContext = /[%₹]|per\s?cent|percent|crore|lakh|billion|million|trillion|\bbn\b|\bmn\b|\./i.test(tok);
     if (digits.length >= 3 || hasContext) facts.add(norm(tok));
   }
-  // Acronyms + hyphenated scheme names.
-  for (const m of text.matchAll(/\b[A-Z]{2,}(?:-[A-Z0-9]+)*\b/g)) {
-    if (m[0].length >= 2) facts.add(m[0].toLowerCase());
+  // Acronyms + hyphenated scheme names. Minimum length 3: bare 2-letter
+  // acronyms (PM, FY) are almost always English scaffolding a translator adds
+  // around a non-Latin-script fact (e.g. "PM-Kisan" glossing "पीएम-किसान",
+  // "FY 2025-26" glossing "2025-26") rather than a checkable claim — they can
+  // never appear verbatim in a Hindi source, so enforcing them only produces
+  // false drops on faithful Hindi→English bullets. Real load-bearing acronyms
+  // (RBI, GDP, CPI, ISRO, NGT) are unaffected — all length >= 3.
+  for (const m of text.matchAll(/\b[A-Z]{3,}(?:-[A-Z0-9]+)*\b/g)) {
+    facts.add(m[0].toLowerCase());
   }
   return [...facts];
 }
 
-/** True if a normalized fact appears in the normalized span text. */
+/** Devanagari block — a cheap, sufficient signal that hay is Hindi source text. */
+function isDevanagari(s: string): boolean {
+  return /[ऀ-ॿ]/.test(s);
+}
+
+/** The leading numeric core of a fact (digits + optional decimal), unit stripped. */
+function numericCore(fact: string): string | null {
+  const m = fact.match(/^[₹]?\s?\d[\d.,]*/);
+  return m ? m[0] : null;
+}
+
+/**
+ * True if a normalized fact appears in the normalized span text.
+ *
+ * FIXED (found via a live Groq dry-run, 2026-08-19): the prior "digit-core"
+ * path stripped ALL non-digit characters from the fact to a bare concatenated
+ * numeral (e.g. "6.50" -> "650"), but stripped non-digits from the haystack to
+ * a SPACE (preserving the decimal point as a word break: "6.50" -> "6 50").
+ * Those two never align, so every decimal-bearing fact (rates, percentages —
+ * exactly the RBI/monetary-policy case) was silently dropped even when the
+ * model cited it correctly. Real-model output surfaced this; a hand-authored
+ * test fixture with pre-matched facts never could have (see the dry-run
+ * report, docs/handoffs/dryrun-and-contested-antigravity.md).
+ *
+ * Fix: compare literally, only collapsing whitespace (both fact and hay are
+ * already comma/case-normalized by norm() before reaching here). This still
+ * requires exact digits AND the decimal point to match — "650" cannot pass
+ * against a source that says "6.50" — so the anti-hallucination guarantee is
+ * unchanged; only formatting/spacing noise around numbers is now tolerated.
+ */
 function factInText(fact: string, hay: string): boolean {
-  // Compare on digit-core for numeric facts (tolerant of spacing/units drift).
-  const digits = fact.replace(/[^\d]/g, "");
-  if (digits.length >= 3) return hay.replace(/[^\d]/g, " ").includes(digits);
-  return hay.includes(fact);
+  const compact = (s: string) => s.replace(/\s+/g, "");
+  if (compact(hay).includes(compact(fact))) return true;
+
+  // Cross-lingual fallback (Hindi-PIB): a currency/scale unit word ("crore")
+  // has no Latin-script counterpart in a Devanagari source ("करोड़") even when
+  // the translation is perfectly faithful. If the full fact (number+unit)
+  // doesn't match AND the source is Devanagari, accept a match on the numeric
+  // core alone — the actual hallucination risk (a wrong FIGURE) is still
+  // caught; only the untranslatable unit word's literal presence is relaxed.
+  if (isDevanagari(hay)) {
+    const core = numericCore(fact);
+    if (core && compact(hay).includes(compact(core))) return true;
+  }
+  return false;
 }
 
 /**

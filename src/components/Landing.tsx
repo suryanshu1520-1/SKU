@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ArrowRight, Target, Brain, Shield, Sparkles, CheckCircle2, Lock, Flame, Trophy, Compass, Layers } from 'lucide-react';
+import { ArrowRight, Target, Brain, Shield, Sparkles, CheckCircle2, Lock, Flame, Trophy, Compass, Layers, BookOpen } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import InteractiveBackground from './InteractiveBackground';
 import TiltCard from './TiltCard';
@@ -11,6 +11,7 @@ interface LandingProps {
   onNavigateArena: () => void;
   onNavigateTracker: () => void;
   onNavigateProfile: () => void;
+  onNavigateLibrary?: () => void;
   onNavigateManifesto?: () => void;
   onNavigateLegal?: (type: 'privacy' | 'terms' | 'refund') => void;
 }
@@ -21,7 +22,7 @@ interface SeatCountData {
   remaining_seats: number;
 }
 
-export default function Landing({ onNavigateArena, onNavigateTracker, onNavigateProfile, onNavigateManifesto, onNavigateLegal }: LandingProps) {
+export default function Landing({ onNavigateArena, onNavigateTracker, onNavigateProfile, onNavigateLibrary, onNavigateManifesto, onNavigateLegal }: LandingProps) {
   const [seatData, setSeatData] = useState<SeatCountData | null>(null);
 
   useEffect(() => {
@@ -138,7 +139,7 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
         </motion.div>
 
         {/* 3D Interactive Capability Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
           <TiltCard
             onClick={onNavigateArena}
             className="bg-zinc-900/30 border border-zinc-800/80 p-6 rounded-sm hover:border-emerald-500/40 transition-all cursor-pointer group backdrop-blur-md"
@@ -151,11 +152,11 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
                 <h3 className="font-serif text-lg font-bold tracking-tight text-zinc-100 group-hover:text-emerald-300 transition-colors">
                   The Arena & Autopsy
                 </h3>
-                <span className="text-[10px] font-sans text-zinc-500">+2.00 / -0.66 negative marking</span>
+                <span className="text-[10px] font-sans text-zinc-500">+2.00 / -0.66 marking</span>
               </div>
             </div>
             <p className="text-zinc-400 text-xs leading-relaxed font-sans mb-4">
-              Timed, high-stakes examination environment built to test reasoning under genuine exam pressure. Every session concludes with an AI-driven conceptual autopsy pinpointing subject-level leakages.
+              Timed examination arena testing recall under authentic exam pressure. Concludes with an AI-driven conceptual autopsy.
             </p>
             <div className="flex items-center gap-2 text-emerald-400 text-xs font-sans group-hover:translate-x-1 transition-transform">
               <span>Enter Arena</span>
@@ -175,14 +176,38 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
                 <h3 className="font-serif text-lg font-bold tracking-tight text-zinc-100 group-hover:text-[#e0d0ab] transition-colors">
                   The Daily Brief
                 </h3>
-                <span className="text-[10px] font-sans text-zinc-500">PIB &amp; policy dispatches, distilled daily</span>
+                <span className="text-[10px] font-sans text-zinc-500">PIB & policy dispatches</span>
               </div>
             </div>
             <p className="text-zinc-400 text-xs leading-relaxed font-sans mb-4">
-              Every PIB release, cabinet decision, and policy dispatch distilled by our AI into high-yield, 4-minute analytical briefs. Read the signal, filter by ministry, and prove your retention.
+              Every PIB release and cabinet dispatch distilled into high-yield, 4-minute analytical briefs. Filter by ministry.
             </p>
             <div className="flex items-center gap-2 text-[#e0d0ab] text-xs font-sans group-hover:translate-x-1 transition-transform">
               <span>Explore Intelligence</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          </TiltCard>
+
+          <TiltCard
+            onClick={onNavigateLibrary ? onNavigateLibrary : onNavigateArena}
+            className="bg-zinc-900/30 border border-zinc-800/80 p-6 rounded-sm hover:border-[#e0d0ab]/40 transition-all cursor-pointer group backdrop-blur-md"
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div className="p-2.5 bg-zinc-800/80 rounded-sm group-hover:bg-[#e0d0ab]/10 transition-colors">
+                <Layers className="w-5 h-5 text-[#e0d0ab]" />
+              </div>
+              <div>
+                <h3 className="font-serif text-lg font-bold tracking-tight text-zinc-100 group-hover:text-[#e0d0ab] transition-colors">
+                  Syllabus Pillars
+                </h3>
+                <span className="text-[10px] font-sans text-zinc-500">25-Year Empirical Spine</span>
+              </div>
+            </div>
+            <p className="text-zinc-400 text-xs leading-relaxed font-sans mb-4">
+              Constitutional jurisprudence, temple architecture, monetary corridors, and moral philosophy mapped against 25 years of UPSC papers.
+            </p>
+            <div className="flex items-center gap-2 text-[#e0d0ab] text-xs font-sans group-hover:translate-x-1 transition-transform">
+              <span>Inspect Pillars</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </div>
           </TiltCard>

@@ -1,0 +1,306 @@
+{
+  "metadata": {
+    "generatedAt": "2026-08-23T11:02:00.361Z",
+    "sourceRepository": "https://github.com/madhurimarawat/UPSC-Notes-Resources",
+    "license": "MIT",
+    "totalSubjects": 8,
+    "totalExternalResources": 7
+  },
+  "subjects": [
+    {
+      "id": "polity",
+      "title": "Indian Polity & Governance",
+      "paper": "GS2",
+      "syllabusNodeId": "GS2.POL.CONSTITUTION",
+      "overview": "Constitutional framework, Fundamental Rights, Federal structure, Parliament, Judicial doctrines, Statutory & Constitutional bodies.",
+      "keyThemes": [
+        "Preamble & Basic Structure Doctrine (Kesavananda Bharati)",
+        "Fundamental Rights (Art 14, 19, 21) & Writs (Art 32)",
+        "Centre-State Relations & Federalism (Art 246, 263, 280, 356)",
+        "Parliamentary Procedures, Motions & Committees",
+        "Supreme Court & High Courts: Collegium, Review, Contempt"
+      ],
+      "recommendedSources": [
+        "M. Laxmikanth — Indian Polity",
+        "PRS Legislative Research Reports",
+        "Supreme Court Landmark Judgments Digest"
+      ],
+      "mindMapHighlights": [
+        "Constitutional Amendment Procedure (Article 368 Flowchart)",
+        "Emergency Provisions Matrix (352 vs 356 vs 360)",
+        "Types of Writs & Judicial Review Scope"
+      ]
+    },
+    {
+      "id": "history",
+      "title": "Indian & World History, Art & Culture",
+      "paper": "GS1",
+      "syllabusNodeId": "GS1.HIS.FREEDOM",
+      "overview": "Ancient India, Medieval empires, Modern Indian Freedom Struggle, Temple Architecture, Classical dances, and World History.",
+      "keyThemes": [
+        "Indus Valley & Vedic Society",
+        "Bhakti & Sufi Movements, Vijayanagara & Mughal Administration",
+        "1857 Revolt, Moderate vs Extremist phases, Gandhian Era",
+        "Nagara, Dravida & Vesara Temple Architecture styles",
+        "Industrial Revolution & World Wars"
+      ],
+      "recommendedSources": [
+        "Spectrum — Brief History of Modern India by Rajiv Ahir",
+        "NCERTs (Class 11 An Introduction to Indian Art)",
+        "Ancient & Medieval India by Poonam Dalal Dahiya"
+      ],
+      "mindMapHighlights": [
+        "Gandhian Mass Movements Timeline (1915–1947)",
+        "Temple Architecture Comparison Matrix",
+        "Socio-Religious Reform Movements & Thinkers"
+      ]
+    },
+    {
+      "id": "geography",
+      "title": "Physical, Human & Economic Geography",
+      "paper": "GS1",
+      "syllabusNodeId": "GS1.GEO.IND_PHYS",
+      "overview": "Geomorphology, Climatology, Oceanography, Indian Physical relief, River drainage basins, Soils, Mineral distributions, and Urbanization.",
+      "keyThemes": [
+        "Plate Tectonics, Earthquakes, Volcanism & Landforms",
+        "Indian Monsoon Mechanism, ITCZ, Jet Streams, El Niño & IOD",
+        "Himalayan vs Peninsular River Systems",
+        "Soil Types (Alluvial, Black, Laterite) & Cropping Patterns",
+        "Mineral Resources & Industrial Location Factors"
+      ],
+      "recommendedSources": [
+        "Certificate Physical and Human Geography by G.C. Leong",
+        "NCERT Class 11 & 12 Geography",
+        "Oxford School Atlas"
+      ],
+      "mindMapHighlights": [
+        "Atmospheric Circulation Cells & Planetary Wind Belts",
+        "Major River Basins & Left/Right Bank Tributaries",
+        "Global Ocean Currents & Salinity Gradients"
+      ]
+    },
+    {
+      "id": "economy",
+      "title": "Indian Economy & Development",
+      "paper": "GS3",
+      "syllabusNodeId": "GS3.ECO.MACRO",
+      "overview": "Macroeconomic indicators, Monetary & Fiscal Policy, Banking & NPA resolution, Agriculture MSP & PDS, Infrastructure, and External Sector.",
+      "keyThemes": [
+        "GDP, Inflation (CPI vs WPI), Monetary Policy Committee (MPC)",
+        "Fiscal Deficit, FRBM Act & Tax Reforms (GST)",
+        "Banking System: Basel III, IBC 2016, Bad Banks",
+        "Agriculture: MSP, PM-KISAN, Agri-tech, Food Processing",
+        "Balance of Payments, Forex Reserves & Trade Agreements"
+      ],
+      "recommendedSources": [
+        "Indian Economy by Nitin Singhania / Ramesh Singh",
+        "Economic Survey & Union Budget Summaries",
+        "RBI Bulletin & Monthly Policy Releases"
+      ],
+      "mindMapHighlights": [
+        "Monetary Policy Transmission Mechanism",
+        "Fiscal Policy Architecture & Revenue vs Capital Budgets",
+        "Banking Resolution (IBC) Workflow"
+      ]
+    },
+    {
+      "id": "environment",
+      "title": "Environment, Ecology & Biodiversity",
+      "paper": "GS3",
+      "syllabusNodeId": "GS3.ENV.ECOLOGY",
+      "overview": "Ecosystem dynamics, Biodiversity hotspots, Wildlife Protection Act, Climate change conventions (UNFCCC, COP), Renewable energy.",
+      "keyThemes": [
+        "Trophic Levels, Biogeochemical Cycles & Ecological Succession",
+        "IUCN Red List Categories, Tiger Reserves, Ramsar Wetlands",
+        "Environmental Impact Assessment (EIA) & Forest Rights Act",
+        "Climate Summits: Paris Agreement (NDCs), Carbon Credits, Net Zero",
+        "Pollution: Air Quality Index, Stubble Burning, Solid Waste Rules"
+      ],
+      "recommendedSources": [
+        "Shankar IAS / PMF IAS Environment",
+        "Ministry of Environment, Forest and Climate Change (MoEFCC) Reports",
+        "UNEP & IPCC Assessment Reports"
+      ],
+      "mindMapHighlights": [
+        "National Parks & Biosphere Reserves Map Locator",
+        "Global Climate Agreements Timeline (Rio 1992 to COP30)",
+        "Environmental Legislation in India (WPA 1972, EPA 1986)"
+      ]
+    },
+    {
+      "id": "ethics",
+      "title": "Ethics, Integrity & Aptitude",
+      "paper": "GS4",
+      "syllabusNodeId": "GS4.ETH.DIMENSIONS",
+      "overview": "Moral philosophy, Emotional Intelligence, Civil Service values, Probity in Governance, Citizen's Charter, Case Study resolution models.",
+      "keyThemes": [
+        "Deontology, Utilitarianism, Virtue Ethics & Thinkers (Kant, Gandhi, Rawls)",
+        "Foundational Civil Service Values (Nolan Principles)",
+        "Emotional Intelligence in Administration & Conflict Resolution",
+        "Corruption Prevention: Lokpal, CVC, Whistleblower Protection",
+        "Case Study Decision Matrices (Stakeholder Identification, Ethical Dilemmas)"
+      ],
+      "recommendedSources": [
+        "Lexicon for Ethics, Integrity & Aptitude",
+        "2nd Administrative Reforms Commission (ARC) Report No. 4: Ethics in Governance",
+        "Harvard Moral Reasoning Case Studies"
+      ],
+      "mindMapHighlights": [
+        "7 Nolan Principles of Public Life",
+        "Case Study 6-Step Resolution Algorithm",
+        "Ethical Dilemma Triangulation (Law vs Morality vs Public Interest)"
+      ]
+    },
+    {
+      "id": "sci_tech",
+      "title": "Science & Technology",
+      "paper": "GS3",
+      "syllabusNodeId": "GS3.SNT.SPACE",
+      "overview": "Space exploration (ISRO missions), Defense tech, Biotechnology (CRISPR, gene therapy), AI/Quantum computing, Nuclear energy.",
+      "keyThemes": [
+        "ISRO Launch Vehicles (PSLV, LVM3, SSLV) & Planetary Missions (Gaganyaan, Aditya-L1)",
+        "Defense: Missile Defense (S-400, BrahMos), Drones, Stealth Subs",
+        "Biotechnology: Recombinant DNA, CAR-T cell therapy, GMO crops",
+        "Emerging Tech: Quantum Key Distribution, Generative AI, Semiconductors",
+        "Nuclear Power: Three-Stage Nuclear Program, Fast Breeder Reactors"
+      ],
+      "recommendedSources": [
+        "The Hindu Science & Tech Weekly Pages",
+        "ISRO & DRDO Annual Reports",
+        "Department of Science and Technology (DST) Releases"
+      ],
+      "mindMapHighlights": [
+        "ISRO Launch Vehicle Payload Capacities & Orbits (LEO, GEO, SSO)",
+        "CRISPR-Cas9 Gene Editing Workflow",
+        "India's Three-Stage Nuclear Power Architecture"
+      ]
+    },
+    {
+      "id": "csat",
+      "title": "CSAT (Paper II Aptitude & Reasoning)",
+      "paper": "CSAT",
+      "syllabusNodeId": "CSAT.REASONING",
+      "overview": "Reading comprehension inference strategies, Logical reasoning, Syllogisms, Permutation & Combination, Number Systems, Data Interpretation.",
+      "keyThemes": [
+        "Reading Comprehension: Crucial Message, Assumption, Inference rules",
+        "Number Systems: Divisibility, Remainder Theorem, Unit Digits",
+        "Permutation & Combination, Probability shortcuts",
+        "Direction Sense, Blood Relations, Seating Arrangements",
+        "Speed, Time & Distance, Work & Time formulas"
+      ],
+      "recommendedSources": [
+        "CSAT Manual by McGraw Hill / Arihant",
+        "Official UPSC CSAT PYQs (2014–2025)",
+        "Mental Math & Vedic Math Shortcuts"
+      ],
+      "mindMapHighlights": [
+        "Reading Comprehension Question Taxonomy (Assumption vs Inference)",
+        "Number System Divisibility Matrix",
+        "Time & Work LCM Method Quick Algorithm"
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "title": "Drishti IAS Topper & Standard Subject Notes",
+      "url": "https://www.pdfnotes.co/drishti-ias-notes/",
+      "category": "Static Subject Revision",
+      "paper": "General",
+      "sourceType": "notes_pdf",
+      "description": "Comprehensive subject-wise notes for Indian Polity, Modern History, Geography, and Economy.",
+      "tags": [
+        "Drishti IAS",
+        "GS1",
+        "GS2",
+        "GS3",
+        "Comprehensive"
+      ]
+    },
+    {
+      "title": "Guidely Banking & Economic Current Affairs Compendium",
+      "url": "https://guidely.in/free-pdf/banking-current-affairs",
+      "category": "Economy & Banking",
+      "paper": "GS3",
+      "sourceType": "official_portal",
+      "description": "Detailed monthly compendiums covering RBI regulations, monetary policy, and financial developments.",
+      "tags": [
+        "Banking",
+        "RBI",
+        "Economy",
+        "Current Affairs"
+      ]
+    },
+    {
+      "title": "Vajiram & Ravi Free UPSC Study Materials & Handouts",
+      "url": "https://vajiramandravi.com/upsc-exam/free-upsc-study-material-notes/",
+      "category": "Classroom Foundation Handouts",
+      "paper": "General",
+      "sourceType": "notes_pdf",
+      "description": "Class handouts and reference primers across all General Studies papers.",
+      "tags": [
+        "Vajiram",
+        "Foundation",
+        "GS1",
+        "GS2",
+        "GS3",
+        "GS4"
+      ]
+    },
+    {
+      "title": "ClearIAS Indian History & Freedom Struggle Notes",
+      "url": "https://www.clearias.com/indian-history/",
+      "category": "History & Heritage",
+      "paper": "GS1",
+      "sourceType": "article",
+      "description": "Structured, point-wise chronologies of Ancient, Medieval, and Modern Indian History.",
+      "tags": [
+        "History",
+        "Ancient",
+        "Modern",
+        "Freedom Struggle"
+      ]
+    },
+    {
+      "title": "IAS Exam Portal Topper Notes & Model Answers",
+      "url": "https://iasexamportal.com/upsc-topper-notes",
+      "category": "Mains Answer Writing",
+      "paper": "GS4",
+      "sourceType": "notes_pdf",
+      "description": "Handwritten notes and answer copies from recent UPSC CSE Rank holders.",
+      "tags": [
+        "Toppers",
+        "Mains",
+        "Handwritten",
+        "Answer Copies"
+      ]
+    },
+    {
+      "title": "UPSC Modern History MCQ Generator AI Tool",
+      "url": "https://chatgpt.com/g/g-688253dce9508191a6e8563d167de179-upsc-modern-history-mcq-generator",
+      "category": "AI Practice Tools",
+      "paper": "GS1",
+      "sourceType": "gpt_tool",
+      "description": "Specialized GPT assistant for generating analytical UPSC-standard Modern History MCQs.",
+      "tags": [
+        "GPT",
+        "AI Tutor",
+        "Modern History",
+        "Practice"
+      ]
+    },
+    {
+      "title": "UPSC Answer Writer & Mains Structuring GPT",
+      "url": "https://chatgpt.com/g/g-40f6OK9C3-upsc-answer-writer",
+      "category": "AI Practice Tools",
+      "paper": "General",
+      "sourceType": "gpt_tool",
+      "description": "AI model calibrated to evaluate and structure 10-marker and 15-marker GS answers.",
+      "tags": [
+        "GPT",
+        "Mains",
+        "Answer Structuring",
+        "AI"
+      ]
+    }
+  ]
+}

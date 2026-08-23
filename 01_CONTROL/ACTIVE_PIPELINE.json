@@ -1,0 +1,101 @@
+{
+  "pipeline_version": "1.0.0",
+  "active_super_prompt": "WS0_PLATFORM_FOUNDATION_BATCH",
+  "current_stage": "QUEUED",
+  "tasks_total": 13,
+  "tasks_completed": 9,
+  "active_task_id": null,
+  "history": [
+    {
+      "task_id": "TASK_001_CANARY",
+      "event": "DISPATCHED",
+      "contract": "02_CONTRACTS/active/TASK_001_CANARY.md"
+    },
+    {
+      "task_id": "TASK_001_CANARY",
+      "event": "VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_001_CANARY.md"
+    },
+    {
+      "task_id": "TASK_002_HUMANITIES_SCHEMA",
+      "event": "SELF_VERIFIED_BY_DELEGATE_THEN_ORCHESTRATOR_RE_VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_002_HUMANITIES_SCHEMA.md"
+    },
+    {
+      "task_id": "TASK_003_HUMANITIES_READER",
+      "event": "SELF_VERIFIED_BY_DELEGATE_THEN_ORCHESTRATOR_RE_VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_003_HUMANITIES_READER.md"
+    },
+    {
+      "task_id": "TASK_004_PILLARS_HONESTY_PASS",
+      "event": "VERIFIED_WITH_ORCHESTRATOR_FOLLOWUP",
+      "contract": "02_CONTRACTS/completed/TASK_004_PILLARS_HONESTY_PASS.md"
+    },
+    {
+      "task_id": "TASK_005_CANON_TEXT_MD",
+      "event": "VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_005_CANON_TEXT_MD.md",
+      "note": "Orchestrator sourced and PD-verified 3 raw texts directly; Antigravity formatted only. Independently re-checked: word counts within tolerance, zero contamination, lint clean."
+    },
+    {
+      "task_id": "TASK_006_DUAL_CLASSIFIER_PILOT",
+      "event": "VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_006_DUAL_CLASSIFIER_PILOT.md",
+      "note": "Real run verified: 13/50 (26%) genuine agreement, real cosine scores throughout, read-only constraint confirmed (current_affairs row count unchanged at 844). Of 37 disagreements: 12 are Rater B language-coverage gaps (fixable), 25 are genuine adjudication-worthy disagreements. Human review queue is smaller and better-characterized than pre-pilot, though not as small as hoped."
+    },
+    {
+      "task_id": "SUBJECT_PILLARS_MINDMAP_REDESIGN",
+      "event": "DIRECT_ORCHESTRATOR_WORK",
+      "contract": null,
+      "note": "No contract -- design/taste work done directly by Orchestrator per explicit user instruction (delegation not appropriate for visual/UX judgment). Rebuilt SubjectPillars.tsx mind-map tab: added branching vs sequential structureType to MindMapNode data model (previously all 6 mind maps were force-fit into one cumulative-path visual, misrepresenting 4 of them), built BranchingMindMap and SequentialMindMap components, fixed a real bug where activeMindmapNode state was shared across all mind maps in a pillar. Typecheck clean; visual verification skipped per user instruction to stop using the browser."
+    },
+    {
+      "task_id": "TASK_007_GS1_2026_DIGEST",
+      "event": "VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_007_GS1_2026_DIGEST.md",
+      "note": "Digest verified: 20/20 rows, spot-checked against source (exact match), lint clean, 11.4% compression ratio. Orchestrator's own acceptance criterion said 'exactly 22 rows' -- that was an Orchestrator arithmetic error (6+8+6=20), not a delegate defect."
+    },
+    {
+      "task_id": "TASK_008_GS1_MAINS_BLUEPRINTS",
+      "event": "VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_008_GS1_MAINS_BLUEPRINTS.md",
+      "note": "Digest headings are too compressed for real MainsBlueprint prose -- this contract goes back to the original source (lines 1942-3405, the Complete Analysis copy only) for full prose. Appends 20 real entries to gs1-history-culture's mainsBlueprints (21 total), and honestly broadens the pillar's shortDescription/empiricalBasis to cover Geography and Society, which it previously omitted despite being real GS1 syllabus content."
+    },
+    {
+      "task_id": "HUMANITIES_WIRING_FIX",
+      "event": "DIRECT_ORCHESTRATOR_WORK",
+      "contract": null,
+      "note": "User noticed HumanitiesReader was never reachable -- confirmed it was built (TASK_003) but never added to App.tsx nav. Fixed directly: added 'humanities' to the activeTab union, added a nav button, wired the content branch to render HumanitiesReader. Typecheck clean. Small mechanical fix, not worth a contract round-trip."
+    },
+    {
+      "task_id": "TASK_009_HUMANITIES_REAL_PASSAGES",
+      "event": "VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_009_HUMANITIES_REAL_PASSAGES.md",
+      "note": "9/9 passages independently confirmed as genuine verbatim substrings of source files (programmatic check, not the self-reported 100% PASS). 3 thinkers, 0 placeholders, lint clean. Open flag: 2 Ambedkar pyqCitations carry forward unverified placeholder year/paper values from TASK_002 -- need real verification before being trusted."
+    },
+    {
+      "task_id": "TASK_010_CORRECTNESS_CI",
+      "event": "QUEUED",
+      "contract": "02_CONTRACTS/pending/TASK_010_CORRECTNESS_CI.md",
+      "note": "WS-0.5. No CI running lint/test/build exists at all -- only two cron/scraper workflows. Part of the Cycle 1 platform-foundation batch dispatched together per explicit user request to sequence and parallelize the remaining roadmap."
+    },
+    {
+      "task_id": "TASK_011_SCHEMA_RECONCILIATION",
+      "event": "QUEUED",
+      "contract": "02_CONTRACTS/pending/TASK_011_SCHEMA_RECONCILIATION.md",
+      "note": "WS-0.4. static_questions/current_affairs/saved_articles used in prod but undeclared by any migration. Delegate may WRITE migrations via introspection, may NEVER call apply_migration -- standing invariant, checked explicitly on verification."
+    },
+    {
+      "task_id": "TASK_012_QUOTA_LEDGER_MODEL_VALIDATION",
+      "event": "QUEUED",
+      "contract": "02_CONTRACTS/pending/TASK_012_QUOTA_LEDGER_MODEL_VALIDATION.md",
+      "note": "WS-0.3. Directly motivated by TASK_006's silent-embedder-fallback incident today. Additive only -- getEmbedder()'s existing behavior must remain byte-for-byte unchanged, this only adds loud model-ID validation + a minimal call ledger."
+    },
+    {
+      "task_id": "TASK_013_ZERO_DOLLAR_LANGUAGE_AUDIT",
+      "event": "QUEUED",
+      "contract": "02_CONTRACTS/pending/TASK_013_ZERO_DOLLAR_LANGUAGE_AUDIT.md",
+      "note": "D-1/D-2. Docs/planning-language audit only -- the actual Vercel Hobby-to-Pro upgrade is a billing action that stays with the user, no contract does that part."
+    }
+  ]
+}

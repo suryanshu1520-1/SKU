@@ -6,13 +6,15 @@ import Manifesto from './components/Manifesto';
 import Arena from './components/Arena';
 import Autopsy from './components/Autopsy';
 import CurrentAffairs from './components/CurrentAffairs';
+import SubjectPillars from './components/SubjectPillars';
+import HumanitiesReader from './components/HumanitiesReader';
 import Profile from './components/Profile';
 import Leaderboard from './components/Leaderboard';
 import PublicProfile from './components/PublicProfile';
 import PasswordReset from './components/PasswordReset';
 import LegalModal, { LegalDocumentType } from './components/LegalModal';
 import { supabase } from './lib/supabase';
-import { Loader2, Trophy, Swords, Globe, User, House, LogIn } from 'lucide-react';
+import { Loader2, Trophy, Swords, Globe, User, House, LogIn, Layers, BookOpen } from 'lucide-react';
 
 export default function App() {
   const [userEmail, setUserEmail] = useState<string>('');
@@ -21,7 +23,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [gameState, setGameState] = useState<'login' | 'landing' | 'arena' | 'autopsy'>('landing');
 
-  const [activeTab, setActiveTab] = useState<'arena' | 'tracker' | 'profile' | 'leaderboard'>('arena');
+  const [activeTab, setActiveTab] = useState<'arena' | 'tracker' | 'library' | 'humanities' | 'profile' | 'leaderboard'>('arena');
 
   const [viewingAnalystId, setViewingAnalystId] = useState<string | null>(null);
   const [showPasswordReset, setShowPasswordReset] = useState(false);
@@ -204,14 +206,14 @@ export default function App() {
     setShowManifesto(false);
   };
 
-  const navigateToTab = (tab: 'arena' | 'tracker' | 'profile' | 'leaderboard') => {
+  const navigateToTab = (tab: 'arena' | 'tracker' | 'library' | 'profile' | 'leaderboard') => {
     if (tab === 'profile' && !userEmail) {
       setGameState('login');
       return;
     }
     setActiveTab(tab);
     if (gameState === 'landing' || gameState === 'login') {
-      if (localStorage.getItem('tark_arena_results')) {
+      if (tab === 'arena' && localStorage.getItem('tark_arena_results')) {
         setGameState('autopsy');
       } else {
         setGameState('arena');
@@ -317,6 +319,42 @@ export default function App() {
                 </button>
 
                 <button
+                  onClick={() => navigateToTab('library')}
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group cursor-pointer"
+                >
+                  {gameState !== 'landing' && activeTab === 'library' && (
+                    <motion.div
+                      layoutId="active-nav-pill"
+                      className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
+                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'library' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
+                    <Layers className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'library') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
+                    <span className="hidden sm:inline">Syllabus Pillars</span>
+                    <span className="sm:hidden">Pillars</span>
+                  </span>
+                </button>
+
+                <button
+                  onClick={() => navigateToTab('humanities')}
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group cursor-pointer"
+                >
+                  {gameState !== 'landing' && activeTab === 'humanities' && (
+                    <motion.div
+                      layoutId="active-nav-pill"
+                      className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
+                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'humanities' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
+                    <BookOpen className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'humanities') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
+                    <span className="hidden sm:inline">Humanities</span>
+                    <span className="sm:hidden">Canon</span>
+                  </span>
+                </button>
+
+                <button
                   onClick={() => navigateToTab('leaderboard')}
                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group cursor-pointer"
                 >
@@ -385,6 +423,7 @@ export default function App() {
           onNavigateArena={() => navigateToTab('arena')}
           onNavigateTracker={() => navigateToTab('tracker')}
           onNavigateProfile={() => navigateToTab('profile')}
+          onNavigateLibrary={() => navigateToTab('library')}
           onNavigateManifesto={handleNavigateManifesto}
           onNavigateLegal={(type) => setLegalDocumentType(type)}
         />
@@ -398,6 +437,13 @@ export default function App() {
             <Leaderboard onAnalystClick={setViewingAnalystId} />
           ) : activeTab === 'tracker' ? (
             <CurrentAffairs userId={userId || 'guest'} />
+          ) : activeTab === 'library' ? (
+            <SubjectPillars
+              onNavigateArena={() => navigateToTab('arena')}
+              onLaunchPractice={() => navigateToTab('arena')}
+            />
+          ) : activeTab === 'humanities' ? (
+            <HumanitiesReader />
           ) : gameState === 'arena' ? (
             <Arena
               onComplete={handleArenaComplete}

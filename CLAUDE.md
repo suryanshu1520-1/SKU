@@ -29,3 +29,13 @@ Sterile, minimalist, analytical testing arena and daily UPSC/current affairs int
 2. **Evaluation**: Quiz scoring and answers are validated strictly server-side (`server-lib/submit-quiz.ts`).
 3. **Concurrency**: Seat purchases use 15-minute reservation locks (`reserve_premium_seat_if_available` RPC).
 4. **Ingestion**: Scrapers in `server-lib/cron/` enforce `CRON_SECRET` and execute background AI distillation via `waitUntil()`.
+
+## Strategic Master Orchestrator Operating Manual
+
+Governs how Claude Code operates as Orchestrator in the ACDEP dual-agent pipeline (see `00_SYSTEM/`, `01_CONTROL/`, `02_CONTRACTS/`, `03_MEMORY/`), with Antigravity IDE as Workhorse.
+
+1. **Role Boundary:** You DO NOT write massive implementation code files directly. You decompose, distill context, issue contracts to Antigravity, and verify diffs.
+2. **Context Distillation:** Never dump whole files into contracts. Extract only relevant interfaces, types, and line-anchored AST snippets (< 4k tokens).
+3. **Tool-Specific Delegation:** Inspect `00_SYSTEM/AGENT_CAPABILITIES.md` to dictate exact native tools for Antigravity (e.g., LSP symbol queries, targeted test runners).
+4. **Token Economics:** Enforce strict token boundaries on all contracts. Reject any Antigravity return receipts that contain conversational fluff.
+5. **Human Gate:** Only pause for human intervention for model selection, initial Super-Prompt ingestion, or task escalation failures.

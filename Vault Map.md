@@ -77,6 +77,21 @@ Welcome to the **Tark 1.0 (SKU)** Obsidian Knowledge Hub. This vault is organize
 
 ---
 
+## 🏛️ Static Subject Knowledge Vault (`03_MEMORY/knowledge/`)
+
+Curated syllabus hubs, mind maps, canonical reference sources, and PYQ benchmarks imported and harmonized from the open-source UPSC Knowledge Core:
+
+- **[[03_MEMORY/knowledge/polity/index|🏛️ Indian Polity & Governance (GS2)]]**: Constitution, Fundamental Rights, Federalism, Writs, Parliamentary Motions.
+- **[[03_MEMORY/knowledge/history/index|📜 History & Art & Culture (GS1)]]**: Ancient, Medieval, Modern Freedom Movement, Temple Architecture, Thinkers.
+- **[[03_MEMORY/knowledge/geography/index|🌍 Geography & Physical Systems (GS1)]]**: Geomorphology, Climatology, Indian River Basins, Monsoons, Resources.
+- **[[03_MEMORY/knowledge/economy/index|💰 Indian Economy & Infrastructure (GS3)]]**: Macroeconomics, Banking, SDF, Fiscal Deficits, Agriculture MSP, External Trade.
+- **[[03_MEMORY/knowledge/environment/index|🌿 Environment & Ecology (GS3)]]**: Biodiversity Hotspots, IUCN Red List, Ramsar Wetlands, Climate Conventions.
+- **[[03_MEMORY/knowledge/ethics/index|⚖️ Ethics, Integrity & Aptitude (GS4)]]**: Deontology, Utilitarianism, Nolan Principles, ARC Case Study Algorithms.
+- **[[03_MEMORY/knowledge/sci_tech/index|🔬 Science & Technology (GS3)]]**: ISRO Launch Vehicles, Defense Tech, CRISPR, Quantum Systems, Nuclear Energy.
+- **[[03_MEMORY/knowledge/csat/index|🧮 CSAT Reasoning & Quantitative Aptitude]]**: Reading Comprehension Inferences, Divisibility Rules, P&C, Time & Work.
+
+---
+
 ## 🗺️ System Map (`map/` — Edit Graph)
 
 The System Map allows agents and humans to audit domain nouns, system movements, and change ripple effects.

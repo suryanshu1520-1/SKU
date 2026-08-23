@@ -14,6 +14,7 @@
  */
 
 import { GoogleGenAI } from "@google/genai";
+import { recordModelInvocation } from "../../monitoring/quota-ledger.js";
 
 export type Embedder = {
   mode: "gemini" | "local";
@@ -122,9 +123,16 @@ function geminiEmbedder(key: string): Embedder {
           });
           const values: number[] =
             res?.embeddings?.[0]?.values ?? res?.embedding?.values ?? [];
-          out.push(values.length ? l2normalize(values) : localEmbed(text));
+          if (values.length) {
+            recordModelInvocation({ model_id: GEMINI_EMBED_MODEL, mode: "primary", caller: "geminiEmbedder.embed" });
+            out.push(l2normalize(values));
+          } else {
+            recordModelInvocation({ model_id: "local-hashed-bow", mode: "fallback", caller: "geminiEmbedder.embed", metadata: { reason: "empty_embedding" } });
+            out.push(localEmbed(text));
+          }
         } catch (err: any) {
           console.warn(`[ingest][embed] gemini failed, local fallback: ${err?.message ?? err}`);
+          recordModelInvocation({ model_id: "local-hashed-bow", mode: "fallback", caller: "geminiEmbedder.embed", metadata: { error: err?.message ?? String(err) } });
           out.push(localEmbed(text));
         }
       }
@@ -136,7 +144,11 @@ function geminiEmbedder(key: string): Embedder {
 /** Resolve the best available embedder for this environment. */
 export function getEmbedder(): Embedder {
   const key = env("GEMINI_API_KEY");
-  if (key) return geminiEmbedder(key);
+  if (key) {
+    recordModelInvocation({ model_id: GEMINI_EMBED_MODEL, mode: "primary", caller: "getEmbedder" });
+    return geminiEmbedder(key);
+  }
   console.warn("[ingest][embed] no GEMINI_API_KEY — using local lexical embedder for clustering");
+  recordModelInvocation({ model_id: "local-hashed-bow", mode: "fallback", caller: "getEmbedder", metadata: { reason: "no_gemini_api_key" } });
   return LOCAL;
 }

@@ -1,4 +1,4 @@
-# Subsystem Wiring Map — Frontend ↔ Backend ↔ Supabase Database
+  # Subsystem Wiring Map — Frontend ↔ Backend ↔ Supabase Database
 
 This document provides a forensic, component-by-component mapping showing exactly how each frontend interface connects to its corresponding backend server routes, business logic libraries, and Supabase database entities.
 

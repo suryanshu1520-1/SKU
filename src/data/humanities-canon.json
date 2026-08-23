@@ -1,0 +1,127 @@
+{
+  "thinkers": [
+    {
+      "id": "ambedkar",
+      "name": "B. R. Ambedkar",
+      "workTitle": "Annihilation of Caste",
+      "year": 1936,
+      "publicDomainBasis": "Author d. 1956; PD in India 60y post-death (since 2017)",
+      "passages": [
+        {
+          "id": "ambedkar-aoc-p1",
+          "text": "Caste System is not merely division of labour. It is also a division of \nlabourers. Civilized society undoubtedly needs division of labour. But in no civilized \nsociety is division of labour accompanied by this unnatural division of labourers into \nwatertight compartments. Caste System is not merely a division of labourers which is \nquite different from division of labour—it is an hierarchy in which the divisions of \nlabourers are graded one above the other. In no other country is the division of labour \naccompanied by this gradation of labourers. There is also a third point of criticism against \nthis view of the Caste System. This division of labour is not spontaneous; it is not based \non natural aptitudes. Social and individual efficiency requires us to develop the capacity \nof an individual to the point of competency to choose and to make his own career. This \nprinciple is violated in the Caste System in so far as it involves an attempt to appoint \ntasks to individuals in advance, selected not on the basis of trained original capacities, but \non that of the social status of the parents. Looked at from another point of view this \nstratification of occupations which is the result of the Caste System is positively \n\n\npernicious. Industry is never static. It undergoes rapid and abrupt changes. With such \nchanges an individual must be free to change his occupation. Without such freedom to \nadjust himself to changing circumstances it would be impossible for him to gain his\n\nlivelihood. Now the Caste System will not allow Hindus to take to occupations where \nthey are wanted if they do not belong to them by heredity. If a Hindu is seen to starve \nrather than take to new occupations not assigned to his Caste, the reason is to be found in \nthe Caste System. By not permitting readjustment of occupations, caste becomes a direct \ncause of much of the unemployment we see in the country.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2019,
+              "paper": "GS-I",
+              "note": "Relevance to social reform movements, division of labour vs division of labourers."
+            }
+          ]
+        },
+        {
+          "id": "ambedkar-aoc-p2",
+          "text": "What is your ideal society if you do \nnot want caste is a question that is bound to be asked of you. If you ask me, my ideal \nwould be a society based on Liberty, Equality and Fraternity. And why not ? What \nobjection can there be to Fraternity ? I cannot imagine any. An ideal society should be \nmobile, should be full of channels for conveying a change taking place in one part to \nother parts. In an ideal society there should be many interests consciously communicated \nand shared. There should be varied and free points of contact with other modes of \nassociation. In other words there must be social endosmosis. This is fraternity, which is \nonly another name for democracy. Democracy is not merely a form of Government. It is \nprimarily a mode of associated living, of conjoint communicated experience. It is \nessentially an attitude of respect and reverence towards fellowmen. Any objection to \nLiberty ? Few object to liberty in the sense of a right to free movement, in the sense of a \nright to life and limb. There is no objection to liberty in the sense of a right to property, \ntools and materials as being necessary for earning a living to keep the body in due state of \nhealth. Why not allow liberty to benefit by an effective and competent use of a person's \npowers ? The supporters of caste who would allow liberty in the sense of a right to life, \nlimb and property, would not readily consent to liberty in this sense, inasmuch as it \ninvolves liberty to choose one's profession. But to object to this kind of liberty is to \nperpetuate slavery. For slavery does not merely mean a legalized form of subjection. It \nmeans a state of society in which some men are forced to accept from other the purposes \nwhich control their conduct. This condition obtains even where there is no slavery in the \nlegal sense. It is found where, as in the Caste System, some persons are compelled to \ncarry on certain prescribed callings which are not of their choice.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2021,
+              "paper": "GS-IV",
+              "note": "Relevance to moral equality, democracy as associated living, and fraternity."
+            }
+          ]
+        },
+        {
+          "id": "ambedkar-aoc-p3",
+          "text": "The effect of caste on the ethics of the Hindus is simply deplorable. Caste has killed \npublic spirit. Caste has destroyed the sense of public charity. Caste has made public \nopinion impossible. A Hindu's public is his caste. His responsibility is only to his caste. \nHis loyalty is restricted only to his caste. Virtue has become caste-ridden and morality \nhas become, caste-bound. There is no sympathy to the deserving. There is no appreciation \nof the meritorious. There is no charity to the needy. Suffering as such calls for no \nresponse. There is charity but it begins with the caste and ends with the caste. There is \nsympathy but not for men of other caste. Would a Hindu acknowledge and follow the \nleadership of a great and good man? The case of a Mahatma apart, the answer must be \nthat he will follow a leader if he is a man of his caste. A Brahmin will follow a leader \nonly if he is a Brahmin, a Kayastha if he is a Kayastha and so on. The capacity to \nappreciate merits in a man apart from his caste does not exist in a Hindu. There is \nappreciation of virtue but only when the man is a fellow caste-man. The whole morality \nis as bad as tribal morality. My caste-man, right or wrong; my caste-man, good or bad. It \nis not a case of standing by virtue and not standing by vice. It is a case of standing or not \nstanding by the caste. Have not Hindus committed treason against their country in the \ninterests of their caste?",
+          "isPlaceholder": false,
+          "pyqCitations": []
+        }
+      ]
+    },
+    {
+      "id": "gandhi",
+      "name": "Mahatma Gandhi",
+      "workTitle": "Hind Swaraj / Indian Home Rule",
+      "year": 1909,
+      "publicDomainBasis": "Author d. 1948; PD in India 60y post-death (since 2009)",
+      "passages": [
+        {
+          "id": "gandhi-hs-p1",
+          "text": "Civilisation  is  that  mode  of  conduct  which \npoints  out  to  man  the  path  of  duty.  Performance \nof  duty  arid  observance  of  morality  are  convertible \nterms.  To  observe  morality  is  to  attain  mastery \nover  our  mind  and  our  passions.  Sd-  doing,  we \nknow  ourselves.  The  Gujarati  equivalent  for \ncivilisation  means  \"  good  conduct.\" \n\nIf  this  definition  be  correct,  then  India,  as \nso  many  writers  have  shown,  has  nothing  to  learn \nftom  anybody  else,  and  this  is  as  it  should  be. \nWe  notice  that  mind  is  a  restless  bird ;  the  more  it \ngets  the  more  it  wants,  and  still  remains  unsatis- \nfied. The  more  we  indulge  our  passions,  the  more \nunbridled  they  become.  Our  ancestors,  therefore, \nset  a  limit  to  our  indulgences.  They  saw  that \nhappiness  was  largely  a  mental  condition.  A  man \nis  not  necessarily  happy  because  he  is  rich,  or \nunhappy  because  he  is  poor.  The  rich  are  often \ns&em  to  be  unhappy,  the  poor  to  be  happy.  Millions \nwill  always  remain  poor.  Observing  all  this,  our \nancestors  dissuaded  us  from  luxuries  and  pleasures. \nWe  have  managed  with  the  same  kind  of  plough  as \nit  existed  thousands  of  years  ago.  We  have \nretained  the  same  kind  of  cottages  that  we  had'  in \nformer  times,  and  our  indigenous  education  remains \nthe  same  as  before.  We  have  had  no  system  of \nlife-corroding  competition.  Each  followed  his  own \noccupation  or  trade,  and  charged  a  regulation  Wage.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2015,
+              "paper": "GS-IV",
+              "note": "Definition of true civilisation as performance of duty and mastery over mind."
+            }
+          ]
+        },
+        {
+          "id": "gandhi-hs-p2",
+          "text": "Passive  resistance  is  a  method  of \nsecuring  rights  by  personal  suffering ;  it  is  the \nreverse  of  resistance  by  arms.  When  I  refuse  to \ndo  a  thing  that  is  repugnant  to  my  conscience,  I \nuse  soul-force.  For  instance,  the  government  of \nthe  day  has  passed  a  iaw  which  is  applicable  to \nme.  I  do  not  like  it.  If,  by  using  violence,  I \nforce  the  government  to  repeal  the  law,  I  am \nemyloying  what  may  be  termed  body-force.  If  I \ndo  not  obey  the  law,  and  accept  the  penalty  for \nits  breach,  I  use  soul-force.  It  involves  sacrifice \nof  self. \n\nEverybody  admits  that  sacrifice  of  self  is \ninfinitely  superior  to  sacrifice  of  others.  Moreover, \nif  this  kind  of  force  is  used  in  a  cause  that  is  unjust, \nonly  the  person  using  it  suffers.  He  does  not  make \nothers  suffer  for  his  mistakes.  Men  have  before  now \ndone  many  things  which  were  subsequently  found \nto  have  been  wrong,  No  man  can  claim  to  be \nabsolutely  in  the  right,  or  that  a  particular  thing  is \nwrong,  because  he  thinks  so,  but  it  is  wrong  for \nbim  so*  long  as  that  is    his  deliberate    judgment. \n\n\n; \n\n\n76  INDIAN    HOME    RULE \n\nIt  is,  therefore,  meet  that  he  should  hot  do  that \nwhich  he  knows  to  be  wrong,  and  suffer  the \nconsequence  whatever  it  may  be.  This  is  the \nkey  to  the  use  of    soul-force.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2019,
+              "paper": "GS-IV",
+              "note": "Passive resistance, soul-force vs brute force, and moral courage."
+            }
+          ]
+        },
+        {
+          "id": "gandhi-hs-p3",
+          "text": "Those  alone \nwho  have  been  affected  by  western  civilisa- \ntion have  become  enslaved.  We  measure  the  uni- \nverse by  our  own  miseraole  foot-rule.  When  we \nare  slaves,  we  think  that  the  whole  universe  is \nenslaved.  Because  we  are  in  an  abject  condition, \nwe  think  that  the  whole  of  India  is  in  that  condi- \ntion. As  a  matter  of  fact,  it  is  not  so,  but  it  is  as \nwell  to  impute  our  slavery  to  the  whole  of  India. \nBut  if  we  bear  in  mind  the  above  fact,  we  can  see \nhat,  if  we  become  free,   India  is  free.     And  in  this \n\n\nHOW   CAN    INDIA   BECOME    FREE  59 \n\n\n• \n\n\nthought  you  have  a  definition  of  Swaraj.  It  is \nSwaraj  when  we  learn  to  rule  ourselves.  It  is, \ntherefore,  in  the  palm  of  our  hands.  Dcf  not  con- \nsider this  Swaraj  to  be  like  a  dream.  Hence  there \nis  no  idea  of  sitting  still  The  Swaraj  that  I  wish \nto  picture  before  you  and  me  is  such  that,  after  we \nhave  once  realised  it,  we  will  endeavour  to  the \nend  of  our  life-time  to  persuade  others  to  do  like- \nwise. But  such  Swaraj  has  to  be  experienced  by \neach  one  for  himself.  One  drowning  man  will \nnever  save  another.  Slaves  ourselves,  it  would  be \na  mere  pretention  to  think  of  freeing  others.  Now \nyou  will  have  seen  that  it  is  not  necessary  for  us \nto  have  as  our  goal  the  expulsion  of  the  English. \nIf  the  English  become  Indianised,  we  can  accom- \nmodate them.  If  they  wish  to  remain  in  India \nalong  with  their  civilisation,  there  is  no  room  for \nthem.  It  lies  with  us  to  bring  about  such  a  state \nof  things.",
+          "isPlaceholder": false,
+          "pyqCitations": []
+        }
+      ]
+    },
+    {
+      "id": "kant",
+      "name": "Immanuel Kant",
+      "workTitle": "Fundamental Principles of the Metaphysic of Morals",
+      "year": 1785,
+      "publicDomainBasis": "Author d. 1804 (Trans. Abbott 1898); Public Domain worldwide",
+      "passages": [
+        {
+          "id": "kant-fpm-p1",
+          "text": "Nothing can possibly be conceived in the world, or even out of it, which\n can be called good, without qualification, except a good will.\n Intelligence, wit, judgement, and the other talents of the mind, however\n they may be named, or courage, resolution, perseverance, as qualities of\n temperament, are undoubtedly good and desirable in many respects; but\n these gifts of nature may also become extremely bad and mischievous if the\n will which is to make use of them, and which, therefore, constitutes what\n is called character, is not good. It is the same with the gifts of\n fortune. Power, riches, honour, even health, and the general well-being\n and contentment with one's condition which is called happiness, inspire\n pride, and often presumption, if there is not a good will to correct the\n influence of these on the mind, and with this also to rectify the whole\n principle of acting and adapt it to its end. The sight of a being who is\n not adorned with a single feature of a pure and good will, enjoying\n unbroken prosperity, can never give pleasure to an impartial rational\n spectator. Thus a good will appears to constitute the indispensable\n condition even of being worthy of happiness.\n \n \n\n There are even some qualities which are of service to this good will\n itself and may facilitate its action, yet which have no intrinsic\n unconditional value, but always presuppose a good will, and this qualifies\n the esteem that we justly have for them and does not permit us to regard\n them as absolutely good.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2020,
+              "paper": "GS-IV",
+              "note": "Deontological ethics, good will as the only unqualified good."
+            }
+          ]
+        },
+        {
+          "id": "kant-fpm-p2",
+          "text": "When I conceive a hypothetical imperative, in general I do not know\n beforehand what it will contain until I am given the condition. But when I\n conceive a categorical imperative, I know at once what it contains. For as\n the imperative contains besides the law only the necessity that the maxims\n * shall conform to this law, while the law contains no conditions\n restricting it, there remains nothing but the general statement that the\n maxim of the action should conform to a universal law, and it is this\n conformity alone that the imperative properly represents as necessary.\n \n\n * A maxim is a subjective principle of action, and must be\n distinguished from the objective principle, namely,\n practical law. The former contains the practical rule set by\n reason according to the conditions of the subject (often its\n ignorance or its inclinations), so that it is the principle\n on which the subject acts; but the law is the objective\n principle valid for every rational being, and is the\n principle on which it ought to act that is an imperative.\n\n \n\n There is therefore but one categorical imperative, namely, this: Act only\n on that maxim whereby thou canst at the same time will that it should\n become a universal law.\n \n \n\n Now if all imperatives of duty can be deduced from this one imperative as\n from their principle, then, although it should remain undecided what is\n called duty is not merely a vain notion, yet at least we shall be able to\n show what we understand by it and what this notion means.\n \n \n\n Since the universality of the law according to which effects are produced\n constitutes what is properly called nature in the most general sense (as\n to form), that is the existence of things so far as it is determined by\n general laws, the imperative of duty may be expressed thus: Act as if the\n maxim of thy action were to become by thy will a universal law of nature.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2022,
+              "paper": "GS-IV",
+              "note": "The Categorical Imperative and universalizability test for moral maxims."
+            }
+          ]
+        },
+        {
+          "id": "kant-fpm-p3",
+          "text": "Now I say: man and generally any rational being exists as an end in\n himself, not merely as a means to be arbitrarily used by this or that\n will, but in all his actions, whether they concern himself or other\n rational beings, must be always regarded at the same time as an end. All\n objects of the inclinations have only a conditional worth, for if the\n inclinations and the wants founded on them did not exist, then their\n object would be without value. But the inclinations, themselves being\n sources of want, are so far from having an absolute worth for which they\n should be desired that on the contrary it must be the universal wish of\n every rational being to be wholly free from them. Thus the worth of any\n object which is to be acquired by our action is always conditional. Beings\n whose existence depends not on our will but on nature's, have\n nevertheless, if they are irrational beings, only a relative value as\n means, and are therefore called things; rational beings, on the contrary,\n are called persons, because their very nature points them out as ends in\n themselves, that is as something which must not be used merely as means,\n and so far therefore restricts freedom of action (and is an object of\n respect). These, therefore, are not merely subjective ends whose existence\n has a worth for us as an effect of our action, but objective ends, that\n is, things whose existence is an end in itself; an end moreover for which\n no other can be substituted, which they should subserve merely as means,\n for otherwise nothing whatever would possess absolute worth; but if all\n worth were conditioned and therefore contingent, then there would be no\n supreme practical principle of reason whatever.\n \n \n\n If then there is a supreme practical principle or, in respect of the human\n will, a categorical imperative, it must be one which, being drawn from the\n conception of that which is necessarily an end for everyone because it is\n an end in itself, constitutes an objective principle of will, and can\n therefore serve as a universal practical law. The foundation of this\n principle is: rational nature exists as an end in itself. Man necessarily\n conceives his own existence as being so; so far then this is a subjective\n principle of human actions. But every other rational being regards its\n existence similarly, just on the same rational principle that holds for\n me: * so that it is at the same time an objective principle, from which as\n a supreme practical law all laws of the will must be capable of being\n deduced. Accordingly the practical imperative will be as follows: So act\n as to treat humanity, whether in thine own person or in that of any other,\n in every case as an end withal, never as means only.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2023,
+              "paper": "GS-IV",
+              "note": "Humanity as an end in itself (Formula of Humanity) vs commodification."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

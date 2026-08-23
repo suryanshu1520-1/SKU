@@ -1,0 +1,80 @@
+version: '3.9'
+
+services:
+  # Main Tark full-stack app (frontend + backend bundled)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tark-app
+    ports:
+      - "3000:3000"
+    environment:
+      # Database
+      SUPABASE_URL: ${SUPABASE_URL:-https://ixngfxaerlkkcacrbdgc.supabase.co}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+      VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:-https://ixngfxaerlkkcacrbdgc.supabase.co}
+      VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+      
+      # AI (Gemini)
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      
+      # Monetization (Razorpay)
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET}
+      VITE_RAZORPAY_KEY_ID: ${VITE_RAZORPAY_KEY_ID}
+      
+      # Security & Workers
+      INTERNAL_WORKER_SECRET: ${INTERNAL_WORKER_SECRET}
+      CRON_SECRET: ${CRON_SECRET}
+      
+      # Runtime
+      NODE_ENV: production
+      PORT: 3000
+    
+    env_file:
+      - .env
+    
+    volumes:
+      - ./src:/app/src
+      - ./server-lib:/app/server-lib
+      - ./public:/app/public
+    
+    restart: unless-stopped
+    
+    # Health check (inherited from Dockerfile)
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  # Optional: separate development service with hot reload (for local iteration)
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: tark-dev
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      VITE_HMR: localhost:3000
+      DISABLE_HMR: "false"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
+    restart: unless-stopped
+    profiles:
+      - dev
+    depends_on:
+      - app
+
+volumes:
+  node_modules:
+    driver: local

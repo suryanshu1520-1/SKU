@@ -103,3 +103,9 @@ _scratch/
 *.dryrun.*
 cluster-test.ts
 tsconfig.verify*.json
+
+# ── Local Agent Plugin State & Sessions ──
+.claudian/
+gemini-scribe/
+.smart-env/
+.obsidian/plugins/*/data.json

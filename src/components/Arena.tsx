@@ -26,6 +26,7 @@ import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import { Modal, EmptyState } from './shared';
+import staticQuestionsData from '../data/static-subject-questions.json';
 
 interface ArenaProps {
   onComplete: (
@@ -426,7 +427,21 @@ export default function Arena({
 
         if (data.error) throw new Error(data.error);
 
-        const questionsList = data.questions || [];
+        let questionsList = data.questions || [];
+        if (questionsList.length === 0) {
+          // Fallback to locally ingested static subject questions
+          questionsList = (staticQuestionsData.questions || []).map((q: any, i: number) => ({
+            id: q.id || `static_${i + 1}`,
+            exam_origin_tag: q.exam_origin_tag || 'UPSC CSE Practice',
+            subject_category: q.subject_category || 'General Studies',
+            difficulty_level: q.difficulty_level || 'medium',
+            question_text: q.question_text,
+            options_matrix: q.options_matrix,
+            correct_option: q.correct_option,
+            conceptual_explanation: q.conceptual_explanation
+          }));
+        }
+
         if (questionsList.length === 0) {
           setErrorMsg('No questions found in the origin database.');
           setIsLoading(false);
@@ -443,7 +458,29 @@ export default function Arena({
           mode: 'vanguard',
         });
       } catch (error: any) {
-        setErrorMsg('Failed to initialize arena: ' + (error.message || 'Unknown network error.'));
+        // Fallback to locally ingested static questions on network error
+        const fallbackList = (staticQuestionsData.questions || []).map((q: any, i: number) => ({
+          id: q.id || `static_${i + 1}`,
+          exam_origin_tag: q.exam_origin_tag || 'UPSC CSE Practice',
+          subject_category: q.subject_category || 'General Studies',
+          difficulty_level: q.difficulty_level || 'medium',
+          question_text: q.question_text,
+          options_matrix: q.options_matrix,
+          correct_option: q.correct_option,
+          conceptual_explanation: q.conceptual_explanation
+        }));
+
+        if (fallbackList.length > 0) {
+          const shuffled = [...fallbackList].sort(() => 0.5 - Math.random());
+          setQuestions(shuffled.slice(0, 25));
+          saveActiveSessionMeta({
+            currentQuestionIndex: 0,
+            isRanked: true,
+            mode: 'vanguard',
+          });
+        } else {
+          setErrorMsg('Failed to initialize arena: ' + (error.message || 'Unknown network error.'));
+        }
       } finally {
         setIsLoading(false);
       }
