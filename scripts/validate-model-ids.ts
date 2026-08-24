@@ -9,9 +9,9 @@ import "dotenv/config";
 import { GoogleGenAI } from "@google/genai";
 
 const GEMINI_MODELS = [
-  "gemini-2.5-flash",
-  "gemini-2.0-flash-lite",
+  "gemini-3.6-flash",
   "gemini-3.5-flash",
+  "gemini-3.5-flash-lite",
   "gemini-3.1-flash-lite",
 ];
 
@@ -22,7 +22,6 @@ const GEMINI_EMBED_MODELS = [
 const GROQ_MODELS = [
   "openai/gpt-oss-120b",
   "openai/gpt-oss-20b",
-  "llama-3.3-70b-versatile",
 ];
 
 async function validateGeminiModels(apiKey: string) {

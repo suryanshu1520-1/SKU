@@ -1,10 +1,13 @@
 /**
- * PIB Aggregator v2 - Production Pipeline
+ * PIB Aggregator v3 - Production Policy Intelligence Engine
  *
- * Scrapes "Daily PIB Highlights" from Lukmaan IAS (primary), with
- * InsightsIAS as a defensive fallback. Passes raw text through
- * Llama 3.1 8B-Instruct to produce a JSON-structured, magazine-formatted
- * Markdown digest, then upserts the result into Supabase.
+ * Scrapes and synthesizes daily PIB and government policy digests from
+ * verified public-domain sources (Lukmaan IAS primary, InsightsIAS defensive fallback,
+ * and Official PIB English RSS as tertiary autonomous spine).
+ *
+ * Distills raw policy text via multi-provider LLM (Gemini primary → Groq fallback)
+ * into a high-density, analytical "Policy Dossier" formatted with GS Paper tags,
+ * structured quantitative Markdown tables, Prelims Trap Radars, and Mains 360° dimensions.
  *
  * Usage: npx tsx server-lib/cron/pib-aggregator.ts
  */
@@ -13,7 +16,7 @@ import { gotScraping } from "got-scraping";
 import * as cheerio from "cheerio";
 import { llmGenerate } from "../llm.js";
 import { createClient } from "@supabase/supabase-js";
-import WebSocket from 'ws';
+import WebSocket from "ws";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -21,29 +24,41 @@ dotenv.config();
 // ============================================================
 // CONFIGURATION
 // ============================================================
-const SCRAPE_TIMEOUT_MS = 10_000;
+const SCRAPE_TIMEOUT_MS = 15_000;
 const MAX_ARTICLES = 5;
-const LLM_INPUT_CHAR_LIMIT = 50000; // Increased significantly to allow full article processing
+const LLM_INPUT_CHAR_LIMIT = 50_000;
 
 const LUKMAAN_PIB_INDEX_URL = "https://blog.lukmaanias.com/category/pib-summary/";
 const INSIGHTS_IAS_FALLBACK_URL = "https://www.insightsonindia.com/current-affairs/daily-current-affairs/";
+const PIB_OFFICIAL_RSS_URL = "https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=1";
 
 // ============================================================
-// EDITORIAL SYSTEM PROMPT (JSON + Markdown Layout Engine)
+// EDITORIAL SYSTEM PROMPT (UPSC Policy Intelligence Engine)
 // ============================================================
 const EDITORIAL_SYSTEM_PROMPT = [
-  "You are an elite public policy editor.",
-  "Extract the policy facts from this raw text and format them into a high-signal 'Policy Magazine Digest'.",
-  "Format distinct policies with H3 (###) headers.",
-  "Use Markdown tables for numerical data and blockquotes (>) for mandates.",
-  "Bold key entities.",
-  "Strip all marketing fluff.",
-  "CRITICAL: You must output ONLY a valid JSON object with exactly three keys:",
-  "'title': A clean, professional title based on the text.",
-  "'date': The exact date of the updates extracted from the text in ISO 8601 format (YYYY-MM-DD). If multiple dates, use the most recent one.",
-  "'content': The heavily formatted Markdown string containing the digest.",
-  "Do NOT wrap the JSON in markdown code fences. Output the raw JSON object only.",
-].join(" ");
+  "You are an elite Senior Public Policy Analyst and Director of UPSC Intelligence.",
+  "Your task is to transform raw government press releases and coaching highlights into an authoritative, high-density 'Policy Intelligence Dossier'.",
+  "",
+  "STRUCTURE EACH TOPIC/POLICY WITH THE FOLLOWING BLUEPRINT:",
+  "1. Header: '### [Initiative / Policy / Scheme Name]'",
+  "2. GS Tag: '**Syllabus Mapping:** GS Paper [1/2/3/4] ([Key Syllabus Subtopics])'",
+  "3. Mandate: Use a blockquote ('> ...') for the sovereign mandate, executive intent, or core statutory objective.",
+  "4. Data Matrix: Create a clean Markdown table summarizing quantifiable facts (Outlays, Target Deadlines, Beneficiary Criteria, Nodal Ministry/Agency).",
+  "5. Prelims Trap Radar: Add a bulleted section titled '**🎯 Prelims Trap Radar**' highlighting subtle distinctions UPSC frequently tests (e.g. Centrally Sponsored vs Central Sector, Constitutional vs Statutory vs Executive body, Mandatory vs Advisory provisions).",
+  "6. Mains 360° Dimensions: Add concise bullet points under '**🏛️ Mains Analytical Dimensions**' covering socio-economic impact, federal dynamics, and administrative bottlenecks/way forward.",
+  "",
+  "EDITORIAL RULES:",
+  "- Strip all coaching marketing, institute promotion, subscribe buttons, and commentary boilerplate.",
+  "- Bold critical institutional entities, statutory acts, indices, and financial figures.",
+  "- Never fabricate facts; extract strictly from the provided policy text.",
+  "",
+  "OUTPUT FORMAT REQUIREMENT:",
+  "Return ONLY a valid JSON object with exactly three keys:",
+  "  \"title\": A clean, high-signal editorial title (e.g. 'PIB Policy Dossier: Rural Economy Overhaul, Space Technology Mandates & Bio-Security').",
+  "  \"date\": The extracted release date in ISO 8601 format (YYYY-MM-DD). If multiple, use the latest.",
+  "  \"content\": The complete Markdown string formatted strictly according to the blueprint above.",
+  "Do NOT wrap the response in markdown code blocks like ```json ... ```. Output raw JSON object only."
+].join("\n");
 
 // ============================================================
 // SUPABASE CLIENT INITIALIZATION
@@ -73,10 +88,10 @@ function getSupabaseClient() {
 }
 
 // ============================================================
-// SCRAPER: Fetch the latest PIB article URL from Lukmaan IAS
+// SCRAPER: Fetch latest PIB article URLs from Lukmaan IAS
 // ============================================================
 async function fetchLukmaanArticleLinks(): Promise<{ title: string; url: string }[]> {
-  console.log("[pib-aggregator] Fetching article index from Lukmaan IAS...");
+  console.log("[pib-aggregator] [1/3] Probing primary source: Lukmaan IAS PIB Index...");
 
   const response = await gotScraping({
     url: LUKMAAN_PIB_INDEX_URL,
@@ -87,14 +102,10 @@ async function fetchLukmaanArticleLinks(): Promise<{ title: string; url: string 
   const $ = cheerio.load(response.body);
   const articles: { title: string; url: string }[] = [];
 
-  // Lukmaan IAS is a WordPress blog. Article links live inside
-  // broad semantic containers. We target <a> tags with href patterns
-  // matching their daily PIB highlight URL structure.
   $("a").each((_i, el) => {
     const href = $(el).attr("href") || "";
     const text = $(el).text().trim();
 
-    // Match the daily-pib-highlights URL slug pattern
     if (
       text.length > 10 &&
       href.includes("/daily-pib-highlights") &&
@@ -105,7 +116,6 @@ async function fetchLukmaanArticleLinks(): Promise<{ title: string; url: string 
         ? href
         : "https://blog.lukmaanias.com" + (href.startsWith("/") ? href : "/" + href);
 
-      // Deduplicate by URL
       if (!articles.some((a) => a.url === fullUrl)) {
         articles.push({ title: text, url: fullUrl });
       }
@@ -113,7 +123,7 @@ async function fetchLukmaanArticleLinks(): Promise<{ title: string; url: string 
   });
 
   const limited = articles.slice(0, MAX_ARTICLES);
-  console.log(`[pib-aggregator] Lukmaan IAS: Found ${articles.length} PIB links, using first ${limited.length}`);
+  console.log(`[pib-aggregator] Lukmaan IAS: Discovered ${articles.length} PIB archives, selecting ${limited.length}`);
   return limited;
 }
 
@@ -121,7 +131,7 @@ async function fetchLukmaanArticleLinks(): Promise<{ title: string; url: string 
 // FALLBACK SCRAPER: InsightsIAS Daily Current Affairs + PIB
 // ============================================================
 async function fetchInsightsIASArticleLinks(): Promise<{ title: string; url: string }[]> {
-  console.log("[pib-aggregator] FALLBACK: Fetching from InsightsIAS...");
+  console.log("[pib-aggregator] [2/3] Probing fallback source: InsightsIAS Current Affairs...");
 
   const response = await gotScraping({
     url: INSIGHTS_IAS_FALLBACK_URL,
@@ -132,7 +142,6 @@ async function fetchInsightsIASArticleLinks(): Promise<{ title: string; url: str
   const $ = cheerio.load(response.body);
   const articles: { title: string; url: string }[] = [];
 
-  // InsightsIAS is also WordPress. Use broad semantic extraction.
   $("article a, main a, .entry-content a, .td-block-span a, h3 a, h2 a").each((_i, el) => {
     const href = $(el).attr("href") || "";
     const text = $(el).text().trim();
@@ -148,7 +157,6 @@ async function fetchInsightsIASArticleLinks(): Promise<{ title: string; url: str
     }
   });
 
-  // If no PIB-specific links, grab whatever daily current affairs links exist
   if (articles.length === 0) {
     $("article a, main a, .entry-content a, h3 a, h2 a").each((_i, el) => {
       const href = $(el).attr("href") || "";
@@ -167,15 +175,48 @@ async function fetchInsightsIASArticleLinks(): Promise<{ title: string; url: str
   }
 
   const limited = articles.slice(0, MAX_ARTICLES);
-  console.log(`[pib-aggregator] InsightsIAS: Found ${articles.length} links, using first ${limited.length}`);
+  console.log(`[pib-aggregator] InsightsIAS: Discovered ${articles.length} links, selecting ${limited.length}`);
   return limited;
 }
 
 // ============================================================
-// SCRAPER: Extract article body using broad semantic selectors
+// TERTIARY FALLBACK: Official Direct PIB English RSS Feed
+// ============================================================
+async function fetchOfficialPibRssArticles(): Promise<{ title: string; url: string; body?: string }[]> {
+  console.log("[pib-aggregator] [3/3] Probing autonomous spine: Official PIB English RSS...");
+
+  try {
+    const response = await gotScraping({
+      url: PIB_OFFICIAL_RSS_URL,
+      headerGeneratorOptions: { browsers: [{ name: "chrome" }] },
+      timeout: { request: SCRAPE_TIMEOUT_MS },
+    });
+
+    const $ = cheerio.load(response.body, { xmlMode: true });
+    const items: { title: string; url: string }[] = [];
+
+    $("item").each((_i, el) => {
+      const title = $(el).find("title").text().trim();
+      const link = $(el).find("link").text().trim() || $(el).find("guid").text().trim();
+
+      if (title && link && link.startsWith("http")) {
+        items.push({ title, url: link });
+      }
+    });
+
+    console.log(`[pib-aggregator] Official PIB RSS: Discovered ${items.length} releases`);
+    return items.slice(0, MAX_ARTICLES);
+  } catch (err: any) {
+    console.warn(`[pib-aggregator] Official PIB RSS probe failed: ${err.message}`);
+    return [];
+  }
+}
+
+// ============================================================
+// SCRAPER: Extract article body using high-precision semantic containers
 // ============================================================
 async function scrapeArticleBody(url: string): Promise<string> {
-  console.log(`[pib-aggregator] Scraping article body: ${url}`);
+  console.log(`[pib-aggregator] Scraping article document: ${url}`);
 
   try {
     const response = await gotScraping({
@@ -186,13 +227,16 @@ async function scrapeArticleBody(url: string): Promise<string> {
 
     const $ = cheerio.load(response.body);
 
-    // Strip noise elements before extracting text
-    $("script, style, nav, footer, header, .sidebar, .advertisement, .social-share, .related-posts, .sharedaddy, .ssba, .comments-area, .ez-toc-container, .ez-toc-widget-container").remove();
+    // Strip noise and promotional boilerplate
+    $(
+      "script, style, nav, footer, header, .sidebar, .advertisement, " +
+      ".social-share, .related-posts, .sharedaddy, .ssba, .comments-area, " +
+      ".ez-toc-container, .ez-toc-widget-container, iframe, noscript"
+    ).remove();
 
-    let contentText = "";
-
-    // Broad semantic selectors for the main article wrapper
+    // Semantic selectors matching Lukmaan, InsightsIAS, and official PIB ASP.NET containers
     const selectors = [
+      ".innner-page-main-about-us-content-right-part", // Official PIB container
       ".elementor-widget-theme-post-content",
       ".entry-content",
       ".td-post-content",
@@ -204,7 +248,7 @@ async function scrapeArticleBody(url: string): Promise<string> {
     let contentContainer = null;
     for (const selector of selectors) {
       const container = $(selector);
-      if (container.length > 0) {
+      if (container.length > 0 && container.text().trim().length > 100) {
         contentContainer = container;
         break;
       }
@@ -214,23 +258,26 @@ async function scrapeArticleBody(url: string): Promise<string> {
       contentContainer = $("body");
     }
 
-    // Extract text specifically from content-bearing tags to avoid truncation and squashing
     const chunks: string[] = [];
-    contentContainer.find("h1, h2, h3, h4, p, li").each((_i, el) => {
-      const text = $(el).text().replace(/\s+/g, " ").trim();
-      if (text.length > 20) {
-        chunks.push(text);
+    contentContainer.find("h1, h2, h3, h4, p, li, table").each((_i, el) => {
+      const tag = el.tagName.toLowerCase();
+      if (tag === "table") {
+        const tableText = $(el).text().replace(/\s+/g, " ").trim();
+        if (tableText.length > 20) chunks.push(tableText);
+      } else {
+        const text = $(el).text().replace(/\s+/g, " ").trim();
+        if (text.length > 20) chunks.push(text);
       }
     });
 
-    contentText = chunks.join("\n\n");
+    const contentText = chunks.join("\n\n");
 
-    if (contentText.length < 50) {
-      console.warn(`[pib-aggregator] Article body too short (${contentText.length} chars), skipping: ${url}`);
+    if (contentText.length < 100) {
+      console.warn(`[pib-aggregator] Article body below threshold (${contentText.length} chars), skipping: ${url}`);
       return "";
     }
 
-    console.log(`[pib-aggregator] Extracted ${contentText.length} chars from: ${url}`);
+    console.log(`[pib-aggregator] Extracted ${contentText.length} clean characters from: ${url}`);
     return contentText;
   } catch (error: any) {
     console.error(`[pib-aggregator] Failed to scrape article body: ${error.message}`);
@@ -239,154 +286,136 @@ async function scrapeArticleBody(url: string): Promise<string> {
 }
 
 // ============================================================
-// LLM: Pass raw text through Llama 3.1 editorial engine
+// LLM: Multi-Strategy Distillation & Resilient Parser
 // ============================================================
 function clampText(input: string, maxChars: number): string {
   return input.length <= maxChars ? input : input.slice(0, maxChars);
 }
 
-// Parsed structure from the LLM JSON response
-type DigestPayload = {
+export type DigestPayload = {
   title: string;
   date: string;
   content: string;
 };
 
 /**
- * Safely parse the LLM response as JSON.
- * Handles common LLM quirks:
- *  - Markdown code fences (```json ... ```)
- *  - Python-style triple-quoted strings (""" ... """)
- *  - Unescaped newlines inside string values
- *  - Trailing commas before closing braces
- *  - Falls back to regex-based key extraction when JSON.parse fails entirely
+ * Bulletproof Multi-Strategy Parser for LLM Distillation Outputs.
+ * Handles:
+ *  - Direct JSON parse
+ *  - Code-fence stripped JSON
+ *  - Triple-quote & unescaped newline normalization
+ *  - Regex-based key & boundary extraction
+ *  - Direct Markdown fallback
  */
-function parseLlmJson(raw: string): DigestPayload | null {
+function parseLlmDigest(raw: string, fallbackTitle: string): DigestPayload | null {
   let cleaned = raw.trim();
 
-  // Strip markdown code fences (```json ... ``` or ``` ... ```)
-  cleaned = cleaned.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
-  cleaned = cleaned.trim();
+  // Strip code fences
+  cleaned = cleaned.replace(/^```(?:json|markdown)?\s*/i, "").replace(/\s*```$/i, "").trim();
 
-  // Normalize triple-quoted strings: replace """ with " and escape inner content
-  // LLMs sometimes output Python-style triple quotes for multiline strings
-  function normalizeTripleQuotes(input: string): string {
-    // Match patterns like: "key": """value""" or "key": """value\n...\n"""
-    return input.replace(
-      /"""\s*([\s\S]*?)\s*"""/g,
-      (_match, innerContent) => {
-        // Escape the inner content for valid JSON
-        const escaped = innerContent
-          .replace(/\\/g, "\\\\")
-          .replace(/"/g, '\\"')
-          .replace(/\n/g, "\\n")
-          .replace(/\r/g, "\\r")
-          .replace(/\t/g, "\\t");
-        return '"' + escaped + '"';
-      }
-    );
-  }
-
-  // Strip trailing commas before closing braces/brackets
-  function stripTrailingCommas(input: string): string {
-    return input.replace(/,\s*([\]}])/g, "$1");
-  }
-
-  // Attempt 1: Direct JSON parse
+  // Strategy 1: Direct JSON.parse
   try {
     const parsed = JSON.parse(cleaned);
     if (parsed && typeof parsed.title === "string" && typeof parsed.content === "string") {
       return {
-        title: parsed.title,
-        date: parsed.date || new Date().toISOString().split("T")[0],
-        content: parsed.content,
+        title: parsed.title.trim(),
+        date: parsed.date ? String(parsed.date).trim() : new Date().toISOString().split("T")[0],
+        content: parsed.content.trim(),
       };
     }
   } catch {
-    // Direct parse failed, continue to normalization
+    // Continue to next strategy
   }
 
-  // Attempt 2: Normalize triple quotes and retry
+  // Strategy 2: Triple-quote & escape normalization
   const jsonBlock = cleaned.match(/\{[\s\S]*\}/);
   if (jsonBlock) {
-    const normalized = stripTrailingCommas(normalizeTripleQuotes(jsonBlock[0]));
     try {
+      let normalized = jsonBlock[0]
+        .replace(/"""\s*([\s\S]*?)\s*"""/g, (_m, inner) => {
+          return JSON.stringify(inner);
+        })
+        .replace(/,\s*([\]}])/g, "$1");
+
       const parsed = JSON.parse(normalized);
       if (parsed && typeof parsed.title === "string" && typeof parsed.content === "string") {
         return {
-          title: parsed.title,
-          date: parsed.date || new Date().toISOString().split("T")[0],
-          content: parsed.content,
+          title: parsed.title.trim(),
+          date: parsed.date ? String(parsed.date).trim() : new Date().toISOString().split("T")[0],
+          content: parsed.content.trim(),
         };
       }
     } catch {
-      // Normalized parse also failed
+      // Continue to regex extraction
     }
   }
 
-  // Attempt 3: Manual regex extraction as last resort
-  // This handles cases where the JSON is structurally broken but keys are present
-  console.warn("[pib-aggregator] JSON.parse failed. Attempting manual key extraction...");
+  // Strategy 3: Boundary Regex Extraction
+  console.warn("[pib-aggregator] JSON parse failed, deploying boundary regex extractor...");
   const source = jsonBlock ? jsonBlock[0] : cleaned;
 
-  const titleMatch = source.match(/"title"\s*:\s*"([^"]+)"/);
-  const dateMatch = source.match(/"date"\s*:\s*"([^"]+)"/);
+  const titleMatch = source.match(/"title"\s*:\s*"([^"]+)"/i);
+  const dateMatch = source.match(/"date"\s*:\s*"([^"]+)"/i);
+  const contentMatch = source.match(/"content"\s*:\s*"{1,3}([\s\S]*)/i);
 
-  // For content, grab everything between "content": and the end of the object
-  // This handles multi-line content with triple quotes or unescaped newlines
-  const contentMatch = source.match(/"content"\s*:\s*"{0,3}\s*([\s\S]*)/);
-
-  if (titleMatch && contentMatch) {
+  if (contentMatch) {
     let contentValue = contentMatch[1].trim();
-    // Strip trailing """, closing braces, and trailing quotes
     contentValue = contentValue
       .replace(/"""\s*\}?\s*$/, "")
       .replace(/"\s*\}?\s*$/, "")
       .replace(/\}\s*$/, "")
       .trim();
 
-    console.log("[pib-aggregator] Manual extraction succeeded.");
     return {
-      title: titleMatch[1],
-      date: dateMatch ? dateMatch[1] : new Date().toISOString().split("T")[0],
+      title: titleMatch ? titleMatch[1].trim() : fallbackTitle,
+      date: dateMatch ? dateMatch[1].trim() : new Date().toISOString().split("T")[0],
       content: contentValue,
     };
   }
 
-  console.error("[pib-aggregator] All JSON parsing strategies failed. Raw output:");
-  console.error(cleaned.substring(0, 500));
+  // Strategy 4: Raw Markdown Fallback (when LLM returns pure markdown dossier)
+  if (cleaned.startsWith("#") || cleaned.includes("###") || cleaned.includes("GS Paper")) {
+    console.log("[pib-aggregator] LLM returned direct high-yield Markdown dossier.");
+    const dateMatchMd = cleaned.match(/\b(202[4-9]-\d{2}-\d{2})\b/);
+    return {
+      title: fallbackTitle,
+      date: dateMatchMd ? dateMatchMd[1] : new Date().toISOString().split("T")[0],
+      content: cleaned,
+    };
+  }
+
+  console.error("[pib-aggregator] All parsing strategies exhausted. Raw output sample:");
+  console.error(cleaned.substring(0, 400));
   return null;
 }
 
-async function transformWithLlama(rawText: string): Promise<DigestPayload | null> {
-  console.log("[pib-aggregator] Distilling digest via multi-provider LLM (Gemini → Groq)...");
+async function distillPolicyDigest(rawText: string, articleTitle: string): Promise<DigestPayload | null> {
+  console.log("[pib-aggregator] Routing policy synthesis to multi-provider LLM (Gemini 3.x → Groq)...");
 
   try {
-    // Routed through the resilient multi-provider layer instead of the dead
-    // Hugging Face Gradio Space. json:true asks the provider for a JSON object;
-    // parseLlmJson still defensively repairs code fences / triple-quotes / etc.
     const result = await llmGenerate({
       system: EDITORIAL_SYSTEM_PROMPT,
-      prompt: ["Raw policy text to transform:", clampText(rawText, LLM_INPUT_CHAR_LIMIT)].join("\n"),
-      temperature: 0.3,
+      prompt: ["Raw policy disclosures to synthesize into UPSC Policy Dossier:", clampText(rawText, LLM_INPUT_CHAR_LIMIT)].join("\n\n"),
+      temperature: 0.25,
       json: true,
+      maxTokens: 8192,
     });
 
     if (!result || !result.text) {
-      console.warn("[pib-aggregator] All LLM providers returned empty/unavailable");
+      console.warn("[pib-aggregator] All configured LLM providers returned empty or unavailable.");
       return null;
     }
 
-    console.log(`[pib-aggregator] LLM (${result.provider}/${result.model}) returned ${result.text.length} chars`);
-    return parseLlmJson(result.text);
+    console.log(`[pib-aggregator] Received synthesis from [${result.provider.toUpperCase()} / ${result.model}] (${result.text.length} chars)`);
+    return parseLlmDigest(result.text, articleTitle);
   } catch (error: any) {
-    console.error(`[pib-aggregator] LLM distillation failed: ${error?.message ?? String(error)}`);
+    console.error(`[pib-aggregator] Policy distillation failed: ${error?.message ?? String(error)}`);
     return null;
   }
 }
 
 // ============================================================
-// DATABASE: Upsert the digest into Supabase
+// DATABASE: Supabase Upsert & Idempotency Check
 // ============================================================
 async function upsertDigest(
   digest: DigestPayload,
@@ -394,20 +423,23 @@ async function upsertDigest(
 ): Promise<{ ok: boolean; errorMessage?: string }> {
   const supabase = getSupabaseClient();
 
-  // Use the actual source URL as the stable, unique URL
-  // This ensures we don't duplicate articles and can check against source URLs
+  const formattedDate = digest.date.includes("T")
+    ? digest.date.split("T")[0]
+    : digest.date;
+
   const row = {
     title: digest.title,
-    date: digest.date.includes("T") ? digest.date.split("T")[0] : digest.date,
+    date: formattedDate,
     content: digest.content,
     url: sourceUrl,
     created_at: new Date().toISOString(),
   };
 
-  console.log("[pib-aggregator] Upserting to Supabase pib_digests...", {
-    title: row.title.substring(0, 60),
+  console.log("[pib-aggregator] Upserting to Supabase pib_digests table...", {
+    title: row.title.substring(0, 65) + "...",
     url: row.url,
     date: row.date,
+    contentLength: row.content.length,
   });
 
   try {
@@ -416,21 +448,18 @@ async function upsertDigest(
       .upsert([row], { onConflict: "url" });
 
     if (error) {
-      console.error(`[pib-aggregator] Supabase upsert rejected: code=${error.code} message=${error.message} details=${error.details}`);
+      console.error(`[pib-aggregator] Supabase upsert rejected: code=${error.code} message=${error.message}`);
       return { ok: false, errorMessage: error.message };
     }
 
-    console.log("[pib-aggregator] Supabase upsert successful");
+    console.log("[pib-aggregator] Supabase upsert verified successfully.");
     return { ok: true };
   } catch (e: any) {
-    console.error(`[pib-aggregator] Supabase connection error: ${e?.message ?? String(e)}`);
+    console.error(`[pib-aggregator] Supabase connection failure: ${e?.message ?? String(e)}`);
     return { ok: false, errorMessage: e?.message ?? String(e) };
   }
 }
 
-// ============================================================
-// DATABASE: Check if article is already processed
-// ============================================================
 async function isArticleProcessed(url: string): Promise<boolean> {
   const supabase = getSupabaseClient();
   const { data, error } = await supabase
@@ -440,119 +469,120 @@ async function isArticleProcessed(url: string): Promise<boolean> {
     .single();
 
   if (error && error.code !== "PGRST116") {
-    // PGRST116 is "No rows found"
-    console.warn(`[pib-aggregator] DB check error for ${url}: ${error.message}`);
-    return false; // Assume not processed to avoid skipping on transient errors
+    console.warn(`[pib-aggregator] DB lookup warning for ${url}: ${error.message}`);
+    return false;
   }
 
   return !!data;
 }
 
 // ============================================================
-// MAIN EXECUTION
+// MAIN PIPELINE EXECUTION
 // ============================================================
-async function main() {
-  console.log("=".repeat(60));
-  console.log("[pib-aggregator] PIB Aggregator v2 - Production Run");
-  console.log("=".repeat(60));
+export async function runPibAggregatorPipeline(): Promise<{ processed: number; success: boolean }> {
+  console.log("=".repeat(70));
+  console.log("  TARK INTELLIGENCE ENGINE — PIB POLICY AGGREGATOR DAEMON");
+  console.log("=".repeat(70));
 
-  // Step 1: Fetch article links (Lukmaan IAS primary, InsightsIAS fallback)
   let articleLinks: { title: string; url: string }[] = [];
 
+  // Step 1: Lukmaan IAS Primary Acquisition
   try {
     articleLinks = await fetchLukmaanArticleLinks();
-    if (articleLinks.length > 0) {
-      console.log("[pib-aggregator] Primary source (Lukmaan IAS) succeeded.");
-    }
-  } catch (error: any) {
-    console.warn(`[pib-aggregator] Primary source (Lukmaan IAS) failed: ${error.message}`);
+  } catch (err: any) {
+    console.warn(`[pib-aggregator] Primary acquisition error: ${err.message}`);
   }
 
-  // Fallback to InsightsIAS if primary source yielded nothing
+  // Step 2: InsightsIAS Secondary Fallback
   if (articleLinks.length === 0) {
-    console.log("[pib-aggregator] Triggering fallback to InsightsIAS...");
     try {
       articleLinks = await fetchInsightsIASArticleLinks();
-    } catch (error: any) {
-      console.error(`[pib-aggregator] Fallback source (InsightsIAS) also failed: ${error.message}`);
+    } catch (err: any) {
+      console.warn(`[pib-aggregator] Secondary acquisition error: ${err.message}`);
+    }
+  }
+
+  // Step 3: Official PIB English RSS Tertiary Fallback
+  if (articleLinks.length === 0) {
+    try {
+      articleLinks = await fetchOfficialPibRssArticles();
+    } catch (err: any) {
+      console.error(`[pib-aggregator] Tertiary acquisition error: ${err.message}`);
     }
   }
 
   if (articleLinks.length === 0) {
-    console.error("[pib-aggregator] No article links found from any source. Exiting.");
-    process.exit(1);
+    console.error("[pib-aggregator] FATAL: No policy links discovered from any provider.");
+    return { processed: 0, success: false };
   }
 
-  // Filter out already processed articles
-  const newArticles = [];
-  for (const article of articleLinks) {
-    const processed = await isArticleProcessed(article.url);
-    if (!processed) {
-      newArticles.push(article);
+  // Step 4: Idempotency Filter
+  const unprocessedArticles: { title: string; url: string }[] = [];
+  for (const item of articleLinks) {
+    const alreadyDone = await isArticleProcessed(item.url);
+    if (!alreadyDone) {
+      unprocessedArticles.push(item);
+    } else {
+      console.log(`[pib-aggregator] Skipping already indexed release: ${item.url}`);
     }
   }
 
-  if (newArticles.length === 0) {
-    console.log("[pib-aggregator] No new PIB summaries released. Exiting silently.");
-    process.exit(0);
+  if (unprocessedArticles.length === 0) {
+    console.log("[pib-aggregator] All discovered releases are current and indexed. Pipeline complete.");
+    return { processed: 0, success: true };
   }
 
-  // The user requested to process only ONE article per run to ensure maximum quality and avoid overwhelming Llama
-  const articlesToProcess = newArticles.slice(0, 1);
-  console.log(`[pib-aggregator] Found ${newArticles.length} new articles. Processing the latest 1 to ensure highest digest quality.`);
+  // Process the freshest unprocessed digest
+  const targetArticles = unprocessedArticles.slice(0, 1);
+  console.log(`[pib-aggregator] Ingesting latest unindexed edition: "${targetArticles[0].title}"`);
 
-  // Step 2 & 3: Process the single new article
   let successCount = 0;
 
-  for (const article of articlesToProcess) {
+  for (const article of targetArticles) {
     const body = await scrapeArticleBody(article.url);
     if (!body) {
+      console.warn(`[pib-aggregator] Skipping article with unresolvable body: ${article.url}`);
       continue;
     }
 
-    const rawText = `[${article.title}]\n${body}`;
-    const digest = await transformWithLlama(rawText);
+    const rawPayload = `[EDITION: ${article.title}]\n[SOURCE: ${article.url}]\n\n${body}`;
+    const digest = await distillPolicyDigest(rawPayload, article.title);
 
     if (!digest) {
-      console.error(`[pib-aggregator] LLM transformation failed for: ${article.url}`);
+      console.error(`[pib-aggregator] Distillation returned null for: ${article.url}`);
       continue;
     }
 
-    // Log the parsed digest for review
-    console.log("\n" + "=".repeat(60));
-    console.log(`PARSED DIGEST: ${article.title}`);
-    console.log("=".repeat(60));
-    console.log(`Title: ${digest.title}`);
-    console.log(`Date:  ${digest.date}`);
-    console.log(`Content length: ${digest.content.length} chars`);
-    console.log("=".repeat(60));
-    console.log(digest.content.substring(0, 500) + "...\n(truncated for logs)");
-    console.log("=".repeat(60));
+    console.log("\n" + "-".repeat(70));
+    console.log(`★ POLICY DOSSIER SYNTHESIZED: ${digest.title}`);
+    console.log(`  Date: ${digest.date} | Length: ${digest.content.length} characters`);
+    console.log("-".repeat(70));
+    console.log(digest.content.substring(0, 450) + "\n... [truncated for terminal]");
+    console.log("-".repeat(70) + "\n");
 
-    // Step 4: Upsert to Supabase
-    const result = await upsertDigest(digest, article.url);
-
-    if (!result.ok) {
-      console.error(`[pib-aggregator] Database write failed for ${article.url}: ${result.errorMessage}`);
-    } else {
+    const writeResult = await upsertDigest(digest, article.url);
+    if (writeResult.ok) {
       successCount++;
+    } else {
+      console.error(`[pib-aggregator] Persistence failure: ${writeResult.errorMessage}`);
     }
-
-    // Polite delay between processing articles
-    await new Promise((r) => setTimeout(r, 2000));
   }
 
-  if (successCount === 0) {
-    console.error("\n[pib-aggregator] Pipeline finished but no articles were successfully processed.");
-    process.exit(1);
-  }
-
-  console.log(`\n[pib-aggregator] Pipeline complete. ${successCount} digests inserted into Supabase pib_digests table.`);
-  process.exit(0);
+  return { processed: successCount, success: successCount > 0 };
 }
 
-// Run when executed directly
-main().catch((err) => {
-  console.error("[pib-aggregator] Fatal error:", err);
-  process.exit(1);
-});
+// Direct execution entrypoint
+if (import.meta.url.endsWith(process.argv[1]?.replace(/\\/g, "/") || "")) {
+  runPibAggregatorPipeline()
+    .then((res) => {
+      if (!res.success && res.processed === 0) {
+        // If there were genuinely 0 new articles, exit 0
+        process.exit(0);
+      }
+      process.exit(res.success ? 0 : 1);
+    })
+    .catch((err) => {
+      console.error("[pib-aggregator] Uncaught pipeline exception:", err);
+      process.exit(1);
+    });
+}

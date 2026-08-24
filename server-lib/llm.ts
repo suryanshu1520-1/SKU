@@ -29,6 +29,8 @@ export type LlmParams = {
   temperature?: number;
   /** Hint that the model should return a JSON object. */
   json?: boolean;
+  /** Maximum generation tokens (defaults to 8192 to prevent JSON truncation). */
+  maxTokens?: number;
 };
 
 function env(name: string): string | undefined {
@@ -51,7 +53,7 @@ function isRetryable(err: any): boolean {
 // ============================================================
 // Provider: Google Gemini (primary)
 // ============================================================
-const GEMINI_MODELS = (env("GEMINI_MODELS") || "gemini-2.5-flash,gemini-2.0-flash-lite")
+const GEMINI_MODELS = (env("GEMINI_MODELS") || "gemini-3.6-flash,gemini-3.5-flash,gemini-3.5-flash-lite,gemini-3.1-flash-lite")
   .split(",").map((s) => s.trim()).filter(Boolean);
 
 async function geminiGenerate(params: LlmParams): Promise<LlmResult> {
@@ -69,6 +71,7 @@ async function geminiGenerate(params: LlmParams): Promise<LlmResult> {
           contents,
           config: {
             temperature: params.temperature ?? 0.3,
+            maxOutputTokens: params.maxTokens ?? 8192,
             ...(params.system ? { systemInstruction: params.system } : {}),
             ...(params.json ? { responseMimeType: "application/json" } : {}),
           },
@@ -91,10 +94,7 @@ async function geminiGenerate(params: LlmParams): Promise<LlmResult> {
 // ============================================================
 // Provider: Groq (fallback; OpenAI-compatible REST, no SDK needed)
 // ============================================================
-// Verified live 2026-08-19: the older llama-3.x Groq slugs now 404
-// (model_not_found) on current accounts; the openai/gpt-oss-* models are the
-// available free-tier chat models. Kept env-overridable via GROQ_MODELS.
-const GROQ_MODELS = (env("GROQ_MODELS") || "openai/gpt-oss-120b,openai/gpt-oss-20b,llama-3.3-70b-versatile")
+const GROQ_MODELS = (env("GROQ_MODELS") || "openai/gpt-oss-120b,openai/gpt-oss-20b")
   .split(",").map((s) => s.trim()).filter(Boolean);
 
 async function groqGenerate(params: LlmParams): Promise<LlmResult> {
@@ -116,6 +116,7 @@ async function groqGenerate(params: LlmParams): Promise<LlmResult> {
             model,
             messages,
             temperature: params.temperature ?? 0.3,
+            max_tokens: params.maxTokens ?? 8192,
             ...(params.json ? { response_format: { type: "json_object" } } : {}),
           }),
           signal: AbortSignal.timeout(30_000),
