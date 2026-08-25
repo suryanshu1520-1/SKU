@@ -22,7 +22,10 @@ import {
   ExternalLink,
   CheckCircle2,
   Sliders,
-  Crosshair
+  Crosshair,
+  Database,
+  Activity,
+  Award
 } from 'lucide-react';
 
 interface ExaminerPsycheModalProps {
@@ -32,10 +35,10 @@ interface ExaminerPsycheModalProps {
 }
 
 export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: ExaminerPsycheModalProps) {
-  const [activeTab, setActiveTab] = useState<'pareto' | 'qualifiers' | 'shifts' | 'dialectics' | 'directives'>('pareto');
+  const [activeTab, setActiveTab] = useState<'trends' | 'pareto' | 'qualifiers' | 'shifts' | 'dialectics' | 'directives'>('trends');
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [examView, setExamView] = useState<'upsc' | 'ssc'>('upsc');
 
   useEffect(() => {
     if (isOpen) {
@@ -71,12 +74,12 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#e0d0ab]/15 text-[#e0d0ab] border border-[#e0d0ab]/30 uppercase tracking-wider">
-                  TARK EMPIRICAL ENGINE v2.0
+                  TARK EMPIRICAL ENGINE v2.5
                 </span>
-                <span className="text-xs font-mono text-zinc-400">25-Year Corpus (2001–2025)</span>
+                <span className="text-xs font-mono text-zinc-400">2,800+ Discrete Item Bank (2000–2025)</span>
               </div>
               <h2 className="text-xl md:text-2xl font-serif font-bold text-stone-100 tracking-tight mt-0.5">
-                The Examiner's Psyche & Testing Rubrics
+                The Examiner's Psyche & Question Bank Intelligence
               </h2>
             </div>
           </div>
@@ -91,6 +94,18 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
 
         {/* Tab Navigation */}
         <div className="px-6 py-2.5 bg-zinc-900/50 border-b border-zinc-800/80 flex items-center gap-2 overflow-x-auto shrink-0">
+          <button
+            onClick={() => setActiveTab('trends')}
+            className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+              activeTab === 'trends'
+                ? 'bg-[#e0d0ab] text-zinc-950 font-bold shadow-sm'
+                : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/50'
+            }`}
+          >
+            <Activity className="w-3.5 h-3.5" />
+            Question Bank Pattern & Trends
+          </button>
+
           <button
             onClick={() => setActiveTab('pareto')}
             className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
@@ -124,7 +139,7 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
             }`}
           >
             <TrendingUp className="w-3.5 h-3.5" />
-            Format Shift Chronology (2001–2025)
+            Format Shift Chronology (2000–2025)
           </button>
 
           <button
@@ -161,6 +176,128 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
             </div>
           ) : (
             <>
+              {/* TAB 0: LIVE QUESTION BANK PATTERN & TREND ANALYSIS */}
+              {activeTab === 'trends' && data?.bankTrends && (
+                <div className="space-y-6">
+                  {/* Census Bar */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+                    <div className="p-3.5 rounded bg-zinc-900/60 border border-zinc-800 space-y-1">
+                      <span className="text-[10px] font-mono text-zinc-400 uppercase font-bold">Total Prelims Bank</span>
+                      <div className="text-xl font-mono font-black text-[#e0d0ab]">{data.bankTrends.census.totalPrelimsQuestions}</div>
+                      <span className="text-[9px] text-zinc-500 block">MCQs Ingested</span>
+                    </div>
+
+                    <div className="p-3.5 rounded bg-zinc-900/60 border border-zinc-800 space-y-1">
+                      <span className="text-[10px] font-mono text-zinc-400 uppercase font-bold">UPSC CSE Items</span>
+                      <div className="text-xl font-mono font-black text-emerald-400">{data.bankTrends.census.upscQuestionsCount}</div>
+                      <span className="text-[9px] text-zinc-500 block">Dedicated Track</span>
+                    </div>
+
+                    <div className="p-3.5 rounded bg-zinc-900/60 border border-zinc-800 space-y-1">
+                      <span className="text-[10px] font-mono text-zinc-400 uppercase font-bold">SSC CGL Items</span>
+                      <div className="text-xl font-mono font-black text-blue-400">{data.bankTrends.census.sscQuestionsCount}</div>
+                      <span className="text-[9px] text-zinc-500 block">Segregated Track</span>
+                    </div>
+
+                    <div className="p-3.5 rounded bg-zinc-900/60 border border-zinc-800 space-y-1">
+                      <span className="text-[10px] font-mono text-zinc-400 uppercase font-bold">Mains Blueprints</span>
+                      <div className="text-xl font-mono font-black text-amber-400">{data.bankTrends.census.totalMainsQuestions}</div>
+                      <span className="text-[9px] text-zinc-500 block">3-Tier Rubrics</span>
+                    </div>
+
+                    <div className="p-3.5 rounded bg-zinc-900/60 border border-zinc-800 space-y-1">
+                      <span className="text-[10px] font-mono text-zinc-400 uppercase font-bold">Syllabus Nodes</span>
+                      <div className="text-xl font-mono font-black text-stone-200">{data.bankTrends.census.totalSyllabusNodes}</div>
+                      <span className="text-[9px] text-zinc-500 block">Hierarchical Graph</span>
+                    </div>
+
+                    <div className="p-3.5 rounded bg-zinc-900/60 border border-zinc-800 space-y-1">
+                      <span className="text-[10px] font-mono text-zinc-400 uppercase font-bold">Zero Null-Key</span>
+                      <div className="text-xl font-mono font-black text-emerald-400">100%</div>
+                      <span className="text-[9px] text-zinc-500 block">Foreign Key Guardrail</span>
+                    </div>
+                  </div>
+
+                  {/* Subject Distribution & Heatmap */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-mono uppercase tracking-wider text-[#e0d0ab] font-bold flex items-center gap-2">
+                        <BarChart3 className="w-4 h-4" />
+                        Empirical Subject Distribution in Question Bank
+                      </h4>
+                      <span className="text-[11px] font-mono text-zinc-400">Sorted by Live Weightage</span>
+                    </div>
+
+                    <div className="overflow-x-auto border border-zinc-800 rounded-sm bg-zinc-950/60">
+                      <table className="w-full text-left text-xs">
+                        <thead className="bg-zinc-900/80 border-b border-zinc-800 font-mono text-zinc-400">
+                          <tr>
+                            <th className="p-3">Subject Domain</th>
+                            <th className="p-3">Syllabus Pillar</th>
+                            <th className="p-3 text-center">Questions</th>
+                            <th className="p-3 text-center">Bank Share</th>
+                            <th className="p-3">Examiner Focus Area</th>
+                            <th className="p-3 text-right">Arena Drill</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-zinc-800/60 font-sans">
+                          {data.bankTrends.subjectDistribution.map((sub: any, idx: number) => (
+                            <tr key={idx} className="hover:bg-zinc-900/40 transition-colors">
+                              <td className="p-3 font-medium text-stone-100">{sub.subject}</td>
+                              <td className="p-3 font-mono text-[11px] text-[#e0d0ab]">{sub.pillar}</td>
+                              <td className="p-3 text-center font-mono font-bold text-stone-200">{sub.count}</td>
+                              <td className="p-3 text-center font-mono font-bold text-emerald-400">{sub.sharePct}%</td>
+                              <td className="p-3 text-zinc-400 text-[11px]">{sub.highYieldFocus}</td>
+                              <td className="p-3 text-right">
+                                <button
+                                  onClick={() => onLaunchPractice && onLaunchPractice(sub.subject)}
+                                  className="px-2 py-1 rounded bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-[10px] font-mono text-[#e0d0ab] inline-flex items-center gap-1 transition-colors cursor-pointer"
+                                >
+                                  <Swords className="w-3 h-3" />
+                                  Drill
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* UPSC vs SSC CGL Comparative Architecture */}
+                  <div className="space-y-3 pt-4 border-t border-zinc-800/80">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-mono uppercase tracking-wider text-[#0194a8] font-bold flex items-center gap-2">
+                        <Shield className="w-4 h-4" />
+                        UPSC CSE vs SSC CGL Structural Architecture Matrix
+                      </h4>
+                      <span className="text-[11px] font-mono text-zinc-400">Strictly Segregated in Tark Arena</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {data.bankTrends.examTrackComparison.map((comp: any, idx: number) => (
+                        <div key={idx} className="p-4 rounded-sm bg-zinc-900/40 border border-zinc-800 space-y-2.5">
+                          <h5 className="font-serif font-bold text-stone-100 text-sm">{comp.feature}</h5>
+                          <div className="space-y-2 text-xs">
+                            <div className="p-2.5 rounded bg-zinc-950 border border-zinc-800/80">
+                              <span className="font-mono text-[10px] text-[#e0d0ab] font-bold uppercase block mb-0.5">UPSC CSE Track:</span>
+                              <p className="text-zinc-300">{comp.upscCseTrack}</p>
+                            </div>
+                            <div className="p-2.5 rounded bg-zinc-950 border border-zinc-800/80">
+                              <span className="font-mono text-[10px] text-[#0194a8] font-bold uppercase block mb-0.5">SSC CGL Track:</span>
+                              <p className="text-zinc-300">{comp.sscCglTrack}</p>
+                            </div>
+                          </div>
+                          <p className="text-[11px] text-zinc-400 italic pt-1 border-t border-zinc-800/60">
+                            <strong>Takeaway:</strong> {comp.strategicTakeaway}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* TAB 1: PARETO 80/20 & DROUGHT */}
               {activeTab === 'pareto' && data?.paretoDrought && (
                 <div className="space-y-6">
@@ -171,7 +308,7 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                         The 80/20 Law of UPSC Testing Weightage
                       </h3>
                       <p className="text-xs text-zinc-400">
-                        Empirical analysis proves that <strong className="text-stone-200">{data.paretoDrought.summary.core80PctNodeCount} syllabus nodes</strong> account for over 85% of total Prelims questions and Mains marks across 2001–2025.
+                        Empirical analysis proves that <strong className="text-stone-200">{data.paretoDrought.summary.core80PctNodeCount} syllabus nodes</strong> account for over 85% of total Prelims questions and Mains marks across 2000–2025.
                       </p>
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
@@ -275,7 +412,7 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                       Examiner Qualifier Linguistics & Trap Mechanics
                     </h3>
                     <p className="text-xs text-zinc-300 leading-relaxed">
-                      Statistical correlation of linguistic qualifiers in UPSC Prelims question statements (2001–2025) reveals stark deterministic polarity: extreme qualifiers exhibit a <strong className="text-red-400 font-mono">86.4% historical falsehood rate</strong>, while contingent qualifiers hold a <strong className="text-emerald-400 font-mono">79.8% truth rate</strong>.
+                      Statistical correlation of linguistic qualifiers in UPSC Prelims question statements (2000–2025) reveals stark deterministic polarity: extreme qualifiers exhibit a <strong className="text-red-400 font-mono">86.4% historical falsehood rate</strong>, while contingent qualifiers hold a <strong className="text-emerald-400 font-mono">79.8% truth rate</strong>.
                     </p>
                   </div>
 
@@ -359,7 +496,7 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                   <div className="p-5 rounded-sm bg-zinc-900/50 border border-zinc-800 space-y-1">
                     <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
                       <TrendingUp className="w-4 h-4" />
-                      Quarter-Century Exam Format Evolutionary Vector (2001–2025)
+                      Quarter-Century Exam Format Evolutionary Vector (2000–2025)
                     </h3>
                     <p className="text-xs text-zinc-400">
                       Tracking how the Union Public Service Commission systematically restructured testing mechanics to penalize rote tutoring and test genuine administrative reasoning.

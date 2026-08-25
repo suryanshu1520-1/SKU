@@ -41,6 +41,8 @@ interface ArenaProps {
     percentile: number
   ) => void;
   userId: string;
+  targetPillar?: { id: string; title: string } | null;
+  onClearTargetPillar?: () => void;
   onReturnToDashboard?: () => void;
   onNavigateManifesto?: () => void;
 }
@@ -168,10 +170,13 @@ function loadCachedResults(): CachedResults | null {
 export default function Arena({
   onComplete,
   userId,
+  targetPillar,
+  onClearTargetPillar,
   onReturnToDashboard,
   onNavigateManifesto,
 }: ArenaProps) {
   const [arenaPhase, setArenaPhase] = useState<'intro' | 'quiz'>('intro');
+  const [examTrack, setExamTrack] = useState<'upsc' | 'ssc'>('upsc');
   const [showPreflightModal, setShowPreflightModal] = useState(false);
   const [showAbandonModal, setShowAbandonModal] = useState(false);
   const [motivation, setMotivation] = useState('');
@@ -369,6 +374,7 @@ export default function Arena({
           subjects: Array.from(selectedSubjects),
           count: trainingLength,
           userId,
+          examTrack,
         }),
       });
 
@@ -420,7 +426,12 @@ export default function Arena({
       setIsLoading(true);
       setErrorMsg('');
       try {
-        const url = userId ? `/api/questions?userId=${encodeURIComponent(userId)}` : '/api/questions';
+        const queryParams = new URLSearchParams();
+        if (userId) queryParams.append('userId', userId);
+        queryParams.append('examTrack', examTrack);
+        if (targetPillar?.id) queryParams.append('pillar', targetPillar.id);
+
+        const url = `/api/questions?${queryParams.toString()}`;
         const response = await fetchWithAuth(url);
         if (!response.ok) throw new Error(`Server returned status code ${response.status}`);
         const data = await response.json();
@@ -882,6 +893,59 @@ export default function Arena({
           Time-bound competitive testing with zero-trust server evaluation and negative marking.
         </p>
 
+        {/* Targeted Syllabus Pillar Drill Banner (if active) */}
+        {targetPillar && (
+          <div className="w-full mb-6 p-4 rounded-sm bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 backdrop-blur-sm">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-sm bg-[#e0d0ab]/20 text-[#e0d0ab]">
+                <Target className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="text-[10px] font-mono uppercase text-[#e0d0ab] font-bold tracking-wider">
+                  Targeted Syllabus Pillar Drill
+                </div>
+                <div className="text-sm font-serif font-bold text-white">
+                  {targetPillar.title} ({targetPillar.id})
+                </div>
+              </div>
+            </div>
+            {onClearTargetPillar && (
+              <button
+                onClick={onClearTargetPillar}
+                className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider bg-zinc-900 border border-zinc-700 hover:border-zinc-500 text-zinc-300 rounded-sm cursor-pointer transition-colors"
+              >
+                Comprehensive Mock [×]
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Exam Track Segregation Switcher */}
+        <div className="w-full mb-6 flex items-center p-1 bg-zinc-900/80 border border-zinc-800 rounded-sm">
+          <button
+            onClick={() => setExamTrack('upsc')}
+            className={`flex-1 py-2 text-xs font-mono font-bold rounded-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
+              examTrack === 'upsc'
+                ? 'bg-[#e0d0ab] text-zinc-950 shadow-sm'
+                : 'text-zinc-400 hover:text-stone-200'
+            }`}
+          >
+            <Shield className="w-3.5 h-3.5" />
+            UPSC CSE Track (Default)
+          </button>
+          <button
+            onClick={() => setExamTrack('ssc')}
+            className={`flex-1 py-2 text-xs font-mono font-bold rounded-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
+              examTrack === 'ssc'
+                ? 'bg-[#0194a8] text-white shadow-sm'
+                : 'text-zinc-400 hover:text-stone-200'
+            }`}
+          >
+            <Target className="w-3.5 h-3.5" />
+            SSC CGL Exam Track
+          </button>
+        </div>
+
         {/* Protocol Option Cards */}
         <div className="w-full space-y-4">
           {/* 1. Ranked Test */}
@@ -1169,6 +1233,13 @@ export default function Arena({
           >
             {isRanked ? 'Ranked' : 'Practice'}
           </span>
+
+          {targetPillar && (
+            <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-[10px] font-mono font-bold bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 text-[#e0d0ab] uppercase">
+              <Target className="w-3 h-3" />
+              {targetPillar.id}
+            </span>
+          )}
 
           <span className="text-xs font-sans text-zinc-400">
             Question <span className="font-mono">{currentQuestionIndex + 1}</span> of <span className="font-mono">{questions.length}</span>

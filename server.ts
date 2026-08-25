@@ -158,10 +158,54 @@ async function startServer() {
 
   app.get("/api/questions", async (req, res) => {
     try {
-      const { data, error } = await supabaseAnon
-        .from('static_questions')
-        .select('*')
-        .limit(500);
+      const examTrack = (req.query.examTrack as string || 'upsc').toLowerCase();
+      const pillar = (req.query.pillar as string || '').toUpperCase();
+      const subject = req.query.subject as string;
+
+      let query = supabaseAnon.from('static_questions').select('*');
+
+      // Exam track segregation: UPSC and SSC CGL must never mix unless explicitly requested
+      if (examTrack === 'ssc' || pillar === 'SSC_CGL') {
+        query = query.ilike('exam_origin_tag', 'SSC%');
+      } else if (examTrack === 'upsc') {
+        query = query.not('exam_origin_tag', 'ilike', 'SSC%');
+      }
+
+      // Syllabus Pillar-specific targeting
+      if (pillar === 'GS1') {
+        query = query.in('subject_category', [
+          'Ancient and Medieval Indian History',
+          'Modern Indian History',
+          'Art and Culture',
+          'Geography',
+          'History',
+          'Geography & Agriculture'
+        ]);
+      } else if (pillar === 'GS2') {
+        query = query.in('subject_category', [
+          'Indian Polity',
+          'Indian Polity & Governance',
+          'World Affairs (International Relations)',
+          'Polity'
+        ]);
+      } else if (pillar === 'GS3') {
+        query = query.in('subject_category', [
+          'Indian Economy',
+          'Environment',
+          'Science and Technology',
+          'Science & Technology',
+          'Environment & Ecology',
+          'Economics'
+        ]);
+      } else if (pillar === 'STATIC_GK') {
+        query = query.or('subject_category.eq.Static GK,exam_origin_tag.ilike.Static GK%');
+      } else if (pillar === 'CSAT') {
+        query = query.or('subject_category.ilike.%CSAT%,exam_origin_tag.ilike.%CSAT%');
+      } else if (subject) {
+        query = query.eq('subject_category', subject);
+      }
+
+      const { data, error } = await query.limit(500);
 
       if (error) {
         console.error("Error fetching static questions via backend:", error);

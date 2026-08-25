@@ -12,6 +12,7 @@ import {
   getFormatShiftTracking,
   getGs4AndEssayDialecticalAxes,
   getDirectiveVerbScoringMatrix,
+  getLiveQuestionBankTrends,
 } from "./examiner_psyche.js";
 import { createClient } from "@supabase/supabase-js";
 
@@ -28,6 +29,16 @@ export const analyticsRouter = Router();
 analyticsRouter.get("/examiner-psyche/overview", async (_req: Request, res: Response) => {
   try {
     const data = await getExaminerPsycheOverview();
+    res.json({ success: true, data });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// 1b. Live Question Bank Trends & Patterns
+analyticsRouter.get("/examiner-psyche/trends", async (_req: Request, res: Response) => {
+  try {
+    const data = await getLiveQuestionBankTrends();
     res.json({ success: true, data });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });

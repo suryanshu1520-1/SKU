@@ -31,6 +31,7 @@ export default function App() {
   // Manifesto modal overlay state
   const [showManifesto, setShowManifesto] = useState(false);
   const [legalDocumentType, setLegalDocumentType] = useState<LegalDocumentType | null>(null);
+  const [targetPillar, setTargetPillar] = useState<{ id: string; title: string } | null>(null);
 
   const [arenaStats, setArenaStats] = useState({
     correct: 0,
@@ -439,8 +440,15 @@ export default function App() {
             <CurrentAffairs userId={userId || 'guest'} />
           ) : activeTab === 'library' ? (
             <SubjectPillars
-              onNavigateArena={() => navigateToTab('arena')}
-              onLaunchPractice={() => navigateToTab('arena')}
+              onNavigateArena={() => {
+                setTargetPillar(null);
+                navigateToTab('arena');
+              }}
+              onLaunchPractice={(categoryOrId) => {
+                setTargetPillar({ id: categoryOrId, title: categoryOrId });
+                setGameState('arena');
+                setActiveTab('arena');
+              }}
             />
           ) : activeTab === 'humanities' ? (
             <HumanitiesReader />
@@ -448,6 +456,8 @@ export default function App() {
             <Arena
               onComplete={handleArenaComplete}
               userId={userId || 'guest'}
+              targetPillar={targetPillar}
+              onClearTargetPillar={() => setTargetPillar(null)}
               onReturnToDashboard={() => setActiveTab('tracker')}
               onNavigateManifesto={handleNavigateManifesto}
             />

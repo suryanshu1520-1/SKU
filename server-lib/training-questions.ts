@@ -45,7 +45,7 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const { subjects, count, userId } = req.body || {};
+    const { subjects, count, userId, examTrack = 'upsc' } = req.body || {};
 
     if (!subjects || !Array.isArray(subjects) || subjects.length === 0) {
       return res.status(400).json({ error: "Missing required field: subjects (non-empty array)" });
@@ -74,34 +74,24 @@ export default async function handler(req: any, res: any) {
       console.warn("[training-questions] Failed to fetch attempt history:", err);
     }
 
-    const S = subjects.length;
-    const N = count;
-    const base = Math.floor(N / S);
-    let remainder = N % S;
-
-    // Track per-subject fetch counts
-    const subjectCounts: Record<string, number> = {};
-    for (const subject of subjects) {
-      let fetchCount = base;
-      if (remainder > 0) {
-        fetchCount += 1;
-        remainder -= 1;
-      }
-      subjectCounts[subject] = fetchCount;
-    }
-
     // Single query for all requested subjects
     let query = getSupabaseAnon()
       .from('static_questions')
       .select('*')
       .in('subject_category', subjects);
 
+    if (examTrack.toLowerCase() === 'ssc') {
+      query = query.ilike('exam_origin_tag', 'SSC%');
+    } else if (examTrack.toLowerCase() === 'upsc') {
+      query = query.not('exam_origin_tag', 'ilike', 'SSC%');
+    }
+
     if (seenIds.length > 0) {
       query = query.not('id', 'in', `(${seenIds.join(',')})`);
     }
 
     // We fetch a larger pool and shuffle/slice on the server
-    const { data, error } = await query.limit(N * 3 + 10);
+    const { data, error } = await query.limit(count * 3 + 10);
 
     if (error) {
       console.warn(`[training-questions] Error fetching subjects:`, error);
@@ -112,24 +102,30 @@ export default async function handler(req: any, res: any) {
     let isBackfilled = false;
 
     // Shuffle the final set and return
-    let finalQuestions = shuffleArray(allQuestions).slice(0, N);
+    let finalQuestions = shuffleArray(allQuestions).slice(0, count);
 
     // Proactive backfill if the filtered subjects yield too few questions
-    if (finalQuestions.length < N) {
+    if (finalQuestions.length < count) {
       isBackfilled = true;
       const excludedIds = [...seenIds, ...finalQuestions.map((q: any) => q.id)];
       let backfillQuery = getSupabaseAnon()
         .from('static_questions')
         .select('*');
+
+      if (examTrack.toLowerCase() === 'ssc') {
+        backfillQuery = backfillQuery.ilike('exam_origin_tag', 'SSC%');
+      } else if (examTrack.toLowerCase() === 'upsc') {
+        backfillQuery = backfillQuery.not('exam_origin_tag', 'ilike', 'SSC%');
+      }
         
       if (excludedIds.length > 0) {
         backfillQuery = backfillQuery.not('id', 'in', `(${excludedIds.join(',')})`);
       }
       
-      const { data: backfillData, error: backfillError } = await backfillQuery.limit(N - finalQuestions.length);
+      const { data: backfillData } = await backfillQuery.limit((count - finalQuestions.length) * 2);
         
-      if (!backfillError && backfillData) {
-        finalQuestions = [...finalQuestions, ...backfillData];
+      if (backfillData) {
+        finalQuestions = [...finalQuestions, ...shuffleArray(backfillData).slice(0, count - finalQuestions.length)];
       }
     }
 

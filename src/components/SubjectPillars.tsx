@@ -489,7 +489,7 @@ export default function SubjectPillars({ onLaunchPractice, onNavigateArena }: Su
               <button
                 onClick={() => {
                   if (onLaunchPractice) {
-                    onLaunchPractice(selectedPillar.title);
+                    onLaunchPractice(selectedPillar.paper);
                   } else if (onNavigateArena) {
                     onNavigateArena();
                   }
