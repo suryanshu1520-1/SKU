@@ -1,13 +1,42 @@
 import { createClient } from "@supabase/supabase-js";
+import { llmGenerate } from "../llm.js";
+
+const DEVANAGARI_REGEX = /[\u0900-\u097F]/;
 
 export async function upsertCurrentAffairs(params: {
   source: string;
   headline: string;
   url: string;
   ministry: string;
-  summary: { bullets: string[]; [k: string]: unknown };
+  summary: { bullets: string[]; prelims?: string; mains?: string; [k: string]: unknown };
 }): Promise<{ ok: boolean; errorMessage?: string }> {
-  const { source, headline, url, ministry, summary } = params;
+  let { source, headline, url, ministry, summary } = params;
+
+  // Auto-translate Hindi headlines into rich contextual English
+  if (headline && DEVANAGARI_REGEX.test(headline)) {
+    try {
+      const summaryContext = `${Array.isArray(summary?.bullets) ? summary.bullets.join(" ") : ""} ${summary?.prelims || ""}`.trim();
+      const prompt = `Translate and synthesize this Hindi government/PIB headline into a single, complete, crisp, authoritative English policy headline (10 to 20 words):
+Headline: "${headline}"
+Context: "${summaryContext.slice(0, 1000)}"
+Output ONLY the clean translated English headline string without quotes or prefixes.`;
+
+      const res = await llmGenerate({ prompt, temperature: 0.2, maxTokens: 2048 });
+      if (res && res.text) {
+        let clean = res.text.trim().replace(/^["']|["']$/g, "").replace(/^(Headline|Translated Headline|English Headline):\s*/i, "").trim();
+        if (clean.length >= 10 && !DEVANAGARI_REGEX.test(clean)) {
+          headline = clean;
+        }
+      }
+    } catch {
+      if (summary?.prelims) {
+        const fallback = summary.prelims.split(".")[0].trim();
+        if (fallback && !DEVANAGARI_REGEX.test(fallback)) {
+          headline = fallback;
+        }
+      }
+    }
+  }
 
   const supabaseUrl =
     process.env.SUPABASE_URL ?? "https://ixngfxaerlkkcacrbdgc.supabase.co";
