@@ -441,10 +441,13 @@ export default function App() {
           ) : activeTab === 'library' ? (
             <SubjectPillars
               onNavigateArena={() => {
+                localStorage.removeItem('tark_arena_results');
                 setTargetPillar(null);
-                navigateToTab('arena');
+                setGameState('arena');
+                setActiveTab('arena');
               }}
               onLaunchPractice={(categoryOrId) => {
+                localStorage.removeItem('tark_arena_results');
                 setTargetPillar({ id: categoryOrId, title: categoryOrId });
                 setGameState('arena');
                 setActiveTab('arena');

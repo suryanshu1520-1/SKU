@@ -13,16 +13,8 @@ import {
   getGs4AndEssayDialecticalAxes,
   getDirectiveVerbScoringMatrix,
   getLiveQuestionBankTrends,
+  getSupabase,
 } from "./examiner_psyche.js";
-import { createClient } from "@supabase/supabase-js";
-
-const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
-const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || "";
-
-const supabase = createClient(rawSupabaseUrl, rawSupabaseKey, {
-  auth: { persistSession: false },
-});
-
 export const analyticsRouter = Router();
 
 // 1. Complete Examiner Psyche Overview
@@ -99,11 +91,12 @@ analyticsRouter.get("/examiner-psyche/directive-rubrics", async (_req: Request, 
 analyticsRouter.get("/examiner-psyche/node/:nodeId", async (req: Request, res: Response) => {
   try {
     const nodeId = req.params.nodeId;
+    const sb = getSupabase();
     const [nodeRes, analyticsRes, prelimsRes, mainsRes] = await Promise.all([
-      supabase.from("syllabus_nodes").select("*").eq("id", nodeId).maybeSingle(),
-      supabase.from("pyq_node_analytics").select("*").eq("node_id", nodeId).maybeSingle(),
-      supabase.from("pyq_prelims").select("id, year, paper, question_num, stem, official_key, question_type").eq("node_id", nodeId).order("year", { ascending: false }).limit(20),
-      supabase.from("pyq_mains").select("id, year, paper, question_num, marks, prompt, directive_verb, nature, rubric_level_1, rubric_level_2, rubric_level_3").eq("node_id", nodeId).order("year", { ascending: false }).limit(20),
+      sb.from("syllabus_nodes").select("*").eq("id", nodeId).maybeSingle(),
+      sb.from("pyq_node_analytics").select("*").eq("node_id", nodeId).maybeSingle(),
+      sb.from("pyq_prelims").select("id, year, paper, question_num, stem, official_key, question_type").eq("node_id", nodeId).order("year", { ascending: false }).limit(20),
+      sb.from("pyq_mains").select("id, year, paper, question_num, marks, prompt, directive_verb, nature, rubric_level_1, rubric_level_2, rubric_level_3").eq("node_id", nodeId).order("year", { ascending: false }).limit(20),
     ]);
 
     res.json({

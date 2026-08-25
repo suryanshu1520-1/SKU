@@ -10,15 +10,31 @@
  * 4. GS-4 & Essay Dialectical Axes Extraction (Moral & philosophical core axes)
  * 5. Directive Verb Cognitive Scoring Matrix (Rubrics for Critically Analyze, Elucidate, Evaluate, etc.)
  */
-
 import { createClient } from "@supabase/supabase-js";
 
-const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
-const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || "";
+function cleanEnvValue(val: any): string {
+  if (typeof val !== 'string') return '';
+  let cleaned = val.trim();
+  while (cleaned.startsWith('"') || cleaned.startsWith("'")) {
+    cleaned = cleaned.substring(1);
+  }
+  while (cleaned.endsWith('"') || cleaned.endsWith("'")) {
+    cleaned = cleaned.substring(0, cleaned.length - 1);
+  }
+  return cleaned.trim();
+}
 
-const supabase = createClient(rawSupabaseUrl, rawSupabaseKey, {
-  auth: { persistSession: false },
-});
+let _supabase: ReturnType<typeof createClient> | null = null;
+export function getSupabase() {
+  if (!_supabase) {
+    const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
+    const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4bmdmeGFlcmxra2NhY3JiZGdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTY3NDQsImV4cCI6MjA5NTc5Mjc0NH0.G44wtBZZKGPb-ZTX3zaIPCXFcRtPP9Vtv-0saO0dEXE";
+    _supabase = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey), {
+      auth: { persistSession: false },
+    });
+  }
+  return _supabase;
+}
 
 export interface ParetoDroughtReport {
   totalNodesEvaluated: number;
@@ -112,7 +128,7 @@ export interface DirectiveVerbRubric {
 // 1. Pareto Distribution & Drought Detection Engine
 // ---------------------------------------------------------------------------
 export async function getParetoAndDroughtAnalysis(): Promise<ParetoDroughtReport> {
-  const { data: analytics, error } = await supabase
+  const { data: analytics, error } = await getSupabase()
     .from("pyq_node_analytics")
     .select("*, syllabus_nodes(paper, gloss)")
     .order("total_prelims_count", { ascending: false });
@@ -128,13 +144,14 @@ export async function getParetoAndDroughtAnalysis(): Promise<ParetoDroughtReport
   }
 
   // Calculate total marks / question weightage across all nodes
-  const totalSystemQuestions = analytics.reduce((acc, row) => acc + (row.total_prelims_count || 0) + (row.total_mains_count || 0), 0);
+  const analyticsList = analytics as any[];
+  const totalSystemQuestions = analyticsList.reduce((acc, row) => acc + (row.total_prelims_count || 0) + (row.total_mains_count || 0), 0);
   
   let runningSum = 0;
   const paretoCoreNodes = [];
   const droughtNodes = [];
 
-  for (const row of analytics) {
+  for (const row of analyticsList) {
     const totalQ = (row.total_prelims_count || 0) + (row.total_mains_count || 0);
     runningSum += totalQ;
     const cumPct = totalSystemQuestions > 0 ? (runningSum / totalSystemQuestions) * 100 : 0;
@@ -168,7 +185,7 @@ export async function getParetoAndDroughtAnalysis(): Promise<ParetoDroughtReport
   }
 
   return {
-    totalNodesEvaluated: analytics.length,
+    totalNodesEvaluated: analyticsList.length,
     paretoCoreNodes: paretoCoreNodes.slice(0, 30),
     droughtNodes: droughtNodes.sort((a, b) => b.yearsDormant - a.yearsDormant).slice(0, 20),
     summary: {
@@ -183,7 +200,7 @@ export async function getParetoAndDroughtAnalysis(): Promise<ParetoDroughtReport
 // 2. Qualifier Trap Correlation Engine
 // ---------------------------------------------------------------------------
 export async function getQualifierTrapCorrelation(): Promise<QualifierCorrelationReport> {
-  const { data: prelims } = await supabase
+  const { data: _prelims } = await getSupabase()
     .from("pyq_prelims")
     .select("stem, statements, options, official_key, qualifiers, question_type")
     .limit(1200);
@@ -434,17 +451,18 @@ export async function getDirectiveVerbScoringMatrix(): Promise<DirectiveVerbRubr
 // 6. Live Question Bank Trends & Exam Track Pattern Analysis
 // ---------------------------------------------------------------------------
 export async function getLiveQuestionBankTrends() {
+  const sb = getSupabase();
   const [prelimsCountRes, staticCountRes, mainsCountRes, nodesCountRes] = await Promise.all([
-    supabase.from("pyq_prelims").select("id", { count: "exact", head: true }),
-    supabase.from("static_questions").select("id, exam_origin_tag, subject_category"),
-    supabase.from("pyq_mains").select("id", { count: "exact", head: true }),
-    supabase.from("syllabus_nodes").select("id", { count: "exact", head: true }),
+    sb.from("pyq_prelims").select("id", { count: "exact", head: true }),
+    sb.from("static_questions").select("id, exam_origin_tag, subject_category"),
+    sb.from("pyq_mains").select("id", { count: "exact", head: true }),
+    sb.from("syllabus_nodes").select("id", { count: "exact", head: true }),
   ]);
 
-  const staticRows = staticCountRes.data || [];
+  const staticRows = (staticCountRes.data || []) as any[];
   const totalStatic = staticRows.length;
-  const upscCount = staticRows.filter(r => !r.exam_origin_tag?.startsWith("SSC")).length;
-  const sscCount = staticRows.filter(r => r.exam_origin_tag?.startsWith("SSC")).length;
+  const upscCount = staticRows.filter((r: any) => !r.exam_origin_tag?.startsWith("SSC")).length;
+  const sscCount = staticRows.filter((r: any) => r.exam_origin_tag?.startsWith("SSC")).length;
 
   const subjectCounts: Record<string, number> = {};
   for (const r of staticRows) {

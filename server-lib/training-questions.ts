@@ -20,8 +20,7 @@ let _supabaseAnon: ReturnType<typeof createClient> | null = null;
 function getSupabaseAnon() {
   if (_supabaseAnon) return _supabaseAnon;
   const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
-  const anonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
-  if (!anonKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase anon key missing.");
+  const anonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4bmdmeGFlcmxra2NhY3JiZGdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTY3NDQsImV4cCI6MjA5NTc5Mjc0NH0.G44wtBZZKGPb-ZTX3zaIPCXFcRtPP9Vtv-0saO0dEXE";
   _supabaseAnon = createClient(cleanEnvValue(url), cleanEnvValue(anonKey));
   return _supabaseAnon;
 }
