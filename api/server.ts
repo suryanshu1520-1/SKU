@@ -17,6 +17,7 @@ import resetLeaderboardHandler from "../server-lib/cron/reset-leaderboard.js";
 import createRazorpayOrderHandler from "../server-lib/create-razorpay-order.js";
 import verifyPaymentHandler from "../server-lib/verify-payment.js";
 import { handleGetRebase, handlePostRebaseAck } from "../server-lib/rebase.js";
+import { analyticsRouter } from "../server-lib/analytics/routes.js";
 
 function cleanEnvValue(val: any): string {
   if (typeof val !== 'string') return '';
@@ -72,6 +73,7 @@ app.post("/api/create-razorpay-order", createRazorpayOrderHandler);
 app.post("/api/verify-payment", verifyPaymentHandler);
 app.get("/api/rebase", handleGetRebase);
 app.post("/api/rebase/ack", handlePostRebaseAck);
+app.use("/api/analytics", analyticsRouter);
 
 // Inline API routes
 app.get("/api/questions/inline", async (req: any, res: any) => {
