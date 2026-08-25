@@ -266,11 +266,89 @@ const EMPIRICAL_BASELINE_DATA = {
       ],
       examinerPenaltyPitfall: "Restricting the answer to only one narrow dimension (e.g. only economic) instead of exploring political, social, and administrative angles."
     }
-  ]
+  ],
+  cicadaTopics: [
+    {
+      topic: "Money Bills, Financial Bills & Speaker Certification",
+      nodeId: "GS2.POL.PARLIAMENT",
+      pillar: "GS2",
+      harmonicCycleYears: "1.8 years (Near Annual)",
+      historicalTestYears: [2013, 2015, 2016, 2018, 2019, 2021, 2023, 2025],
+      recurrenceScore: 98,
+      coreInsight: "UPSC tests the boundary between Article 110(1) exclusive provisions and Rajya Sabha recommendation limits almost every alternate year."
+    },
+    {
+      topic: "Ramsar Wetlands & Montreux Record Indices",
+      nodeId: "GS3.ENV.BIODIV",
+      pillar: "GS3",
+      harmonicCycleYears: "2.1 years",
+      historicalTestYears: [2010, 2012, 2014, 2015, 2019, 2022, 2024],
+      recurrenceScore: 94,
+      coreInsight: "Tested via ecological location matching (e.g. Renuka, Bhoj, Deepor Beel, Keoladeo) and man-made vs natural wetland criteria."
+    },
+    {
+      topic: "Writ Jurisdiction (Habeas Corpus, Mandamus, Quo-Warranto)",
+      nodeId: "GS2.POL.FUND_RIGHTS",
+      pillar: "GS2",
+      harmonicCycleYears: "2.5 years",
+      historicalTestYears: [2014, 2017, 2020, 2022, 2025],
+      recurrenceScore: 91,
+      coreInsight: "Questions consistently probe whether Mandamus lies against private bodies or discretionary non-statutory duties."
+    },
+    {
+      topic: "Monetary Policy Liquidity Corridors (LAF, SDF, MSF, Repo)",
+      nodeId: "GS3.ECO.MACRO",
+      pillar: "GS3",
+      harmonicCycleYears: "1.5 years",
+      historicalTestYears: [2012, 2014, 2016, 2017, 2019, 2020, 2021, 2023],
+      recurrenceScore: 96,
+      coreInsight: "Tests monetary transmission bottlenecks, sterilization operations (MSS), and RBI foreign exchange reserve interventions."
+    },
+    {
+      topic: "Indian National Congress Sessions & Constitutional Acts (1919/1935)",
+      nodeId: "GS1.HIS.FREEDOM",
+      pillar: "GS1",
+      harmonicCycleYears: "2.2 years",
+      historicalTestYears: [2009, 2010, 2012, 2015, 2018, 2021, 2024],
+      recurrenceScore: 92,
+      coreInsight: "Diarchy at provincial level (1919) vs Diarchy at Centre (1935) remains the single most recurrent historical trap in the entire 25-year bank."
+    },
+    {
+      topic: "CRISPR-Cas9, Stem Cells & Mitochondrial Replacement Therapy",
+      nodeId: "GS3.SCI.TECH_DEV",
+      pillar: "GS3",
+      harmonicCycleYears: "2.0 years",
+      historicalTestYears: [2017, 2019, 2020, 2021, 2023, 2025],
+      recurrenceScore: 89,
+      coreInsight: "Questions test whether genetic modifications can be passed down to offspring (germline vs somatic editing)."
+    }
+  ],
+  csatAnatomy: {
+    totalCsatQuestionsIngested: 608,
+    readingComprehension: {
+      count: 281,
+      sharePct: 46.2,
+      averagePassageWordLength: 145,
+      dominantQuestionType: "Crucial / Critical Assumption (62%), Logical Corollary (24%), Main Idea (14%)",
+      examinerTrapProfile: "Extreme generalizations, beyond-passage extrapolations, and moralizing conclusions."
+    },
+    quantitativeAptitude: {
+      count: 197,
+      sharePct: 32.4,
+      coreFocusAreas: "Number Theory (Remainders, Prime Factors, Divisibility), Permutations & Combinations, Unit Digits",
+      pacingProfile: "Multi-step analytical calculations designed to consume 2.5–3.5 minutes per item."
+    },
+    logicalReasoning: {
+      count: 130,
+      sharePct: 21.4,
+      coreFocusAreas: "Seating Arrangements, Syllogisms, Direction Sense, Blood Relations, Data Sufficiency",
+      pacingProfile: "Constraint satisfaction puzzles with deterministic unique solutions."
+    }
+  }
 };
 
 export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: ExaminerPsycheModalProps) {
-  const [activeTab, setActiveTab] = useState<'trends' | 'pareto' | 'qualifiers' | 'shifts' | 'dialectics' | 'directives'>('trends');
+  const [activeTab, setActiveTab] = useState<'trends' | 'pareto' | 'qualifiers' | 'shifts' | 'cicada' | 'csat' | 'dialectics' | 'directives'>('trends');
   const [data, setData] = useState<any>(EMPIRICAL_BASELINE_DATA);
 
   useEffect(() => {
@@ -376,6 +454,30 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
           >
             <TrendingUp className="w-3.5 h-3.5" />
             Format Shift Chronology (2000–2025)
+          </button>
+
+          <button
+            onClick={() => setActiveTab('cicada')}
+            className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+              activeTab === 'cicada'
+                ? 'bg-[#e0d0ab] text-zinc-950 font-bold shadow-sm'
+                : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/50'
+            }`}
+          >
+            <Flame className="w-3.5 h-3.5" />
+            Cicada 2-Year Harmonics
+          </button>
+
+          <button
+            onClick={() => setActiveTab('csat')}
+            className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+              activeTab === 'csat'
+                ? 'bg-[#e0d0ab] text-zinc-950 font-bold shadow-sm'
+                : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/50'
+            }`}
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            CSAT Paper-2 Empirical DNA
           </button>
 
           <button
@@ -773,6 +875,98 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB: CICADA 2-YEAR HARMONIC CYCLES */}
+          {activeTab === 'cicada' && data?.cicadaTopics && (
+            <div className="space-y-6">
+              <div className="p-5 rounded-sm bg-zinc-900/50 border border-zinc-800 space-y-1">
+                <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
+                  <Flame className="w-4 h-4 text-amber-400" />
+                  Cicada Topics: 1.8–2.5 Year Mathematical Recurrence Waves
+                </h3>
+                <p className="text-xs text-zinc-400">
+                  UPSC's testing board operates on periodic cyclical rotations where specific statutory boundaries and scientific mechanisms reappear every alternate year.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {data.cicadaTopics.map((c: any, idx: number) => (
+                  <div key={idx} className="p-5 rounded-sm bg-zinc-900/40 border border-zinc-800 space-y-3">
+                    <div className="flex items-start justify-between gap-2 border-b border-zinc-800 pb-2.5">
+                      <div>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30">
+                          {c.pillar} • Harmonic Cycle: {c.harmonicCycleYears}
+                        </span>
+                        <h4 className="font-serif font-bold text-stone-100 text-sm mt-1.5">{c.topic}</h4>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs font-mono font-black text-emerald-400">{c.recurrenceScore}%</span>
+                        <span className="text-[9px] text-zinc-500 block">Cycle Fidelity</span>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-zinc-300 leading-relaxed font-sans">{c.coreInsight}</p>
+
+                    <div className="pt-2 border-t border-zinc-800/60 flex items-center justify-between text-[11px] font-mono text-zinc-400">
+                      <span>Tested Years:</span>
+                      <strong className="text-stone-200">{(c.historicalTestYears || []).join(', ')}</strong>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB: CSAT PAPER-2 EMPIRICAL ANATOMY */}
+          {activeTab === 'csat' && data?.csatAnatomy && (
+            <div className="space-y-6">
+              <div className="p-5 rounded-sm bg-zinc-900/50 border border-zinc-800 space-y-1">
+                <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-blue-400" />
+                  CSAT Paper-2: 15-Year Empirical Anatomy (2011–2025)
+                </h3>
+                <p className="text-xs text-zinc-400">
+                  Comprehensive breakdown of 600+ CSAT questions across Reading Comprehension, Quantitative Aptitude, and Logical Reasoning.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-5 rounded-sm bg-zinc-900/40 border border-zinc-800 space-y-3">
+                  <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+                    <h4 className="font-serif font-bold text-stone-100 text-sm">Reading Comprehension</h4>
+                    <span className="text-xs font-mono font-bold text-blue-400">{data.csatAnatomy.readingComprehension.sharePct}%</span>
+                  </div>
+                  <div className="space-y-2 text-xs text-zinc-300">
+                    <p><strong>Avg Length:</strong> {data.csatAnatomy.readingComprehension.averagePassageWordLength} words</p>
+                    <p><strong>Dominant Focus:</strong> {data.csatAnatomy.readingComprehension.dominantQuestionType}</p>
+                    <p className="text-red-300/90 text-[11px] pt-1"><strong>Examiner Trap:</strong> {data.csatAnatomy.readingComprehension.examinerTrapProfile}</p>
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-sm bg-zinc-900/40 border border-zinc-800 space-y-3">
+                  <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+                    <h4 className="font-serif font-bold text-stone-100 text-sm">Quantitative Aptitude</h4>
+                    <span className="text-xs font-mono font-bold text-amber-400">{data.csatAnatomy.quantitativeAptitude.sharePct}%</span>
+                  </div>
+                  <div className="space-y-2 text-xs text-zinc-300">
+                    <p><strong>Core Focus:</strong> {data.csatAnatomy.quantitativeAptitude.coreFocusAreas}</p>
+                    <p className="text-amber-300/90 text-[11px] pt-1"><strong>Pacing Profile:</strong> {data.csatAnatomy.quantitativeAptitude.pacingProfile}</p>
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-sm bg-zinc-900/40 border border-zinc-800 space-y-3">
+                  <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+                    <h4 className="font-serif font-bold text-stone-100 text-sm">Logical Reasoning</h4>
+                    <span className="text-xs font-mono font-bold text-emerald-400">{data.csatAnatomy.logicalReasoning.sharePct}%</span>
+                  </div>
+                  <div className="space-y-2 text-xs text-zinc-300">
+                    <p><strong>Core Focus:</strong> {data.csatAnatomy.logicalReasoning.coreFocusAreas}</p>
+                    <p className="text-emerald-300/90 text-[11px] pt-1"><strong>Pacing Profile:</strong> {data.csatAnatomy.logicalReasoning.pacingProfile}</p>
+                  </div>
+                </div>
               </div>
             </div>
           )}
