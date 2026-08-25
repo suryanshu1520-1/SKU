@@ -452,72 +452,93 @@ export async function getDirectiveVerbScoringMatrix(): Promise<DirectiveVerbRubr
 // ---------------------------------------------------------------------------
 export async function getLiveQuestionBankTrends() {
   const sb = getSupabase();
-  const [prelimsCountRes, staticCountRes, mainsCountRes, nodesCountRes] = await Promise.all([
+  const [prelimsCountRes, staticCountRes, mainsCountRes, nodesCountRes, prelimsRowsRes] = await Promise.all([
     sb.from("pyq_prelims").select("id", { count: "exact", head: true }),
     sb.from("static_questions").select("id, exam_origin_tag, subject_category"),
     sb.from("pyq_mains").select("id", { count: "exact", head: true }),
     sb.from("syllabus_nodes").select("id", { count: "exact", head: true }),
+    sb.from("pyq_prelims").select("paper, node_id")
   ]);
 
+  const totalPrelims = prelimsCountRes.count || 4156;
   const staticRows = (staticCountRes.data || []) as any[];
-  const totalStatic = staticRows.length;
-  const upscCount = staticRows.filter((r: any) => !r.exam_origin_tag?.startsWith("SSC")).length;
+  const totalStatic = staticRows.length || 1801;
+  const prelimsRows = (prelimsRowsRes.data || []) as any[];
+
+  const upscCount = staticRows.filter((r: any) => !r.exam_origin_tag?.startsWith("SSC")).length + totalPrelims;
   const sscCount = staticRows.filter((r: any) => r.exam_origin_tag?.startsWith("SSC")).length;
 
-  const subjectCounts: Record<string, number> = {};
-  for (const r of staticRows) {
-    const sub = r.subject_category || "General Studies";
-    subjectCounts[sub] = (subjectCounts[sub] || 0) + 1;
+  const subjectMap: Record<string, { count: number; pillar: string; focus: string }> = {
+    "Indian Polity & Constitutional Governance": { count: 0, pillar: "GS2", focus: "Fundamental Rights, Writ jurisdiction, Parliamentary privileges & Federal dynamics" },
+    "CSAT Paper-2 & General Mental Ability": { count: 0, pillar: "CSAT", focus: "Reading comprehension critical assumptions, syllogisms, permutations & number systems" },
+    "Physical, Indian & World Geography": { count: 0, pillar: "GS1", focus: "Monsoon dynamics, IOD, river basin drainage, mountain passes & tectonic rift valleys" },
+    "Static GK Reference Matrices": { count: 0, pillar: "STATIC_GK", focus: "Supreme Court landmark benches, Ramsar sites, biosphere reserves & mountain passes" },
+    "Economy & Monetary Policy": { count: 0, pillar: "GS3", focus: "Monetary policy transmission, external debt, capital account & RBI liquidity corridor" },
+    "Environment, Biodiversity & Climate": { count: 0, pillar: "GS3", focus: "Ramsar wetlands, National Parks, species IUCN status & UNFCCC COP treaties" },
+    "Ancient & Medieval Indian History": { count: 0, pillar: "GS1", focus: "Harappan trade, Mauryan rock edicts, Sangam literature, Vijayanagara administrative systems" },
+    "Modern Indian History & Freedom Movement": { count: 0, pillar: "GS1", focus: "1919/1935 Constitutional acts, tribal rebellions, Gandhian movements & Round Table conferences" },
+    "Science, Technology & Space Missions": { count: 0, pillar: "GS3", focus: "CRISPR-Cas9, Semiconductor Mission, Quantum computing, IRNSS & 3-stage nuclear program" },
+    "Art, Architecture & Cultural Heritage": { count: 0, pillar: "GS1", focus: "Nagara vs Dravida temple architecture, Bhakti-Sufi literature & classical dances" },
+    "International Relations & Multilateral Bodies": { count: 0, pillar: "GS2", focus: "QUAD, G20, WTO disputes, UNCLOS maritime boundaries & West Asian diplomacy" }
+  };
+
+  for (const p of prelimsRows) {
+    if (p.paper === 'GS-2' || p.node_id?.startsWith('CSAT')) {
+      subjectMap["CSAT Paper-2 & General Mental Ability"].count++;
+    } else if (p.node_id?.includes('ECO')) {
+      subjectMap["Economy & Monetary Policy"].count++;
+    } else if (p.node_id?.includes('ENV')) {
+      subjectMap["Environment, Biodiversity & Climate"].count++;
+    } else if (p.node_id?.includes('POL') || p.node_id?.includes('CONSTITUTION')) {
+      subjectMap["Indian Polity & Constitutional Governance"].count++;
+    } else if (p.node_id?.includes('GEO')) {
+      subjectMap["Physical, Indian & World Geography"].count++;
+    } else if (p.node_id?.includes('SCI')) {
+      subjectMap["Science, Technology & Space Missions"].count++;
+    } else if (p.node_id?.includes('FREEDOM') || p.node_id?.includes('MODERN')) {
+      subjectMap["Modern Indian History & Freedom Movement"].count++;
+    } else if (p.node_id?.includes('ANCIENT') || p.node_id?.includes('MEDIEVAL') || p.node_id?.includes('HIS')) {
+      subjectMap["Ancient & Medieval Indian History"].count++;
+    } else if (p.node_id?.includes('IR')) {
+      subjectMap["International Relations & Multilateral Bodies"].count++;
+    } else if (p.node_id?.includes('CUL')) {
+      subjectMap["Art, Architecture & Cultural Heritage"].count++;
+    } else {
+      subjectMap["Static GK Reference Matrices"].count++;
+    }
   }
 
-  const subjectDistribution = Object.entries(subjectCounts)
-    .sort((a, b) => b[1] - a[1])
-    .map(([subject, count]) => {
-      let pillar = "GS1";
-      let focus = "Historical context & conceptual clarity";
-      if (subject.includes("Polity") || subject.includes("Governance") || subject.includes("World Affairs")) {
-        pillar = "GS2";
-        focus = "Articles, amendments, judicial doctrines & federal dynamics";
-      } else if (subject.includes("Economy") || subject.includes("Environment") || subject.includes("Science")) {
-        pillar = "GS3";
-        focus = "Monetary policy, Ramsar sites, Green hydrogen & high-tech missions";
-      } else if (subject.includes("CSAT")) {
-        pillar = "CSAT";
-        focus = "Logical deductions, assumption validation & quantitative speed";
-      } else if (subject.includes("Static GK")) {
-        pillar = "STATIC_GK";
-        focus = "Protected areas, mountain passes & international organizations";
-      }
-
-      return {
-        subject,
-        count,
-        sharePct: parseFloat(((count / (totalStatic || 1)) * 100).toFixed(1)),
-        pillar,
-        highYieldFocus: focus,
-      };
-    });
+  const denominator = prelimsRows.length || totalPrelims || 1;
+  const subjectDistribution = Object.entries(subjectMap)
+    .sort((a, b) => b[1].count - a[1].count)
+    .map(([subject, info]) => ({
+      subject,
+      count: info.count,
+      sharePct: parseFloat(((info.count / denominator) * 100).toFixed(1)),
+      pillar: info.pillar,
+      highYieldFocus: info.focus
+    }));
 
   const formatEvolution = [
     {
       era: "Legacy Factual Era",
       years: "2000–2010",
-      singleChoicePct: 68.0,
-      multiStatementPct: 24.0,
-      pairMatchingPct: 5.0,
-      assertionReasonPct: 3.0,
+      singleChoicePct: 35.0,
+      multiStatementPct: 54.9,
+      pairMatchingPct: 10.1,
+      assertionReasonPct: 0.0,
       avgWordsPerStem: 38,
-      pedagogicalShift: "Direct single-variable memory recall; high effectiveness of encyclopedic rote learning.",
+      pedagogicalShift: "Direct single-variable memory recall; high effectiveness of encyclopedic rote learning."
     },
     {
       era: "Analytical Statement Era",
       years: "2011–2022",
-      singleChoicePct: 18.0,
-      multiStatementPct: 68.0,
-      pairMatchingPct: 10.0,
-      assertionReasonPct: 4.0,
+      singleChoicePct: 22.4,
+      multiStatementPct: 62.8,
+      pairMatchingPct: 11.2,
+      assertionReasonPct: 3.6,
       avgWordsPerStem: 74,
-      pedagogicalShift: "Transition to 3-statement synthesis where traditional binary option elimination was king.",
+      pedagogicalShift: "Transition to 3-statement synthesis where traditional binary option elimination was king."
     },
     {
       era: "Elimination-Proof Pair Matching Era",
@@ -527,7 +548,7 @@ export async function getLiveQuestionBankTrends() {
       pairMatchingPct: 42.0,
       assertionReasonPct: 8.0,
       avgWordsPerStem: 92,
-      pedagogicalShift: "'Only one pair / Only two pairs' renders option elimination obsolete; requires deterministic multi-statement mastery.",
+      pedagogicalShift: "'Only one pair / Only two pairs' renders option elimination obsolete; requires deterministic multi-statement mastery."
     }
   ];
 
@@ -536,25 +557,25 @@ export async function getLiveQuestionBankTrends() {
       feature: "Cognitive Focus",
       upscCseTrack: "Interdisciplinary conceptual synthesis, analytical deduction & policy evaluation.",
       sscCglTrack: "High-speed direct factual recall, quantitative calculations & procedural accuracy.",
-      strategicTakeaway: "UPSC rewards holistic mental models; SSC rewards rapid pattern recognition and high calculation velocity.",
+      strategicTakeaway: "UPSC rewards holistic mental models; SSC rewards rapid pattern recognition and high calculation velocity."
     },
     {
       feature: "Question Stem Structure",
       upscCseTrack: "Complex multi-statement (avg 3.2 statements per stem), pair-matching matrices & assertion-reasoning.",
       sscCglTrack: "Concise single-choice direct stems (avg 1.1 statements per stem).",
-      strategicTakeaway: "UPSC requires cross-checking multiple interdependent facts; SSC tests isolated discrete points.",
+      strategicTakeaway: "UPSC requires cross-checking multiple interdependent facts; SSC tests isolated discrete points."
     },
     {
       feature: "Negative Marking Risk Profile",
       upscCseTrack: "-0.66 per incorrect MCQ (33.3% penalty); calculated risk on 50/50 eliminations.",
       sscCglTrack: "-0.50 per incorrect MCQ (25% penalty in Tier-1); speed-driven pacing threshold.",
-      strategicTakeaway: "In UPSC, guessing blindly on 4-option uneliminated items destroys percentiles; in SSC, pacing is paramount.",
+      strategicTakeaway: "In UPSC, guessing blindly on 4-option uneliminated items destroys percentiles; in SSC, pacing is paramount."
     },
     {
       feature: "Isolation Boundary",
       upscCseTrack: "Syllabus strictly mapped to 137 General Studies & CSAT nodes.",
       sscCglTrack: "Syllabus mapped to General Awareness, Quantitative Aptitude & Reasoning.",
-      strategicTakeaway: "Both tracks are segregated in Tark Arena to maintain sterile exam preparation fidelity.",
+      strategicTakeaway: "Both tracks are segregated in Tark Arena to maintain sterile exam preparation fidelity."
     }
   ];
 
@@ -568,8 +589,8 @@ export async function getLiveQuestionBankTrends() {
 
   return {
     census: {
-      totalPrelimsQuestions: prelimsCountRes.count || 2796,
-      totalStaticQuestions: totalStatic || 1801,
+      totalPrelimsQuestions: totalPrelims,
+      totalStaticQuestions: totalStatic,
       totalMainsQuestions: mainsCountRes.count || 32,
       totalSyllabusNodes: nodesCountRes.count || 137,
       upscQuestionsCount: upscCount,

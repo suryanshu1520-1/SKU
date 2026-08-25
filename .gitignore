@@ -104,8 +104,6 @@ _scratch/
 cluster-test.ts
 tsconfig.verify*.json
 
-# ── Local Agent Plugin State & Sessions ──
-.claudian/
-gemini-scribe/
-.smart-env/
-.obsidian/plugins/*/data.json
+# ── Raw Source Archive (Local OCR & raw data — NEVER pushed to git) ──
+_raw_source_archive/
+_raw_source_archive/*

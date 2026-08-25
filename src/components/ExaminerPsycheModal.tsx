@@ -35,29 +35,29 @@ interface ExaminerPsycheModalProps {
   onLaunchPractice?: (subjectCategory: string) => void;
 }
 
-// Robust verified empirical baseline derived from 2,796+ Prelims and 32 Mains records (2000–2025)
+// Robust verified empirical baseline derived from 4,156+ Prelims and 32 Mains records (2000–2025)
 const EMPIRICAL_BASELINE_DATA = {
   bankTrends: {
     census: {
-      totalPrelimsQuestions: 2796,
+      totalPrelimsQuestions: 4156,
       totalStaticQuestions: 1801,
       totalMainsQuestions: 32,
       totalSyllabusNodes: 137,
-      upscQuestionsCount: 1672,
+      upscQuestionsCount: 5828,
       sscQuestionsCount: 129,
     },
     subjectDistribution: [
-      { subject: "Economy & Monetary Policy", count: 335, sharePct: 18.6, pillar: "GS3", highYieldFocus: "Monetary policy transmission, external debt, capital account & RBI liquidity corridor" },
-      { subject: "Environment, Biodiversity & Climate", count: 266, sharePct: 14.8, pillar: "GS3", highYieldFocus: "Ramsar wetlands, National Parks, species IUCN status & UNFCCC COP treaties" },
-      { subject: "Indian Polity & Constitutional Governance", count: 250, sharePct: 13.9, pillar: "GS2", highYieldFocus: "Fundamental Rights, Writ jurisdiction, Parliamentary privileges & Federal dynamics" },
-      { subject: "Physical, Indian & World Geography", count: 229, sharePct: 12.7, pillar: "GS1", highYieldFocus: "Monsoon dynamics, IOD, river basin drainage, mountain passes & tectonic rift valleys" },
-      { subject: "Science, Technology & Space Missions", count: 202, sharePct: 11.2, pillar: "GS3", highYieldFocus: "CRISPR-Cas9, Semiconductor Mission, Quantum computing, IRNSS & 3-stage nuclear program" },
-      { subject: "Modern Indian History & Freedom Movement", count: 121, sharePct: 6.7, pillar: "GS1", highYieldFocus: "1919/1935 Constitutional acts, tribal rebellions, Gandhian movements & Round Table conferences" },
-      { subject: "Ancient & Medieval Indian History", count: 100, sharePct: 5.5, pillar: "GS1", highYieldFocus: "Harappan trade, Mauryan rock edicts, Sangam literature, Vijayanagara administrative systems" },
-      { subject: "International Relations & Multilateral Bodies", count: 88, sharePct: 4.9, pillar: "GS2", highYieldFocus: "QUAD, G20, WTO disputes, UNCLOS maritime boundaries & West Asian diplomacy" },
-      { subject: "Art, Architecture & Cultural Heritage", count: 83, sharePct: 4.6, pillar: "GS1", highYieldFocus: "Nagara vs Dravida temple architecture, Bhakti-Sufi literature & classical dances" },
-      { subject: "CSAT Paper-2 & General Mental Ability", count: 78, sharePct: 4.3, pillar: "CSAT", highYieldFocus: "Reading comprehension critical assumptions, syllogisms & number systems" },
-      { subject: "Static GK Reference Matrices", count: 49, sharePct: 2.8, pillar: "STATIC_GK", highYieldFocus: "Supreme Court landmark benches, Ramsar sites, biosphere reserves & mountain passes" }
+      { subject: "Indian Polity & Constitutional Governance", count: 2239, sharePct: 53.9, pillar: "GS2", highYieldFocus: "Fundamental Rights, Writ jurisdiction, Parliamentary privileges & Federal dynamics" },
+      { subject: "CSAT Paper-2 & General Mental Ability", count: 608, sharePct: 14.6, pillar: "CSAT", highYieldFocus: "Reading comprehension critical assumptions, syllogisms, permutations & number systems" },
+      { subject: "Physical, Indian & World Geography", count: 382, sharePct: 9.2, pillar: "GS1", highYieldFocus: "Monsoon dynamics, IOD, river basin drainage, mountain passes & tectonic rift valleys" },
+      { subject: "Static GK Reference Matrices", count: 293, sharePct: 7.1, pillar: "STATIC_GK", highYieldFocus: "Supreme Court landmark benches, Ramsar sites, biosphere reserves & mountain passes" },
+      { subject: "Economy & Monetary Policy", count: 167, sharePct: 4.0, pillar: "GS3", highYieldFocus: "Monetary policy transmission, external debt, capital account & RBI liquidity corridor" },
+      { subject: "Environment, Biodiversity & Climate", count: 123, sharePct: 3.0, pillar: "GS3", highYieldFocus: "Ramsar wetlands, National Parks, species IUCN status & UNFCCC COP treaties" },
+      { subject: "Ancient & Medieval Indian History", count: 97, sharePct: 2.3, pillar: "GS1", highYieldFocus: "Harappan trade, Mauryan rock edicts, Sangam literature, Vijayanagara administrative systems" },
+      { subject: "Modern Indian History & Freedom Movement", count: 96, sharePct: 2.3, pillar: "GS1", highYieldFocus: "1919/1935 Constitutional acts, tribal rebellions, Gandhian movements & Round Table conferences" },
+      { subject: "Science, Technology & Space Missions", count: 83, sharePct: 2.0, pillar: "GS3", highYieldFocus: "CRISPR-Cas9, Semiconductor Mission, Quantum computing, IRNSS & 3-stage nuclear program" },
+      { subject: "Art, Architecture & Cultural Heritage", count: 60, sharePct: 1.4, pillar: "GS1", highYieldFocus: "Nagara vs Dravida temple architecture, Bhakti-Sufi literature & classical dances" },
+      { subject: "International Relations & Multilateral Bodies", count: 8, sharePct: 0.2, pillar: "GS2", highYieldFocus: "QUAD, G20, WTO disputes, UNCLOS maritime boundaries & West Asian diplomacy" }
     ],
     formatEvolution: [
       {
@@ -312,7 +312,7 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#e0d0ab]/15 text-[#e0d0ab] border border-[#e0d0ab]/30 uppercase tracking-wider">
                   TARK EMPIRICAL ENGINE v2.5
                 </span>
-                <span className="text-xs font-mono text-zinc-400">2,800+ Discrete Item Bank (2000–2025)</span>
+                <span className="text-xs font-mono text-zinc-400">4,150+ Discrete Item Bank (2000–2025)</span>
               </div>
               <h2 className="text-xl md:text-2xl font-serif font-bold text-stone-100 tracking-tight mt-0.5">
                 The Examiner's Psyche & Question Bank Intelligence

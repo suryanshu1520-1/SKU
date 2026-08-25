@@ -74,7 +74,7 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
 
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900/60 border border-zinc-800/80 rounded-sm text-[10px] font-sans uppercase tracking-wider text-zinc-400 backdrop-blur-md">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-            <span>1,720+ Items Synced</span>
+            <span>4,150+ Prelims MCQs Synced</span>
           </div>
         </motion.div>
 
@@ -235,7 +235,7 @@ export default function Landing({ onNavigateArena, onNavigateTracker, onNavigate
               No Guesswork. Zero Client-Side Answer Trust.
             </h4>
             <p className="text-zinc-400 text-xs font-sans max-w-xl">
-              1,720+ UPSC & State PSC standard items. Server-evaluated scoring ensures answer keys remain hidden until test completion. Double-spend prevention locks seat reservations atomically.
+              4,150+ Discrete Prelims MCQs & 5,950+ unified question items. Server-evaluated scoring ensures answer keys remain hidden until test completion. Double-spend prevention locks seat reservations atomically.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0 text-emerald-400 font-sans text-xs font-semibold px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded-sm">
