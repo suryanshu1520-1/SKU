@@ -4,6 +4,7 @@ import { Loader2, Sparkles, Shield, Trophy, Clock, CheckCircle2, XCircle, HelpCi
 import Markdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 import { supabase } from '../lib/supabase';
+import { fetchWithAuth } from '../lib/api';
 import { AnimatedNumber, AccuracyBar, StatCard } from './shared';
 
 interface AutopsyProps {
@@ -35,23 +36,17 @@ export default function Autopsy({
   useEffect(() => {
     if (Object.keys(stats.subjectStats || {}).length > 0) {
       setLoadingInsights(true);
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        const token = session?.access_token || '';
-        fetch('/api/insights', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          body: JSON.stringify({ stats }),
+      fetchWithAuth('/api/insights', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stats }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.insights) setInsights(data.insights);
         })
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.insights) setInsights(data.insights);
-          })
-          .catch((err) => console.error('Error fetching insights:', err))
-          .finally(() => setLoadingInsights(false));
-      });
+        .catch((err) => console.error('Error fetching insights:', err))
+        .finally(() => setLoadingInsights(false));
     }
   }, [stats]);
 
@@ -157,37 +152,62 @@ export default function Autopsy({
           </div>
         </motion.div>
 
-        {/* 2. Percentile Standing Banner */}
-        <motion.div
-          initial={prefersReduced ? undefined : { opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          className={`p-6 sm:p-8 rounded-sm border text-center relative overflow-hidden backdrop-blur-sm ${
-            isHighPerformer
-              ? 'bg-gradient-to-b from-zinc-900/60 to-zinc-950 border-[#0194a8]/50 shadow-lg shadow-[#0194a8]/10'
-              : 'bg-zinc-900/40 border-zinc-800'
-          }`}
-        >
-          <div className="space-y-2 max-w-lg mx-auto font-sans">
-            <p className="text-xs font-sans uppercase tracking-wider text-zinc-400 font-medium">
-              Where you stand
-            </p>
-            <h3 className="font-serif text-xl sm:text-2xl font-bold text-white">
-              Higher than{' '}
-              <span className="text-[#e0d0ab] font-mono">
-                <AnimatedNumber value={percentile} suffix="%" />
-              </span>{' '}
-              of candidate submissions.
-            </h3>
-            <p className="text-xs font-sans text-zinc-400 leading-relaxed pt-1">
-              {percentile >= 80
-                ? 'Exceptional precision. You have cleared the benchmark for top accuracy.'
-                : percentile >= 50
-                ? 'Competitive baseline achieved. Strengthening subject focus areas will accelerate percentile growth.'
-                : 'Diagnostic completed. Review conceptual insights below to eliminate repeat errors.'}
-            </p>
-          </div>
-        </motion.div>
+        {/* 2. Percentile Standing / Training Ground Banner */}
+        {isRanked ? (
+          <motion.div
+            initial={prefersReduced ? undefined : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className={`p-6 sm:p-8 rounded-sm border text-center relative overflow-hidden backdrop-blur-sm ${
+              isHighPerformer
+                ? 'bg-gradient-to-b from-zinc-900/60 to-zinc-950 border-[#0194a8]/50 shadow-lg shadow-[#0194a8]/10'
+                : 'bg-zinc-900/40 border-zinc-800'
+            }`}
+          >
+            <div className="space-y-2 max-w-lg mx-auto font-sans">
+              <p className="text-xs font-sans uppercase tracking-wider text-zinc-400 font-medium">
+                Where you stand
+              </p>
+              <h3 className="font-serif text-xl sm:text-2xl font-bold text-white">
+                Higher than{' '}
+                <span className="text-[#e0d0ab] font-mono">
+                  <AnimatedNumber value={percentile} suffix="%" />
+                </span>{' '}
+                of candidate submissions.
+              </h3>
+              <p className="text-xs font-sans text-zinc-400 leading-relaxed pt-1">
+                {percentile >= 80
+                  ? 'Exceptional precision. You have cleared the benchmark for top accuracy.'
+                  : percentile >= 50
+                  ? 'Competitive baseline achieved. Strengthening subject focus areas will accelerate percentile growth.'
+                  : 'Diagnostic completed. Review conceptual insights below to eliminate repeat errors.'}
+              </p>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={prefersReduced ? undefined : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="p-6 sm:p-8 rounded-sm border border-zinc-800 bg-zinc-900/40 text-center relative overflow-hidden backdrop-blur-sm"
+          >
+            <div className="space-y-2 max-w-lg mx-auto font-sans">
+              <p className="text-xs font-sans uppercase tracking-wider text-[#0194a8] font-bold">
+                Training Ground Diagnostic
+              </p>
+              <h3 className="font-serif text-xl sm:text-2xl font-bold text-white">
+                Session Complete &bull;{' '}
+                <span className="text-[#e0d0ab] font-mono">
+                  {Math.round((stats.correct / Math.max(1, total)) * 100)}%
+                </span>{' '}
+                Accuracy
+              </h3>
+              <p className="text-xs font-sans text-zinc-400 leading-relaxed pt-1">
+                Unranked practice session. Conceptual telemetry has been evaluated and logged to your profile for subject-weakness tracking.
+              </p>
+            </div>
+          </motion.div>
+        )}
 
         {/* 3. Rank Points Yield Breakdown (Ranked only) */}
         {isRanked && (

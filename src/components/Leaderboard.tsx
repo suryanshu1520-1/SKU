@@ -307,7 +307,7 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-[#0194a8] font-bold mt-0.5">&bull;</span>
-                <span><strong>Accuracy Bonus:</strong> Attain <strong>80% or higher accuracy</strong> to secure a <strong>+25 CP bonus</strong>.</span>
+                <span><strong>Accuracy Bonus:</strong> Attain <strong>80% or higher accuracy</strong> to secure a <strong>+15 CP bonus</strong>.</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-[#e0d0ab] font-bold mt-0.5">&bull;</span>

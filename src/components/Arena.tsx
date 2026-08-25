@@ -1370,12 +1370,22 @@ export default function Arena({
 
               let optionStyle = 'bg-zinc-900/40 border-zinc-800 text-stone-200 hover:border-[#0194a8]/60';
               if (isQuestionLocked) {
-                if (isOptionCorrect) {
-                  optionStyle = 'bg-emerald-950/40 border-emerald-500/80 text-emerald-300';
-                } else if (isSelected && !isOptionCorrect) {
-                  optionStyle = 'bg-rose-950/40 border-rose-500/80 text-rose-300';
+                if (!isRanked) {
+                  // Training Ground (Unranked): Instant pedagogical feedback
+                  if (isOptionCorrect) {
+                    optionStyle = 'bg-emerald-950/40 border-emerald-500/80 text-emerald-300';
+                  } else if (isSelected && !isOptionCorrect) {
+                    optionStyle = 'bg-rose-950/40 border-rose-500/80 text-rose-300';
+                  } else {
+                    optionStyle = 'bg-zinc-900/20 border-zinc-900 text-zinc-600 opacity-40';
+                  }
                 } else {
-                  optionStyle = 'bg-zinc-900/20 border-zinc-900 text-zinc-600 opacity-40';
+                  // Vanguard (Ranked): Sterile exam lock, no answer key leakage
+                  if (isSelected) {
+                    optionStyle = 'bg-[#0194a8]/20 border-[#0194a8] text-[#e0d0ab] shadow-sm font-semibold';
+                  } else {
+                    optionStyle = 'bg-zinc-900/20 border-zinc-900 text-zinc-600 opacity-40';
+                  }
                 }
               } else if (isSelected) {
                 optionStyle = 'bg-[#0194a8]/15 border-[#0194a8] text-[#e0d0ab] shadow-sm';
@@ -1406,9 +1416,9 @@ export default function Arena({
             })}
           </div>
 
-          {/* AI Conceptual Insights Flashcard (Revealed after lock) */}
+          {/* AI Conceptual Insights Flashcard (Revealed after lock in unranked training mode) */}
           <AnimatePresence>
-            {hasLockedWithAnswer && (
+            {hasLockedWithAnswer && !isRanked && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}

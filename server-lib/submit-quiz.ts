@@ -83,6 +83,28 @@ export default async function handler(req: any, res: any) {
       return res.status(400).json({ error: "Missing required fields: userId, questions, answers" });
     }
 
+    const isRanked = payload.isRanked !== undefined ? payload.isRanked : true;
+
+    // Server-side Quota Enforcement: Free tier accounts are limited to 1 Vanguard ranked assessment
+    if (isRanked) {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('membership_tier, vanguard_sessions_used')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (profile) {
+        const isFounder = profile.membership_tier === 'founder';
+        const vanguardUsed = profile.vanguard_sessions_used || 0;
+        if (!isFounder && vanguardUsed >= 1) {
+          return res.status(403).json({
+            error: "QUOTA_EXCEEDED",
+            message: "Free tier quota reached for Vanguard Ranked Assessment. Upgrade to Founders Club for unlimited testing."
+          });
+        }
+      }
+    }
+
     // 1. Compute session-level stats from the payload
     const totalQuestions = payload.questions.length;
     let correctCount = 0;
@@ -173,8 +195,6 @@ export default async function handler(req: any, res: any) {
         unattemptedCount += diff;
       }
     }
-
-    const isRanked = payload.isRanked !== undefined ? payload.isRanked : true;
 
     // 2. Compute percentile BEFORE inserting the session (ONLY IF RANKED)
     let computedPercentile: number = 0;

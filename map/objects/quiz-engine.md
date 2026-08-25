@@ -4,7 +4,7 @@ status: verified 2026-08-18
 universe: live
 ---
 
-# Object: Quiz Engine (`questions`, `quiz_sessions`, `training_sessions`)
+# Object: Quiz Engine (`static_questions`, `pyq_prelims`, `quiz_sessions`, `training_sessions`)
 
 ## 1. What It Is
 The core testing and evaluation engine responsible for delivering daily UPSC question sets, validating candidate answers server-side, scoring performance (+2 for correct, -0.66 for incorrect), and storing session outcomes.
@@ -20,7 +20,7 @@ The core testing and evaluation engine responsible for delivering daily UPSC que
 
 ## 4. Connected To
 - **Owns**: Answer validations, explanation generation, score breakdowns.
-- **Owned by**: `profiles` (foreign key `user_id`).
+- **Owned by**: `user_profiles` (foreign key `user_id`).
 - **Feeds**: `gamification-leaderboard` (updates XP and streaks).
 
 ## 5. If You Change This

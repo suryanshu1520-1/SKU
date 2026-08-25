@@ -19,7 +19,7 @@ The high-stakes examination interface comprising the timed quiz player, question
 - **App Controller**: [`src/App.tsx:L30-L120`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/src/App.tsx#L30-L120)
 
 ## 4. Connected To
-- **Consumes**: `questions` (from `/api/questions` or `/api/training-questions`).
+- **Consumes**: `static_questions`, `pyq_prelims` (from `/api/questions` or `/api/training-questions`).
 - **Produces**: Submissions to `/api/submit-quiz`.
 
 ## 5. If You Change This

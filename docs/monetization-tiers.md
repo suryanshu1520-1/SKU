@@ -35,8 +35,8 @@ To prevent the **501st member race condition** (overselling a capped batch of me
       ▼
 [ Verify HMAC Signature (`/api/verify-payment`) ]
   - Marks `pending_orders` status = `'paid'`
-  - Upgrades `profiles.tier` = `'pro'`
-  - Unlocks lifetime Pro privileges
+  - Upgrades `user_profiles.membership_tier` = `'founder'`
+  - Unlocks lifetime Founding Member privileges
 ```
 
 ---
