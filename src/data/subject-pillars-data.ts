@@ -145,6 +145,17 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
           "Department-related Parliamentary Standing Committees (DRSCs): 24 committees scrutinizing ministerial demands for grants."
         ],
         examinerPerspective: "UPSC frequently examines why Ministers cannot be members of financial committees, and tests the exact membership split between Lok Sabha and Rajya Sabha."
+      },
+      {
+        title: "Constitutional, Statutory & Regulatory Bodies",
+        syllabusTag: "GS2.POL.INSTITUTIONS",
+        coreTheory: "Governance in India relies on institutional independence. Constitutional bodies derive power directly from Articles of the Constitution (ECI Art 324, CAG Art 148, UPSC Art 315, Finance Commission Art 280), whereas Statutory bodies are created by Acts of Parliament (NHRC, CVC, CIC, NGT, CCI, SEBI).",
+        criticalProvisions: [
+          "Security of Tenure: Judges, CAG, CEC removed only via impeachment-like presidential order (Art 124(4)).",
+          "Charged on Consolidated Fund of India: Salaries of SC Judges, CAG, UPSC Chairman not voted upon by Parliament.",
+          "Statutory Quasi-Judicial Authorities: NGT Act 2010 (applies principles of natural justice and sustainable development)."
+        ],
+        examinerPerspective: "Examiners test the appointment collegiums (e.g. Chief Election Commissioner Act 2023, Lokpal Act 2013, CBI Director selection committee under CVC Act)."
       }
     ],
     mindMaps: [
@@ -188,6 +199,13 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
         testabilityScore: "HIGH",
         examinerTrap: "Assuming Governor has unbounded timeline to assent to bills (addressed in 2023 Punjab & Telangana SC judgments).",
         recentYearAnchors: [2018, 2019, 2022, 2023]
+      },
+      {
+        theme: "Money Bill Certification & Bicameral Powers",
+        frequencyLast10Years: 8,
+        testabilityScore: "HIGH",
+        examinerTrap: "Speaker's certification under Art 110 is subject to judicial review if it is colourable exercise of power.",
+        recentYearAnchors: [2018, 2019, 2023, 2024]
       }
     ],
     mainsBlueprints: [
@@ -230,9 +248,30 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
           ["Minerva Mills", "1980", "Harmony between Fundamental Rights and DPSP is a basic feature", "Art 31C, Art 14, 368"],
           ["S.R. Bommai", "1994", "President's Rule under Art 356 subject to judicial review; floor test mandatory", "Article 356"],
           ["I.R. Coelho", "2007", "Ninth Schedule laws post-April 24, 1973 are open to judicial review", "Article 31B & 9th Sched"],
-          ["K.S. Puttaswamy", "2017", "Right to Privacy declared an intrinsic Fundamental Right under Article 21", "Article 21 & Part III"]
+          ["K.S. Puttaswamy", "2017", "Right to Privacy declared an intrinsic Fundamental Right under Article 21", "Article 21 & Part III"],
+          ["Indra Sawhney", "1992", "Upheld 27% OBC reservation; introduced 50% vertical ceiling and creamy layer", "Art 16(4)"],
+          ["Navtej Singh Johar", "2018", "Decriminalized Section 377 IPC; constitutional morality over majoritarian views", "Art 14, 15, 19, 21"],
+          ["EWS Ruling (Janki Janhit)", "2022", "Upheld 103rd Amendment (10% EWS reservation) breaching 50% ceiling", "Art 15(6) & 16(6)"],
+          ["Electoral Bonds Verdict", "2024", "Struck down Electoral Bonds Scheme as violative of voter's Right to Information", "Article 19(1)(a)"]
         ],
         highYieldTip: "UPSC tests how landmark judgments transformed statutory interpretations from formalistic procedures into substantive rights."
+      },
+      {
+        id: "pol-const-vs-statutory",
+        title: "Constitutional vs Statutory Bodies Comparative Matrix",
+        category: "Institutional Framework",
+        headers: ["Body Name", "Status", "Parent Authority / Act", "Removal / Independence Mechanism"],
+        rows: [
+          ["Election Commission of India", "Constitutional", "Article 324", "CEC removed like SC Judge; conditions of service cannot be varied to disadvantage"],
+          ["Comptroller & Auditor General", "Constitutional", "Article 148", "Removed like SC Judge; ineligible for further office under Union/State"],
+          ["Union Public Service Commission", "Constitutional", "Article 315–323", "Chairman removed by President after SC enquiry on misbehavior (Art 317)"],
+          ["Finance Commission", "Constitutional", "Article 280", "Constituted every 5 years; quasi-judicial advisory body on fiscal devolution"],
+          ["National Human Rights Commission", "Statutory", "Protection of Human Rights Act 1993", "Appointed on recommendation of 6-member committee; recommendatory powers"],
+          ["Central Vigilance Commission", "Statutory", "CVC Act 2003", "Superintends CBI investigations under Prevention of Corruption Act"],
+          ["National Green Tribunal", "Statutory", "NGT Act 2010", "Chaired by retired SC Judge/CJ of HC; 6-month statutory case disposal mandate"],
+          ["NITI Aayog", "Non-Constitutional / Non-Statutory", "Cabinet Resolution (1 Jan 2015)", "Think-tank fostering cooperative & competitive federalism; no financial allocation powers"]
+        ],
+        highYieldTip: "NITI Aayog is neither constitutional nor statutory; it was created by an executive resolution."
       }
     ]
   },
@@ -281,6 +320,17 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
           "Quit India: Immediate end to British rule, 'Do or Die' mantra, underground parallel governments (Balia, Tamluk, Satara)."
         ],
         examinerPerspective: "UPSC analyzes the ideological divergence between Moderates (Gokhale), Extremists (Tilak), Socialists (Nehru, Bose), and Revolutionaries (Bhagat Singh)."
+      },
+      {
+        title: "Buddhism & Jainism: Heterodox Philosophies & Epistemology",
+        syllabusTag: "GS1.CUL.PHILOSOPHY",
+        coreTheory: "Both 6th century BCE heterodox movements rejected Vedic animal sacrifices and caste hierarchies. Buddhism propounded the Middle Path (Majjhima Patipada), Four Noble Truths, and Pratityasamutpada (Dependent Origination). Jainism advocated extreme asceticism, Anekantavada (multiplicity of viewpoints), and Syadvada (relativity of truth).",
+        criticalProvisions: [
+          "Buddhist Pitakas: Vinaya (monastic discipline), Sutta (sermons), Abhidhamma (metaphysical philosophy).",
+          "Jain Canonical Texts: Agamas compiled at Valabhi; division into Digambaras (sky-clad) and Svetambaras (white-clad).",
+          "Key Philosophical Schools: Madhyamaka (Nagarjuna - Shunyavada), Yogachara (Asanga & Vasubandhu)."
+        ],
+        examinerPerspective: "UPSC frequently tests Bodhisattvas (Avalokiteshvara, Maitreya, Manjushri) and pairs philosophical schools with their founders."
       }
     ],
     mindMaps: [
@@ -295,6 +345,18 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
           "Dravida: Stepped pyramidal Vimana, massive Gopurams, enclosed perimeter, Kalyana Mandapas.",
           "Vesara / Hoysala: Stellate (star-shaped) ground plan, soapstone carvings, multi-tiered friezes."
         ]
+      },
+      {
+        id: "mm-freedom-phases",
+        title: "Chronological Sequence of Gandhian Mass Movements",
+        subtitle: "Struggle-Truce-Struggle (S-T-S) Trajectory",
+        structureType: "sequential",
+        details: [
+          "1917–1918: Regional Experiments (Champaran Satyagraha, Ahmedabad Mill Strike, Kheda Satyagraha).",
+          "1919–1922: Rowlatt Satyagraha, Khilafat & All-India Non-Cooperation Movement (Chauri Chaura truce).",
+          "1930–1934: Dandi Salt March & Civil Disobedience Movement (Gandhi-Irwin Pact & Round Table Conferences).",
+          "1940–1942: Individual Satyagraha (Vinoba Bhave, Nehru) leading into Quit India Movement ('Do or Die')."
+        ]
       }
     ],
     pyqEvidence: [
@@ -304,6 +366,13 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
         testabilityScore: "VERY HIGH",
         examinerTrap: "Pair-matching Buddhist vs Jain philosophers or conflating texts (e.g. Sangam works with Vedic literature).",
         recentYearAnchors: [2019, 2021, 2022, 2023, 2024]
+      },
+      {
+        theme: "Harappan Urbanism, Crafts & Maritime Trade",
+        frequencyLast10Years: 8,
+        testabilityScore: "HIGH",
+        examinerTrap: "Assuming iron or horses were widespread in Mature Harappan culture (both are absent/controversial).",
+        recentYearAnchors: [2018, 2019, 2021, 2023]
       }
     ],
     mainsBlueprints: [
@@ -378,6 +447,36 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
           ["Manipuri", "Manipur", "Jagoi & Cholom, Raslila (Radha-Krishna devotion), Pung Cholom drum dance, tubular Kumil skirt", "Guru Bipin Singh, Rabindranath Tagore"]
         ],
         highYieldTip: "Kerala is the ONLY state with two classical dances (Kathakali and Mohiniyattam). Ministry of Culture also recognizes Chhau as the 9th classical form."
+      },
+      {
+        id: "his-harappan-sites",
+        title: "Major Indus Valley / Harappan Archaeological Sites",
+        category: "Ancient Archaeology",
+        headers: ["Site Name", "Location / River Basin", "Key Unique Archaeological Findings", "Excavator"],
+        rows: [
+          ["Harappa", "Punjab (Pakistan) / Ravi", "Granaries in 2 rows of six, working floors, coffin burials (R-37), stone lingam/yoni", "Daya Ram Sahni (1921)"],
+          ["Mohenjo-daro", "Sindh (Pakistan) / Indus", "The Great Bath, Great Granary, Bronze Dancing Girl, Priest-King steatite statue", "R. D. Banerji (1922)"],
+          ["Lothal", "Gujarat (India) / Bhogavo", "Tidal Dockyard connected to Gulf of Khambhat, double burial, rice husk, bead factory", "S. R. Rao (1954)"],
+          ["Dholavira", "Gujarat (India) / Rann of Kutch", "Giant stone water reservoirs, 3-tier city planning (Citadel, Middle, Lower), 10-sign signboard", "R. S. Bisht (1990)"],
+          ["Kalibangan", "Rajasthan (India) / Ghaggar", "Ploughed agricultural field surface, fire altars (Yajna kunds), camel bones, wooden furrow", "A. Ghosh & B. B. Lal"],
+          ["Banawali", "Haryana (India) / Ghaggar-Hakra", "Terracotta replica model of a plough, high radial street planning, barley grains", "R. S. Bisht (1974)"],
+          ["Rakhigarhi", "Haryana (India) / Drishadvati", "Largest Harappan site in the subcontinent, DNA extraction studies, lapidary workshop", "Amarendra Nath / Vasant Shinde"],
+          ["Chanhu-daro", "Sindh (Pakistan) / Indus", "Only Harappan city without a Citadel, industrial bead-making factory, inkpot, lipsticks", "N. G. Majumdar (1931)"]
+        ],
+        highYieldTip: "Dholavira is unique for its 3-tier city division (all other cities had 2 tiers: Citadel and Lower Town) and stone masonry reservoirs."
+      },
+      {
+        id: "his-buddhist-councils",
+        title: "Ancient Buddhist Councils & Canons",
+        category: "Ancient Religious History",
+        headers: ["Council", "Year / Venue", "Royal Patron & Dynasty", "President", "Key Canonical Outcome"],
+        rows: [
+          ["1st Council", "483 BCE / Rajagriha (Sattapanni Cave)", "King Ajatashatru (Haryanka)", "Mahakassapa", "Compilation of Sutta Pitaka (by Ananda) and Vinaya Pitaka (by Upali)"],
+          ["2nd Council", "383 BCE / Vaishali", "King Kalashoka (Shishunaga)", "Sabakami", "First major ideological split into Sthaviravadins (Elders) and Mahasanghikas"],
+          ["3rd Council", "250 BCE / Pataliputra", "Emperor Ashoka (Maurya)", "Moggaliputta Tissa", "Compilation of Abhidhamma Pitaka; expulsion of heretics; dispatch of Dhamma missions abroad"],
+          ["4th Council", "72 CE / Kundalvana (Kashmir)", "Emperor Kanishka (Kushan)", "Vasumitra (Vice: Ashvaghosha)", "Formal division of Buddhism into Mahayana (Great Vehicle) and Hinayana/Theravada; Mahavibhasha compiled"]
+        ],
+        highYieldTip: "Remember the royal patron chronology: Ajatashatru -> Kalashoka -> Ashoka -> Kanishka (AK-AK)."
       }
     ]
   },
@@ -395,7 +494,7 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
     empiricalBasis: "Formulated through rigorous analysis of RBI Monetary Policy reports, Economic Surveys, Union Budget structures, and ISRO/DRDO technical blueprints.",
     colorTheme: {
       primary: "#10b981",
-      border: "rgba(16, 185, 129, 0.3)",
+      border: "rgba(168, 85, 247, 0.3)",
       bgGlow: "rgba(16, 185, 129, 0.08)",
       text: "#34d399"
     },
@@ -426,6 +525,17 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
           "Stage 3: Advanced Heavy Water Reactors (AHWRs) fueled by self-sustaining Thorium-232 / Uranium-233 fuel cycles."
         ],
         examinerPerspective: "UPSC tests why Thorium cannot be used directly in Stage 1 (it is fertile, not fissile; it must be converted into fissile U-233 in an FBR)."
+      },
+      {
+        title: "Balance of Payments (BoP) & Exchange Rate Dynamics",
+        syllabusTag: "GS3.ECO.EXTERNAL_SECTOR",
+        coreTheory: "BoP records all economic transactions between residents and the rest of the world. Current Account tracks visible trade (merchandise trade deficit) and invisibles (services exports, remittances, income). Capital Account tracks FDI, FPI, External Commercial Borrowings (ECB), and banking capital.",
+        criticalProvisions: [
+          "Current Account Deficit (CAD): Financed by Capital Account surpluses; high CAD increases currency vulnerability.",
+          "Real Effective Exchange Rate (REER): Trade-weighted, inflation-adjusted exchange rate measuring export competitiveness.",
+          "Liberalised Remittance Scheme (LRS): Resident individuals can remit up to $250,000 per financial year."
+        ],
+        examinerPerspective: "UPSC tests the twin-deficit hypothesis (Fiscal Deficit + Current Account Deficit) and how currency depreciation impacts inflation."
       }
     ],
     mindMaps: [
@@ -460,6 +570,13 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
         testabilityScore: "VERY HIGH",
         examinerTrap: "Assuming SDF requires G-Sec collateral (it is specifically uncollateralized).",
         recentYearAnchors: [2018, 2020, 2022, 2023, 2024]
+      },
+      {
+        theme: "Priority Sector Lending (PSL) & Sub-targets",
+        frequencyLast10Years: 10,
+        testabilityScore: "HIGH",
+        examinerTrap: "Assuming foreign banks with <20 branches have identical sub-targets for agriculture (they do not).",
+        recentYearAnchors: [2017, 2019, 2021, 2023]
       }
     ],
     mainsBlueprints: [
@@ -495,7 +612,9 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
           ["Global Economic Prospects (GEP)", "World Bank", "Emerging market growth trajectories, structural trade dynamics"],
           ["Human Development Report (HDR)", "UNDP", "HDI, Inequality-adjusted HDI (IHDI), Gender Inequality Index, MPI"],
           ["Global Competitiveness Report", "World Economic Forum (WEF)", "Productivity drivers, institutional quality, business dynamism"],
-          ["World Investment Report", "UNCTAD", "Foreign Direct Investment (FDI) inflows/outflows, transnational corporations"]
+          ["World Investment Report", "UNCTAD", "Foreign Direct Investment (FDI) inflows/outflows, transnational corporations"],
+          ["Global Gender Gap Report", "World Economic Forum (WEF)", "Economic participation, educational attainment, health, political empowerment"],
+          ["Ease of Doing Business (Discontinued)", "World Bank", "Business regulations, property registration, contract enforcement"]
         ],
         highYieldTip: "Direct match: IMF publishes World Economic Outlook & Global Financial Stability Report; World Bank publishes Global Economic Prospects."
       }
@@ -535,6 +654,17 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
           "Conflict of Interest: Direct pecuniary interest vs perceived bias in administrative discretion."
         ],
         examinerPerspective: "UPSC case studies deliberately place Duty/Law in direct tension with Compassion/Public Sentiment, requiring candidates to balance statutory compliance with humanitarian equity."
+      },
+      {
+        title: "Emotional Intelligence & Administrative Crisis Management",
+        syllabusTag: "GS4.ETH.EI",
+        coreTheory: "Emotional Intelligence (Daniel Goleman model: Self-Awareness, Self-Regulation, Motivation, Empathy, Social Skills) enables civil servants to manage personal stress, defuse communal/mob tensions, and deliver empathetic public service without losing objectivity.",
+        criticalProvisions: [
+          "Cognitive Dissonance (Festinger): Tension between personal moral beliefs and official statutory duties.",
+          "Empathy vs Sympathy: Active cognitive perspective-taking leading to policy action vs passive emotional pity.",
+          "Moral Hazard in Administration: Reckless risk-taking when shielded from consequences."
+        ],
+        examinerPerspective: "Examiners evaluate whether candidates apply EI tools to resolve real-world bureaucratic gridlock and crisis negotiations."
       }
     ],
     mindMaps: [
@@ -697,7 +827,7 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
           "India currently has 2 sites on Montreux Record: Keoladeo National Park (Rajasthan) and Loktak Lake (Manipur).",
           "Chilika Lake (Odisha) was placed on the Montreux Record in 1993 but removed in 2002 after successful ecological restoration (first in Asia).",
           "Sundarbans is the largest Ramsar site in India; Renuka Wetland (Himachal Pradesh) is the smallest.",
-          "Tamil Nadu has the highest number of Ramsar sites in India."
+          "Tamil Nadu has the highest number of Ramsar sites in India (16 sites)."
         ],
         examinerPerspective: "UPSC frequently tests which Indian wetlands are on the Montreux Record vs which were removed, and pairs wetlands with their feeder river systems."
       },
@@ -800,7 +930,9 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
           ["Wular Lake", "Jammu & Kashmir", "Tectonic freshwater lake (Jhelum River)", "Largest freshwater lake in India with associated deltaic marshes"],
           ["Renuka Lake", "Himachal Pradesh", "Natural freshwater wetland with springs", "Smallest Ramsar wetland in India; religious sanctuary with captive lion safari"],
           ["Sundarbans", "West Bengal", "Tidal mangrove estuarine complex", "Largest Ramsar site in India; Royal Bengal Tiger, estuarine crocodile, mangrove ecosystem"],
-          ["Kanwar (Kabar) Taal", "Bihar", "Oxbow lake (Burhi Gandak river)", "Largest freshwater oxbow lake in Asia; crucial central Asian flyway stopover"]
+          ["Kanwar (Kabar) Taal", "Bihar", "Oxbow lake (Burhi Gandak river)", "Largest freshwater oxbow lake in Asia; crucial central Asian flyway stopover"],
+          ["Ashtamudi Lake", "Kerala", "Estuarine palm-shaped wetland (Kallada river)", "Gateway to Kerala backwaters; critical habitat for marine finfishes"],
+          ["Vembanad-Kol", "Kerala", "Coastal brackish wetland fed by 10 rivers", "Longest lake in India; Nehru Trophy Boat Race; covers Pampa & Periyar basins"]
         ],
         highYieldTip: "Loktak and Keoladeo are the ONLY 2 Indian sites currently on the Montreux Record. Chilika was removed after restoration."
       },
@@ -818,7 +950,10 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
           ["Nathu La", "Sikkim", "Connects Sikkim with Chumbi Valley (Tibet)", "Branch of historic Silk Route; reopened for border trade in 2006"],
           ["Jelep La", "Sikkim", "Connects Sikkim with Lhasa via Chumbi Valley", "Formed by the Teesta River stream incision"],
           ["Bomdi La", "Arunachal Pradesh", "Connects western Arunachal (Tawang) with Lhasa", "Key strategic transit pass in the Eastern Himalayas"],
-          ["Diphu Pass", "Arunachal Pradesh", "Trijunction of India, China, and Myanmar", "Strategic border crossing on the McMahon Line"]
+          ["Diphu Pass", "Arunachal Pradesh", "Trijunction of India, China, and Myanmar", "Strategic border crossing on the McMahon Line"],
+          ["Palghat (Palakkad) Gap", "Kerala / Tamil Nadu", "Connects Palakkad with Coimbatore", "Major geological break in the Western Ghats between Nilgiri and Anaimalai hills"],
+          ["Thal Ghat (Kasara Ghat)", "Maharashtra", "Connects Mumbai with Nashik and North India", "Traversed by major central railway and NH-3 across Sahyadris"],
+          ["Bhor Ghat", "Maharashtra", "Connects Mumbai with Pune and Deccan plateau", "Historic trade route across Sahyadri mountain range"]
         ],
         highYieldTip: "River Sutlej enters India through Shipki La. Kailash Mansarovar pilgrims transit via Lipulekh (Uttarakhand) and Nathu La (Sikkim)."
       },
@@ -862,6 +997,27 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
           ["106th Amendment", "2023", "Nari Shakti Vandan Adhiniyam: 33% reservation for women in Lok Sabha & State Assemblies", "Inserted Articles 330A, 332A, 334A for 15-year women's legislative representation"]
         ],
         highYieldTip: "42nd Amendment was enacted during Emergency; 44th Amendment reversed its authoritarian provisions. 106th Amendment is the Women's Reservation Act."
+      },
+      {
+        id: "stat-biosphere-reserves",
+        title: "Key Biosphere Reserves of India & Core Fauna",
+        category: "Ecology & Conservation",
+        headers: ["Biosphere Reserve", "State / UT", "UNESCO MAB Status", "Key Iconic Fauna & Flora"],
+        rows: [
+          ["Nilgiri", "Tamil Nadu, Kerala, Karnataka", "Included (2000)", "Nilgiri Tahr, Lion-tailed Macaque, Shola grassland ecosystem"],
+          ["Gulf of Mannar", "Tamil Nadu", "Included (2001)", "Dugong (Sea Cow), Sea cucumber, Coral reefs, Seagrass meadows"],
+          ["Sundarbans", "West Bengal", "Included (2001)", "Royal Bengal Tiger, Estuarine crocodile, Mangrove delta forests"],
+          ["Nanda Devi", "Uttarakhand", "Included (2004)", "Snow Leopard, Himalayan Musk Deer, Valley of Flowers alpine meadows"],
+          ["Nokrek", "Meghalaya (Garo Hills)", "Included (2009)", "Red Panda, Asian Elephant, Citrus indica (mother gene of citrus)"],
+          ["Pachmarhi", "Madhya Pradesh", "Included (2009)", "Giant Flying Squirrel, Chinkara, Teak and Sal forest transition"],
+          ["Similipal", "Odisha (Mayurbhanj)", "Included (2009)", "Tiger, Elephant, Gaur, Mugger crocodile, Khadia tribal communities"],
+          ["Achanakmar-Amarkantak", "Madhya Pradesh & Chhattisgarh", "Included (2012)", "Four-horned antelope (Chousingha), source of Narmada & Son rivers"],
+          ["Great Nicobar", "Andaman & Nicobar Islands", "Included (2013)", "Saltwater Crocodile, Giant Robber Crab, Nicobar Megapode, Shompen tribe"],
+          ["Agasthyamala", "Kerala & Tamil Nadu", "Included (2016)", "Asian Elephant, Nilgiri Tahr, Kanikaran tribal medicinal plant knowledge"],
+          ["Khangchendzonga", "Sikkim", "Included (2018)", "Snow Leopard, Red Panda, Musk Deer, High-altitude glacial lakes"],
+          ["Panna", "Madhya Pradesh", "Included (2020)", "Tiger, Chital, Chinkara, Sambhar, Sloth bear, Ken river ecosystem"]
+        ],
+        highYieldTip: "India has 18 designated Biosphere Reserves, out of which 12 are part of the UNESCO World Network of Biosphere Reserves (WNBR). Panna is the 12th WNBR site."
       }
     ]
   }
