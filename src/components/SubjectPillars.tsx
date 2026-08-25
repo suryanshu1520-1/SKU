@@ -37,6 +37,7 @@ import {
   Bookmark
 } from 'lucide-react';
 import { SUBJECT_PILLARS, SubjectPillar, MindMapNode, StaticFactMatrix } from '../data/subject-pillars-data';
+import { ExaminerPsycheModal } from './ExaminerPsycheModal';
 
 interface SubjectPillarsProps {
   onLaunchPractice?: (subjectCategory: string) => void;
@@ -218,6 +219,7 @@ export default function SubjectPillars({ onLaunchPractice, onNavigateArena }: Su
   const [selectedPillarId, setSelectedPillarId] = useState<string>(SUBJECT_PILLARS[0].id);
   const [activeDossierTab, setActiveDossierTab] = useState<'concepts' | 'mindmaps' | 'pyq-evidence' | 'mains-blueprints' | 'static-vault'>('concepts');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isExaminerPsycheOpen, setIsExaminerPsycheOpen] = useState<boolean>(false);
   const [activeMindmapSteps, setActiveMindmapSteps] = useState<Record<string, number>>({});
   const getActiveStep = (mindmapId: string) => activeMindmapSteps[mindmapId] ?? 0;
   const setActiveStep = (mindmapId: string, stepIdx: number) =>
@@ -303,6 +305,13 @@ export default function SubjectPillars({ onLaunchPractice, onNavigateArena }: Su
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+            <button
+              onClick={() => setIsExaminerPsycheOpen(true)}
+              className="flex items-center justify-center gap-2 px-5 py-3.5 bg-zinc-900 hover:bg-zinc-800 text-[#e0d0ab] border border-[#e0d0ab]/40 rounded-sm text-xs font-sans font-bold uppercase tracking-widest transition-all duration-300 shadow-lg active:scale-[0.98] cursor-pointer"
+            >
+              <Brain className="w-4 h-4 text-[#e0d0ab]" />
+              Examiner's Psyche
+            </button>
             <button
               onClick={() => onNavigateArena && onNavigateArena()}
               className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#e0d0ab] hover:bg-[#ebdcb7] text-zinc-950 rounded-sm text-xs font-sans font-bold uppercase tracking-widest transition-all duration-300 shadow-xl hover:shadow-[#e0d0ab]/25 active:scale-[0.98] cursor-pointer"
@@ -891,6 +900,13 @@ export default function SubjectPillars({ onLaunchPractice, onNavigateArena }: Su
           </div>
         </motion.div>
       )}
+
+      {/* ── The Examiner's Psyche Modal ── */}
+      <ExaminerPsycheModal
+        isOpen={isExaminerPsycheOpen}
+        onClose={() => setIsExaminerPsycheOpen(false)}
+        onLaunchPractice={onLaunchPractice}
+      />
     </div>
   );
 }
