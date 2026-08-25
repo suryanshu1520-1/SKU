@@ -138,6 +138,7 @@ export default function DailyEdition({ userId }: DailyEditionProps) {
           .from('current_affairs')
           .select('*')
           .neq('source', 'PIB_Digest')
+          .neq('source', 'PRS')
           .gte('created_at', since)
           .order('created_at', { ascending: false })
           .limit(120);

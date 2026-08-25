@@ -95,6 +95,7 @@ const CATEGORY_TABS = [
   { id: 'Environment', label: 'Environment & Climate', keywords: ['Environment', 'Forest', 'Climate', 'Renewable', 'Earth Sciences', 'Agriculture', 'Water'] },
   { id: 'SciTech', label: 'Science & Defence', keywords: ['Defence', 'Space', 'ISRO', 'Atomic Energy', 'Electronics', 'IT', 'Science', 'Technology'] },
   { id: 'Social', label: 'Social Justice & Health', keywords: ['Health', 'Education', 'Social Justice', 'Women', 'Child', 'Tribal', 'Rural'] },
+  { id: 'PRS', label: 'PRS Legislative Vault' },
 ];
 
 export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
@@ -264,7 +265,8 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
     filterEndDate?: string,
     pageIndex = 0,
     filterMinistry = 'ALL',
-    filterSource = 'ALL'
+    filterSource = 'ALL',
+    categoryTab = activeCategoryTab
   ) => {
     if (showSkeleton && pageIndex === 0) setLoading(true);
     setErrorMsg('');
@@ -274,11 +276,20 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
         .select('*')
         .neq('source', 'PIB_Digest');
 
+      if (categoryTab === 'PRS' || filterSource === 'PRS') {
+        // Strictly fetch PRS Legislative Research items only
+        query = query.eq('source', 'PRS');
+      } else {
+        // Daily current affairs feed NEVER contains PRS
+        if (filterSource === 'ALL') {
+          query = query.neq('source', 'PRS');
+        } else {
+          query = query.eq('source', filterSource);
+        }
+      }
+
       if (filterMinistry !== 'ALL') {
         query = query.eq('ministry', filterMinistry);
-      }
-      if (filterSource !== 'ALL') {
-        query = query.eq('source', filterSource);
       }
       if (filterStartDate) {
         query = query.gte('created_at', filterStartDate);
@@ -325,8 +336,8 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
   };
 
   useEffect(() => {
-    fetchPolicyData(true, startDate || undefined, endDate || undefined, page, selectedMinistry, selectedSource);
-  }, [startDate, endDate, page, selectedMinistry, selectedSource]);
+    fetchPolicyData(true, startDate || undefined, endDate || undefined, page, selectedMinistry, selectedSource, activeCategoryTab);
+  }, [startDate, endDate, page, selectedMinistry, selectedSource, activeCategoryTab]);
 
   // Sync Feed Handler
   const handleSyncFeed = async () => {
@@ -439,7 +450,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
     let list = items;
 
     // Category Tab Filtering
-    if (activeCategoryTab !== 'ALL') {
+    if (activeCategoryTab !== 'ALL' && activeCategoryTab !== 'PRS') {
       const tab = CATEGORY_TABS.find((t) => t.id === activeCategoryTab);
       if (tab?.keywords) {
         list = list.filter((item) =>
@@ -770,7 +781,43 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
       ) : (
         /* ── Editorial Content Stream ── */
         <div className="space-y-8">
-          
+          {/* PRS Legislative Research Vault Banner */}
+          {(activeCategoryTab === 'PRS' || selectedSource === 'PRS') && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-5 bg-gradient-to-r from-purple-950/40 via-zinc-900/70 to-zinc-950 border border-purple-800/40 rounded-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-sans backdrop-blur-sm shadow-xl"
+            >
+              <div className="flex items-start sm:items-center gap-3.5">
+                <div className="p-2.5 rounded-sm bg-purple-900/30 border border-purple-700/50 text-purple-300 shrink-0">
+                  <Scale className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase tracking-wider">
+                      PRS LEGISLATIVE RESEARCH VAULT
+                    </span>
+                    <span className="text-xs font-mono text-zinc-400">
+                      {displayedItems.length} Parliamentary & Statutory Dossiers
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-300 mt-1 leading-relaxed">
+                    Dedicated statutory and policy intelligence archive. Contains deep analytical breakdowns of Parliamentary Bills, Acts, Standing Committee reports, and constitutional doctrines, isolated from the daily breaking news feed.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setActiveCategoryTab('ALL');
+                  setSelectedSource('ALL');
+                }}
+                className="px-3.5 py-1.5 rounded-sm bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-zinc-500 text-zinc-300 text-xs font-mono uppercase tracking-wider whitespace-nowrap cursor-pointer transition-colors shrink-0"
+              >
+                Daily Signals [×]
+              </button>
+            </motion.div>
+          )}
+
           {/* 1. LEAD STORY (HERO DISPATCH) */}
           {leadItem && (
             <motion.div
