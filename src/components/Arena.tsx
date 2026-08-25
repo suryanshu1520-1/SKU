@@ -20,6 +20,7 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
+  Shield,
 } from 'lucide-react';
 import InfoTooltip from './InfoTooltip';
 import Markdown from 'react-markdown';
