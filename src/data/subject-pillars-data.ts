@@ -6,7 +6,7 @@
  * - 25 Years of Official UPSC CSE Prelims & Mains Papers (2000–2025)
  * - 2nd Administrative Reforms Commission (ARC) Reports & Law Commission recommendations
  * - Economic Survey, Union Budget, and Supreme Court Landmark Judgments
- * - Topper Testimonials & Empirical High-Yield Scoring Blueprints
+ * - High-Yield Static GK Master Data Matrices (Ramsar, Tiger Reserves, Passes, Classical Arts, Treaties)
  */
 
 export interface MindMapNode {
@@ -15,9 +15,9 @@ export interface MindMapNode {
   subtitle: string;
   /**
    * 'branching': details are distinct categories/paths forking from one root question
-   *   (e.g. "what are you amending?" -> 3 different majority thresholds). Not a procedure.
+   *   (e.g. "what are you amending?" -> 3 different majority thresholds).
    * 'sequential': details are an ordered procedure where each step presumes the last
-   *   (e.g. a 6-step resolution algorithm). Order and cumulativeness are the point.
+   *   (e.g. a 6-step resolution algorithm).
    */
   structureType: 'branching' | 'sequential';
   /** For 'branching' only: the forking question the branches answer. */
@@ -45,10 +45,19 @@ export interface PyqEvidenceStat {
   recentYearAnchors: number[];
 }
 
+export interface StaticFactMatrix {
+  id: string;
+  title: string;
+  category: string;
+  headers: string[];
+  rows: string[][];
+  highYieldTip: string;
+}
+
 export interface SubjectPillar {
   id: string;
   code: string;
-  paper: "GS1" | "GS2" | "GS3" | "GS4" | "CSAT";
+  paper: "GS1" | "GS2" | "GS3" | "GS4" | "CSAT" | "STATIC_GK";
   title: string;
   sanskritSubtitle: string;
   shortDescription: string;
@@ -74,9 +83,13 @@ export interface SubjectPillar {
   mindMaps: MindMapNode[];
   pyqEvidence: PyqEvidenceStat[];
   mainsBlueprints: MainsBlueprint[];
+  staticMatrices?: StaticFactMatrix[];
 }
 
 export const SUBJECT_PILLARS: SubjectPillar[] = [
+  // =========================================================================
+  // PILLAR 1: GS2 — Constitutional Architecture & Governance
+  // =========================================================================
   {
     id: "gs2-polity",
     code: "PILLAR_02",
@@ -120,6 +133,18 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
           "Article 279A: GST Council as a constitutional joint forum for fiscal federalism."
         ],
         examinerPerspective: "Examiners consistently target asymmetric provisions (Article 371 series), Governor's discretionary powers (Article 163), and conditional central devolution."
+      },
+      {
+        title: "Parliamentary Committees & Executive Accountability",
+        syllabusTag: "GS2.POL.PARLIAMENT",
+        coreTheory: "Parliament is too large and busy to scrutinize every legislative clause and expenditure detail directly. Standing and Select Committees act as non-partisan institutional watchdogs ensuring continuous legislative oversight over executive bureaucracy.",
+        criticalProvisions: [
+          "Public Accounts Committee (PAC): Examines CAG audit reports; chaired by an Opposition member by convention.",
+          "Estimates Committee: Largest committee (30 members, all from Lok Sabha); examines economy in government expenditure.",
+          "Committee on Public Undertakings (COPU): 22 members (15 LS + 7 RS); oversees PSU performance.",
+          "Department-related Parliamentary Standing Committees (DRSCs): 24 committees scrutinizing ministerial demands for grants."
+        ],
+        examinerPerspective: "UPSC frequently examines why Ministers cannot be members of financial committees, and tests the exact membership split between Lok Sabha and Rajya Sabha."
       }
     ],
     mindMaps: [
@@ -130,9 +155,9 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
         structureType: "branching",
         rootQuestion: "What provision is being amended?",
         details: [
-          "Simple Majority: Creation of new states (Art 2/3), abolition of Legislative Councils (Art 169), official language.",
+          "Simple Majority: Creation of new states (Art 2/3), abolition of Legislative Councils (Art 169), official language, 5th/6th Schedule rules.",
           "Special Majority (Art 368): 2/3rd present & voting + majority of total membership (Fundamental Rights & DPSP).",
-          "Special Majority + 50% State Ratification: Election of President, Union/State Judiciary, 7th Schedule, Art 368 itself."
+          "Special Majority + 50% State Ratification: Election of President, Union/State Judiciary, 7th Schedule lists, Art 368 itself."
         ]
       },
       {
@@ -142,9 +167,9 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
         structureType: "branching",
         rootQuestion: "Which writ fits the violation?",
         details: [
-          "Habeas Corpus: Against both state authorities and private individuals for unlawful detention.",
-          "Mandamus: Command to perform statutory public duty; NOT issued against President/Governor or private bodies.",
-          "Prohibition & Certiorari: Issued against judicial & quasi-judicial bodies (Certiorari also against administrative acts).",
+          "Habeas Corpus: Against both state authorities and private individuals for unlawful bodily detention.",
+          "Mandamus: Command to perform statutory public duty; NOT issued against President/Governor, private entities, or discretionary acts.",
+          "Prohibition & Certiorari: Issued against judicial & quasi-judicial bodies (Certiorari also quashes executive quasi-judicial orders).",
           "Quo-Warranto: Challenges illegal usurpation of a substantive public office created by statute/Constitution."
         ]
       }
@@ -192,8 +217,29 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
           balancedConclusion: "Conclude that both organs operate not in conflict but under mutual constitutional checks, preserving democratic stability without majoritarian tyranny."
         }
       }
+    ],
+    staticMatrices: [
+      {
+        id: "pol-sc-landmarks",
+        title: "Landmark Supreme Court Judgments for Prelims & Mains",
+        category: "Constitutional Jurisprudence",
+        headers: ["Case Law", "Year", "Core Doctrine / Finding", "Constitutional Anchor"],
+        rows: [
+          ["Kesavananda Bharati", "1973", "Propounded Basic Structure Doctrine; limited Article 368 amending power", "Art 368 & Art 13"],
+          ["Maneka Gandhi", "1978", "Expanded Article 21 to include 'Due Process of Law' (Fair, Just, Reasonable)", "Article 21 & Art 14"],
+          ["Minerva Mills", "1980", "Harmony between Fundamental Rights and DPSP is a basic feature", "Art 31C, Art 14, 368"],
+          ["S.R. Bommai", "1994", "President's Rule under Art 356 subject to judicial review; floor test mandatory", "Article 356"],
+          ["I.R. Coelho", "2007", "Ninth Schedule laws post-April 24, 1973 are open to judicial review", "Article 31B & 9th Sched"],
+          ["K.S. Puttaswamy", "2017", "Right to Privacy declared an intrinsic Fundamental Right under Article 21", "Article 21 & Part III"]
+        ],
+        highYieldTip: "UPSC tests how landmark judgments transformed statutory interpretations from formalistic procedures into substantive rights."
+      }
     ]
   },
+
+  // =========================================================================
+  // PILLAR 2: GS1 — History, Civilizations & Heritage
+  // =========================================================================
   {
     id: "gs1-history-culture",
     code: "PILLAR_01",
@@ -201,7 +247,7 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
     title: "History, Civilizations & Heritage",
     sanskritSubtitle: "इतिहास, कला एवं संस्कृति",
     shortDescription: "Ancient to modern Indian history, temple architecture schools, physical and economic geography systems, and contemporary Indian societal dynamics.",
-    empiricalBasis: "History/Culture foundational concepts synthesized from standard syllabus resources (NCERT Fine Arts, Spectrum, Themes in Indian History), with Mains answer blueprints directly extracted and structured from the 2026 UPSC GS Paper 1 Mains faculty analysis.",
+    empiricalBasis: "History/Culture foundational concepts synthesized from standard syllabus resources (NCERT Fine Arts, Spectrum, Themes in Indian History), with Mains answer blueprints directly extracted and structured from official UPSC GS Paper 1 Mains faculty analysis.",
     colorTheme: {
       primary: "#f59e0b",
       border: "rgba(245, 158, 11, 0.3)",
@@ -282,683 +328,63 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
         }
       },
       {
-              "questionTitle": "Analyse the significance of Ashokan inscriptions for reconstructing Mauryan history.",
-              "marks": 10,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "Ashokan inscriptions, deciphered by James Prinsep in 1837 across Major and Minor Rock and Pillar Edicts, serve as direct epigraphical primary sources illuminating Mauryan polity, administrative boundaries, ideological statecraft, and diplomatic horizons.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Reconstruction of Mauryan Polity & Administration",
-                                      "points": [
-                                              "Provides institutional evidence for specialized bureaucratic machinery including Rajukas (rural administrators), Mahamattas, and Dhamma Mahamattas appointed to enforce civic ethics.",
-                                              "Details decentralized provincial governance structures with royal princes (Kumaras) posted as viceroys at Ujjayini, Taxila, and Tosali.",
-                                              "Pillar Edict IV outlines judicial discretion and procedural timelines, including a three-day reprieve granted to condemned prisoners."
-                                      ]
-                              },
-                              {
-                                      "heading": "Ideological Statecraft & Territorial Delimitation",
-                                      "points": [
-                                              "Major Rock Edict XIII explicitly records the psychological watershed of the Kalinga War, marking the transition from Bherighosha (conquest by war) to Dhammaghosha (conquest by righteousness).",
-                                              "Inscriptional distribution from Kandahar (bilingual Greek-Aramaic) and Shahbazgarhi (Kharosthi) to Maski and Brahmagiri (Brahmi) demarcates the imperial frontiers and multilingual linguistic policy.",
-                                              "Major Rock Edict II documents external diplomatic outreach to contemporary Hellenistic kings (Antiochus II, Ptolemy II, Antigonus Gonatas) and south Indian neighbours (Cholas, Pandyas, Satyaputras)."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "Major Rock Edict XIII (Kalinga War)",
-                              "Major Rock Edict II (Hellenistic Diplomacy)",
-                              "Minor Rock Edict I (Maski/Gujarra - Devanampiya Piyadassi)",
-                              "NCERT Class 12 Themes in Indian History Part 1"
-                      ],
-                      "balancedConclusion": "While epigraphs embody royal self-projection requiring critical collation with archaeological remains and foreign accounts (Megasthenes), they remain the foundational bedrock of Mauryan historical reconstruction."
-              }
-      },
+        questionTitle: "Analyse the significance of Ashokan inscriptions for reconstructing Mauryan history.",
+        marks: 10,
+        yearContext: "2026 UPSC GS1 Mains (Real Paper)",
+        structure: {
+          introduction: "Ashokan inscriptions, deciphered by James Prinsep in 1837 across Major and Minor Rock and Pillar Edicts, serve as direct epigraphical primary sources illuminating Mauryan polity, administrative boundaries, ideological statecraft, and diplomatic horizons.",
+          bodyArguments: [
+            {
+              heading: "Reconstruction of Mauryan Polity & Administration",
+              points: [
+                "Provides institutional evidence for specialized bureaucratic machinery including Rajukas (rural administrators), Mahamattas, and Dhamma Mahamattas appointed to enforce civic ethics.",
+                "Details decentralized provincial governance structures with royal princes (Kumaras) posted as viceroys at Ujjayini, Taxila, and Tosali.",
+                "Pillar Edict IV outlines judicial discretion and procedural timelines, including a three-day reprieve granted to condemned prisoners."
+              ]
+            },
+            {
+              heading: "Ideological Statecraft & Territorial Delimitation",
+              points: [
+                "Major Rock Edict XIII explicitly records the psychological watershed of the Kalinga War, marking the transition from Bherighosha (conquest by war) to Dhammaghosha (conquest by righteousness).",
+                "Inscriptional distribution from Kandahar (bilingual Greek-Aramaic) and Shahbazgarhi (Kharosthi) to Maski and Brahmagiri (Brahmi) demarcates the imperial frontiers and multilingual linguistic policy.",
+                "Major Rock Edict II documents external diplomatic outreach to contemporary Hellenistic kings (Antiochus II, Ptolemy II, Antigonus Gonatas) and south Indian neighbours (Cholas, Pandyas, Satyaputras)."
+              ]
+            }
+          ],
+          statutoryAnchors: [
+            "Major Rock Edict XIII (Kalinga War)",
+            "Major Rock Edict II (Hellenistic Diplomacy)",
+            "Minor Rock Edict I (Maski/Gujarra - Devanampiya Piyadassi)",
+            "NCERT Class 12 Themes in Indian History Part 1"
+          ],
+          balancedConclusion: "While epigraphs embody royal self-projection requiring critical collation with archaeological remains and foreign accounts (Megasthenes), they remain the foundational bedrock of Mauryan historical reconstruction."
+        }
+      }
+    ],
+    staticMatrices: [
       {
-              "questionTitle": "The significance of Gandhian movements lay in the masses they mobilised. Elucidate.",
-              "marks": 10,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "Gandhi transformed the Indian national movement from an elite-led constitutional agitation into a pan-Indian mass struggle by deploying universal cultural idioms, Satyagraha, and a multi-class Struggle-Truce-Struggle (S-T-S) architecture.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Horizontal & Cross-Class Demographic Mobilisation",
-                                      "points": [
-                                              "Peasantry integration: Champaran (1917), Kheda (1918), and Bardoli (1928) organically fused agrarian grievances into the mainstream anti-imperialist campaign.",
-                                              "Women's public emancipation: Large-scale picketing of foreign cloth and liquor shops during Non-Cooperation (1920–22) and Civil Disobedience (1930–34), with leaders like Sarojini Naidu at Dharasana.",
-                                              "Working class and urban middle class: Resignation from government institutions, boycott of British courts and schools, and nationwide industrial strikes (hartals)."
-                                      ]
-                              },
-                              {
-                                      "heading": "Strategic Synthesis of Non-Violence & Constructive Program",
-                                      "points": [
-                                              "Constructive program (Khadi production, anti-untouchability work, Hindu-Muslim unity, basic education) sustained grassroots cadres during truce phases between mass movements.",
-                                              "Choice of universal symbols like Salt during the 1930 Dandi March bridged regional, linguistic, and socio-economic divides into a shared anti-colonial consciousness."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "Non-Cooperation Movement (1920–22)",
-                              "Civil Disobedience Movement (1930–34)",
-                              "Quit India Movement (1942)",
-                              "Bipan Chandra's 'India's Struggle for Independence'"
-                      ],
-                      "balancedConclusion": "Gandhi's ultimate contribution was psychological de-subjugation: eroding the perceived moral invincibility of the colonial state by mobilizing millions into non-violent civil resistance."
-              }
-      },
-      {
-              "questionTitle": "Discuss the impact of Macaulay’s Minute on colonial administration and education in India.",
-              "marks": 10,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "Thomas Babington Macaulay’s Minute on Indian Education (February 1835), enacted under William Bentinck via the English Education Act 1835, resolved the Orientalist-Anglicist controversy by institutionalizing English-medium western education across colonial India.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Impact on Colonial Administration",
-                                      "points": [
-                                              "Created a subordinate, English-literate clerical and administrative cadre ('Macaulay's children') that significantly reduced the fiscal overhead of British governance.",
-                                              "Institutionalized English as the official language of administration and courts, displacing Persian and vernacular legal traditions.",
-                                              "Strengthened colonial bureaucratic stability while alienating the administrative machinery from the vernacular-speaking rural populace."
-                                      ]
-                              },
-                              {
-                                      "heading": "Impact on Indian Education & Social Structure",
-                                      "points": [
-                                              "Implemented the 'Downward Filtration Theory', concentrating public funds on small elite classes with the failed expectation that education would trickle down.",
-                                              "Neglected primary education, mass literacy, female education, and scientific/technical instruction in vernacular languages.",
-                                              "Unintended dialectical consequence: Modern English education exposed Indians to Enlightenment ideals (liberty, democracy, rule of law), fostering early nationalist leadership (Raja Ram Mohan Roy, Dadabhai Naoroji)."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "Macaulay's Minute (Feb 1835)",
-                              "English Education Act 1835",
-                              "Wood's Despatch (1854 - Magna Carta of Indian Education)"
-                      ],
-                      "balancedConclusion": "While designed to produce culturally submissive administrative subordinates, Macaulay's Minute inadvertently provided Indian nationalists with a common lingua franca and critical tools to challenge colonial legitimacy."
-              }
-      },
-      {
-              "questionTitle": "Vijayanagara architecture exemplifies the amalgamation of past traditions with contemporary practices. Elucidate with examples.",
-              "marks": 10,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "Vijayanagara architecture (14th–16th century CE) represents a synthesis of classical South Indian idioms (Chola, Chalukya, Hoysala, Pandya) with contemporary Indo-Islamic military and secular design techniques.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Inherited Classical Dravidian & Deccan Traditions",
-                                      "points": [
-                                              "Chola/Pandya legacy: Monumental gateway towers (Raya Gopurams) and massive prakara enclosures surrounding the sacred complexes.",
-                                              "Chalukya/Hoysala legacy: Elaborately carved soapstone/granite pillared halls (Kalyana Mandapas) and dynamic animal friezes (leaping yalis, war horses).",
-                                              "Integration of monolithic stone architecture, exemplified by the iconic Stone Chariot (Garuda Shrine) at the Vittala Temple complex in Hampi."
-                                      ]
-                              },
-                              {
-                                      "heading": "Contemporary Indo-Islamic & Military Amalgamation",
-                                      "points": [
-                                              "Secular royal architecture incorporated Islamic arches, domes, vaults, and plasterwork into structures like the Lotus Mahal and the Elephant Stables.",
-                                              "Advanced fortification techniques combining massive dry-stone masonry with hydraulic water channels and aqueducts (Kamalapuram tank)."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "Virupaksha Temple (Hampi)",
-                              "Vittala Temple Complex (Musical Pillars & Stone Chariot)",
-                              "Lotus Mahal & Elephant Stables (Indo-Islamic secular synthesis)",
-                              "UNESCO World Heritage Site at Hampi"
-                      ],
-                      "balancedConclusion": "Vijayanagara architecture was an open, adaptive architectural idiom that preserved sacred Dravidian traditions while pragmatically absorbing Deccan Sultanate civic innovations."
-              }
-      },
-      {
-              "questionTitle": "Linguistic reorganisation of Indian states was driven by popular pressure from below. Comment.",
-              "marks": 10,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "While the central leadership initially feared linguistic states would jeopardize national integrity, the reorganisation of Indian states (1953–1956) was fundamentally impelled by intense popular democratic movements from below.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Elite Hesitation vs Bottom-Up Mass Agitations",
-                                      "points": [
-                                              "Official bodies (Dhar Commission 1948 and JVP Committee 1949) advised postponing linguistic division due to partition trauma and fear of balkanization.",
-                                              "Potti Sreeramulu's 58-day fast unto death (1952) and subsequent mass unrest in Andhra forced the immediate creation of Andhra State (1953) for Telugu speakers.",
-                                              "Samyukta Maharashtra Samiti and Mahagujarat Movement exerted grassroots pressure against the bilingual Bombay State, culminating in the creation of Maharashtra and Gujarat (1960).",
-                                              "Punjabi Suba movement mobilized Sikh and Punjabi-speaking peasantry, eventually leading to the tripartite division into Punjab, Haryana, and Himachal Pradesh (1966)."
-                                      ]
-                              },
-                              {
-                                      "heading": "Democratic Accommodation & Nation-Building",
-                                      "points": [
-                                              "States Reorganisation Act 1956 institutionalized language as the rational administrative boundary without compromising national unity.",
-                                              "Reorganisation democratized state governance by making administration accessible in citizens' mother tongues."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "Dhar Commission (1948)",
-                              "JVP Committee (1949)",
-                              "Fazal Ali Commission / States Reorganisation Commission (1953)",
-                              "States Reorganisation Act 1956 & 7th Constitutional Amendment Act 1956"
-                      ],
-                      "balancedConclusion": "Far from balkanizing India, linguistic reorganisation fulfilled popular democratic aspirations, demonstrating that regional linguistic identities strengthen rather than weaken Indian federalism."
-              }
-      },
-      {
-              "questionTitle": "The model of planned economy was adopted in India to address the regional imbalances left behind by colonial rule. Comment.",
-              "marks": 15,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "Colonial economic policy created acute spatial disparities by developing coastal enclave ports (Bombay, Calcutta, Madras) for raw material extraction while leaving the hinterland impoverished. Post-independence centralized planning was explicitly structured to redress this structural imbalance.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Colonial Enclave Economy & Structural Distortions",
-                                      "points": [
-                                              "British infrastructure investments (railways, port connectivity) catered strictly to colonial export corridors, creating resource-drained hinterlands across central and eastern India.",
-                                              "Disparate land revenue systems (Permanent Settlement vs Ryotwari) deepened regional agrarian vulnerability and agrarian debt."
-                                      ]
-                              },
-                              {
-                                      "heading": "Planned Economy Interventions (Mahalanobis Heavy Industrialization)",
-                                      "points": [
-                                              "Second Five-Year Plan located public sector heavy industries in backward, tribal, and mineral-rich regions (Bhilai, Rourkela, Durgapur, Bokaro steel plants).",
-                                              "Establishment of major river valley multi-purpose projects (Bhakra Nangal, Damodar Valley Corporation, Hirakud) to distribute irrigation and hydroelectric power across agrarian belts.",
-                                              "Industrial Licensing Policy (IDRA 1951) mandated concessions, tax holidays, and capital subsidies to incentivize private manufacturing in backward districts."
-                                      ]
-                              },
-                              {
-                                      "heading": "Critical Appraisal & Unintended Divergences",
-                                      "points": [
-                                              "Freight Equalization Policy (1952) neutralized the natural locational advantage of mineral-rich eastern states (Bihar, Bengal, Odisha) while benefiting coastal manufacturing hubs.",
-                                              "The Green Revolution (Third Plan onwards) disproportionately benefited fertile, irrigated north-western regions (Punjab, Haryana, Western UP), exacerbating inter-regional agricultural divides."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "Industrial Policy Resolution 1948 & 1956",
-                              "Freight Equalization Policy (1952)",
-                              "Industries (Development and Regulation) Act 1951 (IDRA)",
-                              "NITI Aayog Aspirational Districts Programme (Modern continuum)"
-                      ],
-                      "balancedConclusion": "While planned public investments laid the industrial backbone in underdeveloped interiors, policy instruments like freight equalization and unequal agricultural modernization reproduced fresh regional imbalances that persist today."
-              }
-      },
-      {
-              "questionTitle": "What is the Fujiwhara effect? Discuss its impact on the movement and intensity of tropical cyclones.",
-              "marks": 10,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "The Fujiwhara effect, formulated by Japanese meteorologist Sakuhei Fujiwhara (1921), describes the binary aerodynamic interaction between two concurrent cyclonic vortices spinning in the same direction within approximately 1,400 km of each other.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Physical Mechanism & Interaction Dynamics",
-                                      "points": [
-                                              "Vortices begin orbiting cyclonically around a common central barycentre (counter-clockwise in the Northern Hemisphere).",
-                                              "Distance-dependent outcomes: Mutual orbiting (1000–1400 km), track deflection and elongation, or complete binary merger (coalescence into a larger mega-cyclone if under ~300 km)."
-                                      ]
-                              },
-                              {
-                                      "heading": "Impact on Movement, Track & Forecast Intensity",
-                                      "points": [
-                                              "Disrupts standard steering trade winds, producing erratic, looping, and unpredictable landfall trajectories.",
-                                              "Intensity changes: Asymmetric wind shear may weaken the smaller storm, or mutual moisture feeding can intensify storm surge and prolonged torrential precipitation.",
-                                              "Real-world meteorological benchmarks: Cyclone Seroja and Cyclone Odette (2021, Australian basin), and Storms Noru and Kulap (2017, Western Pacific)."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "Sakuhei Fujiwhara Binary Interaction Model (1921)",
-                              "Cyclone Seroja & Odette Case Study (2021)",
-                              "IMD / WMO Tropical Cyclone Forecasting Protocols"
-                      ],
-                      "balancedConclusion": "Under accelerating climate change and warmer sea surface temperatures, binary cyclone occurrences are increasing, demanding high-resolution satellite tracking and dynamic numerical weather prediction models."
-              }
-      },
-      {
-              "questionTitle": "Tundra regions are ecologically fragile but economically important. Examine this statement critically.",
-              "marks": 10,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "The Tundra biome—spanning high-latitude Arctic regions across Siberia, Northern Canada, and Scandinavia—is characterized by extreme permafrost, low biodiversity, and fragile ecological equilibrium alongside colossal fossil and mineral wealth.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Ecological Fragility & Climate Feedback Loops",
-                                      "points": [
-                                              "Ultra-short growing seasons and slow soil pedogenesis mean biome recovery from anthropogenic disruption takes centuries.",
-                                              "Permafrost thawing triggers massive methane and carbon release (Arctic Amplification), accelerating global warming feedback loops.",
-                                              "Vulnerable trophic food chains: Lichen-moss-reindeer-polar predator dependencies are severely disrupted by habitat fragmentation."
-                                      ]
-                              },
-                              {
-                                      "heading": "Strategic & Geo-Economic Importance",
-                                      "points": [
-                                              "Houses vast unexploited hydrocarbon deposits (estimated 30% of undiscovered global natural gas, 13% of oil per USGS) and critical rare earth minerals (nickel at Norilsk, diamonds).",
-                                              "Opening of the Northern Sea Route (NSR) drastically cuts maritime transit distance between Europe and Asia compared to the Suez Canal."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "Arctic Council Environmental Mandates",
-                              "UNCLOS High Seas & Continental Shelf Regimes",
-                              "India's Arctic Policy (2022) - 'Building a Partnership for Sustainable Development'",
-                              "IPCC Special Report on the Ocean and Cryosphere in a Changing Climate"
-                      ],
-                      "balancedConclusion": "Sustainable Arctic governance requires reconciling sovereign economic extraction with strict multilateral environmental moratoriums to prevent irreversible destabilization of the global cryosphere."
-              }
-      },
-      {
-              "questionTitle": "Discuss the role of aeolian processes in desertification and land degradation.",
-              "marks": 10,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "Aeolian processes—the erosion, transportation, and deposition of sediment by wind action—act as primary physical geomorphic drivers of desertification in arid, semi-arid, and sub-humid ecosystems.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Aeolian Mechanics of Degradation",
-                                      "points": [
-                                              "Deflation: Stripping of nutrient-rich topsoil and organic humus, leaving behind barren stony desert pavements (Reg/Hamada).",
-                                              "Saltation & Abrasion: High-velocity sand grains bouncing across ground level pulverize soil crusts and damage stabilizing natural vegetation.",
-                                              "Dune Encroachment: Mobilization and lateral migration of shifting barchans smother fertile agricultural fields, irrigation canals, and rural settlements."
-                                      ]
-                              },
-                              {
-                                      "heading": "Anthropogenic Acceleration & Ecological Impact",
-                                      "points": [
-                                              "Overgrazing, deforestation, groundwater depletion, and unscientific mining in the Aravallis dismantle natural vegetative windbreaks, expanding Thar desertification eastwards.",
-                                              "Global parallels: Desertification dynamics across the African Sahel and the China Loess Plateau."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "UN Convention to Combat Desertification (UNCCD - Bonn Challenge)",
-                              "ISRO Desertification and Land Degradation Atlas of India (2021)",
-                              "National Action Programme to Combat Desertification (MoEFCC)"
-                      ],
-                      "balancedConclusion": "Halting aeolian desertification necessitates nature-based landscape engineering, including the Great Green Wall shelterbelts, sand-dune stabilization using xerophytic vegetation, and community pasture management."
-              }
-      },
-      {
-              "questionTitle": "Water resources are both an asset and a source of conflict in South Asia. Examine with examples.",
-              "marks": 10,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "South Asia’s Himalayan river basins (Indus, Ganga, Brahmaputra) sustain over 1.8 billion people as vital agrarian and economic lifelines, yet asymmetrical geographic position, seasonal variability, and geopolitical mistrust turn them into chronic flashpoints.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Water as a Shared Regional Asset",
-                                      "points": [
-                                              "Himalayan rivers support extensive irrigation systems (Punjab, Gangetic Plain, Indus basin), ensuring regional food security.",
-                                              "Vast hydroelectric potential: Bhutan-India bilateral hydropower cooperation (Chukha, Tala, Mangdechhu) acts as a clean energy model."
-                                      ]
-                              },
-                              {
-                                      "heading": "Dimensions of Hydrological Conflict & Tension",
-                                      "points": [
-                                              "India-Pakistan: Tensions over run-of-the-river projects (Kishanganga, Ratle) within the framework of the Indus Waters Treaty (1960).",
-                                              "India-Bangladesh: Lean-season discharge disputes over the Teesta River and barrage operations at Farakka.",
-                                              "China upper-riparian dominance: Dam construction on the Yarlung Tsangpo (Brahmaputra) raises downstream water-diversion and siltation anxieties in India and Bangladesh."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "Indus Waters Treaty (1960)",
-                              "Ganga Water Treaty (1996 - India-Bangladesh)",
-                              "UN Convention on the Law of the Non-Navigational Uses of International Watercourses (1997)"
-                      ],
-                      "balancedConclusion": "Transitioning from zero-sum water security to integrated basin-wide river governance and institutional data sharing is essential for long-term South Asian geopolitical stability."
-              }
-      },
-      {
-              "questionTitle": "Compare the Loo, Chinook and Foehn winds with respect to their regions of prevalence, nature and climatic impact.",
-              "marks": 15,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "Local winds are meso-scale atmospheric phenomena induced by regional pressure gradients, topographical barriers, and adiabatic heating. Loo, Chinook, and Foehn represent three distinct warm local wind regimes with profound socio-economic impacts.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Regions of Prevalence & Physical Nature",
-                                      "points": [
-                                              "Loo: Hot, dry, dust-laden summer wind originating from the Thar desert blowing across the Indo-Gangetic Plains (May–June; temperatures 45°C–50°C).",
-                                              "Chinook: Warm, dry katabatic/foehn-type wind descending the eastern leeward slopes of the Rocky Mountains in North America (Canada & USA).",
-                                              "Foehn: Warm, dry leeward descending wind blowing down the northern valleys of the European Alps (Switzerland, Austria, Germany)."
-                                      ]
-                              },
-                              {
-                                      "heading": "Adiabatic Thermodynamics vs Advection",
-                                      "points": [
-                                              "Chinook and Foehn operate on the Orographic Adiabatic Lapse Rate: Moist air ascends windward (cooling at DALR/SALR), loses moisture, and descends leeward, warming rapidly at the Dry Adiabatic Lapse Rate (10°C/km).",
-                                              "Loo operates primarily via continental advective heating over sun-baked arid landmasses without significant orographic descent."
-                                      ]
-                              },
-                              {
-                                      "heading": "Climatic & Socio-Agrarian Impacts",
-                                      "points": [
-                                              "Loo causes severe heatstroke, desiccation of soils, and crop wilting in northern India.",
-                                              "Chinook acts as a 'Snow Eater', rapidly melting snow cover, opening winter pastures for livestock grazing in North American prairies.",
-                                              "Foehn accelerates early spring snowmelt, facilitates viticulture (grape ripening) in Alpine valleys, but increases avalanche risks."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "Adiabatic Thermodynamics & Lapse Rate Principles",
-                              "NCERT Class 11 Fundamentals of Physical Geography (Atmospheric Circulation)",
-                              "IMD Heatwave Protocols & Criteria"
-                      ],
-                      "balancedConclusion": "While Chinook and Foehn confer agrarian benefits through winter snow clearance and valley warming, the Loo is an extreme climatic hazard requiring proactive heat-action urban governance."
-              }
-      },
-      {
-              "questionTitle": "Analyse the role of satellite-based technologies in achieving climate-smart agriculture and food security.",
-              "marks": 15,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "Climate-Smart Agriculture (CSA)—anchored on sustainable productivity, climate adaptation, and GHG mitigation—relies fundamentally on space-borne Earth Observation (EO), Global Navigation Satellite Systems (GNSS), and GIS data streams.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Earth Observation & Precision Agro-Advisories",
-                                      "points": [
-                                              "Crop health and yield estimation using multispectral vegetation indices (NDVI, NDWI) through satellites like Resourcesat and Sentinel.",
-                                              "Soil moisture and drought surveillance: Radar altimetry and synthetic aperture radar (SAR - NISAR/RISAT) enable real-time drought tracking regardless of cloud cover.",
-                                              "Precision irrigation: Thermal imaging guides variable-rate water application, minimizing groundwater over-extraction."
-                                      ]
-                              },
-                              {
-                                      "heading": "Direct Reinforcement of National Food Security",
-                                      "points": [
-                                              "Availability: Timely agro-meteorological forecasting (monsoon onset, dry spells, cyclone tracks via INSAT-3D) mitigates crop loss.",
-                                              "Access & Stability: Satellite-based acreage estimation under PM Fasal Bima Yojana (PMFBY) ensures swift, dispute-free crop insurance claims.",
-                                              "Supply chain optimization: Geo-tagging of warehousing infrastructure (PM Gati Shakti) minimizes post-harvest logistical leakages."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "FAO Climate-Smart Agriculture Framework",
-                              "PM Fasal Bima Yojana (CROPIC satellite assessment)",
-                              "ISRO FASAL (Forecasting Agricultural Output using Space, Agro-meteorology and Land-based observations)",
-                              "CHAMAN (Horticulture Assessment via Space Tech)"
-                      ],
-                      "balancedConclusion": "Integrating satellite remote sensing with ground-level IoT sensors, AI analytics, and Krishi Vigyan Kendras is crucial for democratizing precision agriculture down to small and marginal farmers."
-              }
-      },
-      {
-              "questionTitle": "The centre of global trade is gradually shifting from the Atlantic region to the Indo-Pacific region. Examine.",
-              "marks": 15,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "The geo-economic center of gravity is decisively pivoting from the transatlantic axis (North America–Western Europe) to the Indo-Pacific mega-corridor, driven by demographic expansion, industrial manufacturing dominance, and vital maritime trade routes.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Drivers of the Indo-Pacific Geo-Economic Shift",
-                                      "points": [
-                                              "Concentration of global output: The Indo-Pacific accounts for over 60% of global GDP and two-thirds of global economic growth (led by China, India, ASEAN, Japan).",
-                                              "Critical maritime chokepoints: Malacca, Sunda, Lombok straits and the Bab-el-Mandeb handle over 50% of global container traffic and two-thirds of maritime oil trade.",
-                                              "Mega-regional trade agreements: Regional Comprehensive Economic Partnership (RCEP), CPTPP, and Indo-Pacific Economic Framework (IPEF)."
-                                      ]
-                              },
-                              {
-                                      "heading": "Counter-Perspectives: Enduring Atlantic Dominance",
-                                      "points": [
-                                              "High-value technological and financial supremacy: Transatlantic trade maintains dominance in services trade, intellectual property, capital depth, and US Dollar hegemony.",
-                                              "Geopolitical friction in Indo-Pacific: Supply chain fragility, South China Sea territorial disputes, Taiwan Strait tensions, and non-traditional security threats (piracy, militarization)."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "UNCTAD Review of Maritime Transport",
-                              "UNCLOS Freedom of Navigation Principles",
-                              "IPEF (Indo-Pacific Economic Framework for Prosperity)",
-                              "India's Indo-Pacific Oceans Initiative (IPOI)"
-                      ],
-                      "balancedConclusion": "While the Indo-Pacific leads in physical merchandise and manufacturing throughput, a multipolar trade architecture demands open sea lines of communication and rules-based maritime order."
-              }
-      },
-      {
-              "questionTitle": "Analyse the major drivers of human-induced land use changes in India and their geographical consequences.",
-              "marks": 15,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "Rapid population expansion, urbanization, and industrialization have drastically altered India's land-use matrix, converting forests, wetlands, and arable pastures into built infrastructure with severe ecological consequences.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Major Anthropogenic Drivers",
-                                      "points": [
-                                              "Unplanned urban sprawl and peri-urban expansion converting prime agricultural fringes into residential and industrial complexes.",
-                                              "Linear infrastructure development (expressways, dedicated freight corridors, railway expansions) causing severe forest fragmentation.",
-                                              "Agricultural intensification: Incursion into fragile forest borders and wetland reclamation for monoculture cropping.",
-                                              "Open-cast mining and quarrying across central and eastern tribal forested belts (Jharkhand, Odisha, Chhattisgarh)."
-                                      ]
-                              },
-                              {
-                                      "heading": "Severe Geographical & Environmental Consequences",
-                                      "points": [
-                                              "Hydrological disruption: Encroachment of urban floodplains and water bodies (wetlands in Chennai, Bengaluru lakes) leading to recurrent urban flooding.",
-                                              "Accelerated land degradation and soil erosion: Loss of forest root networks triggering slope instability and catastrophic landslides in Western Ghats and Himalayas.",
-                                              "Microclimate modification: Proliferation of Urban Heat Islands (UHI) with localized thermal distress.",
-                                              "Escalation of Human-Wildlife Conflict due to fragmentation of traditional wildlife corridors (elephant and tiger habitats)."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "ISRO Land Use / Land Cover (LULC) Atlas",
-                              "National Land Use Policy Guidelines",
-                              "Wetlands (Conservation and Management) Rules 2017",
-                              "National Disaster Management Authority (NDMA) Urban Flood Guidelines"
-                      ],
-                      "balancedConclusion": "Reversing land degradation requires enforcing spatial zoning master plans, scientific catchment management, and integrating the Land Degradation Neutrality (LDN) framework into regional infrastructure planning."
-              }
-      },
-      {
-              "questionTitle": "Unity in diversity remains the defining feature of Indian society despite the challenges from communalism and regionalism. Comment.",
-              "marks": 10,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "India’s 'Unity in Diversity' is not an artificial homogeneity but an evolving composite cultural mosaic (Ganga-Jamuni tehzeeb) sustained by constitutional accommodation despite recurring communal and sub-national tensions.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Divisive Stresses: Communalism & Regionalism",
-                                      "points": [
-                                              "Communalism: Majoritarian-minoritarian polarization, competitive identity politics, and social media radicalization threaten social harmony.",
-                                              "Regionalism: Son-of-the-soil agitations, interstate river disputes (Cauvery), and linguistic chauvinism challenging interstate migrant mobility."
-                                      ]
-                              },
-                              {
-                                      "heading": "Structural Pillars of Enduring Unity",
-                                      "points": [
-                                              "Constitutional secularism and fundamental rights (Articles 14, 19, 25–30) provide structural protection to minority languages and faiths.",
-                                              "Economic interdependence: Pan-Indian supply chains, internal migrant labor mobility, and unified GST market architecture.",
-                                              "Cultural cross-fertilization: Universal celebration of diverse festivals, cinema, cuisine, and national sports unifying popular consciousness."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "Constitutional Preamble (Unity and Integrity of the Nation)",
-                              "Articles 15, 16, 29, 30 & 51A(e) (Composite Culture)",
-                              "Inter-State Council (Article 263)",
-                              "NCERT Class 12 'Understanding Indian Society'"
-                      ],
-                      "balancedConclusion": "Unity in diversity endures because Indian federalism accommodates regional and linguistic pluralism within a flexible constitutional democracy rather than enforcing forced assimilation."
-              }
-      },
-      {
-              "questionTitle": "How do you understand disability? Substantiate the need for inclusive policy framework in India in this regard.",
-              "marks": 10,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "Disability has evolved from the traditional medical/charity model (locating pathology within the individual) to the rights-based social model, which recognizes disability as the outcome of societal, structural, and attitudinal barriers.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Conceptual Transition to the Rights-Based Social Model",
-                                      "points": [
-                                              "Under the social model, a physical impairment becomes a 'disability' only when society fails to provide accessible built infrastructure, inclusive education, and equal employment.",
-                                              "Emphasizes universal design, reasonable accommodation, and institutional autonomy over paternalistic medical charity."
-                                      ]
-                              },
-                              {
-                                      "heading": "Imperatives for an Inclusive Policy Framework",
-                                      "points": [
-                                              "Infrastructural accessibility: Eliminating physical barriers in public transport, government offices, and digital interfaces under Sugamya Bharat Abhiyan.",
-                                              "Economic inclusion: Overcoming low formal workforce participation of Persons with Disabilities (PwDs) through quota enforcement and assistive technology subsidies.",
-                                              "Intersectionality: Addressing the compounded vulnerability of disabled women and rural PwDs lacking access to early diagnostic intervention."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "UN Convention on the Rights of Persons with Disabilities (UNCRPD)",
-                              "Rights of Persons with Disabilities Act 2016 (RPwD Act - 21 recognized disabilities)",
-                              "Accessible India Campaign (Sugamya Bharat Abhiyan)"
-                      ],
-                      "balancedConclusion": "Building an inclusive society requires moving beyond legislative compliance to universal accessibility, assistive digital infrastructure, and dismantling social stigma."
-              }
-      },
-      {
-              "questionTitle": "Do you think digital technology promotes social empowerment? Explain with examples.",
-              "marks": 10,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "Digital technology acts as a double-edged equalizer: democratizing information, public service delivery, and market access, while simultaneously risking the entrenchment of existing social stratification due to digital divides.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Empowerment Across Socio-Economic Spheres",
-                                      "points": [
-                                              "Financial inclusion: The JAM Trinity (Jan Dhan-Aadhaar-Mobile) and UPI eliminated predatory intermediaries, delivering direct benefit transfers (DBT) to marginalized households.",
-                                              "Gender and livelihood empowerment: Rural self-help group women utilizing micro-e-commerce platforms and digital literacy under PM-GDISHA.",
-                                              "Democratic accountability: Digital portals (RTI online, CPGRAMS, DigiLocker) enabling citizens to demand transparent administrative service delivery."
-                                      ]
-                              },
-                              {
-                                      "heading": "Constraints & Compounded Inequalities",
-                                      "points": [
-                                              "The Digital Divide: Glaring disparities in smartphone ownership and high-speed broadband between urban elites and rural/female demographics.",
-                                              "Technological exclusion: Biometric authentication failures and digital illiteracy leading to wrongful denial of welfare entitlements (PDS ration)."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "Digital India Programme",
-                              "PM Gramin Digital Saksharta Abhiyan (PMGDISHA)",
-                              "National Digital Health Mission (NDHM)",
-                              "CPGRAMS Grievance Redressal Architecture"
-                      ],
-                      "balancedConclusion": "Digital technology is a powerful catalyst for empowerment only when accompanied by robust public digital infrastructure, vernacular digital interfaces, and universal data privacy protections."
-              }
-      },
-      {
-              "questionTitle": "Is caste disappearing in urban India? Illustrate your answer with examples.",
-              "marks": 15,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "While urbanization and modern capitalist markets have weakened the ritualistic and occupational rigidities of caste (purity-pollution in public spaces), caste has mutated into new secular, political, and socio-economic networks in urban India.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Spheres of Ritual Attenuation & Urban Anonymity",
-                                      "points": [
-                                              "Public transport, modern workplaces (IT/corporate sectors), malls, and eateries enforce secular civic interactions, dismantling traditional untouchability and commensality taboos.",
-                                              "Meritocratic education and diversified service-sector jobs weaken hereditary caste-based occupations."
-                                      ]
-                              },
-                              {
-                                      "heading": "Spheres of Structural Mutation & Resilience",
-                                      "points": [
-                                              "Endogamy persistence: Matrimonial preferences remain strictly caste-aligned, with modern digital matrimonial websites formalizing sub-caste matching.",
-                                              "Residential segregation: Urban housing markets and rental discrimination create segregated caste enclaves in metropolitan centers.",
-                                              "Caste capital and networks: Informal hiring networks and elite educational/corporate circles continue to operate on social and cultural capital (caste-based nepotism).",
-                                              "Electoral and political consolidation: Urban caste associations (sabhas) mobilize as lobbying pressure groups for political representation and economic benefits."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "Protection of Civil Rights Act 1955",
-                              "Scheduled Castes and Scheduled Tribes (Prevention of Atrocities) Act 1989",
-                              "Articles 15, 16 & 17 of the Constitution of India",
-                              "M.N. Srinivas (Dominant Caste / Sanskritization) & Sukhadeo Thorat (Caste & Market Discrimination)"
-                      ],
-                      "balancedConclusion": "Caste in urban India is not disappearing; it is shedding its traditional ritualistic form and reconstituting itself as modern socio-economic networks, residential clustering, and electoral voting blocs."
-              }
-      },
-      {
-              "questionTitle": "Critically examine the challenges of demographic transition in contemporary India.",
-              "marks": 15,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "India is experiencing a complex demographic transition: national Total Fertility Rate (TFR) has dropped to 2.0 (below replacement level of 2.1), presenting a closing window of demographic dividend alongside stark regional divergence and accelerating geriatric challenges.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "The Demographic Dividend: Window vs Disaster Risk",
-                                      "points": [
-                                              "With over 65% of the population in the working-age bracket (15–59 years), India possesses a vital economic opportunity until ~2040.",
-                                              "Jobless growth and skill deficit: The India Skills Report highlights that nearly 50% of graduates remain unemployable, converting the dividend into social unrest without formal job creation."
-                                      ]
-                              },
-                              {
-                                      "heading": "Regional Demographic Divergence (North vs South)",
-                                      "points": [
-                                              "Southern and Western states (Kerala TFR ~1.5, Tamil Nadu ~1.6) are experiencing rapid population ageing, labor shortages, and rising geriatric burdens.",
-                                              "Northern states (Bihar TFR ~2.98, UP ~2.35) have young, expanding populations requiring massive investments in primary education and healthcare.",
-                                              "Federal and political friction: Impending delimitation of parliamentary constituencies creates anxieties over political representation between demographically prudent southern states and populous northern states."
-                                      ]
-                              },
-                              {
-                                      "heading": "Emerging Geriatric Care & Feminization of Ageing",
-                                      "points": [
-                                              "Elderly population is projected to reach over 20% by 2050, accompanied by inadequate public pension coverage, specialized geriatric healthcare deficit, and vulnerable elderly widows."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "National Family Health Survey (NFHS-5 Data)",
-                              "Periodic Labour Force Survey (PLFS)",
-                              "Maintenance and Welfare of Parents and Senior Citizens Act 2007",
-                              "Economic Survey Demographic Projections"
-                      ],
-                      "balancedConclusion": "Harnessing the demographic dividend requires simultaneous investment in female labor force participation, vocational skilling, universal social security pensions, and amicable federal accommodation."
-              }
-      },
-      {
-              "questionTitle": "Evaluate the impact of globalisation on Indian youth with reference to social, political, economic and cultural spheres.",
-              "marks": 15,
-              "yearContext": "2026 UPSC GS1 Mains (Real Paper)",
-              "structure": {
-                      "introduction": "Globalisation—facilitated by trade liberalization, digital telecommunications, and transnational mobility—has profoundly reshaped the aspirations, lifestyles, and challenges of India's 350+ million youth cohort across multiple dimensions.",
-                      "bodyArguments": [
-                              {
-                                      "heading": "Economic & Employment Sphere",
-                                      "points": [
-                                              "Positive: Proliferation of IT/ITES, startup ecosystems, fintech innovations, and global remote employment opportunities.",
-                                              "Negative: Rise of precarious gig-economy work lacking formal social security, high youth underemployment, and vulnerability to global economic shocks."
-                                      ]
-                              },
-                              {
-                                      "heading": "Social & Familial Sphere",
-                                      "points": [
-                                              "Positive: Greater individual agency, delayed marriage age, rising female educational mobility, and inter-caste marriages in urban areas.",
-                                              "Negative: Erosion of joint family support systems, rising mental health stressors, social isolation, and youth substance abuse issues."
-                                      ]
-                              },
-                              {
-                                      "heading": "Cultural & Lifestyle Sphere",
-                                      "points": [
-                                              "Hybridization / 'Glocalization': Synthesis of global pop-culture (OTT media, fashion, global cuisine) with local cultural expressions (fusion arts, yoga revival).",
-                                              "Consumerism vs cultural alienation: Hyper-consumerist lifestyle aspirations colliding with real socio-economic constraints."
-                                      ]
-                              },
-                              {
-                                      "heading": "Political & Civic Engagement",
-                                      "points": [
-                                              "Positive: Digital civic activism, climate consciousness, and global solidarity movements mobilized via social media platforms.",
-                                              "Negative: Susceptibility to online echo chambers, identity radicalization, and spread of misinformation."
-                                      ]
-                              }
-                      ],
-                      "statutoryAnchors": [
-                              "National Youth Policy 2014 / Draft National Youth Policy",
-                              "NITI Aayog 'Booster Shots' for Gig Economy Report",
-                              "Mental Healthcare Act 2017",
-                              "NCERT Class 12 'Social Change and Development in India'"
-                      ],
-                      "balancedConclusion": "Maximizing the benefits of globalisation for Indian youth requires building ethical digital resilience, accessible mental health support systems, and equitable quality employment avenues."
-              }
+        id: "his-classical-dances",
+        title: "Classical Indian Dances & Origin Roots (Sangeet Natak Akademi)",
+        category: "Art & Culture",
+        headers: ["Dance Form", "State of Origin", "Key Distinctive Characteristics", "Pioneering Revivers"],
+        rows: [
+          ["Bharatanatyam", "Tamil Nadu", "Ekaharya solo presentation, fire element (Abhinaya), alarippu to tillana", "Rukmini Devi Arundale, E. Krishna Iyer"],
+          ["Kathakali", "Kerala", "Dance-drama, sky element, elaborate facial makeup (Aharya) with green (paccha)/red (katti) faces", "Vallathol Narayana Menon (Kalamandalam)"],
+          ["Mohiniyattam", "Kerala", "Dance of enchantress, air element, Lasya dominance, white-and-gold Kasavu saree", "Kalyanikutty Amma, Swathi Thirunal"],
+          ["Kuchipudi", "Andhra Pradesh", "Earth element, Tarangam (dancing on brass plate), vachika abhinaya (speaking dialogues)", "Siddhendra Yogi, Vedantam Lakshminarayana"],
+          ["Odissi", "Odisha", "Water element, Tribhanga posture, chowk stance, Mahari and Gotipua origins", "Kelucharan Mohapatra, Sanjukta Panigrahi"],
+          ["Kathak", "Uttar Pradesh", "Storytellers (Kathakars), chakkars (pirouettes), jugalbandi with tabla, Lucknow & Jaipur gharanas", "Birju Maharaj, Sitara Devi"],
+          ["Sattriya", "Assam", "15th-century Vaishnavite monastic tradition in Sattras, Borgeet musical grounding", "Mahapurusha Sankaradeva"],
+          ["Manipuri", "Manipur", "Jagoi & Cholom, Raslila (Radha-Krishna devotion), Pung Cholom drum dance, tubular Kumil skirt", "Guru Bipin Singh, Rabindranath Tagore"]
+        ],
+        highYieldTip: "Kerala is the ONLY state with two classical dances (Kathakali and Mohiniyattam). Ministry of Culture also recognizes Chhau as the 9th classical form."
       }
     ]
   },
+
+  // =========================================================================
+  // PILLAR 3: GS3 — Macroeconomic Systems & Technology
+  // =========================================================================
   {
     id: "gs3-economy-infra",
     code: "PILLAR_03",
@@ -989,6 +415,17 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
           "FRBM Act 2003: Fiscal deficit glide paths, escape clause (national security, disaster, structural reform)."
         ],
         examinerPerspective: "Examiners test the exact transmission mechanism from Repo cuts to commercial lending rates, bond yields, and capital flight."
+      },
+      {
+        title: "India's Three-Stage Nuclear Power Architecture",
+        syllabusTag: "GS3.SCI.NUCLEAR",
+        coreTheory: "Formulated by Dr. Homi J. Bhabha to exploit India's vast domestic Thorium reserves (Monazite sands of Kerala) while compensating for scarce natural Uranium.",
+        criticalProvisions: [
+          "Stage 1: Pressurised Heavy Water Reactors (PHWRs) fueled by Natural Uranium (U-238) with Heavy Water (D2O) as moderator/coolant; generates Plutonium-239.",
+          "Stage 2: Fast Breeder Reactors (FBRs, e.g. Kalpakkam PFBR) fueled by Pu-239 with liquid sodium coolant; breeds U-233 from Thorium-232 blankets.",
+          "Stage 3: Advanced Heavy Water Reactors (AHWRs) fueled by self-sustaining Thorium-232 / Uranium-233 fuel cycles."
+        ],
+        examinerPerspective: "UPSC tests why Thorium cannot be used directly in Stage 1 (it is fertile, not fissile; it must be converted into fissile U-233 in an FBR)."
       }
     ],
     mindMaps: [
@@ -999,9 +436,20 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
         structureType: "branching",
         rootQuestion: "Where does the facility sit in the corridor?",
         details: [
-          "Ceiling: MSF (Marginal Standing Facility) — Emergency penal borrowing window.",
-          "Middle: Policy Repo Rate — Core signaling rate for commercial borrowing.",
-          "Floor: SDF (Standing Deposit Facility) — Uncollateralized excess liquidity absorption."
+          "Ceiling: MSF (Marginal Standing Facility) — Emergency penal borrowing window (Repo + 25 bps).",
+          "Middle: Policy Repo Rate — Core benchmark signaling rate for commercial borrowing.",
+          "Floor: SDF (Standing Deposit Facility) — Uncollateralized excess liquidity absorption (Repo - 25 bps)."
+        ]
+      },
+      {
+        id: "mm-nuclear",
+        title: "Three-Stage Nuclear Fuel Cycle Transition",
+        subtitle: "Sequential Breeding Pathway",
+        structureType: "sequential",
+        details: [
+          "Stage 1 (PHWR): Natural Uranium (U-238 + 0.7% U-235) generates electricity + byproduct Plutonium-239.",
+          "Stage 2 (FBR / Kalpakkam): Plutonium-239 fuel core surrounded by Thorium-232 blanket transmutes into fissile Uranium-233.",
+          "Stage 3 (Thorium AHWR): Abundant domestic Thorium-232 sustained by bred Uranium-233 delivers centuries of sovereign clean baseload power."
         ]
       }
     ],
@@ -1034,8 +482,29 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
           balancedConclusion: "SDF enhances monetary operational flexibility while sterilizing liquidity surges during high capital inflows or currency demonetization."
         }
       }
+    ],
+    staticMatrices: [
+      {
+        id: "eco-reports-publishers",
+        title: "Major Global Economic & Development Reports",
+        category: "Global Institutional Indices",
+        headers: ["Report Name", "Publishing Institution", "Primary Economic Metrics Tracked"],
+        rows: [
+          ["World Economic Outlook (WEO)", "International Monetary Fund (IMF)", "Global GDP growth projections, inflation forecasts, fiscal deficits"],
+          ["Global Financial Stability Report", "International Monetary Fund (IMF)", "Systemic financial risks, sovereign debt vulnerabilities, banking buffers"],
+          ["Global Economic Prospects (GEP)", "World Bank", "Emerging market growth trajectories, structural trade dynamics"],
+          ["Human Development Report (HDR)", "UNDP", "HDI, Inequality-adjusted HDI (IHDI), Gender Inequality Index, MPI"],
+          ["Global Competitiveness Report", "World Economic Forum (WEF)", "Productivity drivers, institutional quality, business dynamism"],
+          ["World Investment Report", "UNCTAD", "Foreign Direct Investment (FDI) inflows/outflows, transnational corporations"]
+        ],
+        highYieldTip: "Direct match: IMF publishes World Economic Outlook & Global Financial Stability Report; World Bank publishes Global Economic Prospects."
+      }
     ]
   },
+
+  // =========================================================================
+  // PILLAR 4: GS4 — Moral Philosophy & Administrative Probity
+  // =========================================================================
   {
     id: "gs4-ethics-probity",
     code: "PILLAR_04",
@@ -1115,6 +584,10 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
       }
     ]
   },
+
+  // =========================================================================
+  // PILLAR 5: CSAT — Analytical Reasoning & Aptitude Core
+  // =========================================================================
   {
     id: "csat-analytical-core",
     code: "PILLAR_05",
@@ -1189,6 +662,206 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
           statutoryAnchors: ["UPSC Examination Gazette Regulations"],
           balancedConclusion: "Focus on zero-guessing discipline to comfortably clear the 33% gate."
         }
+      }
+    ]
+  },
+
+  // =========================================================================
+  // PILLAR 6: STATIC GK VAULT — High-Yield Memory & Elimination Engine
+  // =========================================================================
+  {
+    id: "static-gk-vault",
+    code: "PILLAR_06",
+    paper: "STATIC_GK",
+    title: "Static Knowledge Vault & High-Yield Fact Engine",
+    sanskritSubtitle: "स्थिर ज्ञान एवं तथ्य मंजूषा",
+    shortDescription: "Curated, high-probability static knowledge repository: Ramsar wetlands, Tiger reserves, Mountain passes, Oceanic straits, Classical languages, and International conventions.",
+    empiricalBasis: "Reverse-engineered across 25 years of UPSC Prelims pattern matrices where direct match-the-following and statement elimination depend on deterministic static factual recall.",
+    colorTheme: {
+      primary: "#ec4899",
+      border: "rgba(236, 72, 153, 0.3)",
+      bgGlow: "rgba(236, 72, 153, 0.08)",
+      text: "#f472b6"
+    },
+    keyMetrics: {
+      totalMarksWeight: "35–45 Marks in Prelims",
+      prelimsAvgQuestions: "18–22 Questions / Year",
+      pyqCoverageYears: "2000–2025 (25 Years)"
+    },
+    foundationalConcepts: [
+      {
+        title: "Ramsar Convention & Montreux Record Architecture",
+        syllabusTag: "GS3.ENV.CONSERVATION",
+        coreTheory: "The Ramsar Convention (Iran, 1971) provides the international framework for wetland conservation. The Montreux Record is a register of wetland sites on the List of Wetlands of International Importance where changes in ecological character have occurred, are occurring, or are likely to occur as a result of technological developments, pollution or other human interference.",
+        criticalProvisions: [
+          "India currently has 2 sites on Montreux Record: Keoladeo National Park (Rajasthan) and Loktak Lake (Manipur).",
+          "Chilika Lake (Odisha) was placed on the Montreux Record in 1993 but removed in 2002 after successful ecological restoration (first in Asia).",
+          "Sundarbans is the largest Ramsar site in India; Renuka Wetland (Himachal Pradesh) is the smallest.",
+          "Tamil Nadu has the highest number of Ramsar sites in India."
+        ],
+        examinerPerspective: "UPSC frequently tests which Indian wetlands are on the Montreux Record vs which were removed, and pairs wetlands with their feeder river systems."
+      },
+      {
+        title: "Protected Planet Architecture: National Parks vs Sanctuaries vs Biosphere Reserves",
+        syllabusTag: "GS3.ENV.PROTECTED",
+        coreTheory: "India's protected area network is governed by the Wildlife (Protection) Act, 1972 (amended 2022) and UNESCO Man and the Biosphere (MAB) Program.",
+        criticalProvisions: [
+          "National Park: Highest level of statutory protection; no human habitation or grazing of livestock is permitted.",
+          "Wildlife Sanctuary: Certain rights (like grazing by local cattle) may be permitted by the Chief Wildlife Warden.",
+          "Biosphere Reserve: Large landscape ecosystem with 3 zones: Core (strictly protected), Buffer (research and education), Transition (sustainable human settlements).",
+          "Project Tiger (1973): Core-buffer strategy; National Tiger Conservation Authority (NTCA) has statutory status under Section 38V of WPA 1972."
+        ],
+        examinerPerspective: "Examiners test whether a national park can be created by state government decree without central clearance, and test rivers flowing through specific iconic national parks (e.g. Ramganga through Jim Corbett, Dihing through Dehing Patkai)."
+      }
+    ],
+    mindMaps: [
+      {
+        id: "mm-env-treaties",
+        title: "Multilateral Environmental Agreements (MEA) Taxonomy",
+        subtitle: "Thematic Treaties",
+        structureType: "branching",
+        rootQuestion: "What ecological domain does the treaty govern?",
+        details: [
+          "Biodiversity & Habitat: CBD (Rio 1992), CITES (1973, wildlife trade), CMS (Bonn 1979, migratory species), Ramsar (1971, wetlands).",
+          "Climate & Atmosphere: UNFCCC (1992), Kyoto Protocol (1997, common but differentiated), Paris Agreement (2015, NDC framework).",
+          "Chemicals & Hazardous Waste: Basel (1989, transboundary waste), Rotterdam (1998, prior informed consent), Stockholm (2001, POPs), Minamata (2013, mercury).",
+          "Ozone Depletion: Vienna Convention (1985), Montreal Protocol (1987, ODS phase-out), Kigali Amendment (2016, HFC phase-down)."
+        ]
+      },
+      {
+        id: "mm-pa-hierarchy",
+        title: "Protected Area Legal Escalation Hierarchy",
+        subtitle: "WPA 1972 Statutory Tiers",
+        structureType: "sequential",
+        details: [
+          "Tier 1: Community Reserve — Declared on private/community land where community has volunteered to conserve wildlife.",
+          "Tier 2: Conservation Reserve — Declared on government land adjacent to National Parks/Sanctuaries acting as corridors.",
+          "Tier 3: Wildlife Sanctuary — Substantial statutory protection; regulated human grazing and forest rights permitted.",
+          "Tier 4: National Park — Absolute protection; zero livestock grazing, zero commercial exploitation, boundary changes require NBWL approval.",
+          "Tier 5: Biosphere Reserve (MAB) — Trans-landscape zoning integrating core reserves, buffer zones, and sustainable human transition belts."
+        ]
+      }
+    ],
+    pyqEvidence: [
+      {
+        theme: "Mountain Passes, Straits & Geographical Confluences",
+        frequencyLast10Years: 15,
+        testabilityScore: "VERY HIGH",
+        examinerTrap: "Mixing up Himalayan passes between Ladakh, Himachal, Uttarakhand, and Sikkim (e.g., placing Lipulekh in Arunachal).",
+        recentYearAnchors: [2018, 2020, 2022, 2023, 2024]
+      },
+      {
+        theme: "Ramsar Sites, Rivers & Unique Wildlife Associations",
+        frequencyLast10Years: 18,
+        testabilityScore: "VERY HIGH",
+        examinerTrap: "Confusing artificially impounded wetlands (Harike) with natural ox-bow lakes (Kanwar Lake, Bihar) or tectonic lakes (Wular, J&K).",
+        recentYearAnchors: [2019, 2021, 2022, 2023, 2024]
+      }
+    ],
+    mainsBlueprints: [
+      {
+        questionTitle: "Examine the role of the Ramsar Wetland network in drought resilience and municipal water security in India.",
+        marks: 10,
+        yearContext: "Mains GS3 Benchmark",
+        structure: {
+          introduction: "Define wetlands as hydrological kidneys: nature-based infrastructure that regulates seasonal runoff, recharges aquifers, and buffers flood peaks.",
+          bodyArguments: [
+            {
+              heading: "Groundwater Recharge & Flood Mitigation",
+              points: [
+                "Spongy peat and wetland soil retain monsoon torrents, preventing flash urban inundations (e.g. Deepor Beel, Pallikaranai).",
+                "Sub-surface percolation feeds unconfined aquifers, sustaining agrarian wells during lean dry seasons."
+              ]
+            },
+            {
+              heading: "Ecological & Socio-Economic Assets",
+              points: [
+                "Nutrient filtering and heavy metal sequestration by aquatic macrophytes.",
+                "Ecotourism and inland fishery livelihoods for indigenous fishing communities."
+              ]
+            }
+          ],
+          statutoryAnchors: ["Wetlands (Conservation and Management) Rules 2017", "Amrit Dharohar Scheme", "Ramsar Convention"],
+          balancedConclusion: "Wetland conservation must transition from isolated gazetted notifications to integrated basin-wide urban catchment planning."
+        }
+      }
+    ],
+    staticMatrices: [
+      {
+        id: "stat-ramsar-matrix",
+        title: "High-Frequency Indian Ramsar Wetlands Matrix",
+        category: "Wetlands & Ecology",
+        headers: ["Wetland Site", "State", "Type & Feeder River", "Ecological / High-Yield Significance"],
+        rows: [
+          ["Loktak Lake", "Manipur", "Natural freshwater lake", "Only floating lake in the world; houses Keibul Lamjao floating park & Sangai Deer; on Montreux Record"],
+          ["Keoladeo Ghana", "Rajasthan", "Man-made wetland (Gambhir & Banganga rivers)", "Wintering ground for rare Siberian Crane; on Montreux Record"],
+          ["Chilika Lake", "Odisha", "Brackish coastal lagoon (Daya River)", "First Ramsar site in India (1981); Irrawaddy Dolphin habitat; removed from Montreux Record in 2002"],
+          ["Harike Wetland", "Punjab", "Man-made reservoir (Beas & Sutlej confluence)", "Indira Gandhi Canal originates here; vital wintering ground for migratory birds"],
+          ["Wular Lake", "Jammu & Kashmir", "Tectonic freshwater lake (Jhelum River)", "Largest freshwater lake in India with associated deltaic marshes"],
+          ["Renuka Lake", "Himachal Pradesh", "Natural freshwater wetland with springs", "Smallest Ramsar wetland in India; religious sanctuary with captive lion safari"],
+          ["Sundarbans", "West Bengal", "Tidal mangrove estuarine complex", "Largest Ramsar site in India; Royal Bengal Tiger, estuarine crocodile, mangrove ecosystem"],
+          ["Kanwar (Kabar) Taal", "Bihar", "Oxbow lake (Burhi Gandak river)", "Largest freshwater oxbow lake in Asia; crucial central Asian flyway stopover"]
+        ],
+        highYieldTip: "Loktak and Keoladeo are the ONLY 2 Indian sites currently on the Montreux Record. Chilika was removed after restoration."
+      },
+      {
+        id: "stat-passes-matrix",
+        title: "Strategic Mountain Passes of India Matrix",
+        category: "Physiographic Geography",
+        headers: ["Pass Name", "State / UT", "Route / Connectivity", "Strategic Significance"],
+        rows: [
+          ["Zoji La", "Ladakh / J&K", "Connects Srinagar with Kargil & Leh", "Vital lifeline across Great Himalayas; Zoji La tunnel provides all-weather link"],
+          ["Banihal Pass (Jawahar Tunnel)", "Jammu & Kashmir", "Connects Jammu with Srinagar valley", "Crosses the Pir Panjal range in outer Himalayas"],
+          ["Rohtang Pass", "Himachal Pradesh", "Connects Kullu Valley with Lahaul & Spiti", "Crosses Pir Panjal; bypassed by the Atal Tunnel at 3,000m altitude"],
+          ["Shipki La", "Himachal Pradesh", "Connects Kinnaur with Tibet (China)", "The Sutlej River enters India from Tibet through this gorge"],
+          ["Lipulekh", "Uttarakhand", "Trijunction of India, Nepal and Tibet", "Primary overland route for the Kailash Mansarovar Yatra pilgrimage"],
+          ["Nathu La", "Sikkim", "Connects Sikkim with Chumbi Valley (Tibet)", "Branch of historic Silk Route; reopened for border trade in 2006"],
+          ["Jelep La", "Sikkim", "Connects Sikkim with Lhasa via Chumbi Valley", "Formed by the Teesta River stream incision"],
+          ["Bomdi La", "Arunachal Pradesh", "Connects western Arunachal (Tawang) with Lhasa", "Key strategic transit pass in the Eastern Himalayas"],
+          ["Diphu Pass", "Arunachal Pradesh", "Trijunction of India, China, and Myanmar", "Strategic border crossing on the McMahon Line"]
+        ],
+        highYieldTip: "River Sutlej enters India through Shipki La. Kailash Mansarovar pilgrims transit via Lipulekh (Uttarakhand) and Nathu La (Sikkim)."
+      },
+      {
+        id: "stat-classical-languages",
+        title: "All 11 Classical Languages of India",
+        category: "Art, Culture & Literature",
+        headers: ["Language", "Year Conferred", "Language Family", "Historical & Literary Antiquity"],
+        rows: [
+          ["Tamil", "2004", "Dravidian", "Sangam literature (Tolkappiyam, Silappadikaram), 2000+ years of continuous corpus"],
+          ["Sanskrit", "2005", "Indo-Aryan", "Vedas, Upanishads, Epics (Ramayana, Mahabharata), Panini's Ashtadhyayi"],
+          ["Telugu", "2008", "Dravidian", "Nannaya's Andhra Mahabharatam, Gatha Saptashati references (1st century CE)"],
+          ["Kannada", "2008", "Dravidian", "Kavirajamarga (9th century CE), Halmidi inscription (450 CE), Vachana literature"],
+          ["Malayalam", "2013", "Dravidian", "Ramacharitam, Manipravalam literature, ancient coastal trade epigraphs"],
+          ["Odia", "2014", "Indo-Aryan", "Kharavela's Hathigumpha inscription (1st century BCE), Charyapada Buddhist poems"],
+          ["Marathi", "2024", "Indo-Aryan", "Mukundaraj's Vivekasindhu, Dnyaneshwari (13th century), Mahanubhava literature"],
+          ["Bengali", "2024", "Indo-Aryan", "Charyapada manuscripts (8th–12th century), Mangal-Kavya, Gaudiya Vaishnavism"],
+          ["Pali", "2024", "Middle Indo-Aryan (Prakrit)", "Tipitaka canonical Buddhist scripture, Mahavamsa, Milinda Panha"],
+          ["Prakrit", "2024", "Middle Indo-Aryan", "Ashokan Edicts, Jain canonical Agamas, Hala's Gaha Sattasai"],
+          ["Assamese", "2024", "Indo-Aryan", "Charyapada antecedents, Sankaradeva's Borgeet & Ankiya Naat, Buranjis"]
+        ],
+        highYieldTip: "The Union Cabinet expanded the Classical Languages list from 6 to 11 in October 2024 by adding Marathi, Bengali, Pali, Prakrit, and Assamese."
+      },
+      {
+        id: "stat-const-amendments",
+        title: "Landmark Constitutional Amendments Matrix",
+        category: "Constitutional Milestones",
+        headers: ["Amendment Act", "Year", "Major Constitutional Alterations", "Key Purpose / Impact"],
+        rows: [
+          ["1st Amendment", "1951", "Added 9th Schedule & Article 31A/31B; added reasonable restrictions to Art 19(1)(a)", "Shielded Zamindari land reforms from judicial fundamental rights challenges"],
+          ["7th Amendment", "1956", "Abolished Part A, B, C, D states; created 14 States & 6 UTs; common High Courts", "Implemented States Reorganisation Commission (Fazal Ali) recommendations"],
+          ["24th Amendment", "1971", "Affirmed Parliament's power to amend any part of Constitution including Part III", "Made presidential assent mandatory for Constitution Amendment Bills"],
+          ["42nd Amendment", "1976", "'Mini Constitution': Added Socialist, Secular, Integrity to Preamble; Part IVA (Duties)", "Shifted 5 subjects to Concurrent List; curtailed judicial review powers (later curtailed)"],
+          ["44th Amendment", "1978", "Removed Right to Property from Part III; replaced 'internal disturbance' with 'armed rebellion'", "Restored checks on Emergency (Art 352); mandated written cabinet recommendation"],
+          ["52nd Amendment", "1985", "Added Tenth Schedule (Anti-Defection Law)", "Disqualified defecting legislators to curb political floor-crossing ('Aaya Ram Gaya Ram')"],
+          ["73rd & 74th Amendments", "1992", "Added Part IX (11th Schedule, 29 subjects) & Part IXA (12th Schedule, 18 subjects)", "Conferred constitutional status on Panchayati Raj Institutions and Urban Local Bodies"],
+          ["86th Amendment", "2002", "Inserted Article 21A (Right to Free & Compulsory Education); added Art 51A(k)", "Made elementary education a Fundamental Right for children aged 6–14 years"],
+          ["91st Amendment", "2003", "Capped Council of Ministers at 15% of Lok Sabha/Assembly; omitted 1/3rd defection split", "Prevented jumbo cabinets and closed defection loophole"],
+          ["101st Amendment", "2016", "Introduced Goods and Services Tax (GST); created GST Council (Article 279A)", "Replaced multiple indirect taxes with nationwide unified destination-based tax"],
+          ["103rd Amendment", "2019", "Introduced 10% EWS reservation in public employment & education (Art 15(6), 16(6))", "Allowed economic status as sole criteria for affirmative action"],
+          ["106th Amendment", "2023", "Nari Shakti Vandan Adhiniyam: 33% reservation for women in Lok Sabha & State Assemblies", "Inserted Articles 330A, 332A, 334A for 15-year women's legislative representation"]
+        ],
+        highYieldTip: "42nd Amendment was enacted during Emergency; 44th Amendment reversed its authoritarian provisions. 106th Amendment is the Women's Reservation Act."
       }
     ]
   }
