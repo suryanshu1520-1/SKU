@@ -658,6 +658,8 @@ export default function CurrentAffairs({ userId, onRegisterActions }: CurrentAff
       onClick: () => setActiveCategoryTab(activeCategoryTab === 'SAVED' ? 'ALL' : 'SAVED'),
       tooltip: 'Candidate Bookmarked Dispatches',
     },
+  ];
+
   // Register Contextual Actions to the Primary Vertical Rail
   useEffect(() => {
     onRegisterActions?.(contextActions);
@@ -725,8 +727,12 @@ export default function CurrentAffairs({ userId, onRegisterActions }: CurrentAff
       {/* ── MODE 2: SIGNAL DECK & POLICY EXPLORER ── */}
       {briefViewMode === 'signals' && (
         <>
+          <div className="pt-2 mb-4 font-sans">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 className="font-serif text-base font-bold text-[#e8e0cf] flex items-center gap-2">
                   <Layers className="w-4 h-4 text-[#0194a8]" />
-                  <span>Policy Dispatches & Signal Explorer</span>
+                  <span>Policy Dispatches &amp; Signal Explorer</span>
                 </h3>
                 <p className="text-xs text-[#8fa2bd] font-sans m-0">
                   Search policy dispatches, filter by ministry, or browse verified intelligence.
