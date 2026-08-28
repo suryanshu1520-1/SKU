@@ -13,7 +13,7 @@ import Leaderboard from './components/Leaderboard';
 import PublicProfile from './components/PublicProfile';
 import PasswordReset from './components/PasswordReset';
 import LegalModal, { LegalDocumentType } from './components/LegalModal';
-import VerticalNavRail from './components/VerticalNavRail';
+import VerticalNavRail, { ContextActionItem } from './components/VerticalNavRail';
 import Onboarding from './components/Onboarding';
 import BrandLogo from './components/BrandLogo';
 import { supabase } from './lib/supabase';
@@ -27,6 +27,7 @@ export default function App() {
   const [gameState, setGameState] = useState<'login' | 'landing' | 'arena' | 'autopsy'>('landing');
 
   const [activeTab, setActiveTab] = useState<'arena' | 'tracker' | 'library' | 'humanities' | 'profile' | 'leaderboard'>('arena');
+  const [pageContextActions, setPageContextActions] = useState<ContextActionItem[]>([]);
 
   const [viewingAnalystId, setViewingAnalystId] = useState<string | null>(null);
   const [showPasswordReset, setShowPasswordReset] = useState(false);
@@ -347,6 +348,7 @@ export default function App() {
             isLanding={gameState === 'landing'}
             userEmail={userEmail}
             isExpanded={isRailExpanded}
+            contextActions={pageContextActions}
             onToggleExpand={handleToggleRailExpand}
             onNavigateTab={navigateToTab}
             onNavigateHome={handleNavigateHome}
@@ -595,7 +597,7 @@ export default function App() {
           ) : activeTab === 'leaderboard' ? (
             <Leaderboard onAnalystClick={setViewingAnalystId} />
           ) : activeTab === 'tracker' ? (
-            <CurrentAffairs userId={userId || 'guest'} />
+            <CurrentAffairs userId={userId || 'guest'} onRegisterActions={setPageContextActions} />
           ) : activeTab === 'library' ? (
             <SubjectPillars
               onNavigateArena={() => {

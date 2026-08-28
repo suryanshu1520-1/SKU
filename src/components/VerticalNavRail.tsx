@@ -21,6 +21,20 @@ import BrandLogo, { TarkSigil } from './BrandLogo';
 
 export type NavTab = 'arena' | 'tracker' | 'library' | 'humanities' | 'leaderboard' | 'profile';
 
+export interface ContextActionItem {
+  id: string;
+  label: string;
+  shortLabel: string;
+  icon: React.ComponentType<{ className?: string }>;
+  badge?: string | number;
+  isActive?: boolean;
+  disabled?: boolean;
+  isAccent?: boolean;
+  accentColor?: 'gold' | 'purple' | 'cyan' | 'emerald';
+  onClick: () => void;
+  tooltip?: string;
+}
+
 interface NavItem {
   id: NavTab | 'home';
   label: string;
@@ -35,6 +49,7 @@ interface VerticalNavRailProps {
   isLanding: boolean;
   userEmail: string | null;
   isExpanded: boolean;
+  contextActions?: ContextActionItem[];
   onToggleExpand: () => void;
   onNavigateTab: (tab: NavTab) => void;
   onNavigateHome: () => void;
@@ -182,6 +197,64 @@ export default function VerticalNavRail({
             </button>
           )}
         </nav>
+
+        {/* ── Contextual Page Actions (Bracket Area - Dynamic per Page) ── */}
+        {!isLanding && contextActions && contextActions.length > 0 && (
+          <div className="p-2 border-t border-[rgba(19,108,153,0.3)] my-1 bg-[rgba(3,18,42,0.4)]">
+            {isExpanded && (
+              <div className="px-2 py-1 mb-1 text-[9px] font-mono uppercase tracking-wider text-[#0194a8] font-bold flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0194a8] animate-pulse" />
+                  <span>Page Actions</span>
+                </span>
+              </div>
+            )}
+            <div className="space-y-1">
+              {contextActions.map((action) => {
+                const Icon = action.icon;
+                const active = !!action.isActive;
+                return (
+                  <button
+                    key={action.id}
+                    onClick={action.onClick}
+                    disabled={action.disabled}
+                    title={`${action.label}${action.tooltip ? ` — ${action.tooltip}` : ''}`}
+                    className={`relative w-full flex items-center gap-3 px-3 py-2 rounded-xs transition-all duration-200 group cursor-pointer ${
+                      isExpanded ? 'justify-start' : 'justify-center'
+                    } ${
+                      active
+                        ? 'bg-[rgba(224,208,171,0.14)] text-[#e0d0ab] border border-[rgba(224,208,171,0.4)] font-medium shadow-sm'
+                        : 'text-[#8fa2bd] hover:text-[#e8e0cf] hover:bg-[rgba(11,61,120,0.35)]'
+                    } ${action.disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
+                  >
+                    {active && (
+                      <motion.span
+                        layoutId="vertical-rail-context-active-edge"
+                        className="absolute left-0 top-1 bottom-1 w-1 bg-[#e0d0ab] rounded-r-xs"
+                        transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', bounce: 0.15, duration: 0.4 }}
+                      />
+                    )}
+                    <Icon
+                      className={`w-4 h-4 shrink-0 transition-transform duration-200 ${
+                        active ? 'text-[#e0d0ab] scale-105' : 'text-[#8fa2bd] group-hover:text-[#e8e0cf] group-hover:scale-110'
+                      }`}
+                    />
+                    {isExpanded && (
+                      <div className="flex items-center justify-between flex-1 min-w-0">
+                        <span className="text-xs truncate">{action.label}</span>
+                        {action.badge !== undefined && (
+                          <span className="text-[9px] font-mono px-1.5 py-0.2 rounded-xs bg-[rgba(11,61,120,0.6)] text-[#e0d0ab] border border-[rgba(19,108,153,0.4)]">
+                            {action.badge}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── Bottom Controls & Layout Switcher ── */}

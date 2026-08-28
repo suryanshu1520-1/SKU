@@ -80,6 +80,7 @@ interface PibDigestItem {
 
 interface CurrentAffairsProps {
   userId: string;
+  onRegisterActions?: (actions: ContextActionItem[]) => void;
 }
 
 // Slide-and-fade variants for the PIB edition carousel, keyed by swipe/nav direction.
@@ -115,7 +116,7 @@ const TOP_MINISTRIES = [
   'Ministry of External Affairs',
 ];
 
-export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
+export default function CurrentAffairs({ userId, onRegisterActions }: CurrentAffairsProps) {
   const [items, setItems] = useState<CurrentAffairsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -657,14 +658,24 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
       onClick: () => setActiveCategoryTab(activeCategoryTab === 'SAVED' ? 'ALL' : 'SAVED'),
       tooltip: 'Candidate Bookmarked Dispatches',
     },
-  ];
+  // Register Contextual Actions to the Primary Vertical Rail
+  useEffect(() => {
+    onRegisterActions?.(contextActions);
+  }, [
+    activeCategoryTab,
+    briefViewMode,
+    isFilterDrawerOpen,
+    activeFilterCount,
+    savedArticleIds.size,
+    onRegisterActions,
+  ]);
 
   return (
     <div className="w-full min-h-screen text-stone-100 font-sans pb-24">
       
       {/* ── Editorial Masthead Header ── */}
-      <div className="border-b border-zinc-800/80 pb-6 mb-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div className="border-b border-zinc-800/80 pb-5 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -680,51 +691,14 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
             </p>
           </div>
 
-          {/* Quick status badge & Mobile Actions */}
-          <div className="flex items-center gap-2.5 shrink-0 font-sans flex-wrap">
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(3,18,42,0.8)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-mono text-[#8fa2bd]">
+          {/* Indexed status badge */}
+          <div className="flex items-center gap-2.5 shrink-0 font-sans">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(3,18,42,0.8)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-mono text-[#8fa2bd]">
               <span className="text-[#e0d0ab] font-bold">{items.length}</span> dispatches indexed
             </span>
-
-            {/* Mobile / Tablet Compact Action Bar (< lg) */}
-            <div className="flex lg:hidden items-center gap-2">
-              <button
-                onClick={() => {
-                  setActiveCategoryTab('PRS');
-                  setSelectedSource('PRS');
-                }}
-                className={`px-3 py-1.5 rounded-xs text-xs font-mono font-bold transition-all border ${
-                  activeCategoryTab === 'PRS'
-                    ? 'bg-purple-950 border-[#c084fc] text-[#e0d0ab]'
-                    : 'bg-zinc-900 border-purple-900 text-purple-300'
-                }`}
-              >
-                ⚖️ PRS
-              </button>
-              <button
-                onClick={() => setShowPibModal(true)}
-                className="px-3 py-1.5 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xs text-xs font-sans cursor-pointer"
-              >
-                PIB
-              </button>
-            </div>
           </div>
         </div>
       </div>
-
-      {/* ── Main Layout: Context Action Sub-Bar (Left) + Intelligence Stream (Right) ── */}
-      <div className="flex items-start gap-6">
-        {/* Shorter Vertical Action Rail (Docked Left, Sticky) */}
-        <div className="hidden lg:block shrink-0 sticky top-24 z-30">
-          <ContextActionRail
-            activeTab="tracker"
-            gameState="arena"
-            customActions={contextActions}
-          />
-        </div>
-
-        {/* Main Intelligence Stream Container */}
-        <div className="flex-1 min-w-0">
 
       {/* ── Error Banner ── */}
       {errorMsg && (
@@ -737,60 +711,9 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
         </div>
       )}
 
-      {/* ── View Mode Switcher ── */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-[rgba(19,108,153,0.35)]">
-        <LayoutGroup id="brief-view-modes">
-          <div className="flex items-center gap-1.5 p-1 bg-[rgba(3,18,42,0.7)] border border-[rgba(19,108,153,0.4)] rounded-xs">
-            <button
-              onClick={() => handleSelectViewMode('signals')}
-              className={`relative px-3.5 py-1.5 rounded-xs text-xs font-mono font-medium transition-all cursor-pointer ${
-                briefViewMode === 'signals' ? 'text-[#072e63] font-bold' : 'text-[#8fa2bd] hover:text-[#e0d0ab]'
-              }`}
-            >
-              {briefViewMode === 'signals' && (
-                <motion.span
-                  layoutId="brief-view-mode-pill"
-                  className="absolute inset-0 bg-[#e0d0ab] rounded-xs shadow-sm"
-                  transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', bounce: 0.15, duration: 0.45 }}
-                />
-              )}
-              <span className="relative z-10 flex items-center gap-1.5">
-                <Zap className="w-3.5 h-3.5" />
-                <span>Signal Deck</span>
-              </span>
-            </button>
-
-            <button
-              onClick={() => handleSelectViewMode('edition')}
-              className={`relative px-3.5 py-1.5 rounded-xs text-xs font-mono font-medium transition-all cursor-pointer ${
-                briefViewMode === 'edition' ? 'text-[#072e63] font-bold' : 'text-[#8fa2bd] hover:text-[#e0d0ab]'
-              }`}
-            >
-              {briefViewMode === 'edition' && (
-                <motion.span
-                  layoutId="brief-view-mode-pill"
-                  className="absolute inset-0 bg-[#e0d0ab] rounded-xs shadow-sm"
-                  transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', bounce: 0.15, duration: 0.45 }}
-                />
-              )}
-              <span className="relative z-10 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Daily Edition (10 Briefs)</span>
-              </span>
-            </button>
-          </div>
-        </LayoutGroup>
-
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono text-[#8fa2bd]">
-            {briefViewMode === 'edition' ? 'Finite curated reading path' : `${displayedItems.length} policy signals indexed`}
-          </span>
-        </div>
-      </div>
-
-      {/* ── MODE 1: FULL DAILY EDITION READER ── */}
+      {/* ── MODE 1: FULL DAILY EDITION READER (When selected from sidebar) ── */}
       {briefViewMode === 'edition' && (
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto pt-2">
           <RebaseEdition
             userId={userId}
             refreshKey={editionRefreshKey}
@@ -802,61 +725,6 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
       {/* ── MODE 2: SIGNAL DECK & POLICY EXPLORER ── */}
       {briefViewMode === 'signals' && (
         <>
-          {/* Optional Daily Edition Upfront Hero Banner */}
-          <div className="mb-6 p-4 rounded-xs border border-[rgba(19,108,153,0.45)] bg-[rgba(4,25,54,0.6)] backdrop-blur-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-xs bg-[rgba(224,208,171,0.12)] border border-[rgba(224,208,171,0.3)] flex items-center justify-center text-[#e0d0ab] shrink-0">
-                <Sparkles className="w-4 h-4" />
-              </span>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-bold text-[#e0d0ab]">Today's Finite Curated Edition</span>
-                  <span className="text-[11px] font-mono text-[#8fa2bd]">&bull; 10 briefs &bull; ~4 min read</span>
-                </div>
-                <p className="text-[12px] text-[#9fb0c8] m-0">Significance-ranked policy decisions with verified Prelims & Mains takeaways.</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                onClick={() => handleSelectViewMode('edition')}
-                className="px-3 py-1.5 bg-[#e0d0ab] hover:bg-white text-[#072e63] font-mono font-bold text-xs uppercase tracking-wider rounded-xs transition-colors cursor-pointer"
-              >
-                Open Edition →
-              </button>
-              <button
-                onClick={() => setShowDailyEditionInline(!showDailyEditionInline)}
-                className="px-3 py-1.5 bg-[rgba(3,18,42,0.6)] hover:bg-[rgba(11,61,120,0.4)] border border-[rgba(19,108,153,0.4)] text-[#c8b998] font-mono text-xs rounded-xs transition-colors cursor-pointer"
-              >
-                {showDailyEditionInline ? 'Hide Inline ▴' : 'Expand Inline ▾'}
-              </button>
-            </div>
-          </div>
-
-          {/* Inline Collapsible Edition (if toggled) */}
-          <AnimatePresence>
-            {showDailyEditionInline && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.25 }}
-                className="overflow-hidden mb-8"
-              >
-                <RebaseEdition
-                  userId={userId}
-                  refreshKey={editionRefreshKey}
-                  fallback={<DailyEdition userId={userId} compactModeDefault={true} />}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* ── Archive & Signal Explorer Header ── */}
-          <div className="pt-4 border-t border-[rgba(19,108,153,0.3)] mb-6 font-sans">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-              <div>
-                <h3 className="font-serif text-base font-bold text-[#e8e0cf] flex items-center gap-2">
                   <Layers className="w-4 h-4 text-[#0194a8]" />
                   <span>Policy Dispatches & Signal Explorer</span>
                 </h3>
@@ -1520,9 +1388,6 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
       )}
       </>
       )}
-
-        </div> {/* Close Main Intelligence Stream Container */}
-      </div> {/* Close Main Layout Flex */}
 
       {/* ── Full Brief Slide-Over (Slide-Over) ── */}
       <AnimatePresence>
