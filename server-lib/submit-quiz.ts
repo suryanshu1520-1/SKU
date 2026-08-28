@@ -85,7 +85,7 @@ export default async function handler(req: any, res: any) {
 
     const isRanked = payload.isRanked !== undefined ? payload.isRanked : true;
 
-    // Server-side Quota Enforcement: Free tier accounts are limited to 1 Vanguard ranked assessment
+    // Server-side Quota / Access Check
     if (isRanked) {
       const { data: profile } = await supabase
         .from('user_profiles')
@@ -94,12 +94,12 @@ export default async function handler(req: any, res: any) {
         .maybeSingle();
 
       if (profile) {
-        const isFounder = profile.membership_tier === 'founder';
-        const vanguardUsed = profile.vanguard_sessions_used || 0;
-        if (!isFounder && vanguardUsed >= 1) {
+        const isFounderOrPremium = profile.membership_tier === 'founder' || profile.membership_tier === 'premium';
+        // Note: For signed-in candidates, allow assessment evaluation
+        if (!isFounderOrPremium && (profile.vanguard_sessions_used || 0) >= 50) {
           return res.status(403).json({
             error: "QUOTA_EXCEEDED",
-            message: "Free tier quota reached for Vanguard Ranked Assessment. Upgrade to Founders Club for unlimited testing."
+            message: "Daily test quota reached. Upgrade to Founders Club for unlimited evaluations."
           });
         }
       }

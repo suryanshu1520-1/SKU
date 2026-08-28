@@ -27,7 +27,8 @@ import {
   FileText,
   CheckCircle2,
   AlertCircle,
-  Zap
+  Zap,
+  Scale
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -710,7 +711,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
       <div className="space-y-4 mb-8 font-sans">
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
           
-          {/* Category Tabs — animated sliding pill instead of an instant color swap */}
+          {/* Category Tabs */}
           <LayoutGroup id="ca-category-tabs">
             <div className="flex items-center gap-1.5 overflow-x-auto pb-2 lg:pb-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               {CATEGORY_TABS.map((tab) => {
@@ -719,18 +720,18 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                   <button
                     key={tab.id}
                     onClick={() => setActiveCategoryTab(tab.id)}
-                    className={`relative px-3.5 py-1.5 rounded-sm text-xs font-sans font-medium tracking-wide whitespace-nowrap transition-colors cursor-pointer border ${
-                      isActive ? 'border-transparent' : 'bg-zinc-900/60 border-zinc-800/80 hover:border-zinc-700'
+                    className={`relative px-3.5 py-1.5 rounded-xs text-xs font-mono font-medium tracking-wide whitespace-nowrap transition-colors cursor-pointer border ${
+                      isActive ? 'border-transparent text-[#072e63] font-bold' : 'bg-[rgba(3,18,42,0.6)] border-[rgba(19,108,153,0.35)] text-[#8fa2bd] hover:text-[#e0d0ab] hover:border-[rgba(19,108,153,0.6)]'
                     }`}
                   >
                     {isActive && (
                       <motion.span
                         layoutId="ca-category-active-pill"
-                        className="absolute inset-0 bg-[#e0d0ab] border border-[#e0d0ab] rounded-sm shadow-sm"
-                        transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', bounce: 0.2, duration: 0.5 }}
+                        className="absolute inset-0 bg-[#e0d0ab] rounded-xs shadow-sm"
+                        transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', bounce: 0.15, duration: 0.45 }}
                       />
                     )}
-                    <span className={`relative z-10 ${isActive ? 'text-zinc-950 font-bold' : 'text-zinc-400 hover:text-stone-200'}`}>
+                    <span className="relative z-10">
                       {tab.label}
                     </span>
                   </button>
@@ -742,18 +743,18 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
           {/* Search Input & Deep Filter Toggle */}
           <div className="flex items-center gap-2">
             <div className="relative flex-1 lg:w-72">
-              <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-[#0194a8] absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Search policy briefs, ministries, keywords..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 bg-zinc-900/90 border border-zinc-800 rounded-sm text-xs font-sans text-stone-200 placeholder-zinc-500 focus:outline-none focus:border-[#e0d0ab]/60 focus:ring-1 focus:ring-[#e0d0ab]/30"
+                className="w-full pl-9 pr-3 py-1.5 bg-[rgba(3,18,42,0.85)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-stone-200 placeholder-[#8fa2bd]/60 focus:outline-none focus:border-[#e0d0ab] focus:ring-1 focus:ring-[#e0d0ab]/30"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#8fa2bd] hover:text-stone-200 cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -762,16 +763,16 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
             <button
               onClick={() => setIsFilterDrawerOpen(!isFilterDrawerOpen)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm border text-xs font-sans font-medium transition-all cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xs border text-xs font-mono font-medium transition-all cursor-pointer ${
                 activeFilterCount > 0 || isFilterDrawerOpen
-                  ? 'bg-zinc-900 border-[#e0d0ab]/60 text-[#e0d0ab]'
-                  : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-stone-200'
+                  ? 'bg-[rgba(11,61,120,0.4)] border-[#e0d0ab] text-[#e0d0ab]'
+                  : 'bg-[rgba(3,18,42,0.6)] border-[rgba(19,108,153,0.35)] text-[#8fa2bd] hover:border-[rgba(19,108,153,0.6)] hover:text-stone-200'
               }`}
             >
-              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <SlidersHorizontal className="w-3.5 h-3.5 text-[#0194a8]" />
               <span>Filters</span>
               {activeFilterCount > 0 && (
-                <span className="w-4 h-4 rounded-full bg-[#e0d0ab] text-zinc-950 font-bold text-[9px] flex items-center justify-center ml-0.5">
+                <span className="w-4 h-4 rounded-full bg-[#e0d0ab] text-[#072e63] font-bold text-[9px] flex items-center justify-center ml-0.5">
                   {activeFilterCount}
                 </span>
               )}
@@ -786,17 +787,17 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden bg-zinc-900/40 border border-zinc-800/80 rounded-sm p-4 backdrop-blur-md font-sans"
+              className="overflow-hidden bg-[rgba(3,18,42,0.9)] border border-[rgba(19,108,153,0.45)] rounded-xs p-4 backdrop-blur-xl font-sans"
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
                 <div>
-                  <label className="block text-[10px] font-sans uppercase tracking-wider text-zinc-400 font-bold mb-1.5">
+                  <label className="block text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mb-1.5">
                     Ministry / Department
                   </label>
                   <select
                     value={selectedMinistry}
                     onChange={(e) => setSelectedMinistry(e.target.value)}
-                    className="w-full px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-sm text-xs font-sans text-stone-200 focus:outline-none focus:border-[#e0d0ab]"
+                    className="w-full px-2.5 py-1.5 bg-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-stone-200 focus:outline-none focus:border-[#e0d0ab]"
                   >
                     <option value="ALL">All Ministries ({items.length})</option>
                     {ministries.map((min) => (
@@ -808,13 +809,13 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-sans uppercase tracking-wider text-zinc-400 font-bold mb-1.5">
+                  <label className="block text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mb-1.5">
                     Verified Source
                   </label>
                   <select
                     value={selectedSource}
                     onChange={(e) => setSelectedSource(e.target.value)}
-                    className="w-full px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-sm text-xs font-sans text-stone-200 focus:outline-none focus:border-[#e0d0ab]"
+                    className="w-full px-2.5 py-1.5 bg-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-stone-200 focus:outline-none focus:border-[#e0d0ab]"
                   >
                     <option value="ALL">All Sources ({sources.length})</option>
                     {sources.map((src) => (
@@ -826,33 +827,33 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-sans uppercase tracking-wider text-zinc-400 font-bold mb-1.5">
+                  <label className="block text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mb-1.5">
                     Start Date
                   </label>
                   <input
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-sm text-xs font-sans text-stone-200 [color-scheme:dark]"
+                    className="w-full px-2.5 py-1.5 bg-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-stone-200 [color-scheme:dark]"
                   />
                 </div>
 
                 <div className="flex items-center gap-2">
                   <div className="flex-1">
-                    <label className="block text-[10px] font-sans uppercase tracking-wider text-zinc-400 font-bold mb-1.5">
+                    <label className="block text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mb-1.5">
                       End Date
                     </label>
                     <input
                       type="date"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full px-2.5 py-1.5 bg-zinc-900 border border-zinc-800 rounded-sm text-xs font-sans text-stone-200 [color-scheme:dark]"
+                      className="w-full px-2.5 py-1.5 bg-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-stone-200 [color-scheme:dark]"
                     />
                   </div>
                   {activeFilterCount > 0 && (
                     <button
                       onClick={resetAllFilters}
-                      className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-sm text-xs font-sans flex items-center gap-1 shrink-0 cursor-pointer"
+                      className="px-3 py-2 bg-[rgba(11,61,120,0.4)] hover:bg-[rgba(11,61,120,0.6)] border border-[rgba(19,108,153,0.4)] text-[#e0d0ab] rounded-xs text-xs font-mono flex items-center gap-1 shrink-0 cursor-pointer"
                       title="Reset all filters"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
@@ -953,25 +954,25 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               animate={{ opacity: 1, y: 0 }}
               whileHover={prefersReducedMotion ? undefined : { y: -3 }}
               transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-              className="bg-gradient-to-br from-zinc-900/50 via-zinc-900/30 to-zinc-950 border border-zinc-800 hover:border-[#e0d0ab]/50 rounded-sm p-6 sm:p-8 relative overflow-hidden shadow-xl backdrop-blur-sm group font-sans"
+              className="bg-gradient-to-br from-[rgba(4,25,54,0.85)] via-[rgba(7,46,99,0.55)] to-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.5)] hover:border-[#e0d0ab]/70 rounded-xs p-6 sm:p-8 relative overflow-hidden shadow-[0_16px_50px_rgba(0,0,0,0.6)] backdrop-blur-xl group font-sans"
             >
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                 <div className="flex items-center gap-2 flex-wrap font-sans">
-                  <span className="px-2.5 py-0.5 bg-[#e0d0ab] text-zinc-950 text-[10px] font-sans font-bold uppercase tracking-wider rounded-sm">
+                  <span className="px-2.5 py-0.5 bg-[#e0d0ab] text-[#072e63] text-[10px] font-mono font-bold uppercase tracking-wider rounded-xs shadow-sm">
                     LEAD SIGNAL
                   </span>
-                  <span className="px-2.5 py-0.5 bg-zinc-800 text-[#e0d0ab] text-[10px] font-sans uppercase tracking-wider rounded-sm border border-zinc-700">
+                  <span className="px-2.5 py-0.5 bg-[rgba(11,61,120,0.35)] text-[#e0d0ab] text-[10px] font-mono uppercase tracking-wider rounded-xs border border-[rgba(19,108,153,0.4)]">
                     {leadItem.ministry}
                   </span>
-                  <span className="text-zinc-500 text-[10px] font-sans uppercase">
+                  <span className="text-[#8fa2bd] text-[10px] font-mono uppercase">
                     {leadItem.source}
                   </span>
                   <GroundingBadge grounding={leadItem.summary?.grounding} verificationMethod={leadItem.summary?.verification_method} />
                 </div>
 
                 {leadItem.created_at && (
-                  <span className="text-[11px] font-mono text-zinc-400 flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-zinc-500" />
+                  <span className="text-[11px] font-mono text-[#8fa2bd] flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-[#0194a8]" />
                     {new Date(leadItem.created_at).toLocaleDateString('en-GB', {
                       day: '2-digit',
                       month: 'short',
@@ -981,12 +982,11 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                 )}
               </div>
 
-              {/* Lead Headline — shares a layoutId with the dossier modal's title so opening it
-                  morphs the text directly into place instead of two disconnected fades. */}
+              {/* Lead Headline */}
               <motion.h2
                 layoutId={`dossier-headline-${leadItem.id}`}
                 onClick={() => setSelectedDossier(leadItem)}
-                className="font-serif text-xl sm:text-2xl md:text-3xl font-bold text-white group-hover:text-[#e0d0ab] transition-colors leading-tight mb-4 cursor-pointer"
+                className="font-serif text-xl sm:text-2xl md:text-3xl font-bold text-[#e8e0cf] group-hover:text-[#e0d0ab] transition-colors leading-tight mb-4 cursor-pointer"
               >
                 {leadItem.headline}
               </motion.h2>
@@ -997,12 +997,12 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                   {leadItem.summary.bullets.slice(0, 3).map((bullet, idx) => {
                     const claim = (leadItem.summary?.claims || []).find((c) => c.text?.trim() === bullet?.trim()) || (leadItem.summary?.claims || [])[idx];
                     return (
-                      <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-zinc-300 font-sans leading-relaxed">
-                        <span className="text-[#e0d0ab] font-bold mt-0.5 select-none">&bull;</span>
-                        <p>
-                          {bullet}
-                          {claim && <SourceAnchor claim={claim} />}
-                        </p>
+                      <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#9fb0c8] font-sans leading-relaxed">
+                        <span className="text-[#0194a8] font-bold mt-0.5 select-none text-[11px]">&bull;</span>
+                        <div className="flex-1 min-w-0">
+                          <span>{bullet}</span>
+                          {claim && <span className="inline-block ml-1.5 align-middle"><SourceAnchor claim={claim} /></span>}
+                        </div>
                       </div>
                     );
                   })}
@@ -1013,16 +1013,16 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               <ContestedCard contested={leadItem.summary?.contested} />
 
               {/* Footer Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-zinc-800/80 font-sans">
+              <div className="flex items-center justify-between pt-4 border-t border-[rgba(19,108,153,0.35)] font-sans">
                 <div className="flex items-center gap-4">
                   <motion.button
                     onClick={() => toggleBookmark(leadItem.id || '')}
                     disabled={savingArticleIds.has(leadItem.id || '')}
                     whileTap={prefersReducedMotion ? undefined : { scale: 0.8 }}
-                    className={`inline-flex items-center gap-1.5 text-xs font-sans font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
+                    className={`inline-flex items-center gap-1.5 text-xs font-mono font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
                       savedArticleIds.has(leadItem.id || '')
                         ? 'text-emerald-400 hover:text-emerald-300'
-                        : 'text-zinc-400 hover:text-[#e0d0ab]'
+                        : 'text-[#8fa2bd] hover:text-[#e0d0ab]'
                     }`}
                   >
                     <motion.span
@@ -1043,10 +1043,10 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
                   <button
                     onClick={() => setSelectedDossier(leadItem)}
-                    className="text-xs font-sans text-zinc-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1"
+                    className="text-xs font-mono text-[#8fa2bd] hover:text-white transition-colors cursor-pointer flex items-center gap-1"
                   >
                     <span>Read Full Brief</span>
-                    <ChevronRight className="w-3.5 h-3.5 text-[#e0d0ab]" />
+                    <ChevronRight className="w-3.5 h-3.5 text-[#0194a8]" />
                   </button>
                 </div>
 
@@ -1055,7 +1055,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                     href={leadItem.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-sans text-[#e0d0ab] hover:underline cursor-pointer"
+                    className="inline-flex items-center gap-1 text-xs font-mono text-[#e0d0ab] hover:underline cursor-pointer"
                   >
                     <span>Gov Source</span>
                     <ArrowUpRight className="w-3.5 h-3.5" />
@@ -1067,12 +1067,12 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
 
           {/* 2. CHRONOLOGICAL GAZETTE FEED */}
           <div>
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3 mb-6 font-sans">
+            <div className="flex items-center justify-between border-b border-[rgba(19,108,153,0.35)] pb-3 mb-6 font-sans">
               <h3 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab] flex items-center gap-2">
-                <Layers className="w-3.5 h-3.5" />
+                <Layers className="w-3.5 h-3.5 text-[#0194a8]" />
                 <span>Latest Briefs <span className="font-mono">({displayedItems.length})</span></span>
               </h3>
-              <span className="text-[10px] font-sans text-zinc-500">
+              <span className="text-[10px] font-mono text-[#8fa2bd]">
                 Page <span className="font-mono">{page + 1}</span> &bull; Sorted by Recency
               </span>
             </div>
@@ -1090,19 +1090,19 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                     whileHover={prefersReducedMotion ? undefined : { y: -4, scale: 1.012 }}
                     whileTap={prefersReducedMotion ? undefined : { scale: 0.985 }}
                     transition={{ delay: Math.min(idx * 0.03, 0.3), type: 'spring', stiffness: 340, damping: 30 }}
-                    className="bg-zinc-900/25 hover:bg-zinc-900/50 border border-zinc-800/80 hover:border-[#e0d0ab]/40 p-5 rounded-sm flex flex-col justify-between transition-colors duration-200 group backdrop-blur-sm"
+                    className="bg-[rgba(4,25,54,0.7)] hover:bg-[rgba(7,36,75,0.8)] border border-[rgba(19,108,153,0.35)] hover:border-[#e0d0ab]/50 p-5 rounded-xs flex flex-col justify-between transition-all duration-200 group backdrop-blur-xl shadow-md"
                   >
                     <div>
                       {/* Meta Tags */}
                       <div className="flex items-center justify-between gap-2 mb-3 font-sans">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="px-2 py-0.5 bg-zinc-800/90 text-[#e0d0ab] text-[10px] font-sans uppercase tracking-wider rounded-sm border border-zinc-700/60 truncate max-w-[180px]">
+                          <span className="px-2 py-0.5 bg-[rgba(11,61,120,0.3)] text-[#e0d0ab] text-[10px] font-mono uppercase tracking-wider rounded-xs border border-[rgba(19,108,153,0.35)] truncate max-w-[180px]">
                             {item.ministry}
                           </span>
                           <GroundingBadge grounding={item.summary?.grounding} verificationMethod={item.summary?.verification_method} />
                         </div>
                         {item.created_at && (
-                          <span className="text-[10px] font-mono text-zinc-500">
+                          <span className="text-[10px] font-mono text-[#8fa2bd]">
                             {new Date(item.created_at).toLocaleDateString('en-GB', {
                               day: '2-digit',
                               month: 'short',
@@ -1111,11 +1111,11 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                         )}
                       </div>
 
-                      {/* Headline — shares a layoutId with the dossier modal title (see lead story) */}
+                      {/* Headline */}
                       <motion.h4
                         layoutId={`dossier-headline-${articleId}`}
                         onClick={() => setSelectedDossier(item)}
-                        className="font-serif text-sm font-bold text-stone-100 group-hover:text-[#e0d0ab] transition-colors leading-snug mb-3 cursor-pointer"
+                        className="font-serif text-sm font-bold text-[#e8e0cf] group-hover:text-[#e0d0ab] transition-colors leading-snug mb-3 cursor-pointer"
                       >
                         {item.headline}
                       </motion.h4>
@@ -1126,12 +1126,12 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                           {item.summary.bullets.slice(0, 2).map((b, bIdx) => {
                             const claim = (item.summary?.claims || []).find((c) => c.text?.trim() === b?.trim()) || (item.summary?.claims || [])[bIdx];
                             return (
-                              <li key={bIdx} className="text-xs text-zinc-400 font-sans leading-relaxed flex items-start gap-2">
-                                <span className="text-[#e0d0ab] font-bold mt-0.5 select-none">•</span>
-                                <span className="line-clamp-2">
-                                  {b}
-                                  {claim && <SourceAnchor claim={claim} />}
-                                </span>
+                              <li key={bIdx} className="text-xs text-[#9fb0c8] font-sans leading-relaxed flex items-start gap-2">
+                                <span className="text-[#0194a8] font-bold mt-0.5 select-none text-[10px]">•</span>
+                                <div className="flex-1 min-w-0">
+                                  <span className="line-clamp-2 inline">{b}</span>
+                                  {claim && <span className="inline-block ml-1.5 align-middle"><SourceAnchor claim={claim} /></span>}
+                                </div>
                               </li>
                             );
                           })}
@@ -1143,13 +1143,13 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                     </div>
 
                     {/* Action Bar */}
-                    <div className="flex items-center justify-between pt-3 border-t border-zinc-800/60 text-xs font-sans">
+                    <div className="flex items-center justify-between pt-3 border-t border-[rgba(19,108,153,0.3)] text-xs font-sans">
                       <motion.button
                         onClick={() => toggleBookmark(articleId)}
                         disabled={savingArticleIds.has(articleId)}
                         whileTap={prefersReducedMotion ? undefined : { scale: 0.8 }}
-                        className={`inline-flex items-center gap-1 font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
-                          isSaved ? 'text-emerald-400' : 'text-zinc-500 hover:text-[#e0d0ab]'
+                        className={`inline-flex items-center gap-1 font-mono text-[11px] font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
+                          isSaved ? 'text-emerald-400' : 'text-[#8fa2bd] hover:text-[#e0d0ab]'
                         }`}
                       >
                         <motion.span
@@ -1167,7 +1167,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                       <div className="flex items-center gap-3">
                         <button
                           onClick={() => setSelectedDossier(item)}
-                          className="text-zinc-400 hover:text-stone-100 transition-colors cursor-pointer"
+                          className="font-mono text-[11px] text-[#8fa2bd] hover:text-white transition-colors cursor-pointer"
                         >
                           Full Brief
                         </button>
@@ -1176,7 +1176,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                             href={item.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[#e0d0ab] hover:underline flex items-center gap-0.5 cursor-pointer"
+                            className="font-mono text-[11px] text-[#e0d0ab] hover:underline flex items-center gap-0.5 cursor-pointer"
                           >
                             <span>Source</span>
                             <ArrowUpRight className="w-3 h-3" />

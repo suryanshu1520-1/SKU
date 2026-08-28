@@ -298,38 +298,12 @@ export default function Arena({
 
   // Start Assessment Triggers
   const handleBeginAssessment = () => {
-    if (userLimits && userLimits.tier !== 'premium' && userLimits.vanguardUsed >= 3) {
-      if (onNavigateManifesto) onNavigateManifesto();
-      return;
-    }
     setIsRanked(true);
     setMotivation(getRandomMotivation());
     setShowPreflightModal(true);
   };
 
   const handleTrainingGround = async () => {
-    let tier = 'free';
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const { data } = await supabase
-          .from('user_profiles')
-          .select('membership_tier')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
-        if (data) {
-          tier = data.membership_tier || 'free';
-        }
-      }
-    } catch {
-      // Free fallback
-    }
-
-    if (tier !== 'premium') {
-      if (onNavigateManifesto) onNavigateManifesto();
-      return;
-    }
-
     setIsRanked(false);
     setLoadingSubjects(true);
     try {
@@ -1038,11 +1012,6 @@ export default function Arena({
               <p className="text-xs font-sans text-zinc-400 leading-relaxed">
                 25 multi-domain questions &bull; 20s per question &bull; Negative marking (+2 / -0.66) &bull; Earns Rank Points.
               </p>
-              {userLimits && userLimits.tier !== 'premium' && (
-                <p className="text-[10px] font-sans text-[#e0d0ab] pt-1">
-                  Free tests today: {Math.min(userLimits.vanguardUsed + 1, 3)} of 3 completed
-                </p>
-              )}
             </div>
           </motion.div>
 
