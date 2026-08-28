@@ -1,23 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import {
-  BookOpen,
-  Pin,
-  PinOff,
   Search,
-  Check,
-  Copy,
-  X,
-  ChevronLeft,
-  ChevronRight,
-  Sparkles,
-  ArrowRight,
-  Columns3,
-  Layers,
-  Award,
-  Calendar,
-  ExternalLink,
-  RotateCcw
+  X
 } from 'lucide-react';
 import canonData from '../data/humanities-canon.json';
 import type { HumanitiesCanon, Thinker, Passage, PyqCitation } from '../types/humanities';
@@ -26,7 +10,7 @@ import ThinkerEngravingSvg from './ThinkerEngravingSvg';
 const canon = canonData as HumanitiesCanon;
 
 // Rich thinker metadata definitions
-const THINKER_METADATA: Record<string, { era: string; workShort: string; workYear: number; voice: string; voiceCite?: { paper: string; year: number } }> = {
+const THINKER_METADATA: Record<string, { era: string; workShort: string; workYear: number; voice: string; voiceCite: { paper: string; year: number } }> = {
   ambedkar: {
     era: '1891–1956',
     workShort: 'Annihilation of Caste',
@@ -50,20 +34,20 @@ const THINKER_METADATA: Record<string, { era: string; workShort: string; workYea
   }
 };
 
-// Ambient floating particles coordinates
-const AMBIENT_DOTS = [
-  { left: '6%', top: '18%', size: 2.5, animDuration: 9 },
-  { left: '14%', top: '62%', size: 1.5, animDuration: 11 },
-  { left: '23%', top: '34%', size: 2, animDuration: 13 },
-  { left: '31%', top: '78%', size: 1.5, animDuration: 8 },
-  { left: '39%', top: '12%', size: 2.5, animDuration: 12 },
-  { left: '47%', top: '55%', size: 1.5, animDuration: 10 },
-  { left: '56%', top: '26%', size: 2, animDuration: 14 },
-  { left: '63%', top: '70%', size: 1.5, animDuration: 9 },
-  { left: '71%', top: '40%', size: 2, animDuration: 12 },
-  { left: '79%', top: '15%', size: 1.5, animDuration: 11 },
-  { left: '86%', top: '60%', size: 2, animDuration: 13 },
-  { left: '93%', top: '33%', size: 1.5, animDuration: 10 }
+const GOLD = '#e0d0ab';
+const DOTS = [
+  [6, 18, 2, 9],
+  [14, 62, 1.5, 11],
+  [23, 34, 2, 13],
+  [31, 78, 1.5, 8],
+  [39, 12, 2.5, 12],
+  [47, 55, 1.5, 10],
+  [56, 26, 2, 14],
+  [63, 70, 1.5, 9],
+  [71, 40, 2, 12],
+  [79, 15, 1.5, 11],
+  [86, 60, 2, 13],
+  [93, 33, 1.5, 10]
 ];
 
 const PAPERS = ['GS-I', 'GS-IV'];
@@ -83,271 +67,470 @@ export function isPassagePinned(pinnedList: Passage[], passageId: string): boole
 }
 
 export default function HumanitiesReader() {
-  // Navigation & View Mode
   const [mode, setMode] = useState<'hall' | 'read'>('hall');
-  const [activeThinkerId, setActiveThinkerId] = useState<string>('ambedkar');
-  const [readThinkerId, setReadThinkerId] = useState<string>('ambedkar');
-  const [readPassageIdx, setReadPassageIdx] = useState<number>(0);
-
-  // Bench / Pinned State
-  const [pinnedPassages, setPinnedPassages] = useState<Passage[]>([]);
+  const [activeId, setActiveId] = useState<string>('ambedkar');
+  const [readId, setReadId] = useState<string>('ambedkar');
+  const [readIdx, setReadIdx] = useState<number>(0);
+  const [pinned, setPinned] = useState<string[]>([]);
+  const [query, setQuery] = useState<string>('');
+  const [paper, setPaper] = useState<string>('ALL');
+  const [year, setYear] = useState<string>('ALL');
   const [benchOpen, setBenchOpen] = useState<boolean>(false);
-
-  // Search & Lens Filters
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedPaper, setSelectedPaper] = useState<string>('ALL');
-  const [selectedYear, setSelectedYear] = useState<string>('ALL');
-
-  // Interactive typewriter & UI state
-  const [typedLength, setTypedLength] = useState<number>(0);
+  const [typed, setTyped] = useState<number>(0);
+  const [reduced, setReduced] = useState<boolean>(false);
+  const [vw, setVw] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 1280);
   const [copiedPassage, setCopiedPassage] = useState<boolean>(false);
   const [copiedSynthesis, setCopiedSynthesis] = useState<boolean>(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState<boolean>(false);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Detect reduced motion preferences
+  // Resize & Reduced Motion listeners
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
+    setReduced(mq.matches);
+    const onMq = (e: MediaQueryListEvent) => setReduced(e.matches);
+    mq.addEventListener('change', onMq);
+
+    const onResize = () => setVw(window.innerWidth);
+    window.addEventListener('resize', onResize);
+
+    return () => {
+      mq.removeEventListener('change', onMq);
+      window.removeEventListener('resize', onResize);
+    };
   }, []);
 
-  const activeThinker = useMemo(() => {
-    return canon.thinkers.find((t) => t.id === activeThinkerId) || canon.thinkers[0];
-  }, [activeThinkerId]);
-
-  const readThinker = useMemo(() => {
-    return canon.thinkers.find((t) => t.id === readThinkerId) || canon.thinkers[0];
-  }, [readThinkerId]);
-
-  const currentPassage = useMemo(() => {
-    if (!readThinker || !readThinker.passages.length) return null;
-    const safeIdx = Math.min(Math.max(0, readPassageIdx), readThinker.passages.length - 1);
-    return readThinker.passages[safeIdx];
-  }, [readThinker, readPassageIdx]);
+  const findThinker = useCallback((id: string): Thinker => {
+    return canon.thinkers.find((x) => x.id === id) || canon.thinkers[0];
+  }, []);
 
   // Voice typewriter effect when attending a thinker
   useEffect(() => {
-    const meta = THINKER_METADATA[activeThinkerId];
+    const meta = THINKER_METADATA[activeId];
     if (!meta || !meta.voice) return;
 
-    if (prefersReducedMotion) {
-      setTypedLength(meta.voice.length);
+    if (reduced) {
+      setTyped(meta.voice.length);
       return;
     }
 
-    setTypedLength(0);
-    const speed = 18; // ms per char
-    const interval = setInterval(() => {
-      setTypedLength((prev) => {
+    setTyped(0);
+    const step = 17;
+    const voiceInterval = setInterval(() => {
+      setTyped((prev) => {
         if (prev >= meta.voice.length) {
-          clearInterval(interval);
+          clearInterval(voiceInterval);
           return prev;
         }
         return prev + 1;
       });
-    }, speed);
+    }, step);
 
-    return () => clearInterval(interval);
-  }, [activeThinkerId, prefersReducedMotion]);
+    return () => clearInterval(voiceInterval);
+  }, [activeId, reduced]);
 
-  // Match test for lens & search
-  const matchesPassage = useCallback(
-    (thinker: Thinker, passage: Passage) => {
-      if (selectedPaper !== 'ALL') {
-        const hasPaper = passage.pyqCitations.some((c) => c.paper === selectedPaper);
-        if (!hasPaper) return false;
-      }
-      if (selectedYear !== 'ALL') {
-        const hasYear = passage.pyqCitations.some((c) => String(c.year) === selectedYear);
-        if (!hasYear) return false;
-      }
-      const q = searchQuery.trim().toLowerCase();
-      if (q) {
-        const textToSearch = (
-          passage.text +
-          ' ' +
-          thinker.name +
-          ' ' +
-          thinker.workTitle +
-          ' ' +
-          passage.pyqCitations.map((c) => `${c.paper} ${c.year} ${c.note || ''}`).join(' ')
-        ).toLowerCase();
-        if (!textToSearch.includes(q)) return false;
-      }
-      return true;
-    },
-    [selectedPaper, selectedYear, searchQuery]
-  );
-
-  // Total matching passage count across the entire canon
-  const totalMatchesCount = useMemo(() => {
-    let count = 0;
-    canon.thinkers.forEach((t) => {
-      t.passages.forEach((p) => {
-        if (matchesPassage(t, p)) count++;
-      });
-    });
-    return count;
-  }, [matchesPassage]);
-
-  const hasActiveLens = selectedPaper !== 'ALL' || selectedYear !== 'ALL' || searchQuery.trim().length > 0;
-
-  // Actions
-  const handleAttendThinker = (thinkerId: string) => {
-    if (activeThinkerId !== thinkerId) {
-      setActiveThinkerId(thinkerId);
-    }
+  const attend = (id: string) => {
+    if (activeId === id) return;
+    setActiveId(id);
   };
 
-  const handleOpenReadingChamber = (thinkerId: string, passageIndex: number = 0) => {
-    setReadThinkerId(thinkerId);
-    setActiveThinkerId(thinkerId);
-    setReadPassageIdx(passageIndex);
+  const openRead = (id: string, idx: number = 0) => {
     setMode('read');
+    setReadId(id);
+    setReadIdx(idx);
+    setActiveId(id);
   };
 
-  const handleExitReadingChamber = () => {
+  const exitRead = () => {
     setMode('hall');
   };
 
-  const handleStepPassage = (delta: number) => {
-    if (!readThinker || !readThinker.passages.length) return;
-    const n = readThinker.passages.length;
-    setReadPassageIdx((prev) => (prev + delta + n) % n);
+  const stepPassage = (delta: number) => {
+    const t = findThinker(readId);
+    const n = t.passages.length;
+    setReadIdx((prev) => (prev + delta + n) % n);
   };
 
-  const handleStepThinkerInHall = (delta: number) => {
-    const idx = canon.thinkers.findIndex((t) => t.id === activeThinkerId);
-    const n = canon.thinkers.length;
-    const nextThinker = canon.thinkers[(idx + delta + n) % n];
-    if (nextThinker) {
-      setActiveThinkerId(nextThinker.id);
+  const stepThinker = (delta: number) => {
+    const list = canon.thinkers;
+    const i = list.findIndex((x) => x.id === activeId);
+    const next = list[(i + delta + list.length) % list.length];
+    if (mode === 'read') {
+      openRead(next.id, 0);
+    } else {
+      attend(next.id);
     }
   };
 
-  const handleTogglePinCurrent = (passageToPin?: Passage) => {
-    const target = passageToPin || currentPassage;
-    if (!target) return;
-    setPinnedPassages((prev) => togglePinPassage(prev, target));
+  const togglePin = (pid: string) => {
+    setPinned((prev) =>
+      prev.includes(pid) ? prev.filter((x) => x !== pid) : [...prev, pid]
+    );
   };
 
-  const handleCopyPassage = () => {
-    if (!currentPassage || !readThinker) return;
-    const cite = currentPassage.pyqCitations[0];
-    const citeTail = cite ? ` [UPSC ${cite.paper} ${cite.year}]` : '';
-    const formatted = `"${currentPassage.text}"\n— ${readThinker.name}, ${readThinker.workTitle} (${readThinker.year})${citeTail}`;
+  const current = useCallback(() => {
+    const t = findThinker(readId);
+    const p = t.passages[Math.min(readIdx, t.passages.length - 1)] || t.passages[0];
+    return { t, p };
+  }, [readId, readIdx, findThinker]);
 
-    navigator.clipboard?.writeText(formatted).then(() => {
-      setCopiedPassage(true);
-      setTimeout(() => setCopiedPassage(false), 2000);
-    });
+  const copyPassage = () => {
+    const { t, p } = current();
+    const c = p.pyqCitations[0];
+    const tail = c ? ` [UPSC ${c.paper} ${c.year}]` : '';
+    const text = `"${p.text}"\n— ${t.name}, ${t.workTitle} (${t.year})${tail}`;
+    try {
+      navigator.clipboard.writeText(text);
+    } catch {}
+    setCopiedPassage(true);
+    setTimeout(() => setCopiedPassage(false), 1700);
   };
 
-  const handleCopySynthesis = () => {
-    if (pinnedPassages.length === 0) return;
-    let out = '# Cross-Thinker Dialectic Synthesis (Tark Canon)\n\n';
+  const copySynthesis = () => {
+    let out = '# Cross-thinker synthesis\n\n';
     canon.thinkers.forEach((t) => {
-      const items = t.passages.filter((p) => pinnedPassages.some((pinned) => pinned.id === p.id));
+      const items = t.passages.filter((p) => pinned.includes(p.id));
       if (!items.length) return;
-      out += `## ${t.name} — ${t.workTitle} (${t.year})\n\n`;
+      out += `## ${t.name} — ${t.workTitle} (${t.year})\n`;
       items.forEach((p) => {
         out += `> "${p.text}"\n`;
         p.pyqCitations.forEach((c) => {
-          out += `> — UPSC ${c.paper} ${c.year}${c.note ? ` (${c.note})` : ''}\n`;
+          out += `> — UPSC ${c.paper} ${c.year}\n`;
         });
         out += '\n';
       });
     });
-
-    navigator.clipboard?.writeText(out).then(() => {
-      setCopiedSynthesis(true);
-      setTimeout(() => setCopiedSynthesis(false), 2000);
-    });
+    try {
+      navigator.clipboard.writeText(out);
+    } catch {}
+    setCopiedSynthesis(true);
+    setTimeout(() => setCopiedSynthesis(false), 1700);
   };
 
-  const handleClearLens = () => {
-    setSelectedPaper('ALL');
-    setSelectedYear('ALL');
-    setSearchQuery('');
-  };
-
-  // Global Keyboard Shortcuts
+  // Keyboard navigation
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-        if (e.key === 'Escape') target.blur();
+    const handleKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA') {
+        if (e.key === 'Escape') (e.target as HTMLElement).blur();
         return;
       }
 
-      if (e.key === '/') {
+      const k = e.key;
+      if (k === '/') {
         e.preventDefault();
         searchInputRef.current?.focus();
         return;
       }
-
-      if (e.key === 'b' || e.key === 'B') {
+      if (k === 'b' || k === 'B') {
         e.preventDefault();
         setBenchOpen((prev) => !prev);
         return;
       }
 
       if (mode === 'hall') {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        if (k === 'ArrowRight' || k === 'ArrowDown') {
           e.preventDefault();
-          handleStepThinkerInHall(1);
-        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          stepThinker(1);
+        } else if (k === 'ArrowLeft' || k === 'ArrowUp') {
           e.preventDefault();
-          handleStepThinkerInHall(-1);
-        } else if (e.key === 'Enter') {
+          stepThinker(-1);
+        } else if (k === 'Enter') {
           e.preventDefault();
-          handleOpenReadingChamber(activeThinkerId, 0);
+          openRead(activeId, 0);
         }
-      } else if (mode === 'read') {
-        if (e.key === 'Escape') {
+      } else {
+        if (k === 'Escape') {
           e.preventDefault();
-          handleExitReadingChamber();
-        } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          exitRead();
+        } else if (k === 'ArrowRight' || k === 'ArrowDown') {
           e.preventDefault();
-          handleStepPassage(1);
-        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          stepPassage(1);
+        } else if (k === 'ArrowLeft' || k === 'ArrowUp') {
           e.preventDefault();
-          handleStepPassage(-1);
-        } else if (e.key === 'p' || e.key === 'P') {
+          stepPassage(-1);
+        } else if (k === 'p' || k === 'P') {
           e.preventDefault();
-          handleTogglePinCurrent();
-        } else if (e.key === 'c' || e.key === 'C') {
+          const { p } = current();
+          togglePin(p.id);
+        } else if (k === 'c' || k === 'C') {
           e.preventDefault();
-          handleCopyPassage();
+          copyPassage();
         }
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [mode, activeThinkerId, readPassageIdx, currentPassage, readThinker]);
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [mode, activeId, readId, readIdx, current]);
+
+  const matchesWith = useCallback(
+    (t: Thinker, p: Passage, s: { paper: string; year: string; query: string }) => {
+      if (s.paper !== 'ALL' && !p.pyqCitations.some((c) => c.paper === s.paper)) return false;
+      if (s.year !== 'ALL' && !p.pyqCitations.some((c) => String(c.year) === s.year)) return false;
+      const q = (s.query || '').trim().toLowerCase();
+      if (q) {
+        const hay = (
+          p.text +
+          ' ' +
+          t.name +
+          ' ' +
+          t.workTitle +
+          ' ' +
+          p.pyqCitations.map((c) => `${c.paper} ${c.year} ${c.note || ''}`).join(' ')
+        ).toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    },
+    []
+  );
+
+  const matches = useCallback(
+    (t: Thinker, p: Passage) => {
+      return matchesWith(t, p, { paper, year, query });
+    },
+    [paper, year, query, matchesWith]
+  );
+
+  const applyLens = (patch: Partial<{ paper: string; year: string; query: string }>) => {
+    const next = { paper, year, query, ...patch };
+    if (patch.paper !== undefined) setPaper(patch.paper);
+    if (patch.year !== undefined) setYear(patch.year);
+    if (patch.query !== undefined) setQuery(patch.query);
+
+    const list = canon.thinkers;
+    const stillHas = (t: Thinker) => t.passages.some((p) => matchesWith(t, p, next));
+    const active = findThinker(activeId);
+    if (active && !stillHas(active)) {
+      const first = list.find(stillHas);
+      if (first) {
+        setActiveId(first.id);
+      }
+    }
+  };
+
+  const list = canon.thinkers;
+  const narrow = vw < 900;
+  const ambient = !reduced;
+  const measure = '690px';
+
+  const lensOn = paper !== 'ALL' || year !== 'ALL' || !!query.trim();
+  let hits = 0;
+  list.forEach((t) => {
+    t.passages.forEach((p) => {
+      if (matches(t, p)) hits++;
+    });
+  });
+
+  const dots = DOTS.map((d) => ({
+    left: `${d[0]}%`,
+    top: `${d[1]}%`,
+    size: `${d[2]}px`,
+    anim: ambient ? `drift ${d[3]}s ease-in-out infinite` : 'none'
+  }));
+
+  const lenses = [
+    { label: 'ALL', on: paper === 'ALL' && year === 'ALL', act: () => applyLens({ paper: 'ALL', year: 'ALL' }) },
+    ...PAPERS.map((p) => ({ label: p, on: paper === p, act: () => applyLens({ paper: paper === p ? 'ALL' : p }) })),
+    ...YEARS.map((y) => ({ label: String(y), on: year === String(y), act: () => applyLens({ year: year === String(y) ? 'ALL' : String(y) }) }))
+  ];
+
+  const thinkers = list.map((t) => {
+    const isActive = t.id === activeId;
+    const meta = THINKER_METADATA[t.id] || {
+      era: 'Canonical Era',
+      workShort: t.workTitle,
+      workYear: t.year,
+      voice: t.passages[0]?.text.slice(0, 120) || '',
+      voiceCite: { paper: 'GS-IV', year: 2021 }
+    };
+
+    const tHits = t.passages.filter((p) => matches(t, p));
+    const faded = lensOn && tHits.length === 0;
+    const done = typed >= meta.voice.length;
+    const typedText = isActive ? meta.voice.slice(0, typed) : '';
+
+    const open = () => openRead(t.id, 0);
+    const attendOrOpen = () => {
+      if (isActive) open();
+      else attend(t.id);
+    };
+
+    return {
+      id: t.id,
+      name: t.name,
+      era: meta.era,
+      work: meta.workShort,
+      workYear: meta.workYear,
+      aria: `${t.name}, ${meta.workShort} — ${t.passages.length} passages`,
+      isActive,
+      isDim: !isActive,
+      typed: typedText,
+      caretDisplay: !done && !reduced ? 'inline-block' : 'none',
+      stampOpacity: done ? 1 : 0,
+      stamp: `UPSC ${meta.voiceCite.paper} · ${meta.voiceCite.year}`,
+      leaderAnim: done && !reduced ? 'leader .5s ease-out both' : 'none',
+      voiceSize: narrow ? '15px' : '19px',
+      flex: narrow ? '0 0 auto' : (isActive ? '2.5' : '1'),
+      minH: narrow ? 'auto' : '470px',
+      pad: narrow ? '20px 18px' : (isActive ? '44px 34px 30px' : '44px 16px 26px'),
+      innerDir: narrow ? ('row' as const) : ('column' as const),
+      innerAlign: narrow ? ('flex-start' as const) : (isActive ? ('flex-start' as const) : ('center' as const)),
+      innerGap: narrow ? '15px' : '20px',
+      textAlign: narrow ? ('flex-start' as const) : (isActive ? ('flex-start' as const) : ('center' as const)),
+      textAlignCss: narrow ? ('left' as const) : (isActive ? ('left' as const) : ('center' as const)),
+      portraitPx: narrow ? '76px' : (isActive ? '196px' : '116px'),
+      nameSize: narrow ? '17px' : (isActive ? '30px' : '17px'),
+      nameColor: isActive ? GOLD : '#c8b998',
+      workColor: '#9fb0c8',
+      metaColor: isActive ? '#9fb0c8' : '#8fa2bd',
+      citeCount: `${tHits.length} ${lensOn ? 'MATCH' : 'PYQ'}`,
+      border: isActive ? 'rgba(224,208,171,.5)' : 'rgba(19,108,153,.5)',
+      bg: isActive
+        ? 'linear-gradient(165deg,rgba(11,61,120,.55) 0%,rgba(4,25,54,.9) 100%)'
+        : 'rgba(4,25,54,.45)',
+      shadow: isActive ? '0 26px 70px rgba(0,0,0,.5), inset 0 1px 0 rgba(224,208,171,.14)' : 'none',
+      opacity: faded ? (isActive ? '0.55' : '0.3') : '1',
+      stroke: isActive ? GOLD : '#0194a8',
+      stroke2: isActive ? '#c8b998' : '#136c99',
+      accent: isActive ? GOLD : '#0194a8',
+      lensFill: isActive ? 'rgba(224,208,171,.1)' : 'none',
+      guideOpacity: isActive ? 0.26 : 0.12,
+      portraitGlow: isActive ? 'drop-shadow(0 0 26px rgba(224,208,171,.22))' : 'none',
+      dimHint: faded ? 'no match in this lens' : 'attend →',
+      onAttend: () => attend(t.id),
+      onAttendOrOpen: attendOrOpen,
+      ticks: t.passages.map((p, i) => {
+        const hit = matches(t, p);
+        const go = () => openRead(t.id, i);
+        return {
+          id: p.id,
+          label: `§${String(i + 1).padStart(2, '0')}`,
+          onClick: (e: React.MouseEvent) => {
+            e.stopPropagation();
+            go();
+          },
+          bg: pinned.includes(p.id) ? 'rgba(224,208,171,.16)' : 'rgba(3,18,42,.55)',
+          color: hit ? '#c8b998' : '#8fa2bd',
+          border: hit ? 'rgba(1,148,168,.5)' : 'rgba(19,108,153,.35)'
+        };
+      })
+    };
+  });
+
+  const { t: rt, p: rp } = current();
+  const read = rt && rp ? {
+    id: rt.id,
+    thinkerName: rt.name,
+    workTitle: rt.workTitle,
+    workYear: rt.year,
+    pdBasis: rt.publicDomainBasis,
+    dropCap: rp.text.trim().charAt(0),
+    body: rp.text.trim().slice(1),
+    indexLabel: `PASSAGE ${String(readIdx + 1).padStart(2, '0')} OF ${String(rt.passages.length).padStart(2, '0')}`,
+    progress: `${Math.round(((readIdx + 1) / rt.passages.length) * 100)}%`,
+    hasCite: rp.pyqCitations.length > 0,
+    noCite: rp.pyqCitations.length === 0,
+    citations: rp.pyqCitations,
+    pinLabel: pinned.includes(rp.id) ? '✓ On the bench' : 'Pin to bench · P',
+    pinBg: pinned.includes(rp.id) ? GOLD : 'transparent',
+    pinColor: pinned.includes(rp.id) ? '#072e63' : GOLD,
+    pinBorder: GOLD,
+    copyLabel: copiedPassage ? '✓ Copied' : 'Copy for answer · C',
+    onPin: () => togglePin(rp.id),
+    onCopy: () => copyPassage()
+  } : null;
+
+  const benchGroups = list
+    .map((t) => {
+      const items = t.passages.filter((p) => pinned.includes(p.id));
+      if (!items.length) return null;
+      return {
+        name: t.name,
+        work: `${t.workTitle} · ${t.year}`,
+        items: items.map((p) => {
+          const idx = t.passages.indexOf(p);
+          const go = () => {
+            openRead(t.id, idx);
+            setBenchOpen(false);
+          };
+          const rm = () => togglePin(p.id);
+          return {
+            id: p.id,
+            cite: p.pyqCitations.length
+              ? `UPSC ${p.pyqCitations[0].paper} · ${p.pyqCitations[0].year}`
+              : 'NO PYQ CITATION',
+            snippet: `“${p.text.slice(0, 170).trim()}…”`,
+            onOpen: go,
+            onRemove: rm
+          };
+        })
+      };
+    })
+    .filter(Boolean);
+
+  const benchChips: Array<{ label: string; onOpen: () => void }> = [];
+  list.forEach((t) => {
+    t.passages.forEach((p, i) => {
+      if (!pinned.includes(p.id)) return;
+      const go = () => openRead(t.id, i);
+      benchChips.push({
+        label: `${t.name.split(' ').pop()?.toUpperCase()} §${String(i + 1).padStart(2, '0')}`,
+        onOpen: go
+      });
+    });
+  });
+
+  const spine = list.map((t) => {
+    const go = () => openRead(t.id, 0);
+    const on = t.id === readId;
+    return {
+      id: t.id,
+      name: t.name,
+      onClick: go,
+      bar: on ? GOLD : 'rgba(19,108,153,.6)',
+      bg: on ? 'rgba(224,208,171,.08)' : 'transparent',
+      color: on ? GOLD : '#9fb0c8'
+    };
+  });
+
+  const matchLine = !lensOn
+    ? `${list.length} thinkers · ${list.reduce((a, t) => a + t.passages.length, 0)} verbatim passages`
+    : hits === 0
+    ? 'No passage was asked under this combination'
+    : `${hits} passage${hits === 1 ? '' : 's'} match this lens`;
+
+  const matchColor = !lensOn ? '#9fb0c8' : hits === 0 ? '#e14e4e' : GOLD;
+  const showClear = lensOn;
 
   return (
-    <div className="relative min-h-[90vh] bg-radial-[120%_78%_at_50%_0%] from-[#0b3d78] via-[#072e63] to-[#041d40] text-stone-200 font-sans pb-32 overflow-x-hidden selection:bg-[#e0d0ab] selection:text-[#072e63]">
+    <div className="relative min-h-screen bg-[#041d40] text-stone-200 font-sans pb-28 overflow-x-hidden selection:bg-[#e0d0ab] selection:text-[#072e63]"
+         style={{ background: 'radial-gradient(120% 78% at 50% 0%, #0b3d78 0%, #072e63 40%, #041d40 100%)' }}>
+
+      {/* ── Keyframe Animations embedded ── */}
+      <style>{`
+        @keyframes drift { 0% { transform: translateY(0); opacity: .35; } 50% { transform: translateY(-16px); opacity: .9; } 100% { transform: translateY(0); opacity: .35; } }
+        @keyframes caret { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+        @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes leader { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+      `}</style>
+
       {/* ── Ambient Constellation Particle Atmosphere ── */}
       <div aria-hidden="true" className="absolute inset-0 pointer-events-none overflow-hidden">
-        {AMBIENT_DOTS.map((d, idx) => (
+        {dots.map((d, idx) => (
           <span
             key={idx}
             style={{
               position: 'absolute',
               left: d.left,
               top: d.top,
-              width: `${d.size}px`,
-              height: `${d.size}px`,
+              width: d.size,
+              height: d.size,
               borderRadius: '50%',
               backgroundColor: '#7fd4e0',
-              opacity: 0.35,
-              animation: prefersReducedMotion ? 'none' : `pulse ${d.animDuration}s ease-in-out infinite`
+              opacity: 0.4,
+              animation: d.anim
             }}
           />
         ))}
@@ -355,296 +538,420 @@ export default function HumanitiesReader() {
 
       <div
         aria-hidden="true"
-        className="absolute inset-0 pointer-events-none bg-radial-[115%_80%_at_50%_30%] from-transparent via-[rgba(4,29,64,0)] to-[rgba(3,16,38,0.75)]"
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(115% 80% at 50% 32%, rgba(4,29,64,0) 36%, rgba(3,16,38,.78) 100%)' }}
       />
 
       {/* ══════════════════════════════════════════════════════════════════
-          MODE 1: THE PHILOSOPHICAL CANON HALL OF THINKERS
+          MODE 1: THE HALL OF THINKERS
           ══════════════════════════════════════════════════════════════════ */}
       {mode === 'hall' && (
-        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 pt-8 sm:pt-12">
-          {/* Header & Atmospheric Lens Masthead */}
-          <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8 mb-10">
-            <div className="space-y-4 max-w-2xl">
-              <div className="flex items-center gap-3">
-                <span className="w-8 h-px bg-[#0194a8]" />
-                <span className="font-serif text-[11px] uppercase tracking-[0.2em] text-[#0194a8] font-bold">
+        <section
+          className="relative z-10 max-w-[1460px] mx-auto"
+          style={{ padding: narrow ? '30px 18px 26px' : '52px 30px 30px' }}
+        >
+          {/* Header & Lens Control */}
+          <div className="flex items-end justify-between gap-8 flex-wrap mb-8">
+            <div style={{ animation: 'rise .6s ease-out both' }}>
+              <div className="flex items-center gap-2.5 mb-3">
+                <span className="w-[26px] h-px bg-[#0194a8]" />
+                <span className="font-mono text-[9.5px] uppercase tracking-[0.24em] text-[#0194a8]">
                   The Philosophical Canon
                 </span>
               </div>
-              <h1 className="font-serif font-light text-3xl sm:text-4xl md:text-5xl text-[#e0d0ab] leading-[1.1] tracking-tight">
-                Sit with the thinkers <br />
+              <h1
+                className="font-serif font-light text-[#e0d0ab] m-0 tracking-tight"
+                style={{ fontSize: narrow ? '30px' : '52px', lineHeight: 1.1 }}
+              >
+                Sit with the thinkers<br />
                 <span className="italic text-[#9fb0c8]">the examiner keeps returning to.</span>
               </h1>
-              <p className="text-xs sm:text-sm text-[#9fb0c8] leading-relaxed font-sans max-w-xl">
+              <p className="mt-4 m-0 max-w-[540px] text-[13.5px] leading-[1.75] text-[#9fb0c8]">
                 Every line is a verbatim excerpt from the primary text, carrying the exact paper and year it has been drawn from. Give a thinker your attention — hover, tap or tab — and they speak first.
               </p>
             </div>
 
-            {/* Interactive Lens & Search Panel */}
-            <div className="flex flex-col gap-3 min-w-[280px] w-full lg:w-auto lg:max-w-md">
-              {/* Search Bar */}
+            {/* Lens Box */}
+            <div
+              className="flex flex-col gap-3 items-start min-w-[290px]"
+              style={{ flex: narrow ? '1 1 100%' : '0 1 340px' }}
+            >
               <div className="relative w-full">
-                <Search className="w-4 h-4 text-[#0194a8] absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   ref={searchInputRef}
                   type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search the canon — text, thinker or citation (/)"
-                  className="w-full pl-10 pr-8 py-2.5 bg-[#03122a]/80 border border-[#0194a8]/50 focus:border-[#e0d0ab] rounded-sm text-xs text-[#e0d0ab] placeholder-[#8fa2bd] outline-none transition-colors font-sans shadow-inner"
+                  value={query}
+                  onChange={(e) => applyLens({ query: e.target.value })}
+                  placeholder="Search the canon — text, thinker or citation"
+                  className="w-full py-[11px] pr-[14px] pl-[32px] bg-[rgba(3,18,42,.8)] border border-[rgba(1,148,168,.5)] focus:border-[#e0d0ab] rounded-[2px] text-[#e0d0ab] text-[12.5px] outline-none font-sans transition-colors"
                 />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
+                <span className="absolute left-[11px] top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#0194a8] pointer-events-none">
+                  <Search className="w-3.5 h-3.5" />
+                </span>
               </div>
 
-              {/* Lens Filters */}
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="font-mono text-[9.5px] uppercase tracking-wider text-[#8fa2bd] mr-1">
+              <div className="flex flex-wrap gap-[5px] items-center">
+                <span className="font-mono text-[9px] tracking-[0.16em] text-[#8fa2bd] uppercase mr-[3px]">
                   Lens
                 </span>
-
-                <button
-                  onClick={() => {
-                    setSelectedPaper('ALL');
-                    setSelectedYear('ALL');
-                  }}
-                  className={`px-2.5 py-1 rounded-sm font-mono text-[10.5px] transition-all cursor-pointer border ${
-                    selectedPaper === 'ALL' && selectedYear === 'ALL'
-                      ? 'bg-[#e0d0ab] text-[#072e63] border-[#e0d0ab] font-bold shadow-sm'
-                      : 'bg-[#03122a]/60 text-[#9fb0c8] border-[#0194a8]/35 hover:border-[#e0d0ab] hover:text-[#e0d0ab]'
-                  }`}
-                >
-                  ALL
-                </button>
-
-                {PAPERS.map((p) => (
-                  <button
-                    key={p}
-                    onClick={() => setSelectedPaper(selectedPaper === p ? 'ALL' : p)}
-                    className={`px-2.5 py-1 rounded-sm font-mono text-[10.5px] transition-all cursor-pointer border ${
-                      selectedPaper === p
-                        ? 'bg-[#e0d0ab] text-[#072e63] border-[#e0d0ab] font-bold shadow-sm'
-                        : 'bg-[#03122a]/60 text-[#9fb0c8] border-[#0194a8]/35 hover:border-[#e0d0ab] hover:text-[#e0d0ab]'
-                    }`}
+                {lenses.map((l, lIdx) => (
+                  <span
+                    key={lIdx}
+                    role="button"
+                    tabIndex={0}
+                    onClick={l.act}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        l.act();
+                      }
+                    }}
+                    style={{
+                      padding: '4px 9px',
+                      borderRadius: '2px',
+                      cursor: 'pointer',
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: '10.5px',
+                      letterSpacing: '.05em',
+                      border: `1px solid ${l.on ? GOLD : 'rgba(1,148,168,.4)'}`,
+                      background: l.on ? GOLD : 'rgba(3,18,42,.6)',
+                      color: l.on ? '#072e63' : '#9fb0c8',
+                      transition: 'all .2s'
+                    }}
                   >
-                    {p}
-                  </button>
-                ))}
-
-                {YEARS.map((y) => (
-                  <button
-                    key={y}
-                    onClick={() => setSelectedYear(selectedYear === String(y) ? 'ALL' : String(y))}
-                    className={`px-2.5 py-1 rounded-sm font-mono text-[10.5px] transition-all cursor-pointer border ${
-                      selectedYear === String(y)
-                        ? 'bg-[#e0d0ab] text-[#072e63] border-[#e0d0ab] font-bold shadow-sm'
-                        : 'bg-[#03122a]/60 text-[#9fb0c8] border-[#0194a8]/35 hover:border-[#e0d0ab] hover:text-[#e0d0ab]'
-                    }`}
-                  >
-                    {y}
-                  </button>
+                    {l.label}
+                  </span>
                 ))}
               </div>
 
-              {/* Lens Results Feedback */}
-              <div className="flex items-center justify-between text-[10.5px] font-mono">
-                <span className={hasActiveLens ? 'text-[#e0d0ab]' : 'text-[#8fa2bd]'}>
-                  {totalMatchesCount} passages match active lens
+              <div className="flex items-center gap-[9px] flex-wrap">
+                <span className="font-mono text-[10px] tracking-[0.04em]" style={{ color: matchColor }}>
+                  {matchLine}
                 </span>
-                {hasActiveLens && (
-                  <button
-                    onClick={handleClearLens}
-                    className="text-[#9fb0c8] hover:text-[#e0d0ab] underline cursor-pointer"
+                {showClear && (
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => applyLens({ paper: 'ALL', year: 'ALL', query: '' })}
+                    className="font-mono text-[9.5px] tracking-[0.1em] text-[#9fb0c8] hover:text-[#e0d0ab] cursor-pointer border-b border-[rgba(159,176,200,.5)] hover:border-[#e0d0ab]"
                   >
-                    ✕ Clear Lens
-                  </button>
+                    ✕ CLEAR LENS
+                  </span>
                 )}
               </div>
             </div>
           </div>
 
-          {/* ── Thinker Steles / Expanding Stele Row ── */}
-          <div className="grid grid-cols-1 lg:flex lg:flex-row gap-4 sm:gap-6 items-stretch mb-10">
-            {canon.thinkers.map((thinker) => {
-              const isActive = activeThinkerId === thinker.id;
-              const meta = THINKER_METADATA[thinker.id] || {
-                era: 'Canonical Era',
-                workShort: thinker.workTitle,
-                workYear: thinker.year,
-                voice: thinker.passages[0]?.text.slice(0, 120) || ''
-              };
-
-              // Count citations on this thinker
-              const totalThinkerCites = thinker.passages.reduce(
-                (sum, p) => sum + p.pyqCitations.length,
-                0
-              );
-
-              return (
-                <div
-                  key={thinker.id}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => handleAttendThinker(thinker.id)}
-                  onMouseEnter={() => handleAttendThinker(thinker.id)}
-                  onFocus={() => handleAttendThinker(thinker.id)}
+          {/* ── Band of Thinkers (Steles) ── */}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: narrow ? 'column' : 'row',
+              gap: narrow ? '10px' : '3px',
+              alignItems: 'stretch'
+            }}
+          >
+            {thinkers.map((t) => (
+              <div
+                key={t.id}
+                role="button"
+                tabIndex={0}
+                aria-label={t.aria}
+                onMouseEnter={t.onAttend}
+                onFocus={t.onAttend}
+                onClick={t.onAttendOrOpen}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    t.onAttendOrOpen();
+                  }
+                }}
+                style={{
+                  position: 'relative',
+                  flex: t.flex,
+                  minHeight: t.minH,
+                  padding: t.pad,
+                  cursor: 'pointer',
+                  outline: 'none',
+                  overflow: 'hidden',
+                  border: `1px solid ${t.border}`,
+                  background: t.bg,
+                  boxShadow: t.shadow,
+                  opacity: t.opacity,
+                  transition: 'flex .5s cubic-bezier(.4,0,.2,1), background .4s, border-color .3s, opacity .3s',
+                  display: 'flex',
+                  flexDirection: t.innerDir,
+                  alignItems: t.innerAlign,
+                  gap: t.innerGap
+                }}
+              >
+                {/* Top Corner Metadata */}
+                <span
                   style={{
-                    flex: isActive ? '3.5' : '1',
-                    transition: 'flex 0.5s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s, border-color 0.3s'
+                    position: 'absolute',
+                    top: '10px',
+                    left: '12px',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: '9px',
+                    letterSpacing: '.16em',
+                    color: t.metaColor
                   }}
-                  className={`relative p-5 sm:p-7 rounded-sm border cursor-pointer outline-none overflow-hidden flex flex-col justify-between transition-all select-none ${
-                    isActive
-                      ? 'bg-gradient-to-b from-[#072e63]/90 via-[#072e63]/70 to-[#041d40] border-[#e0d0ab]/80 shadow-[0_12px_40px_rgba(0,0,0,0.6)]'
-                      : 'bg-[#041936]/60 border-[#136c99]/40 hover:border-[#0194a8]/70 hover:bg-[#072e63]/40'
-                  }`}
                 >
-                  {/* Top Meta Badges */}
-                  <div className="flex items-center justify-between w-full font-mono text-[9.5px] tracking-wider text-[#8fa2bd] mb-4">
-                    <span>{meta.era}</span>
-                    <span className="px-2 py-0.5 rounded bg-[#0b3d78]/60 border border-[#136c99]/50 text-[#e0d0ab]">
-                      {totalThinkerCites} CITATION{totalThinkerCites !== 1 ? 'S' : ''}
-                    </span>
+                  {t.era}
+                </span>
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '12px',
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: '9px',
+                    letterSpacing: '.1em',
+                    color: t.metaColor
+                  }}
+                >
+                  {t.citeCount}
+                </span>
+
+                {/* SVG Portrait Engraving */}
+                <div
+                  style={{
+                    flex: 'none',
+                    width: t.portraitPx,
+                    height: t.portraitPx,
+                    transition: 'width .5s cubic-bezier(.4,0,.2,1), height .5s cubic-bezier(.4,0,.2,1)',
+                    filter: t.portraitGlow
+                  }}
+                >
+                  <ThinkerEngravingSvg
+                    who={t.id}
+                    stroke={t.stroke}
+                    stroke2={t.stroke2}
+                    accent={t.accent}
+                    lensFill={t.lensFill}
+                    guideOpacity={t.guideOpacity}
+                    className="w-full h-full"
+                  />
+                </div>
+
+                {/* Thinker Name, Work & Active Voice Block */}
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: t.textAlign,
+                    textAlign: t.textAlignCss,
+                    gap: '5px',
+                    width: '100%',
+                    minWidth: 0
+                  }}
+                >
+                  <div
+                    style={{
+                      fontFamily: 'Merriweather, serif',
+                      fontWeight: 400,
+                      fontSize: t.nameSize,
+                      color: t.nameColor,
+                      lineHeight: 1.15,
+                      transition: 'color .3s, font-size .4s'
+                    }}
+                  >
+                    {t.name}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: 'Merriweather, serif',
+                      fontStyle: 'italic',
+                      fontSize: '11.5px',
+                      color: t.workColor
+                    }}
+                  >
+                    {t.work} · {t.workYear}
                   </div>
 
-                  {/* Thinker Portrait & Voice Block */}
-                  <div className="flex flex-col lg:flex-row items-center lg:items-start gap-6 my-auto">
-                    {/* SVG Engraving Portrait */}
-                    <div
-                      className={`shrink-0 transition-all duration-500 ${
-                        isActive ? 'w-32 h-32 sm:w-40 sm:h-40' : 'w-24 h-24 sm:w-28 sm:h-28 opacity-80'
-                      }`}
-                    >
-                      <ThinkerEngravingSvg
-                        thinkerId={thinker.id}
-                        isHovered={isActive}
-                        isSelected={isActive}
-                        className="w-full h-full"
-                      />
-                    </div>
-
-                    {/* Thinker Info & Typed Voice */}
-                    <div className="flex-1 min-w-0 text-center lg:text-left space-y-2">
-                      <h2
-                        className={`font-serif transition-colors ${
-                          isActive ? 'text-2xl sm:text-3xl text-[#e0d0ab] font-normal' : 'text-lg sm:text-xl text-[#c8b998]'
-                        }`}
-                      >
-                        {thinker.name}
-                      </h2>
-                      <div className="font-serif italic text-xs text-[#9fb0c8]">
-                        {thinker.workTitle} · {thinker.year}
+                  {/* Attended / Active Voice Dossier */}
+                  {t.isActive && (
+                    <div style={{ width: '100%', maxWidth: '520px', marginTop: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '9px' }}>
+                        <span
+                          style={{
+                            flex: 'none',
+                            fontFamily: 'Merriweather, serif',
+                            fontSize: '34px',
+                            lineHeight: 0.7,
+                            color: 'rgba(224,208,171,.45)'
+                          }}
+                        >
+                          “
+                        </span>
+                        <p
+                          style={{
+                            margin: 0,
+                            fontFamily: 'Merriweather, serif',
+                            fontWeight: 300,
+                            fontSize: t.voiceSize,
+                            lineHeight: 1.62,
+                            color: '#e8e0cf'
+                          }}
+                        >
+                          {t.typed}
+                          <span
+                            style={{
+                              display: t.caretDisplay,
+                              width: '2px',
+                              height: '.95em',
+                              backgroundColor: '#e0d0ab',
+                              verticalAlign: 'text-bottom',
+                              marginLeft: '3px',
+                              animation: 'caret 1s step-end infinite'
+                            }}
+                          />
+                        </p>
                       </div>
 
-                      {/* Active Voice Box with Real-time Typing */}
-                      {isActive && (
-                        <div className="pt-3 space-y-4 animate-in fade-in duration-300">
-                          <div className="flex items-start gap-2.5">
-                            <span className="font-serif text-3xl sm:text-4xl text-[#e0d0ab]/40 leading-none select-none">
-                              “
-                            </span>
-                            <p className="font-serif font-light text-xs sm:text-sm text-[#e8e0cf] leading-relaxed">
-                              {meta.voice.slice(0, typedLength)}
-                              <span
-                                className={`inline-block w-1.5 h-3.5 bg-[#e0d0ab] ml-1 align-baseline ${
-                                  prefersReducedMotion ? 'hidden' : 'animate-pulse'
-                                }`}
-                              />
-                            </p>
-                          </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '11px',
+                          marginTop: '16px',
+                          opacity: t.stampOpacity,
+                          transition: 'opacity .5s'
+                        }}
+                      >
+                        <span
+                          style={{
+                            height: '1px',
+                            width: '38px',
+                            background: 'linear-gradient(90deg, rgba(224,208,171,0), #e0d0ab)',
+                            transformOrigin: 'left',
+                            animation: t.leaderAnim
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: '10.5px',
+                            fontWeight: 700,
+                            letterSpacing: '.09em',
+                            color: '#072e63',
+                            background: '#e0d0ab',
+                            padding: '3px 8px',
+                            borderRadius: '2px'
+                          }}
+                        >
+                          {t.stamp}
+                        </span>
+                        <span
+                          style={{
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: '9.5px',
+                            letterSpacing: '.1em',
+                            color: '#9fb0c8'
+                          }}
+                        >
+                          drawn from this passage
+                        </span>
+                      </div>
 
-                          {/* UPSC Citation Stamp with Animated Rule */}
-                          {meta.voiceCite && (
-                            <div className="flex items-center gap-3 pt-2">
-                              <span className="w-8 h-px bg-gradient-to-r from-transparent to-[#e0d0ab]" />
-                              <span className="px-2 py-0.5 rounded bg-[#e0d0ab] text-[#072e63] font-mono text-[10px] font-bold">
-                                {meta.voiceCite.paper} {meta.voiceCite.year}
-                              </span>
-                              <span className="font-mono text-[9.5px] text-[#9fb0c8]">
-                                drawn from this passage
-                              </span>
-                            </div>
-                          )}
-
-                          {/* Passage Ticks & Enter Action */}
-                          <div className="flex items-center justify-between gap-3 pt-4 border-t border-[#136c99]/40 flex-wrap">
-                            <div className="flex items-center gap-2">
-                              <span className="font-mono text-[9px] uppercase tracking-wider text-[#8fa2bd]">
-                                Passages:
-                              </span>
-                              {thinker.passages.map((p, pIdx) => {
-                                const cite = p.pyqCitations[0];
-                                return (
-                                  <button
-                                    key={p.id}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleOpenReadingChamber(thinker.id, pIdx);
-                                    }}
-                                    className="px-2 py-1 rounded bg-[#03122a]/80 hover:bg-[#e0d0ab] hover:text-[#072e63] border border-[#0194a8]/40 hover:border-[#e0d0ab] text-[#e0d0ab] font-mono text-[10px] font-bold transition-all cursor-pointer flex items-center gap-1"
-                                  >
-                                    P{pIdx + 1}
-                                    {cite && (
-                                      <span className="text-[8.5px] opacity-75 font-normal">
-                                        ({cite.paper})
-                                      </span>
-                                    )}
-                                  </button>
-                                );
-                              })}
-                            </div>
-
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleOpenReadingChamber(thinker.id, 0);
-                              }}
-                              className="px-3.5 py-1.5 rounded bg-[#e0d0ab] hover:bg-[#e0d0ab]/90 text-[#072e63] font-mono text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-md"
-                            >
-                              <span>Enter Chamber</span>
-                              <ArrowRight className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                      {!isActive && (
-                        <div className="pt-2">
-                          <span className="font-mono text-[10px] text-[#8fa2bd] group-hover:text-[#e0d0ab] flex items-center justify-center lg:justify-start gap-1">
-                            Click or Hover to Attend →
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '7px',
+                          marginTop: '20px',
+                          flexWrap: 'wrap'
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: '9px',
+                            letterSpacing: '.16em',
+                            color: '#8fa2bd'
+                          }}
+                        >
+                          READ IN FULL
+                        </span>
+                        {t.ticks.map((k) => (
+                          <span
+                            key={k.id}
+                            role="button"
+                            tabIndex={0}
+                            onClick={k.onClick}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                k.onClick(e as any);
+                              }
+                            }}
+                            className="hover:border-[#e0d0ab] hover:text-[#e0d0ab]"
+                            style={{
+                              fontFamily: "'JetBrains Mono', monospace",
+                              fontSize: '10.5px',
+                              padding: '4px 9px',
+                              borderRadius: '2px',
+                              cursor: 'pointer',
+                              border: `1px solid ${k.border}`,
+                              background: k.bg,
+                              color: k.color,
+                              transition: 'all .2s'
+                            }}
+                          >
+                            {k.label}
                           </span>
-                        </div>
-                      )}
+                        ))}
+                        <span
+                          style={{
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: '9.5px',
+                            color: '#8fa2bd'
+                          }}
+                        >
+                          ↵
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {t.isDim && (
+                    <div
+                      style={{
+                        marginTop: '5px',
+                        fontFamily: "'JetBrains Mono', monospace",
+                        fontSize: '9.5px',
+                        letterSpacing: '.1em',
+                        color: '#8fa2bd'
+                      }}
+                    >
+                      {t.dimHint}
+                    </div>
+                  )}
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
 
-          {/* Bottom Keyboard Hotkeys Telemetry */}
-          <div className="flex items-center gap-4 flex-wrap font-mono text-[10px] text-[#8fa2bd] border-t border-[#136c99]/40 pt-4">
-            <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 rounded bg-[#041936] border border-[#136c99]/50 text-[#e0d0ab]">← →</kbd> Switch Thinker
-            </span>
-            <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 rounded bg-[#041936] border border-[#136c99]/50 text-[#e0d0ab]">↵ Enter</kbd> Read in Full
-            </span>
-            <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 rounded bg-[#041936] border border-[#136c99]/50 text-[#e0d0ab]">/</kbd> Search Canon
-            </span>
-            <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 rounded bg-[#041936] border border-[#136c99]/50 text-[#e0d0ab]">B</kbd> Toggle Bench
-            </span>
-            <span className="text-[#41536e] ml-auto">
-              hover, tap or tab — all the same door
-            </span>
+          {/* Bottom Hotkeys Bar */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '15px',
+              flexWrap: 'wrap',
+              marginTop: '20px',
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: '9.5px',
+              letterSpacing: '.08em',
+              color: '#8fa2bd'
+            }}
+          >
+            <span>← → THINKER</span>
+            <span>↵ READ</span>
+            <span>/ SEARCH</span>
+            <span>B BENCH</span>
+            <span style={{ color: '#41536e' }}>·</span>
+            <span style={{ letterSpacing: '.02em' }}>hover, tap or tab — all the same door</span>
           </div>
         </section>
       )}
@@ -652,360 +959,717 @@ export default function HumanitiesReader() {
       {/* ══════════════════════════════════════════════════════════════════
           MODE 2: THE MONASTIC READING CHAMBER
           ══════════════════════════════════════════════════════════════════ */}
-      {mode === 'read' && currentPassage && (
-        <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 pt-6 sm:pt-10">
-          {/* Ambient Background Watermark of Active Thinker */}
+      {mode === 'read' && read && (
+        <section style={{ position: 'relative', zIndex: 10 }}>
+          {/* Ambient Background Watermark */}
           <div
             aria-hidden="true"
-            className="absolute top-12 left-1/2 -translate-x-1/2 w-[520px] h-[520px] opacity-[0.06] pointer-events-none select-none"
+            style={{
+              position: 'absolute',
+              top: narrow ? '120px' : '80px',
+              left: narrow ? '50%' : '62%',
+              transform: 'translateX(-50%)',
+              width: narrow ? '340px' : '620px',
+              height: narrow ? '340px' : '620px',
+              opacity: 0.075,
+              pointerEvents: 'none'
+            }}
           >
             <ThinkerEngravingSvg
-              thinkerId={readThinker.id}
-              isHovered={true}
-              isSelected={true}
+              who={read.id}
+              stroke="#e0d0ab"
+              stroke2="#c8b998"
+              accent="#e0d0ab"
+              guideOpacity={0.55}
               className="w-full h-full"
             />
           </div>
 
-          <div className="flex flex-col md:flex-row gap-8 items-start relative">
-            {/* Sticky Left Spine: Thinker Nav & Legal Basis */}
-            <aside className="hidden md:flex flex-col gap-2 w-44 shrink-0 sticky top-24 pt-2">
-              <span className="font-mono text-[9.5px] uppercase tracking-[0.2em] text-[#8fa2bd] mb-2 font-bold">
-                The Canon
-              </span>
-              {canon.thinkers.map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => handleOpenReadingChamber(t.id, 0)}
-                  className={`p-2.5 rounded-sm text-left font-serif text-xs transition-all cursor-pointer border-l-2 ${
-                    readThinker.id === t.id
-                      ? 'border-[#e0d0ab] bg-[#072e63] text-[#e0d0ab] font-bold'
-                      : 'border-transparent text-[#9fb0c8] hover:text-[#e0d0ab] hover:bg-[#072e63]/40'
-                  }`}
+          <div
+            style={{
+              position: 'relative',
+              display: 'flex',
+              gap: '34px',
+              alignItems: 'flex-start',
+              padding: narrow ? '26px 18px 30px' : '46px 30px 40px',
+              maxWidth: '1460px',
+              margin: '0 auto'
+            }}
+          >
+            {/* Sticky Left Spine */}
+            <div
+              style={{
+                display: narrow ? 'none' : 'flex',
+                flexDirection: 'column',
+                gap: '3px',
+                width: '156px',
+                flex: 'none',
+                position: 'sticky',
+                top: '96px',
+                animation: 'rise .5s ease-out both'
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: '9px',
+                  letterSpacing: '.2em',
+                  color: '#8fa2bd',
+                  marginBottom: '9px'
+                }}
+              >
+                THE CANON
+              </div>
+              {spine.map((sp) => (
+                <span
+                  key={sp.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={sp.onClick}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      sp.onClick();
+                    }
+                  }}
+                  className="hover:text-[#e0d0ab]"
+                  style={{
+                    padding: '8px 11px',
+                    borderLeft: `2px solid ${sp.bar}`,
+                    background: sp.bg,
+                    color: sp.color,
+                    fontFamily: 'Merriweather, serif',
+                    fontSize: '12.5px',
+                    cursor: 'pointer',
+                    transition: 'all .2s'
+                  }}
                 >
-                  {t.name}
-                </button>
+                  {sp.name}
+                </span>
               ))}
 
-              <div className="my-4 h-px bg-[#136c99]/40" />
-
-              <div className="font-mono text-[9px] text-[#8fa2bd] leading-relaxed">
-                {readThinker.publicDomainBasis}
+              <div style={{ marginTop: '22px', height: '1px', background: 'rgba(19,108,153,.45)' }} />
+              <div
+                style={{
+                  marginTop: '14px',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: '9px',
+                  lineHeight: 1.8,
+                  letterSpacing: '.04em',
+                  color: '#8fa2bd'
+                }}
+              >
+                {read.pdBasis}
               </div>
-            </aside>
+            </div>
 
-            {/* Reading Center Article (Optimal 690px Reading Measure) */}
-            <main className="flex-1 min-w-0 flex justify-center">
-              <article className="w-full max-w-[690px] space-y-6">
-                {/* Top Action & Passage Counter */}
-                <div className="flex items-center justify-between gap-4 pb-3 border-b border-[#136c99]/40">
-                  <button
-                    onClick={handleExitReadingChamber}
-                    className="px-3 py-1.5 rounded border border-[#0194a8]/50 hover:border-[#e0d0ab] text-[#9fb0c8] hover:text-[#e0d0ab] font-mono text-[10px] tracking-wider transition-all cursor-pointer flex items-center gap-1.5"
+            {/* Reading Measure Center Container */}
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', justifyContent: 'center' }}>
+              <article style={{ width: '100%', maxWidth: measure, animation: 'rise .55s ease-out both' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '14px' }}>
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={exitRead}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        exitRead();
+                      }
+                    }}
+                    className="hover:text-[#e0d0ab] hover:border-[#e0d0ab]"
+                    style={{
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: '9.5px',
+                      letterSpacing: '.14em',
+                      color: '#9fb0c8',
+                      cursor: 'pointer',
+                      border: '1px solid rgba(1,148,168,.45)',
+                      padding: '5px 10px',
+                      borderRadius: '2px',
+                      transition: 'all .2s'
+                    }}
                   >
-                    <ChevronLeft className="w-3.5 h-3.5" />
-                    <span>ESC — Back to Hall</span>
-                  </button>
-
-                  <span className="font-mono text-[10.5px] tracking-widest text-[#8fa2bd]">
-                    PASSAGE {readPassageIdx + 1} OF {readThinker.passages.length}
+                    ESC — BACK TO THE HALL
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: '9.5px',
+                      letterSpacing: '.12em',
+                      color: '#8fa2bd'
+                    }}
+                  >
+                    {read.indexLabel}
                   </span>
                 </div>
 
-                {/* Reading Progress Line */}
-                <div className="h-0.5 bg-[#136c99]/30 rounded-full overflow-hidden">
+                {/* Progress Bar */}
+                <div style={{ height: '2px', background: 'rgba(19,108,153,.4)', marginBottom: '36px' }}>
                   <div
-                    className="h-full bg-[#e0d0ab] transition-all duration-400 ease-out"
-                    style={{ width: `${((readPassageIdx + 1) / readThinker.passages.length) * 100}%` }}
+                    style={{
+                      height: '2px',
+                      width: read.progress,
+                      background: '#e0d0ab',
+                      transition: 'width .4s cubic-bezier(.4,0,.2,1)'
+                    }}
                   />
                 </div>
 
-                {/* Thinker Name & Work Header */}
-                <div className="space-y-1 pt-2">
-                  <h2 className="font-serif font-light text-3xl sm:text-4xl text-[#e0d0ab] tracking-tight">
-                    {readThinker.name}
-                  </h2>
-                  <div className="font-serif italic text-sm text-[#9fb0c8]">
-                    {readThinker.workTitle} · {readThinker.year}
-                  </div>
+                <h2
+                  style={{
+                    fontFamily: 'Merriweather, serif',
+                    fontWeight: 300,
+                    fontSize: narrow ? '28px' : '40px',
+                    lineHeight: 1.15,
+                    color: '#e0d0ab',
+                    margin: '0 0 7px',
+                    letterSpacing: '-.01em'
+                  }}
+                >
+                  {read.thinkerName}
+                </h2>
+                <div
+                  style={{
+                    fontFamily: 'Merriweather, serif',
+                    fontStyle: 'italic',
+                    fontSize: '13.5px',
+                    color: '#9fb0c8',
+                    marginBottom: '38px'
+                  }}
+                >
+                  {read.workTitle} · {read.workYear}
                 </div>
 
-                {/* Primary Source Passage Text with Elegant Drop-Cap */}
-                <div className="pt-2 font-serif font-light text-stone-100 text-sm sm:text-base leading-[1.9] text-pretty">
-                  <span className="float-left font-serif font-bold text-4xl sm:text-5xl text-[#e0d0ab] mr-3 mt-1 leading-[0.8]">
-                    {currentPassage.text.trim().charAt(0)}
+                {/* Primary Passage Text with Drop-Cap */}
+                <p
+                  style={{
+                    margin: 0,
+                    fontFamily: 'Merriweather, serif',
+                    fontWeight: 300,
+                    fontSize: narrow ? '17px' : '20px',
+                    lineHeight: 1.9,
+                    color: '#e8e0cf'
+                  }}
+                >
+                  <span
+                    style={{
+                      float: 'left',
+                      fontFamily: 'Merriweather, serif',
+                      fontWeight: 700,
+                      fontSize: narrow ? '54px' : '68px',
+                      lineHeight: 0.8,
+                      color: '#e0d0ab',
+                      margin: '7px 13px 0 0'
+                    }}
+                  >
+                    {read.dropCap}
                   </span>
-                  {currentPassage.text.trim().slice(1)}
-                </div>
+                  {read.body}
+                </p>
 
-                {/* WHERE THIS WAS ASKED — Verified UPSC Citation Dossier */}
-                <div className="pt-6 border-t border-[#136c99]/50 space-y-3">
-                  <div className="font-mono text-[9.5px] uppercase tracking-[0.2em] text-[#8fa2bd] font-bold">
-                    Where this was asked in UPSC
+                {/* WHERE THIS WAS ASKED */}
+                <div
+                  style={{
+                    clear: 'both',
+                    marginTop: '40px',
+                    paddingTop: '20px',
+                    borderTop: '1px solid rgba(19,108,153,.45)'
+                  }}
+                >
+                  <div
+                    style={{
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: '9px',
+                      letterSpacing: '.2em',
+                      color: '#8fa2bd',
+                      marginBottom: '14px'
+                    }}
+                  >
+                    WHERE THIS WAS ASKED
                   </div>
 
-                  {currentPassage.pyqCitations.length > 0 ? (
-                    currentPassage.pyqCitations.map((cite, cIdx) => (
+                  {read.hasCite &&
+                    read.citations.map((c: PyqCitation, cIdx: number) => (
                       <div
                         key={cIdx}
-                        className="p-3.5 rounded bg-[#03122a]/70 border border-[#0194a8]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                        style={{
+                          display: 'flex',
+                          gap: '14px',
+                          alignItems: 'flex-start',
+                          marginBottom: '13px'
+                        }}
                       >
-                        <div className="flex items-center gap-3">
-                          <span className="px-2.5 py-1 rounded bg-[#e0d0ab] text-[#072e63] font-mono text-xs font-bold">
-                            UPSC {cite.paper} · {cite.year}
-                          </span>
-                          <span className="text-xs text-[#9fb0c8] leading-relaxed">
-                            {cite.note || 'Tested conceptual anchor in UPSC examination cycle.'}
-                          </span>
-                        </div>
+                        <span
+                          style={{
+                            flex: 'none',
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            letterSpacing: '.07em',
+                            color: '#072e63',
+                            background: '#e0d0ab',
+                            padding: '4px 9px',
+                            borderRadius: '2px'
+                          }}
+                        >
+                          UPSC {c.paper} · {c.year}
+                        </span>
+                        <span style={{ fontSize: '12.5px', lineHeight: 1.7, color: '#9fb0c8' }}>
+                          {c.note}
+                        </span>
                       </div>
-                    ))
-                  ) : (
-                    <div className="p-3 rounded bg-[#03122a]/40 border border-[#136c99]/30 text-xs italic text-[#8fa2bd]">
-                      Foundational philosophical text — carried for conceptual rigor and synthesis drafting.
+                    ))}
+
+                  {read.noCite && (
+                    <div style={{ fontSize: '12.5px', fontStyle: 'italic', lineHeight: 1.7, color: '#8fa2bd' }}>
+                      No verified PYQ citation for this passage — carried as foundational canon, not claimed as a past question.
                     </div>
                   )}
                 </div>
 
-                {/* Action Bar: Pin, Copy, Prev, Next */}
-                <div className="flex items-center justify-between gap-3 pt-6 border-t border-[#136c99]/50 flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleTogglePinCurrent()}
-                      className={`px-3.5 py-2 rounded-sm font-mono text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 border ${
-                        isPassagePinned(pinnedPassages, currentPassage.id)
-                          ? 'bg-[#e0d0ab] text-[#072e63] border-[#e0d0ab]'
-                          : 'bg-[#03122a] text-[#c8b998] border-[#0194a8]/50 hover:border-[#e0d0ab] hover:text-[#e0d0ab]'
-                      }`}
-                    >
-                      {isPassagePinned(pinnedPassages, currentPassage.id) ? (
-                        <>
-                          <Check className="w-3.5 h-3.5" />
-                          <span>Pinned to Bench</span>
-                        </>
-                      ) : (
-                        <>
-                          <Pin className="w-3.5 h-3.5" />
-                          <span>Pin to Bench (P)</span>
-                        </>
-                      )}
-                    </button>
+                {/* Bottom Actions */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '9px',
+                    flexWrap: 'wrap',
+                    marginTop: '34px'
+                  }}
+                >
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={read.onPin}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        read.onPin();
+                      }
+                    }}
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      padding: '10px 16px',
+                      borderRadius: '2px',
+                      cursor: 'pointer',
+                      border: `1px solid ${read.pinBorder}`,
+                      background: read.pinBg,
+                      color: read.pinColor,
+                      transition: 'all .2s'
+                    }}
+                  >
+                    {read.pinLabel}
+                  </span>
 
-                    <button
-                      onClick={handleCopyPassage}
-                      className="px-3.5 py-2 rounded-sm font-mono text-xs text-[#c8b998] border border-[#0194a8]/50 hover:border-[#e0d0ab] hover:text-[#e0d0ab] transition-all cursor-pointer flex items-center gap-1.5"
-                    >
-                      {copiedPassage ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-400" />
-                          <span className="text-emerald-400">Copied!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5" />
-                          <span>Copy (C)</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={read.onCopy}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        read.onCopy();
+                      }
+                    }}
+                    className="hover:border-[#e0d0ab] hover:text-[#e0d0ab]"
+                    style={{
+                      fontSize: '12px',
+                      padding: '10px 16px',
+                      borderRadius: '2px',
+                      cursor: 'pointer',
+                      border: '1px solid rgba(1,148,168,.45)',
+                      color: '#c8b998',
+                      transition: 'all .2s'
+                    }}
+                  >
+                    {read.copyLabel}
+                  </span>
 
-                  <div className="flex items-center gap-2 ml-auto">
-                    <button
-                      onClick={() => handleStepPassage(-1)}
-                      className="px-3 py-2 rounded-sm font-mono text-xs text-[#9fb0c8] border border-[#0194a8]/50 hover:border-[#e0d0ab] hover:text-[#e0d0ab] transition-all cursor-pointer flex items-center gap-1"
-                    >
-                      <ChevronLeft className="w-3.5 h-3.5" />
-                      <span>Prev</span>
-                    </button>
-                    <button
-                      onClick={() => handleStepPassage(1)}
-                      className="px-3 py-2 rounded-sm font-mono text-xs text-[#9fb0c8] border border-[#0194a8]/50 hover:border-[#e0d0ab] hover:text-[#e0d0ab] transition-all cursor-pointer flex items-center gap-1"
-                    >
-                      <span>Next</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+                  <span style={{ flex: 1, minWidth: '12px' }} />
+
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => stepPassage(-1)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        stepPassage(-1);
+                      }
+                    }}
+                    className="hover:text-[#e0d0ab] hover:border-[#e0d0ab]"
+                    style={{
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: '10.5px',
+                      padding: '10px 13px',
+                      borderRadius: '2px',
+                      cursor: 'pointer',
+                      border: '1px solid rgba(1,148,168,.45)',
+                      color: '#9fb0c8',
+                      transition: 'all .2s'
+                    }}
+                  >
+                    ← PREV
+                  </span>
+
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => stepPassage(1)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        stepPassage(1);
+                      }
+                    }}
+                    className="hover:text-[#e0d0ab] hover:border-[#e0d0ab]"
+                    style={{
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: '10.5px',
+                      padding: '10px 13px',
+                      borderRadius: '2px',
+                      cursor: 'pointer',
+                      border: '1px solid rgba(1,148,168,.45)',
+                      color: '#9fb0c8',
+                      transition: 'all .2s'
+                    }}
+                  >
+                    NEXT →
+                  </span>
                 </div>
               </article>
-            </main>
+            </div>
           </div>
         </section>
       )}
 
       {/* ══════════════════════════════════════════════════════════════════
-          THE BENCH: FIXED BOTTOM BAR & DIALECTIC WORKBENCH DRAWER
+          THE BENCH: FIXED DRAWER & COMPARISON GRID
           ══════════════════════════════════════════════════════════════════ */}
-      <div className="fixed left-0 right-0 bottom-0 z-40">
-        {/* Sliding Bench Drawer */}
-        <AnimatePresence>
-          {benchOpen && (
-            <motion.div
-              initial={{ y: '100%', opacity: 0 }}
-              animate={{ y: '0%', opacity: 1 }}
-              exit={{ y: '100%', opacity: 0 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="max-h-[65vh] overflow-y-auto bg-[#03122a]/95 backdrop-blur-xl border-t border-[#e0d0ab]/30 p-6 shadow-2xl space-y-6"
+      <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 40 }}>
+        {benchOpen && (
+          <div
+            style={{
+              maxHeight: '60vh',
+              overflowY: 'auto',
+              background: 'rgba(3,18,42,.97)',
+              backdropFilter: 'blur(16px)',
+              borderTop: '1px solid rgba(224,208,171,.3)',
+              padding: '22px 26px 18px'
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'baseline',
+                justifyContent: 'space-between',
+                gap: '16px',
+                flexWrap: 'wrap',
+                marginBottom: '18px'
+              }}
             >
-              <div className="max-w-7xl mx-auto space-y-6">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[#136c99]/40">
-                  <div>
-                    <h3 className="font-serif text-xl text-[#e0d0ab] font-normal flex items-center gap-2">
-                      <Columns3 className="w-5 h-5 text-[#0194a8]" />
-                      The Dialectic Bench
-                    </h3>
-                    <p className="text-xs text-[#9fb0c8] mt-1 max-w-xl">
-                      Passages pinned from different thinkers line up here side by side — the exact multidimensional structure demanded by high-yield GS-IV ethics and essay answers.
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    {pinnedPassages.length > 0 && (
-                      <button
-                        onClick={handleCopySynthesis}
-                        className="px-4 py-2 rounded-sm bg-[#e0d0ab] hover:bg-[#e0d0ab]/90 text-[#072e63] font-mono text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-md"
-                      >
-                        {copiedSynthesis ? (
-                          <>
-                            <Check className="w-3.5 h-3.5" />
-                            <span>Synthesis Copied!</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3.5 h-3.5" />
-                            <span>Copy Full Synthesis</span>
-                          </>
-                        )}
-                      </button>
-                    )}
-
-                    <button
-                      onClick={() => setBenchOpen(false)}
-                      className="px-3.5 py-2 rounded-sm border border-[#0194a8]/50 hover:border-[#e0d0ab] text-[#c8b998] hover:text-[#e0d0ab] font-mono text-xs transition-colors cursor-pointer"
-                    >
-                      Close
-                    </button>
-                  </div>
+              <div>
+                <div style={{ fontFamily: 'Merriweather, serif', fontSize: '17px', color: '#e0d0ab' }}>
+                  The Bench
                 </div>
-
-                {/* Multi-Column Dialectic Comparison */}
-                {pinnedPassages.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {canon.thinkers.map((thinker) => {
-                      const thinkerPinned = thinker.passages.filter((p) =>
-                        pinnedPassages.some((pinned) => pinned.id === p.id)
-                      );
-                      if (!thinkerPinned.length) return null;
-
-                      return (
-                        <div
-                          key={thinker.id}
-                          className="border-t-2 border-[#e0d0ab] pt-3 bg-[#072e63]/40 p-4 rounded-sm border border-[#136c99]/40 space-y-3"
-                        >
-                          <div className="flex items-baseline justify-between gap-2">
-                            <span className="font-serif font-bold text-sm text-[#e0d0ab]">
-                              {thinker.name}
-                            </span>
-                            <span className="font-serif italic text-[11px] text-[#9fb0c8]">
-                              {thinker.workTitle}
-                            </span>
-                          </div>
-
-                          <div className="space-y-3">
-                            {thinkerPinned.map((p) => (
-                              <div
-                                key={p.id}
-                                className="p-3 rounded bg-[#03122a]/80 border border-[#0194a8]/35 space-y-2 text-xs"
-                              >
-                                <div className="flex items-center justify-between gap-2 font-mono text-[10px]">
-                                  <span className="text-[#e0d0ab] font-bold">
-                                    {p.pyqCitations[0]
-                                      ? `UPSC ${p.pyqCitations[0].paper} ${p.pyqCitations[0].year}`
-                                      : 'Foundational'}
-                                  </span>
-                                  <button
-                                    onClick={() => handleTogglePinCurrent(p)}
-                                    className="text-[#9fb0c8] hover:text-red-400 transition-colors cursor-pointer flex items-center gap-1"
-                                  >
-                                    <PinOff className="w-3 h-3" />
-                                    <span>Unpin</span>
-                                  </button>
-                                </div>
-
-                                <p className="font-serif font-light text-stone-300 leading-relaxed text-[12.5px] line-clamp-4">
-                                  "{p.text}"
-                                </p>
-
-                                <div className="pt-2 flex justify-end">
-                                  <button
-                                    onClick={() => {
-                                      const pIdx = thinker.passages.findIndex((item) => item.id === p.id);
-                                      handleOpenReadingChamber(thinker.id, Math.max(0, pIdx));
-                                      setBenchOpen(false);
-                                    }}
-                                    className="font-mono text-[10px] text-[#0194a8] hover:text-[#e0d0ab] flex items-center gap-1 cursor-pointer"
-                                  >
-                                    <span>Open in full →</span>
-                                  </button>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="p-8 text-center border border-dashed border-[#0194a8]/40 rounded-sm space-y-2">
-                    <p className="font-serif text-sm text-[#c8b998]">
-                      Nothing on the Dialectic Bench yet.
-                    </p>
-                    <p className="text-xs text-[#9fb0c8] max-w-md mx-auto leading-relaxed">
-                      Pin passages from different thinkers while in reading mode (press <kbd className="px-1 py-0.5 rounded bg-[#041936] text-[#e0d0ab] font-mono text-[10px]">P</kbd>) to compare them side by side for comparative synthesis.
-                    </p>
-                  </div>
-                )}
+                <div style={{ fontSize: '12px', color: '#9fb0c8', marginTop: '4px', lineHeight: 1.6, maxWidth: '560px' }}>
+                  {pinned.length
+                    ? `${benchGroups.length} thinker${benchGroups.length === 1 ? '' : 's'} set against one theme — ${pinned.length} passage${pinned.length === 1 ? '' : 's'} collated`
+                    : 'Cross-thinker collation'}
+                </div>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
-        {/* Bottom Floating Bar */}
-        <div className="flex items-center justify-between gap-4 px-6 py-3 bg-[#020d20]/95 backdrop-blur-md border-t border-[#136c99]/55">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setBenchOpen((prev) => !prev)}
-              className="flex items-center gap-2 cursor-pointer font-mono text-xs text-[#e0d0ab] hover:underline"
-            >
-              <Columns3 className="w-4 h-4 text-[#0194a8]" />
-              <span className="font-bold tracking-wider">BENCH</span>
-              <span className="px-2 py-0.5 rounded bg-[#e0d0ab] text-[#072e63] font-bold text-[10.5px]">
-                {pinnedPassages.length}
-              </span>
-            </button>
-
-            <span className="h-4 w-px bg-[#136c99]/60" />
-
-            <div className="hidden sm:flex items-center gap-1.5 overflow-x-auto max-w-xl">
-              {pinnedPassages.length > 0 ? (
-                pinnedPassages.map((p) => (
-                  <span
-                    key={p.id}
-                    className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#072e63]/60 border border-[#e0d0ab]/30 text-[#c8b998] whitespace-nowrap"
-                  >
-                    {p.id}
-                  </span>
-                ))
-              ) : (
-                <span className="text-[11px] text-[#8fa2bd]">
-                  Pin passages to start comparing thinkers — press <kbd className="font-mono text-[#e0d0ab]">P</kbd> while reading
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <span
+                  role="button"
+                  tabIndex={0}
+                  onClick={copySynthesis}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      copySynthesis();
+                    }
+                  }}
+                  style={{
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    padding: '9px 15px',
+                    borderRadius: '2px',
+                    cursor: 'pointer',
+                    background: '#e0d0ab',
+                    color: '#072e63'
+                  }}
+                >
+                  {copiedSynthesis ? '✓ Copied synthesis' : 'Copy synthesis block'}
                 </span>
-              )}
+
+                <span
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setBenchOpen(false)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setBenchOpen(false);
+                    }
+                  }}
+                  style={{
+                    fontSize: '12px',
+                    padding: '9px 15px',
+                    borderRadius: '2px',
+                    cursor: 'pointer',
+                    border: '1px solid rgba(1,148,168,.45)',
+                    color: '#c8b998'
+                  }}
+                >
+                  Close
+                </span>
+              </div>
             </div>
+
+            {pinned.length > 0 ? (
+              <div style={{ display: 'flex', gap: '18px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                {benchGroups.map((g, gIdx) => {
+                  if (!g) return null;
+                  return (
+                    <div
+                      key={gIdx}
+                      style={{
+                        flex: 1,
+                        minWidth: '250px',
+                        borderTop: '2px solid #e0d0ab',
+                        paddingTop: '13px'
+                      }}
+                    >
+                      <div style={{ fontFamily: 'Merriweather, serif', fontSize: '14px', color: '#e0d0ab' }}>
+                        {g.name}
+                      </div>
+                      <div
+                        style={{
+                          fontFamily: 'Merriweather, serif',
+                          fontStyle: 'italic',
+                          fontSize: '11px',
+                          color: '#9fb0c8',
+                          margin: '2px 0 13px'
+                        }}
+                      >
+                        {g.work}
+                      </div>
+                      {g.items.map((it) => (
+                        <div
+                          key={it.id}
+                          style={{
+                            marginBottom: '11px',
+                            padding: '12px',
+                            background: 'rgba(7,46,99,.6)',
+                            border: '1px solid rgba(1,148,168,.35)',
+                            borderRadius: '2px'
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', marginBottom: '8px' }}>
+                            <span
+                              style={{
+                                fontFamily: "'JetBrains Mono', monospace",
+                                fontSize: '9.5px',
+                                letterSpacing: '.06em',
+                                color: '#e0d0ab'
+                              }}
+                            >
+                              {it.cite}
+                            </span>
+                            <span
+                              role="button"
+                              tabIndex={0}
+                              onClick={it.onRemove}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  it.onRemove();
+                                }
+                              }}
+                              className="hover:text-[#e14e4e]"
+                              style={{
+                                fontFamily: "'JetBrains Mono', monospace",
+                                fontSize: '9.5px',
+                                color: '#9fb0c8',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              UNPIN
+                            </span>
+                          </div>
+                          <p
+                            style={{
+                              margin: 0,
+                              fontFamily: 'Merriweather, serif',
+                              fontWeight: 300,
+                              fontSize: '12.5px',
+                              lineHeight: 1.7,
+                              color: '#d8d0bd'
+                            }}
+                          >
+                            {it.snippet}
+                          </p>
+                          <span
+                            role="button"
+                            tabIndex={0}
+                            onClick={it.onOpen}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                it.onOpen();
+                              }
+                            }}
+                            className="hover:text-[#e0d0ab]"
+                            style={{
+                              display: 'inline-block',
+                              marginTop: '10px',
+                              fontFamily: "'JetBrains Mono', monospace",
+                              fontSize: '9.5px',
+                              letterSpacing: '.08em',
+                              color: '#0194a8',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            OPEN IN FULL →
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div
+                style={{
+                  padding: '28px',
+                  textAlign: 'center',
+                  border: '1px dashed rgba(1,148,168,.4)',
+                  borderRadius: '2px'
+                }}
+              >
+                <div style={{ fontFamily: 'Merriweather, serif', fontSize: '14px', color: '#c8b998' }}>
+                  Nothing on the bench yet.
+                </div>
+                <div
+                  style={{
+                    fontSize: '12px',
+                    color: '#9fb0c8',
+                    marginTop: '7px',
+                    lineHeight: 1.7,
+                    maxWidth: '520px',
+                    marginLeft: 'auto',
+                    marginRight: 'auto'
+                  }}
+                >
+                  Pin passages from different thinkers and they line up here side by side — the way a strong GS-IV or essay answer sets two or three of them against one theme.
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Bottom Floating Status Bar */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '13px',
+            flexWrap: 'wrap',
+            padding: '11px 26px',
+            background: 'rgba(2,13,32,.95)',
+            backdropFilter: 'blur(12px)',
+            borderTop: '1px solid rgba(19,108,153,.55)'
+          }}
+        >
+          <span
+            role="button"
+            tabIndex={0}
+            onClick={() => setBenchOpen((prev) => !prev)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setBenchOpen((prev) => !prev);
+              }
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '9px', cursor: 'pointer' }}
+          >
+            <span
+              style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '9.5px',
+                letterSpacing: '.2em',
+                color: '#e0d0ab'
+              }}
+            >
+              BENCH
+            </span>
+            <span
+              style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '11px',
+                fontWeight: 700,
+                color: '#072e63',
+                background: '#e0d0ab',
+                padding: '1px 7px',
+                borderRadius: '2px'
+              }}
+            >
+              {pinned.length}
+            </span>
+          </span>
+
+          <span style={{ height: '15px', width: '1px', background: 'rgba(19,108,153,.6)' }} />
+
+          <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', flex: 1, minWidth: 0, alignItems: 'center' }}>
+            {benchChips.length > 0 ? (
+              benchChips.map((ch, chIdx) => (
+                <span
+                  key={chIdx}
+                  role="button"
+                  tabIndex={0}
+                  onClick={ch.onOpen}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      ch.onOpen();
+                    }
+                  }}
+                  className="hover:text-[#e0d0ab] hover:border-[#e0d0ab]"
+                  style={{
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: '9.5px',
+                    letterSpacing: '.05em',
+                    padding: '4px 8px',
+                    borderRadius: '2px',
+                    cursor: 'pointer',
+                    border: '1px solid rgba(224,208,171,.35)',
+                    color: '#c8b998',
+                    transition: 'all .2s'
+                  }}
+                >
+                  {ch.label}
+                </span>
+              ))
+            ) : (
+              <span style={{ fontSize: '11.5px', color: '#8fa2bd' }}>
+                Pin a passage to start comparing thinkers — <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>P</span> while reading
+              </span>
+            )}
           </div>
 
-          <div className="font-mono text-[10px] text-[#8fa2bd] tracking-wider hidden md:block">
-            TARK CANON v2.5 · EMPIRICAL HUMANITIES
-          </div>
+          <span
+            style={{
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: '9px',
+              letterSpacing: '.1em',
+              color: '#8fa2bd'
+            }}
+          >
+            {reduced ? 'REDUCED MOTION · ON' : ''}
+          </span>
         </div>
       </div>
     </div>
