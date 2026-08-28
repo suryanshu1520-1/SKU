@@ -75,6 +75,7 @@ export default function VerticalNavRail({
   isLanding,
   userEmail,
   isExpanded,
+  contextActions,
   onToggleExpand,
   onNavigateTab,
   onNavigateHome,
