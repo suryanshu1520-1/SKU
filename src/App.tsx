@@ -272,12 +272,12 @@ export default function App() {
                   {gameState === 'landing' && (
                     <motion.div
                       layoutId="active-nav-pill"
-                      className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
-                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                      className="absolute inset-0 bg-[#e0d0ab] rounded-xs z-0 shadow-sm"
+                      transition={{ type: 'spring', bounce: 0.15, duration: 0.45 }}
                     />
                   )}
-                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState === 'landing' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
-                    <House className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${gameState !== 'landing' ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
+                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-200 ease-out ${gameState === 'landing' ? 'text-[#072e63] font-bold' : 'text-[#8fa2bd] group-hover:text-[#e0d0ab] group-hover:-translate-y-0.5'}`}>
+                    <House className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-200 ease-out ${gameState !== 'landing' ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
                     <span className="hidden sm:inline">Home</span>
                     <span className="sm:hidden">Home</span>
                   </span>
@@ -285,17 +285,17 @@ export default function App() {
 
                 <button
                   onClick={() => navigateToTab('arena')}
-                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group cursor-pointer"
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-xs outline-none group cursor-pointer"
                 >
                   {gameState !== 'landing' && activeTab === 'arena' && (
                     <motion.div
                       layoutId="active-nav-pill"
-                      className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
-                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                      className="absolute inset-0 bg-[#e0d0ab] rounded-xs z-0 shadow-sm"
+                      transition={{ type: 'spring', bounce: 0.15, duration: 0.45 }}
                     />
                   )}
-                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'arena' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
-                    <Swords className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'arena') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
+                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-200 ease-out ${gameState !== 'landing' && activeTab === 'arena' ? 'text-[#072e63] font-bold' : 'text-[#8fa2bd] group-hover:text-[#e0d0ab] group-hover:-translate-y-0.5'}`}>
+                    <Swords className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-200 ease-out ${!(gameState !== 'landing' && activeTab === 'arena') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
                     <span className="hidden sm:inline">Test Arena</span>
                     <span className="sm:hidden">Arena</span>
                   </span>
@@ -303,17 +303,17 @@ export default function App() {
 
                 <button
                   onClick={() => navigateToTab('tracker')}
-                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group cursor-pointer"
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-xs outline-none group cursor-pointer"
                 >
                   {gameState !== 'landing' && activeTab === 'tracker' && (
                     <motion.div
                       layoutId="active-nav-pill"
-                      className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
-                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                      className="absolute inset-0 bg-[#e0d0ab] rounded-xs z-0 shadow-sm"
+                      transition={{ type: 'spring', bounce: 0.15, duration: 0.45 }}
                     />
                   )}
-                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'tracker' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
-                    <Globe className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'tracker') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
+                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-200 ease-out ${gameState !== 'landing' && activeTab === 'tracker' ? 'text-[#072e63] font-bold' : 'text-[#8fa2bd] group-hover:text-[#e0d0ab] group-hover:-translate-y-0.5'}`}>
+                    <Globe className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-200 ease-out ${!(gameState !== 'landing' && activeTab === 'tracker') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
                     <span className="hidden sm:inline">Daily Brief</span>
                     <span className="sm:hidden">Brief</span>
                   </span>
@@ -321,17 +321,17 @@ export default function App() {
 
                 <button
                   onClick={() => navigateToTab('library')}
-                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group cursor-pointer"
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-xs outline-none group cursor-pointer"
                 >
                   {gameState !== 'landing' && activeTab === 'library' && (
                     <motion.div
                       layoutId="active-nav-pill"
-                      className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
-                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                      className="absolute inset-0 bg-[#e0d0ab] rounded-xs z-0 shadow-sm"
+                      transition={{ type: 'spring', bounce: 0.15, duration: 0.45 }}
                     />
                   )}
-                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'library' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
-                    <Layers className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'library') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
+                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-200 ease-out ${gameState !== 'landing' && activeTab === 'library' ? 'text-[#072e63] font-bold' : 'text-[#8fa2bd] group-hover:text-[#e0d0ab] group-hover:-translate-y-0.5'}`}>
+                    <Layers className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-200 ease-out ${!(gameState !== 'landing' && activeTab === 'library') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
                     <span className="hidden sm:inline">Syllabus Pillars</span>
                     <span className="sm:hidden">Pillars</span>
                   </span>
@@ -339,17 +339,17 @@ export default function App() {
 
                 <button
                   onClick={() => navigateToTab('humanities')}
-                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group cursor-pointer"
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-xs outline-none group cursor-pointer"
                 >
                   {gameState !== 'landing' && activeTab === 'humanities' && (
                     <motion.div
                       layoutId="active-nav-pill"
-                      className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
-                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                      className="absolute inset-0 bg-[#e0d0ab] rounded-xs z-0 shadow-sm"
+                      transition={{ type: 'spring', bounce: 0.15, duration: 0.45 }}
                     />
                   )}
-                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'humanities' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
-                    <BookOpen className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'humanities') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
+                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-200 ease-out ${gameState !== 'landing' && activeTab === 'humanities' ? 'text-[#072e63] font-bold' : 'text-[#8fa2bd] group-hover:text-[#e0d0ab] group-hover:-translate-y-0.5'}`}>
+                    <BookOpen className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-200 ease-out ${!(gameState !== 'landing' && activeTab === 'humanities') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
                     <span className="hidden sm:inline">Humanities</span>
                     <span className="sm:hidden">Canon</span>
                   </span>
@@ -357,17 +357,17 @@ export default function App() {
 
                 <button
                   onClick={() => navigateToTab('leaderboard')}
-                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group cursor-pointer"
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-xs outline-none group cursor-pointer"
                 >
                   {gameState !== 'landing' && activeTab === 'leaderboard' && (
                     <motion.div
                       layoutId="active-nav-pill"
-                      className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
-                      transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                      className="absolute inset-0 bg-[#e0d0ab] rounded-xs z-0 shadow-sm"
+                      transition={{ type: 'spring', bounce: 0.15, duration: 0.45 }}
                     />
                   )}
-                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'leaderboard' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
-                    <Trophy className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'leaderboard') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
+                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-200 ease-out ${gameState !== 'landing' && activeTab === 'leaderboard' ? 'text-[#072e63] font-bold' : 'text-[#8fa2bd] group-hover:text-[#e0d0ab] group-hover:-translate-y-0.5'}`}>
+                    <Trophy className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-200 ease-out ${!(gameState !== 'landing' && activeTab === 'leaderboard') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
                     <span className="hidden sm:inline">Leaderboard</span>
                     <span className="sm:hidden">Rank</span>
                   </span>
@@ -378,17 +378,17 @@ export default function App() {
                 {userEmail && (
                   <button
                     onClick={() => navigateToTab('profile')}
-                    className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group cursor-pointer"
+                    className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-xs outline-none group cursor-pointer"
                   >
                     {gameState !== 'landing' && activeTab === 'profile' && (
                       <motion.div
                         layoutId="active-nav-pill"
-                        className="absolute inset-0 bg-[#e0d0ab] rounded-sm z-0 shadow-sm"
-                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                        className="absolute inset-0 bg-[#e0d0ab] rounded-xs z-0 shadow-sm"
+                        transition={{ type: 'spring', bounce: 0.15, duration: 0.45 }}
                       />
                     )}
-                    <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-300 ease-out ${gameState !== 'landing' && activeTab === 'profile' ? 'text-zinc-950 font-medium' : 'text-zinc-400 group-hover:text-white group-hover:-translate-y-0.5'}`}>
-                      <User className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-300 ease-out ${!(gameState !== 'landing' && activeTab === 'profile') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
+                    <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-200 ease-out ${gameState !== 'landing' && activeTab === 'profile' ? 'text-[#072e63] font-bold' : 'text-[#8fa2bd] group-hover:text-[#e0d0ab] group-hover:-translate-y-0.5'}`}>
+                      <User className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-200 ease-out ${!(gameState !== 'landing' && activeTab === 'profile') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
                       <span className="hidden sm:inline">Profile & History</span>
                       <span className="sm:hidden">Profile</span>
                     </span>
