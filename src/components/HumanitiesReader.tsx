@@ -102,6 +102,13 @@ const DOTS = [
 const PAPERS = ['GS-I', 'GS-II', 'GS-IV', 'Essay'];
 const YEARS = [2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015];
 
+const TRADITIONS: Record<string, { label: string; ids: string[] }> = {
+  ALL: { label: 'All Thinkers', ids: [] },
+  INDIAN: { label: 'Indian Moral & Political Thought', ids: ['ambedkar', 'gandhi', 'kautilya', 'vivekananda', 'tagore'] },
+  WESTERN: { label: 'Western Ethics & Philosophy', ids: ['kant', 'mill', 'aristotle', 'rawls', 'rousseau'] },
+  JUSTICE: { label: 'Justice & Constitutional Liberty', ids: ['ambedkar', 'rawls', 'mill', 'rousseau', 'kautilya'] },
+};
+
 // Pure helper functions preserved for contract & unit test verification
 export function togglePinPassage(currentPinned: Passage[], passage: Passage): Passage[] {
   const isAlreadyPinned = currentPinned.some((p) => p.id === passage.id);
@@ -124,6 +131,7 @@ export default function HumanitiesReader() {
   const [query, setQuery] = useState<string>('');
   const [paper, setPaper] = useState<string>('ALL');
   const [year, setYear] = useState<string>('ALL');
+  const [tradition, setTradition] = useState<string>('ALL');
   const [benchOpen, setBenchOpen] = useState<boolean>(false);
   const [typed, setTyped] = useState<number>(0);
   const [reduced, setReduced] = useState<boolean>(false);
@@ -468,6 +476,13 @@ export default function HumanitiesReader() {
     };
   });
 
+  const activeThinker = thinkers.find((t) => t.id === activeId) || thinkers[0];
+  const filteredThinkers = thinkers.filter((t) => {
+    if (tradition === 'ALL') return true;
+    const allowed = TRADITIONS[tradition]?.ids || [];
+    return allowed.includes(t.id);
+  });
+
   const { t: rt, p: rp } = current();
   const read = rt && rp ? {
     id: rt.id,
@@ -684,294 +699,256 @@ export default function HumanitiesReader() {
             </div>
           </div>
 
-          {/* ── Band of Thinkers (Steles) ── */}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: narrow ? 'column' : 'row',
-              gap: narrow ? '10px' : '3px',
-              alignItems: 'stretch'
-            }}
-          >
-            {thinkers.map((t) => (
-              <div
-                key={t.id}
-                role="button"
-                tabIndex={0}
-                aria-label={t.aria}
-                onMouseEnter={t.onAttend}
-                onFocus={t.onAttend}
-                onClick={t.onAttendOrOpen}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    t.onAttendOrOpen();
-                  }
-                }}
-                style={{
-                  position: 'relative',
-                  flex: t.flex,
-                  minHeight: t.minH,
-                  padding: t.pad,
-                  cursor: 'pointer',
-                  outline: 'none',
-                  overflow: 'hidden',
-                  border: `1px solid ${t.border}`,
-                  background: t.bg,
-                  boxShadow: t.shadow,
-                  opacity: t.opacity,
-                  transition: 'flex .5s cubic-bezier(.4,0,.2,1), background .4s, border-color .3s, opacity .3s',
-                  display: 'flex',
-                  flexDirection: t.innerDir,
-                  alignItems: t.innerAlign,
-                  gap: t.innerGap
-                }}
-              >
-                {/* Top Corner Metadata */}
-                <span
-                  style={{
-                    position: 'absolute',
-                    top: '10px',
-                    left: '12px',
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: '9px',
-                    letterSpacing: '.16em',
-                    color: t.metaColor
-                  }}
-                >
-                  {t.era}
-                </span>
-                <span
-                  style={{
-                    position: 'absolute',
-                    top: '10px',
-                    right: '12px',
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: '9px',
-                    letterSpacing: '.1em',
-                    color: t.metaColor
-                  }}
-                >
-                  {t.citeCount}
-                </span>
+          {/* ══════════════════════════════════════════════════════════════════
+              TIER 1: THE ACTIVE THINKER SPOTLIGHT MONUMENT (MASTER CHAMBER)
+              ══════════════════════════════════════════════════════════════════ */}
+          {activeThinker && (
+            <div className="relative p-6 sm:p-8 lg:p-10 bg-gradient-to-br from-[rgba(4,25,54,0.95)] via-[rgba(7,46,99,0.65)] to-[rgba(4,25,54,0.98)] border border-[rgba(224,208,171,0.45)] rounded-xs shadow-[0_24px_70px_rgba(0,0,0,0.7)] mb-10 overflow-hidden backdrop-blur-xl">
+              {/* Radial ambient highlight */}
+              <div className="absolute top-0 right-0 w-[480px] h-[480px] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[rgba(1,148,168,0.18)] via-transparent to-transparent pointer-events-none" />
 
-                {/* SVG Portrait Engraving */}
-                <div
-                  style={{
-                    flex: 'none',
-                    width: t.portraitPx,
-                    height: t.portraitPx,
-                    transition: 'width .5s cubic-bezier(.4,0,.2,1), height .5s cubic-bezier(.4,0,.2,1)',
-                    filter: t.portraitGlow
-                  }}
-                >
-                  <ThinkerEngravingSvg
-                    who={t.id}
-                    stroke={t.stroke}
-                    stroke2={t.stroke2}
-                    accent={t.accent}
-                    lensFill={t.lensFill}
-                    guideOpacity={t.guideOpacity}
-                    className="w-full h-full"
-                  />
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+                {/* Col 1: Majestic Portrait Engraving (Spacious 200px Canvas) */}
+                <div className="lg:col-span-3 flex flex-col items-center justify-center">
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => openRead(activeThinker.id, 0)}
+                    className="relative w-44 h-44 sm:w-52 sm:h-52 cursor-pointer transition-transform hover:scale-105"
+                    style={{ filter: activeThinker.portraitGlow }}
+                    title={`Open ${activeThinker.name}'s Reading Chamber`}
+                  >
+                    <ThinkerEngravingSvg
+                      who={activeThinker.id}
+                      stroke={GOLD}
+                      stroke2="#c8b998"
+                      accent={GOLD}
+                      lensFill="rgba(224,208,171,0.12)"
+                      guideOpacity={0.28}
+                      className="w-full h-full"
+                    />
+                  </div>
+                  <button
+                    onClick={() => openRead(activeThinker.id, 0)}
+                    className="mt-3 px-4 py-1.5 bg-[rgba(3,18,42,0.85)] hover:bg-[#e0d0ab] text-[#9fb0c8] hover:text-[#072e63] border border-[rgba(1,148,168,0.5)] hover:border-[#e0d0ab] text-[11px] font-mono rounded-xs uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                  >
+                    <span>Open Full Work</span>
+                    <span>→</span>
+                  </button>
                 </div>
 
-                {/* Thinker Name, Work & Active Voice Block */}
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: t.textAlign,
-                    textAlign: t.textAlignCss,
-                    gap: '5px',
-                    width: '100%',
-                    minWidth: 0
-                  }}
-                >
-                  <div
-                    style={{
-                      fontFamily: 'Merriweather, serif',
-                      fontWeight: 400,
-                      fontSize: t.nameSize,
-                      color: t.nameColor,
-                      lineHeight: 1.15,
-                      transition: 'color .3s, font-size .4s'
-                    }}
-                  >
-                    {t.name}
-                  </div>
-                  <div
-                    style={{
-                      fontFamily: 'Merriweather, serif',
-                      fontStyle: 'italic',
-                      fontSize: '11.5px',
-                      color: t.workColor
-                    }}
-                  >
-                    {t.work} · {t.workYear}
+                {/* Col 2: Thinker Display, Work & Live Typewriter Voice */}
+                <div className="lg:col-span-6 flex flex-col items-start min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap mb-2">
+                    <span className="px-2.5 py-0.5 rounded-xs bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.4)] text-[#9fb0c8] font-mono text-[10px] uppercase tracking-wider">
+                      {activeThinker.era}
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-xs bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 text-[#e0d0ab] font-mono text-[10px] uppercase tracking-wider">
+                      {activeThinker.citeCount}
+                    </span>
                   </div>
 
-                  {/* Attended / Active Voice Dossier */}
-                  {t.isActive && (
-                    <div style={{ width: '100%', maxWidth: '520px', marginTop: '12px' }}>
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '9px' }}>
-                        <span
-                          style={{
-                            flex: 'none',
-                            fontFamily: 'Merriweather, serif',
-                            fontSize: '34px',
-                            lineHeight: 0.7,
-                            color: 'rgba(224,208,171,.45)'
-                          }}
-                        >
-                          “
-                        </span>
-                        <p
-                          style={{
-                            margin: 0,
-                            fontFamily: 'Merriweather, serif',
-                            fontWeight: 300,
-                            fontSize: t.voiceSize,
-                            lineHeight: 1.62,
-                            color: '#e8e0cf'
-                          }}
-                        >
-                          {t.typed}
-                          <span
-                            style={{
-                              display: t.caretDisplay,
-                              width: '2px',
-                              height: '.95em',
-                              backgroundColor: '#e0d0ab',
-                              verticalAlign: 'text-bottom',
-                              marginLeft: '3px',
-                              animation: 'caret 1s step-end infinite'
-                            }}
-                          />
-                        </p>
-                      </div>
+                  <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl text-[#e0d0ab] font-normal tracking-tight m-0 leading-tight">
+                    {activeThinker.name}
+                  </h2>
+                  <div className="font-serif italic text-sm text-[#9fb0c8] mt-1 mb-4">
+                    {activeThinker.work} · {activeThinker.workYear}
+                  </div>
 
-                      <div
+                  {/* Live Typewriter Voice Excerpt */}
+                  <div className="relative w-full pl-5 border-l-2 border-[#e0d0ab]/40 my-2">
+                    <span className="absolute left-1 -top-3 font-serif text-3xl text-[#e0d0ab]/30 select-none">“</span>
+                    <p className="font-serif font-light text-sm sm:text-base text-[#f0e8d8] leading-relaxed m-0">
+                      {activeThinker.typed}
+                      <span
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '11px',
-                          marginTop: '16px',
-                          opacity: t.stampOpacity,
-                          transition: 'opacity .5s'
+                          display: activeThinker.caretDisplay,
+                          width: '2px',
+                          height: '.95em',
+                          backgroundColor: '#e0d0ab',
+                          verticalAlign: 'text-bottom',
+                          marginLeft: '3px',
+                          animation: 'caret 1s step-end infinite',
                         }}
-                      >
-                        <span
-                          style={{
-                            height: '1px',
-                            width: '38px',
-                            background: 'linear-gradient(90deg, rgba(224,208,171,0), #e0d0ab)',
-                            transformOrigin: 'left',
-                            animation: t.leaderAnim
-                          }}
-                        />
-                        <span
-                          style={{
-                            fontFamily: "'JetBrains Mono', monospace",
-                            fontSize: '10.5px',
-                            fontWeight: 700,
-                            letterSpacing: '.09em',
-                            color: '#072e63',
-                            background: '#e0d0ab',
-                            padding: '3px 8px',
-                            borderRadius: '2px'
-                          }}
-                        >
-                          {t.stamp}
-                        </span>
-                        <span
-                          style={{
-                            fontFamily: "'JetBrains Mono', monospace",
-                            fontSize: '9.5px',
-                            letterSpacing: '.1em',
-                            color: '#9fb0c8'
-                          }}
-                        >
-                          drawn from this passage
-                        </span>
-                      </div>
+                      />
+                    </p>
+                  </div>
 
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '7px',
-                          marginTop: '20px',
-                          flexWrap: 'wrap'
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontFamily: "'JetBrains Mono', monospace",
-                            fontSize: '9px',
-                            letterSpacing: '.16em',
-                            color: '#8fa2bd'
-                          }}
-                        >
-                          READ IN FULL
-                        </span>
-                        {t.ticks.map((k) => (
-                          <span
-                            key={k.id}
-                            role="button"
-                            tabIndex={0}
-                            onClick={k.onClick}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                k.onClick(e as any);
-                              }
-                            }}
-                            className="hover:border-[#e0d0ab] hover:text-[#e0d0ab]"
-                            style={{
-                              fontFamily: "'JetBrains Mono', monospace",
-                              fontSize: '10.5px',
-                              padding: '4px 9px',
-                              borderRadius: '2px',
-                              cursor: 'pointer',
-                              border: `1px solid ${k.border}`,
-                              background: k.bg,
-                              color: k.color,
-                              transition: 'all .2s'
-                            }}
-                          >
-                            {k.label}
-                          </span>
-                        ))}
-                        <span
-                          style={{
-                            fontFamily: "'JetBrains Mono', monospace",
-                            fontSize: '9.5px',
-                            color: '#8fa2bd'
-                          }}
-                        >
-                          ↵
-                        </span>
-                      </div>
+                  {/* UPSC Citation Stamp */}
+                  <div
+                    className="flex items-center gap-2.5 mt-3 transition-opacity duration-500"
+                    style={{ opacity: activeThinker.stampOpacity }}
+                  >
+                    <span className="px-2.5 py-0.5 rounded-xs bg-[#e0d0ab] text-[#072e63] font-mono font-bold text-[10px] tracking-wider uppercase shadow-sm">
+                      {activeThinker.stamp}
+                    </span>
+                    <span className="font-mono text-[10px] text-[#9fb0c8] tracking-wide">
+                      drawn from this primary passage
+                    </span>
+                  </div>
+                </div>
+
+                {/* Col 3: Direct Passage Jump Index & Quick Actions */}
+                <div className="lg:col-span-3 flex flex-col justify-between h-full p-4 bg-[rgba(3,18,42,0.7)] border border-[rgba(19,108,153,0.4)] rounded-xs gap-4 shadow-inner">
+                  <div>
+                    <div className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-[#0194a8] mb-2.5 flex items-center justify-between">
+                      <span>Verbatim Passages</span>
+                      <span className="text-[#e0d0ab] font-bold">({activeThinker.ticks.length})</span>
                     </div>
-                  )}
+                    <div className="grid grid-cols-2 gap-1.5 max-h-[150px] overflow-y-auto pr-1">
+                      {activeThinker.ticks.map((k, idx) => (
+                        <button
+                          key={k.id}
+                          onClick={k.onClick}
+                          className="px-2.5 py-2 bg-[rgba(7,46,99,0.35)] hover:bg-[#e0d0ab]/15 border border-[rgba(19,108,153,0.4)] hover:border-[#e0d0ab] rounded-xs font-mono text-[10.5px] text-[#c8b998] hover:text-[#e0d0ab] flex items-center justify-between transition-colors cursor-pointer text-left"
+                        >
+                          <span className="font-bold">{k.label}</span>
+                          <span className="text-[9px] text-[#8fa2bd]">§{idx + 1}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-                  {t.isDim && (
-                    <div
-                      style={{
-                        marginTop: '5px',
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: '9.5px',
-                        letterSpacing: '.1em',
-                        color: '#8fa2bd'
-                      }}
+                  <div className="space-y-2 pt-2 border-t border-[rgba(19,108,153,0.3)]">
+                    <button
+                      onClick={() => openRead(activeThinker.id, 0)}
+                      className="w-full py-2.5 px-3 bg-[#e0d0ab] hover:bg-[#f0e2be] text-[#072e63] font-mono font-bold text-xs uppercase tracking-wider rounded-xs transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
                     >
-                      {t.dimHint}
-                    </div>
-                  )}
+                      <span>Enter Reading Chamber</span>
+                      <span>↵</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-            ))}
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════════════════════════════════
+              TIER 2: THE LIVING PANTHEON GALLERY GRID (RESPONSIVE & EXPANSIVE)
+              ══════════════════════════════════════════════════════════════════ */}
+          <div className="space-y-5">
+            <div className="flex items-center justify-between flex-wrap gap-4 pt-2">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#0194a8]" />
+                  <h3 className="font-serif text-lg text-[#e0d0ab] m-0 font-normal">
+                    The Living Pantheon
+                  </h3>
+                  <span className="font-mono text-xs text-[#9fb0c8]">
+                    ({filteredThinkers.length} Classical & Modern Pillars)
+                  </span>
+                </div>
+                <p className="text-xs text-[#8fa2bd] mt-0.5 mb-0">
+                  Select any thinker to focus in the Master Chamber, or double-click to read their passages directly.
+                </p>
+              </div>
+
+              {/* Tradition / Domain Filter Tabs */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {Object.entries(TRADITIONS).map(([key, item]) => {
+                  const active = tradition === key;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setTradition(key)}
+                      className={`px-3 py-1 font-mono text-[10.5px] rounded-xs uppercase tracking-wider transition-all cursor-pointer border ${
+                        active
+                          ? 'bg-[#e0d0ab] text-[#072e63] border-[#e0d0ab] font-bold shadow-sm'
+                          : 'bg-[rgba(3,18,42,0.6)] text-[#9fb0c8] border-[rgba(19,108,153,0.4)] hover:border-[#e0d0ab] hover:text-[#e0d0ab]'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Generous 5-Column Responsive Card Grid (No horizontal claustrophobia!) */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-4">
+              {filteredThinkers.map((t) => {
+                const isCurrentActive = t.id === activeId;
+                return (
+                  <div
+                    key={t.id}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={t.aria}
+                    onClick={() => attend(t.id)}
+                    onDoubleClick={() => openRead(t.id, 0)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        attend(t.id);
+                      }
+                    }}
+                    className={`relative p-4 sm:p-5 rounded-xs transition-all duration-300 flex flex-col items-center justify-between text-center cursor-pointer select-none group min-h-[260px] ${
+                      isCurrentActive
+                        ? 'bg-gradient-to-b from-[rgba(11,61,120,0.6)] to-[rgba(4,25,54,0.95)] border-2 border-[#e0d0ab] shadow-[0_12px_36px_rgba(224,208,171,0.25)]'
+                        : 'bg-[rgba(4,25,54,0.65)] hover:bg-[rgba(7,46,99,0.5)] border border-[rgba(19,108,153,0.4)] hover:border-[#0194a8] shadow-md hover:-translate-y-1'
+                    }`}
+                  >
+                    {/* Top metadata row */}
+                    <div className="w-full flex items-center justify-between text-[9.5px] font-mono text-[#8fa2bd] mb-2">
+                      <span className="truncate max-w-[100px]">{t.era}</span>
+                      <span className={isCurrentActive ? 'text-[#e0d0ab] font-bold' : ''}>
+                        {t.citeCount}
+                      </span>
+                    </div>
+
+                    {/* SVG Portrait Engraving */}
+                    <div
+                      className="w-20 h-20 sm:w-24 sm:h-24 my-1 transition-transform group-hover:scale-105"
+                      style={{ filter: isCurrentActive ? 'drop-shadow(0 0 16px rgba(224,208,171,0.3))' : 'none' }}
+                    >
+                      <ThinkerEngravingSvg
+                        who={t.id}
+                        stroke={isCurrentActive ? GOLD : '#0194a8'}
+                        stroke2={isCurrentActive ? '#c8b998' : '#136c99'}
+                        accent={isCurrentActive ? GOLD : '#0194a8'}
+                        lensFill={isCurrentActive ? 'rgba(224,208,171,0.1)' : 'none'}
+                        guideOpacity={isCurrentActive ? 0.28 : 0.14}
+                        className="w-full h-full"
+                      />
+                    </div>
+
+                    {/* Thinker Name & Work */}
+                    <div className="w-full mt-2">
+                      <h4
+                        className={`font-serif text-sm font-normal tracking-tight leading-snug m-0 transition-colors ${
+                          isCurrentActive ? 'text-[#e0d0ab] font-semibold' : 'text-[#f0e8d8] group-hover:text-[#e0d0ab]'
+                        }`}
+                      >
+                        {t.name}
+                      </h4>
+                      <div className="font-serif italic text-[11px] text-[#9fb0c8] truncate mt-0.5">
+                        {t.work} · {t.workYear}
+                      </div>
+                    </div>
+
+                    {/* Bottom Status / Action Indicator */}
+                    <div className="w-full mt-3 pt-2 border-t border-[rgba(19,108,153,0.25)] flex items-center justify-center">
+                      {isCurrentActive ? (
+                        <span className="font-mono text-[9.5px] uppercase tracking-wider text-[#e0d0ab] font-bold flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#e0d0ab] animate-pulse" />
+                          <span>In Spotlight</span>
+                        </span>
+                      ) : (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openRead(t.id, 0);
+                          }}
+                          className="font-mono text-[9.5px] uppercase tracking-wider text-[#8fa2bd] group-hover:text-[#e0d0ab] transition-colors cursor-pointer"
+                        >
+                          Read Work →
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* Bottom Hotkeys Bar */}
