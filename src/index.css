@@ -117,8 +117,12 @@
 }
 
 body {
-  background-color: #072e63;
+  margin: 0;
+  background-color: #041d40;
+  background-image: radial-gradient(120% 78% at 50% 0%, #0b3d78 0%, #072e63 40%, #041d40 100%);
+  background-attachment: fixed;
   color: #e0d0ab;
+  -webkit-font-smoothing: antialiased;
 }
 
 @keyframes shake {

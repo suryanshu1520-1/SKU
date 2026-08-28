@@ -505,8 +505,7 @@ export default function HumanitiesReader() {
   const showClear = lensOn;
 
   return (
-    <div className="relative min-h-screen bg-[#041d40] text-stone-200 font-sans pb-28 overflow-x-hidden selection:bg-[#e0d0ab] selection:text-[#072e63]"
-         style={{ background: 'radial-gradient(120% 78% at 50% 0%, #0b3d78 0%, #072e63 40%, #041d40 100%)' }}>
+    <div className="relative w-full text-stone-200 font-sans pb-28 selection:bg-[#e0d0ab] selection:text-[#072e63]">
 
       {/* ── Keyframe Animations embedded ── */}
       <style>{`
@@ -535,12 +534,6 @@ export default function HumanitiesReader() {
           />
         ))}
       </div>
-
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(115% 80% at 50% 32%, rgba(4,29,64,0) 36%, rgba(3,16,38,.78) 100%)' }}
-      />
 
       {/* ══════════════════════════════════════════════════════════════════
           MODE 1: THE HALL OF THINKERS

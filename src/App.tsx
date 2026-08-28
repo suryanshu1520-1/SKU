@@ -235,10 +235,10 @@ export default function App() {
   }
 
   return (
-    <div className="bg-zinc-950 min-h-screen relative font-sans text-stone-100 selection:bg-[#e0d0ab] selection:text-zinc-950">
+    <div className="min-h-screen relative font-sans text-stone-100 selection:bg-[#e0d0ab] selection:text-[#072e63]">
       {/* Unified Frosted Header Bar */}
       {gameState !== 'login' && (
-        <header className="fixed top-0 left-0 w-full z-50 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-900">
+        <header className="fixed top-0 left-0 w-full z-50 bg-[rgba(4,25,54,0.75)] backdrop-blur-md border-b border-[rgba(19,108,153,0.5)]">
           <div className="flex flex-col md:flex-row md:items-center justify-between px-4 py-3 md:px-8 gap-3 md:gap-0">
             {/* Brand Logo & Mobile Action */}
             <div className="flex items-center justify-between w-full md:w-auto">
@@ -431,7 +431,7 @@ export default function App() {
       )}
 
       {gameState !== 'login' && gameState !== 'landing' && (
-        <main className="pt-28 md:pt-24 pb-12 w-full max-w-7xl mx-auto px-4 md:px-8">
+        <main className={`pt-28 md:pt-24 pb-12 w-full ${activeTab === 'humanities' ? 'max-w-none px-0' : 'max-w-7xl mx-auto px-4 md:px-8'}`}>
           {activeTab === 'profile' && userEmail ? (
             <Profile userEmail={userEmail} userId={userId} userName={userName} onLogout={handleLogout} />
           ) : activeTab === 'leaderboard' ? (
