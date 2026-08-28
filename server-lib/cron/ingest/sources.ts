@@ -101,7 +101,7 @@ const PIB: SourceAdapter = {
 };
 
 // ============================================================
-// PRS Legislative Research — blog listing → article, content in `.top_content`
+// PRS Legislative Research — RSS + blog listing, content in `.top_content` & `.field--name-body`
 // ============================================================
 const PRS: SourceAdapter = {
   id: "PRS",
@@ -110,20 +110,41 @@ const PRS: SourceAdapter = {
   lang: "en",
   enabled: true,
   discover: async () => {
-    const html = await fetchText("https://prsindia.org/theprsblog");
-    if (!html) return [];
-    const $ = cheerio.load(html);
     const seen = new Set<string>();
     const refs: RawRef[] = [];
-    $('a[href*="/theprsblog/"]').each((_i, el) => {
-      const href = $(el).attr("href") || "";
-      const title = collapse($(el).text());
-      if (title.length < 25) return;
-      const url = href.startsWith("http") ? href : "https://prsindia.org" + href;
-      if (seen.has(url)) return;
-      seen.add(url);
-      refs.push({ url, title });
-    });
+
+    // 1. Try PRS standard RSS feed
+    try {
+      const feedItems = await fetchFeed("https://prsindia.org/feed.xml");
+      for (const item of feedItems) {
+        if (item.url && !seen.has(item.url)) {
+          seen.add(item.url);
+          refs.push({ ...item, ministryHint: "Parliamentary Affairs" });
+        }
+      }
+    } catch {
+      // Feed fallback
+    }
+
+    // 2. Discover from the PRS Blog & Billstrack
+    try {
+      const html = await fetchText("https://prsindia.org/theprsblog");
+      if (html) {
+        const $ = cheerio.load(html);
+        $('a[href*="/theprsblog/"], a[href*="/billtrack/"]').each((_i, el) => {
+          const href = $(el).attr("href") || "";
+          const title = collapse($(el).text());
+          if (title.length < 20) return;
+          const url = href.startsWith("http") ? href : "https://prsindia.org" + href;
+          if (seen.has(url)) return;
+          seen.add(url);
+          refs.push({ url, title, ministryHint: "Parliamentary Affairs" });
+        });
+      }
+    } catch {
+      // Blog fallback
+    }
+
     return refs;
   },
   extract: async (ref) => {
@@ -131,8 +152,11 @@ const PRS: SourceAdapter = {
       ".top_content",
       ".field--name-body",
       ".node__content",
+      ".field-item",
+      "article",
+      ".content",
     ]);
-    if (!body || body.length < 250) return null;
+    if (!body || body.length < 200) return null;
     return { title: ref.title, body };
   },
 };

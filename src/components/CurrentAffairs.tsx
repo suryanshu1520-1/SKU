@@ -35,6 +35,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import DailyEdition from './DailyEdition';
 import RebaseEdition from './RebaseEdition';
+import prsVaultDossiers from '../data/prs-vault-dossiers.json';
 import {
   SourceAnchor,
   GroundingBadge,
@@ -329,16 +330,25 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
       if (error) throw error;
 
       if (data) {
+        let finalData = data;
+        if ((categoryTab === 'PRS' || filterSource === 'PRS') && pageIndex === 0) {
+          const liveUrls = new Set(data.map((d: any) => d.url));
+          const supplementary = (prsVaultDossiers as CurrentAffairsItem[]).filter(
+            (item) => !liveUrls.has(item.url)
+          );
+          finalData = [...data, ...supplementary];
+        }
+
         if (pageIndex === 0) {
-          setItems(data);
+          setItems(finalData);
         } else {
-          setItems((prev) => [...prev, ...data]);
+          setItems((prev) => [...prev, ...finalData]);
         }
 
         setHasMore(data.length === PAGE_SIZE);
 
-        const uniqueMinistries = Array.from(new Set(data.map((item: any) => item.ministry).filter(Boolean))) as string[];
-        const uniqueSources = Array.from(new Set(data.map((item: any) => item.source).filter(Boolean))) as string[];
+        const uniqueMinistries = Array.from(new Set(finalData.map((item: any) => item.ministry).filter(Boolean))) as string[];
+        const uniqueSources = Array.from(new Set(finalData.map((item: any) => item.source).filter(Boolean))) as string[];
 
         if (pageIndex === 0 && filterMinistry === 'ALL' && filterSource === 'ALL' && !filterStartDate && !filterEndDate) {
           setMinistries(uniqueMinistries.sort());
@@ -915,22 +925,22 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-5 bg-gradient-to-r from-purple-950/40 via-zinc-900/70 to-zinc-950 border border-purple-800/40 rounded-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-sans backdrop-blur-sm shadow-xl"
+              className="p-5 bg-gradient-to-r from-[rgba(30,15,65,0.8)] via-[rgba(7,30,70,0.7)] to-[rgba(4,25,54,0.85)] border border-[rgba(168,85,247,0.4)] rounded-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-sans backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.5)]"
             >
               <div className="flex items-start sm:items-center gap-3.5">
-                <div className="p-2.5 rounded-sm bg-purple-900/30 border border-purple-700/50 text-purple-300 shrink-0">
+                <div className="p-2.5 rounded-xs bg-[rgba(168,85,247,0.15)] border border-[rgba(168,85,247,0.35)] text-[#c084fc] shrink-0 shadow-sm">
                   <Scale className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase tracking-wider">
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-xs bg-[#e0d0ab] text-[#072e63] uppercase tracking-wider shadow-sm">
                       PRS LEGISLATIVE RESEARCH VAULT
                     </span>
-                    <span className="text-xs font-mono text-zinc-400">
+                    <span className="text-xs font-mono text-[#e0d0ab]">
                       {displayedItems.length} Parliamentary & Statutory Dossiers
                     </span>
                   </div>
-                  <p className="text-xs text-zinc-300 mt-1 leading-relaxed">
+                  <p className="text-xs text-[#9fb0c8] mt-1 leading-relaxed">
                     Dedicated statutory and policy intelligence archive. Contains deep analytical breakdowns of Parliamentary Bills, Acts, Standing Committee reports, and constitutional doctrines, isolated from the daily breaking news feed.
                   </p>
                 </div>
@@ -940,7 +950,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                   setActiveCategoryTab('ALL');
                   setSelectedSource('ALL');
                 }}
-                className="px-3.5 py-1.5 rounded-sm bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-zinc-500 text-zinc-300 text-xs font-mono uppercase tracking-wider whitespace-nowrap cursor-pointer transition-colors shrink-0"
+                className="px-3.5 py-1.5 rounded-xs bg-[rgba(4,25,54,0.8)] hover:bg-[rgba(11,61,120,0.6)] border border-[rgba(19,108,153,0.4)] hover:border-[#e0d0ab] text-[#e0d0ab] text-xs font-mono uppercase tracking-wider whitespace-nowrap cursor-pointer transition-colors shrink-0"
               >
                 Daily Signals [×]
               </button>

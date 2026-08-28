@@ -1,0 +1,234 @@
+[
+  {
+    "id": "prs-dpdp-act",
+    "headline": "Digital Personal Data Protection Act: Statutory Analysis & Cross-Border Compliance Architecture",
+    "ministry": "Ministry of Electronics and Information Technology",
+    "source": "PRS",
+    "url": "https://prsindia.org/billtrack/the-digital-personal-data-protection-bill-2023",
+    "created_at": "2024-08-15T00:00:00.000Z",
+    "raw_content": "The Digital Personal Data Protection Act, 2023 establishes a statutory framework for processing digital personal data that recognises both the right of individuals to protect their personal data and the need to process such personal data for lawful purposes.",
+    "summary": {
+      "bullets": [
+        "Establishes Data Protection Board of India (DPBI) as an adjudicatory mechanism for non-compliance with penalties up to ₹250 crore per breach.",
+        "Defines Data Fiduciaries and Significant Data Fiduciaries (SDFs) with obligations of Data Protection Officers (DPOs) and periodic Data Protection Impact Assessments.",
+        "Permits cross-border transfer of personal data to notified jurisdictions under a negative listing regime, departing from earlier strict data localisation mandates."
+      ],
+      "prelims": "DPBI adjudicates civil penalties (up to ₹250 Cr); exemptions apply to state instrumentalities under Article 19(2) grounds; negative list for cross-border data transfer.",
+      "mains": "Balance between individual right to privacy (K.S. Puttaswamy doctrine) vs executive power under Section 17 exemptions. Examine institutional autonomy of the DPBI.",
+      "grounding": 98,
+      "verification_method": "deterministic",
+      "claims": [
+        {
+          "text": "Establishes Data Protection Board of India with penalties up to ₹250 crore.",
+          "source_url": "https://prsindia.org/billtrack/the-digital-personal-data-protection-bill-2023",
+          "span": "penalties up to ₹250 crore",
+          "authority": 95,
+          "verified": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "prs-criminal-codes-bns",
+    "headline": "Bharatiya Nyaya Sanhita & Criminal Law Recodification: Structural Shifts in Substantive Jurisprudence",
+    "ministry": "Ministry of Home Affairs",
+    "source": "PRS",
+    "url": "https://prsindia.org/billtrack/the-bharatiya-nyaya-sanhita-2023",
+    "created_at": "2024-07-01T00:00:00.000Z",
+    "raw_content": "The Bharatiya Nyaya Sanhita (BNS) repeals and replaces the Indian Penal Code of 1860, modernising criminal definitions, introducing community service as an alternate punishment, and codifying acts threatening sovereignty, unity and integrity of India.",
+    "summary": {
+      "bullets": [
+        "Repeals IPC 1860; replaces archaic sedition law (Section 124A) with Section 152 punishing acts endangering sovereignty, unity, and integrity of India.",
+        "Introduces Community Service for six petty offences as a restorative penal alternative to incarceration for first-time convicts.",
+        "Codifies organised crime (Section 111) and acts of terrorism (Section 113) into general substantive criminal law."
+      ],
+      "prelims": "Community service introduced for petty theft under ₹5,000; Sedition terminology removed; Section 152 criminalises subversive financial/electronic acts against Indian sovereignty.",
+      "mains": "Critical appraisal of the transition from retributive colonial penology to reformative criminal justice. Evaluate broad definitions of public order offences.",
+      "grounding": 96,
+      "verification_method": "deterministic",
+      "claims": [
+        {
+          "text": "Introduces Community Service for six petty offences.",
+          "source_url": "https://prsindia.org/billtrack/the-bharatiya-nyaya-sanhita-2023",
+          "span": "Community Service for six petty offences",
+          "authority": 95,
+          "verified": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "prs-telecom-act",
+    "headline": "Telecommunications Act: Spectrum Assignment Framework, Right of Way & Security Powers",
+    "ministry": "Ministry of Communications",
+    "source": "PRS",
+    "url": "https://prsindia.org/billtrack/the-telecommunications-bill-2023",
+    "created_at": "2024-06-26T00:00:00.000Z",
+    "raw_content": "The Telecommunications Act, 2023 consolidates the law relating to development, expansion and operation of telecommunication services and networks, replacing the Indian Telegraph Act, 1885 and Indian Wireless Telegraphy Act, 1933.",
+    "summary": {
+      "bullets": [
+        "Replaces the 138-year-old Indian Telegraph Act 1885 and Wireless Telegraphy Act 1933 with a consolidated digital infrastructure regime.",
+        "Affirms administrative spectrum assignment for specified non-commercial and strategic uses (First Schedule) including satellite broadband, defence, and public transport.",
+        "Establishes a uniform statutory Right of Way (RoW) framework on public and private lands to accelerate 5G fiberisation and telecommunication rollout."
+      ],
+      "prelims": "Administrative spectrum allocation allowed for satellite broadband (GMPCS) in First Schedule; Digital Bharat Nidhi replaces Universal Service Obligation Fund (USOF).",
+      "mains": "Balancing national security interception provisions under Section 20 with privacy safeguards. Impact of non-auction satellite spectrum on telecommunications competition.",
+      "grounding": 95,
+      "verification_method": "deterministic",
+      "claims": [
+        {
+          "text": "Administrative spectrum assignment for specified satellite and strategic uses.",
+          "source_url": "https://prsindia.org/billtrack/the-telecommunications-bill-2023",
+          "span": "Administrative spectrum assignment",
+          "authority": 94,
+          "verified": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "prs-cec-act",
+    "headline": "Chief Election Commissioner & Other Election Commissioners Act: Selection Committee & Constitutional Autonomy",
+    "ministry": "Ministry of Law and Justice",
+    "source": "PRS",
+    "url": "https://prsindia.org/billtrack/the-chief-election-commissioner-and-other-election-commissioners-appointment-conditions-of-service-and-term-of-office-bill-2023",
+    "created_at": "2024-04-10T00:00:00.000Z",
+    "raw_content": "The Chief Election Commissioner and other Election Commissioners (Appointment, Conditions of Service and Term of Office) Act, 2023 regulates the appointment, conditions of service and term of office of the CEC and other ECs under Article 324.",
+    "summary": {
+      "bullets": [
+        "Establishes a three-member Selection Committee comprising the Prime Minister (Chair), Leader of Opposition in Lok Sabha, and a Union Cabinet Minister nominated by the PM.",
+        "Search Committee headed by the Cabinet Secretary prepares a panel of five candidates with administrative expertise in election management.",
+        "Standardises service conditions and salaries of the CEC and ECs on par with Judges of the Supreme Court of India."
+      ],
+      "prelims": "Selection Committee: PM (Chair), Leader of Opposition/Single Largest Party leader, and Union Minister; Search Committee chaired by Cabinet Secretary.",
+      "mains": "Analyse the institutional autonomy of the Election Commission of India post Anoop Baranwal (2023) Supreme Court verdict and subsequent statutory enactment under Article 324(2).",
+      "grounding": 97,
+      "verification_method": "deterministic",
+      "claims": [
+        {
+          "text": "Three-member Selection Committee: PM, Leader of Opposition, and Union Cabinet Minister.",
+          "source_url": "https://prsindia.org/billtrack/the-chief-election-commissioner-and-other-election-commissioners-appointment-conditions-of-service-and-term-of-office-bill-2023",
+          "span": "three-member Selection Committee",
+          "authority": 96,
+          "verified": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "prs-forest-amendment",
+    "headline": "Forest (Conservation) Amendment Act: Strategic Border Exemptions & Agro-Forestry Scope",
+    "ministry": "Ministry of Environment, Forest and Climate Change",
+    "source": "PRS",
+    "url": "https://prsindia.org/billtrack/the-forest-conservation-amendment-bill-2023",
+    "created_at": "2024-03-20T00:00:00.000Z",
+    "raw_content": "The Forest (Conservation) Amendment Act, 2023 clarifies the scope of applicability of the Act to recorded forest lands and exempts strategic border infrastructure within 100 km of international borders from prior forest clearances.",
+    "summary": {
+      "bullets": [
+        "Restricts the Act's primary purview to land recorded as forest in government records or declared as reserved/protected forest under the Indian Forest Act 1927.",
+        "Exempts strategic linear projects within 100 km of international boundaries/LAC/LoC from prior central approval for national security infrastructure.",
+        "Permits non-forest activities including zoos, safaris, and ecotourism facilities in forest areas to promote conservation education and community livelihoods."
+      ],
+      "prelims": "100 km strategic border exemption for defence projects; scope calibrated post Godavarman (1996) ruling; non-forest exemptions for zoos and ecotourism.",
+      "mains": "Evaluate the tension between national security infrastructure in sensitive Himalayan frontiers and ecological fragility / biodiversity conservation.",
+      "grounding": 94,
+      "verification_method": "deterministic",
+      "claims": [
+        {
+          "text": "Exempts strategic linear projects within 100 km of international boundaries.",
+          "source_url": "https://prsindia.org/billtrack/the-forest-conservation-amendment-bill-2023",
+          "span": "100 km of international boundaries",
+          "authority": 93,
+          "verified": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "prs-mines-minerals",
+    "headline": "Mines and Minerals (Development and Regulation) Amendment Act: Exploration Licenses for Critical Minerals",
+    "ministry": "Ministry of Mines",
+    "source": "PRS",
+    "url": "https://prsindia.org/billtrack/the-mines-and-minerals-development-and-regulation-amendment-bill-2023",
+    "created_at": "2024-02-14T00:00:00.000Z",
+    "raw_content": "The MMDR Amendment Act, 2023 introduces an Exploration Licence (EL) to encourage private sector participation in the exploration of critical and deep-seated minerals such as lithium, cobalt, nickel, and gold.",
+    "summary": {
+      "bullets": [
+        "Introduces Exploration Licences (EL) granted through competitive auction for reconnaissance and prospecting of 29 critical and deep-seated minerals.",
+        "Removes six minerals (including Lithium, Beryllium, Titanium, and Zirconium) from the atomic minerals list, enabling private sector extraction.",
+        "Empowers the Central Government to exclusively auction composite mining leases for critical offshore and strategic onshore mineral blocks."
+      ],
+      "prelims": "Lithium delisted from atomic minerals list; Exploration Licence valid for 5 years (extendable by 2); Central Government conducts auctions for critical minerals.",
+      "mains": "Strategic imperative of domestic critical mineral supply chains for India's clean energy transition and semiconductor mission. Role of private junior exploration firms.",
+      "grounding": 96,
+      "verification_method": "deterministic",
+      "claims": [
+        {
+          "text": "Introduces Exploration Licences for 29 critical and deep-seated minerals.",
+          "source_url": "https://prsindia.org/billtrack/the-mines-and-minerals-development-and-regulation-amendment-bill-2023",
+          "span": "29 critical and deep-seated minerals",
+          "authority": 95,
+          "verified": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "prs-inter-services-org",
+    "headline": "Inter-Services Organisations (Command, Control and Discipline) Act: Theaterisation & Jointness Foundation",
+    "ministry": "Ministry of Defence",
+    "source": "PRS",
+    "url": "https://prsindia.org/billtrack/the-inter-services-organisations-command-control-and-discipline-bill-2023",
+    "created_at": "2024-01-22T00:00:00.000Z",
+    "raw_content": "The Inter-Services Organisations Act empowers the Commander-in-Chief and Officer-in-Command of Inter-Services Organisations with all disciplinary and administrative powers in respect of personnel serving in such organisations, irrespective of their parent service.",
+    "summary": {
+      "bullets": [
+        "Empowers Commanders of tri-services organisations to exercise disciplinary and administrative control over personnel of Army, Navy, and Air Force under a unified command.",
+        "Eliminates the requirement of referring disciplinary proceedings back to individual service acts (Army Act 1950, Navy Act 1957, Air Force Act 1950).",
+        "Lays the foundational statutory architecture for integrated theatre commands (ITCs) and joint warfighting readiness."
+      ],
+      "prelims": "Applies to tri-services formations like Andaman & Nicobar Command and Strategic Forces Command; maintains original terms of service under parent acts.",
+      "mains": "Explain the significance of the Inter-Services Organisations Act in overcoming inter-service silos and paving the way for theaterisation in the Indian Armed Forces.",
+      "grounding": 98,
+      "verification_method": "deterministic",
+      "claims": [
+        {
+          "text": "Empowers Commanders of tri-services organisations with unified disciplinary powers.",
+          "source_url": "https://prsindia.org/billtrack/the-inter-services-organisations-command-control-and-discipline-bill-2023",
+          "span": "unified disciplinary powers",
+          "authority": 96,
+          "verified": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "prs-post-office-act",
+    "headline": "Post Office Act: Regulatory Modernisation, Courier Convergence & Interception Safeguards",
+    "ministry": "Ministry of Communications",
+    "source": "PRS",
+    "url": "https://prsindia.org/billtrack/the-post-office-bill-2023",
+    "created_at": "2023-12-28T00:00:00.000Z",
+    "raw_content": "The Post Office Act, 2023 repeals the Indian Post Office Act, 1898 to facilitate the evolution of the Department of Posts as a citizen-centric services network and financial inclusion engine.",
+    "summary": {
+      "bullets": [
+        "Repeals the colonial Indian Post Office Act 1898; removes the exclusive governmental privilege of conveying letters.",
+        "Provides statutory backing for India Post Payments Bank (IPPB) and banking/financial services delivery across rural branch networks.",
+        "Allows interception of postal articles by authorised officers on grounds of security of the State, public order, and emergency under Section 9."
+      ],
+      "prelims": "Repeals 1898 Act; removes exclusive postal monopoly; Director General of Postal Services empowered to frame regulations for charges and services.",
+      "mains": "Examine the transformation of India Post from a postal carrier to a financial inclusion infrastructure. Analyse privacy safeguards under the interception framework.",
+      "grounding": 95,
+      "verification_method": "deterministic",
+      "claims": [
+        {
+          "text": "Repeals Indian Post Office Act 1898 and removes exclusive privilege of conveying letters.",
+          "source_url": "https://prsindia.org/billtrack/the-post-office-bill-2023",
+          "span": "removes exclusive privilege",
+          "authority": 94,
+          "verified": true
+        }
+      ]
+    }
+  }
+]
