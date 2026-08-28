@@ -50,9 +50,9 @@ export default function App() {
   type NavOrientation = 'horizontal' | 'vertical';
   const [navOrientation, setNavOrientation] = useState<NavOrientation>(() => {
     try {
-      return (localStorage.getItem('tark_nav_orientation') as NavOrientation) || 'horizontal';
+      return (localStorage.getItem('tark_nav_orientation') as NavOrientation) || 'vertical';
     } catch {
-      return 'horizontal';
+      return 'vertical';
     }
   });
 

@@ -35,6 +35,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import DailyEdition from './DailyEdition';
 import RebaseEdition from './RebaseEdition';
+import ContextActionRail, { ContextActionItem } from './ContextActionRail';
 import prsVaultDossiers from '../data/prs-vault-dossiers.json';
 import {
   SourceAnchor,
@@ -592,17 +593,93 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
     setPage(0);
   };
 
+  // Contextual Page Action Bar items (Sleek Vertical Sub-bar)
+  const contextActions: ContextActionItem[] = [
+    {
+      id: 'prs',
+      label: 'PRS Legislative Vault',
+      shortLabel: 'PRS',
+      icon: Scale,
+      isActive: activeCategoryTab === 'PRS',
+      accentColor: 'purple',
+      onClick: () => {
+        setActiveCategoryTab('PRS');
+        setSelectedSource('PRS');
+      },
+      tooltip: 'Open Statutory Acts & Parliamentary Bills (PRS Vault)',
+    },
+    {
+      id: 'pib',
+      label: 'PIB Daily Digest',
+      shortLabel: 'PIB',
+      icon: BookOpen,
+      onClick: () => setShowPibModal(true),
+      tooltip: 'Open PIB Daily Digest Reader',
+    },
+    {
+      id: 'sync',
+      label: syncing ? 'Ingesting Feeds...' : syncCooldown > 0 ? `Cooldown (${syncCooldown}s)` : 'Fetch Live Intelligence',
+      shortLabel: 'Sync',
+      icon: RefreshCw,
+      disabled: syncing || syncCooldown > 0,
+      badge: syncCooldown > 0 ? `${syncCooldown}s` : undefined,
+      onClick: handleSyncFeed,
+      tooltip: 'Trigger Real-time Scraping & Verification',
+    },
+    {
+      id: 'signals',
+      label: 'Signal Deck Feed',
+      shortLabel: 'Deck',
+      icon: Zap,
+      isActive: briefViewMode === 'signals',
+      accentColor: 'gold',
+      onClick: () => handleSelectViewMode('signals'),
+      tooltip: 'Continuous Policy Dispatches Stream',
+    },
+    {
+      id: 'edition',
+      label: 'Daily Edition (10 Briefs)',
+      shortLabel: 'Edition',
+      icon: Sparkles,
+      isActive: briefViewMode === 'edition',
+      badge: 10,
+      accentColor: 'cyan',
+      onClick: () => handleSelectViewMode('edition'),
+      tooltip: 'Finite Curated Daily Edition',
+    },
+    {
+      id: 'filters',
+      label: isFilterDrawerOpen ? 'Close Filter Hub' : 'Open Filter Hub',
+      shortLabel: 'Filters',
+      icon: SlidersHorizontal,
+      isActive: isFilterDrawerOpen || activeFilterCount > 0,
+      badge: activeFilterCount > 0 ? activeFilterCount : undefined,
+      onClick: () => setIsFilterDrawerOpen(!isFilterDrawerOpen),
+      tooltip: 'Toggle Intelligence Filters',
+    },
+    {
+      id: 'saved',
+      label: `Saved Signals (${savedArticleIds.size})`,
+      shortLabel: 'Saved',
+      icon: Bookmark,
+      isActive: activeCategoryTab === 'SAVED',
+      badge: savedArticleIds.size > 0 ? savedArticleIds.size : undefined,
+      onClick: () => setActiveCategoryTab(activeCategoryTab === 'SAVED' ? 'ALL' : 'SAVED'),
+      tooltip: 'Candidate Bookmarked Dispatches',
+    },
+  ];
+
   return (
     <div className="w-full min-h-screen text-stone-100 font-sans pb-24">
       
       {/* ── Editorial Masthead Header ── */}
-      <div className="border-b border-zinc-800/80 pb-8 mb-8">
+      <div className="border-b border-zinc-800/80 pb-6 mb-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-[10px] font-sans uppercase tracking-wider text-[#e0d0ab] font-medium">
-                Today's Policy &amp; Governance
+                Today's Policy &amp; Governance Intelligence
               </span>
             </div>
             <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">
@@ -613,51 +690,58 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
             </p>
           </div>
 
-          {/* Quick Actions Bar */}
+          {/* Quick status badge & Mobile Actions */}
           <div className="flex items-center gap-2.5 shrink-0 font-sans flex-wrap">
-            <motion.button
-              onClick={() => {
-                setActiveCategoryTab('PRS');
-                setSelectedSource('PRS');
-              }}
-              whileHover={prefersReducedMotion ? undefined : { y: -2 }}
-              whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xs text-xs font-mono font-bold uppercase tracking-wider shadow-sm cursor-pointer transition-all border ${
-                activeCategoryTab === 'PRS'
-                  ? 'bg-gradient-to-r from-purple-900/60 to-purple-950 border-[#c084fc] text-[#e0d0ab] shadow-[0_0_20px_rgba(168,85,247,0.35)]'
-                  : 'bg-[rgba(30,15,65,0.7)] hover:bg-[rgba(45,20,95,0.8)] border-purple-800/60 hover:border-[#c084fc] text-purple-300'
-              }`}
-            >
-              <Scale className="w-4 h-4 text-[#c084fc]" />
-              <span>⚖️ PRS Vault</span>
-            </motion.button>
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(3,18,42,0.8)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-mono text-[#8fa2bd]">
+              <span className="text-[#e0d0ab] font-bold">{items.length}</span> dispatches indexed
+            </span>
 
-            <motion.button
-              onClick={() => setShowPibModal(true)}
-              whileHover={prefersReducedMotion ? undefined : { y: -2 }}
-              whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-[#e0d0ab]/60 text-zinc-200 hover:text-[#e0d0ab] rounded-xs text-xs font-sans font-semibold shadow-sm cursor-pointer"
-            >
-              <BookOpen className="w-4 h-4 text-[#e0d0ab]" />
-              <span>PIB Briefs</span>
-            </motion.button>
-
-            <motion.button
-              onClick={handleSyncFeed}
-              disabled={syncing || syncCooldown > 0}
-              whileHover={prefersReducedMotion ? undefined : { y: -2 }}
-              whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 rounded-xs text-xs font-sans font-bold uppercase tracking-wider disabled:opacity-50 cursor-pointer shadow-md shadow-[#e0d0ab]/10"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
-              <span>{syncing ? 'Syncing...' : syncCooldown > 0 ? `${syncCooldown}s` : 'Fetch Live'}</span>
-            </motion.button>
+            {/* Mobile / Tablet Compact Action Bar (< lg) */}
+            <div className="flex lg:hidden items-center gap-2">
+              <button
+                onClick={() => {
+                  setActiveCategoryTab('PRS');
+                  setSelectedSource('PRS');
+                }}
+                className={`px-3 py-1.5 rounded-xs text-xs font-mono font-bold transition-all border ${
+                  activeCategoryTab === 'PRS'
+                    ? 'bg-purple-950 border-[#c084fc] text-[#e0d0ab]'
+                    : 'bg-zinc-900 border-purple-900 text-purple-300'
+                }`}
+              >
+                ⚖️ PRS
+              </button>
+              <button
+                onClick={() => setShowPibModal(true)}
+                className="px-3 py-1.5 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xs text-xs font-sans"
+              >
+                PIB
+              </button>
+              <button
+                onClick={handleSyncFeed}
+                disabled={syncing || syncCooldown > 0}
+                className="px-3 py-1.5 bg-[#e0d0ab] text-zinc-950 rounded-xs text-xs font-sans font-bold uppercase"
+              >
+                {syncing ? '...' : syncCooldown > 0 ? `${syncCooldown}s` : 'Fetch'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* ── Main Layout: Context Action Sub-Bar (Left) + Intelligence Stream (Right) ── */}
+      <div className="flex items-start gap-6">
+        {/* Shorter Vertical Action Rail (Docked Left, Sticky) */}
+        <div className="hidden lg:block shrink-0 sticky top-24 z-30">
+          <ContextActionRail
+            activeTab="tracker"
+            gameState="arena"
+            customActions={contextActions}
+          />
+        </div>
+
+        {/* Main Intelligence Stream Container */}
+        <div className="flex-1 min-w-0">
 
       {/* ── Error Banner ── */}
       {errorMsg && (
@@ -1453,6 +1537,9 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
       )}
       </>
       )}
+
+        </div> {/* Close Main Intelligence Stream Container */}
+      </div> {/* Close Main Layout Flex */}
 
       {/* ── Full Brief Slide-Over (Slide-Over) ── */}
       <AnimatePresence>
