@@ -617,16 +617,6 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
       tooltip: 'Open PIB Daily Digest Reader',
     },
     {
-      id: 'sync',
-      label: syncing ? 'Ingesting Feeds...' : syncCooldown > 0 ? `Cooldown (${syncCooldown}s)` : 'Fetch Live Intelligence',
-      shortLabel: 'Sync',
-      icon: RefreshCw,
-      disabled: syncing || syncCooldown > 0,
-      badge: syncCooldown > 0 ? `${syncCooldown}s` : undefined,
-      onClick: handleSyncFeed,
-      tooltip: 'Trigger Real-time Scraping & Verification',
-    },
-    {
       id: 'signals',
       label: 'Signal Deck Feed',
       shortLabel: 'Deck',
@@ -679,7 +669,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-[10px] font-sans uppercase tracking-wider text-[#e0d0ab] font-medium">
-                Today's Policy &amp; Governance Intelligence
+                Autonomous Policy &amp; Governance Intelligence
               </span>
             </div>
             <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">
@@ -713,16 +703,9 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               </button>
               <button
                 onClick={() => setShowPibModal(true)}
-                className="px-3 py-1.5 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xs text-xs font-sans"
+                className="px-3 py-1.5 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xs text-xs font-sans cursor-pointer"
               >
                 PIB
-              </button>
-              <button
-                onClick={handleSyncFeed}
-                disabled={syncing || syncCooldown > 0}
-                className="px-3 py-1.5 bg-[#e0d0ab] text-zinc-950 rounded-xs text-xs font-sans font-bold uppercase"
-              >
-                {syncing ? '...' : syncCooldown > 0 ? `${syncCooldown}s` : 'Fetch'}
               </button>
             </div>
           </div>
