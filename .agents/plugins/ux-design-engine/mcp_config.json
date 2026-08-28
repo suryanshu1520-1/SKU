@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "ux-design-engine": {
+      "command": "npx",
+      "args": ["-y", "@elsahafy/ux-mcp-server"]
+    }
+  }
+}
