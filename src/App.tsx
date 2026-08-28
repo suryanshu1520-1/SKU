@@ -541,6 +541,7 @@ export default function App() {
             onNavigateTracker={() => navigateToTab('tracker')}
             onNavigateProfile={() => navigateToTab('profile')}
             onNavigateLibrary={() => navigateToTab('library')}
+            onNavigateHumanities={() => navigateToTab('humanities')}
             onNavigateManifesto={handleNavigateManifesto}
             onNavigateLegal={(type) => setLegalDocumentType(type)}
           />
