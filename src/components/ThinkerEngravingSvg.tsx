@@ -41,6 +41,7 @@ export default function ThinkerEngravingSvg({
 
   return (
     <div className={`relative flex items-center justify-center select-none overflow-hidden ${className}`} style={style}>
+      {/* 1. AMBEDKAR — Constitutional Compass & Architect Sigil */}
       {id === 'ambedkar' && (
         <svg viewBox="0 0 200 200" fill="none" className="w-full h-full block">
           <g stroke={resolvedStroke} opacity={resolvedGuideOpacity} strokeWidth="0.75" strokeDasharray="2 3" fill="none">
@@ -90,6 +91,7 @@ export default function ThinkerEngravingSvg({
         </svg>
       )}
 
+      {/* 2. GANDHI — Charkha Wheel & Moral Simplicity */}
       {id === 'gandhi' && (
         <svg viewBox="0 0 200 200" fill="none" className="w-full h-full block">
           <g stroke={resolvedStroke} opacity={resolvedGuideOpacity} strokeWidth="0.8" fill="none">
@@ -143,6 +145,7 @@ export default function ThinkerEngravingSvg({
         </svg>
       )}
 
+      {/* 3. KANT — Celestial Compass & Pure Duty */}
       {id === 'kant' && (
         <svg viewBox="0 0 200 200" fill="none" className="w-full h-full block">
           <g stroke={resolvedStroke} opacity={resolvedGuideOpacity} strokeWidth="0.8" fill="none">
@@ -182,10 +185,201 @@ export default function ThinkerEngravingSvg({
             <path d="M 72 138 L 44 175 L 44 195 L 156 195 L 156 175 L 128 138" />
             <path d="M 72 138 L 84 185 L 100 195 L 116 185 L 128 138" />
           </g>
-          <path stroke={resolvedStroke2} d="M 95 146 Q 100 152 105 146" strokeWidth="1" fill="none" />
           <circle fill={resolvedAccent} cx="100" cy="168" r="1.8" />
           <circle fill={resolvedAccent} cx="100" cy="180" r="1.8" />
-          <circle fill={resolvedAccent} cx="100" cy="192" r="1.8" />
+        </svg>
+      )}
+
+      {/* 4. MILL — Torch of Liberty & Marketplace of Ideas */}
+      {id === 'mill' && (
+        <svg viewBox="0 0 200 200" fill="none" className="w-full h-full block">
+          <g stroke={resolvedStroke} opacity={resolvedGuideOpacity} strokeWidth="0.8" fill="none">
+            <circle cx="100" cy="100" r="88" strokeDasharray="3 3" />
+            <polygon points="100,16 173,142 27,142" strokeWidth="0.7" />
+            <polygon points="100,184 27,58 173,58" strokeWidth="0.7" opacity={0.5} />
+          </g>
+          {/* Flame of Free Speech */}
+          <path
+            stroke={resolvedStroke}
+            fill={resolvedHead}
+            strokeWidth="1.75"
+            d="M 100 32 C 84 56 70 82 82 108 C 88 122 100 134 100 134 C 100 134 112 122 118 108 C 130 82 116 56 100 32 Z"
+          />
+          <path stroke={resolvedAccent} strokeWidth="1.5" d="M 100 60 C 92 78 88 94 94 110 C 96 116 100 122 100 122 C 100 122 104 116 106 110 C 112 94 108 78 100 60 Z" fill="none" />
+          <circle fill={resolvedAccent} cx="100" cy="98" r="3" />
+          <path stroke={resolvedStroke2} strokeWidth="1.2" d="M 76 138 L 124 138 L 114 178 L 86 178 Z" fill="none" />
+          <line stroke={resolvedStroke} x1="70" y1="184" x2="130" y2="184" strokeWidth="2" />
+          <line stroke={resolvedStroke2} x1="60" y1="192" x2="140" y2="192" strokeWidth="1.5" />
+          <path stroke={resolvedStroke2} d="M 45 100 Q 100 135 155 100" strokeWidth="1" strokeDasharray="2 3" />
+        </svg>
+      )}
+
+      {/* 5. KAUTILYA — Royal Mauryan Pillar & Saptanga Seal */}
+      {id === 'kautilya' && (
+        <svg viewBox="0 0 200 200" fill="none" className="w-full h-full block">
+          <g stroke={resolvedStroke} opacity={resolvedGuideOpacity} strokeWidth="0.8" fill="none">
+            <circle cx="100" cy="100" r="90" />
+            <circle cx="100" cy="100" r="72" strokeDasharray="4 2" />
+            <line x1="100" y1="10" x2="100" y2="190" />
+            <line x1="10" y1="100" x2="190" y2="100" />
+          </g>
+          {/* Saptanga Crown & Fortress Pillar */}
+          <path stroke={resolvedStroke} fill={resolvedHead} strokeWidth="1.75" d="M 75 42 L 100 28 L 125 42 L 120 75 C 120 100 100 120 100 120 C 100 120 80 100 80 75 Z" />
+          <g stroke={resolvedStroke2} strokeWidth="1.2" fill="none">
+            <path d="M 85 52 L 100 42 L 115 52" />
+            <circle cx="100" cy="68" r="8" />
+            <path d="M 92 90 Q 100 98 108 90" />
+          </g>
+          <circle fill={resolvedAccent} cx="100" cy="68" r="2.5" />
+          {/* Arthashastra Scepter & Foundation */}
+          <path stroke={resolvedStroke} strokeWidth="1.5" d="M 88 122 L 88 170 L 112 170 L 112 122" fill="none" />
+          <line stroke={resolvedStroke} x1="65" y1="170" x2="135" y2="170" strokeWidth="2" />
+          <line stroke={resolvedStroke2} x1="50" y1="182" x2="150" y2="182" strokeWidth="1.5" />
+          <circle fill={resolvedAccent} cx="100" cy="146" r="2" />
+        </svg>
+      )}
+
+      {/* 6. ARISTOTLE — Golden Mean Scales & Lyre */}
+      {id === 'aristotle' && (
+        <svg viewBox="0 0 200 200" fill="none" className="w-full h-full block">
+          <g stroke={resolvedStroke} opacity={resolvedGuideOpacity} strokeWidth="0.8" fill="none">
+            <circle cx="100" cy="100" r="88" strokeDasharray="3 3" />
+            <ellipse cx="100" cy="100" rx="90" ry="45" />
+          </g>
+          {/* The Balanced Beam */}
+          <line stroke={resolvedStroke} x1="45" y1="75" x2="155" y2="75" strokeWidth="2" strokeLinecap="round" />
+          <circle fill={resolvedAccent} cx="100" cy="75" r="4" />
+          <path stroke={resolvedStroke} strokeWidth="1.75" d="M 100 75 L 100 165" />
+          {/* Left Pan: Deficiency */}
+          <path stroke={resolvedStroke2} strokeWidth="1.2" d="M 45 75 L 28 115 L 62 115 Z" fill="none" />
+          <path stroke={resolvedStroke} strokeWidth="1.5" d="M 22 115 Q 45 130 68 115" fill={resolvedHead} />
+          {/* Right Pan: Excess */}
+          <path stroke={resolvedStroke2} strokeWidth="1.2" d="M 155 75 L 138 115 L 172 115 Z" fill="none" />
+          <path stroke={resolvedStroke} strokeWidth="1.5" d="M 132 115 Q 155 130 178 115" fill={resolvedHead} />
+          {/* Center Fulcrum: The Golden Mean (Virtue) */}
+          <polygon points="100,60 92,72 108,72" fill={resolvedAccent} />
+          <path stroke={resolvedStroke} strokeWidth="1.5" d="M 70 175 L 130 175 L 120 165 L 80 165 Z" fill={resolvedHead} />
+        </svg>
+      )}
+
+      {/* 7. RAWLS — The Veil of Ignorance & Prism of Equal Liberty */}
+      {id === 'rawls' && (
+        <svg viewBox="0 0 200 200" fill="none" className="w-full h-full block">
+          <g stroke={resolvedStroke} opacity={resolvedGuideOpacity} strokeWidth="0.8" fill="none">
+            <circle cx="100" cy="100" r="90" strokeDasharray="3 3" />
+            <polygon points="100,25 165,145 35,145" strokeWidth="0.8" />
+          </g>
+          {/* The Veil Membrane */}
+          <path
+            stroke={resolvedStroke}
+            fill={resolvedHead}
+            strokeWidth="1.75"
+            d="M 50 65 Q 100 40 150 65 L 140 155 Q 100 175 60 155 Z"
+          />
+          <line stroke={resolvedStroke} x1="50" y1="100" x2="150" y2="100" strokeWidth="1.5" strokeDasharray="4 3" />
+          <g stroke={resolvedStroke2} strokeWidth="1.2" fill="none">
+            <path d="M 70 80 Q 100 95 130 80" />
+            <path d="M 70 120 Q 100 135 130 120" />
+            <line x1="100" y1="50" x2="100" y2="165" />
+          </g>
+          {/* Light Rays of Fairness */}
+          <circle fill={resolvedAccent} cx="100" cy="100" r="4" />
+          <circle fill={resolvedAccent} cx="75" cy="138" r="2" />
+          <circle fill={resolvedAccent} cx="125" cy="138" r="2" />
+        </svg>
+      )}
+
+      {/* 8. VIVEKANANDA — Lotus of Detached Action & Radiance */}
+      {id === 'vivekananda' && (
+        <svg viewBox="0 0 200 200" fill="none" className="w-full h-full block">
+          <g stroke={resolvedStroke} opacity={resolvedGuideOpacity} strokeWidth="0.8" fill="none">
+            <circle cx="100" cy="100" r="90" />
+            <circle cx="100" cy="100" r="70" strokeDasharray="2 3" />
+            {Array.from({ length: 12 }).map((_, i) => (
+              <line
+                key={i}
+                x1="100"
+                y1="100"
+                x2={100 + 85 * Math.cos((i * Math.PI) / 6)}
+                y2={100 + 85 * Math.sin((i * Math.PI) / 6)}
+                strokeDasharray="2 4"
+              />
+            ))}
+          </g>
+          {/* Blooming Lotus Petals */}
+          <path
+            stroke={resolvedStroke}
+            fill={resolvedHead}
+            strokeWidth="1.75"
+            d="M 100 45 C 80 75 75 110 100 140 C 125 110 120 75 100 45 Z"
+          />
+          <path
+            stroke={resolvedStroke2}
+            fill="none"
+            strokeWidth="1.5"
+            d="M 65 75 C 55 100 65 125 100 140 C 90 115 80 90 65 75 Z"
+          />
+          <path
+            stroke={resolvedStroke2}
+            fill="none"
+            strokeWidth="1.5"
+            d="M 135 75 C 145 100 135 125 100 140 C 110 115 120 90 135 75 Z"
+          />
+          <circle fill={resolvedAccent} cx="100" cy="100" r="3.5" />
+          {/* Base of Karma Yoga */}
+          <path stroke={resolvedStroke} strokeWidth="1.5" d="M 55 155 Q 100 170 145 155" fill="none" />
+          <path stroke={resolvedStroke2} strokeWidth="1" d="M 65 165 Q 100 180 135 165" fill="none" />
+        </svg>
+      )}
+
+      {/* 9. TAGORE — Universal Quill & Harmony */}
+      {id === 'tagore' && (
+        <svg viewBox="0 0 200 200" fill="none" className="w-full h-full block">
+          <g stroke={resolvedStroke} opacity={resolvedGuideOpacity} strokeWidth="0.8" fill="none">
+            <circle cx="100" cy="100" r="88" strokeDasharray="3 3" />
+            <path d="M 25 100 Q 100 35 175 100 Q 100 165 25 100 Z" />
+          </g>
+          {/* Universalist Feather / Quill */}
+          <path
+            stroke={resolvedStroke}
+            fill={resolvedHead}
+            strokeWidth="1.75"
+            d="M 145 35 C 110 55 75 90 65 145 L 60 165 L 75 155 C 105 135 130 95 145 35 Z"
+          />
+          <line stroke={resolvedStroke} x1="145" y1="35" x2="60" y2="165" strokeWidth="1.5" />
+          <g stroke={resolvedStroke2} strokeWidth="1" strokeLinecap="round" fill="none">
+            <line x1="130" y1="58" x2="105" y2="68" />
+            <line x1="115" y1="78" x2="90" y2="90" />
+            <line x1="100" y1="100" x2="78" y2="114" />
+            <line x1="88" y1="120" x2="68" y2="135" />
+          </g>
+          <circle fill={resolvedAccent} cx="60" cy="165" r="2.5" />
+        </svg>
+      )}
+
+      {/* 10. ROUSSEAU — The Social Contract Scroll & Civic Laurel */}
+      {id === 'rousseau' && (
+        <svg viewBox="0 0 200 200" fill="none" className="w-full h-full block">
+          <g stroke={resolvedStroke} opacity={resolvedGuideOpacity} strokeWidth="0.8" fill="none">
+            <circle cx="100" cy="100" r="90" />
+            <circle cx="100" cy="100" r="75" strokeDasharray="4 2" />
+          </g>
+          {/* Ancient Parchment of the General Will */}
+          <path
+            stroke={resolvedStroke}
+            fill={resolvedHead}
+            strokeWidth="1.75"
+            d="M 60 45 C 50 45 50 65 60 65 L 135 65 C 145 65 145 45 135 45 Z"
+          />
+          <path stroke={resolvedStroke} fill={resolvedHead} strokeWidth="1.5" d="M 60 65 L 60 145 C 60 155 70 155 70 155 L 145 155 C 145 155 145 65 145 65" />
+          <g stroke={resolvedStroke2} strokeWidth="1.2" strokeLinecap="round" fill="none">
+            <line x1="75" y1="85" x2="130" y2="85" />
+            <line x1="75" y1="102" x2="130" y2="102" />
+            <line x1="75" y1="119" x2="130" y2="119" />
+            <line x1="75" y1="136" x2="110" y2="136" />
+          </g>
+          <circle fill={resolvedAccent} cx="128" cy="136" r="3" />
+          <path stroke={resolvedStroke} strokeWidth="1.5" d="M 50 155 C 50 165 70 165 70 155" fill="none" />
         </svg>
       )}
     </div>

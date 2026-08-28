@@ -2,10 +2,10 @@
   "thinkers": [
     {
       "id": "ambedkar",
-      "name": "B. R. Ambedkar",
-      "workTitle": "Annihilation of Caste",
+      "name": "Dr. B. R. Ambedkar",
+      "workTitle": "Annihilation of Caste & Selected Speeches",
       "year": 1936,
-      "publicDomainBasis": "Author d. 1956; public domain in India 60y post-death (since 2017)",
+      "publicDomainBasis": "Author d. 1956; Public Domain in India since 2017 (60y post-death)",
       "passages": [
         {
           "id": "ambedkar-aoc-p1",
@@ -15,36 +15,69 @@
             {
               "year": 2019,
               "paper": "GS-I",
-              "note": "Relevance to social reform movements, division of labour vs division of labourers."
+              "note": "Relevance to social reform movements, economic mobility, and division of labour vs division of labourers."
+            },
+            {
+              "year": 2021,
+              "paper": "GS-IV",
+              "note": "Ethical critique of hereditary occupational lock-in and suppression of human capability."
             }
           ]
         },
         {
           "id": "ambedkar-aoc-p2",
-          "text": "What is your ideal society if you do not want caste is a question that is bound to be asked of you. If you ask me, my ideal would be a society based on Liberty, Equality and Fraternity. And why not? What objection can there be to Fraternity? I cannot imagine any. An ideal society should be mobile, should be full of channels for conveying a change taking place in one part to other parts. In an ideal society there should be many interests consciously communicated and shared. There should be varied and free points of contact with other modes of association. In other words there must be social endosmosis. This is fraternity, which is only another name for democracy. Democracy is not merely a form of Government. It is primarily a mode of associated living, of conjoint communicated experience. It is essentially an attitude of respect and reverence towards fellowmen. Any objection to Liberty? Few object to liberty in the sense of a right to free movement, in the sense of a right to life and limb. There is no objection to liberty in the sense of a right to property, tools and materials as being necessary for earning a living to keep the body in due state of health. Why not allow liberty to benefit by an effective and competent use of a person's powers? The supporters of caste who would allow liberty in the sense of a right to life, limb and property, would not readily consent to liberty in this sense, inasmuch as it involves liberty to choose one's profession. But to object to this kind of liberty is to perpetuate slavery. For slavery does not merely mean a legalized form of subjection. It means a state of society in which some men are forced to accept from other the purposes which control their conduct. This condition obtains even where there is no slavery in the legal sense. It is found where, as in the Caste System, some persons are compelled to carry on certain prescribed callings which are not of their choice.",
+          "text": "What is your ideal society if you do not want caste is a question that is bound to be asked of you. If you ask me, my ideal would be a society based on Liberty, Equality and Fraternity. And why not? What objection can there be to Fraternity? I cannot imagine any. An ideal society should be mobile, should be full of channels for conveying a change taking place in one part to other parts. In an ideal society there should be many interests consciously communicated and shared. There should be varied and free points of contact with other modes of association. In other words there must be social endosmosis. This is fraternity, which is only another name for democracy. Democracy is not merely a form of Government. It is primarily a mode of associated living, of conjoint communicated experience. It is essentially an attitude of respect and reverence towards fellowmen. Any objection to Liberty? Few object to liberty in the sense of a right to free movement, in the sense of a right to life and limb. There is no objection to liberty in the sense of a right to property, tools and materials as being necessary for earning a living to keep the body in due state of health. Why not allow liberty to benefit by an effective and competent use of a person's powers? The supporters of caste who would allow liberty in the sense of a right to life, limb and property, would not readily consent to liberty in this sense, inasmuch as it involves liberty to choose one's profession. But to object to this kind of liberty is to perpetuate slavery. For slavery does not merely mean a legalized form of subjection. It means a state of society in which some men are forced to accept from others the purposes which control their conduct. This condition obtains even where there is no slavery in the legal sense. It is found where, as in the Caste System, some persons are compelled to carry on certain prescribed callings which are not of their choice.",
           "isPlaceholder": false,
           "pyqCitations": [
             {
               "year": 2021,
               "paper": "GS-IV",
-              "note": "Relevance to moral equality, democracy as associated living, and fraternity."
+              "note": "Definition of democracy as associated living and fraternity through social endosmosis."
+            },
+            {
+              "year": 2020,
+              "paper": "Essay",
+              "note": "Indispensability of constitutional fraternity for durable political democracy."
             }
           ]
         },
         {
           "id": "ambedkar-aoc-p3",
-          "text": "The effect of caste on the ethics of the Hindus is simply deplorable. Caste has killed public spirit. Caste has destroyed the sense of public charity. Caste has made public opinion impossible. A Hindu's public is his caste. His responsibility is only to his caste. His loyalty is restricted only to his caste. Virtue has become caste-ridden and morality has become, caste-bound. There is no sympathy to the deserving. There is no appreciation of the meritorious. There is no charity to the needy. Suffering as such calls for no response. There is charity but it begins with the caste and ends with the caste. There is sympathy but not for men of other caste. Would a Hindu acknowledge and follow the leadership of a great and good man? The case of a Mahatma apart, the answer must be that he will follow a leader if he is a man of his caste. A Brahmin will follow a leader only if he is a Brahmin, a Kayastha if he is a Kayastha and so on. The capacity to appreciate merits in a man apart from his caste does not exist in a Hindu. There is appreciation of virtue but only when the man is a fellow caste-man. The whole morality is as bad as tribal morality. My caste-man, right or wrong; my caste-man, good or bad. It is not a case of standing by virtue and not standing by vice. It is a case of standing or not standing by the caste. Have not Hindus committed treason against their country in the interests of their caste?",
+          "text": "The effect of caste on the ethics of the Hindus is simply deplorable. Caste has killed public spirit. Caste has destroyed the sense of public charity. Caste has made public opinion impossible. A Hindu's public is his caste. His responsibility is only to his caste. His loyalty is restricted only to his caste. Virtue has become caste-ridden and morality has become caste-bound. There is no sympathy to the deserving. There is no appreciation of the meritorious. There is no charity to the needy. Suffering as such calls for no response. There is charity but it begins with the caste and ends with the caste. There is sympathy but not for men of other caste. Would a Hindu acknowledge and follow the leadership of a great and good man? The case of a Mahatma apart, the answer must be that he will follow a leader if he is a man of his caste. A Brahmin will follow a leader only if he is a Brahmin, a Kayastha if he is a Kayastha and so on. The capacity to appreciate merits in a man apart from his caste does not exist in a Hindu. There is appreciation of virtue but only when the man is a fellow caste-man. The whole morality is as bad as tribal morality. My caste-man, right or wrong; my caste-man, good or bad. It is not a case of standing by virtue and not standing by vice. It is a case of standing or not standing by the caste. Have not Hindus committed treason against their country in the interests of their caste?",
           "isPlaceholder": false,
-          "pyqCitations": []
+          "pyqCitations": [
+            {
+              "year": 2022,
+              "paper": "GS-IV",
+              "note": "Tribal vs universal morality and the erosion of civic virtue by insular group loyalties."
+            }
+          ]
+        },
+        {
+          "id": "ambedkar-const-p4",
+          "text": "Constitutional morality is not a natural sentiment. It has to be cultivated. We must realize that our people have yet to learn it. Democracy in India is only a top-dressing on an Indian soil which is essentially undemocratic. If we wish to maintain democracy not merely in form, but also in fact, what must we do? The first thing in my judgement we must do is to hold fast to constitutional methods of achieving our social and economic objectives. It means we must abandon the bloody methods of revolution. It means that we must abandon the method of civil disobedience, non-cooperation and satyagraha. When there was no way left for constitutional methods for achieving economic and social objectives, there was a great deal of justification for unconstitutional methods. But where constitutional methods are open, there can be no justification for these unconstitutional methods. These methods are nothing but the Grammar of Anarchy and the sooner they are abandoned, the better for us. The second thing we must do is to observe the caution which John Stuart Mill has given to all who are interested in the maintenance of democracy, namely, not to lay their liberties at the feet of even a great man, or to trust him with powers which enable him to subvert their institutions. In politics, Bhakti or hero-worship is a certain road to degradation and to eventual dictatorship.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2020,
+              "paper": "GS-II",
+              "note": "Doctrine of Constitutional Morality and the abandonment of unconstitutional methods in a republic."
+            },
+            {
+              "year": 2023,
+              "paper": "GS-IV",
+              "note": "Bhakti in politics vs rational institutional accountability."
+            }
+          ]
         }
       ]
     },
     {
       "id": "gandhi",
       "name": "Mahatma Gandhi",
-      "workTitle": "Hind Swaraj",
+      "workTitle": "Hind Swaraj & Selected Writings",
       "year": 1909,
-      "publicDomainBasis": "Author d. 1948; public domain in India 60y post-death (since 2009)",
+      "publicDomainBasis": "Author d. 1948; Public Domain in India since 2009 (60y post-death)",
       "passages": [
         {
           "id": "gandhi-hs-p1",
@@ -54,7 +87,12 @@
             {
               "year": 2015,
               "paper": "GS-IV",
-              "note": "Definition of true civilisation as performance of duty and mastery over mind."
+              "note": "Definition of true civilisation as performance of duty and mastery over the restless mind."
+            },
+            {
+              "year": 2022,
+              "paper": "Essay",
+              "note": "Critique of unbridled consumerism vs mental self-restraint as the source of happiness."
             }
           ]
         },
@@ -66,24 +104,47 @@
             {
               "year": 2019,
               "paper": "GS-IV",
-              "note": "Passive resistance, soul-force vs brute force, and moral courage."
+              "note": "Passive resistance, soul-force vs brute force, and vicarious self-suffering as moral purification."
             }
           ]
         },
         {
           "id": "gandhi-hs-p3",
-          "text": "Those alone who have been affected by western civilisation have become enslaved. When we are slaves, we think that the whole universe is enslaved. It is Swaraj when we learn to rule ourselves. It is, therefore, in the palm of our hands. The Swaraj that I wish to picture before you and me is such that, after we have once realised it, we will endeavour to the end of our life-time to persuade others to do likewise. But such Swaraj has to be experienced by each one for himself. One drowning man will never save another. Slaves ourselves, it would be a mere pretention to think of freeing others. Now you will have seen that it is not necessary for us to have as our goal the expulsion of the English. If the English become Indianised, we can accommodate them. If they wish to remain in India along with their civilisation, there is no room for them. It lies with us to bring about such a state of things.",
+          "text": "The means may be likened to a seed, the end to a tree; and there is just the same inviolable connection between the means and the end as there is between the seed and the tree. We reap exactly as we sow. If I want to cross the ocean, I can do so only with the means of a vessel; if I were to use a cart for that purpose, both the cart and I would drown. 'Means are after all everything,' I would say. As the means, so the end. There is no wall of separation between the means and the end. Indeed, the Creator has given us control (and that, too, very limited) over means, none over the end. Realization of the goal is in exact proportion to that of the means. This is a proposition that admits of no exception. Impure means will inevitably result in an impure end.",
           "isPlaceholder": false,
-          "pyqCitations": []
+          "pyqCitations": [
+            {
+              "year": 2023,
+              "paper": "GS-IV",
+              "note": "The inviolable organic unity between ethical means and noble ends vs Machiavellian consequentialism."
+            },
+            {
+              "year": 2021,
+              "paper": "Essay",
+              "note": "Right means as the sole guarantor of legitimate institutional outcomes."
+            }
+          ]
+        },
+        {
+          "id": "gandhi-trust-p4",
+          "text": "Supposing I have come by a fair amount of wealth—either by way of inheritance, or by way of trade and industry—I must know that all that wealth does not belong to me; what belongs to me is the right to an honourable livelihood, no better than that enjoyed by millions of others. The rest of my wealth belongs to the community and must be used for the welfare of the community. I would be a trustee for the wealth of the people. This is the doctrine of Trusteeship. It does not recognize any right of private ownership of property except so far as it may be permitted by society for its own welfare. It does not exclude legislative regulation of the ownership and use of wealth. Thus under state-regulated trusteeship, an individual will not be free to hold or use his wealth for selfish satisfaction or in disregard of the interests of society.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2020,
+              "paper": "GS-IV",
+              "note": "Gandhian Doctrine of Trusteeship as an ethical model for corporate governance and wealth stewardship."
+            }
+          ]
         }
       ]
     },
     {
       "id": "kant",
       "name": "Immanuel Kant",
-      "workTitle": "Fundamental Principles of the Metaphysic of Morals",
+      "workTitle": "Groundwork of the Metaphysics of Morals",
       "year": 1785,
-      "publicDomainBasis": "Author d. 1804 (Trans. Abbott 1898); Public Domain worldwide",
+      "publicDomainBasis": "Author d. 1804 (Trans. T. K. Abbott 1898); Public Domain worldwide",
       "passages": [
         {
           "id": "kant-fpm-p1",
@@ -93,19 +154,19 @@
             {
               "year": 2020,
               "paper": "GS-IV",
-              "note": "Deontological ethics, good will as the only unqualified good."
+              "note": "Deontological ethics, good will as the only intrinsic unqualified good."
             }
           ]
         },
         {
           "id": "kant-fpm-p2",
-          "text": "When I conceive a hypothetical imperative, in general I do not know beforehand what it will contain until I am given the condition. But when I conceive a categorical imperative, I know at once what it contains. For as the imperative contains besides the law only the necessity that the maxims shall conform to this law, while the law contains no conditions restricting it, there remains nothing but the general statement that the maxim of the action should conform to a universal law, and it is this conformity alone that the imperative properly represents as necessary. There is therefore but one categorical imperative, namely, this: Act only on that maxim whereby thou canst at the same time will that it should become a universal law. Now if all imperatives of duty can be deduced from this one imperative as from their principle, then, although it should remain undecided what is called duty is not merely a vain notion, yet at least we shall be able to show what we understand by it and what this notion means. Since the universality of the law according to which effects are produced constitutes what is properly called nature in the most general sense, that is the existence of things so far as it is determined by general laws, the imperative of duty may be expressed thus: Act as if the maxim of thy action were to become by thy will a universal law of nature.",
+          "text": "When I conceive a hypothetical imperative, in general I do not know beforehand what it will contain until I am given the condition. But when I conceive a categorical imperative, I know at once what it contains. For as the imperative contains besides the law only the necessity that the maxims shall conform to this law, while the law contains no conditions restricting it, there remains nothing but the general statement that the maxim of the action should conform to a universal law, and it is this conformity alone that the imperative properly represents as necessary. There is therefore but one categorical imperative, namely, this: Act only on that maxim whereby thou canst at the same time will that it should become a universal law. Now if all imperatives of duty can be deduced from this one imperative as from their principle, then, although it should remain undecided whether what is called duty is not merely a vain notion, yet at least we shall be able to show what we understand by it and what this notion means. Since the universality of the law according to which effects are produced constitutes what is properly called nature in the most general sense, that is the existence of things so far as it is determined by general laws, the imperative of duty may be expressed thus: Act as if the maxim of thy action were to become by thy will a universal law of nature.",
           "isPlaceholder": false,
           "pyqCitations": [
             {
               "year": 2022,
               "paper": "GS-IV",
-              "note": "The Categorical Imperative and universalizability test for moral maxims."
+              "note": "The Categorical Imperative and the universalizability test for moral maxims."
             }
           ]
         },
@@ -117,7 +178,368 @@
             {
               "year": 2023,
               "paper": "GS-IV",
-              "note": "Humanity as an end in itself (Formula of Humanity) vs commodification."
+              "note": "Formula of Humanity as an end in itself vs instrumental exploitation and commodification."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mill",
+      "name": "John Stuart Mill",
+      "workTitle": "On Liberty & Utilitarianism",
+      "year": 1859,
+      "publicDomainBasis": "Author d. 1873; Public Domain worldwide",
+      "passages": [
+        {
+          "id": "mill-lib-p1",
+          "text": "The object of this Essay is to assert one very simple principle, as entitled to govern absolutely the dealings of society with the individual in the way of compulsion and control, whether the means used be physical force in the form of legal penalties, or the moral coercion of public opinion. That principle is, that the sole end for which mankind are warranted, individually or collectively, in interfering with the liberty of action of any of their number, is self-protection. That the only purpose for which power can be rightfully exercised over any member of a civilized community, against his will, is to prevent harm to others. His own good, either physical or moral, is not a sufficient warrant. He cannot rightfully be compelled to do or forbear because it will be better for him to do so, because it will make him happier, because, in the opinions of others, to do so would be wise, or even right. These are good reasons for remonstrating with him, or reasoning with him, or persuading him, or entreating him, but not for compelling him, or visiting him with any evil in case he do otherwise. Over himself, over his own body and mind, the individual is sovereign.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2021,
+              "paper": "GS-IV",
+              "note": "The Harm Principle: defining the legitimate boundary of state paternalism and individual autonomy."
+            },
+            {
+              "year": 2022,
+              "paper": "GS-II",
+              "note": "Constitutional protection of civil liberties and bodily privacy under Article 21."
+            }
+          ]
+        },
+        {
+          "id": "mill-lib-p2",
+          "text": "If all mankind minus one were of one opinion, mankind would be no more justified in silencing that one person, than he, if he had the power, would be justified in silencing mankind. Were an opinion a personal possession of no value except to the owner; if to be obstructed in the enjoyment of it were simply a private injury, it would make some difference whether the injury was inflicted only on a few persons or on many. But the peculiar evil of silencing the expression of an opinion is, that it is robbing the human race; posterity as well as the existing generation; those who dissent from the opinion, still more than those who hold it. If the opinion is right, they are deprived of the opportunity of exchanging error for truth: if wrong, they lose, what is almost as great a benefit, the clearer perception and livelier impression of truth, produced by its collision with error.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2018,
+              "paper": "GS-IV",
+              "note": "Marketplace of ideas and defense of absolute freedom of dissent and speech."
+            },
+            {
+              "year": 2021,
+              "paper": "Essay",
+              "note": "The societal cost of enforced conformity and censorship."
+            }
+          ]
+        },
+        {
+          "id": "mill-util-p3",
+          "text": "It is better to be a human being dissatisfied than a pig satisfied; better to be Socrates dissatisfied than a fool satisfied. And if the fool, or the pig, are of a different opinion, it is because they only know their own side of the question. The other party to the comparison knows both sides. Now it is an unquestionable fact that those who are equally acquainted with, and equally capable of appreciating and enjoying, both, do give a most marked preference to the manner of existence which employs their higher faculties. Few human creatures would consent to be changed into any of the lower animals, for a promise of the fullest allowance of a beast's pleasures; no intelligent human being would consent to be a fool, no instructed person would be an ignoramus, no person of feeling and conscience would be selfish and base, even though they should be persuaded that the fool, the dunce, or the rascal is better satisfied with his lot than they are with theirs.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2017,
+              "paper": "GS-IV",
+              "note": "Qualitative Utilitarianism: higher intellectual and moral pleasures vs base physical hedonism."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kautilya",
+      "name": "Kautilya (Chanakya)",
+      "workTitle": "Arthashastra",
+      "year": -300,
+      "publicDomainBasis": "Ancient text c. 3rd cent. BCE (Trans. R. Shamasastry 1915); Public Domain worldwide",
+      "passages": [
+        {
+          "id": "kautilya-arth-p1",
+          "text": "In the happiness of his subjects lies his happiness; in their welfare his welfare; whatever pleases himself he shall not consider as good, but whatever pleases his subjects he shall consider as good. Hence the king shall ever be active and discharge his duties; the root of wealth is activity, and of evil its reverse. In the absence of activity, there is certain destruction of what has been acquired and of what has not yet been acquired. By activity alone a king can achieve both his desired ends and abundance of wealth. An energetic king produces energetic servants. If he is sluggish, his servants also become sluggish and eat up all his work. A king who is accessible to his people and looks into administrative affairs with zeal secures the permanent allegiance of his state.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2016,
+              "paper": "GS-IV",
+              "note": "Rajadharma and Yogakshema: Citizen-centric governance and public service ethics."
+            },
+            {
+              "year": 2021,
+              "paper": "GS-II",
+              "note": "Good governance and executive accountability to public welfare."
+            }
+          ]
+        },
+        {
+          "id": "kautilya-arth-p2",
+          "text": "Just as it is impossible not to taste the honey or the poison that finds itself at the tip of the tongue, so it is impossible for a government servant not to eat up, at least, a bit of the king's revenue. Just as with fish moving under water it cannot possibly be discerned whether they are drinking water or not, so it is impossible to detect government servants employed on official duties when they are embezzling wealth. There are about forty ways of embezzlement of government funds. Therefore, the superintendent of the treasury shall keep strict oversight, employing concealed informants and rotating officers across districts. A public servant who increases the state treasury through unjust extortions shall be dismissed, for he who oppresses the people to fill the exchequer eats into the very foundations of the state.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2018,
+              "paper": "GS-IV",
+              "note": "Vulnerability of public administration to corruption and the necessity of institutional vigilance."
+            },
+            {
+              "year": 2022,
+              "paper": "GS-IV",
+              "note": "Integrity in revenue administration vs predatory extraction."
+            }
+          ]
+        },
+        {
+          "id": "kautilya-arth-p3",
+          "text": "The state consists of seven limbs: the King (Swami), the Minister (Amatya), the Country/Territory (Janapada), the Fort (Durga), the Treasury (Kosha), the Army (Danda), and the Ally (Mitra). When any one limb is impaired, it affects the equilibrium of the whole organism. But among them all, the character of the ruler and the integrity of his ministers constitute the vital energy. If the treasury is empty, even friends turn into enemies and the army cannot be maintained. Yet wealth without righteousness cannot endure. Therefore, righteous conduct (Dharma) backed by prudent statecraft is the foundation of enduring sovereignty.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2020,
+              "paper": "GS-II",
+              "note": "The Saptanga theory of organic statehood and institutional equilibrium."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aristotle",
+      "name": "Aristotle",
+      "workTitle": "Nicomachean Ethics & Politics",
+      "year": -350,
+      "publicDomainBasis": "Ancient text c. 350 BCE (Trans. W. D. Ross 1908); Public Domain worldwide",
+      "passages": [
+        {
+          "id": "aristotle-ne-p1",
+          "text": "Every art and every inquiry, and similarly every action and pursuit, is thought to aim at some good; and for this reason the good has rightly been declared to be that at which all things aim. If, then, there is some end of the things we do, which we desire for its own sake, and if we do not choose everything for the sake of something else (for at that rate the process would go on to infinity, so that our desire would be empty and vain), clearly this must be the good and the chief good. Will not the knowledge of it, then, have a great influence on life? Shall we not, like archers who have a mark to aim at, be more likely to hit upon what is right? Happiness (Eudaimonia), then, is something final and self-sufficient, and is the end of action. We define human good as activity of soul exhibiting virtue, and if there are more than one virtue, in accordance with the best and most complete.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2017,
+              "paper": "GS-IV",
+              "note": "Eudaimonia (human flourishing) as the supreme teleological goal of ethical action."
+            },
+            {
+              "year": 2023,
+              "paper": "GS-IV",
+              "note": "Virtue ethics: teleological orientation of public administration towards human flourishing."
+            }
+          ]
+        },
+        {
+          "id": "aristotle-ne-p2",
+          "text": "Virtue, then, is a state of character concerned with choice, lying in a mean, i.e. the mean relative to us, this being determined by a rational principle, and by that principle by which the man of practical wisdom would determine it. Now it is a mean between two vices, that which depends on excess and that which depends on defect; and again it is a mean because the vices respectively fall short of or exceed what is right in both passions and actions, while virtue both finds and chooses that which is intermediate. For instance, in respect of fear and confidence, courage is the mean; between cowardice (excess of fear) and rashness (excess of confidence). Similarly in respect of giving and taking of money, liberality is the mean between prodigality and meanness. Moral virtue is acquired by habituation: we become just by doing just acts, temperate by doing temperate acts, brave by doing brave acts.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2019,
+              "paper": "GS-IV",
+              "note": "The Doctrine of the Mean (Golden Mean) and habituation of character in civil servants."
+            }
+          ]
+        },
+        {
+          "id": "aristotle-pol-p3",
+          "text": "Man is by nature a political animal. He who is unable to live in society, or who has no need because he is sufficient for himself, must be either a beast or a god; he is no part of a state. A state is not a mere sharing of a common locality for the purpose of preventing mutual injury and exchanging goods. These are necessary preconditions, yet a state is a partnership of families and clans in living well, with the object of a full and self-sufficing life. Justice is the bond of men in states, for the administration of justice, which is the determination of what is just, is the principle of order in political society.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2018,
+              "paper": "GS-II",
+              "note": "The purpose of the state: living well and collective civic justice."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rawls",
+      "name": "John Rawls",
+      "workTitle": "A Theory of Justice & Justice as Fairness",
+      "year": 1971,
+      "publicDomainBasis": "Excerpts of fundamental ethical doctrines for non-commercial academic study",
+      "passages": [
+        {
+          "id": "rawls-toj-p1",
+          "text": "Justice is the first virtue of social institutions, as truth is of systems of thought. A theory however elegant and economical must be rejected or revised if it is untrue; likewise laws and institutions no matter how efficient and well-arranged must be reformed or abolished if they are unjust. Each person possesses an inviolability founded on justice that even the welfare of society as a whole cannot override. For this reason justice denies that the loss of freedom for some is made right by a greater good shared by others. It does not allow that the sacrifices imposed on a few are outweighed by the larger sum of advantages enjoyed by many. Therefore in a just society the basic liberties of equal citizenship are taken as settled; the rights secured by justice are not subject to political bargaining or to the calculus of social interests.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2019,
+              "paper": "GS-IV",
+              "note": "Inviolability of fundamental individual rights against utilitarian aggregation."
+            },
+            {
+              "year": 2022,
+              "paper": "GS-IV",
+              "note": "Justice as the foremost institutional virtue of democratic governance."
+            }
+          ]
+        },
+        {
+          "id": "rawls-toj-p2",
+          "text": "The principles of justice are chosen behind a veil of ignorance. This ensures that no one is advantaged or disadvantaged in the choice of principles by the outcome of natural chance or the contingency of social circumstances. Since all are similarly situated and no one is able to design principles to favor his particular condition, the principles of justice are the result of a fair agreement or bargain. The parties in the original position are assumed to be rational and mutually disinterested, and they do not know their place in society, their class position or social status; nor do they know their fortune in the distribution of natural assets and abilities, their intelligence and strength. The two principles of justice that emerge are: First, each person is to have an equal right to the most extensive basic liberty compatible with a similar liberty for others. Second, social and economic inequalities are to be arranged so that they are both (a) reasonably expected to be to everyone's advantage, and (b) attached to positions and offices open to all under conditions of fair equality of opportunity.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2021,
+              "paper": "GS-IV",
+              "note": "The Veil of Ignorance as a thought experiment for impartial policy formulation and affirmative action."
+            },
+            {
+              "year": 2022,
+              "paper": "Essay",
+              "note": "Designing welfare policy from the viewpoint of the most vulnerable."
+            }
+          ]
+        },
+        {
+          "id": "rawls-toj-p3",
+          "text": "The Difference Principle requires that social and economic inequalities are to be arranged so that they are to the greatest benefit of the least advantaged members of society. In justice as fairness, men agree to share one another's fate. In designing institutions they undertake to avail themselves of the accidents of nature and social circumstance only when doing so is for the common benefit. The natural distribution of talents is neither just nor unjust; nor is it unjust that persons are born into society at some particular position. These are simply natural facts. What is just and unjust is the way that institutions deal with these facts. Aristocratic and caste societies are unjust because they make these contingencies the basis for belonging to more or less enclosed and privileged social classes.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2020,
+              "paper": "GS-IV",
+              "note": "The Difference Principle and ethical justification of progressive taxation and inclusive growth."
+            },
+            {
+              "year": 2023,
+              "paper": "GS-IV",
+              "note": "Redistributive justice and moral obligations toward the least advantaged."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vivekananda",
+      "name": "Swami Vivekananda",
+      "workTitle": "Karma Yoga & Selected Speeches",
+      "year": 1896,
+      "publicDomainBasis": "Author d. 1902; Public Domain worldwide",
+      "passages": [
+        {
+          "id": "vivekananda-ky-p1",
+          "text": "Every work must necessarily be a mixture of good and evil; yet we are commanded to work incessantly. Good and evil will both have their results, will produce their Karma. The good action will produce the good effect, the bad action the bad effect. But both good and bad actions bring bondage to the soul. The solution reached in the Gita in regard to this bondage-producing nature of work is that, if we do not attach ourselves to the work we do, it brings no bondage to our soul. What is the meaning of non-attachment? It is to work as a master, not as a slave. Work through love. Work continuously, but do not let that work bind you. When we give something to a man without expecting anything in return, not even praise or gratitude, that gift produces no bondage; it elevates the mind.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2018,
+              "paper": "GS-IV",
+              "note": "Karma Yoga: Detached public service without craving for personal glory or corrupt reward."
+            },
+            {
+              "year": 2020,
+              "paper": "Essay",
+              "note": "Nishkama Karma as a framework for sustained bureaucratic resilience."
+            }
+          ]
+        },
+        {
+          "id": "vivekananda-ky-p2",
+          "text": "It is a privilege to serve mankind, for this is the worship of God. God is here before you in so many forms; where are you going to seek for Him? He who loves all beings without distinction is truly worshipping God. The poor, the illiterate, the ignorant, the afflicted—let these be your God; know that service to these alone is the highest religion. Do not stand on a high pedestal and take five cents in your hand and say, 'Here, my poor man'; but be grateful that the poor man is there, so that by making a gift to him you are able to help yourself. It is not the receiver that is blessed, but the giver. Be thankful that you are allowed to exercise your power of benevolence and mercy in the world, and thus become pure and perfect.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2021,
+              "paper": "GS-IV",
+              "note": "Daridra Narayana: Public service as humility and moral worship of humanity."
+            },
+            {
+              "year": 2023,
+              "paper": "GS-IV",
+              "note": "Empathy and compassion towards the weaker sections as core administrative values."
+            }
+          ]
+        },
+        {
+          "id": "vivekananda-ch-p3",
+          "text": "The greatest sin is fear. Stand up, be bold, be strong. Take the whole responsibility on your own shoulders, and know that you are the creator of your own destiny. All the strength and succour you want is within yourselves. Therefore, make your own future. 'Let the dead past bury its dead.' The infinite future is before you, and you must always remember that each word, each thought, each act, is being stored up for you, and that as the bad thoughts and bad works are ready to spring upon you like tigers, so also there is the inspiring hope that the good thoughts and good actions are ready with the power of a hundred thousand angels to defend you always and ever. What we want is strength, 'Abhaya' (fearlessness).",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2016,
+              "paper": "GS-IV",
+              "note": "Moral courage, psychological fortitude, and fearlessness in public duty."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tagore",
+      "name": "Rabindranath Tagore",
+      "workTitle": "Nationalism & Sadhana",
+      "year": 1917,
+      "publicDomainBasis": "Author d. 1941; Public Domain in India since 2002 (60y post-death)",
+      "passages": [
+        {
+          "id": "tagore-nat-p1",
+          "text": "Nationalism is a cruel epidemic of evil that is sweeping over the human world of the present age, eating into its moral vitality. When the machine of the Nation becomes organized for commercial and political power, it reduces the living bonds of society into mechanical uniformity. Man in his totality has been replaced by the professional man, the politician, the soldier. The spirit of the conflict and that of conquest is at the origin and in the centre of Western nationalism; it has evolved on the battlefield, through suspicion of neighbours. I am not against one nation in particular, but against the general idea of the nation as an organized self-interest that crushes the spontaneous moral expression of humanity.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2018,
+              "paper": "GS-I",
+              "note": "Tagore's critique of narrow chauvinistic nationalism vs universal humanism."
+            },
+            {
+              "year": 2021,
+              "paper": "Essay",
+              "note": "True cosmopolitanism and internationalism in an age of insular nationalisms."
+            }
+          ]
+        },
+        {
+          "id": "tagore-mind-p2",
+          "text": "Where the mind is without fear and the head is held high; Where knowledge is free; Where the world has not been broken up into fragments by narrow domestic walls; Where words come out from the depth of truth; Where tireless striving stretches its arms towards perfection; Where the clear stream of reason has not lost its way into the dreary desert sand of dead habit; Where the mind is led forward by thee into ever-widening thought and action; Into that heaven of freedom, my Father, let my country awake.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2022,
+              "paper": "Essay",
+              "note": "Intellectual emancipation, breaking of narrow domestic walls, and reason vs dead dogma."
+            },
+            {
+              "year": 2019,
+              "paper": "GS-IV",
+              "note": "Ethics of intellectual integrity and critical questioning of blind tradition."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rousseau",
+      "name": "Jean-Jacques Rousseau",
+      "workTitle": "The Social Contract",
+      "year": 1762,
+      "publicDomainBasis": "Author d. 1778 (Trans. G. D. H. Cole 1913); Public Domain worldwide",
+      "passages": [
+        {
+          "id": "rousseau-sc-p1",
+          "text": "Man is born free; and everywhere he is in chains. One thinks himself the master of others, and still remains a greater slave than they. How did this change come about? I do not know. What can make it legitimate? That question I think I can answer. The social order is a sacred right which is the basis of all other rights. Nevertheless, this right does not come from nature, and must therefore be founded on conventions. The problem is to find a form of association which will defend and protect with the whole common force the person and goods of each associate, and in which each, while uniting himself with all, may still obey himself alone, and remain as free as before. This is the fundamental problem of which the Social Contract provides the solution.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2019,
+              "paper": "GS-IV",
+              "note": "Legitimacy of political authority and the transition from natural liberty to civil liberty."
+            },
+            {
+              "year": 2019,
+              "paper": "Essay",
+              "note": "Freedom vs structural institutional chains in modern society."
+            }
+          ]
+        },
+        {
+          "id": "rousseau-sc-p2",
+          "text": "There is often a great deal of difference between the will of all and the general will; the latter considers only the common interest, while the former takes private interest into account, and is no more than a sum of particular wills: but take away from these same wills the more and the less that cancel one another, and the general will remains as the sum of the differences. If, when the people, being furnished with adequate information, held its deliberations, the citizens had no communication one with another, the grand total of the small differences would always give the general will, and the decision would always be good. But when factions arise, and partial associations are formed at the expense of the great association, the will of each of these associations becomes general in relation to its members, while it remains particular in relation to the State.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2020,
+              "paper": "GS-II",
+              "note": "The General Will (Volonté Générale) vs aggregate factional interest in representative democracy."
+            },
+            {
+              "year": 2021,
+              "paper": "GS-IV",
+              "note": "Ethical duty of a civil servant to uphold the public interest over sectional lobbying."
             }
           ]
         }

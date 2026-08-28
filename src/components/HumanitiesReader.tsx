@@ -31,6 +31,55 @@ const THINKER_METADATA: Record<string, { era: string; workShort: string; workYea
     workYear: 1785,
     voice: 'Act only on that maxim whereby thou canst at the same time will that it should become a universal law.',
     voiceCite: { paper: 'GS-IV', year: 2022 }
+  },
+  mill: {
+    era: '1806–1873',
+    workShort: 'On Liberty',
+    workYear: 1859,
+    voice: 'The only purpose for which power can be rightfully exercised over any member of a civilized community, against his will, is to prevent harm to others. Over himself, over his own body and mind, the individual is sovereign.',
+    voiceCite: { paper: 'GS-IV', year: 2021 }
+  },
+  kautilya: {
+    era: 'c. 375–283 BCE',
+    workShort: 'Arthashastra',
+    workYear: -300,
+    voice: 'In the happiness of his subjects lies his happiness; in their welfare his welfare; whatever pleases himself he shall not consider as good, but whatever pleases his subjects he shall consider as good.',
+    voiceCite: { paper: 'GS-IV', year: 2016 }
+  },
+  aristotle: {
+    era: '384–322 BCE',
+    workShort: 'Nicomachean Ethics',
+    workYear: -350,
+    voice: 'Happiness (Eudaimonia), then, is something final and self-sufficient, and is the end of action. We define human good as activity of soul exhibiting virtue.',
+    voiceCite: { paper: 'GS-IV', year: 2017 }
+  },
+  rawls: {
+    era: '1921–2002',
+    workShort: 'A Theory of Justice',
+    workYear: 1971,
+    voice: 'Justice is the first virtue of social institutions, as truth is of systems of thought. Each person possesses an inviolability founded on justice that even the welfare of society as a whole cannot override.',
+    voiceCite: { paper: 'GS-IV', year: 2019 }
+  },
+  vivekananda: {
+    era: '1863–1902',
+    workShort: 'Karma Yoga',
+    workYear: 1896,
+    voice: 'The poor, the illiterate, the afflicted—let these be your God; know that service to these alone is the highest religion. It is not the receiver that is blessed, but the giver.',
+    voiceCite: { paper: 'GS-IV', year: 2021 }
+  },
+  tagore: {
+    era: '1861–1941',
+    workShort: 'Nationalism',
+    workYear: 1917,
+    voice: 'Where the mind is without fear and the head is held high; Where knowledge is free; Where the world has not been broken up into fragments by narrow domestic walls.',
+    voiceCite: { paper: 'Essay', year: 2022 }
+  },
+  rousseau: {
+    era: '1712–1778',
+    workShort: 'The Social Contract',
+    workYear: 1762,
+    voice: 'Man is born free; and everywhere he is in chains. The problem is to find a form of association which will defend and protect with the whole common force the person and goods of each associate.',
+    voiceCite: { paper: 'GS-IV', year: 2019 }
   }
 };
 
@@ -50,8 +99,8 @@ const DOTS = [
   [93, 33, 1.5, 10]
 ];
 
-const PAPERS = ['GS-I', 'GS-IV'];
-const YEARS = [2023, 2022, 2021, 2020, 2019, 2015];
+const PAPERS = ['GS-I', 'GS-II', 'GS-IV', 'Essay'];
+const YEARS = [2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015];
 
 // Pure helper functions preserved for contract & unit test verification
 export function togglePinPassage(currentPinned: Passage[], passage: Passage): Passage[] {
