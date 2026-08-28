@@ -92,12 +92,26 @@ const editionVariants = {
 
 const CATEGORY_TABS = [
   { id: 'ALL', label: 'All Signals' },
-  { id: 'Governance', label: 'Cabinet & Policy', keywords: ['Cabinet', 'Prime Minister', 'Home Affairs', 'Law', 'Personnel', 'Parliament', 'Governance'] },
-  { id: 'Economy', label: 'Economy & Trade', keywords: ['Finance', 'Commerce', 'RBI', 'Corporate Affairs', 'NITI Aayog', 'Revenue', 'Economy'] },
-  { id: 'Environment', label: 'Environment & Climate', keywords: ['Environment', 'Forest', 'Climate', 'Renewable', 'Earth Sciences', 'Agriculture', 'Water'] },
+  { id: 'Governance', label: 'Polity & Cabinet', keywords: ['Cabinet', 'Prime Minister', 'Home Affairs', 'Law', 'Personnel', 'Parliament', 'Governance'] },
+  { id: 'Economy', label: 'Economy & RBI', keywords: ['Finance', 'Commerce', 'RBI', 'Corporate Affairs', 'NITI Aayog', 'Revenue', 'Economy'] },
   { id: 'SciTech', label: 'Science & Defence', keywords: ['Defence', 'Space', 'ISRO', 'Atomic Energy', 'Electronics', 'IT', 'Science', 'Technology'] },
-  { id: 'Social', label: 'Social Justice & Health', keywords: ['Health', 'Education', 'Social Justice', 'Women', 'Child', 'Tribal', 'Rural'] },
-  { id: 'PRS', label: 'PRS Legislative Vault' },
+  { id: 'Environment', label: 'Climate & Ecology', keywords: ['Environment', 'Forest', 'Climate', 'Renewable', 'Earth Sciences', 'Agriculture', 'Water'] },
+  { id: 'Social', label: 'Social & Health', keywords: ['Health', 'Education', 'Social Justice', 'Women', 'Child', 'Tribal', 'Rural'] },
+  { id: 'PRS', label: '⚖️ PRS Legislative Vault', isVault: true },
+  { id: 'SAVED', label: '⭐ Saved Signals' },
+];
+
+const TOP_MINISTRIES = [
+  'Ministry of Finance',
+  'Ministry of Law and Justice',
+  'Ministry of Electronics and Information Technology',
+  'Ministry of Home Affairs',
+  'Ministry of Defence',
+  'Ministry of Environment, Forest and Climate Change',
+  'Ministry of Health and Family Welfare',
+  'Ministry of Commerce and Industry',
+  'Ministry of Agriculture & Farmers Welfare',
+  'Ministry of External Affairs',
 ];
 
 export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
@@ -119,6 +133,9 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
   const [selectedSource, setSelectedSource] = useState<string>('ALL');
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
+  const [timePreset, setTimePreset] = useState<'ALL' | 'TODAY' | 'WEEK' | 'MONTH' | 'CUSTOM'>('ALL');
+  const [trustFilter, setTrustFilter] = useState<'ALL' | 'HIGH_GROUNDING' | 'CONTESTED'>('ALL');
+  const [ministrySearch, setMinistrySearch] = useState<string>('');
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   // View Mode: 'signals' (Signal Deck) vs 'edition' (Daily Edition)
@@ -138,6 +155,27 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
       localStorage.setItem('tark_brief_view_mode', mode);
     } catch {
       /* ignore */
+    }
+  };
+
+  const applyTimePreset = (preset: 'ALL' | 'TODAY' | 'WEEK' | 'MONTH' | 'CUSTOM') => {
+    setTimePreset(preset);
+    const now = new Date();
+    if (preset === 'ALL') {
+      setStartDate('');
+      setEndDate('');
+    } else if (preset === 'TODAY') {
+      const todayStr = now.toISOString().split('T')[0];
+      setStartDate(todayStr);
+      setEndDate(todayStr);
+    } else if (preset === 'WEEK') {
+      const pastWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      setStartDate(pastWeek.toISOString().split('T')[0]);
+      setEndDate(now.toISOString().split('T')[0]);
+    } else if (preset === 'MONTH') {
+      const pastMonth = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      setStartDate(pastMonth.toISOString().split('T')[0]);
+      setEndDate(now.toISOString().split('T')[0]);
     }
   };
 
@@ -480,8 +518,12 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
   const displayedItems = useMemo(() => {
     let list = items;
 
-    // Category Tab Filtering
-    if (activeCategoryTab !== 'ALL' && activeCategoryTab !== 'PRS') {
+    // 1. Category Tab / Saved Signals / PRS Vault Filtering
+    if (activeCategoryTab === 'SAVED') {
+      list = list.filter((item) => item.id && savedArticleIds.has(item.id));
+    } else if (activeCategoryTab === 'PRS') {
+      list = list.filter((item) => item.source === 'PRS');
+    } else if (activeCategoryTab !== 'ALL') {
       const tab = CATEGORY_TABS.find((t) => t.id === activeCategoryTab);
       if (tab?.keywords) {
         list = list.filter((item) =>
@@ -494,7 +536,24 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
       }
     }
 
-    // Search Query Filtering
+    // 2. Trust / Grounding Filter
+    if (trustFilter === 'HIGH_GROUNDING') {
+      list = list.filter((item) => (item.summary?.grounding ?? 0) >= 90);
+    } else if (trustFilter === 'CONTESTED') {
+      list = list.filter((item) => !!item.summary?.contested);
+    }
+
+    // 3. Source Filter
+    if (selectedSource !== 'ALL') {
+      list = list.filter((item) => item.source?.toUpperCase() === selectedSource.toUpperCase());
+    }
+
+    // 4. Ministry Filter
+    if (selectedMinistry !== 'ALL') {
+      list = list.filter((item) => item.ministry === selectedMinistry);
+    }
+
+    // 5. Search Query Filtering
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
@@ -507,7 +566,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
     }
 
     return list;
-  }, [items, activeCategoryTab, searchQuery]);
+  }, [items, activeCategoryTab, searchQuery, trustFilter, selectedSource, selectedMinistry, savedArticleIds]);
 
   const leadItem = displayedItems[0] || null;
   const standardItems = displayedItems.slice(1);
@@ -515,15 +574,21 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
   const activeFilterCount =
     (selectedMinistry !== 'ALL' ? 1 : 0) +
     (selectedSource !== 'ALL' ? 1 : 0) +
-    (startDate || endDate ? 1 : 0);
+    (timePreset !== 'ALL' ? 1 : 0) +
+    (trustFilter !== 'ALL' ? 1 : 0) +
+    (activeCategoryTab !== 'ALL' ? 1 : 0) +
+    (searchQuery ? 1 : 0);
 
   const resetAllFilters = () => {
     setSelectedMinistry('ALL');
     setSelectedSource('ALL');
+    setTimePreset('ALL');
+    setTrustFilter('ALL');
     setStartDate('');
     setEndDate('');
     setActiveCategoryTab('ALL');
     setSearchQuery('');
+    setMinistrySearch('');
     setPage(0);
   };
 
@@ -549,13 +614,31 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
           </div>
 
           {/* Quick Actions Bar */}
-          <div className="flex items-center gap-3 shrink-0 font-sans">
+          <div className="flex items-center gap-2.5 shrink-0 font-sans flex-wrap">
+            <motion.button
+              onClick={() => {
+                setActiveCategoryTab('PRS');
+                setSelectedSource('PRS');
+              }}
+              whileHover={prefersReducedMotion ? undefined : { y: -2 }}
+              whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xs text-xs font-mono font-bold uppercase tracking-wider shadow-sm cursor-pointer transition-all border ${
+                activeCategoryTab === 'PRS'
+                  ? 'bg-gradient-to-r from-purple-900/60 to-purple-950 border-[#c084fc] text-[#e0d0ab] shadow-[0_0_20px_rgba(168,85,247,0.35)]'
+                  : 'bg-[rgba(30,15,65,0.7)] hover:bg-[rgba(45,20,95,0.8)] border-purple-800/60 hover:border-[#c084fc] text-purple-300'
+              }`}
+            >
+              <Scale className="w-4 h-4 text-[#c084fc]" />
+              <span>⚖️ PRS Vault</span>
+            </motion.button>
+
             <motion.button
               onClick={() => setShowPibModal(true)}
               whileHover={prefersReducedMotion ? undefined : { y: -2 }}
               whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-[#e0d0ab]/60 text-zinc-200 hover:text-[#e0d0ab] rounded-sm text-xs font-sans font-semibold shadow-sm cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-[#e0d0ab]/60 text-zinc-200 hover:text-[#e0d0ab] rounded-xs text-xs font-sans font-semibold shadow-sm cursor-pointer"
             >
               <BookOpen className="w-4 h-4 text-[#e0d0ab]" />
               <span>PIB Briefs</span>
@@ -567,7 +650,7 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
               whileHover={prefersReducedMotion ? undefined : { y: -2 }}
               whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 rounded-sm text-xs font-sans font-bold uppercase tracking-wider disabled:opacity-50 cursor-pointer shadow-md shadow-[#e0d0ab]/10"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 rounded-xs text-xs font-sans font-bold uppercase tracking-wider disabled:opacity-50 cursor-pointer shadow-md shadow-[#e0d0ab]/10"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
               <span>{syncing ? 'Syncing...' : syncCooldown > 0 ? `${syncCooldown}s` : 'Fetch Live'}</span>
@@ -790,91 +873,246 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
           </div>
         </div>
 
-        {/* Expandable Refined Filter Tray */}
+        {/* Expandable Refined Filter Tray (Intuitive Command Center) */}
         <AnimatePresence>
           {isFilterDrawerOpen && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden bg-[rgba(3,18,42,0.9)] border border-[rgba(19,108,153,0.45)] rounded-xs p-4 backdrop-blur-xl font-sans"
+              className="overflow-hidden bg-[rgba(3,18,42,0.95)] border border-[rgba(19,108,153,0.45)] rounded-xs p-5 backdrop-blur-xl font-sans space-y-5 shadow-2xl"
             >
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
+              {/* Row 1: Time Horizon & Verification Controls */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* 1. Time Horizon Presets */}
                 <div>
-                  <label className="block text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mb-1.5">
-                    Ministry / Department
+                  <label className="block text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mb-2">
+                    Time Horizon
                   </label>
-                  <select
-                    value={selectedMinistry}
-                    onChange={(e) => setSelectedMinistry(e.target.value)}
-                    className="w-full px-2.5 py-1.5 bg-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-stone-200 focus:outline-none focus:border-[#e0d0ab]"
-                  >
-                    <option value="ALL">All Ministries ({items.length})</option>
-                    {ministries.map((min) => (
-                      <option key={min} value={min}>
-                        {min}
-                      </option>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {[
+                      { id: 'ALL', label: 'All Time' },
+                      { id: 'TODAY', label: "Today's Briefing" },
+                      { id: 'WEEK', label: 'Past 7 Days' },
+                      { id: 'MONTH', label: 'This Month' },
+                      { id: 'CUSTOM', label: 'Custom Range' },
+                    ].map((preset) => (
+                      <button
+                        key={preset.id}
+                        onClick={() => applyTimePreset(preset.id as any)}
+                        className={`px-3 py-1.5 rounded-xs text-xs font-mono transition-colors cursor-pointer border ${
+                          timePreset === preset.id
+                            ? 'bg-[#e0d0ab] text-[#072e63] border-[#e0d0ab] font-bold shadow-sm'
+                            : 'bg-[rgba(4,25,54,0.8)] border-[rgba(19,108,153,0.4)] text-[#9fb0c8] hover:border-[#e0d0ab] hover:text-[#e0d0ab]'
+                        }`}
+                      >
+                        {preset.label}
+                      </button>
                     ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mb-1.5">
-                    Verified Source
-                  </label>
-                  <select
-                    value={selectedSource}
-                    onChange={(e) => setSelectedSource(e.target.value)}
-                    className="w-full px-2.5 py-1.5 bg-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-stone-200 focus:outline-none focus:border-[#e0d0ab]"
-                  >
-                    <option value="ALL">All Sources ({sources.length})</option>
-                    {sources.map((src) => (
-                      <option key={src} value={src}>
-                        {src}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mb-1.5">
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full px-2.5 py-1.5 bg-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-stone-200 [color-scheme:dark]"
-                  />
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <div className="flex-1">
-                    <label className="block text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mb-1.5">
-                      End Date
-                    </label>
-                    <input
-                      type="date"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full px-2.5 py-1.5 bg-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-stone-200 [color-scheme:dark]"
-                    />
                   </div>
-                  {activeFilterCount > 0 && (
+
+                  {/* Custom Date Inputs if Custom selected */}
+                  {timePreset === 'CUSTOM' && (
+                    <div className="flex items-center gap-2 mt-2.5">
+                      <input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="px-2.5 py-1.5 bg-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-stone-200 [color-scheme:dark]"
+                      />
+                      <span className="text-xs text-[#8fa2bd] font-mono">to</span>
+                      <input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="px-2.5 py-1.5 bg-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-stone-200 [color-scheme:dark]"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* 2. Verification & Grounding Filter */}
+                <div>
+                  <label className="block text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mb-2">
+                    Evidence & Grounding
+                  </label>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {[
+                      { id: 'ALL', label: 'All Dispatches' },
+                      { id: 'HIGH_GROUNDING', label: '🛡️ High Grounding (≥90%)' },
+                      { id: 'CONTESTED', label: '⚠️ Contested Claims' },
+                    ].map((trust) => (
+                      <button
+                        key={trust.id}
+                        onClick={() => setTrustFilter(trust.id as any)}
+                        className={`px-3 py-1.5 rounded-xs text-xs font-mono transition-colors cursor-pointer border ${
+                          trustFilter === trust.id
+                            ? 'bg-[#e0d0ab] text-[#072e63] border-[#e0d0ab] font-bold shadow-sm'
+                            : 'bg-[rgba(4,25,54,0.8)] border-[rgba(19,108,153,0.4)] text-[#9fb0c8] hover:border-[#e0d0ab] hover:text-[#e0d0ab]'
+                        }`}
+                      >
+                        {trust.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 2: Primary Source Filter */}
+              <div>
+                <label className="block text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mb-2">
+                  Verified Intelligence Source
+                </label>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {[
+                    { id: 'ALL', label: 'All Sources' },
+                    { id: 'PIB', label: '🏛️ PIB Official (Press Information Bureau)' },
+                    { id: 'RBI', label: '📈 RBI Notifications (Reserve Bank of India)' },
+                    { id: 'PRS', label: '⚖️ PRS Legislative Research (Bills & Acts)' },
+                  ].map((src) => (
                     <button
-                      onClick={resetAllFilters}
-                      className="px-3 py-2 bg-[rgba(11,61,120,0.4)] hover:bg-[rgba(11,61,120,0.6)] border border-[rgba(19,108,153,0.4)] text-[#e0d0ab] rounded-xs text-xs font-mono flex items-center gap-1 shrink-0 cursor-pointer"
-                      title="Reset all filters"
+                      key={src.id}
+                      onClick={() => {
+                        setSelectedSource(src.id);
+                        if (src.id === 'PRS') setActiveCategoryTab('PRS');
+                      }}
+                      className={`px-3 py-1.5 rounded-xs text-xs font-mono transition-colors cursor-pointer border ${
+                        selectedSource === src.id
+                          ? 'bg-[#e0d0ab] text-[#072e63] border-[#e0d0ab] font-bold shadow-sm'
+                          : 'bg-[rgba(4,25,54,0.8)] border-[rgba(19,108,153,0.4)] text-[#9fb0c8] hover:border-[#e0d0ab] hover:text-[#e0d0ab]'
+                      }`}
                     >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      <span>Reset</span>
+                      {src.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Row 3: High-Yield Ministries (Interactive Chips & Search) */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold">
+                    High-Yield Ministries & Departments
+                  </label>
+                  {selectedMinistry !== 'ALL' && (
+                    <button
+                      onClick={() => setSelectedMinistry('ALL')}
+                      className="text-[10px] font-mono text-[#0194a8] hover:text-[#e0d0ab] cursor-pointer"
+                    >
+                      Show All Ministries
                     </button>
                   )}
                 </div>
+
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <button
+                    onClick={() => setSelectedMinistry('ALL')}
+                    className={`px-2.5 py-1 rounded-xs text-xs font-sans transition-colors cursor-pointer border ${
+                      selectedMinistry === 'ALL'
+                        ? 'bg-[#e0d0ab] text-[#072e63] border-[#e0d0ab] font-bold shadow-sm'
+                        : 'bg-[rgba(4,25,54,0.7)] border-[rgba(19,108,153,0.35)] text-[#8fa2bd] hover:text-stone-200'
+                    }`}
+                  >
+                    All Ministries ({items.length})
+                  </button>
+                  {TOP_MINISTRIES.map((min) => {
+                    const count = items.filter((it) => it.ministry === min).length;
+                    const isSelected = selectedMinistry === min;
+                    const shortName = min.replace('Ministry of ', '').replace('and ', '& ');
+                    return (
+                      <button
+                        key={min}
+                        onClick={() => setSelectedMinistry(isSelected ? 'ALL' : min)}
+                        className={`px-2.5 py-1 rounded-xs text-xs font-sans transition-colors cursor-pointer border ${
+                          isSelected
+                            ? 'bg-[#e0d0ab] text-[#072e63] border-[#e0d0ab] font-bold shadow-sm'
+                            : 'bg-[rgba(4,25,54,0.7)] border-[rgba(19,108,153,0.35)] text-[#8fa2bd] hover:border-[#e0d0ab] hover:text-[#e0d0ab]'
+                        }`}
+                      >
+                        <span>{shortName}</span>
+                        {count > 0 && <span className="ml-1 text-[10px] opacity-75">({count})</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Bottom Actions Bar */}
+              <div className="flex items-center justify-between pt-3 border-t border-[rgba(19,108,153,0.3)]">
+                <span className="text-xs font-mono text-[#8fa2bd]">
+                  Showing <span className="text-[#e0d0ab] font-bold">{displayedItems.length}</span> dispatches matching filters
+                </span>
+                {activeFilterCount > 0 && (
+                  <button
+                    onClick={resetAllFilters}
+                    className="px-3.5 py-1.5 bg-[rgba(11,61,120,0.5)] hover:bg-[rgba(11,61,120,0.8)] border border-[#e0d0ab] text-[#e0d0ab] rounded-xs text-xs font-mono flex items-center gap-1.5 cursor-pointer shadow-sm"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Reset All Filters</span>
+                  </button>
+                )}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* ── Active Filter Badges Bar (Quick 1-Click Clear) ── */}
+        {activeFilterCount > 0 && (
+          <div className="flex items-center gap-2 flex-wrap pt-1">
+            <span className="font-mono text-[9px] uppercase tracking-wider text-[#8fa2bd]">
+              Active Filters:
+            </span>
+
+            {activeCategoryTab !== 'ALL' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-xs bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.5)] text-[#e0d0ab] text-[11px] font-mono">
+                <span>{CATEGORY_TABS.find((t) => t.id === activeCategoryTab)?.label || activeCategoryTab}</span>
+                <button onClick={() => setActiveCategoryTab('ALL')} className="hover:text-white cursor-pointer ml-1">×</button>
+              </span>
+            )}
+
+            {selectedSource !== 'ALL' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-xs bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.5)] text-[#e0d0ab] text-[11px] font-mono">
+                <span>Source: {selectedSource}</span>
+                <button onClick={() => setSelectedSource('ALL')} className="hover:text-white cursor-pointer ml-1">×</button>
+              </span>
+            )}
+
+            {selectedMinistry !== 'ALL' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-xs bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.5)] text-[#e0d0ab] text-[11px] font-mono">
+                <span>{selectedMinistry.replace('Ministry of ', '')}</span>
+                <button onClick={() => setSelectedMinistry('ALL')} className="hover:text-white cursor-pointer ml-1">×</button>
+              </span>
+            )}
+
+            {timePreset !== 'ALL' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-xs bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.5)] text-[#e0d0ab] text-[11px] font-mono">
+                <span>Time: {timePreset === 'TODAY' ? 'Today' : timePreset === 'WEEK' ? 'Past 7 Days' : timePreset === 'MONTH' ? 'Past 30 Days' : 'Custom'}</span>
+                <button onClick={() => applyTimePreset('ALL')} className="hover:text-white cursor-pointer ml-1">×</button>
+              </span>
+            )}
+
+            {trustFilter !== 'ALL' && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-xs bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.5)] text-[#e0d0ab] text-[11px] font-mono">
+                <span>{trustFilter === 'HIGH_GROUNDING' ? 'Grounding ≥90%' : 'Contested'}</span>
+                <button onClick={() => setTrustFilter('ALL')} className="hover:text-white cursor-pointer ml-1">×</button>
+              </span>
+            )}
+
+            {searchQuery && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-xs bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.5)] text-[#e0d0ab] text-[11px] font-mono">
+                <span>"{searchQuery}"</span>
+                <button onClick={() => setSearchQuery('')} className="hover:text-white cursor-pointer ml-1">×</button>
+              </span>
+            )}
+
+            <button
+              onClick={resetAllFilters}
+              className="text-[10px] font-mono text-[#8fa2bd] hover:text-[#e0d0ab] underline cursor-pointer ml-1"
+            >
+              Clear all
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ── Loading Skeleton ── */}
