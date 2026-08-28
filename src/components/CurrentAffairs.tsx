@@ -119,6 +119,26 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
   const [endDate, setEndDate] = useState<string>('');
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
+  // View Mode: 'signals' (Signal Deck) vs 'edition' (Daily Edition)
+  type BriefViewMode = 'signals' | 'edition';
+  const [briefViewMode, setBriefViewMode] = useState<BriefViewMode>(() => {
+    try {
+      return (localStorage.getItem('tark_brief_view_mode') as BriefViewMode) || 'signals';
+    } catch {
+      return 'signals';
+    }
+  });
+  const [showDailyEditionInline, setShowDailyEditionInline] = useState(false);
+
+  const handleSelectViewMode = (mode: BriefViewMode) => {
+    setBriefViewMode(mode);
+    try {
+      localStorage.setItem('tark_brief_view_mode', mode);
+    } catch {
+      /* ignore */
+    }
+  };
+
   // Available options
   const [ministries, setMinistries] = useState<string[]>([]);
   const [sources, setSources] = useState<string[]>([]);
@@ -556,27 +576,135 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
         </div>
       )}
 
-      {/* Rebase fails closed to the proven Daily Edition until its API contract is live. */}
-      <RebaseEdition
-        userId={userId}
-        refreshKey={editionRefreshKey}
-        fallback={<DailyEdition userId={userId} />}
-      />
+      {/* ── View Mode Switcher ── */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-[rgba(19,108,153,0.35)]">
+        <LayoutGroup id="brief-view-modes">
+          <div className="flex items-center gap-1.5 p-1 bg-[rgba(3,18,42,0.7)] border border-[rgba(19,108,153,0.4)] rounded-xs">
+            <button
+              onClick={() => handleSelectViewMode('signals')}
+              className={`relative px-3.5 py-1.5 rounded-xs text-xs font-mono font-medium transition-all cursor-pointer ${
+                briefViewMode === 'signals' ? 'text-[#072e63] font-bold' : 'text-[#8fa2bd] hover:text-[#e0d0ab]'
+              }`}
+            >
+              {briefViewMode === 'signals' && (
+                <motion.span
+                  layoutId="brief-view-mode-pill"
+                  className="absolute inset-0 bg-[#e0d0ab] rounded-xs shadow-sm"
+                  transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', bounce: 0.15, duration: 0.45 }}
+                />
+              )}
+              <span className="relative z-10 flex items-center gap-1.5">
+                <Zap className="w-3.5 h-3.5" />
+                <span>Signal Deck</span>
+              </span>
+            </button>
 
-      {/* ── Archive & Signal Explorer Section ── */}
-      <div className="pt-8 border-t border-zinc-800/80 mb-6 font-sans">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-          <div>
-            <h3 className="font-serif text-base font-bold text-stone-100 flex items-center gap-2">
-              <Layers className="w-4 h-4 text-[#e0d0ab]" />
-              <span>Policy Dispatches & Signal Explorer</span>
-            </h3>
-            <p className="text-xs text-zinc-500 font-sans">
-              Search policy dispatches, filter by ministry, or browse verified intelligence.
-            </p>
+            <button
+              onClick={() => handleSelectViewMode('edition')}
+              className={`relative px-3.5 py-1.5 rounded-xs text-xs font-mono font-medium transition-all cursor-pointer ${
+                briefViewMode === 'edition' ? 'text-[#072e63] font-bold' : 'text-[#8fa2bd] hover:text-[#e0d0ab]'
+              }`}
+            >
+              {briefViewMode === 'edition' && (
+                <motion.span
+                  layoutId="brief-view-mode-pill"
+                  className="absolute inset-0 bg-[#e0d0ab] rounded-xs shadow-sm"
+                  transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', bounce: 0.15, duration: 0.45 }}
+                />
+              )}
+              <span className="relative z-10 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Daily Edition (10 Briefs)</span>
+              </span>
+            </button>
           </div>
+        </LayoutGroup>
+
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-mono text-[#8fa2bd]">
+            {briefViewMode === 'edition' ? 'Finite curated reading path' : `${displayedItems.length} policy signals indexed`}
+          </span>
         </div>
       </div>
+
+      {/* ── MODE 1: FULL DAILY EDITION READER ── */}
+      {briefViewMode === 'edition' && (
+        <div className="max-w-4xl mx-auto">
+          <RebaseEdition
+            userId={userId}
+            refreshKey={editionRefreshKey}
+            fallback={<DailyEdition userId={userId} compactModeDefault={false} />}
+          />
+        </div>
+      )}
+
+      {/* ── MODE 2: SIGNAL DECK & POLICY EXPLORER ── */}
+      {briefViewMode === 'signals' && (
+        <>
+          {/* Optional Daily Edition Upfront Hero Banner */}
+          <div className="mb-6 p-4 rounded-xs border border-[rgba(19,108,153,0.45)] bg-[rgba(4,25,54,0.6)] backdrop-blur-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span className="w-8 h-8 rounded-xs bg-[rgba(224,208,171,0.12)] border border-[rgba(224,208,171,0.3)] flex items-center justify-center text-[#e0d0ab] shrink-0">
+                <Sparkles className="w-4 h-4" />
+              </span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-xs font-bold text-[#e0d0ab]">Today's Finite Curated Edition</span>
+                  <span className="text-[11px] font-mono text-[#8fa2bd]">&bull; 10 briefs &bull; ~4 min read</span>
+                </div>
+                <p className="text-[12px] text-[#9fb0c8] m-0">Significance-ranked policy decisions with verified Prelims & Mains takeaways.</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => handleSelectViewMode('edition')}
+                className="px-3 py-1.5 bg-[#e0d0ab] hover:bg-white text-[#072e63] font-mono font-bold text-xs uppercase tracking-wider rounded-xs transition-colors cursor-pointer"
+              >
+                Open Edition →
+              </button>
+              <button
+                onClick={() => setShowDailyEditionInline(!showDailyEditionInline)}
+                className="px-3 py-1.5 bg-[rgba(3,18,42,0.6)] hover:bg-[rgba(11,61,120,0.4)] border border-[rgba(19,108,153,0.4)] text-[#c8b998] font-mono text-xs rounded-xs transition-colors cursor-pointer"
+              >
+                {showDailyEditionInline ? 'Hide Inline ▴' : 'Expand Inline ▾'}
+              </button>
+            </div>
+          </div>
+
+          {/* Inline Collapsible Edition (if toggled) */}
+          <AnimatePresence>
+            {showDailyEditionInline && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden mb-8"
+              >
+                <RebaseEdition
+                  userId={userId}
+                  refreshKey={editionRefreshKey}
+                  fallback={<DailyEdition userId={userId} compactModeDefault={true} />}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* ── Archive & Signal Explorer Header ── */}
+          <div className="pt-4 border-t border-[rgba(19,108,153,0.3)] mb-6 font-sans">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+              <div>
+                <h3 className="font-serif text-base font-bold text-[#e8e0cf] flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-[#0194a8]" />
+                  <span>Policy Dispatches & Signal Explorer</span>
+                </h3>
+                <p className="text-xs text-[#8fa2bd] font-sans m-0">
+                  Search policy dispatches, filter by ministry, or browse verified intelligence.
+                </p>
+              </div>
+            </div>
+          </div>
 
       {/* ── Search & Horizontal Category Filter Tabs ── */}
       <div className="space-y-4 mb-8 font-sans">
@@ -1074,6 +1202,8 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
             </div>
           )}
         </div>
+      )}
+      </>
       )}
 
       {/* ── Full Brief Slide-Over (Slide-Over) ── */}
