@@ -17,6 +17,8 @@ import {
   Sparkles
 } from 'lucide-react';
 
+import BrandLogo, { TarkSigil } from './BrandLogo';
+
 export type NavTab = 'arena' | 'tracker' | 'library' | 'humanities' | 'leaderboard' | 'profile';
 
 interface NavItem {
@@ -89,30 +91,16 @@ export default function VerticalNavRail({
       <div className="flex flex-col">
         <div
           onClick={onNavigateHome}
-          className={`flex items-center gap-3 px-4 py-5 border-b border-[rgba(19,108,153,0.35)] cursor-pointer group transition-colors ${
+          className={`flex items-center px-4 py-4 border-b border-[rgba(19,108,153,0.35)] cursor-pointer group transition-colors ${
             isExpanded ? 'justify-start' : 'justify-center'
           }`}
           title="Tark | तर्क — Home"
         >
-          <div className="w-8 h-8 rounded-xs bg-[rgba(224,208,171,0.12)] border border-[rgba(224,208,171,0.4)] flex items-center justify-center text-[#e0d0ab] group-hover:border-[#e0d0ab] group-hover:bg-[rgba(224,208,171,0.2)] transition-all shrink-0">
-            <span className="font-serif font-bold text-sm">त</span>
-          </div>
-
-          {isExpanded && (
-            <motion.div
-              initial={{ opacity: 0, x: -6 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -6 }}
-              className="flex flex-col min-w-0"
-            >
-              <span className="font-serif font-bold text-[15px] tracking-wide text-[#e0d0ab] leading-none">
-                Tark
-              </span>
-              <span className="font-serif text-[11px] text-[#8fa2bd] tracking-widest mt-1">
-                तर्क &bull; ARENA
-              </span>
-            </motion.div>
-          )}
+          <BrandLogo
+            size="md"
+            isCompact={!isExpanded}
+            showSubtitle={true}
+          />
         </div>
 
         {/* ── Navigation Groupings ── */}

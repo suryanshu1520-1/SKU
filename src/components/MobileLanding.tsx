@@ -17,6 +17,7 @@ import {
   Check
 } from 'lucide-react';
 import DiagnosticPreview from './DiagnosticPreview';
+import BrandLogo from './BrandLogo';
 
 interface MobileLandingProps {
   onNavigateArena: () => void;
@@ -108,8 +109,9 @@ export default function MobileLanding({
       </div>
 
       {/* ── 2. Mobile Hero Lockup ── */}
-      <div className="text-center space-y-3.5 px-2">
-        <h1 className="font-serif text-3xl font-bold tracking-tight text-[#e0d0ab] leading-snug drop-shadow-[0_2px_16px_rgba(224,208,171,0.2)]">
+      <div className="text-center space-y-3.5 px-2 flex flex-col items-center">
+        <BrandLogo size="md" showSubtitle={false} />
+        <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#e0d0ab] leading-snug drop-shadow-[0_2px_16px_rgba(224,208,171,0.2)] pt-1">
           The Analytical Crucible for India&apos;s Toughest Exam.
         </h1>
         <p className="text-[#c8b998] text-[14.5px] font-sans leading-relaxed">

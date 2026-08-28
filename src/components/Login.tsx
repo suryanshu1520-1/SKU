@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { fetchWithAuth } from '../lib/api';
 import { supabase } from '../lib/supabase';
 import InteractiveBackground from './InteractiveBackground';
+import BrandLogo from './BrandLogo';
 
 interface LoginProps {
   onAuthenticated: (email: string, name: string, uuid?: string) => void;
@@ -228,14 +229,9 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
           {/* Card Wrapper */}
           <div className="bg-[rgba(4,25,54,0.8)] backdrop-blur-xl border border-[rgba(19,108,153,0.45)] rounded-xs p-6 sm:p-8 shadow-[0_16px_50px_rgba(0,0,0,0.7)] space-y-6">
             
-            {/* Brand Title */}
-            <div className="text-center space-y-1">
-              <span className="font-mono text-xs uppercase tracking-widest text-[#0194a8]">
-                Candidate Access Portal
-              </span>
-              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#e0d0ab] tracking-tight">
-                Tark 1.0 &bull; तर्क
-              </h2>
+            {/* Brand Title Lockup */}
+            <div className="flex flex-col items-center justify-center space-y-1">
+              <BrandLogo size="lg" showSubtitle={true} />
             </div>
 
             {/* Segmented Mode Switcher (Sign In vs Enroll) */}

@@ -15,6 +15,7 @@ import PasswordReset from './components/PasswordReset';
 import LegalModal, { LegalDocumentType } from './components/LegalModal';
 import VerticalNavRail from './components/VerticalNavRail';
 import Onboarding from './components/Onboarding';
+import BrandLogo from './components/BrandLogo';
 import { supabase } from './lib/supabase';
 import { Loader2, Trophy, Swords, Globe, User, House, LogIn, Layers, BookOpen, PanelLeftOpen, LayoutTemplate } from 'lucide-react';
 
@@ -365,13 +366,11 @@ export default function App() {
           <div className="flex flex-col md:flex-row md:items-center justify-between px-4 py-3 md:px-8 gap-3 md:gap-0">
             {/* Brand Logo & Mobile Action */}
             <div className="flex items-center justify-between w-full md:w-auto">
-              <motion.h1
-                layoutId="brand-header-h1"
+              <BrandLogo
+                size="md"
+                showSubtitle={false}
                 onClick={handleNavigateHome}
-                className="font-serif text-base md:text-xl font-bold tracking-wider text-[#e0d0ab] cursor-pointer select-none whitespace-nowrap drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] shrink-0"
-              >
-                Tark | तर्क
-              </motion.h1>
+              />
 
               {!userEmail && (
                 <button
