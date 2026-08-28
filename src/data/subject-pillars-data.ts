@@ -23,6 +23,12 @@ export interface MindMapNode {
   /** For 'branching' only: the forking question the branches answer. */
   rootQuestion?: string;
   details: string[];
+  /**
+   * Optional, same length/order as `details` — a worked illustration of
+   * that step. Labeled as illustrative in the UI, not attributed to a
+   * specific real paper, unless the text itself cites one.
+   */
+  examples?: string[];
 }
 
 export interface MainsBlueprint {
@@ -760,6 +766,11 @@ export const SUBJECT_PILLARS: SubjectPillar[] = [
           "Rule 1: Reject options with external true facts that lack passage textual support.",
           "Rule 2: Apply Negation Test for 'Crucial Assumption' questions.",
           "Rule 3: Beware of narrow vs broad scoping errors in 'Most Rational Implication'."
+        ],
+        examples: [
+          "Illustrative: passage is about a village's drinking-water shortage. An option reads 'Rainwater harvesting is the most cost-effective solution to water scarcity' — true in the real world, but if the passage never raises rainwater harvesting, it's unsupported by THIS passage and must be rejected.",
+          "Illustrative: passage argues a policy will succeed 'because people will change their behaviour once informed.' Negate a candidate assumption — 'people act rationally when given accurate information' — if the argument collapses without it, that's the crucial assumption.",
+          "Illustrative: passage describes rising temperatures in one metro city. An option concluding 'India's climate is warming everywhere' broadens a local observation into a national claim — the most RATIONAL implication stays inside the passage's actual scope."
         ]
       }
     ],

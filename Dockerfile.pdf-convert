@@ -1,0 +1,19 @@
+FROM python:3.11-slim
+
+RUN apt-get update && apt-get install -y \
+    poppler-utils \
+    tesseract-ocr \
+    ghostscript \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir \
+    pdf2image \
+    pytesseract \
+    pdfrw \
+    pymupdf
+
+WORKDIR /workdir
+
+COPY pdf-to-md.py .
+
+ENTRYPOINT ["python", "pdf-to-md.py"]

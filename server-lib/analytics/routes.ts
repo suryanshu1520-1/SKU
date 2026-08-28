@@ -14,6 +14,7 @@ import {
   getDirectiveVerbScoringMatrix,
   getLiveQuestionBankTrends,
   getSupabase,
+  isCleanPrelimsRow,
 } from "./examiner_psyche.js";
 export const analyticsRouter = Router();
 
@@ -99,12 +100,14 @@ analyticsRouter.get("/examiner-psyche/node/:nodeId", async (req: Request, res: R
       sb.from("pyq_mains").select("id, year, paper, question_num, marks, prompt, directive_verb, nature, rubric_level_1, rubric_level_2, rubric_level_3").eq("node_id", nodeId).order("year", { ascending: false }).limit(20),
     ]);
 
+    const cleanPrelims = (prelimsRes.data || []).filter(isCleanPrelimsRow).slice(0, 5);
+
     res.json({
       success: true,
       data: {
         node: nodeRes.data,
         analytics: analyticsRes.data,
-        prelimsQuestions: prelimsRes.data || [],
+        prelimsQuestions: cleanPrelims,
         mainsQuestions: mainsRes.data || [],
       }
     });

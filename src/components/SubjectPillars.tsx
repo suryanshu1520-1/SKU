@@ -191,6 +191,14 @@ function SequentialMindMap({
                 <p className={`text-xs md:text-sm font-sans leading-relaxed ${isDone ? 'text-stone-100' : 'text-zinc-500'}`}>
                   {step}
                 </p>
+                {isActive && mm.examples?.[sIdx] && (
+                  <div className="mt-2.5 pt-2.5 border-t border-zinc-800/80">
+                    <span className="text-[9px] font-mono uppercase tracking-wider text-[#e0d0ab]">Worked example</span>
+                    <p className="text-[11px] md:text-xs text-zinc-400 leading-relaxed font-sans mt-1 italic">
+                      {mm.examples[sIdx]}
+                    </p>
+                  </div>
+                )}
               </div>
             </motion.div>
             {sIdx < mm.details.length - 1 && (

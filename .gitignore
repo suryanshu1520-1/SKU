@@ -22,8 +22,7 @@ id_rsa*
 # ── Obsidian Secrets & Local Workspace Clutter ──
 .obsidian/workspace.json
 .obsidian/workspace-mobile.json
-.obsidian/plugins/obsidian-local-rest-api/data.json
-.obsidian/plugins/*/data.json
+.obsidian/plugins/
 
 # ── Dependencies ──
 node_modules/
@@ -107,3 +106,13 @@ tsconfig.verify*.json
 # ── Raw Source Archive (Local OCR & raw data — NEVER pushed to git) ──
 _raw_source_archive/
 _raw_source_archive/*
+
+# ── Local plugin caches & session logs ──
+.claudian/
+.smart-env/
+.opencode/
+roster-backups/
+copilot/
+gemini-scribe/
+YOLO/
+hive/

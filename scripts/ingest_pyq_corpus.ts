@@ -17,7 +17,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { persistSession: false }
 });
 
-const EXPORT_FILE = path.join(process.cwd(), '_raw_source_archive', 'pyq-extraction', 'pyq_prelims_export.json');
+const EXPORT_FILE = path.join(process.cwd(), '_raw_source_archive', 'pyq-extraction', 'verified_clean_export.json');
 
 async function fetchAllRows(tableName: string, selectCols: string): Promise<any[]> {
   const allData: any[] = [];
@@ -68,12 +68,21 @@ async function runIngestion(dryRun: boolean = false) {
   // 3. Filter and sanitize rows to insert
   const toInsert: any[] = [];
   let skippedDuplicates = 0;
+  let skippedCorrupted = 0;
   let mappedFallbackNodes = 0;
 
   for (const q of extractedQuestions) {
     const key = `${q.year}_${q.paper}_${q.question_num}`;
     if (existingTuples.has(key)) {
       skippedDuplicates++;
+      continue;
+    }
+
+    // Quality gate: reject placeholder options or malformed stems
+    const optValues = q.options ? Object.values(q.options) : [];
+    const hasPlaceholder = optValues.some(v => typeof v === 'string' && /^option\s*[a-d]$/i.test(v.trim()));
+    if (hasPlaceholder || !q.stem || q.stem.trim().length < 15 || optValues.length < 4) {
+      skippedCorrupted++;
       continue;
     }
 
@@ -102,6 +111,7 @@ async function runIngestion(dryRun: boolean = false) {
   console.log(`\nIngestion Plan:`);
   console.log(`- Net-New Rows to Insert: ${toInsert.length}`);
   console.log(`- Exact Duplicates Skipped: ${skippedDuplicates}`);
+  console.log(`- Corrupted / Placeholder Questions Skipped: ${skippedCorrupted}`);
   console.log(`- Fallback Nodes Assigned (to satisfy NOT NULL): ${mappedFallbackNodes}`);
 
   if (dryRun) {

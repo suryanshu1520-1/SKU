@@ -1,0 +1,13 @@
+FROM python:3.11-slim-bookworm
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir docling
+
+# Bake layout/table/OCR models into the image at build time (forcing OCR on a
+# throwaway warmup doc) so `docker run --rm` doesn't re-download them per file.
+RUN docling convert https://arxiv.org/pdf/2206.01062 --to md --ocr-mode full_page --output /tmp/warmup
+
+ENTRYPOINT ["docling"]

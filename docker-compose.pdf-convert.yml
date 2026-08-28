@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  pdf-converter:
+    image: arachnid/pdf2htmlex:latest
+    volumes:
+      - ./C:/Users/bentn/OneDrive/Desktop/SKU/_raw_source_archive/manjunath-study-material-ocr:/input:ro
+      - ./C:/Users/bentn/OneDrive/Desktop/SKU/_raw_source_archive/manjunath-study-material-md:/output
+    working_dir: /workdir
+    command: |
+      bash -c '
+        echo "🚀 PDF to Markdown Batch Converter"
+        echo "Input:  /input"
+        echo "Output: /output"
+        find /input -type f -name "*.pdf" | sort | while read pdf; do
+          filename=$$(basename "$$pdf" .pdf)
+          echo "Converting: $$filename..."
+          pdftotext -layout "$$pdf" "/output/$${filename}.txt"
+          
+          # Convert text to markdown
+          {
+            echo "# $${filename//_/ }"
+            echo ""
+            cat "/output/$${filename}.txt" | grep -v "^$$" | sed "s/^//"
+          } > "/output/$${filename}.md"
+          
+          rm "/output/$${filename}.txt"
+          echo "✅ $${filename}.md"
+        done
+        echo ""
+        echo "📊 Conversion complete!"
+        ls -1 /output/*.md | wc -l | xargs echo "📁 Total markdown files:"
+      '

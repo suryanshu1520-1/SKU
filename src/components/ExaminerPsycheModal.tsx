@@ -347,9 +347,90 @@ const EMPIRICAL_BASELINE_DATA = {
   }
 };
 
+interface NodeLinkDetail {
+  loading: boolean;
+  prelims: any[];
+  mains: any[];
+  error?: string;
+}
+
+// Fetches and renders the real PYQ records behind a frequency stat — the
+// answer to "you're telling me to read this, but based on which questions?"
+function NodeLinkedPyqs({ detail }: { detail?: NodeLinkDetail }) {
+  if (!detail || detail.loading) {
+    return (
+      <div className="p-3 rounded-sm bg-zinc-950/60 border border-zinc-800 text-[11px] font-mono text-zinc-500">
+        Loading the questions behind this stat…
+      </div>
+    );
+  }
+  if (detail.error || (detail.prelims.length === 0 && detail.mains.length === 0)) {
+    return (
+      <div className="p-3 rounded-sm bg-zinc-950/60 border border-zinc-800 text-[11px] font-mono text-zinc-500">
+        {detail.error || 'No cleanly-extracted linked PYQ on file for this node yet.'}
+      </div>
+    );
+  }
+  return (
+    <div className="p-3 rounded-sm bg-zinc-950/60 border border-zinc-800 space-y-2">
+      <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">
+        The actual questions behind this stat
+      </span>
+      {detail.prelims.map((q: any) => (
+        <div key={q.id} className="p-2.5 rounded bg-zinc-900/60 border border-zinc-800/80 text-xs">
+          <div className="flex items-center justify-between mb-1">
+            <span className="font-mono text-[10px] text-[#e0d0ab]">Prelims {q.year} · {q.paper}</span>
+            <span className="font-mono text-[10px] text-emerald-400">Ans: {String(q.official_key || '').toUpperCase()}</span>
+          </div>
+          <p className="text-zinc-300 leading-relaxed">{q.stem}</p>
+        </div>
+      ))}
+      {detail.mains.map((m: any) => (
+        <div key={m.id} className="p-2.5 rounded bg-zinc-900/60 border border-zinc-800/80 text-xs">
+          <div className="flex items-center justify-between mb-1">
+            <span className="font-mono text-[10px] text-[#e0d0ab]">Mains {m.year} · {m.paper} · {m.marks}m</span>
+            <span className="font-mono text-[10px] text-zinc-400">{m.directive_verb}</span>
+          </div>
+          <p className="text-zinc-300 leading-relaxed">{m.prompt}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: ExaminerPsycheModalProps) {
   const [activeTab, setActiveTab] = useState<'trends' | 'pareto' | 'qualifiers' | 'shifts' | 'cicada' | 'csat' | 'dialectics' | 'directives'>('trends');
   const [data, setData] = useState<any>(EMPIRICAL_BASELINE_DATA);
+  const [expandedNodeId, setExpandedNodeId] = useState<string | null>(null);
+  const [nodeDetails, setNodeDetails] = useState<Record<string, NodeLinkDetail>>({});
+
+  const toggleNodeLinks = (nodeId: string) => {
+    if (expandedNodeId === nodeId) {
+      setExpandedNodeId(null);
+      return;
+    }
+    setExpandedNodeId(nodeId);
+    if (nodeDetails[nodeId]) return;
+    setNodeDetails((prev) => ({ ...prev, [nodeId]: { loading: true, prelims: [], mains: [] } }));
+    fetch(`/api/analytics/examiner-psyche/node/${encodeURIComponent(nodeId)}`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((json) => {
+        if (!json.success || !json.data) throw new Error('No data');
+        setNodeDetails((prev) => ({
+          ...prev,
+          [nodeId]: { loading: false, prelims: json.data.prelimsQuestions || [], mains: json.data.mainsQuestions || [] },
+        }));
+      })
+      .catch(() => {
+        setNodeDetails((prev) => ({
+          ...prev,
+          [nodeId]: { loading: false, prelims: [], mains: [], error: 'Could not load linked PYQs right now.' },
+        }));
+      });
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -673,29 +754,51 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                     </thead>
                     <tbody className="divide-y divide-zinc-800/60 font-sans">
                       {data.paretoDrought.paretoCoreNodes.slice(0, 15).map((node: any, idx: number) => (
-                        <tr key={idx} className="hover:bg-zinc-900/40 transition-colors">
-                          <td className="p-3">
-                            <div className="font-mono text-[#e0d0ab] font-bold text-[11px]">{node.nodeId}</div>
-                            <div className="text-zinc-400 text-[11px] line-clamp-1 mt-0.5">{node.gloss}</div>
-                          </td>
-                          <td className="p-3 font-mono text-[11px] text-zinc-300">{node.paper}</td>
-                          <td className="p-3 text-center font-mono font-bold text-stone-200">{node.totalPrelims}</td>
-                          <td className="p-3 text-center font-mono text-zinc-400">{node.totalMains}</td>
-                          <td className="p-3 text-center font-mono text-[#e0d0ab] font-bold">{node.totalMarks}</td>
-                          <td className="p-3 text-right font-mono text-emerald-400 font-bold">{node.cumulativeWeightPct}%</td>
-                          <td className="p-3 text-right">
-                            <button
-                              onClick={() => {
-                                onClose();
-                                if (onLaunchPractice) onLaunchPractice(node.gloss);
-                              }}
-                              className="px-2 py-1 rounded bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-[10px] font-mono text-[#e0d0ab] inline-flex items-center gap-1 transition-colors"
-                            >
-                              <Swords className="w-3 h-3" />
-                              Drill
-                            </button>
-                          </td>
-                        </tr>
+                        <React.Fragment key={idx}>
+                          <tr className="hover:bg-zinc-900/40 transition-colors">
+                            <td className="p-3">
+                              <div className="font-mono text-[#e0d0ab] font-bold text-[11px]">{node.nodeId}</div>
+                              <div className="text-zinc-400 text-[11px] line-clamp-1 mt-0.5">{node.gloss}</div>
+                            </td>
+                            <td className="p-3 font-mono text-[11px] text-zinc-300">{node.paper}</td>
+                            <td className="p-3 text-center font-mono font-bold text-stone-200">{node.totalPrelims}</td>
+                            <td className="p-3 text-center font-mono text-zinc-400">{node.totalMains}</td>
+                            <td className="p-3 text-center font-mono text-[#e0d0ab] font-bold">{node.totalMarks}</td>
+                            <td className="p-3 text-right font-mono text-emerald-400 font-bold">{node.cumulativeWeightPct}%</td>
+                            <td className="p-3 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  onClick={() => toggleNodeLinks(node.nodeId)}
+                                  className={`px-2 py-1 rounded border text-[10px] font-mono inline-flex items-center gap-1 transition-colors cursor-pointer ${
+                                    expandedNodeId === node.nodeId
+                                      ? 'bg-[#e0d0ab] text-zinc-950 border-[#e0d0ab] font-bold'
+                                      : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-700 text-[#e0d0ab]'
+                                  }`}
+                                >
+                                  <Search className="w-3 h-3" />
+                                  Sources
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    onClose();
+                                    if (onLaunchPractice) onLaunchPractice(node.gloss);
+                                  }}
+                                  className="px-2 py-1 rounded bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-[10px] font-mono text-[#e0d0ab] inline-flex items-center gap-1 transition-colors cursor-pointer"
+                                >
+                                  <Swords className="w-3 h-3" />
+                                  Drill
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                          {expandedNodeId === node.nodeId && (
+                            <tr>
+                              <td colSpan={7} className="p-3 bg-zinc-950/40">
+                                <NodeLinkedPyqs detail={nodeDetails[node.nodeId]} />
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
                       ))}
                     </tbody>
                   </table>
@@ -914,6 +1017,19 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                       <span>Tested Years:</span>
                       <strong className="text-stone-200">{(c.historicalTestYears || []).join(', ')}</strong>
                     </div>
+
+                    <button
+                      onClick={() => toggleNodeLinks(c.nodeId)}
+                      className={`w-full px-2.5 py-1.5 rounded border text-[10px] font-mono inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
+                        expandedNodeId === c.nodeId
+                          ? 'bg-[#e0d0ab] text-zinc-950 border-[#e0d0ab] font-bold'
+                          : 'bg-zinc-950/60 hover:bg-zinc-900 border-zinc-800 text-[#e0d0ab]'
+                      }`}
+                    >
+                      <Search className="w-3 h-3" />
+                      {expandedNodeId === c.nodeId ? 'Hide base questions' : 'Show base questions'}
+                    </button>
+                    {expandedNodeId === c.nodeId && <NodeLinkedPyqs detail={nodeDetails[c.nodeId]} />}
                   </div>
                 ))}
               </div>

@@ -124,6 +124,20 @@ export interface DirectiveVerbRubric {
   examinerPenaltyPitfall: string;
 }
 
+/**
+ * One extraction batch (the `pyq_2019_gs2_q*` CSAT rows — see
+ * PARKED_FILES.md) never cleanly extracted: option cells got
+ * cross-contaminated between unrelated questions during OCR. The cheapest
+ * reliable signature is literal "Option A/B/C/D" placeholder text left over
+ * from the failed pass. Used to keep corrupted rows out of anything shown
+ * to a student as a real linked PYQ.
+ */
+export function isCleanPrelimsRow(row: { stem?: string | null; options?: any }): boolean {
+  if (!row.stem || row.stem.trim().length < 15) return false;
+  const values = row.options ? Object.values(row.options) : [];
+  return !values.some((v) => typeof v === "string" && /^option\s*[a-d]\s*$/i.test(v.trim()));
+}
+
 // ---------------------------------------------------------------------------
 // 1. Pareto Distribution & Drought Detection Engine
 // ---------------------------------------------------------------------------

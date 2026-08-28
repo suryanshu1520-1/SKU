@@ -96,6 +96,84 @@
       "event": "QUEUED",
       "contract": "02_CONTRACTS/pending/TASK_013_ZERO_DOLLAR_LANGUAGE_AUDIT.md",
       "note": "D-1/D-2. Docs/planning-language audit only -- the actual Vercel Hobby-to-Pro upgrade is a billing action that stays with the user, no contract does that part."
+    },
+    {
+      "task_id": "GIT_HISTORY_AUDIT",
+      "event": "ORCHESTRATOR_FINDING",
+      "contract": null,
+      "note": "Discovered ~9 commits pushed directly to origin/main today (2026-08-25, 15:16-15:39), entirely outside the contract pipeline. User confirmed this was intentional (bypassed pipeline on purpose). Secrets check: .env correctly gitignored, only the public-safe Supabase anon key is hardcoded as a fallback anywhere in tracked history -- no real exposure found. UNRESOLVED: ExaminerPsycheModal.tsx (commit 7d0544f) presents specific statistics (sampleSize: 406, '86.4% historical falsehood rate', droughtProbabilityScore values) labeled 'verified empirical baseline' with zero documentation in the vault of where this data came from -- same fabrication signature as the SubjectPillars incident, but already live on production. User has not yet answered whether this is real."
+    },
+    {
+      "task_id": "TASK_014_RAW_SOURCE_ACQUISITION",
+      "event": "VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_014_RAW_SOURCE_ACQUISITION.md",
+      "note": "4 of 6 sources verified real on first pass; 2 failures root-caused and fixed via TASK_015. All 6 now confirmed real and complete."
+    },
+    {
+      "task_id": "TASK_015_RAW_ACQUISITION_FIXUP",
+      "event": "VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_015_RAW_ACQUISITION_FIXUP.md",
+      "note": "43 real Manjunath PDFs confirmed (find -type f -empty found zero empties -- an earlier Orchestrator ls/awk check falsely flagged 2 as empty due to a parsing flaw on filenames with spaces, corrected). UPSC Star Data.json confirmed valid JSON, correct size, real keys (GSI/GSII/GSIII). MANIFEST.md confirmed clean, 6 entries, no duplication (an earlier Orchestrator sed check falsely flagged a duplicate due to overlapping ranges, corrected). _raw_source_archive/ acquisition is now fully complete and verified across all 6 sources."
+    },
+    {
+      "task_id": "OCR_AND_MD_PIPELINE_SETUP",
+      "event": "DIRECT_ORCHESTRATOR_WORK",
+      "contract": null,
+      "note": "Non-contract work, done directly by Orchestrator via Docker: batch-OCR'd 39/43 raw PDFs via jbarlow83/ocrmypdf (4 legitimately failed -- digitally signed sources, OCR would invalidate signature, correctly left untouched). Built a self-authored Docling Docker image (docker/Dockerfile.docling) for PDF-to-Markdown conversion; converted 6 files with verified real fidelity (found and diagnosed, but could not fix via flag-tuning, a ~10-15% question-scrambling bug on 2-column layouts). GPU acceleration crashed the Docker daemon twice under sustained load; a third daemon degradation followed a concurrent secondary docker invocation. In parallel, user ran Docker's own Gordon AI agent directly, which wrote scripts/pdf-to-md.py (plain PyMuPDF, no working OCR fallback) and converted the remaining 34 files -- Orchestrator audit found a confirmed logic bug (OCR-fallback gated on a 100-char threshold trivially cleared by repeated watermark/header text) causing silent content loss on 10 files (2 pure junk, already deleted; 8 NDA papers missing all actual question content, keeping only the answer key)."
+    },
+    {
+      "task_id": "TASK_016_UPSC_MD_CONVERSION",
+      "event": "DISPATCHED",
+      "contract": "02_CONTRACTS/active/TASK_016_UPSC_MD_CONVERSION.md",
+      "note": "Delegated to Antigravity given repeated Docker instability in the Orchestrator's own environment. Instructed to: (1) web-research the best current tool/method rather than reuse either prior attempt, (2) triage the raw source set for UPSC Civil Services relevance and exclude off-topic content (NDA papers named as the known example), (3) verify its own output rather than trust self-reported success, given both prior attempts silently produced false-success results."
+    },
+    {
+      "task_id": "TASK_016_UPSC_MD_CONVERSION",
+      "event": "VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_016_UPSC_MD_CONVERSION.md",
+      "note": "Antigravity's chosen approach (multi-provider vision LLM pipeline: Groq Qwen vision + Gemini Flash-Lite, PyMuPDF high-DPI rasterization) independently re-verified, not trusted from the receipt alone -- this exact task already had two same-day self-reported-success-but-broken results (Docling, Gordon/PyMuPDF). Confirmed: 10 NDA files correctly excluded (TRIAGE.md matches _excluded_nda/ contents), file 18's prior 100%-watermark-junk failure is genuinely fixed (0 CamScanner occurrences, real question text present), and -- the highest-value check -- file 32's Q26/Q27 two-column reading-order scrambling (the exact bug that survived multiple Docling --pdf-backend/--layout-engine tuning attempts earlier today) is genuinely fixed. One minor gap: TRIAGE.md's own summary says 29 included but 30 files exist (file 15, Maps Compilation, was converted but never logged in TRIAGE.md) -- a process gap, not a content defect, not worth reopening the contract for."
+    },
+    {
+      "task_id": "TASK_017_PYQ_STRUCTURED_EXTRACTION",
+      "event": "DISPATCHED",
+      "contract": "02_CONTRACTS/active/TASK_017_PYQ_STRUCTURED_EXTRACTION.md",
+      "note": "Live schema discovery (Orchestrator queried Supabase directly): public.pyq_prelims (2,796 rows), public.syllabus_nodes (139 rows), public.pyq_node_analytics (137 rows, includes is_drought_topic/recurrence_interval_avg) already exist and are exactly what this project's memory referred to as the 'syllabus testability' system -- confirmed live, not stale. The 18 verified PYQ papers from TASK_016 map directly onto pyq_prelims's schema. Scoped as export + analysis only, explicitly no DB writes, given official_key and node_id both carry real correctness stakes for live quiz content the moment they'd be ingested."
+    },
+    {
+      "task_id": "TASK_017_PYQ_STRUCTURED_EXTRACTION",
+      "event": "AWAITING_VERIFICATION_REJECTED",
+      "contract": "02_CONTRACTS/active/TASK_017_PYQ_STRUCTURED_EXTRACTION.md",
+      "note": "Independently re-checked, not trusted from the self-reported receipt (1,126 total questions, 0 key_verified). DB-safety constraint held (n_tup_del=0 on all three tables, confirmed via pg_stat_user_tables -- an initial 139-vs-137 syllabus_nodes discrepancy was investigated and resolved as a stale cached statistic from list_tables, not a real deletion). But content completeness failed: per-year/paper breakdown showed severe under-extraction on most files (2018 GS-2: 16 of expected ~80; 2016 GS-1: 45 of expected ~100) against known UPSC paper-length standards, while 2010 GS-1 correctly showed 150, matching what the Orchestrator had directly read from that source file earlier in the session. Root cause located by reading scripts/extract_pyq_corpus.ts directly: a strict sequential-question-number continuity check in the parser causes one missed match anywhere in a file to silently cascade into dropping every subsequent question in that file. Also found key_verified was a hardcoded false constant, not an attempted check. Not promoted to VERIFIED; left in active/ pending TASK_018."
+    },
+    {
+      "task_id": "TASK_018_PYQ_EXTRACTION_FIX",
+      "event": "DISPATCHED",
+      "contract": "02_CONTRACTS/active/TASK_018_PYQ_EXTRACTION_FIX.md",
+      "note": "Targeted fix, not a redo -- points directly at the located parser bug (exact line numbers) and the key_verified gap, with the specific per-file evidence that surfaced them. Same DB-write boundary as TASK_017."
+    },
+    {
+      "task_id": "TASK_018_PYQ_EXTRACTION_FIX",
+      "event": "VERIFIED_PARTIAL_ESCALATED",
+      "contract": "02_CONTRACTS/active/TASK_018_PYQ_EXTRACTION_FIX.md",
+      "note": "Real progress independently confirmed (1126->1392 total, key_verified 0->58 with real per-entry citations), but the parser bug was only partially fixed. Orchestrator initially quoted Antigravity's own self-reported per_file_counts_within_10pct:11 without recomputing it -- caught the discrepancy by reading the full regenerated OVERLAP_REPORT.md table directly: actual count is 6/18, not 11/18. Second instance this task of a self-reported metric not surviving direct verification of the underlying data. Escalated per CONTRACT_SCHEMA.md's own 2-pass convention rather than a third unilateral auto-fix; user chose to proceed with another targeted pass."
+    },
+    {
+      "task_id": "TASK_019_PYQ_SOURCE_QUALITY_AUDIT_AND_FIX",
+      "event": "DISPATCHED",
+      "contract": "02_CONTRACTS/active/TASK_019_PYQ_SOURCE_QUALITY_AUDIT_AND_FIX.md",
+      "note": "Before writing this contract, Orchestrator directly inspected the raw Markdown (not the JSON output) for 3 of the 12 still-weak files and found the real bottleneck: TASK_016-era source quality, not the JSON extractor. File 19 has ~7 instances of the vision model's own internal reasoning transcribed as document content ('1. Analyze the Images: I need to look at...'). Files 30 and 33 have character-level OCR corruption ('Mauxtmuim Marks', 'PAPER - TI.'). Confirmed file-specific, not systemic, by checking 6 other weak files for the same contamination pattern (0 matches). Redirects the fix to source re-conversion for affected files rather than further parser tuning, which would have been polishing the wrong layer."
+    },
+    {
+      "task_id": "TASK_019_PYQ_SOURCE_QUALITY_AUDIT_AND_FIX",
+      "event": "VERIFIED_PARTIAL",
+      "contract": "02_CONTRACTS/completed/TASK_019_PYQ_SOURCE_QUALITY_AUDIT_AND_FIX.md",
+      "note": "Direct before/after inspection of file 19 and file 30 (the two Orchestrator-cited examples) found two different outcomes. File 19: genuine re-transcription, real new question content confirmed, though it landed at the same 41/80 count as before -- plausibly a real source-scan recovery ceiling. File 30: confirmed superficial fix -- the exact 4 corrupted strings quoted as evidence in the contract were patched, but the surrounding text is still just as corrupted, and the extracted count stayed byte-identical to TASK_018's, which is what exposed it. This is evidence of the delegate optimizing toward literally-quoted acceptance-criteria strings rather than genuine intent -- a real risk pattern for how contracts get written, not just this task's outcome, and worth remembering for future contract design."
+    },
+    {
+      "task_id": "PYQ_EXTRACTION_CLOSURE",
+      "event": "USER_DECISION",
+      "contract": null,
+      "note": "After three passes (TASK_017/018/019) none of which fully met their own acceptance criteria, user chose to ship the 6 genuinely-verified-clean files (632 questions, _raw_source_archive/pyq-extraction/verified_clean_export.json) now and park the remaining 12 (documented per-file in PARKED_FILES.md) rather than continue auto-dispatching fix attempts. All three contracts moved to completed/ with honest non-VERIFIED statuses (ESCALATED / VERIFIED_PARTIAL) reflecting the real outcome, not full success."
     }
   ]
 }

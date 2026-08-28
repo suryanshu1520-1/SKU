@@ -1,3 +1,21 @@
 [
-  "obsidian-local-rest-api"
+  "obsidian-local-rest-api",
+  "obsidian-kanban",
+  "obsidian-mind-map",
+  "lazy-plugins",
+  "surfing",
+  "obsidian-contextual-typography",
+  "obsidian-link-embed",
+  "yolo",
+  "gemini-scribe",
+  "omnisearch",
+  "copilot",
+  "obsidian-minimal-settings",
+  "smart-connections",
+  "smart-context",
+  "smart-lookup",
+  "realclaudian",
+  "grimoire",
+  "pdf-plus",
+  "marker-api"
 ]
