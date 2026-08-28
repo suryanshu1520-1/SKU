@@ -13,8 +13,9 @@ import Leaderboard from './components/Leaderboard';
 import PublicProfile from './components/PublicProfile';
 import PasswordReset from './components/PasswordReset';
 import LegalModal, { LegalDocumentType } from './components/LegalModal';
+import VerticalNavRail from './components/VerticalNavRail';
 import { supabase } from './lib/supabase';
-import { Loader2, Trophy, Swords, Globe, User, House, LogIn, Layers, BookOpen } from 'lucide-react';
+import { Loader2, Trophy, Swords, Globe, User, House, LogIn, Layers, BookOpen, PanelLeftOpen, LayoutTemplate } from 'lucide-react';
 
 export default function App() {
   const [userEmail, setUserEmail] = useState<string>('');
@@ -41,6 +42,75 @@ export default function App() {
     subjectStats: {} as Record<string, { correct: number; total: number }>
   });
   const [percentile, setPercentile] = useState(0);
+
+  // Layout Orientation: 'horizontal' (Top Bar) vs 'vertical' (Left Command Rail)
+  type NavOrientation = 'horizontal' | 'vertical';
+  const [navOrientation, setNavOrientation] = useState<NavOrientation>(() => {
+    try {
+      return (localStorage.getItem('tark_nav_orientation') as NavOrientation) || 'horizontal';
+    } catch {
+      return 'horizontal';
+    }
+  });
+
+  const [isRailExpanded, setIsRailExpanded] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('tark_rail_expanded') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const handleToggleNavOrientation = () => {
+    const next = navOrientation === 'horizontal' ? 'vertical' : 'horizontal';
+    setNavOrientation(next);
+    try {
+      localStorage.setItem('tark_nav_orientation', next);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const handleToggleRailExpand = () => {
+    const next = !isRailExpanded;
+    setIsRailExpanded(next);
+    try {
+      localStorage.setItem('tark_rail_expanded', String(next));
+    } catch {
+      /* ignore */
+    }
+  };
+
+  // Keyboard Shortcuts: Alt+[ or Alt+V to toggle orientation, Alt+1..6 to switch tabs
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.altKey && (e.key === '[' || e.key === 'v' || e.key === 'V')) {
+        e.preventDefault();
+        handleToggleNavOrientation();
+      } else if (e.altKey && e.key === '1') {
+        e.preventDefault();
+        handleNavigateHome();
+      } else if (e.altKey && e.key === '2') {
+        e.preventDefault();
+        navigateToTab('tracker');
+      } else if (e.altKey && e.key === '3') {
+        e.preventDefault();
+        navigateToTab('arena');
+      } else if (e.altKey && e.key === '4') {
+        e.preventDefault();
+        navigateToTab('library');
+      } else if (e.altKey && e.key === '5') {
+        e.preventDefault();
+        navigateToTab('humanities');
+      } else if (e.altKey && e.key === '6') {
+        e.preventDefault();
+        navigateToTab('leaderboard');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [navOrientation, isRailExpanded]);
 
   // Restore authenticated states on start
   useEffect(() => {
@@ -236,9 +306,30 @@ export default function App() {
 
   return (
     <div className="min-h-screen relative font-sans text-stone-100 selection:bg-[#e0d0ab] selection:text-[#072e63]">
-      {/* Unified Frosted Header Bar */}
+      {/* ── Mode 1: Left Vertical Command Rail (Desktop) ── */}
+      {gameState !== 'login' && navOrientation === 'vertical' && (
+        <div className="hidden md:block">
+          <VerticalNavRail
+            activeTab={activeTab}
+            isLanding={gameState === 'landing'}
+            userEmail={userEmail}
+            isExpanded={isRailExpanded}
+            onToggleExpand={handleToggleRailExpand}
+            onNavigateTab={navigateToTab}
+            onNavigateHome={handleNavigateHome}
+            onOpenLogin={() => setGameState('login')}
+            onSwitchToHorizontal={() => setNavOrientation('horizontal')}
+          />
+        </div>
+      )}
+
+      {/* ── Mode 2: Top Horizontal Header (Mobile or when Horizontal is chosen) ── */}
       {gameState !== 'login' && (
-        <header className="fixed top-0 left-0 w-full z-50 bg-[rgba(4,25,54,0.75)] backdrop-blur-md border-b border-[rgba(19,108,153,0.5)]">
+        <header
+          className={`fixed top-0 left-0 w-full z-40 bg-[rgba(4,25,54,0.75)] backdrop-blur-md border-b border-[rgba(19,108,153,0.5)] ${
+            navOrientation === 'vertical' ? 'md:hidden' : ''
+          }`}
+        >
           <div className="flex flex-col md:flex-row md:items-center justify-between px-4 py-3 md:px-8 gap-3 md:gap-0">
             {/* Brand Logo & Mobile Action */}
             <div className="flex items-center justify-between w-full md:w-auto">
@@ -263,11 +354,11 @@ export default function App() {
 
             {/* Navigation Tabs - Animated Pill */}
             <nav className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              <LayoutGroup>
+              <LayoutGroup id="app-nav-pills">
                 <button
                   onClick={handleNavigateHome}
-                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-sm outline-none group cursor-pointer"
-                  title="Home"
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-xs outline-none group cursor-pointer"
+                  title="Home (Alt+1)"
                 >
                   {gameState === 'landing' && (
                     <motion.div
@@ -286,6 +377,7 @@ export default function App() {
                 <button
                   onClick={() => navigateToTab('arena')}
                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-xs outline-none group cursor-pointer"
+                  title="Test Arena (Alt+3)"
                 >
                   {gameState !== 'landing' && activeTab === 'arena' && (
                     <motion.div
@@ -304,6 +396,7 @@ export default function App() {
                 <button
                   onClick={() => navigateToTab('tracker')}
                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-xs outline-none group cursor-pointer"
+                  title="Daily Brief (Alt+2)"
                 >
                   {gameState !== 'landing' && activeTab === 'tracker' && (
                     <motion.div
@@ -322,6 +415,7 @@ export default function App() {
                 <button
                   onClick={() => navigateToTab('library')}
                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-xs outline-none group cursor-pointer"
+                  title="Syllabus Pillars (Alt+4)"
                 >
                   {gameState !== 'landing' && activeTab === 'library' && (
                     <motion.div
@@ -340,6 +434,7 @@ export default function App() {
                 <button
                   onClick={() => navigateToTab('humanities')}
                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-xs outline-none group cursor-pointer"
+                  title="Humanities Canon (Alt+5)"
                 >
                   {gameState !== 'landing' && activeTab === 'humanities' && (
                     <motion.div
@@ -358,6 +453,7 @@ export default function App() {
                 <button
                   onClick={() => navigateToTab('leaderboard')}
                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-xs outline-none group cursor-pointer"
+                  title="Leaderboard (Alt+6)"
                 >
                   {gameState !== 'landing' && activeTab === 'leaderboard' && (
                     <motion.div
@@ -373,12 +469,12 @@ export default function App() {
                   </span>
                 </button>
 
-                {/* Profile tab only exists when signed in — logged-out users get the
-                    dedicated Sign In button below, so there is one sign-in affordance, not two. */}
+                {/* Profile tab only exists when signed in */}
                 {userEmail && (
                   <button
                     onClick={() => navigateToTab('profile')}
                     className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-xs outline-none group cursor-pointer"
+                    title="Profile & History"
                   >
                     {gameState !== 'landing' && activeTab === 'profile' && (
                       <motion.div
@@ -395,6 +491,16 @@ export default function App() {
                   </button>
                 )}
               </LayoutGroup>
+
+              {/* Layout Switcher Button (Switch to Left Vertical Rail) */}
+              <button
+                onClick={() => setNavOrientation('vertical')}
+                title="Switch to Left Vertical Command Rail (Alt+[)"
+                className="hidden md:inline-flex items-center gap-1.5 ml-2 px-2.5 py-1.5 bg-zinc-900/80 border border-zinc-800 hover:border-[#e0d0ab]/50 text-[#8fa2bd] hover:text-[#e0d0ab] rounded-xs text-xs font-mono transition-all cursor-pointer"
+              >
+                <PanelLeftOpen className="w-3.5 h-3.5 text-[#0194a8]" />
+                <span className="hidden lg:inline">Vertical Rail</span>
+              </button>
 
               {!userEmail && (
                 <button
@@ -420,18 +526,38 @@ export default function App() {
       )}
 
       {gameState === 'landing' && (
-        <Landing
-          onNavigateArena={() => navigateToTab('arena')}
-          onNavigateTracker={() => navigateToTab('tracker')}
-          onNavigateProfile={() => navigateToTab('profile')}
-          onNavigateLibrary={() => navigateToTab('library')}
-          onNavigateManifesto={handleNavigateManifesto}
-          onNavigateLegal={(type) => setLegalDocumentType(type)}
-        />
+        <div
+          className={`transition-all duration-300 ${
+            navOrientation === 'vertical'
+              ? isRailExpanded
+                ? 'md:pl-56 pt-6'
+                : 'md:pl-16 pt-6'
+              : ''
+          }`}
+          style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+        >
+          <Landing
+            onNavigateArena={() => navigateToTab('arena')}
+            onNavigateTracker={() => navigateToTab('tracker')}
+            onNavigateProfile={() => navigateToTab('profile')}
+            onNavigateLibrary={() => navigateToTab('library')}
+            onNavigateManifesto={handleNavigateManifesto}
+            onNavigateLegal={(type) => setLegalDocumentType(type)}
+          />
+        </div>
       )}
 
       {gameState !== 'login' && gameState !== 'landing' && (
-        <main className={`pt-28 md:pt-24 pb-12 w-full ${activeTab === 'humanities' ? 'max-w-none px-0' : 'max-w-7xl mx-auto px-4 md:px-8'}`}>
+        <main
+          className={`w-full transition-all duration-300 ${
+            navOrientation === 'vertical'
+              ? isRailExpanded
+                ? 'md:pl-56 pt-6 pb-12'
+                : 'md:pl-16 pt-6 pb-12'
+              : 'pt-28 md:pt-24 pb-12'
+          } ${activeTab === 'humanities' ? 'max-w-none px-0' : 'max-w-7xl mx-auto px-4 md:px-8'}`}
+          style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+        >
           {activeTab === 'profile' && userEmail ? (
             <Profile userEmail={userEmail} userId={userId} userName={userName} onLogout={handleLogout} />
           ) : activeTab === 'leaderboard' ? (
