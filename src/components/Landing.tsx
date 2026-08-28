@@ -20,6 +20,7 @@ import {
 import { supabase } from '../lib/supabase';
 import InteractiveBackground from './InteractiveBackground';
 import DiagnosticPreview from './DiagnosticPreview';
+import MobileLanding from './MobileLanding';
 
 interface LandingProps {
   onNavigateArena: () => void;
@@ -118,12 +119,27 @@ export default function Landing({
   const ActiveIcon = activeFeature.icon;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start pt-20 pb-20 px-4 md:px-8 text-stone-100 font-sans relative overflow-x-hidden selection:bg-[#e0d0ab] selection:text-[#072e63]">
+    <div className="min-h-screen flex flex-col items-center justify-start pt-16 md:pt-20 pb-20 px-3 sm:px-4 md:px-8 text-stone-100 font-sans relative overflow-x-hidden selection:bg-[#e0d0ab] selection:text-[#072e63]">
       
       {/* Background Interactive Constellation Grid */}
       <InteractiveBackground />
 
-      <div className="w-full max-w-5xl z-10 flex flex-col items-center justify-start space-y-16 mt-4">
+      {/* ── Dedicated Mobile-First Landing Experience (< md) ── */}
+      <div className="w-full md:hidden z-10">
+        <MobileLanding
+          onNavigateArena={onNavigateArena}
+          onNavigateTracker={onNavigateTracker}
+          onNavigateProfile={onNavigateProfile}
+          onNavigateLibrary={onNavigateLibrary}
+          onNavigateHumanities={onNavigateHumanities}
+          onNavigateManifesto={onNavigateManifesto}
+          onNavigateLegal={onNavigateLegal}
+          seatData={seatData}
+        />
+      </div>
+
+      {/* ── Desktop Widescreen Layout (md and above) ── */}
+      <div className="hidden md:flex w-full max-w-5xl z-10 flex-col items-center justify-start space-y-16 mt-4">
         
         {/* ══════════════════════════════════════════════════════════════════
             1. HERO & CALM, HIGH-READABILITY HEADLINE

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { ShieldCheck, Scale, ExternalLink, AlertTriangle, Sparkles, Check } from 'lucide-react';
+import { ShieldCheck, Scale, ExternalLink, AlertTriangle, Sparkles, Check, X } from 'lucide-react';
 
 const ACCENT = '#e0d0ab';
 
@@ -34,16 +35,50 @@ export interface ContestedClaim {
 
 /**
  * SourceAnchor — Interactive trust surface for verified claims.
- * Hover on desktop, click/tap to toggle on mobile/touch with glassmorphic tooltip.
+ * Uses createPortal to attach directly to document.body, completely preventing any
+ * clipping from parent overflow-hidden or transform bounds on desktop and mobile.
  */
 export function SourceAnchor({ claim }: { claim: VerifiedClaim }) {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLSpanElement>(null);
+  const [coords, setCoords] = useState<{ top: number; left: number; isAbove: boolean } | null>(null);
+
+  const updatePosition = () => {
+    if (!anchorRef.current) return;
+    const rect = anchorRef.current.getBoundingClientRect();
+    const popoverWidth = Math.min(360, window.innerWidth - 32);
+
+    let left = rect.left;
+    if (left + popoverWidth > window.innerWidth - 16) {
+      left = window.innerWidth - popoverWidth - 16;
+    }
+    if (left < 16) left = 16;
+
+    const spaceAbove = rect.top;
+    const isAbove = spaceAbove > 220;
+    const top = isAbove ? rect.top - 8 : rect.bottom + 8;
+
+    setCoords({ top, left, isAbove });
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    updatePosition();
+    const handleScrollOrResize = () => updatePosition();
+    window.addEventListener('scroll', handleScrollOrResize, true);
+    window.addEventListener('resize', handleScrollOrResize);
+    return () => {
+      window.removeEventListener('scroll', handleScrollOrResize, true);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
     const handleClickOutside = (e: MouseEvent | TouchEvent) => {
       if (anchorRef.current && !anchorRef.current.contains(e.target as Node)) {
+        const portalEl = document.getElementById('source-anchor-portal-content');
+        if (portalEl && portalEl.contains(e.target as Node)) return;
         setOpen(false);
       }
     };
@@ -63,12 +98,14 @@ export function SourceAnchor({ claim }: { claim: VerifiedClaim }) {
     !claim.quotes?.length
   ) return null;
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+
   return (
     <span
       ref={anchorRef}
-      className="relative inline-flex items-center align-middle select-none mx-1 z-10"
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      className="relative inline-flex items-center align-middle select-none mx-1"
+      onMouseEnter={() => !isMobile && setOpen(true)}
+      onMouseLeave={() => !isMobile && setOpen(false)}
     >
       <button
         type="button"
@@ -80,91 +117,130 @@ export function SourceAnchor({ claim }: { claim: VerifiedClaim }) {
         title={`Grounded in ${claim.source} (Click to inspect evidence)`}
         className={`inline-flex items-center justify-center w-4 h-4 rounded-full transition-all cursor-pointer ${
           open
-            ? 'bg-[#e0d0ab] text-zinc-950 shadow-[0_0_8px_rgba(224,208,171,0.5)]'
-            : 'text-[#e0d0ab]/80 hover:text-[#e0d0ab] bg-[#e0d0ab]/10 hover:bg-[#e0d0ab]/20 border border-[#e0d0ab]/20'
+            ? 'bg-[#e0d0ab] text-[#072e63] shadow-[0_0_8px_rgba(224,208,171,0.6)]'
+            : 'text-[#e0d0ab] hover:text-white bg-[rgba(224,208,171,0.15)] hover:bg-[rgba(224,208,171,0.3)] border border-[rgba(224,208,171,0.35)]'
         }`}
       >
         <ShieldCheck className="w-2.5 h-2.5" />
       </button>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: 4, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 4, scale: 0.96 }}
-            transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            onClick={(e) => e.stopPropagation()}
-            className="absolute left-0 bottom-full mb-2 w-80 max-w-[85vw] z-50 origin-bottom-left"
-          >
-            <div className="rounded-sm border border-[#e0d0ab]/30 bg-zinc-950/95 backdrop-blur-md p-3 shadow-[0_16px_36px_-10px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] font-sans">
-              {/* Header */}
-              <div className="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-zinc-800">
-                <div className="flex items-center gap-1.5 text-[9px] font-mono font-bold uppercase tracking-wider text-[#e0d0ab]">
-                  <ShieldCheck className="w-3 h-3 text-[#e0d0ab]" />
-                  <span>Grounded in {claim.source}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  {claim.spanIds?.length > 0 && (
-                    <span className="text-[8px] font-mono text-zinc-500 bg-zinc-900 px-1 py-0.5 rounded border border-zinc-800">
-                      {claim.spanIds.join(', ')}
-                    </span>
-                  )}
-                  <button
+      {/* Portal Container */}
+      {typeof document !== 'undefined' &&
+        createPortal(
+          <AnimatePresence>
+            {open && (
+              <>
+                {/* Mobile Backdrop */}
+                {isMobile && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
                     onClick={() => setOpen(false)}
-                    className="text-zinc-500 hover:text-white text-xs px-1 cursor-pointer"
-                    title="Close"
-                  >
-                    &times;
-                  </button>
-                </div>
-              </div>
+                    className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[9998]"
+                  />
+                )}
 
-              {/* Verbatim Quotes */}
-              <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
-                {claim.quotes.map((q, i) => (
-                  <div
-                    key={i}
-                    className="border-l-2 border-[#e0d0ab]/50 pl-2 py-0.5 text-[11px] font-serif italic text-zinc-200 leading-relaxed"
-                  >
-                    &ldquo;{q}&rdquo;
+                {/* Popover Card */}
+                <motion.div
+                  id="source-anchor-portal-content"
+                  initial={{ opacity: 0, scale: 0.96, y: coords?.isAbove ? 6 : -6 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.96, y: coords?.isAbove ? 6 : -6 }}
+                  transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                  onClick={(e) => e.stopPropagation()}
+                  style={
+                    isMobile
+                      ? {
+                          position: 'fixed',
+                          bottom: '16px',
+                          left: '16px',
+                          right: '16px',
+                          zIndex: 9999,
+                          maxWidth: 'calc(100vw - 32px)',
+                        }
+                      : {
+                          position: 'fixed',
+                          top: coords?.isAbove ? undefined : `${coords?.top}px`,
+                          bottom: coords?.isAbove ? `${window.innerHeight - (coords?.top || 0)}px` : undefined,
+                          left: `${coords?.left}px`,
+                          zIndex: 9999,
+                          width: '350px',
+                          maxWidth: 'calc(100vw - 32px)',
+                        }
+                  }
+                >
+                  <div className="rounded-xs border border-[rgba(224,208,171,0.45)] bg-[rgba(4,25,54,0.96)] backdrop-blur-xl p-3.5 shadow-[0_20px_50px_rgba(0,0,0,0.85)] font-sans text-stone-100">
+                    {/* Header */}
+                    <div className="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-[rgba(19,108,153,0.35)]">
+                      <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-[#e0d0ab]">
+                        <ShieldCheck className="w-3.5 h-3.5 text-[#34d399]" />
+                        <span>Grounded in {claim.source}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        {claim.spanIds?.length > 0 && (
+                          <span className="text-[8.5px] font-mono text-[#8fa2bd] bg-[rgba(11,61,120,0.4)] px-1.5 py-0.5 rounded-xs border border-[rgba(19,108,153,0.4)]">
+                            {claim.spanIds.join(', ')}
+                          </span>
+                        )}
+                        <button
+                          onClick={() => setOpen(false)}
+                          className="text-[#8fa2bd] hover:text-[#e8e0cf] p-1 cursor-pointer"
+                          title="Close"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Verbatim Quotes */}
+                    <div className="space-y-2 max-h-44 overflow-y-auto pr-1 custom-scrollbar">
+                      {claim.quotes.map((q, i) => (
+                        <div
+                          key={i}
+                          className="border-l-2 border-[#e0d0ab] pl-2.5 py-0.5 text-[12px] font-serif italic text-[#e8e0cf] leading-relaxed bg-[rgba(11,61,120,0.2)] rounded-r-xs"
+                        >
+                          &ldquo;{q}&rdquo;
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Facts Verified Ledger */}
+                    {claim.facts?.length > 0 && (
+                      <div className="mt-2.5 pt-2 border-t border-[rgba(19,108,153,0.3)] flex flex-wrap gap-1 items-center">
+                        <span className="text-[9px] font-mono text-[#8fa2bd] uppercase">Facts Verified:</span>
+                        {claim.facts.map((f, i) => (
+                          <span
+                            key={i}
+                            className="text-[9px] font-mono px-1.5 py-0.5 bg-[rgba(52,211,153,0.12)] text-[#34d399] rounded-xs border border-[rgba(52,211,153,0.3)]"
+                          >
+                            {f}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Source Link */}
+                    {claim.url && (
+                      <div className="mt-2.5 pt-2 border-t border-[rgba(19,108,153,0.3)] flex justify-end">
+                        <a
+                          href={claim.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-[11px] font-mono text-[#e0d0ab] hover:underline"
+                        >
+                          <span>View Primary Source</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    )}
                   </div>
-                ))}
-              </div>
-
-              {/* Facts Verified Ledger */}
-              {claim.facts?.length > 0 && (
-                <div className="mt-2 pt-1.5 border-t border-zinc-800/80 flex flex-wrap gap-1 items-center">
-                  <span className="text-[8px] font-mono text-zinc-500 uppercase">Facts Verified:</span>
-                  {claim.facts.map((f, i) => (
-                    <span
-                      key={i}
-                      className="text-[8px] font-mono px-1 py-0.2 bg-[#e0d0ab]/10 text-[#e0d0ab] rounded-sm border border-[#e0d0ab]/20"
-                    >
-                      {f}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Source Link */}
-              {claim.url && (
-                <div className="mt-2 pt-1.5 border-t border-zinc-800/80 flex justify-end">
-                  <a
-                    href={claim.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-[10px] font-mono text-[#e0d0ab] hover:underline"
-                  >
-                    <span>View Primary Source</span>
-                    <ExternalLink className="w-2.5 h-2.5" />
-                  </a>
-                </div>
-              )}
-            </div>
-          </motion.div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>,
+          document.body
         )}
-      </AnimatePresence>
     </span>
   );
 }
