@@ -14,6 +14,7 @@ import PublicProfile from './components/PublicProfile';
 import PasswordReset from './components/PasswordReset';
 import LegalModal, { LegalDocumentType } from './components/LegalModal';
 import VerticalNavRail from './components/VerticalNavRail';
+import Onboarding from './components/Onboarding';
 import { supabase } from './lib/supabase';
 import { Loader2, Trophy, Swords, Globe, User, House, LogIn, Layers, BookOpen, PanelLeftOpen, LayoutTemplate } from 'lucide-react';
 
@@ -28,6 +29,7 @@ export default function App() {
 
   const [viewingAnalystId, setViewingAnalystId] = useState<string | null>(null);
   const [showPasswordReset, setShowPasswordReset] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Manifesto modal overlay state
   const [showManifesto, setShowManifesto] = useState(false);
@@ -239,6 +241,12 @@ export default function App() {
     localStorage.setItem('tark_session_email', email);
     localStorage.setItem('tark_session_name', name);
     localStorage.setItem('tark_session_user_id', resolvedUserId);
+
+    const hasCompletedOnboarding = localStorage.getItem('tark_onboarding_completed') === 'true';
+    if (!hasCompletedOnboarding) {
+      setShowOnboarding(true);
+    }
+
     setGameState('landing');
     setActiveTab('arena');
   };
@@ -654,6 +662,19 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Onboarding Crucible Modal */}
+      {showOnboarding && (
+        <Onboarding
+          userName={userName}
+          userEmail={userEmail}
+          onComplete={(profile) => {
+            if (profile.name) setUserName(profile.name);
+            setShowOnboarding(false);
+          }}
+          onSkip={() => setShowOnboarding(false)}
+        />
+      )}
 
       {/* Legal Modal Overlay */}
       <AnimatePresence>
