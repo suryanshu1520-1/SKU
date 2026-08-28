@@ -10,6 +10,9 @@
 @import "@fontsource/jetbrains-mono/400.css";
 @import "@fontsource/jetbrains-mono/500.css";
 @import "@fontsource/jetbrains-mono/700.css";
+@import "@fontsource/cinzel/500.css";
+@import "@fontsource/cinzel/600.css";
+@import "@fontsource/cinzel/700.css";
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
@@ -17,6 +20,19 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Merriweather", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-cinzel: "Cinzel", ui-serif, Georgia, serif;
+
+  /* ── Chamber System Core Grounds & Inks ── */
+  --color-chamber-ground: #041d40;
+  --color-chamber-surface: #072e63;
+  --color-chamber-elevated: #0b3d78;
+  --color-chamber-shell: #041936;
+  --color-chamber-slate-body: #9fb0c8;
+  --color-chamber-slate-dim: #8fa2bd;
+  --color-chamber-divider: #41536e;
+  --color-chamber-cyan-border: #136c99;
+  --color-chamber-gold: #e0d0ab;
+  --color-chamber-gold-dim: #c8b998;
 
   --color-zinc-950: #072e63;
   --color-zinc-900: #136c99;

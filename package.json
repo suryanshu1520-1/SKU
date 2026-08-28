@@ -20,6 +20,7 @@
     "test": "tsx --test scripts/test-rebase-contract.ts"
   },
   "dependencies": {
+    "@fontsource/cinzel": "^5.3.0",
     "@fontsource/inter": "^5.2.8",
     "@fontsource/jetbrains-mono": "^5.2.8",
     "@fontsource/merriweather": "^5.2.11",
