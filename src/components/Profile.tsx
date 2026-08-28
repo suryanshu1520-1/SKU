@@ -7,17 +7,10 @@ import rehypeSanitize from 'rehype-sanitize';
 import {
   User,
   History,
-  Clock,
   TrendingUp,
   LogOut,
-  CheckCircle2,
-  XCircle,
-  AlertCircle,
-  Inbox,
   Award,
   Bookmark,
-  ChevronDown,
-  ChevronUp,
   Trash2,
   Loader2,
   BookOpen,
@@ -31,10 +24,13 @@ import {
   ExternalLink,
   Sparkles,
   Layers,
+  Activity,
+  Target,
+  FileSpreadsheet,
+  ChevronRight
 } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
-import InfoTooltip from './InfoTooltip';
-import { StatCard, EmptyState, SkeletonCard } from './shared';
+import { EmptyState, SkeletonCard } from './shared';
 
 interface ProfileProps {
   userEmail: string;
@@ -65,25 +61,22 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
   const [editNameValue, setEditNameValue] = useState('');
   const [savingName, setSavingName] = useState(false);
   const [localUserName, setLocalUserName] = useState(userName);
-  const [nameError, setNameError] = useState('');
   const nameInputRef = useRef<HTMLInputElement>(null);
 
-  // Membership tier
+  // Membership tier & Public ledger
   const [membershipTier, setMembershipTier] = useState<string | null>(null);
   const [loadingTier, setLoadingTier] = useState(true);
   const [exportToast, setExportToast] = useState('');
-
-  // Privacy toggle state
   const [isPublic, setIsPublic] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
 
-  // Bookmark / Saved Insights State
+  // Bookmarks state
   const [savedInsights, setSavedInsights] = useState<SavedInsight[]>([]);
   const [loadingSaved, setLoadingSaved] = useState(false);
   const [expandedInsightId, setExpandedInsightId] = useState<string | null>(null);
   const [deletingInsightId, setDeletingInsightId] = useState<string | null>(null);
 
-  // View mode toggle
+  // View mode for saved items
   const [viewMode, setViewMode] = useState<'insights' | 'articles'>('insights');
 
   // Saved articles state
@@ -292,7 +285,6 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
 
   // Computed Aggregates
   const totalAttempts = history.length;
-  const lastAttempt = history[0] || null;
 
   const averageAccuracy = useMemo(() => {
     if (history.length === 0) return 0;
@@ -308,21 +300,57 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
     return Math.max(...history.map((h) => h.correct_count));
   }, [history]);
 
+  // Trajectory delta (last 3 vs overall)
+  const trajectoryTrend = useMemo(() => {
+    if (history.length < 2) return { label: 'Calibrating', delta: 0, positive: true };
+    const recent = history.slice(0, Math.min(3, history.length));
+    const recentAvg = Math.round(
+      recent.reduce((acc, h) => {
+        const tot = h.correct_count + h.incorrect_count + h.unattempted_count;
+        return acc + (tot > 0 ? (h.correct_count / tot) * 100 : 0);
+      }, 0) / recent.length
+    );
+    const diff = recentAvg - averageAccuracy;
+    if (diff > 0) return { label: `+${diff}% Surge`, delta: diff, positive: true };
+    if (diff < 0) return { label: `${diff}% Dip`, delta: diff, positive: false };
+    return { label: 'Steady', delta: 0, positive: true };
+  }, [history, averageAccuracy]);
+
   // Chart Time Series Data
   const chartData = useMemo(() => {
     return [...history]
       .reverse()
-      .slice(-12)
+      .slice(-10)
       .map((h, idx) => {
         const tot = h.correct_count + h.incorrect_count + h.unattempted_count;
         const acc = tot > 0 ? Math.round((h.correct_count / tot) * 100) : 0;
         return {
-          session: `#${idx + 1}`,
+          session: `§${idx + 1}`,
           accuracy: acc,
           correct: h.correct_count,
           date: new Date(h.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }),
         };
       });
+  }, [history]);
+
+  // Precision distribution
+  const precisionDistribution = useMemo(() => {
+    if (history.length === 0) return { high: 0, moderate: 0, review: 0 };
+    let high = 0;
+    let moderate = 0;
+    let review = 0;
+    history.forEach((h) => {
+      const tot = h.correct_count + h.incorrect_count + h.unattempted_count;
+      const acc = tot > 0 ? (h.correct_count / tot) * 100 : 0;
+      if (acc >= 70) high++;
+      else if (acc >= 40) moderate++;
+      else review++;
+    });
+    return {
+      high: Math.round((high / history.length) * 100),
+      moderate: Math.round((moderate / history.length) * 100),
+      review: Math.round((review / history.length) * 100),
+    };
   }, [history]);
 
   const formatDate = (iso: string) => {
@@ -334,417 +362,557 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
   };
 
   const isPro = membershipTier === 'pro' || membershipTier === 'premium';
+  const initialLetter = (localUserName || userEmail || 'C').charAt(0).toUpperCase();
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-8 font-sans pb-24 text-stone-100">
+    <div className="w-full max-w-6xl mx-auto space-y-6 font-sans text-stone-100 pb-20">
       
-      {/* 1. Header Profile Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 bg-zinc-900/30 border border-zinc-800 rounded-sm backdrop-blur-sm">
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-sm">
-            <User className="w-8 h-8 text-[#e0d0ab]" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              {editingName ? (
-                <div className="flex items-center gap-2">
-                  <input
-                    ref={nameInputRef}
-                    type="text"
-                    value={editNameValue}
-                    onChange={(e) => setEditNameValue(e.target.value)}
-                    className="px-2 py-1 bg-zinc-950 border border-zinc-700 rounded-sm text-sm font-bold text-white focus:outline-none focus:border-[#e0d0ab]"
-                  />
-                  <button
-                    onClick={async () => {
-                      if (!editNameValue.trim()) return;
-                      setSavingName(true);
-                      try {
-                        const { error } = await supabase.auth.updateUser({ data: { name: editNameValue.trim() } });
-                        if (!error) {
-                          setLocalUserName(editNameValue.trim());
-                          setEditingName(false);
+      {/* ══════════════════════════════════════════════════════════════════
+          1. COMPACT CANDIDATE DOSSIER & INTEGRATED TELEMETRY STRIP
+          ══════════════════════════════════════════════════════════════════ */}
+      <div className="bg-[rgba(4,25,54,0.65)] backdrop-blur-md border border-[rgba(19,108,153,0.4)] rounded-xs overflow-hidden shadow-[0_8px_32px_-6px_rgba(0,0,0,0.45)]">
+        
+        {/* Upper Identity Bar */}
+        <div className="p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-5 border-b border-[rgba(19,108,153,0.3)]">
+          <div className="flex items-center gap-4">
+            
+            {/* Monogram Seal */}
+            <div className="relative w-12 h-12 rounded-xs bg-[rgba(224,208,171,0.12)] border border-[rgba(224,208,171,0.4)] flex items-center justify-center text-[#e0d0ab] shadow-inner shrink-0">
+              <span className="font-serif font-bold text-lg">{initialLetter}</span>
+              <span className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-[#34d399] border-2 border-[#041d40]" title="Active Candidate" />
+            </div>
+
+            {/* Name, Email & Tier Tag */}
+            <div className="min-w-0">
+              <div className="flex items-center gap-2.5 flex-wrap">
+                {editingName ? (
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      ref={nameInputRef}
+                      type="text"
+                      value={editNameValue}
+                      onChange={(e) => setEditNameValue(e.target.value)}
+                      className="px-2 py-0.5 bg-[rgba(3,16,38,0.9)] border border-[#e0d0ab] rounded-xs text-sm font-serif font-bold text-[#e0d0ab] focus:outline-none"
+                    />
+                    <button
+                      onClick={async () => {
+                        if (!editNameValue.trim()) return;
+                        setSavingName(true);
+                        try {
+                          const { error } = await supabase.auth.updateUser({ data: { name: editNameValue.trim() } });
+                          if (!error) {
+                            setLocalUserName(editNameValue.trim());
+                            setEditingName(false);
+                          }
+                        } finally {
+                          setSavingName(false);
                         }
-                      } finally {
-                        setSavingName(false);
-                      }
-                    }}
-                    className="p-1.5 bg-[#e0d0ab] text-zinc-950 rounded-sm cursor-pointer"
-                  >
-                    <Check className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => setEditingName(false)}
-                    className="p-1.5 bg-zinc-800 text-zinc-400 rounded-sm cursor-pointer"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
+                      }}
+                      className="p-1 bg-[#e0d0ab] text-[#072e63] rounded-xs cursor-pointer hover:bg-white transition-colors"
+                      title="Save Name"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => setEditingName(false)}
+                      className="p-1 bg-zinc-800 text-zinc-400 rounded-xs cursor-pointer hover:text-white"
+                      title="Cancel"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <h1 className="font-serif text-lg md:text-xl font-bold text-[#e8e0cf] tracking-tight">
+                      {localUserName || 'Anonymous Candidate'}
+                    </h1>
+                    <button
+                      onClick={() => {
+                        setEditNameValue(localUserName);
+                        setEditingName(true);
+                        setTimeout(() => nameInputRef.current?.focus(), 50);
+                      }}
+                      className="p-1 text-[#8fa2bd] hover:text-[#e0d0ab] transition-colors cursor-pointer"
+                      title="Edit display name"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Membership Badge */}
+                {isPro ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-xs text-[10px] font-mono font-semibold uppercase tracking-wider bg-[rgba(224,208,171,0.12)] border border-[rgba(224,208,171,0.35)] text-[#e0d0ab]">
+                    <Shield className="w-3 h-3 text-[#e0d0ab]" />
+                    Founders Club
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-xs text-[10px] font-mono font-medium uppercase tracking-wider bg-[rgba(19,108,153,0.2)] border border-[rgba(19,108,153,0.4)] text-[#8fa2bd]">
+                    <Award className="w-3 h-3 text-[#0194a8]" />
+                    Candidate Ledger
+                  </span>
+                )}
+              </div>
+
+              <p className="text-[11.5px] font-mono text-[#8fa2bd] mt-0.5 truncate">{userEmail}</p>
+            </div>
+          </div>
+
+          {/* Action Pills */}
+          <div className="flex items-center gap-2 flex-wrap shrink-0">
+            {/* Visibility Toggle */}
+            <button
+              onClick={handleToggleVisibility}
+              disabled={savingVisibility}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xs border text-xs font-mono transition-all cursor-pointer ${
+                isPublic
+                  ? 'bg-[rgba(52,211,153,0.1)] border-[rgba(52,211,153,0.4)] text-[#34d399] hover:bg-[rgba(52,211,153,0.2)]'
+                  : 'bg-[rgba(11,61,120,0.25)] border-[rgba(19,108,153,0.4)] text-[#8fa2bd] hover:text-[#e8e0cf]'
+              }`}
+              title="Toggle public visibility on the cohort leaderboard"
+            >
+              {isPublic ? <Eye className="w-3.5 h-3.5 text-[#34d399]" /> : <EyeOff className="w-3.5 h-3.5" />}
+              <span>{isPublic ? 'Public Dossier' : 'Private Mode'}</span>
+            </button>
+
+            {/* CSV Export */}
+            <button
+              onClick={handleExportClick}
+              disabled={history.length === 0 || loadingTier}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xs border text-xs font-mono transition-all cursor-pointer ${
+                isPro
+                  ? 'bg-[rgba(224,208,171,0.1)] border-[rgba(224,208,171,0.35)] text-[#e0d0ab] hover:bg-[#e0d0ab] hover:text-[#072e63]'
+                  : 'bg-[rgba(11,61,120,0.25)] border-[rgba(19,108,153,0.4)] text-[#8fa2bd] hover:text-[#e8e0cf]'
+              }`}
+              title={isPro ? 'Export complete assessment history to CSV' : 'Export CSV (Founders Tier)'}
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>{isPro ? 'Export CSV' : 'Export CSV (Pro)'}</span>
+            </button>
+
+            {/* Sign Out */}
+            <button
+              onClick={onLogout}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(225,78,78,0.1)] hover:bg-[rgba(225,78,78,0.2)] border border-[rgba(225,78,78,0.3)] text-[#e14e4e] rounded-xs text-xs font-mono transition-all cursor-pointer"
+              title="Sign out of current workstation session"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Integrated 4-Metric Telemetry Ribbon */}
+        <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-[rgba(19,108,153,0.25)] bg-[rgba(3,16,38,0.4)]">
+          
+          {/* Total Assessments */}
+          <div className="p-4 flex flex-col justify-between">
+            <div className="flex items-center justify-between text-[#8fa2bd] text-[11px] font-mono">
+              <span>ASSESSMENTS</span>
+              <Layers className="w-3.5 h-3.5 text-[#0194a8]" />
+            </div>
+            <div className="mt-2">
+              <span className="font-serif text-2xl font-bold text-[#e0d0ab]">{totalAttempts}</span>
+              <p className="text-[10px] font-mono text-[#8fa2bd] mt-0.5">Processed sessions</p>
+            </div>
+          </div>
+
+          {/* Mean Accuracy */}
+          <div className="p-4 flex flex-col justify-between">
+            <div className="flex items-center justify-between text-[#8fa2bd] text-[11px] font-mono">
+              <span>COHORT ACCURACY</span>
+              <TrendingUp className="w-3.5 h-3.5 text-[#34d399]" />
+            </div>
+            <div className="mt-2">
+              <span className={`font-serif text-2xl font-bold ${averageAccuracy >= 70 ? 'text-[#34d399]' : 'text-[#0194a8]'}`}>
+                {averageAccuracy}%
+              </span>
+              <p className="text-[10px] font-mono text-[#8fa2bd] mt-0.5">Weighted average</p>
+            </div>
+          </div>
+
+          {/* Best Score */}
+          <div className="p-4 flex flex-col justify-between">
+            <div className="flex items-center justify-between text-[#8fa2bd] text-[11px] font-mono">
+              <span>PEAK SCORE</span>
+              <Award className="w-3.5 h-3.5 text-[#e0d0ab]" />
+            </div>
+            <div className="mt-2">
+              <div className="flex items-baseline gap-1">
+                <span className="font-serif text-2xl font-bold text-[#e0d0ab]">{bestScore}</span>
+                <span className="text-xs font-mono text-[#8fa2bd]">/ 25</span>
+              </div>
+              <p className="text-[10px] font-mono text-[#8fa2bd] mt-0.5">Highest single test</p>
+            </div>
+          </div>
+
+          {/* Recent Momentum */}
+          <div className="p-4 flex flex-col justify-between">
+            <div className="flex items-center justify-between text-[#8fa2bd] text-[11px] font-mono">
+              <span>MOMENTUM</span>
+              <Sparkles className="w-3.5 h-3.5 text-[#e0d0ab]" />
+            </div>
+            <div className="mt-2">
+              <span className={`font-serif text-xl font-bold ${trajectoryTrend.positive ? 'text-[#34d399]' : 'text-[#e14e4e]'}`}>
+                {trajectoryTrend.label}
+              </span>
+              <p className="text-[10px] font-mono text-[#8fa2bd] mt-0.5">Last 3 tests vs mean</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          2. TWO-COLUMN ANALYTICAL DECK
+          ══════════════════════════════════════════════════════════════════ */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        {/* Left Column: Visual Accuracy Telemetry (5 cols) */}
+        <div className="lg:col-span-5 flex flex-col gap-6">
+          
+          {/* Accuracy Trajectory Area Chart */}
+          <div className="p-5 bg-[rgba(4,25,54,0.6)] backdrop-blur-md border border-[rgba(19,108,153,0.4)] rounded-xs flex-1 flex flex-col justify-between shadow-md">
+            <div>
+              <div className="flex items-center justify-between mb-3 border-b border-[rgba(19,108,153,0.3)] pb-2.5">
+                <div className="flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-[#0194a8]" />
+                  <h3 className="font-serif text-xs uppercase tracking-wider font-bold text-[#e0d0ab]">
+                    Accuracy Trajectory
+                  </h3>
+                </div>
+                <span className="text-[9.5px] font-mono px-1.5 py-0.5 rounded-xs bg-[rgba(1,148,168,0.15)] border border-[rgba(1,148,168,0.35)] text-[#0194a8]">
+                  Target: 80%
+                </span>
+              </div>
+
+              {chartData.length > 1 ? (
+                <div className="w-full h-44 mt-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -22, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="profileAccGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#0194a8" stopOpacity={0.45} />
+                          <stop offset="95%" stopColor="#0194a8" stopOpacity={0.0} />
+                        </linearGradient>
+                      </defs>
+                      <XAxis
+                        dataKey="session"
+                        stroke="rgba(143,162,189,0.4)"
+                        tick={{ fill: '#8fa2bd', fontSize: 9, fontFamily: 'monospace' }}
+                      />
+                      <YAxis
+                        domain={[0, 100]}
+                        stroke="rgba(143,162,189,0.4)"
+                        tick={{ fill: '#8fa2bd', fontSize: 9, fontFamily: 'monospace' }}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#041d40',
+                          borderColor: '#0194a8',
+                          borderRadius: '2px',
+                          fontSize: '11px',
+                          color: '#e0d0ab',
+                          fontFamily: 'monospace',
+                          boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+                        }}
+                        formatter={(val: any) => [`${val}% Accuracy`, 'Score']}
+                        labelFormatter={(lbl: any) => `Assessment ${lbl}`}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="accuracy"
+                        stroke="#0194a8"
+                        strokeWidth={2}
+                        fillOpacity={1}
+                        fill="url(#profileAccGradient)"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="flex items-center gap-2">
-                  <h1 className="font-serif text-xl sm:text-2xl font-bold text-white">
-                    {localUserName || 'Anonymous Candidate'}
-                  </h1>
-                  <button
-                    onClick={() => {
-                      setEditNameValue(localUserName);
-                      setEditingName(true);
-                      setTimeout(() => nameInputRef.current?.focus(), 50);
-                    }}
-                    className="p-1 text-zinc-500 hover:text-[#e0d0ab] transition-colors cursor-pointer"
-                    title="Edit display name"
-                  >
-                    <Pencil className="w-3.5 h-3.5" />
-                  </button>
+                <div className="h-44 flex flex-col items-center justify-center text-center p-4 text-[#8fa2bd]">
+                  <Activity className="w-8 h-8 text-[rgba(19,108,153,0.5)] mb-2 animate-pulse" />
+                  <p className="text-xs font-mono">Telemetry Requires &ge; 2 Assessment Sessions</p>
                 </div>
               )}
             </div>
 
-            <p className="text-xs font-sans text-zinc-400 mt-0.5">{userEmail}</p>
-          </div>
-        </div>
-
-        {/* Action Pills: Tier Badge + Privacy Toggle + Logout */}
-        <div className="flex items-center gap-3 flex-wrap font-sans">
-          {/* Membership Badge */}
-          {isPro ? (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#e0d0ab]/15 border border-[#e0d0ab]/40 text-[#e0d0ab] rounded-sm text-xs font-sans font-bold uppercase tracking-wider shadow-sm shadow-[#e0d0ab]/10">
-              <Shield className="w-3.5 h-3.5 text-[#e0d0ab]" />
-              <span>Founders Club</span>
-            </div>
-          ) : (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 border border-zinc-800 text-zinc-400 rounded-sm text-xs font-sans uppercase tracking-wider">
-              <Award className="w-3.5 h-3.5 text-zinc-500" />
-              <span>Standard Tier</span>
-            </div>
-          )}
-
-          {/* Visibility Toggle */}
-          <button
-            onClick={handleToggleVisibility}
-            disabled={savingVisibility}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm border text-xs font-sans font-medium transition-all cursor-pointer ${
-              isPublic
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-                : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-stone-200'
-            }`}
-            title="Show your profile on the leaderboard"
-          >
-            {isPublic ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-            <span>{isPublic ? 'Public Ledger' : 'Private'}</span>
-          </button>
-
-          {/* Logout */}
-          <button
-            onClick={onLogout}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-rose-950/30 border border-zinc-800 hover:border-rose-700/50 text-zinc-400 hover:text-rose-300 rounded-sm text-xs font-sans transition-all cursor-pointer"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Sign Out</span>
-          </button>
-        </div>
-      </div>
-
-      {/* 2. Top-Level Analytical Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard
-          label="Total Assessments"
-          value={totalAttempts}
-          icon={Layers}
-          accentColor="text-stone-100"
-          subtext="Processed quiz sessions"
-          delay={0.05}
-        />
-        <StatCard
-          label="Cohort Mean Accuracy"
-          value={averageAccuracy}
-          suffix="%"
-          icon={TrendingUp}
-          accentColor={averageAccuracy >= 70 ? 'text-emerald-400' : 'text-[#0194a8]'}
-          subtext="Average accuracy across attempts"
-          delay={0.1}
-        />
-        <StatCard
-          label="Best Score"
-          value={bestScore}
-          suffix=" / 25"
-          icon={Award}
-          accentColor="text-[#e0d0ab]"
-          subtext="Your highest in a single test"
-          delay={0.15}
-        />
-      </div>
-
-      {/* 3. Performance Trend AreaChart */}
-      {chartData.length > 1 && (
-        <motion.div
-          initial={prefersReduced ? undefined : { opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          className="p-6 bg-zinc-900/30 border border-zinc-800 rounded-sm space-y-4 backdrop-blur-sm"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-[#0194a8]" />
-              <h3 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
-                Accuracy Trajectory (Last <span className="font-mono">{chartData.length}</span> Attempts)
-              </h3>
-            </div>
-            <span className="text-[10px] font-sans text-zinc-500">
-              Benchmark Target: 80%
-            </span>
-          </div>
-
-          <div className="w-full h-48 sm:h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorAcc" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0194a8" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#0194a8" stopOpacity={0.0} />
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="session" stroke="#52525b" tick={{ fill: '#a69a7f', fontSize: 10, fontFamily: 'monospace' }} />
-                <YAxis domain={[0, 100]} stroke="#52525b" tick={{ fill: '#a69a7f', fontSize: 10, fontFamily: 'monospace' }} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#072e63', borderColor: '#0194a8', borderRadius: '2px', fontSize: '11px', color: '#e0d0ab', fontFamily: 'monospace' }}
-                  formatter={(val: any) => [`${val}% Accuracy`, 'Score']}
-                  labelFormatter={(lbl: any) => `Session ${lbl}`}
+            {/* Precision Spectrum Ribbon */}
+            <div className="mt-4 pt-3 border-t border-[rgba(19,108,153,0.25)] space-y-2">
+              <div className="flex items-center justify-between text-[10px] font-mono text-[#8fa2bd]">
+                <span>PRECISION SPECTRUM</span>
+                <span>{history.length} Logs</span>
+              </div>
+              <div className="w-full h-2 rounded-xs overflow-hidden flex bg-[rgba(3,16,38,0.8)] border border-[rgba(19,108,153,0.3)]">
+                <div
+                  style={{ width: `${precisionDistribution.high}%` }}
+                  className="bg-[#34d399] transition-all duration-500"
+                  title={`High Accuracy (≥70%): ${precisionDistribution.high}%`}
                 />
-                <Area type="monotone" dataKey="accuracy" stroke="#0194a8" strokeWidth={2} fillOpacity={1} fill="url(#colorAcc)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </motion.div>
-      )}
+                <div
+                  style={{ width: `${precisionDistribution.moderate}%` }}
+                  className="bg-[#0194a8] transition-all duration-500"
+                  title={`Moderate (40-69%): ${precisionDistribution.moderate}%`}
+                />
+                <div
+                  style={{ width: `${precisionDistribution.review}%` }}
+                  className="bg-[#e14e4e] transition-all duration-500"
+                  title={`Needs Review (<40%): ${precisionDistribution.review}%`}
+                />
+              </div>
+              <div className="flex items-center justify-between text-[9px] font-mono text-[#8fa2bd]">
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[#34d399]" /> ≥70%</span>
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[#0194a8]" /> 40–69%</span>
+                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-[#e14e4e]" /> &lt;40%</span>
+              </div>
+            </div>
 
-      {/* 4. Bookmarks Section (Saved Insights & Articles) */}
-      <div className="p-6 bg-zinc-900/20 border border-zinc-800 rounded-sm space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-4">
-          <div className="flex items-center gap-2">
-            <Bookmark className="w-4 h-4 text-[#e0d0ab]" />
-            <h3 className="font-serif text-lg tracking-tight text-[#e0d0ab] font-bold">
-              Saved for Later
-            </h3>
           </div>
 
-          {/* View Mode Toggle Pill */}
-          <div className="flex items-center gap-1.5 p-0.5 bg-zinc-900 border border-zinc-800 rounded-sm self-start sm:self-auto font-sans">
-            <button
-              onClick={() => setViewMode('insights')}
-              className={`px-3 py-1 text-[10px] font-sans font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer ${
-                viewMode === 'insights'
-                  ? 'bg-[#e0d0ab] text-zinc-950 shadow-sm'
-                  : 'text-zinc-400 hover:text-stone-200'
-              }`}
-            >
-              Saved Insights <span className="font-mono">({savedInsights.length})</span>
-            </button>
-            <button
-              onClick={() => setViewMode('articles')}
-              className={`px-3 py-1 text-[10px] font-sans font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer ${
-                viewMode === 'articles'
-                  ? 'bg-[#e0d0ab] text-zinc-950 shadow-sm'
-                  : 'text-zinc-400 hover:text-stone-200'
-              }`}
-            >
-              Saved Dispatches <span className="font-mono">({savedArticles.length})</span>
-            </button>
+        </div>
+
+        {/* Right Column: Saved Intelligence & Dispatches (7 cols) */}
+        <div className="lg:col-span-7 bg-[rgba(4,25,54,0.6)] backdrop-blur-md border border-[rgba(19,108,153,0.4)] rounded-xs p-5 flex flex-col justify-between shadow-md">
+          <div>
+            {/* Header & Segmented Pill */}
+            <div className="flex items-center justify-between gap-3 border-b border-[rgba(19,108,153,0.3)] pb-3 mb-4">
+              <div className="flex items-center gap-2">
+                <Bookmark className="w-4 h-4 text-[#e0d0ab]" />
+                <h3 className="font-serif text-xs uppercase tracking-wider font-bold text-[#e0d0ab]">
+                  Saved Vault
+                </h3>
+              </div>
+
+              <div className="flex items-center p-0.5 bg-[rgba(3,16,38,0.8)] border border-[rgba(19,108,153,0.4)] rounded-xs font-mono text-[10px]">
+                <button
+                  onClick={() => setViewMode('insights')}
+                  className={`px-2.5 py-1 rounded-xs transition-all cursor-pointer ${
+                    viewMode === 'insights'
+                      ? 'bg-[#e0d0ab] text-[#072e63] font-bold shadow-xs'
+                      : 'text-[#8fa2bd] hover:text-[#e8e0cf]'
+                  }`}
+                >
+                  Insights ({savedInsights.length})
+                </button>
+                <button
+                  onClick={() => setViewMode('articles')}
+                  className={`px-2.5 py-1 rounded-xs transition-all cursor-pointer ${
+                    viewMode === 'articles'
+                      ? 'bg-[#e0d0ab] text-[#072e63] font-bold shadow-xs'
+                      : 'text-[#8fa2bd] hover:text-[#e8e0cf]'
+                  }`}
+                >
+                  Dispatches ({savedArticles.length})
+                </button>
+              </div>
+            </div>
+
+            {/* Insights View */}
+            {viewMode === 'insights' && (
+              <div>
+                {loadingSaved ? (
+                  <div className="py-12 flex items-center justify-center text-[#8fa2bd] font-mono text-xs">
+                    <Loader2 className="w-4 h-4 animate-spin text-[#0194a8] mr-2" />
+                    <span>Retrieving conceptual flashcards...</span>
+                  </div>
+                ) : savedInsights.length === 0 ? (
+                  <EmptyState
+                    icon={BookOpen}
+                    title="No Insights Saved"
+                    description="Click the bookmark icon on test autopsies to pin high-yield conceptual lessons here."
+                  />
+                ) : (
+                  <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+                    {savedInsights.map((insight) => {
+                      const isExpanded = expandedInsightId === insight.id;
+                      const isDeleting = deletingInsightId === insight.id;
+
+                      return (
+                        <div
+                          key={insight.id}
+                          className="bg-[rgba(11,61,120,0.2)] border border-[rgba(19,108,153,0.35)] hover:border-[#0194a8]/60 rounded-xs p-3.5 transition-all"
+                        >
+                          <div
+                            onClick={() => setExpandedInsightId(isExpanded ? null : insight.id)}
+                            className="cursor-pointer space-y-1.5"
+                          >
+                            <div className="flex items-center justify-between text-[10px] font-mono text-[#8fa2bd]">
+                              <span className="text-[#0194a8]">CONCEPT FLASHCARD</span>
+                              <span>{formatDate(insight.created_at)}</span>
+                            </div>
+                            <p className="text-xs font-serif text-[#e8e0cf] line-clamp-2 leading-relaxed">
+                              {insight.question_text}
+                            </p>
+                          </div>
+
+                          <AnimatePresence>
+                            {isExpanded && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                className="overflow-hidden pt-3 mt-3 border-t border-[rgba(19,108,153,0.3)]"
+                              >
+                                <div className="prose prose-invert prose-p:text-xs max-w-none text-[#9fb0c8] font-sans text-xs leading-relaxed">
+                                  <Markdown rehypePlugins={[rehypeSanitize]}>{insight.insight_text}</Markdown>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+
+                          <div className="flex items-center justify-between pt-2.5 mt-2.5 border-t border-[rgba(19,108,153,0.25)] text-xs font-mono">
+                            <button
+                              onClick={() => setExpandedInsightId(isExpanded ? null : insight.id)}
+                              className="text-[#0194a8] hover:text-[#e0d0ab] flex items-center gap-1 transition-colors cursor-pointer text-[11px]"
+                            >
+                              <span>{isExpanded ? 'Collapse' : 'Read Full Insight'}</span>
+                              <ChevronRight className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                            </button>
+                            <button
+                              onClick={() => deleteBookmark(insight.id)}
+                              disabled={isDeleting}
+                              className="text-[#8fa2bd] hover:text-[#e14e4e] transition-colors p-1 cursor-pointer"
+                              title="Delete bookmark"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Articles View */}
+            {viewMode === 'articles' && (
+              <div>
+                {loadingArticles ? (
+                  <div className="py-12 flex items-center justify-center text-[#8fa2bd] font-mono text-xs">
+                    <Loader2 className="w-4 h-4 animate-spin text-[#0194a8] mr-2" />
+                    <span>Retrieving saved dispatches...</span>
+                  </div>
+                ) : savedArticles.length === 0 ? (
+                  <EmptyState
+                    icon={Bookmark}
+                    title="No Dispatches Saved"
+                    description="Save official cabinet decisions and PIB releases from The Daily Brief."
+                  />
+                ) : (
+                  <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+                    {savedArticles.map((saved) => {
+                      const article = saved.current_affairs;
+                      const isRemoving = removingArticleId === saved.id;
+
+                      return (
+                        <div
+                          key={saved.id}
+                          className="bg-[rgba(11,61,120,0.2)] border border-[rgba(19,108,153,0.35)] hover:border-[#0194a8]/60 rounded-xs p-3.5 transition-all flex flex-col justify-between"
+                        >
+                          <div className="space-y-1.5">
+                            <div className="flex items-center gap-2 flex-wrap text-[9.5px] font-mono">
+                              <span className="px-1.5 py-0.2 rounded-xs bg-[rgba(224,208,171,0.12)] border border-[rgba(224,208,171,0.35)] text-[#e0d0ab]">
+                                {article.ministry}
+                              </span>
+                              <span className="text-[#8fa2bd]">{article.source}</span>
+                            </div>
+                            <h4 className="font-serif text-xs font-bold text-[#e8e0cf] leading-snug line-clamp-2">
+                              {article.headline}
+                            </h4>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-2.5 mt-2.5 border-t border-[rgba(19,108,153,0.25)] text-xs font-mono">
+                            {article.url ? (
+                              <a
+                                href={article.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[#0194a8] hover:text-[#e0d0ab] flex items-center gap-1 cursor-pointer text-[11px]"
+                              >
+                                <span>Gov Source</span>
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            ) : <span />}
+
+                            <button
+                              onClick={() => removeSavedArticle(saved.id)}
+                              disabled={isRemoving}
+                              className="text-[#8fa2bd] hover:text-[#e14e4e] transition-colors p-1 cursor-pointer"
+                              title="Remove dispatch"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
           </div>
         </div>
 
-        {/* Insights View */}
-        {viewMode === 'insights' && (
-          <div>
-            {loadingSaved ? (
-              <div className="py-8 flex items-center justify-center text-zinc-500 font-sans text-xs">
-                <Loader2 className="w-4 h-4 animate-spin text-[#0194a8] mr-2" />
-                <span>Loading saved conceptual flashcards...</span>
-              </div>
-            ) : savedInsights.length === 0 ? (
-              <EmptyState
-                icon={BookOpen}
-                title="No Insights Bookmarked"
-                description="During mock test autopsies, click the bookmark icon on conceptual feedback to save high-yield flashcards here."
-              />
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {savedInsights.map((insight) => {
-                  const isExpanded = expandedInsightId === insight.id;
-                  const isDeleting = deletingInsightId === insight.id;
-
-                  return (
-                    <motion.div
-                      key={insight.id}
-                      className="bg-zinc-900/40 border border-zinc-800 hover:border-[#0194a8]/50 rounded-sm p-4 flex flex-col justify-between transition-all"
-                    >
-                      <div
-                        onClick={() => setExpandedInsightId(isExpanded ? null : insight.id)}
-                        className="cursor-pointer space-y-2"
-                      >
-                        <p className="text-xs font-sans text-stone-200 leading-relaxed line-clamp-2">
-                          {insight.question_text}
-                        </p>
-                        <p className="text-[10px] font-sans text-zinc-500">
-                          Saved on <span className="font-mono">{formatDate(insight.created_at)}</span>
-                        </p>
-                      </div>
-
-                      <AnimatePresence>
-                        {isExpanded && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            className="overflow-hidden pt-3 mt-3 border-t border-zinc-800"
-                          >
-                            <div className="prose prose-invert prose-p:text-xs prose-li:text-xs max-w-none text-zinc-300 font-serif">
-                              <Markdown rehypePlugins={[rehypeSanitize]}>{insight.insight_text}</Markdown>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-
-                      <div className="flex items-center justify-between pt-3 mt-3 border-t border-zinc-800/60 text-xs font-sans">
-                        <button
-                          onClick={() => setExpandedInsightId(isExpanded ? null : insight.id)}
-                          className="text-[#0194a8] hover:text-[#e0d0ab] transition-colors cursor-pointer"
-                        >
-                          {isExpanded ? 'Collapse Flashcard' : 'Read Insight'}
-                        </button>
-                        <button
-                          onClick={() => deleteBookmark(insight.id)}
-                          disabled={isDeleting}
-                          className="text-zinc-500 hover:text-rose-400 transition-colors p-1 cursor-pointer"
-                          title="Delete bookmark"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Articles View */}
-        {viewMode === 'articles' && (
-          <div>
-            {loadingArticles ? (
-              <div className="py-8 flex items-center justify-center text-zinc-500 font-sans text-xs">
-                <Loader2 className="w-4 h-4 animate-spin text-[#0194a8] mr-2" />
-                <span>Loading saved policy signals...</span>
-              </div>
-            ) : savedArticles.length === 0 ? (
-              <EmptyState
-                icon={Bookmark}
-                title="No Dispatches Bookmarked"
-                description="Browse The Daily Brief and save important cabinet releases and policy dispatches to your ledger."
-              />
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {savedArticles.map((saved) => {
-                  const article = saved.current_affairs;
-                  const isRemoving = removingArticleId === saved.id;
-
-                  return (
-                    <div
-                      key={saved.id}
-                      className="p-4 bg-zinc-900/40 border border-zinc-800 hover:border-[#0194a8]/50 rounded-sm flex flex-col justify-between transition-all"
-                    >
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 flex-wrap font-sans">
-                          <span className="px-2 py-0.5 text-[9px] font-sans uppercase font-bold bg-zinc-900 text-[#e0d0ab] border border-zinc-800 rounded-sm">
-                            {article.ministry}
-                          </span>
-                          <span className="text-[9px] font-sans text-zinc-500">
-                            {article.source}
-                          </span>
-                        </div>
-                        <h4 className="font-serif text-xs font-bold text-stone-100 leading-snug line-clamp-2">
-                          {article.headline}
-                        </h4>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-3 mt-3 border-t border-zinc-800/60 text-xs font-sans">
-                        {article.url ? (
-                          <a
-                            href={article.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#0194a8] hover:text-[#e0d0ab] flex items-center gap-1 cursor-pointer"
-                          >
-                            <span>Gov Source</span>
-                            <ExternalLink className="w-3 h-3" />
-                          </a>
-                        ) : <span />}
-
-                        <button
-                          onClick={() => removeSavedArticle(saved.id)}
-                          disabled={isRemoving}
-                          className="text-zinc-500 hover:text-rose-400 transition-colors p-1 cursor-pointer"
-                          title="Remove bookmark"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
-      {/* 5. Previous Attempts Table */}
-      <div className="p-6 bg-zinc-900/20 border border-zinc-800 rounded-sm space-y-4 font-sans">
-        <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+      {/* ══════════════════════════════════════════════════════════════════
+          3. HISTORICAL ASSESSMENT LEDGER (COMPACT TABULAR VIEW)
+          ══════════════════════════════════════════════════════════════════ */}
+      <div className="bg-[rgba(4,25,54,0.65)] backdrop-blur-md border border-[rgba(19,108,153,0.4)] rounded-xs p-5 shadow-md space-y-4">
+        
+        {/* Table Title Bar */}
+        <div className="flex items-center justify-between border-b border-[rgba(19,108,153,0.3)] pb-3">
           <div className="flex items-center gap-2">
             <History className="w-4 h-4 text-[#e0d0ab]" />
-            <h3 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
-              Historical Assessment Ledger <span className="font-mono">({history.length})</span>
+            <h3 className="font-serif text-xs uppercase tracking-wider font-bold text-[#e0d0ab]">
+              Historical Assessment Ledger
             </h3>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-xs bg-[rgba(11,61,120,0.4)] border border-[rgba(19,108,153,0.4)] text-[#8fa2bd]">
+              {history.length} attempts
+            </span>
           </div>
 
           <button
             onClick={handleExportClick}
             disabled={history.length === 0 || loadingTier}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-sans font-bold uppercase tracking-wider rounded-sm border transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-wider rounded-xs border transition-all cursor-pointer ${
               isPro
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20'
-                : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-zinc-300'
+                ? 'bg-[rgba(52,211,153,0.12)] border-[rgba(52,211,153,0.4)] text-[#34d399] hover:bg-[#34d399] hover:text-[#041d40]'
+                : 'bg-[rgba(11,61,120,0.3)] border-[rgba(19,108,153,0.4)] text-[#8fa2bd] hover:text-[#e8e0cf]'
             }`}
           >
-            <Download className="w-3 h-3" />
+            <FileSpreadsheet className="w-3 h-3" />
             <span>{isPro ? 'Export CSV' : 'Export CSV (Pro)'}</span>
           </button>
         </div>
 
+        {/* Table Body */}
         {loading ? (
           <SkeletonCard variant="feed" count={3} />
         ) : errorMsg ? (
-          <p className="text-xs text-rose-400 font-sans py-4 text-center">{errorMsg}</p>
+          <p className="text-xs text-[#e14e4e] font-mono py-4 text-center">{errorMsg}</p>
         ) : history.length === 0 ? (
           <EmptyState
             icon={History}
             title="No Prior Assessments Recorded"
-            description="Take your first timed mock exam in the Arena to log your baseline."
+            description="Take your first timed mock exam in the Test Arena to log your baseline."
           />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse font-sans">
               <thead>
-                <tr className="border-b border-zinc-800 text-zinc-500 text-[10px] font-sans uppercase tracking-wider font-bold">
-                  <th className="py-3 px-4">Session ID</th>
-                  <th className="py-3 px-4">Date</th>
-                  <th className="py-3 px-4">Mode</th>
-                  <th className="py-3 px-4 text-right">Accuracy</th>
+                <tr className="border-b border-[rgba(19,108,153,0.3)] text-[#8fa2bd] text-[10px] font-mono uppercase tracking-wider">
+                  <th className="py-2.5 px-3">Session</th>
+                  <th className="py-2.5 px-3">Timestamp</th>
+                  <th className="py-2.5 px-3">Mode</th>
+                  <th className="py-2.5 px-3">Distribution</th>
+                  <th className="py-2.5 px-3 text-right">Accuracy</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-800/60 text-xs">
+              <tbody className="divide-y divide-[rgba(19,108,153,0.2)] text-xs">
                 {history.map((attempt, index) => {
                   const totalCount = attempt.correct_count + attempt.incorrect_count + attempt.unattempted_count;
                   const maxPossible = totalCount > 0 ? totalCount : 25;
@@ -752,25 +920,41 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
                   const isExcellent = ratio >= 70;
                   const isPass = ratio >= 40;
 
+                  const correctPct = Math.round((attempt.correct_count / maxPossible) * 100);
+                  const incorrectPct = Math.round((attempt.incorrect_count / maxPossible) * 100);
+                  const unattemptedPct = 100 - correctPct - incorrectPct;
+
                   return (
-                    <tr key={attempt.id || index} className="hover:bg-zinc-900/40 text-stone-300 transition-colors">
-                      <td className="py-3.5 px-4 font-mono text-zinc-500 text-[11px] uppercase">
-                        AT-{attempt.id ? attempt.id.substring(0, 8) : `LOG${history.length - index}`}
+                    <tr
+                      key={attempt.id || index}
+                      className="hover:bg-[rgba(11,61,120,0.25)] text-[#e8e0cf] transition-colors"
+                    >
+                      <td className="py-3 px-3 font-mono text-[#0194a8] text-[11px]">
+                        AT-{attempt.id ? attempt.id.substring(0, 8).toUpperCase() : `LOG${history.length - index}`}
                       </td>
-                      <td className="py-3.5 px-4 font-mono text-zinc-400 text-[11px]">
+                      <td className="py-3 px-3 font-mono text-[#8fa2bd] text-[11px]">
                         {formatDate(attempt.created_at)}
                       </td>
-                      <td className="py-3.5 px-4 font-sans text-zinc-300 text-[11px]">
-                        {attempt.subject_stats ? 'Ranked' : 'Training Ground'}
+                      <td className="py-3 px-3 font-mono text-[#8fa2bd] text-[11px]">
+                        <span className="px-1.5 py-0.5 rounded-xs bg-[rgba(3,16,38,0.6)] border border-[rgba(19,108,153,0.3)]">
+                          {attempt.subject_stats ? 'Ranked Arena' : 'Training Ground'}
+                        </span>
                       </td>
-                      <td className="py-3.5 px-4 text-right">
+                      <td className="py-3 px-3">
+                        <div className="w-24 h-1.5 rounded-full overflow-hidden flex bg-[rgba(3,16,38,0.8)] border border-[rgba(19,108,153,0.25)]" title={`Correct: ${attempt.correct_count}, Incorrect: ${attempt.incorrect_count}, Skipped: ${attempt.unattempted_count}`}>
+                          <div style={{ width: `${correctPct}%` }} className="bg-[#34d399]" />
+                          <div style={{ width: `${incorrectPct}%` }} className="bg-[#e14e4e]" />
+                          <div style={{ width: `${unattemptedPct}%` }} className="bg-[#8fa2bd]" />
+                        </div>
+                      </td>
+                      <td className="py-3 px-3 text-right">
                         <span
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-sm font-mono font-bold text-[10px] uppercase ${
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-xs font-mono font-bold text-[10px] uppercase ${
                             isExcellent
-                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                              ? 'bg-[rgba(52,211,153,0.12)] text-[#34d399] border border-[rgba(52,211,153,0.35)]'
                               : isPass
-                              ? 'bg-[#0194a8]/10 text-[#0194a8] border border-[#0194a8]/30'
-                              : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                              ? 'bg-[rgba(1,148,168,0.15)] text-[#0194a8] border border-[rgba(1,148,168,0.35)]'
+                              : 'bg-[rgba(225,78,78,0.12)] text-[#e14e4e] border border-[rgba(225,78,78,0.35)]'
                           }`}
                         >
                           {attempt.correct_count}/{maxPossible} ({ratio}%)
@@ -785,16 +969,17 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
         )}
       </div>
 
-      {/* Export Toast */}
+      {/* Export Toast Notification */}
       <AnimatePresence>
         {exportToast && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] px-6 py-3 bg-zinc-900 border border-zinc-700/80 rounded-sm shadow-2xl"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] px-5 py-2.5 bg-[#041d40] border border-[#0194a8] rounded-xs shadow-2xl flex items-center gap-2 text-xs font-mono text-[#e0d0ab]"
           >
-            <p className="text-xs text-stone-200 font-sans whitespace-nowrap">{exportToast}</p>
+            <Sparkles className="w-3.5 h-3.5 text-[#e0d0ab]" />
+            <span>{exportToast}</span>
           </motion.div>
         )}
       </AnimatePresence>
