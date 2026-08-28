@@ -27,7 +27,6 @@ export default function App() {
   const [gameState, setGameState] = useState<'login' | 'landing' | 'arena' | 'autopsy'>('landing');
 
   const [activeTab, setActiveTab] = useState<'arena' | 'tracker' | 'library' | 'humanities' | 'profile' | 'leaderboard'>('arena');
-  const [pageContextActions, setPageContextActions] = useState<ContextActionItem[]>([]);
 
   const [viewingAnalystId, setViewingAnalystId] = useState<string | null>(null);
   const [showPasswordReset, setShowPasswordReset] = useState(false);
@@ -348,7 +347,6 @@ export default function App() {
             isLanding={gameState === 'landing'}
             userEmail={userEmail}
             isExpanded={isRailExpanded}
-            contextActions={pageContextActions}
             onToggleExpand={handleToggleRailExpand}
             onNavigateTab={navigateToTab}
             onNavigateHome={handleNavigateHome}
@@ -597,7 +595,7 @@ export default function App() {
           ) : activeTab === 'leaderboard' ? (
             <Leaderboard onAnalystClick={setViewingAnalystId} />
           ) : activeTab === 'tracker' ? (
-            <CurrentAffairs userId={userId || 'guest'} onRegisterActions={setPageContextActions} />
+            <CurrentAffairs userId={userId || 'guest'} />
           ) : activeTab === 'library' ? (
             <SubjectPillars
               onNavigateArena={() => {

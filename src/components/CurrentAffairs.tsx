@@ -35,7 +35,6 @@ import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import DailyEdition from './DailyEdition';
 import RebaseEdition from './RebaseEdition';
-import ContextActionRail, { ContextActionItem } from './ContextActionRail';
 import prsVaultDossiers from '../data/prs-vault-dossiers.json';
 import {
   SourceAnchor,
@@ -80,7 +79,6 @@ interface PibDigestItem {
 
 interface CurrentAffairsProps {
   userId: string;
-  onRegisterActions?: (actions: ContextActionItem[]) => void;
 }
 
 // Slide-and-fade variants for the PIB edition carousel, keyed by swipe/nav direction.
@@ -116,7 +114,7 @@ const TOP_MINISTRIES = [
   'Ministry of External Affairs',
 ];
 
-export default function CurrentAffairs({ userId, onRegisterActions }: CurrentAffairsProps) {
+export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
   const [items, setItems] = useState<CurrentAffairsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -594,83 +592,42 @@ export default function CurrentAffairs({ userId, onRegisterActions }: CurrentAff
     setPage(0);
   };
 
-  // Contextual Page Action Bar items (Sleek Vertical Sub-bar)
-  const contextActions: ContextActionItem[] = [
-    {
-      id: 'prs',
-      label: 'PRS Legislative Vault',
-      shortLabel: 'PRS',
-      icon: Scale,
-      isActive: activeCategoryTab === 'PRS',
-      accentColor: 'purple',
-      onClick: () => {
+  // Listen to Contextual Navigation Action Events dispatched from Vertical Nav Rail
+  useEffect(() => {
+    const handleBriefAction = (e: Event) => {
+      const customEvent = e as CustomEvent<string>;
+      const action = customEvent.detail;
+      if (action === 'prs') {
+        setBriefViewMode('signals');
         setActiveCategoryTab('PRS');
         setSelectedSource('PRS');
-      },
-      tooltip: 'Open Statutory Acts & Parliamentary Bills (PRS Vault)',
-    },
-    {
-      id: 'pib',
-      label: 'PIB Daily Digest',
-      shortLabel: 'PIB',
-      icon: BookOpen,
-      onClick: () => setShowPibModal(true),
-      tooltip: 'Open PIB Daily Digest Reader',
-    },
-    {
-      id: 'signals',
-      label: 'Signal Deck Feed',
-      shortLabel: 'Deck',
-      icon: Zap,
-      isActive: briefViewMode === 'signals',
-      accentColor: 'gold',
-      onClick: () => handleSelectViewMode('signals'),
-      tooltip: 'Continuous Policy Dispatches Stream',
-    },
-    {
-      id: 'edition',
-      label: 'Daily Edition (10 Briefs)',
-      shortLabel: 'Edition',
-      icon: Sparkles,
-      isActive: briefViewMode === 'edition',
-      badge: 10,
-      accentColor: 'cyan',
-      onClick: () => handleSelectViewMode('edition'),
-      tooltip: 'Finite Curated Daily Edition',
-    },
-    {
-      id: 'filters',
-      label: isFilterDrawerOpen ? 'Close Filter Hub' : 'Open Filter Hub',
-      shortLabel: 'Filters',
-      icon: SlidersHorizontal,
-      isActive: isFilterDrawerOpen || activeFilterCount > 0,
-      badge: activeFilterCount > 0 ? activeFilterCount : undefined,
-      onClick: () => setIsFilterDrawerOpen(!isFilterDrawerOpen),
-      tooltip: 'Toggle Intelligence Filters',
-    },
-    {
-      id: 'saved',
-      label: `Saved Signals (${savedArticleIds.size})`,
-      shortLabel: 'Saved',
-      icon: Bookmark,
-      isActive: activeCategoryTab === 'SAVED',
-      badge: savedArticleIds.size > 0 ? savedArticleIds.size : undefined,
-      onClick: () => setActiveCategoryTab(activeCategoryTab === 'SAVED' ? 'ALL' : 'SAVED'),
-      tooltip: 'Candidate Bookmarked Dispatches',
-    },
-  ];
+      } else if (action === 'pib') {
+        setShowPibModal(true);
+      } else if (action === 'signals') {
+        setBriefViewMode('signals');
+        try {
+          localStorage.setItem('tark_brief_view_mode', 'signals');
+        } catch {
+          /* ignore */
+        }
+      } else if (action === 'edition') {
+        setBriefViewMode('edition');
+        try {
+          localStorage.setItem('tark_brief_view_mode', 'edition');
+        } catch {
+          /* ignore */
+        }
+      } else if (action === 'filters') {
+        setIsFilterDrawerOpen((prev) => !prev);
+      } else if (action === 'saved') {
+        setBriefViewMode('signals');
+        setActiveCategoryTab((prev) => (prev === 'SAVED' ? 'ALL' : 'SAVED'));
+      }
+    };
 
-  // Register Contextual Actions to the Primary Vertical Rail
-  useEffect(() => {
-    onRegisterActions?.(contextActions);
-  }, [
-    activeCategoryTab,
-    briefViewMode,
-    isFilterDrawerOpen,
-    activeFilterCount,
-    savedArticleIds.size,
-    onRegisterActions,
-  ]);
+    window.addEventListener('tark:brief-action', handleBriefAction);
+    return () => window.removeEventListener('tark:brief-action', handleBriefAction);
+  }, []);
 
   return (
     <div className="w-full min-h-screen text-stone-100 font-sans pb-24">

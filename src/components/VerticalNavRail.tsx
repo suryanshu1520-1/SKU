@@ -14,7 +14,11 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   LayoutTemplate,
-  Sparkles
+  Sparkles,
+  Scale,
+  Zap,
+  SlidersHorizontal,
+  Bookmark
 } from 'lucide-react';
 
 import BrandLogo, { TarkSigil } from './BrandLogo';
@@ -91,6 +95,66 @@ export default function VerticalNavRail({
     if (item.id === 'home') return isLanding;
     return !isLanding && activeTab === item.id;
   };
+
+  const effectiveActions: ContextActionItem[] =
+    contextActions && contextActions.length > 0
+      ? contextActions
+      : !isLanding && activeTab === 'tracker'
+      ? [
+          {
+            id: 'prs',
+            label: 'PRS Legislative Vault',
+            shortLabel: 'PRS',
+            icon: Scale,
+            accentColor: 'purple',
+            onClick: () => window.dispatchEvent(new CustomEvent('tark:brief-action', { detail: 'prs' })),
+            tooltip: 'Open Statutory Acts & Parliamentary Bills (PRS Vault)',
+          },
+          {
+            id: 'pib',
+            label: 'PIB Daily Digest',
+            shortLabel: 'PIB',
+            icon: BookOpen,
+            onClick: () => window.dispatchEvent(new CustomEvent('tark:brief-action', { detail: 'pib' })),
+            tooltip: 'Open PIB Daily Digest Reader',
+          },
+          {
+            id: 'signals',
+            label: 'Signal Deck Feed',
+            shortLabel: 'Deck',
+            icon: Zap,
+            accentColor: 'gold',
+            onClick: () => window.dispatchEvent(new CustomEvent('tark:brief-action', { detail: 'signals' })),
+            tooltip: 'Continuous Policy Dispatches Stream',
+          },
+          {
+            id: 'edition',
+            label: 'Daily Edition (10 Briefs)',
+            shortLabel: 'Edition',
+            icon: Sparkles,
+            badge: 10,
+            accentColor: 'cyan',
+            onClick: () => window.dispatchEvent(new CustomEvent('tark:brief-action', { detail: 'edition' })),
+            tooltip: 'Finite Curated Daily Edition',
+          },
+          {
+            id: 'filters',
+            label: 'Filter Hub',
+            shortLabel: 'Filters',
+            icon: SlidersHorizontal,
+            onClick: () => window.dispatchEvent(new CustomEvent('tark:brief-action', { detail: 'filters' })),
+            tooltip: 'Toggle Intelligence Filters',
+          },
+          {
+            id: 'saved',
+            label: 'Saved Signals',
+            shortLabel: 'Saved',
+            icon: Bookmark,
+            onClick: () => window.dispatchEvent(new CustomEvent('tark:brief-action', { detail: 'saved' })),
+            tooltip: 'Candidate Bookmarked Dispatches',
+          },
+        ]
+      : [];
 
   return (
     <aside
@@ -199,7 +263,7 @@ export default function VerticalNavRail({
         </nav>
 
         {/* ── Contextual Page Actions (Bracket Area - Dynamic per Page) ── */}
-        {!isLanding && contextActions && contextActions.length > 0 && (
+        {!isLanding && effectiveActions && effectiveActions.length > 0 && (
           <div className="p-2 border-t border-[rgba(19,108,153,0.3)] my-1 bg-[rgba(3,18,42,0.4)]">
             {isExpanded && (
               <div className="px-2 py-1 mb-1 text-[9px] font-mono uppercase tracking-wider text-[#0194a8] font-bold flex items-center justify-between">
@@ -210,7 +274,7 @@ export default function VerticalNavRail({
               </div>
             )}
             <div className="space-y-1">
-              {contextActions.map((action) => {
+              {effectiveActions.map((action) => {
                 const Icon = action.icon;
                 const active = !!action.isActive;
                 return (
