@@ -83,36 +83,88 @@ export default function App() {
     }
   };
 
+  const handleNavigateManifesto = () => {
+    setShowManifesto(true);
+  };
+
+  const handleNavigateHome = () => {
+    setGameState('landing');
+    setActiveTab('arena');
+    setShowManifesto(false);
+  };
+
+  const navigateToTab = (tab: 'arena' | 'tracker' | 'library' | 'humanities' | 'profile' | 'leaderboard') => {
+    if (tab === 'profile' && !userEmail) {
+      setGameState('login');
+      return;
+    }
+    setActiveTab(tab);
+    if (gameState === 'landing' || gameState === 'login') {
+      if (tab === 'arena' && localStorage.getItem('tark_arena_results')) {
+        setGameState('autopsy');
+      } else {
+        setGameState('arena');
+      }
+    } else if (tab === 'arena' && localStorage.getItem('tark_arena_results')) {
+      setGameState('autopsy');
+    } else if (tab === 'arena') {
+      setGameState('arena');
+    }
+  };
+
   // Keyboard Shortcuts: Alt+[ or Alt+V to toggle orientation, Alt+1..6 to switch tabs
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (e.altKey && (e.key === '[' || e.key === 'v' || e.key === 'V')) {
-        e.preventDefault();
-        handleToggleNavOrientation();
-      } else if (e.altKey && e.key === '1') {
-        e.preventDefault();
-        handleNavigateHome();
-      } else if (e.altKey && e.key === '2') {
-        e.preventDefault();
-        navigateToTab('tracker');
-      } else if (e.altKey && e.key === '3') {
-        e.preventDefault();
-        navigateToTab('arena');
-      } else if (e.altKey && e.key === '4') {
-        e.preventDefault();
-        navigateToTab('library');
-      } else if (e.altKey && e.key === '5') {
-        e.preventDefault();
-        navigateToTab('humanities');
-      } else if (e.altKey && e.key === '6') {
-        e.preventDefault();
-        navigateToTab('leaderboard');
+      const target = e.target as HTMLElement | null;
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target?.isContentEditable
+      ) {
+        return;
+      }
+
+      if (e.altKey) {
+        const key = e.key.toLowerCase();
+        const code = e.code;
+
+        if (
+          key === '[' ||
+          code === 'BracketLeft' ||
+          key === 'v' ||
+          code === 'KeyV' ||
+          key === '\\' ||
+          code === 'Backslash'
+        ) {
+          e.preventDefault();
+          handleToggleNavOrientation();
+        } else if (key === '1' || code === 'Digit1' || code === 'Numpad1') {
+          e.preventDefault();
+          handleNavigateHome();
+        } else if (key === '2' || code === 'Digit2' || code === 'Numpad2') {
+          e.preventDefault();
+          navigateToTab('tracker');
+        } else if (key === '3' || code === 'Digit3' || code === 'Numpad3') {
+          e.preventDefault();
+          navigateToTab('arena');
+        } else if (key === '4' || code === 'Digit4' || code === 'Numpad4') {
+          e.preventDefault();
+          navigateToTab('library');
+        } else if (key === '5' || code === 'Digit5' || code === 'Numpad5') {
+          e.preventDefault();
+          navigateToTab('humanities');
+        } else if (key === '6' || code === 'Digit6' || code === 'Numpad6') {
+          e.preventDefault();
+          navigateToTab('leaderboard');
+        } else if (key === '7' || code === 'Digit7' || code === 'Numpad7' || key === 'p' || code === 'KeyP') {
+          e.preventDefault();
+          navigateToTab('profile');
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [navOrientation, isRailExpanded]);
+  }, [navOrientation, isRailExpanded, userEmail, gameState]);
 
   // Restore authenticated states on start
   useEffect(() => {
@@ -275,34 +327,6 @@ export default function App() {
     setActiveTab('arena');
   };
 
-  const handleNavigateManifesto = () => {
-    setShowManifesto(true);
-  };
-
-  const handleNavigateHome = () => {
-    setGameState('landing');
-    setActiveTab('arena');
-    setShowManifesto(false);
-  };
-
-  const navigateToTab = (tab: 'arena' | 'tracker' | 'library' | 'profile' | 'leaderboard') => {
-    if (tab === 'profile' && !userEmail) {
-      setGameState('login');
-      return;
-    }
-    setActiveTab(tab);
-    if (gameState === 'landing' || gameState === 'login') {
-      if (tab === 'arena' && localStorage.getItem('tark_arena_results')) {
-        setGameState('autopsy');
-      } else {
-        setGameState('arena');
-      }
-    } else if (tab === 'arena' && localStorage.getItem('tark_arena_results')) {
-      setGameState('autopsy');
-    } else if (tab === 'arena') {
-      setGameState('arena');
-    }
-  };
 
   if (loading) {
     return (

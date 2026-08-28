@@ -870,6 +870,71 @@ export default function Arena({
     }
   };
 
+  // Keyboard Shortcuts during Arena Quiz
+  useEffect(() => {
+    if (arenaPhase !== 'quiz') return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target?.isContentEditable
+      ) {
+        return;
+      }
+
+      // Ignore if modifier keys (like Alt or Ctrl or Meta) are held, to allow global app shortcuts
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+
+      const key = e.key.toUpperCase();
+      const code = e.code;
+
+      if (key === 'A' || code === 'KeyA' || key === '1' || code === 'Digit1' || code === 'Numpad1') {
+        e.preventDefault();
+        handleSelect('A');
+      } else if (key === 'B' || code === 'KeyB' || key === '2' || code === 'Digit2' || code === 'Numpad2') {
+        e.preventDefault();
+        handleSelect('B');
+      } else if (key === 'C' || code === 'KeyC' || key === '3' || code === 'Digit3' || code === 'Numpad3') {
+        e.preventDefault();
+        handleSelect('C');
+      } else if (key === 'D' || code === 'KeyD' || key === '4' || code === 'Digit4' || code === 'Numpad4') {
+        e.preventDefault();
+        handleSelect('D');
+      } else if (key === 'L' || code === 'KeyL') {
+        e.preventDefault();
+        handleLock();
+      } else if (key === 'ARROWLEFT' || code === 'ArrowLeft' || key === 'P' || code === 'KeyP') {
+        e.preventDefault();
+        handlePrevious();
+      } else if (key === 'ARROWRIGHT' || code === 'ArrowRight' || key === 'N' || code === 'KeyN') {
+        e.preventDefault();
+        handleNext();
+      } else if (key === 'ENTER' || code === 'Enter' || key === ' ' || code === 'Space') {
+        e.preventDefault();
+        if (currentQuestionId) {
+          const pending = pendingAnswersMap[currentQuestionId];
+          const locked = lockedMap[currentQuestionId];
+          if (pending && !locked) {
+            handleLock();
+          } else {
+            handleNext();
+          }
+        }
+      } else if (key === 'M' || code === 'KeyM') {
+        e.preventDefault();
+        toggleBookmark();
+      } else if (key === 'ESCAPE' || code === 'Escape') {
+        e.preventDefault();
+        setShowAbandonModal(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [arenaPhase, currentQuestionId, pendingAnswersMap, lockedMap, currentQuestionIndex, questions.length]);
+
   // ----------------------------------------------------------------
   // RENDER: INTRO PHASE
   // ----------------------------------------------------------------

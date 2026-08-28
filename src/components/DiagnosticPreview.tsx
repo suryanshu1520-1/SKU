@@ -80,20 +80,42 @@ export default function DiagnosticPreview({ onLaunchFullArena }: DiagnosticPrevi
     setCurrentIndex((prev) => (prev + 1) % SAMPLE_QUESTIONS.length);
   };
 
-  // Keyboard shortcut listener for A, B, C, D
+  // Keyboard shortcut listener for A, B, C, D and 1, 2, 3, 4
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target?.isContentEditable
+      ) {
+        return;
+      }
+
       if (hasAnswered) {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space' || e.code === 'Enter') {
+          e.preventDefault();
           handleNext();
         }
         return;
       }
+
       const key = e.key.toUpperCase();
-      if (key === 'A') handleSelect(0);
-      else if (key === 'B') handleSelect(1);
-      else if (key === 'C') handleSelect(2);
-      else if (key === 'D') handleSelect(3);
+      const code = e.code;
+
+      if (key === 'A' || code === 'KeyA' || key === '1' || code === 'Digit1' || code === 'Numpad1') {
+        e.preventDefault();
+        handleSelect(0);
+      } else if (key === 'B' || code === 'KeyB' || key === '2' || code === 'Digit2' || code === 'Numpad2') {
+        e.preventDefault();
+        handleSelect(1);
+      } else if (key === 'C' || code === 'KeyC' || key === '3' || code === 'Digit3' || code === 'Numpad3') {
+        e.preventDefault();
+        handleSelect(2);
+      } else if (key === 'D' || code === 'KeyD' || key === '4' || code === 'Digit4' || code === 'Numpad4') {
+        e.preventDefault();
+        handleSelect(3);
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
