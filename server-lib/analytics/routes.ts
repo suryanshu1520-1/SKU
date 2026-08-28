@@ -96,18 +96,85 @@ analyticsRouter.get("/examiner-psyche/node/:nodeId", async (req: Request, res: R
     const [nodeRes, analyticsRes, prelimsRes, mainsRes] = await Promise.all([
       sb.from("syllabus_nodes").select("*").eq("id", nodeId).maybeSingle(),
       sb.from("pyq_node_analytics").select("*").eq("node_id", nodeId).maybeSingle(),
-      sb.from("pyq_prelims").select("id, year, paper, question_num, stem, official_key, question_type").eq("node_id", nodeId).order("year", { ascending: false }).limit(20),
-      sb.from("pyq_mains").select("id, year, paper, question_num, marks, prompt, directive_verb, nature, rubric_level_1, rubric_level_2, rubric_level_3").eq("node_id", nodeId).order("year", { ascending: false }).limit(20),
+      sb.from("pyq_prelims")
+        .select("id, year, paper, question_num, stem, statements, options, official_key, question_type, qualifiers")
+        .eq("node_id", nodeId)
+        .order("year", { ascending: false })
+        .limit(40),
+      sb.from("pyq_mains")
+        .select("id, year, paper, question_num, marks, prompt, directive_verb, nature, rubric_level_1, rubric_level_2, rubric_level_3, trigger_entity")
+        .eq("node_id", nodeId)
+        .order("year", { ascending: false })
+        .limit(20),
     ]);
 
-    const cleanPrelims = (prelimsRes.data || []).filter(isCleanPrelimsRow).slice(0, 5);
+    let cleanPrelims: any[] = ((prelimsRes.data || []) as any[]).filter(isCleanPrelimsRow);
+
+    // If direct node_id lookup yielded few or zero prelims, perform intelligent entity / keyword fallback
+    const nodeData = nodeRes.data as any;
+    if (cleanPrelims.length < 3 && nodeData) {
+      const terms: string[] = [
+        ...(nodeData.entities || []),
+        nodeData.id ? nodeData.id.split('.').pop() : '',
+      ].filter((t: any) => typeof t === 'string' && t.length >= 4);
+
+      if (terms.length > 0) {
+        // Query recent pyq_prelims matching node entities
+        const { data: fallbackPrelims } = await sb
+          .from("pyq_prelims")
+          .select("id, year, paper, question_num, stem, statements, options, official_key, question_type, qualifiers")
+          .ilike("stem", `%${terms[0]}%`)
+          .order("year", { ascending: false })
+          .limit(10);
+
+        if (fallbackPrelims && fallbackPrelims.length > 0) {
+          const cleanFallback = (fallbackPrelims as any[]).filter(isCleanPrelimsRow);
+          const existingIds = new Set(cleanPrelims.map((p: any) => p.id));
+          for (const fb of cleanFallback) {
+            if (!existingIds.has((fb as any).id)) {
+              cleanPrelims.push(fb);
+              existingIds.add((fb as any).id);
+            }
+          }
+        }
+      }
+    }
+
+
+    // Sort to prioritize year diversity across distinct testing cycles (e.g. 2024, 2022, 2020, 2018, 2015, 2012, etc.)
+    const yearBuckets = new Map<number, any[]>();
+    for (const q of cleanPrelims) {
+      const yr = q.year || 2024;
+      if (!yearBuckets.has(yr)) yearBuckets.set(yr, []);
+      yearBuckets.get(yr)!.push(q);
+    }
+
+    const diversePrelims: any[] = [];
+    const sortedYears = Array.from(yearBuckets.keys()).sort((a, b) => b - a);
+
+    // First pass: 1 question per distinct year
+    for (const yr of sortedYears) {
+      const qs = yearBuckets.get(yr)!;
+      if (qs.length > 0) {
+        diversePrelims.push(qs[0]);
+      }
+    }
+
+    // Second pass: fill up to 8 questions with remaining items
+    for (const yr of sortedYears) {
+      if (diversePrelims.length >= 8) break;
+      const qs = yearBuckets.get(yr)!;
+      for (let i = 1; i < qs.length && diversePrelims.length < 8; i++) {
+        diversePrelims.push(qs[i]);
+      }
+    }
 
     res.json({
       success: true,
       data: {
         node: nodeRes.data,
         analytics: analyticsRes.data,
-        prelimsQuestions: cleanPrelims,
+        prelimsQuestions: diversePrelims,
         mainsQuestions: mainsRes.data || [],
       }
     });
@@ -115,3 +182,4 @@ analyticsRouter.get("/examiner-psyche/node/:nodeId", async (req: Request, res: R
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
