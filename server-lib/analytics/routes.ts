@@ -16,7 +16,26 @@ import {
   getSupabase,
   isCleanPrelimsRow,
 } from "./examiner_psyche.js";
+import { queryMasterPYQs } from "./pyq_explorer.js";
 export const analyticsRouter = Router();
+
+// Master 7,841 PYQ Intelligence Explorer Live Search Endpoint
+analyticsRouter.get("/observatory/pyqs", async (req: Request, res: Response) => {
+  try {
+    const result = queryMasterPYQs({
+      q: req.query.q as string,
+      subject: req.query.subject as string,
+      era: req.query.era as string,
+      cognitiveType: req.query.cognitiveType as string,
+      stage: req.query.stage as string,
+      page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
+      limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 10,
+    });
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 // 1. Complete Examiner Psyche Overview
 analyticsRouter.get("/examiner-psyche/overview", async (_req: Request, res: Response) => {
