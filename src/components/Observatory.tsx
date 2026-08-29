@@ -562,7 +562,7 @@ export default function Observatory({ onLaunchPractice, onNavigateArena }: Obser
                     Markov Chain First-Order Answer Key Serial Transition Kernel
                   </h3>
                   <p className="text-xs text-zinc-400">
-                    Select a previous question answer key to inspect the conditional transition probability $P(K_{{t+1}} \mid K_t)$.
+                    Select a previous question answer key to inspect the conditional transition probability P(K_t+1 | K_t).
                   </p>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -632,7 +632,7 @@ export default function Observatory({ onLaunchPractice, onNavigateArena }: Obser
                     Bayesian Epistemic Modifier Discrimination Engine
                   </h2>
                   <p className="text-xs text-zinc-400">
-                    Posterior probability $P(\text{{False}} \mid \text{{Extreme Modifier}}) = 81.36\%$ computed across $N = 998$ items.
+                    Posterior probability P(False | Extreme Modifier) = 81.36% computed across N = 998 items.
                   </p>
                 </div>
                 <span className="px-2.5 py-1 rounded bg-red-500/10 border border-red-500/30 text-red-400 font-mono text-xs font-bold">
@@ -726,7 +726,7 @@ export default function Observatory({ onLaunchPractice, onNavigateArena }: Obser
                     Adversarial Game Theory & 50/50 Expected Value Simulator
                   </h2>
                   <p className="text-xs text-zinc-400">
-                    Mathematical payoff: $\text{{EV}}(k) = \frac{{1}}{{4-k}}(+2.00) + \frac{{3-k}}{{4-k}}(-0.66)$.
+                    Mathematical payoff: EV(k) = [1 / (4 - k)](+2.00) + [(3 - k) / (4 - k)](-0.66).
                   </p>
                 </div>
                 <span className="px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-mono text-xs font-bold">
