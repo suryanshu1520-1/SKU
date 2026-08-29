@@ -13,6 +13,7 @@
 @import "@fontsource/cinzel/500.css";
 @import "@fontsource/cinzel/600.css";
 @import "@fontsource/cinzel/700.css";
+@import "katex/dist/katex.min.css";
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
