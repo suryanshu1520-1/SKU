@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Radio,
@@ -600,9 +600,15 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
   };
 
   const handleCopyQuestion = (q: any) => {
-    const md = `### UPSC CSE (${q.year}) — ${q.subject}\n**Question:**\n${q.stem}\n\n**Options:**\n${q.options.join('\n')}\n\n**Official Answer:** (${q.correctKey})\n**Cognitive Taxonomy:** ${q.cognitiveType}\n**Examiner Trap Breakdown:** ${q.trapAnalysis}\n`;
+    if (!q) return;
+    const optsStr = Array.isArray(q.options)
+      ? q.options.join('\n')
+      : typeof q.options === 'object' && q.options
+      ? Object.entries(q.options).map(([k, v]) => `(${k}) ${v}`).join('\n')
+      : '';
+    const md = `### UPSC CSE (${q.year || 'PYQ'}) — ${q.subject || 'General Studies'}\n**Question:**\n${q.stem || ''}\n\n**Options:**\n${optsStr}\n\n**Official Answer:** (${(q.correctKey || 'C').toUpperCase()})\n**Cognitive Taxonomy:** ${q.cognitiveType || 'Direct Synthesis'}\n**Examiner Trap Breakdown:** ${q.trapAnalysis || ''}\n`;
     navigator.clipboard.writeText(md);
-    setCopiedQuestionId(q.id);
+    setCopiedQuestionId(q.id || 'copied');
     setTimeout(() => setCopiedQuestionId(null), 2000);
   };
 
@@ -1545,15 +1551,28 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
 
               {/* Question Cards List */}
               <div className="space-y-6">
-                {activeQuestionsList.map((q) => {
-                  const isBookmarked = bookmarkedIds.has(q.id);
-                  const chosenKey = userAnswers[q.id];
+                {activeQuestionsList.map((q, idx) => {
+                  const qId = q?.id || `q-item-${idx}`;
+                  const isBookmarked = bookmarkedIds.has(qId);
+                  const chosenKey = userAnswers[qId];
                   const hasAnswered = chosenKey !== undefined;
-                  const isCorrect = hasAnswered && chosenKey.toUpperCase() === q.correctKey.toUpperCase();
+                  const officialKey = (q?.correctKey || 'C').toString().toUpperCase();
+                  const isCorrect = hasAnswered && chosenKey.toUpperCase() === officialKey;
+                  const optionsArray: string[] = Array.isArray(q?.options) && q.options.length > 0
+                    ? q.options
+                    : typeof q?.options === 'object' && q?.options
+                    ? Object.entries(q.options).map(([k, v]) => `(${k}) ${v}`)
+                    : ['(a) Option A', '(b) Option B', '(c) Option C', '(d) Option D'];
+                  const extremeTokens = Array.isArray(q?.qualifiers?.extreme) ? q.qualifiers.extreme : [];
+                  const contingentTokens = Array.isArray(q?.qualifiers?.contingent) ? q.qualifiers.contingent : [];
+                  const wordCount = q?.wordCount || (q?.stem ? q.stem.split(/\s+/).length : 45);
+                  const subject = q?.subject || 'General Studies';
+                  const cognitiveType = q?.cognitiveType || 'Direct Analysis';
+                  const trapAnalysis = q?.trapAnalysis || `Official UPSC Key is (${officialKey}). Classified under ${subject}.`;
 
                   return (
                     <div
-                      key={q.id}
+                      key={qId}
                       className={`p-6 rounded bg-zinc-900/50 border transition-all ${
                         hasAnswered
                           ? isCorrect
@@ -1566,18 +1585,18 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                       <div className="flex items-center justify-between flex-wrap gap-2 text-xs font-mono">
                         <div className="flex items-center gap-2.5">
                           <span className="px-2.5 py-0.5 rounded bg-[#e0d0ab]/10 text-[#e0d0ab] border border-[#e0d0ab]/30 font-bold">
-                            UPSC CSE {q.year}
+                            UPSC CSE {q?.year || 'PYQ'}
                           </span>
-                          <span className="text-zinc-300 font-bold">{q.subject}</span>
+                          <span className="text-zinc-300 font-bold">{subject}</span>
                           <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/30 text-[10px]">
-                            {q.cognitiveType}
+                            {cognitiveType}
                           </span>
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <span className="text-zinc-500">{q.wordCount} Words</span>
+                          <span className="text-zinc-500">{wordCount} Words</span>
                           <button
-                            onClick={() => handleToggleBookmark(q.id)}
+                            onClick={() => handleToggleBookmark(qId)}
                             className={`p-1.5 rounded transition-colors cursor-pointer ${
                               isBookmarked ? 'text-amber-400' : 'text-zinc-500 hover:text-zinc-300'
                             }`}
@@ -1590,7 +1609,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                             className="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[11px] font-mono flex items-center gap-1 cursor-pointer transition-colors"
                             title="Copy Markdown"
                           >
-                            {copiedQuestionId === q.id ? (
+                            {copiedQuestionId === qId ? (
                               <>
                                 <Check className="w-3 h-3 text-emerald-400" />
                                 <span className="text-emerald-400 font-bold">Copied!</span>
@@ -1607,14 +1626,14 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
 
                       {/* Question Stem */}
                       <p className="text-xs md:text-sm text-stone-100 font-sans leading-relaxed whitespace-pre-line">
-                        {q.stem}
+                        {q?.stem || 'Question stem unavailable.'}
                       </p>
 
                       {/* Interactive Option Cards */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 font-mono text-xs">
-                        {q.options.map((opt: string, oIdx: number) => {
-                          const optionLetter = ['A', 'B', 'C', 'D'][oIdx];
-                          const isOptionCorrect = optionLetter === q.correctKey.toUpperCase();
+                        {optionsArray.map((opt: string, oIdx: number) => {
+                          const optionLetter = ['A', 'B', 'C', 'D'][oIdx] || 'A';
+                          const isOptionCorrect = optionLetter === officialKey;
                           const isOptionSelected = chosenKey === optionLetter;
 
                           let optionStyle = 'bg-zinc-900/60 border-zinc-800 text-zinc-300 hover:border-zinc-700 hover:bg-zinc-800/80';
@@ -1631,7 +1650,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                           return (
                             <button
                               key={oIdx}
-                              onClick={() => handleSelectOption(q.id, optionLetter)}
+                              onClick={() => handleSelectOption(qId, optionLetter)}
                               className={`p-3 rounded border text-left flex items-start justify-between gap-2 transition-all cursor-pointer ${optionStyle}`}
                             >
                               <span>{opt}</span>
@@ -1659,30 +1678,30 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                               Examiner Decoy & Trap Architecture
                             </span>
                             <div className="flex items-center gap-2 font-mono text-[10px]">
-                              {q.qualifiers?.extreme && q.qualifiers.extreme.length > 0 && (
+                              {extremeTokens.length > 0 && (
                                 <span className="px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/40">
-                                  Extreme: {q.qualifiers.extreme.join(', ')}
+                                  Extreme: {extremeTokens.join(', ')}
                                 </span>
                               )}
-                              {q.qualifiers?.contingent && q.qualifiers.contingent.length > 0 && (
+                              {contingentTokens.length > 0 && (
                                 <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                                  Contingent: {q.qualifiers.contingent.join(', ')}
+                                  Contingent: {contingentTokens.join(', ')}
                                 </span>
                               )}
                             </div>
                           </div>
                           <p className="text-zinc-300 font-sans leading-relaxed">
-                            {q.trapAnalysis}
+                            {trapAnalysis}
                           </p>
                         </motion.div>
                       )}
 
                       {/* Bottom Quick Action Bar */}
                       <div className="flex items-center justify-between pt-2 border-t border-zinc-800/60 font-mono text-xs">
-                        <span className="text-zinc-500">Official UPSC Key: <strong className="text-[#e0d0ab]">Option ({q.correctKey})</strong></span>
+                        <span className="text-zinc-500">Official UPSC Key: <strong className="text-[#e0d0ab]">Option ({officialKey})</strong></span>
                         {onLaunchPractice && (
                           <button
-                            onClick={() => onLaunchPractice(q.subject)}
+                            onClick={() => onLaunchPractice(subject)}
                             className="text-[#0194a8] hover:text-[#e0d0ab] flex items-center gap-1 font-bold transition-colors cursor-pointer"
                           >
                             <span>Practice Similar in Arena</span>
