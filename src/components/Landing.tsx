@@ -15,7 +15,8 @@ import {
   Swords,
   ChevronRight,
   Activity,
-  Check
+  Check,
+  Radio
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import InteractiveBackground from './InteractiveBackground';
@@ -28,6 +29,7 @@ interface LandingProps {
   onNavigateProfile: () => void;
   onNavigateLibrary?: () => void;
   onNavigateHumanities?: () => void;
+  onNavigateObservatory?: () => void;
   onNavigateManifesto?: () => void;
   onNavigateLegal?: (type: 'privacy' | 'terms' | 'refund') => void;
 }
@@ -44,11 +46,12 @@ export default function Landing({
   onNavigateProfile,
   onNavigateLibrary,
   onNavigateHumanities,
+  onNavigateObservatory,
   onNavigateManifesto,
   onNavigateLegal,
 }: LandingProps) {
   const [seatData, setSeatData] = useState<SeatCountData | null>(null);
-  const [activeFeatureTab, setActiveFeatureTab] = useState<'arena' | 'brief' | 'canon' | 'pillars'>('arena');
+  const [activeFeatureTab, setActiveFeatureTab] = useState<'arena' | 'observatory' | 'brief' | 'canon' | 'pillars'>('arena');
 
   useEffect(() => {
     async function fetchSeats() {
@@ -76,6 +79,18 @@ export default function Landing({
       icon: Swords,
       action: onNavigateArena,
       color: '#34d399'
+    },
+    {
+      id: 'observatory' as const,
+      label: 'The Observatory',
+      title: '25-Year Empirical Intelligence & Examiner Psyche Engine',
+      subtitle: '7,841 verified questions modeled via cognitive psychometrics & game theory.',
+      description: 'Explore mathematical derivations, working memory speededness curves, Bayesian modifier truth rates (81.4% false), and 50-50 elimination expected values (+13.4 marks gain).',
+      metrics: ['7,841 Question Corpus', 'Q-Matrix Factorization', 'Markov & Game Theory Models'],
+      cta: 'Launch 25-Yr Observatory',
+      icon: Radio,
+      action: onNavigateObservatory || onNavigateArena,
+      color: '#e0d0ab'
     },
     {
       id: 'brief' as const,

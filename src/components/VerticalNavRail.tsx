@@ -18,12 +18,13 @@ import {
   Scale,
   Zap,
   SlidersHorizontal,
-  Bookmark
+  Bookmark,
+  Radio
 } from 'lucide-react';
 
 import BrandLogo, { TarkSigil } from './BrandLogo';
 
-export type NavTab = 'arena' | 'tracker' | 'library' | 'humanities' | 'leaderboard' | 'profile';
+export type NavTab = 'arena' | 'tracker' | 'library' | 'humanities' | 'observatory' | 'leaderboard' | 'profile';
 
 export interface ContextActionItem {
   id: string;
@@ -67,7 +68,8 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'arena', label: 'Test Arena', shortLabel: 'Arena', icon: Swords, hotkey: '3', group: 'arena' },
   { id: 'library', label: 'Syllabus Pillars', shortLabel: 'Pillars', icon: Layers, hotkey: '4', group: 'vault' },
   { id: 'humanities', label: 'Humanities Canon', shortLabel: 'Canon', icon: BookOpen, hotkey: '5', group: 'vault' },
-  { id: 'leaderboard', label: 'Leaderboard', shortLabel: 'Rank', icon: Trophy, hotkey: '6', group: 'system' },
+  { id: 'observatory', label: 'The Observatory', shortLabel: 'Observatory', icon: Radio, hotkey: '6', group: 'vault' },
+  { id: 'leaderboard', label: 'Leaderboard', shortLabel: 'Rank', icon: Trophy, hotkey: '7', group: 'system' },
 ];
 
 export default function VerticalNavRail({

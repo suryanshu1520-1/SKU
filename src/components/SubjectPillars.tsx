@@ -354,7 +354,7 @@ export default function SubjectPillars({ onLaunchPractice, onNavigateArena }: Su
           <div className="flex flex-wrap items-center gap-3 text-xs font-sans text-zinc-400">
             <div className="flex items-center gap-2 p-2 rounded-sm bg-zinc-900/40 border border-zinc-800/60">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span className="font-mono text-[11px] text-stone-200">1,760+ Verified PYQ Items</span>
+              <span className="font-mono text-[11px] text-stone-200">7,841 Verified PYQ Items (2000–2025)</span>
             </div>
             <div className="flex items-center gap-2 p-2 rounded-sm bg-zinc-900/40 border border-zinc-800/60">
               <Database className="w-3.5 h-3.5 text-emerald-400 shrink-0" />

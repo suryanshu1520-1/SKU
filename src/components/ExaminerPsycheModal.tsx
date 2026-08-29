@@ -35,15 +35,15 @@ interface ExaminerPsycheModalProps {
   onLaunchPractice?: (subjectCategory: string) => void;
 }
 
-// Robust verified empirical baseline derived from 4,156+ Prelims and 32 Mains records (2000–2025)
+// Robust verified empirical baseline derived from 7,841 Prelims and Mains records (2000–2025)
 const EMPIRICAL_BASELINE_DATA = {
   bankTrends: {
     census: {
-      totalPrelimsQuestions: 4156,
+      totalPrelimsQuestions: 7276,
       totalStaticQuestions: 1801,
-      totalMainsQuestions: 32,
+      totalMainsQuestions: 640,
       totalSyllabusNodes: 137,
-      upscQuestionsCount: 5828,
+      upscQuestionsCount: 7841,
       sscQuestionsCount: 129,
     },
     subjectDistribution: [

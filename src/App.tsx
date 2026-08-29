@@ -8,6 +8,7 @@ import Autopsy from './components/Autopsy';
 import CurrentAffairs from './components/CurrentAffairs';
 import SubjectPillars from './components/SubjectPillars';
 import HumanitiesReader from './components/HumanitiesReader';
+import Observatory from './components/Observatory';
 import Profile from './components/Profile';
 import Leaderboard from './components/Leaderboard';
 import PublicProfile from './components/PublicProfile';
@@ -17,7 +18,7 @@ import VerticalNavRail, { ContextActionItem } from './components/VerticalNavRail
 import Onboarding from './components/Onboarding';
 import BrandLogo from './components/BrandLogo';
 import { supabase } from './lib/supabase';
-import { Loader2, Trophy, Swords, Globe, User, House, LogIn, Layers, BookOpen, PanelLeftOpen, LayoutTemplate } from 'lucide-react';
+import { Loader2, Trophy, Swords, Globe, User, House, LogIn, Layers, BookOpen, PanelLeftOpen, LayoutTemplate, Radio } from 'lucide-react';
 
 export default function App() {
   const [userEmail, setUserEmail] = useState<string>('');
@@ -26,7 +27,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [gameState, setGameState] = useState<'login' | 'landing' | 'arena' | 'autopsy'>('landing');
 
-  const [activeTab, setActiveTab] = useState<'arena' | 'tracker' | 'library' | 'humanities' | 'profile' | 'leaderboard'>('arena');
+  const [activeTab, setActiveTab] = useState<'arena' | 'tracker' | 'library' | 'humanities' | 'observatory' | 'profile' | 'leaderboard'>('arena');
 
   const [viewingAnalystId, setViewingAnalystId] = useState<string | null>(null);
   const [showPasswordReset, setShowPasswordReset] = useState(false);
@@ -94,7 +95,7 @@ export default function App() {
     setShowManifesto(false);
   };
 
-  const navigateToTab = (tab: 'arena' | 'tracker' | 'library' | 'humanities' | 'profile' | 'leaderboard') => {
+  const navigateToTab = (tab: 'arena' | 'tracker' | 'library' | 'humanities' | 'observatory' | 'profile' | 'leaderboard') => {
     if (tab === 'profile' && !userEmail) {
       setGameState('login');
       return;
@@ -113,7 +114,7 @@ export default function App() {
     }
   };
 
-  // Keyboard Shortcuts: Alt+[ or Alt+V to toggle orientation, Alt+1..6 to switch tabs
+  // Keyboard Shortcuts: Alt+[ or Alt+V to toggle orientation, Alt+1..7 to switch tabs
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
@@ -154,10 +155,13 @@ export default function App() {
         } else if (key === '5' || code === 'Digit5' || code === 'Numpad5') {
           e.preventDefault();
           navigateToTab('humanities');
-        } else if (key === '6' || code === 'Digit6' || code === 'Numpad6') {
+        } else if (key === '6' || code === 'Digit6' || code === 'Numpad6' || key === 'o' || code === 'KeyO') {
+          e.preventDefault();
+          navigateToTab('observatory');
+        } else if (key === '7' || code === 'Digit7' || code === 'Numpad7') {
           e.preventDefault();
           navigateToTab('leaderboard');
-        } else if (key === '7' || code === 'Digit7' || code === 'Numpad7' || key === 'p' || code === 'KeyP') {
+        } else if (key === '8' || code === 'Digit8' || code === 'Numpad8' || key === 'p' || code === 'KeyP') {
           e.preventDefault();
           navigateToTab('profile');
         }
@@ -482,9 +486,28 @@ export default function App() {
                 </button>
 
                 <button
+                  onClick={() => navigateToTab('observatory')}
+                  className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-xs outline-none group cursor-pointer"
+                  title="The Observatory (Alt+6)"
+                >
+                  {gameState !== 'landing' && activeTab === 'observatory' && (
+                    <motion.div
+                      layoutId="active-nav-pill"
+                      className="absolute inset-0 bg-[#e0d0ab] rounded-xs z-0 shadow-sm"
+                      transition={{ type: 'spring', bounce: 0.15, duration: 0.45 }}
+                    />
+                  )}
+                  <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-200 ease-out ${gameState !== 'landing' && activeTab === 'observatory' ? 'text-[#072e63] font-bold' : 'text-[#8fa2bd] group-hover:text-[#e0d0ab] group-hover:-translate-y-0.5'}`}>
+                    <Radio className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-200 ease-out ${!(gameState !== 'landing' && activeTab === 'observatory') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
+                    <span className="hidden sm:inline">Observatory</span>
+                    <span className="sm:hidden">Observatory</span>
+                  </span>
+                </button>
+
+                <button
                   onClick={() => navigateToTab('leaderboard')}
                   className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-xs outline-none group cursor-pointer"
-                  title="Leaderboard (Alt+6)"
+                  title="Leaderboard (Alt+7)"
                 >
                   {gameState !== 'landing' && activeTab === 'leaderboard' && (
                     <motion.div
@@ -505,7 +528,7 @@ export default function App() {
                   <button
                     onClick={() => navigateToTab('profile')}
                     className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-xs outline-none group cursor-pointer"
-                    title="Profile & History"
+                    title="Profile & History (Alt+8)"
                   >
                     {gameState !== 'landing' && activeTab === 'profile' && (
                       <motion.div
@@ -573,6 +596,7 @@ export default function App() {
             onNavigateProfile={() => navigateToTab('profile')}
             onNavigateLibrary={() => navigateToTab('library')}
             onNavigateHumanities={() => navigateToTab('humanities')}
+            onNavigateObservatory={() => navigateToTab('observatory')}
             onNavigateManifesto={handleNavigateManifesto}
             onNavigateLegal={(type) => setLegalDocumentType(type)}
           />
@@ -587,7 +611,7 @@ export default function App() {
                 ? 'md:pl-56 pt-6 pb-12'
                 : 'md:pl-16 pt-6 pb-12'
               : 'pt-28 md:pt-24 pb-12'
-          } ${activeTab === 'humanities' ? 'max-w-none px-0' : 'max-w-7xl mx-auto px-4 md:px-8'}`}
+          } ${activeTab === 'humanities' || activeTab === 'observatory' ? 'max-w-none px-0' : 'max-w-7xl mx-auto px-4 md:px-8'}`}
           style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
         >
           {activeTab === 'profile' && userEmail ? (
@@ -596,6 +620,21 @@ export default function App() {
             <Leaderboard onAnalystClick={setViewingAnalystId} />
           ) : activeTab === 'tracker' ? (
             <CurrentAffairs userId={userId || 'guest'} />
+          ) : activeTab === 'observatory' ? (
+            <Observatory
+              onNavigateArena={() => {
+                localStorage.removeItem('tark_arena_results');
+                setTargetPillar(null);
+                setGameState('arena');
+                setActiveTab('arena');
+              }}
+              onLaunchPractice={(categoryOrId) => {
+                localStorage.removeItem('tark_arena_results');
+                setTargetPillar({ id: categoryOrId, title: categoryOrId });
+                setGameState('arena');
+                setActiveTab('arena');
+              }}
+            />
           ) : activeTab === 'library' ? (
             <SubjectPillars
               onNavigateArena={() => {

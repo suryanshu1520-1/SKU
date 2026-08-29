@@ -77,6 +77,7 @@ $RECYCLE.BIN/
 *~
 *.tmp
 *.bak
+*.zip
 
 # ── Agent handoffs, briefs & inboxes (internal orchestration — NEVER public) ──
 # Cross-agent task briefs (Claude ⇄ Antigravity) are internal process artifacts.
