@@ -1,0 +1,347 @@
+{
+  "generated_at": "2026-08-31T02:02:45.447233",
+  "census": {
+    "total_documents": 1074,
+    "current_affairs_articles_count": 927,
+    "pib_digests_count": 20,
+    "current_affairs_mcqs_count": 127,
+    "total_character_volume": 1115895,
+    "total_word_volume": 160868,
+    "breakdown": {
+      "articles_words": 131591,
+      "pib_words": 13570,
+      "mcqs_words": 15707
+    },
+    "source_distribution": {
+      "THE HINDU": 566,
+      "LIVEMINT": 164,
+      "PIB": 106,
+      "INDIAN EXPRESS": 34,
+      "PRS": 22,
+      "BUSINESS STANDARD": 18,
+      "RBI": 16,
+      "PIB_Digest": 1
+    },
+    "ministry_distribution": {
+      "MINISTRY OF FINANCE": 228,
+      "Government of India": 174,
+      "GENERAL": 160,
+      "UNION CABINET": 158,
+      "MINISTRY OF COMMERCE AND INDUSTRY": 53,
+      "Ministry of Electronics & IT": 47,
+      "Reserve Bank of India": 28,
+      "Ministry of Defence": 13,
+      "MINISTRY OF EARTH SCIENCES": 12,
+      "Ministry of Finance": 7,
+      "Ministry of Commerce & Industry": 7,
+      "Ministry of External Affairs": 6,
+      "Ministry of Power": 4,
+      "Union Cabinet": 3,
+      "Ministry of Home Affairs": 3,
+      "Ministry of Education": 3,
+      "Ministry of Parliamentary Affairs": 3,
+      "Ministry of Agriculture & Farmers Welfare": 2,
+      "Ministry of Civil Aviation": 2,
+      "Ministry of Law & Justice": 2
+    },
+    "weekly_distribution": {
+      "2026-W23": {
+        "articles": 4,
+        "pib": 3,
+        "mcqs": 0,
+        "words": 2590
+      },
+      "2026-W24": {
+        "articles": 122,
+        "pib": 4,
+        "mcqs": 0,
+        "words": 14376
+      },
+      "2026-W25": {
+        "articles": 138,
+        "pib": 4,
+        "mcqs": 0,
+        "words": 16754
+      },
+      "2026-W26": {
+        "articles": 125,
+        "pib": 1,
+        "mcqs": 0,
+        "words": 13567
+      },
+      "2026-W27": {
+        "articles": 117,
+        "pib": 1,
+        "mcqs": 0,
+        "words": 12778
+      },
+      "2026-W28": {
+        "articles": 101,
+        "pib": 2,
+        "mcqs": 0,
+        "words": 11909
+      },
+      "2026-W29": {
+        "articles": 107,
+        "pib": 0,
+        "mcqs": 0,
+        "words": 11026
+      },
+      "2026-W30": {
+        "articles": 69,
+        "pib": 0,
+        "mcqs": 0,
+        "words": 11987
+      },
+      "2026-W33": {
+        "articles": 0,
+        "pib": 3,
+        "mcqs": 0,
+        "words": 1918
+      },
+      "2026-W34": {
+        "articles": 67,
+        "pib": 2,
+        "mcqs": 57,
+        "words": 27784
+      },
+      "2026-W35": {
+        "articles": 77,
+        "pib": 0,
+        "mcqs": 65,
+        "words": 33359
+      },
+      "2026-W36": {
+        "articles": 0,
+        "pib": 0,
+        "mcqs": 5,
+        "words": 796
+      }
+    }
+  },
+  "institutions": {
+    "ranking_by_mentions": [
+      [
+        "Reserve Bank of India (RBI)",
+        450
+      ],
+      [
+        "Ministry of Finance",
+        258
+      ],
+      [
+        "Judiciary (Supreme Court & High Courts)",
+        150
+      ],
+      [
+        "Ministry of Commerce & Industry",
+        73
+      ],
+      [
+        "Ministry of Electronics & Information Technology",
+        55
+      ],
+      [
+        "Ministry of Education",
+        49
+      ],
+      [
+        "Ministry of Science & Technology",
+        35
+      ],
+      [
+        "Election Commission of India (ECI)",
+        34
+      ],
+      [
+        "Ministry of Home Affairs",
+        34
+      ],
+      [
+        "Food and Drug Administration (FDA)",
+        34
+      ],
+      [
+        "Ministry of Defence",
+        29
+      ],
+      [
+        "Ministry of Rural Development",
+        25
+      ],
+      [
+        "Finance Commission",
+        17
+      ],
+      [
+        "Directorate of Revenue Intelligence (DRI)",
+        16
+      ],
+      [
+        "ISRO / Space Commission",
+        15
+      ],
+      [
+        "Ministry of Power & Renewable Energy",
+        14
+      ],
+      [
+        "Ministry of Environment, Forest & Climate Change",
+        10
+      ],
+      [
+        "Ministry of Agriculture & Farmers Welfare",
+        9
+      ],
+      [
+        "Ministry of External Affairs",
+        8
+      ],
+      [
+        "Ministry of Health & Family Welfare",
+        7
+      ],
+      [
+        "Ministry of Law & Justice",
+        2
+      ],
+      [
+        "NITI Aayog",
+        1
+      ]
+    ]
+  },
+  "geopolitics": {
+    "partner_ranking": [
+      [
+        "BRICS",
+        57
+      ],
+      [
+        "Australia",
+        50
+      ],
+      [
+        "United States / Quad",
+        31
+      ],
+      [
+        "China",
+        27
+      ],
+      [
+        "Japan",
+        22
+      ],
+      [
+        "SACU (Southern African Customs Union)",
+        15
+      ],
+      [
+        "SAARC / SAFTA",
+        8
+      ],
+      [
+        "Africa / Global South",
+        6
+      ],
+      [
+        "ASEAN",
+        6
+      ],
+      [
+        "European Union / UK",
+        3
+      ]
+    ]
+  },
+  "linguistics": {
+    "mega_overall": {
+      "word_count": 161035,
+      "rhetoric_count": 147,
+      "substance_count": 2092,
+      "rds_score": 0.91,
+      "sar_score": 12.99,
+      "srr_ratio": 14.23,
+      "top_rhetoric": {
+        "sustainable": 37,
+        "ecosystem": 32,
+        "resilient": 21,
+        "empowerment": 18,
+        "robust": 15
+      },
+      "substance_breakdown": {
+        "currency_amount": 596,
+        "percentage_metric": 633,
+        "statutory_reference": 61,
+        "timeline_target_year": 750,
+        "physical_quant_metric": 52
+      }
+    },
+    "articles_only": {
+      "word_count": 131591,
+      "rhetoric_count": 89,
+      "substance_count": 1821,
+      "rds_score": 0.68,
+      "sar_score": 13.84,
+      "srr_ratio": 20.46,
+      "top_rhetoric": {
+        "sustainable": 29,
+        "ecosystem": 20,
+        "robust": 12,
+        "empowerment": 11,
+        "resilient": 8
+      },
+      "substance_breakdown": {
+        "currency_amount": 531,
+        "percentage_metric": 586,
+        "statutory_reference": 43,
+        "timeline_target_year": 620,
+        "physical_quant_metric": 41
+      }
+    },
+    "pib_only": {
+      "word_count": 13570,
+      "rhetoric_count": 46,
+      "substance_count": 112,
+      "rds_score": 3.39,
+      "sar_score": 8.25,
+      "srr_ratio": 2.43,
+      "top_rhetoric": {
+        "resilient": 13,
+        "ecosystem": 11,
+        "dynamic": 7,
+        "sustainable": 3,
+        "empowerment": 3
+      },
+      "substance_breakdown": {
+        "currency_amount": 32,
+        "percentage_metric": 22,
+        "statutory_reference": 5,
+        "timeline_target_year": 44,
+        "physical_quant_metric": 9
+      }
+    },
+    "mcqs_only": {
+      "word_count": 13683,
+      "rhetoric_count": 11,
+      "substance_count": 124,
+      "rds_score": 0.8,
+      "sar_score": 9.06,
+      "srr_ratio": 11.27,
+      "top_rhetoric": {
+        "sustainable": 5,
+        "empowerment": 4,
+        "robust": 1,
+        "ecosystem": 1
+      },
+      "substance_breakdown": {
+        "currency_amount": 30,
+        "percentage_metric": 25,
+        "statutory_reference": 11,
+        "timeline_target_year": 56,
+        "physical_quant_metric": 2
+      }
+    }
+  }
+}
