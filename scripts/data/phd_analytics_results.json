@@ -1,0 +1,1372 @@
+{
+  "generated_at": "2026-08-31T01:57:16.853982",
+  "census": {
+    "total_documents": 147,
+    "pib_digests_count": 20,
+    "ca_mcqs_count": 127,
+    "total_character_volume": 202696,
+    "total_word_volume": 29277,
+    "pib_word_volume": 13570,
+    "ca_word_volume": 15707,
+    "avg_words_per_pib": 678.5,
+    "avg_words_per_ca": 123.7,
+    "temporal_span": {
+      "pib_earliest": "2026-06-01",
+      "pib_latest": "2026-08-18",
+      "ca_earliest": "2026-08-19",
+      "ca_latest": "2026-08-31"
+    },
+    "weekly_distribution": {
+      "2026-W23": {
+        "pib_count": 3,
+        "pib_words": 2137,
+        "ca_count": 0,
+        "ca_words": 0
+      },
+      "2026-W24": {
+        "pib_count": 4,
+        "pib_words": 3008,
+        "ca_count": 0,
+        "ca_words": 0
+      },
+      "2026-W25": {
+        "pib_count": 4,
+        "pib_words": 2956,
+        "ca_count": 0,
+        "ca_words": 0
+      },
+      "2026-W26": {
+        "pib_count": 1,
+        "pib_words": 590,
+        "ca_count": 0,
+        "ca_words": 0
+      },
+      "2026-W27": {
+        "pib_count": 1,
+        "pib_words": 544,
+        "ca_count": 0,
+        "ca_words": 0
+      },
+      "2026-W28": {
+        "pib_count": 2,
+        "pib_words": 1607,
+        "ca_count": 0,
+        "ca_words": 0
+      },
+      "2026-W33": {
+        "pib_count": 3,
+        "pib_words": 1918,
+        "ca_count": 0,
+        "ca_words": 0
+      },
+      "2026-W34": {
+        "pib_count": 2,
+        "pib_words": 810,
+        "ca_count": 57,
+        "ca_words": 3888
+      },
+      "2026-W35": {
+        "pib_count": 0,
+        "pib_words": 0,
+        "ca_count": 65,
+        "ca_words": 8999
+      },
+      "2026-W36": {
+        "pib_count": 0,
+        "pib_words": 0,
+        "ca_count": 5,
+        "ca_words": 796
+      }
+    }
+  },
+  "institutions": {
+    "ranking_by_mentions": [
+      [
+        "Reserve Bank of India (RBI)",
+        33
+      ],
+      [
+        "Ministry of Science & Technology",
+        14
+      ],
+      [
+        "Ministry of Rural Development",
+        12
+      ],
+      [
+        "Judiciary (Supreme Court & High Courts)",
+        11
+      ],
+      [
+        "Ministry of Power & Renewable Energy",
+        7
+      ],
+      [
+        "Ministry of Education",
+        7
+      ],
+      [
+        "Finance Commission",
+        6
+      ],
+      [
+        "ISRO / Space Commission",
+        6
+      ],
+      [
+        "Food and Drug Administration (FDA)",
+        5
+      ],
+      [
+        "Election Commission of India (ECI)",
+        5
+      ],
+      [
+        "Ministry of Environment, Forest & Climate Change",
+        5
+      ],
+      [
+        "Ministry of Finance",
+        4
+      ],
+      [
+        "Ministry of Defence",
+        4
+      ],
+      [
+        "Ministry of Home Affairs",
+        4
+      ],
+      [
+        "Ministry of Agriculture & Farmers Welfare",
+        3
+      ],
+      [
+        "Ministry of Electronics & Information Technology",
+        3
+      ],
+      [
+        "Ministry of Commerce & Industry",
+        2
+      ],
+      [
+        "Directorate of Revenue Intelligence (DRI)",
+        2
+      ],
+      [
+        "NITI Aayog",
+        1
+      ],
+      [
+        "Ministry of Health & Family Welfare",
+        1
+      ]
+    ],
+    "pib_counts": [
+      [
+        "Ministry of Rural Development",
+        11
+      ],
+      [
+        "Ministry of Power & Renewable Energy",
+        7
+      ],
+      [
+        "Finance Commission",
+        6
+      ],
+      [
+        "ISRO / Space Commission",
+        6
+      ],
+      [
+        "Ministry of Science & Technology",
+        5
+      ],
+      [
+        "Ministry of Education",
+        4
+      ],
+      [
+        "Reserve Bank of India (RBI)",
+        4
+      ],
+      [
+        "Election Commission of India (ECI)",
+        3
+      ],
+      [
+        "Ministry of Electronics & Information Technology",
+        3
+      ],
+      [
+        "Ministry of Agriculture & Farmers Welfare",
+        2
+      ],
+      [
+        "Ministry of Commerce & Industry",
+        2
+      ],
+      [
+        "Ministry of Environment, Forest & Climate Change",
+        2
+      ],
+      [
+        "Ministry of Defence",
+        2
+      ],
+      [
+        "Food and Drug Administration (FDA)",
+        1
+      ],
+      [
+        "NITI Aayog",
+        1
+      ]
+    ],
+    "ca_counts": [
+      [
+        "Reserve Bank of India (RBI)",
+        29
+      ],
+      [
+        "Judiciary (Supreme Court & High Courts)",
+        11
+      ],
+      [
+        "Ministry of Science & Technology",
+        9
+      ],
+      [
+        "Food and Drug Administration (FDA)",
+        4
+      ],
+      [
+        "Ministry of Home Affairs",
+        4
+      ],
+      [
+        "Ministry of Education",
+        3
+      ],
+      [
+        "Ministry of Finance",
+        3
+      ],
+      [
+        "Ministry of Environment, Forest & Climate Change",
+        3
+      ],
+      [
+        "Ministry of Defence",
+        2
+      ],
+      [
+        "Election Commission of India (ECI)",
+        2
+      ],
+      [
+        "Ministry of Rural Development",
+        1
+      ],
+      [
+        "Ministry of Agriculture & Farmers Welfare",
+        1
+      ],
+      [
+        "Ministry of Health & Family Welfare",
+        1
+      ],
+      [
+        "Directorate of Revenue Intelligence (DRI)",
+        1
+      ]
+    ],
+    "pib_co_occurrences": {
+      "Finance Commission": {
+        "Food and Drug Administration (FDA)": 1,
+        "Ministry of Rural Development": 1
+      },
+      "Food and Drug Administration (FDA)": {
+        "Finance Commission": 1
+      },
+      "Ministry of Power & Renewable Energy": {
+        "Ministry of Commerce & Industry": 2,
+        "Ministry of Agriculture & Farmers Welfare": 1,
+        "Ministry of Rural Development": 1,
+        "NITI Aayog": 1,
+        "Ministry of Electronics & Information Technology": 1
+      },
+      "Ministry of Agriculture & Farmers Welfare": {
+        "Ministry of Rural Development": 2,
+        "Ministry of Power & Renewable Energy": 1,
+        "NITI Aayog": 1,
+        "Ministry of Electronics & Information Technology": 1,
+        "Ministry of Environment, Forest & Climate Change": 1
+      },
+      "Ministry of Rural Development": {
+        "Ministry of Agriculture & Farmers Welfare": 2,
+        "Ministry of Power & Renewable Energy": 1,
+        "NITI Aayog": 1,
+        "Ministry of Electronics & Information Technology": 1,
+        "Ministry of Environment, Forest & Climate Change": 1
+      },
+      "NITI Aayog": {
+        "Ministry of Power & Renewable Energy": 1,
+        "Ministry of Agriculture & Farmers Welfare": 1,
+        "Ministry of Rural Development": 1
+      },
+      "Ministry of Commerce & Industry": {
+        "Ministry of Power & Renewable Energy": 2,
+        "Ministry of Electronics & Information Technology": 1
+      },
+      "Ministry of Electronics & Information Technology": {
+        "Ministry of Power & Renewable Energy": 1,
+        "Ministry of Commerce & Industry": 1,
+        "Ministry of Agriculture & Farmers Welfare": 1,
+        "Ministry of Environment, Forest & Climate Change": 1,
+        "Ministry of Rural Development": 1
+      },
+      "Ministry of Environment, Forest & Climate Change": {
+        "Ministry of Electronics & Information Technology": 1,
+        "Ministry of Agriculture & Farmers Welfare": 1,
+        "Ministry of Rural Development": 1,
+        "ISRO / Space Commission": 1
+      },
+      "Ministry of Education": {
+        "Ministry of Power & Renewable Energy": 1,
+        "Ministry of Defence": 1
+      },
+      "ISRO / Space Commission": {
+        "Ministry of Science & Technology": 1,
+        "Ministry of Rural Development": 1,
+        "Reserve Bank of India (RBI)": 1,
+        "Ministry of Environment, Forest & Climate Change": 1
+      },
+      "Ministry of Science & Technology": {
+        "Reserve Bank of India (RBI)": 2,
+        "ISRO / Space Commission": 1,
+        "Ministry of Rural Development": 1
+      },
+      "Reserve Bank of India (RBI)": {
+        "Ministry of Science & Technology": 2,
+        "ISRO / Space Commission": 1,
+        "Ministry of Rural Development": 1
+      },
+      "Ministry of Finance": {
+        "Directorate of Revenue Intelligence (DRI)": 1
+      },
+      "Directorate of Revenue Intelligence (DRI)": {
+        "Ministry of Finance": 1
+      },
+      "Ministry of Defence": {
+        "Ministry of Education": 1
+      }
+    }
+  },
+  "geopolitics": {
+    "partner_ranking": [
+      [
+        "BRICS",
+        36
+      ],
+      [
+        "Australia",
+        32
+      ],
+      [
+        "SACU (Southern African Customs Union)",
+        11
+      ],
+      [
+        "SAARC / SAFTA",
+        8
+      ],
+      [
+        "ASEAN",
+        6
+      ],
+      [
+        "United States / Quad",
+        5
+      ],
+      [
+        "Africa / Global South",
+        4
+      ],
+      [
+        "Japan",
+        3
+      ],
+      [
+        "China",
+        3
+      ],
+      [
+        "European Union / UK",
+        1
+      ]
+    ],
+    "domain_alignment": {
+      "BRICS": {
+        "Trade & Free Trade Agreements": 4,
+        "Science, Space & Technology": 5,
+        "Defense & Maritime Security": 3,
+        "Critical Minerals & Clean Energy": 5,
+        "Diplomatic & Multilateral Summits": 2
+      },
+      "Africa / Global South": {
+        "Trade & Free Trade Agreements": 2,
+        "Science, Space & Technology": 2,
+        "Defense & Maritime Security": 1
+      },
+      "Japan": {
+        "Trade & Free Trade Agreements": 2,
+        "Critical Minerals & Clean Energy": 1,
+        "Science, Space & Technology": 1,
+        "Diplomatic & Multilateral Summits": 2
+      },
+      "European Union / UK": {
+        "Trade & Free Trade Agreements": 1
+      },
+      "Australia": {
+        "Trade & Free Trade Agreements": 3,
+        "Defense & Maritime Security": 2,
+        "Critical Minerals & Clean Energy": 1,
+        "Science, Space & Technology": 2,
+        "Diplomatic & Multilateral Summits": 3
+      },
+      "ASEAN": {
+        "Trade & Free Trade Agreements": 1,
+        "Defense & Maritime Security": 1,
+        "Critical Minerals & Clean Energy": 1,
+        "Science, Space & Technology": 1,
+        "Diplomatic & Multilateral Summits": 1
+      },
+      "United States / Quad": {
+        "Trade & Free Trade Agreements": 2,
+        "Defense & Maritime Security": 2,
+        "Critical Minerals & Clean Energy": 1,
+        "Science, Space & Technology": 2,
+        "Diplomatic & Multilateral Summits": 2
+      },
+      "SACU (Southern African Customs Union)": {
+        "Trade & Free Trade Agreements": 2,
+        "Defense & Maritime Security": 1,
+        "Critical Minerals & Clean Energy": 1,
+        "Science, Space & Technology": 2,
+        "Diplomatic & Multilateral Summits": 2
+      },
+      "China": {
+        "Trade & Free Trade Agreements": 1,
+        "Defense & Maritime Security": 1,
+        "Science, Space & Technology": 1,
+        "Diplomatic & Multilateral Summits": 1
+      },
+      "SAARC / SAFTA": {
+        "Trade & Free Trade Agreements": 1,
+        "Critical Minerals & Clean Energy": 1
+      }
+    }
+  },
+  "judicial_friction_cases_count": 19,
+  "sample_judicial_frictions": [
+    {
+      "source_type": "pib_digest",
+      "date": "2026-06-11",
+      "title": "Daily PIB Highlights (10th & 11th June 2026)",
+      "case_evidence": [
+        "### Election Nomination Rejection: Constitutional Framework, Key Cases and Democratic Implications",
+        "| Case Name | Year | Outcome |",
+        "| S. R. Bommai v. Union of India | 1994 |  |",
+        "| Naveen Kumar Jain v. Election Commission of India | 2010 |  |",
+        "| Ashwani Kumar v. Election Commission of India | 2015 |  |"
+      ]
+    },
+    {
+      "source_type": "pib_digest",
+      "date": "2026-08-13",
+      "title": "Policy Magazine Digest \u2013 13 August 2026 Highlights",
+      "case_evidence": [
+        "- Cross\u2011cluster roll\u2011outs: Digital Podiatry Clinics, **Kalaanubhav.in**, **i\u2011Passport**, **I\u2011RISE**."
+      ]
+    },
+    {
+      "source_type": "pib_digest",
+      "date": "2026-08-17",
+      "title": "Policy Updates: DRI Crackdown on SAFTA Misuse & India Guide to Grasslands (16\u201117 Aug 2026)",
+      "case_evidence": [
+        "### DRI Crackdown on SAFTA Misuse in Areca Nut Imports"
+      ]
+    },
+    {
+      "source_type": "current_affairs_mcq",
+      "date": "2026-08-19",
+      "headline": "'You are going overboard': Bombay HC imposes \u20b95 lakh cost on FDA for not restoring Pune shop's licence",
+      "subject": "Polity & Governance",
+      "summary": "The court\u2019s observation that the FDA\u2019s action was excessive relative to the shop\u2019s near\u2011full compliance reflects the Doctrine of Proportionality, which requires that regulatory measures be commensurate with the objective. The other options relate to ..."
+    },
+    {
+      "source_type": "current_affairs_mcq",
+      "date": "2026-08-19",
+      "headline": "A note of gratitude to Mr. N. Vaghul",
+      "subject": "Economy",
+      "summary": "The text states that higher electricity demand required increased coal imports at higher global prices, which significantly contributed to the rising cost of electricity purchase for discoms, driving up the average cost per unit. The other options de..."
+    },
+    {
+      "source_type": "current_affairs_mcq",
+      "date": "2026-08-20",
+      "headline": "What is Fuelling Power Sector Losses?",
+      "subject": "Economy",
+      "summary": "The report lists long\u2011term PPAs, delayed subsidies and infrequent tariff revisions as structural problems that keep discoms in deficit. Rising coal import costs, while a major contributor to losses, is a market\u2011driven factor and not a structural issu..."
+    },
+    {
+      "source_type": "current_affairs_mcq",
+      "date": "2026-08-20",
+      "headline": "\u0915\u0947\u0902\u0926\u094d\u0930\u0940\u092f \u0917\u0943\u0939 \u090f\u0935\u0902 \u0938\u0939\u0915\u093e\u0930\u093f\u0924\u093e \u092e\u0902\u0924\u094d\u0930\u0940 \u0936\u094d\u0930\u0940 \u0905\u092e\u093f\u0924 \u0936\u093e\u0939 \u0928\u0947 \u0915\u0947\u0902\u0926\u094d\u0930\u0940\u092f \u092e\u0902\u0924\u094d\u0930\u093f\u092e\u0902\u0921\u0932 \u0926\u094d\u0935\u093e\u0930\u093e \u091c\u092e\u094d\u092e\u0942-\u0915\u0936\u094d\u092e\u0940\u0930 \u0914\u0930 \u0932\u0926\u094d\u0926\u093e\u0916 \u0909\u091a\u094d\u091a \u0928\u094d\u092f\u093e\u092f\u093e\u0932\u092f \u0915\u0940 \u092a\u0940\u0920 \u0915\u094b \u0932\u0926\u094d\u0926\u093e\u0916 \u092e\u0947\u0902 \u0915\u093e\u0930\u094d\u092f\u0930\u0924 \u0915\u0930\u0928\u0947 \u0915\u0947 \u0938\u0948\u0926\u094d\u0927\u093e\u0902\u0924\u093f\u0915 \u0928\u093f\u0930\u094d\u0923\u092f \u0915\u093e \u0938\u094d\u0935\u093e\u0917\u0924 \u0915\u093f\u092f\u093e",
+      "subject": "Polity & Governance",
+      "summary": "The notification states that the cabinet's decision to locate a bench of the Jammu & Kashmir High Court in Ladakh will make justice more accessible for residents of remote areas, reducing time to obtain legal services. The other options contradict th..."
+    },
+    {
+      "source_type": "current_affairs_mcq",
+      "date": "2026-08-22",
+      "headline": "RBI imposes monetary penalty on Shri Ram Finance Corporation Private Limited",
+      "subject": "Polity & Governance",
+      "summary": "The order states that the penalty was imposed in exercise of powers conferred on RBI under section\u202f58G(1)(b) read with section\u202f58B(5)(aa) of the RBI Act, 1934. The other sections mentioned are not cited in the provided text...."
+    },
+    {
+      "source_type": "current_affairs_mcq",
+      "date": "2026-08-22",
+      "headline": "Understanding vacancies in the Indian judiciary",
+      "subject": "Polity & Governance",
+      "summary": "The text states that between 2010 and 2020, vacancy in the Supreme Court increased from 6% to 12%. The other options misstate the trends: High Court vacancies rose, subordinate court vacancies rose to 20%, and overall vacancies increased from 18% to ..."
+    },
+    {
+      "source_type": "current_affairs_mcq",
+      "date": "2026-08-22",
+      "headline": "The Tribunal Rules, 2021 contradict the Supreme Court rulings",
+      "subject": "Polity & Governance",
+      "summary": "The 1986 Supreme Court judgment mandates that the Chairman of a tribunal that replaces a High Court must be a current or former High Court Judge, i.e., equivalent to a Chief Justice. The 2021 Rules allowing a member with only three years\u2019 experience ..."
+    },
+    {
+      "source_type": "current_affairs_mcq",
+      "date": "2026-08-23",
+      "headline": "RBI imposes monetary penalty on Progfin Private Limited",
+      "subject": "Polity & Governance",
+      "summary": "The RBI order states that the penalty was imposed because the company failed to conduct a periodic risk\u2011categorisation review of accounts at least once in six months. The other options are not mentioned in the order...."
+    },
+    {
+      "source_type": "current_affairs_mcq",
+      "date": "2026-08-25",
+      "headline": "\u0938\u0940\u090f\u0938\u0906\u0908\u0906\u0930-\u0938\u0940\u0906\u0930\u0906\u0930\u0906\u0908 \u0928\u0947 \u0938\u0921\u093c\u0915 \u092a\u0930\u093f\u0938\u0902\u092a\u0924\u094d\u0924\u093f \u092a\u094d\u0930\u092c\u0902\u0927\u0928 \u092a\u094d\u0930\u0923\u093e\u0932\u0940 \u0914\u0930 \u092a\u0942\u0930\u094d\u0935\u093e\u0928\u0941\u092e\u093e\u0928 \u0935\u093f\u0936\u094d\u0932\u0947\u0937\u0923 \u092a\u0930 \u090f\u0915 \u0926\u093f\u0935\u0938\u0940\u092f \u0930\u093e\u0937\u094d\u091f\u094d\u0930\u0940\u092f \u0915\u093e\u0930\u094d\u092f\u0936\u093e\u0932\u093e \u0915\u093e \u0906\u092f\u094b\u091c\u0928 \u0915\u093f\u092f\u093e",
+      "subject": "Science & Technology",
+      "summary": "Both statements are correct. The CSIR-Central Road Research Institute (CSIR-CRRI), in collaboration with the Ministry of Education under the Scheme for Promotion of Academic and Research Collaboration (SPARC), organized a national workshop on Road As..."
+    }
+  ],
+  "linguistics": {
+    "pib_overall": {
+      "word_count": 13570,
+      "rhetoric_count": 46,
+      "substance_count": 112,
+      "rds_score": 3.39,
+      "sar_score": 8.25,
+      "srr_ratio": 2.43,
+      "top_rhetoric": {
+        "resilient": 13,
+        "ecosystem": 11,
+        "dynamic": 7,
+        "sustainable": 3,
+        "empowerment": 3
+      },
+      "substance_breakdown": {
+        "currency_amount": 32,
+        "percentage_metric": 22,
+        "statutory_reference": 5,
+        "timeline_target_year": 44,
+        "physical_quant_metric": 9
+      }
+    },
+    "ca_overall": {
+      "word_count": 13683,
+      "rhetoric_count": 11,
+      "substance_count": 124,
+      "rds_score": 0.8,
+      "sar_score": 9.06,
+      "srr_ratio": 11.27,
+      "top_rhetoric": {
+        "sustainable": 5,
+        "empowerment": 4,
+        "robust": 1,
+        "ecosystem": 1
+      },
+      "substance_breakdown": {
+        "currency_amount": 30,
+        "percentage_metric": 25,
+        "statutory_reference": 11,
+        "timeline_target_year": 56,
+        "physical_quant_metric": 2
+      }
+    },
+    "per_edition_breakdown": [
+      {
+        "date": "2026-06-01",
+        "title": "India's Policy Updates: BHAVYA Scheme, State Finance Commissions, and BRICS Science Academies Forum",
+        "scores": {
+          "word_count": 568,
+          "rhetoric_count": 4,
+          "substance_count": 7,
+          "rds_score": 7.04,
+          "sar_score": 12.32,
+          "srr_ratio": 1.75,
+          "top_rhetoric": {
+            "ecosystem": 3,
+            "dynamic": 1
+          },
+          "substance_breakdown": {
+            "currency_amount": 3,
+            "percentage_metric": 1,
+            "timeline_target_year": 3
+          }
+        }
+      },
+      {
+        "date": "2026-06-02",
+        "title": "Daily PIB Highlights (1st & 2nd June 2026)",
+        "scores": {
+          "word_count": 688,
+          "rhetoric_count": 0,
+          "substance_count": 7,
+          "rds_score": 0.0,
+          "sar_score": 10.17,
+          "srr_ratio": 10174.42,
+          "top_rhetoric": {},
+          "substance_breakdown": {
+            "currency_amount": 1,
+            "percentage_metric": 4,
+            "timeline_target_year": 2
+          }
+        }
+      },
+      {
+        "date": "2026-06-03",
+        "title": "Daily PIB Highlights (3rd June 2026)",
+        "scores": {
+          "word_count": 881,
+          "rhetoric_count": 0,
+          "substance_count": 3,
+          "rds_score": 0.0,
+          "sar_score": 3.41,
+          "srr_ratio": 3405.22,
+          "top_rhetoric": {},
+          "substance_breakdown": {
+            "currency_amount": 1,
+            "timeline_target_year": 1,
+            "physical_quant_metric": 1
+          }
+        }
+      },
+      {
+        "date": "2026-06-11",
+        "title": "India's Strategic Policy Developments Update",
+        "scores": {
+          "word_count": 1261,
+          "rhetoric_count": 5,
+          "substance_count": 11,
+          "rds_score": 3.97,
+          "sar_score": 8.72,
+          "srr_ratio": 2.2,
+          "top_rhetoric": {
+            "ecosystem": 2,
+            "seamless": 1,
+            "robust": 1,
+            "resilient": 1
+          },
+          "substance_breakdown": {
+            "currency_amount": 3,
+            "percentage_metric": 5,
+            "timeline_target_year": 3
+          }
+        }
+      },
+      {
+        "date": "2026-06-11",
+        "title": "Daily PIB Highlights (10th & 11th June 2026)",
+        "scores": {
+          "word_count": 267,
+          "rhetoric_count": 0,
+          "substance_count": 2,
+          "rds_score": 0.0,
+          "sar_score": 7.49,
+          "srr_ratio": 7490.64,
+          "top_rhetoric": {},
+          "substance_breakdown": {
+            "statutory_reference": 2
+          }
+        }
+      },
+      {
+        "date": "2026-06-13",
+        "title": "2026 Policy Digest: Economic Governance and Development in India",
+        "scores": {
+          "word_count": 796,
+          "rhetoric_count": 7,
+          "substance_count": 1,
+          "rds_score": 8.79,
+          "sar_score": 1.26,
+          "srr_ratio": 0.14,
+          "top_rhetoric": {
+            "resilient": 5,
+            "dynamic": 2
+          },
+          "substance_breakdown": {
+            "currency_amount": 1
+          }
+        }
+      },
+      {
+        "date": "2026-06-13",
+        "title": "Daily PIB Highlights (12th & 13th June 2026)",
+        "scores": {
+          "word_count": 684,
+          "rhetoric_count": 5,
+          "substance_count": 4,
+          "rds_score": 7.31,
+          "sar_score": 5.85,
+          "srr_ratio": 0.8,
+          "top_rhetoric": {
+            "resilient": 4,
+            "seamless": 1
+          },
+          "substance_breakdown": {
+            "currency_amount": 1,
+            "timeline_target_year": 3
+          }
+        }
+      },
+      {
+        "date": "2026-06-15",
+        "title": "India's Public Policy Developments: June 2026",
+        "scores": {
+          "word_count": 860,
+          "rhetoric_count": 5,
+          "substance_count": 9,
+          "rds_score": 5.81,
+          "sar_score": 10.47,
+          "srr_ratio": 1.8,
+          "top_rhetoric": {
+            "resilient": 2,
+            "sustainable": 1,
+            "robust": 1,
+            "dynamic": 1
+          },
+          "substance_breakdown": {
+            "currency_amount": 1,
+            "statutory_reference": 2,
+            "timeline_target_year": 6
+          }
+        }
+      },
+      {
+        "date": "2026-06-17",
+        "title": "Indian Government Policy Digest (16th-17th June 2026)",
+        "scores": {
+          "word_count": 638,
+          "rhetoric_count": 1,
+          "substance_count": 11,
+          "rds_score": 1.57,
+          "sar_score": 17.24,
+          "srr_ratio": 11.0,
+          "top_rhetoric": {
+            "sustainable": 1
+          },
+          "substance_breakdown": {
+            "currency_amount": 3,
+            "statutory_reference": 1,
+            "timeline_target_year": 3,
+            "physical_quant_metric": 4
+          }
+        }
+      },
+      {
+        "date": "2026-06-19",
+        "title": "Policy Digest: India's Key Developments in June 2026",
+        "scores": {
+          "word_count": 1049,
+          "rhetoric_count": 0,
+          "substance_count": 7,
+          "rds_score": 0.0,
+          "sar_score": 6.67,
+          "srr_ratio": 6673.02,
+          "top_rhetoric": {},
+          "substance_breakdown": {
+            "currency_amount": 1,
+            "percentage_metric": 2,
+            "timeline_target_year": 4
+          }
+        }
+      },
+      {
+        "date": "2026-06-21",
+        "title": "Indian Policy Digest - June 2026",
+        "scores": {
+          "word_count": 409,
+          "rhetoric_count": 0,
+          "substance_count": 2,
+          "rds_score": 0.0,
+          "sar_score": 4.89,
+          "srr_ratio": 4889.98,
+          "top_rhetoric": {},
+          "substance_breakdown": {
+            "timeline_target_year": 2
+          }
+        }
+      },
+      {
+        "date": "2026-06-24",
+        "title": "Policy Digest of June 22-24, 2026",
+        "scores": {
+          "word_count": 590,
+          "rhetoric_count": 1,
+          "substance_count": 6,
+          "rds_score": 1.69,
+          "sar_score": 10.17,
+          "srr_ratio": 6.0,
+          "top_rhetoric": {
+            "ecosystem": 1
+          },
+          "substance_breakdown": {
+            "currency_amount": 1,
+            "percentage_metric": 5
+          }
+        }
+      },
+      {
+        "date": "2026-07-04",
+        "title": "India's Policy Highlights: 3rd & 4th July 2026",
+        "scores": {
+          "word_count": 544,
+          "rhetoric_count": 3,
+          "substance_count": 7,
+          "rds_score": 5.51,
+          "sar_score": 12.87,
+          "srr_ratio": 2.33,
+          "top_rhetoric": {
+            "dynamic": 2,
+            "empowerment": 1
+          },
+          "substance_breakdown": {
+            "currency_amount": 5,
+            "percentage_metric": 2
+          }
+        }
+      },
+      {
+        "date": "2026-07-09",
+        "title": "ASEAN-India Economic Integration & India-Australia Comprehensive Strategic Partnership",
+        "scores": {
+          "word_count": 394,
+          "rhetoric_count": 0,
+          "substance_count": 3,
+          "rds_score": 0.0,
+          "sar_score": 7.61,
+          "srr_ratio": 7614.21,
+          "top_rhetoric": {},
+          "substance_breakdown": {
+            "currency_amount": 1,
+            "percentage_metric": 1,
+            "timeline_target_year": 1
+          }
+        }
+      },
+      {
+        "date": "2026-07-11",
+        "title": "India-Australia and Indo-Pacific Policy Digest",
+        "scores": {
+          "word_count": 1213,
+          "rhetoric_count": 2,
+          "substance_count": 9,
+          "rds_score": 1.65,
+          "sar_score": 7.42,
+          "srr_ratio": 4.5,
+          "top_rhetoric": {
+            "ecosystem": 1,
+            "resilient": 1
+          },
+          "substance_breakdown": {
+            "timeline_target_year": 9
+          }
+        }
+      },
+      {
+        "date": "2026-08-12",
+        "title": "Policy Updates: Gram Sabha Participation, Space Vision 2047, India\u2011SACU PTA, and CBDC\u2011Based DBT",
+        "scores": {
+          "word_count": 775,
+          "rhetoric_count": 2,
+          "substance_count": 3,
+          "rds_score": 2.58,
+          "sar_score": 3.87,
+          "srr_ratio": 1.5,
+          "top_rhetoric": {
+            "vision 2047": 2
+          },
+          "substance_breakdown": {
+            "timeline_target_year": 3
+          }
+        }
+      },
+      {
+        "date": "2026-08-13",
+        "title": "Policy Magazine Digest \u2013 13 August 2026 Highlights",
+        "scores": {
+          "word_count": 626,
+          "rhetoric_count": 0,
+          "substance_count": 2,
+          "rds_score": 0.0,
+          "sar_score": 3.19,
+          "srr_ratio": 3194.89,
+          "top_rhetoric": {},
+          "substance_breakdown": {
+            "currency_amount": 1,
+            "timeline_target_year": 1
+          }
+        }
+      },
+      {
+        "date": "2026-08-15",
+        "title": "Policy Updates \u2013 August 15, 2026",
+        "scores": {
+          "word_count": 517,
+          "rhetoric_count": 2,
+          "substance_count": 11,
+          "rds_score": 3.87,
+          "sar_score": 21.28,
+          "srr_ratio": 5.5,
+          "top_rhetoric": {
+            "vibrant": 1,
+            "inclusivity": 1
+          },
+          "substance_breakdown": {
+            "currency_amount": 7,
+            "timeline_target_year": 1,
+            "physical_quant_metric": 3
+          }
+        }
+      },
+      {
+        "date": "2026-08-17",
+        "title": "Policy Updates: DRI Crackdown on SAFTA Misuse & India Guide to Grasslands (16\u201117 Aug 2026)",
+        "scores": {
+          "word_count": 340,
+          "rhetoric_count": 6,
+          "substance_count": 3,
+          "rds_score": 17.65,
+          "sar_score": 8.82,
+          "srr_ratio": 0.5,
+          "top_rhetoric": {
+            "ecosystem": 3,
+            "sustainable": 1,
+            "paradigm shift": 1,
+            "dynamic": 1
+          },
+          "substance_breakdown": {
+            "currency_amount": 2,
+            "timeline_target_year": 1
+          }
+        }
+      },
+      {
+        "date": "2026-08-18",
+        "title": "Policy Updates: Agriculture & Rural Development, NCC Expedition, and School Education (18 August 2026)",
+        "scores": {
+          "word_count": 470,
+          "rhetoric_count": 3,
+          "substance_count": 4,
+          "rds_score": 6.38,
+          "sar_score": 8.51,
+          "srr_ratio": 1.33,
+          "top_rhetoric": {
+            "empowerment": 2,
+            "ecosystem": 1
+          },
+          "substance_breakdown": {
+            "percentage_metric": 2,
+            "timeline_target_year": 1,
+            "physical_quant_metric": 1
+          }
+        }
+      }
+    ]
+  },
+  "capital_ledger": {
+    "total_financial_anchors_found": 51,
+    "sample_entries": [
+      {
+        "date": "2026-06-01",
+        "amount_str": "\u20b933",
+        "context": "uilding 100 Plug-and-Play Industrial Parks  *   **Budget**: \u20b933,660 crore (budgetary reference of ~\u20b934,000 crore) *   **Obj",
+        "source": "pib"
+      },
+      {
+        "date": "2026-06-01",
+        "amount_str": "\u20b934",
+        "context": "rks  *   **Budget**: \u20b933,660 crore (budgetary reference of ~\u20b934,000 crore) *   **Objective**: Build globally competitive, s",
+        "source": "pib"
+      },
+      {
+        "date": "2026-06-01",
+        "amount_str": "\u20b987",
+        "context": "n transformation *   **Performance-Based Grant Framework**: \u20b987,000 crore earmarked exclusively for Panchayats, with access",
+        "source": "pib"
+      },
+      {
+        "date": "2026-06-02",
+        "amount_str": "USD 1.07 billion",
+        "context": "riff lines. | Ongoing | | Key Sectoral Impacts | Unlock the USD 1.07 billion luxury market in Oman for Indian gems and jewellery exports",
+        "source": "pib"
+      },
+      {
+        "date": "2026-06-03",
+        "amount_str": "\u20b9136",
+        "context": "| --- | | MDoNER Capital Injection | Directly provisioning \u20b9136\u2013151 crore out of the macro pool to build infrastructure and",
+        "source": "pib"
+      },
+      {
+        "date": "2026-06-11",
+        "amount_str": "USD 58.12 million",
+        "context": ".23% |  > India\u2019s merchandise exports to Tajikistan reached USD 58.12 million in FY 2025-26, registering an impressive year-on-year growt",
+        "source": "pib"
+      },
+      {
+        "date": "2026-06-11",
+        "amount_str": "\u20b910 ",
+        "context": "The Fiscal Incentive: Gold winners receive a cash prize of \u20b910 Lakh, while Silver winners are awarded \u20b95 Lakh. These funds",
+        "source": "pib"
+      },
+      {
+        "date": "2026-06-11",
+        "amount_str": "\u20b95 ",
+        "context": "a cash prize of \u20b910 Lakh, while Silver winners are awarded \u20b95 Lakh. These funds are legally mandated to bridge local welfa",
+        "source": "pib"
+      },
+      {
+        "date": "2026-06-13",
+        "amount_str": "\u20b90.48 ",
+        "context": "*   Generates high-quality video content at a fixed cost of \u20b90.48 per second, making it affordable for village schools, small",
+        "source": "pib"
+      },
+      {
+        "date": "2026-06-13",
+        "amount_str": "\u20b90.48 ",
+        "context": "**: Generates high-quality video content at a fixed cost of \u20b90.48 per second.     *   **Localized Context**: Trained to accura",
+        "source": "pib"
+      },
+      {
+        "date": "2026-06-15",
+        "amount_str": "\u20b91 ",
+        "context": "rural women generating a sustainable annual net income of \u2265 \u20b91 Lakh).  | **Infrastructure** | **Quantity** | | --- | --- |",
+        "source": "pib"
+      },
+      {
+        "date": "2026-06-17",
+        "amount_str": "\u20b98 ",
+        "context": "under the Central Sector Interest Subsidy (CSIS) scheme to \u20b98 Lakh across all courses and institutions \t+ Remove any rank-",
+        "source": "pib"
+      },
+      {
+        "date": "2026-06-17",
+        "amount_str": "\u20b950 ",
+        "context": "ties \t+ Increase the Priority Sector Lending (PSL) limit to \u20b950 Lakh to cover modern professional degrees \t+ Increase the Cr",
+        "source": "pib"
+      },
+      {
+        "date": "2026-06-17",
+        "amount_str": "\u20b920 ",
+        "context": "e Credit Guarantee Fund (CGFSEL) guarantee cover ceiling to \u20b920 Lakh  ### Article 6.2 Carbon Market Architectures & India-Ja",
+        "source": "pib"
+      },
+      {
+        "date": "2026-06-19",
+        "amount_str": "USD 1.3 billion",
+        "context": "sion | Total trade turnover between the two nations reached USD 1.3 billion in 2025, marking a sharp 33.3% annual growth. |  ### Key Bi",
+        "source": "pib"
+      },
+      {
+        "date": "2026-06-24",
+        "amount_str": "\u20b953.5 crore",
+        "context": "International Convention, backed by financial assistance of \u20b953.5 crore. *   **Ship-Breaking Credit Note Scheme:** a unique policy",
+        "source": "pib"
+      },
+      {
+        "date": "2026-07-04",
+        "amount_str": "USD 326.61 million",
+        "context": "Values | | --- | --- | | **Bilateral Trade (FY 2025\u201326)** | USD 326.61 million | | **Annual Growth (FY 2024-25)**     | 55% | | **India's",
+        "source": "pib"
+      },
+      {
+        "date": "2026-07-04",
+        "amount_str": "\u20b94",
+        "context": "| Values | | --- | --- | | **Total Devolution (16th FC)** | \u20b94,35,236 crore | | **Increase over 15th FC**      | 84% | | *",
+        "source": "pib"
+      },
+      {
+        "date": "2026-07-04",
+        "amount_str": "\u20b9953 ",
+        "context": "15th FC**      | 84% | | **Per Capita Record (16th FC)** | \u20b9953 | | **Per Capita Record (13th FC)** | \u20b9176 |  ### Modified U",
+        "source": "pib"
+      },
+      {
+        "date": "2026-07-04",
+        "amount_str": "\u20b9176 ",
+        "context": "rd (16th FC)** | \u20b9953 | | **Per Capita Record (13th FC)** | \u20b9176 |  ### Modified UDAN Scheme & Regional Aviation Infrastructu",
+        "source": "pib"
+      }
+    ]
+  },
+  "thematic_collocations": {
+    "top_bigrams": [
+      [
+        "following statements",
+        73
+      ],
+      [
+        "--- ---",
+        72
+      ],
+      [
+        "consider following",
+        66
+      ],
+      [
+        "statements given",
+        66
+      ],
+      [
+        "given above",
+        66
+      ],
+      [
+        "above correct",
+        66
+      ],
+      [
+        "statements correct",
+        52
+      ],
+      [
+        "statement correct",
+        41
+      ],
+      [
+        "description ---",
+        33
+      ],
+      [
+        "august 2026",
+        24
+      ],
+      [
+        "correct three",
+        21
+      ],
+      [
+        "three statements",
+        21
+      ],
+      [
+        "statements regarding",
+        20
+      ],
+      [
+        "name description",
+        19
+      ],
+      [
+        "correct based",
+        19
+      ],
+      [
+        "correct statement",
+        18
+      ],
+      [
+        "statement incorrect",
+        18
+      ],
+      [
+        "correct both",
+        18
+      ],
+      [
+        "both statements",
+        18
+      ],
+      [
+        "june 2026",
+        15
+      ],
+      [
+        "incorrect because",
+        15
+      ],
+      [
+        "correct because",
+        15
+      ],
+      [
+        "prime minister",
+        14
+      ],
+      [
+        "reserve bank",
+        14
+      ],
+      [
+        "financial assistance",
+        12
+      ],
+      [
+        "option correct",
+        11
+      ],
+      [
+        "high court",
+        10
+      ],
+      [
+        "reference recent",
+        10
+      ],
+      [
+        "artificial intelligence",
+        9
+      ],
+      [
+        "digital infrastructure",
+        9
+      ]
+    ],
+    "top_trigrams": [
+      [
+        "statements given above",
+        66
+      ],
+      [
+        "given above correct",
+        66
+      ],
+      [
+        "consider following statements",
+        65
+      ],
+      [
+        "description --- ---",
+        33
+      ],
+      [
+        "above correct three",
+        21
+      ],
+      [
+        "correct three statements",
+        21
+      ],
+      [
+        "three statements correct",
+        21
+      ],
+      [
+        "following statements regarding",
+        20
+      ],
+      [
+        "name description ---",
+        19
+      ],
+      [
+        "statements correct based",
+        19
+      ],
+      [
+        "above correct both",
+        18
+      ],
+      [
+        "correct both statements",
+        18
+      ],
+      [
+        "both statements correct",
+        18
+      ],
+      [
+        "above correct statement",
+        16
+      ],
+      [
+        "correct statement correct",
+        15
+      ],
+      [
+        "statement incorrect because",
+        15
+      ],
+      [
+        "statement correct because",
+        14
+      ],
+      [
+        "--- --- ---",
+        9
+      ],
+      [
+        "making option correct",
+        8
+      ],
+      [
+        "above correct statements",
+        8
+      ],
+      [
+        "correct statements correct",
+        8
+      ],
+      [
+        "metric value ---",
+        6
+      ],
+      [
+        "value --- ---",
+        6
+      ],
+      [
+        "ministry road transport",
+        6
+      ],
+      [
+        "road transport highways",
+        6
+      ],
+      [
+        "bureau narcotics cbn",
+        6
+      ],
+      [
+        "viksit bharat 2047",
+        5
+      ],
+      [
+        "task area description",
+        5
+      ],
+      [
+        "area description --------------",
+        5
+      ],
+      [
+        "description -------------- -----------------------------------------------------------------------------------------------",
+        5
+      ]
+    ]
+  }
+}
