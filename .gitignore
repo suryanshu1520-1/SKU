@@ -55,6 +55,8 @@ test-output.md
 ts_trace.txt
 *.tsbuildinfo
 .cache/
+*.sqlite3
+*.db
 
 # ── Operating System Clutter ──
 .DS_Store

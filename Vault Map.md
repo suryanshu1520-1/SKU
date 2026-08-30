@@ -97,6 +97,7 @@ Curated syllabus hubs, mind maps, canonical reference sources, and PYQ benchmark
 - **[[03_MEMORY/knowledge/ethics/index|⚖️ Ethics, Integrity & Aptitude (GS4)]]**: Deontology, Utilitarianism, Nolan Principles, ARC Case Study Algorithms.
 - **[[03_MEMORY/knowledge/sci_tech/index|🔬 Science & Technology (GS3)]]**: ISRO Launch Vehicles, Defense Tech, CRISPR, Quantum Systems, Nuclear Energy.
 - **[[03_MEMORY/knowledge/csat/index|🧮 CSAT Reasoning & Quantitative Aptitude]]**: Reading Comprehension Inferences, Divisibility Rules, P&C, Time & Work.
+- **[[03_MEMORY/knowledge/news-summer-2026/INDEX|📰 Summer 2026 News & Governance Vault]]**: 1,074 offline articles, PIB policy digests, MCQs, and full-text search SQLite database (`news_corpus_summer_2026.sqlite3`).
 
 ---
 
