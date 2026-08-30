@@ -167,7 +167,7 @@ export default async function handler(req: any, res: any) {
     if (questionId && String(questionId).startsWith('ca_')) {
       const rawCaId = String(questionId).replace(/^ca_/, '');
       try {
-        const { data: caRow, error: caErr } = await supabaseAnon
+        const { data: caRow, error: caErr } = await supabaseServer
           .from('current_affairs_mcqs')
           .select('id, question, options, correct_index, explanation, subject')
           .eq('id', rawCaId)
@@ -190,7 +190,7 @@ export default async function handler(req: any, res: any) {
     // Step 1: Query the database first for question metadata and correct option
     if (questionId) {
       try {
-        const { data, error } = await supabaseAnon
+        const { data, error } = await supabaseServer
           .from('static_questions')
           .select('id, correct_option, options_matrix, ai_insights, conceptual_explanation, is_generated')
           .eq('id', questionId)
@@ -200,8 +200,15 @@ export default async function handler(req: any, res: any) {
           dbQuestion = data;
           correctOption = data.correct_option?.trim();
           if (correctOption && data.options_matrix) {
-            const matrix = typeof data.options_matrix === 'string' ? JSON.parse(data.options_matrix) : data.options_matrix;
-            if (matrix && matrix[correctOption]) {
+            let matrix = data.options_matrix;
+            if (typeof matrix === 'string') {
+              try {
+                matrix = JSON.parse(matrix);
+              } catch {
+                matrix = null;
+              }
+            }
+            if (matrix && typeof matrix === 'object' && matrix[correctOption]) {
               effectiveAnswer = matrix[correctOption];
             }
           }
@@ -221,6 +228,7 @@ export default async function handler(req: any, res: any) {
       res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
       return res.status(200).json({
         explanation: dbQuestion.ai_insights,
+        conceptual_explanation: dbQuestion.conceptual_explanation,
         correct_option: correctOption
       });
     }
@@ -232,11 +240,13 @@ export default async function handler(req: any, res: any) {
         res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
         return res.status(200).json({
           explanation: dbQuestion.conceptual_explanation,
+          conceptual_explanation: dbQuestion.conceptual_explanation,
           correct_option: correctOption
         });
       }
       return res.status(200).json({
         explanation: "- Detailed AI insights are currently throttled or unavailable.\n- Please refer to core textbook materials or consult reference sources for this topic.",
+        conceptual_explanation: dbQuestion?.conceptual_explanation || null,
         correct_option: correctOption
       });
     };
@@ -287,6 +297,7 @@ export default async function handler(req: any, res: any) {
     res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
     return res.status(200).json({
       explanation: generatedInsights,
+      conceptual_explanation: dbQuestion?.conceptual_explanation || null,
       correct_option: correctOption
     });
   } catch (error: any) {

@@ -1,10 +1,10 @@
 {
   "pipeline_version": "1.0.0",
   "active_super_prompt": "AUDIT_REMEDIATION_BATCH_2026_08_30",
-  "current_stage": "TASK_028_UNBLOCKED_ONE_ESCALATION_OPEN",
-  "tasks_total": 8,
-  "tasks_completed": 6,
-  "active_task_id": "TASK_031_QUARANTINE_LITERAL_FINAL_SWEEP",
+  "current_stage": "CRITICAL_RLS_LEAK_FOUND_TOP_PRIORITY_DISPATCHED",
+  "tasks_total": 9,
+  "tasks_completed": 7,
+  "active_task_id": "TASK_032_RLS_ANSWER_COLUMN_LOCKDOWN",
   "note_on_stale_counters_above": "These fields track ONE super-prompt batch at a time, not the whole pipeline lifetime. Prior values (WS0_PLATFORM_FOUNDATION_BATCH, tasks_total:13, tasks_completed:9) had already drifted from STATE.md's real count of 15 completed by 2026-08-30 -- found and reconciled here rather than left stale. The WS0 batch (TASK_010-013) is still real and still queued in 02_CONTRACTS/pending/ -- see STATE.md's Queue section, not this top-level counter, for its status. This file's per-task history array below is append-only and remains the accurate long-form record regardless of which batch these summary fields point at.",
   "history": [
     {
@@ -301,6 +301,30 @@
       "event": "ESCALATED",
       "contract": "02_CONTRACTS/active/TASK_030_HARDCODED_LITERALS_REMAINING_SITES.md",
       "note": "FAILED independent verification -- second failure in this pipeline for the identical category (self-compiled sweep list presented as exhaustive). server.ts's full JWT genuinely and correctly fixed (highest-priority target, confirmed via direct read: throw-before-use, no literal fallback). JWT-prefix sweep confirmed clean repo-wide. But scripts/quarantine/backfill-grounding.ts.quarantine (tracked, not gitignored) still hardcodes the project-ref URL literal and was never on the receipt's 33-file checked list, despite the receipt asserting full_repo_sweep_clean:true. This is the THIRD occurrence of this exact failure shape in this pipeline (TASK_019 historically, TASK_022, now TASK_030). New standing rule added to 00_SYSTEM/AGENT_CAPABILITIES.md Section 5: 'find every occurrence of X' contracts must include raw, unedited command output in the receipt, not a self-compiled checked-files list. Fast-follow TASK_031 dispatched -- deliberately narrow, single named file, single named command, verbatim output required."
+    },
+    {
+      "task_id": "TASK_031_QUARANTINE_LITERAL_FINAL_SWEEP",
+      "event": "VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_031_QUARANTINE_LITERAL_FINAL_SWEEP.md",
+      "note": "Independently reproduced zero matches for the project-ref literal via two separate tools (Grep tool + direct scan of scripts/quarantine/), not trusting the receipt's own paraphrase-not-raw-output claim. Genuinely clean. Closes the TASK_022 -> TASK_030 -> TASK_031 hardcoded-literal chain for good."
+    },
+    {
+      "task_id": "TASK_028_UNION_NEWS_MCQS_INTO_ARENA",
+      "event": "ESCALATED",
+      "contract": "02_CONTRACTS/active/TASK_028_UNION_NEWS_MCQS_INTO_ARENA.md",
+      "note": "Own code genuinely correct (3-lens independent verification, no gaming) but escalated anyway: verification found the actual production Supabase RLS policies grant blanket anon SELECT on correct_index/correct_option for BOTH current_affairs_mcqs and static_questions, live-confirmed via direct curl against the production REST API -- making every application-layer fix (TASK_021/029/028) cosmetic. TASK_028 also newly places a ranked Arena entry point beside DailyEdition.tsx's ungated client-side-graded 'Quick Review' over the same question pool, creating a concrete cheat path. This is the most severe finding of the entire batch. TASK_032 dispatched as new top-priority contract, superseding queue order."
+    },
+    {
+      "task_id": "TASK_032_RLS_ANSWER_COLUMN_LOCKDOWN",
+      "event": "DISPATCHED",
+      "contract": "02_CONTRACTS/active/TASK_032_RLS_ANSWER_COLUMN_LOCKDOWN.md",
+      "note": "TOP PRIORITY, supersedes queue order. Database-layer fix (RLS/GRANT policy on current_affairs_mcqs and static_questions) plus DailyEdition.tsx Quick Review client-side leak. Antigravity may write the migration but is explicitly forbidden from calling apply_migration (same standing invariant as TASK_011) -- applying to production is an Orchestrator/user decision after review."
+    },
+    {
+      "task_id": "TASK_033_PYQ_CORPUS_LOADCORPUS_DIRNAME_CRASH",
+      "event": "DISPATCHED",
+      "contract": "02_CONTRACTS/active/TASK_033_PYQ_CORPUS_LOADCORPUS_DIRNAME_CRASH.md",
+      "note": "User-reported: Question Bank paginates to only 3 pages (13 fallback questions) instead of the real 7,841. Orchestrator fully root-caused before dispatch (user explicitly asked for investigation-only, no fix): pyq_explorer.ts's loadCorpus() builds a possiblePaths array literal containing path.join(__dirname, ...) under package.json's \"type\":\"module\" -- __dirname is undefined in native ESM, array literals evaluate eagerly, so this throws before ever reaching the correct working path candidate. The ReferenceError is caught and memoizes cachedCorpus=[] permanently for the process lifetime (module-level singleton, never retried). Confirmed via live stack trace, direct curl of both /pyqs and /census endpoints (both return success:true with zero data), and a standalone script proving the data file + correct path are fine in isolation. Production's CJS-bundled server.ts does not reproduce this (consistent with TASK_024's earlier successful verification against that bundle); Vercel's api/server.ts entrypoint is unconfirmed and is in scope for this contract to check. Fix-only contract, no re-investigation needed."
     }
   ]
 }

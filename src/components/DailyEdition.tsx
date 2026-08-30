@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
+import { fetchWithAuth } from '../lib/api';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import {
   Sparkles,
@@ -25,6 +26,7 @@ import {
   type VerifiedClaim,
   type ContestedClaim,
 } from './TrustUI';
+import { ConceptInsightRenderer } from './shared';
 
 const GOLD = '#e0d0ab';
 const MUTED_GOLD = '#c8b998';
@@ -62,12 +64,12 @@ interface EditionItem {
 interface Mcq {
   id: string;
   affair_url: string;
-  headline: string;
+  headline?: string;
   question: string;
   options: string[];
-  correct_index: number;
-  explanation: string;
-  subject: string;
+  correct_index?: number;
+  explanation?: string;
+  subject?: string;
 }
 
 interface DailyEditionProps {
@@ -214,7 +216,7 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
       const urls = items.map((i) => i.url);
       const { data } = await supabase
         .from('current_affairs_mcqs')
-        .select('*')
+        .select('id, affair_url, headline, question, options, subject, edition_date, created_at')
         .in('affair_url', urls);
       setMcqs((data as Mcq[]) || []);
     } catch (err) {
@@ -549,20 +551,43 @@ function QuizModal({
   const [picked, setPicked] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [revealedData, setRevealedData] = useState<{ correct_option?: string; explanation?: string } | null>(null);
+  const [revealing, setRevealing] = useState(false);
 
   const q = mcqs[idx];
 
-  const choose = (i: number) => {
-    if (picked !== null) return;
+  const choose = async (i: number) => {
+    if (picked !== null || revealing || !q) return;
     setPicked(i);
-    if (i === q.correct_index) setScore((s) => s + 1);
+    setRevealing(true);
+    try {
+      const res = await fetchWithAuth('/api/explanation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questionId: `ca_${q.id}` })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setRevealedData(data);
+        const pickedLetter = String.fromCharCode(65 + i);
+        if (data.correct_option === pickedLetter) {
+          setScore((s) => s + 1);
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to verify answer:', err);
+    } finally {
+      setRevealing(false);
+    }
   };
+
   const next = () => {
     if (idx + 1 >= mcqs.length) {
       setFinished(true);
     } else {
       setIdx((n) => n + 1);
       setPicked(null);
+      setRevealedData(null);
     }
   };
 
@@ -630,12 +655,18 @@ function QuizModal({
             <div className="space-y-2 mb-5">
               {q.options.map((opt, i) => {
                 const isSelected = picked === i;
-                const isCorrect = i === q.correct_index;
+                const optLetter = String.fromCharCode(65 + i);
+                const isCorrect = revealedData?.correct_option === optLetter;
                 let optStyle = 'border-[rgba(19,108,153,0.4)] bg-[rgba(3,18,42,0.5)] text-[#e8e0cf] hover:border-[#e0d0ab]/60';
                 if (picked !== null) {
-                  if (isCorrect) optStyle = 'border-emerald-500 bg-emerald-500/15 text-emerald-200';
-                  else if (isSelected) optStyle = 'border-rose-500 bg-rose-500/15 text-rose-200';
-                  else optStyle = 'border-zinc-800 bg-zinc-900/30 text-zinc-500';
+                  if (revealedData) {
+                    if (isCorrect) optStyle = 'border-emerald-500 bg-emerald-500/15 text-emerald-200';
+                    else if (isSelected) optStyle = 'border-rose-500 bg-rose-500/15 text-rose-200';
+                    else optStyle = 'border-zinc-800 bg-zinc-900/30 text-zinc-500';
+                  } else {
+                    if (isSelected) optStyle = 'border-[#e0d0ab] bg-[#e0d0ab]/10 text-stone-100';
+                    else optStyle = 'border-zinc-800 bg-zinc-900/30 text-zinc-500';
+                  }
                 }
                 return (
                   <button
@@ -645,7 +676,7 @@ function QuizModal({
                     className={`w-full text-left p-3 rounded-xs border text-xs sm:text-sm font-sans transition-colors flex items-start gap-2.5 cursor-pointer disabled:cursor-default ${optStyle}`}
                   >
                     <span className="font-mono text-xs font-bold shrink-0 opacity-70">
-                      {String.fromCharCode(65 + i)}.
+                      {optLetter}.
                     </span>
                     <span className="flex-1">{opt}</span>
                   </button>
@@ -659,8 +690,17 @@ function QuizModal({
                 animate={{ opacity: 1, y: 0 }}
                 className="p-3.5 rounded-xs bg-[rgba(3,18,42,0.6)] border border-[rgba(19,108,153,0.4)] text-xs text-[#9fb0c8] mb-4 leading-relaxed"
               >
-                <strong className="text-[#e0d0ab] font-mono block mb-1">Explanation:</strong>
-                {q.explanation}
+                <div className="font-mono text-[10.5px] uppercase font-bold text-[#e0d0ab] mb-1">
+                  {revealing ? 'Verifying with server…' : (revealedData ? (revealedData.correct_option === String.fromCharCode(65 + (picked ?? 0)) ? '✓ Correct' : '✕ Incorrect') : 'Answer Locked')}
+                </div>
+                {revealing ? (
+                  <p className="m-0 text-[#8fa2bd]">Contacting evaluation engine…</p>
+                ) : (
+                  <ConceptInsightRenderer
+                    content={revealedData?.explanation || q.explanation}
+                    showBadges={false}
+                  />
+                )}
               </motion.div>
             )}
 

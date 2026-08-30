@@ -1,6 +1,6 @@
 ---
 task_id: "TASK_028_UNION_NEWS_MCQS_INTO_ARENA"
-status: "AWAITING_VERIFICATION"
+status: "ESCALATED"
 assigned_to: "ANTIGRAVITY"
 target_model: "Gemini 3.7 Flash (Hybrid Reasoning / Thinking Mode)"
 thinking_tier: "high"
@@ -237,4 +237,14 @@ diff: |
   +              <button onClick={onOpenArenaQuiz} className="...">Launch Today's Current Affairs Arena</button>
   +            </div>
   +          )}
+
+# 6. Orchestrator Verification Note (2026-08-30) — ESCALATED (root cause is bigger than this contract)
+
+Independently re-verified across three lenses (leak-safety, grading-integrity, UI-and-regression). **This contract's own code is genuinely correct and not gamed**: `questions.ts`'s new `CURRENT_AFFAIRS` branch never includes `correct_index` in the bulk fetch, `submit-quiz.ts` independently re-fetches and grades server-side against `current_affairs_mcqs`'s own DB truth, the reveal is properly gated behind `questionIsLocked`, and a real `npm run build` + grep of the actual `dist/assets/*.js` confirmed no new leak surface. All 4 required commands independently re-run fresh, all exit 0.
+
+**But the underlying answer-key-leak class this whole gate exists to prevent is NOT closed, at a layer none of TASK_021/029/028 ever checked.** Live-verified with a real `curl` against the actual production Supabase REST API using the app's own public anon key (from `.env.local`): `GET .../rest/v1/current_affairs_mcqs?select=id,correct_index,subject` and `GET .../rest/v1/static_questions?select=id,correct_option` both return HTTP 200 with real answer data, for real rows, in bulk — **no application code involved at all**. Root cause: `supabase/migrations/20260619000003_current_affairs_mcqs.sql` and `20260823200000_reconcile_core_content_tables.sql` both grant blanket `SELECT` to `anon`/`public` with no column restriction. The anon key is, by design, embedded in every client bundle. Every endpoint-level fix built across this entire batch is cosmetic against this — an attacker doesn't need `submit-quiz.ts`, `questions.ts`, or `explanation.ts` at all; they can pull the whole answer key directly from PostgREST.
+
+**This contract specifically raises the real-world stakes of that pre-existing gap.** It places a new ranked, leaderboard-eligible "Launch Timed Arena Battle" entry point directly beside `DailyEdition.tsx`'s pre-existing "Quick Review" feature, which already does client-side `select('*')` + client-side grading with zero gating, over the same overlapping `current_affairs_mcqs` row set. A user can click through Quick Review to see every answer, then immediately launch the new ranked Arena on the same pool for a guaranteed perfect score — a concrete, zero-skill cheat path against the exact surface this contract creates.
+
+**Escalating, not promoting.** This is a database-layer fix (RLS/GRANT policy), not an application-code fix — genuinely out of scope for what TASK_021/029/028 could have caught by reading `server-lib/` alone. `TASK_032_RLS_ANSWER_COLUMN_LOCKDOWN.md` dispatched as the new top-priority contract in `active/` — this is now the highest-severity open issue in the entire audit-remediation effort, above everything else in the queue. `TASK_028` will not be reconsidered for `completed/` until `TASK_032` lands and this contract's own `DailyEdition.tsx` co-location issue is addressed.
 ```

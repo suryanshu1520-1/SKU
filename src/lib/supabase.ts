@@ -1,9 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 
-const meta = import.meta as any;
-const rawUrl = meta.env?.VITE_SUPABASE_URL || '';
-const rawKey = meta.env?.VITE_SUPABASE_ANON_KEY || '';
-
 function cleanEnvValue(val: any): string {
   if (typeof val !== 'string') return '';
   let cleaned = val.trim();
@@ -16,4 +12,7 @@ function cleanEnvValue(val: any): string {
   return cleaned.trim();
 }
 
-export const supabase = createClient(cleanEnvValue(rawUrl), cleanEnvValue(rawKey));
+export const supabase = createClient(
+  cleanEnvValue(import.meta.env.VITE_SUPABASE_URL),
+  cleanEnvValue(import.meta.env.VITE_SUPABASE_ANON_KEY)
+);

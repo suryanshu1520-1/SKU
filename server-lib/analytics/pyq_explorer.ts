@@ -73,16 +73,27 @@ export interface PYQQueryResult {
 
 let cachedCorpus: PYQItem[] | null = null;
 
+function getCandidatePaths(): string[] {
+  const candidates = [
+    path.join(process.cwd(), 'server-lib', 'analytics', 'data', 'master_7841_pyqs.json'),
+    path.join(process.cwd(), 'dist', 'master_7841_pyqs.json'),
+  ];
+
+  if (typeof __dirname !== 'undefined') {
+    candidates.push(
+      path.join(__dirname, 'data', 'master_7841_pyqs.json'),
+      path.join(__dirname, '..', 'analytics', 'data', 'master_7841_pyqs.json')
+    );
+  }
+
+  return candidates;
+}
+
 function loadCorpus(): PYQItem[] {
   if (cachedCorpus) return cachedCorpus;
 
   try {
-    const possiblePaths = [
-      path.join(process.cwd(), 'server-lib', 'analytics', 'data', 'master_7841_pyqs.json'),
-      path.join(process.cwd(), 'dist', 'master_7841_pyqs.json'),
-      path.join(__dirname, 'data', 'master_7841_pyqs.json'),
-      path.join(__dirname, '..', 'analytics', 'data', 'master_7841_pyqs.json'),
-    ];
+    const possiblePaths = getCandidatePaths();
 
     for (const p of possiblePaths) {
       if (fs.existsSync(p)) {

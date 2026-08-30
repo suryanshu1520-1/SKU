@@ -26,7 +26,7 @@ import InfoTooltip from './InfoTooltip';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
-import { Modal, EmptyState } from './shared';
+import { Modal, EmptyState, ConceptInsightRenderer, formatInsightToText } from './shared';
 import staticQuestionsData from '../data/static-subject-questions.json';
 
 interface ArenaProps {
@@ -205,7 +205,7 @@ export default function Arena({
   const [lockedMap, setLockedMap] = useState<Record<string, boolean>>({});
 
   // Explanation cache states
-  const [explanationCache, setExplanationCache] = useState<Record<string, string>>({});
+  const [explanationCache, setExplanationCache] = useState<Record<string, any>>({});
   const [revealedAnswers, setRevealedAnswers] = useState<Record<string, string>>({});
   const [loadingExplanationMap, setLoadingExplanationMap] = useState<Record<string, boolean>>({});
 
@@ -698,7 +698,8 @@ export default function Arena({
 
     const qId = String(currentQuestionId);
     const isSaved = savedInsightIds.has(qId);
-    const insightText = explanationCache[currentQuestionId] || currentQuestion.ai_insights || currentQuestion.conceptual_explanation || '';
+    const rawInsight = explanationCache[currentQuestionId] || currentQuestion.ai_insights || currentQuestion.conceptual_explanation || '';
+    const insightText = formatInsightToText(rawInsight, currentQuestion.conceptual_explanation);
 
     if (!insightText) return;
 
@@ -1481,18 +1482,18 @@ export default function Arena({
                   </button>
                 </div>
 
-                {isLoadingExplanation && !currentExplanation ? (
+                {isLoadingExplanation && !currentExplanation && !currentQuestion.conceptual_explanation ? (
                   <div className="p-4 bg-zinc-950/60 border border-zinc-800 rounded-sm flex items-center gap-2 text-xs font-sans text-zinc-400">
                     <Loader2 className="w-4 h-4 animate-spin text-[#0194a8]" />
-                    <span>Synthesizing explanation...</span>
-                  </div>
-                ) : currentExplanation ? (
-                  <div className="p-5 bg-zinc-950/60 border border-zinc-800 rounded-sm prose prose-invert prose-p:text-xs sm:prose-p:text-sm max-w-none text-zinc-300 font-serif leading-relaxed">
-                    <Markdown rehypePlugins={[rehypeSanitize]}>{currentExplanation}</Markdown>
+                    <span>Synthesizing conceptual analysis...</span>
                   </div>
                 ) : (
-                  <div className="p-4 bg-zinc-950/60 border border-zinc-800 rounded-sm text-xs font-sans text-zinc-400">
-                    {currentQuestion.conceptual_explanation || 'No explanation available for this question yet.'}
+                  <div className="p-5 bg-zinc-950/60 border border-zinc-800 rounded-sm">
+                    <ConceptInsightRenderer
+                      content={currentExplanation}
+                      fallbackText={currentQuestion.conceptual_explanation}
+                      showBadges={true}
+                    />
                   </div>
                 )}
               </motion.div>

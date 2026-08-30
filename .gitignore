@@ -112,6 +112,7 @@ _raw_source_archive/*
 .claudian/
 .smart-env/
 .opencode/
+.impeccable/
 roster-backups/
 copilot/
 gemini-scribe/

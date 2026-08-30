@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "./server-lib/load-env.js";
 import express from "express";
 import path from "path";
 import fs from "fs";
@@ -270,15 +270,18 @@ Return ONLY valid JSON. Do not wrap in markdown \`\`\`json block.`,
       // Step 1: Query the database first if we have a valid questionId
       if (questionId) {
         try {
-          const { data: dbQuestion, error } = await supabaseAnon
+          const { data: dbQuestion, error } = await supabaseServer
             .from('static_questions')
-            .select('ai_insights, is_generated')
+            .select('ai_insights, conceptual_explanation, is_generated')
             .eq('id', questionId)
             .maybeSingle();
 
           if (!error && dbQuestion && dbQuestion.ai_insights) {
             res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
-            return res.json({ explanation: dbQuestion.ai_insights });
+            return res.json({
+              explanation: dbQuestion.ai_insights,
+              conceptual_explanation: dbQuestion.conceptual_explanation
+            });
           }
         } catch (dbErr) {
           console.warn("Supabase query-first cache error:", dbErr);

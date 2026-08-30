@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import type { QuizSession, SavedInsight } from '../types';
 import Markdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
+import { ConceptInsightRenderer } from './shared';
 import {
   User,
   History,
@@ -754,9 +755,7 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
                                 exit={{ height: 0, opacity: 0 }}
                                 className="overflow-hidden pt-3 mt-3 border-t border-[rgba(19,108,153,0.3)]"
                               >
-                                <div className="prose prose-invert prose-p:text-xs max-w-none text-[#9fb0c8] font-sans text-xs leading-relaxed">
-                                  <Markdown rehypePlugins={[rehypeSanitize]}>{insight.insight_text}</Markdown>
-                                </div>
+                                <ConceptInsightRenderer content={insight.insight_text} showBadges={true} />
                               </motion.div>
                             )}
                           </AnimatePresence>

@@ -5,7 +5,7 @@ import Markdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 import { supabase } from '../lib/supabase';
 import { fetchWithAuth } from '../lib/api';
-import { AnimatedNumber, AccuracyBar, StatCard } from './shared';
+import { AnimatedNumber, AccuracyBar, StatCard, ConceptInsightRenderer } from './shared';
 
 interface AutopsyProps {
   stats: {
@@ -333,15 +333,22 @@ export default function Autopsy({
                   })
                   .map(([subj, data], sIdx) => {
                     const percentage = Math.round((data.correct / data.total) * 100);
+                    const subjectNote = insights?.subjectInsights?.[subj];
                     return (
-                      <AccuracyBar
-                        key={subj}
-                        label={subj}
-                        accuracy={percentage}
-                        correctCount={data.correct}
-                        totalCount={data.total}
-                        delay={sIdx * 0.1}
-                      />
+                      <div key={subj} className="space-y-1.5">
+                        <AccuracyBar
+                          label={subj}
+                          accuracy={percentage}
+                          correctCount={data.correct}
+                          totalCount={data.total}
+                          delay={sIdx * 0.1}
+                        />
+                        {subjectNote && (
+                          <div className="pl-2 border-l-2 border-[#0194a8]/40 text-[11px] font-sans text-stone-300 italic">
+                            {subjectNote}
+                          </div>
+                        )}
+                      </div>
                     );
                   })}
               </div>
@@ -364,8 +371,8 @@ export default function Autopsy({
                   <span>Synthesizing conceptual diagnostic feedback...</span>
                 </div>
               ) : insights?.overallInsights ? (
-                <div className="prose prose-invert prose-p:text-xs sm:prose-p:text-sm prose-li:text-xs sm:prose-li:text-sm prose-p:leading-relaxed max-w-none text-zinc-300 font-serif bg-zinc-950/60 p-5 rounded-sm border border-zinc-800/80">
-                  <Markdown rehypePlugins={[rehypeSanitize]}>{insights.overallInsights}</Markdown>
+                <div className="bg-zinc-950/60 p-5 rounded-sm border border-zinc-800/80">
+                  <ConceptInsightRenderer content={insights.overallInsights} showBadges={true} />
                 </div>
               ) : null}
             </div>
