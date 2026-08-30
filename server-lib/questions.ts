@@ -12,12 +12,14 @@ function cleanEnvValue(val: any): string {
   return cleaned.trim();
 }
 
-const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
-const rawSupabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4bmdmeGFlcmxra2NhY3JiZGdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTY3NDQsImV4cCI6MjA5NTc5Mjc0NH0.G44wtBZZKGPb-ZTX3zaIPCXFcRtPP9Vtv-0saO0dEXE";
-
 let _supabaseAnon: ReturnType<typeof createClient> | null = null;
 function getSupabaseAnon() {
   if (!_supabaseAnon) {
+    const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+    const rawSupabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+    if (!rawSupabaseUrl || !rawSupabaseAnonKey) {
+      throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL or Anon Key missing.");
+    }
     _supabaseAnon = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseAnonKey));
   }
   return _supabaseAnon;
@@ -36,20 +38,61 @@ export default async function handler(req: any, res: any) {
 
   try {
     const examTrack = (req.query.examTrack as string || 'upsc').toLowerCase();
-    const pillar = (req.query.pillar as string || '').toUpperCase();
-    const subject = req.query.subject as string;
+    const pillarUpper = (req.query.pillar as string || '').toUpperCase();
+    const rawTarget = ((req.query.subject as string) || (req.query.pillar as string) || '').trim();
 
-    let query = getSupabaseAnon().from('static_questions').select('*');
+    // ─── Current Affairs MCQ Integration ─────────────────────
+    if (pillarUpper === 'CURRENT_AFFAIRS' || rawTarget.toLowerCase().includes('current_affairs') || rawTarget.toLowerCase().includes('current affairs')) {
+      const { data: caData, error: caError } = await getSupabaseAnon()
+        .from('current_affairs_mcqs')
+        .select('id, headline, question, options, explanation, subject, edition_date, created_at')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (caError) {
+        console.error("Error fetching current affairs mcqs:", caError);
+        return res.status(500).json({ error: caError.message });
+      }
+
+      const formattedQuestions = (caData || []).map((row: any) => {
+        const matrix: Record<string, string> = {};
+        if (Array.isArray(row.options)) {
+          const keys = ['A', 'B', 'C', 'D'];
+          row.options.forEach((opt: string, idx: number) => {
+            if (keys[idx]) matrix[keys[idx]] = opt;
+          });
+        } else if (row.options && typeof row.options === 'object') {
+          Object.assign(matrix, row.options);
+        }
+
+        return {
+          id: `ca_${row.id}`,
+          exam_origin_tag: row.headline ? `Daily Intelligence (${row.edition_date || 'Today'})` : `Daily Current Affairs (${row.edition_date || 'Today'})`,
+          subject_category: row.subject || 'Current Affairs',
+          difficulty_level: 'intermediate',
+          question_text: row.question,
+          options_matrix: matrix,
+          conceptual_explanation: row.explanation,
+          ai_insights: row.explanation,
+          is_generated: true,
+          created_at: row.created_at
+        };
+      });
+
+      return res.json({ questions: formattedQuestions });
+    }
+
+    let query = getSupabaseAnon().from('static_questions').select('id, exam_origin_tag, subject_category, difficulty_level, question_text, options_matrix, ai_insights, conceptual_explanation, is_generated, created_at');
 
     // Exam track segregation: UPSC and SSC CGL must never mix unless explicitly requested
-    if (examTrack === 'ssc' || pillar === 'SSC_CGL') {
+    if (examTrack === 'ssc' || pillarUpper === 'SSC_CGL') {
       query = query.ilike('exam_origin_tag', 'SSC%');
     } else if (examTrack === 'upsc') {
       query = query.not('exam_origin_tag', 'ilike', 'SSC%');
     }
 
-    // Syllabus Pillar-specific targeting
-    if (pillar === 'GS1' || pillar.includes('HISTORICAL') || pillar.includes('GS-1')) {
+    // Syllabus Pillar-specific targeting or subject targeting
+    if (pillarUpper === 'GS1' || pillarUpper.includes('HISTORICAL') || pillarUpper.includes('GS-1')) {
       query = query.in('subject_category', [
         'Ancient and Medieval Indian History',
         'Modern Indian History',
@@ -58,14 +101,14 @@ export default async function handler(req: any, res: any) {
         'History',
         'Geography & Agriculture'
       ]);
-    } else if (pillar === 'GS2' || pillar.includes('POLITY') || pillar.includes('GS-2')) {
+    } else if (pillarUpper === 'GS2' || pillarUpper.includes('POLITY') || pillarUpper.includes('GS-2')) {
       query = query.in('subject_category', [
         'Indian Polity',
         'Indian Polity & Governance',
         'World Affairs (International Relations)',
         'Polity'
       ]);
-    } else if (pillar === 'GS3' || pillar.includes('MACROECONOMIC') || pillar.includes('GS-3')) {
+    } else if (pillarUpper === 'GS3' || pillarUpper.includes('MACROECONOMIC') || pillarUpper.includes('GS-3')) {
       query = query.in('subject_category', [
         'Indian Economy',
         'Environment',
@@ -74,19 +117,38 @@ export default async function handler(req: any, res: any) {
         'Environment & Ecology',
         'Economics'
       ]);
-    } else if (pillar === 'STATIC_GK' || pillar.includes('STATIC')) {
+    } else if (pillarUpper === 'STATIC_GK' || pillarUpper.includes('STATIC')) {
       query = query.or('subject_category.eq.Static GK,exam_origin_tag.ilike.Static GK%');
-    } else if (pillar === 'CSAT' || pillar.includes('CSAT')) {
+    } else if (pillarUpper === 'CSAT' || pillarUpper.includes('CSAT')) {
       query = query.or('subject_category.ilike.%CSAT%,exam_origin_tag.ilike.%CSAT%');
-    } else if (subject) {
-      query = query.ilike('subject_category', `%${subject}%`);
+    } else if (rawTarget) {
+      const lower = rawTarget.toLowerCase();
+      if (lower.includes('history')) {
+        query = query.in('subject_category', ['Modern Indian History', 'Ancient and Medieval Indian History', 'History', 'Art and Culture']);
+      } else if (lower.includes('polity') || lower.includes('governance')) {
+        query = query.in('subject_category', ['Indian Polity', 'Indian Polity & Governance', 'Polity']);
+      } else if (lower.includes('economy') || lower.includes('economic')) {
+        query = query.in('subject_category', ['Indian Economy', 'Economics']);
+      } else if (lower.includes('environment') || lower.includes('ecology')) {
+        query = query.in('subject_category', ['Environment', 'Environment & Ecology']);
+      } else if (lower.includes('geography')) {
+        query = query.in('subject_category', ['Geography', 'Geography & Agriculture']);
+      } else if (lower.includes('science') || lower.includes('tech')) {
+        query = query.in('subject_category', ['Science and Technology', 'Science & Technology']);
+      } else if (lower.includes('art') || lower.includes('culture')) {
+        query = query.in('subject_category', ['Art and Culture', 'Ancient and Medieval Indian History']);
+      } else if (lower.includes('international') || lower === 'ir') {
+        query = query.in('subject_category', ['World Affairs (International Relations)']);
+      } else {
+        query = query.ilike('subject_category', `%${rawTarget}%`);
+      }
     }
 
     let { data, error } = await query.limit(500);
 
     // Fallback if specific pillar / subject query yielded too few
     if (!data || data.length === 0) {
-      let fallbackQuery = getSupabaseAnon().from('static_questions').select('*');
+      let fallbackQuery = getSupabaseAnon().from('static_questions').select('id, exam_origin_tag, subject_category, difficulty_level, question_text, options_matrix, ai_insights, conceptual_explanation, is_generated, created_at');
       if (examTrack === 'ssc') {
         fallbackQuery = fallbackQuery.ilike('exam_origin_tag', 'SSC%');
       } else {

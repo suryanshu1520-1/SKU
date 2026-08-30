@@ -79,6 +79,7 @@ interface PibDigestItem {
 
 interface CurrentAffairsProps {
   userId: string;
+  onLaunchPractice?: (pillarOrSubject: string) => void;
 }
 
 // Slide-and-fade variants for the PIB edition carousel, keyed by swipe/nav direction.
@@ -114,7 +115,7 @@ const TOP_MINISTRIES = [
   'Ministry of External Affairs',
 ];
 
-export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
+export default function CurrentAffairs({ userId, onLaunchPractice }: CurrentAffairsProps) {
   const [items, setItems] = useState<CurrentAffairsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -676,7 +677,14 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
           <RebaseEdition
             userId={userId}
             refreshKey={editionRefreshKey}
-            fallback={<DailyEdition userId={userId} compactModeDefault={false} />}
+            onOpenArenaQuiz={() => onLaunchPractice?.('CURRENT_AFFAIRS')}
+            fallback={
+              <DailyEdition 
+                userId={userId} 
+                compactModeDefault={false} 
+                onOpenArenaQuiz={() => onLaunchPractice?.('CURRENT_AFFAIRS')}
+              />
+            }
           />
         </div>
       )}
@@ -695,6 +703,15 @@ export default function CurrentAffairs({ userId }: CurrentAffairsProps) {
                   Search policy dispatches, filter by ministry, or browse verified intelligence.
                 </p>
               </div>
+              {onLaunchPractice && (
+                <button
+                  onClick={() => onLaunchPractice('CURRENT_AFFAIRS')}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#e0d0ab] text-[#072e63] font-mono font-bold text-[11px] uppercase tracking-wider rounded-xs hover:bg-white transition-colors cursor-pointer shadow-sm self-start sm:self-auto shrink-0"
+                >
+                  <Zap className="w-3.5 h-3.5 text-[#072e63]" />
+                  Today's Arena Battle
+                </button>
+              )}
             </div>
           </div>
 

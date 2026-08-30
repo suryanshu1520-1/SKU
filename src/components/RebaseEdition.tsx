@@ -24,6 +24,7 @@ interface RebaseEditionProps {
   userId: string;
   refreshKey: number;
   fallback: ReactNode;
+  onOpenArenaQuiz?: () => void;
 }
 
 type Availability = 'loading' | 'ready' | 'unavailable';
@@ -55,7 +56,7 @@ function actionCopy(item: RebasePatchItem): { eyebrow: string; button: string } 
     : { eyebrow: 'New exam obligation', button: 'Learned' };
 }
 
-export default function RebaseEdition({ userId, refreshKey, fallback }: RebaseEditionProps) {
+export default function RebaseEdition({ userId, refreshKey, fallback, onOpenArenaQuiz }: RebaseEditionProps) {
   const prefersReducedMotion = useReducedMotion();
   const [availability, setAvailability] = useState<Availability>('loading');
   const [patch, setPatch] = useState<RebasePatch | null>(null);
@@ -387,6 +388,16 @@ export default function RebaseEdition({ userId, refreshKey, fallback }: RebaseEd
             >
               {completion === 'saving' ? 'Saving checkpoint…' : 'Confirm rebase'}
             </button>
+          )}
+          {onOpenArenaQuiz && (
+            <div className="mt-3">
+              <button
+                onClick={onOpenArenaQuiz}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-sm border border-[#e0d0ab]/40 bg-[#e0d0ab]/10 hover:bg-[#e0d0ab]/20 text-[#e0d0ab] text-[10px] font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer"
+              >
+                Launch Today's Current Affairs Arena
+              </button>
+            </div>
           )}
         </div>
       )}

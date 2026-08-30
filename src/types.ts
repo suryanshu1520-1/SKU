@@ -5,7 +5,7 @@ export interface Question {
   difficulty_level: string;
   question_text: string;
   options_matrix: Record<string, string>; // e.g. { "A": "...", "B": "..." }
-  correct_option: string;
+  correct_option?: string;
   conceptual_explanation: string;
   ai_insights?: any;
   is_generated?: boolean;

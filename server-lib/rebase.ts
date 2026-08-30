@@ -23,10 +23,11 @@ function cleanEnv(val: any): string {
 }
 
 function getSupabase() {
-  const url = cleanEnv(process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co");
-  const key = cleanEnv(process.env.SUPABASE_SERVICE_ROLE_KEY || "");
-  if (!key) throw new Error("SUPABASE_SERVICE_ROLE_KEY is missing");
-  return createClient(url, key);
+  const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+  if (!rawSupabaseUrl) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing.");
+  const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!rawSupabaseKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
+  return createClient(cleanEnv(rawSupabaseUrl), cleanEnv(rawSupabaseKey));
 }
 
 /**

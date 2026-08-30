@@ -16,8 +16,18 @@ import {
   getSupabase,
   isCleanPrelimsRow,
 } from "./examiner_psyche.js";
-import { queryMasterPYQs } from "./pyq_explorer.js";
+import { queryMasterPYQs, getCorpusCensus } from "./pyq_explorer.js";
 export const analyticsRouter = Router();
+
+// Master 7,841 PYQ Live Corpus Census & Distribution Endpoint
+analyticsRouter.get("/observatory/census", async (_req: Request, res: Response) => {
+  try {
+    const data = getCorpusCensus();
+    res.json({ success: true, data });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 // Master 7,841 PYQ Intelligence Explorer Live Search Endpoint
 analyticsRouter.get("/observatory/pyqs", async (req: Request, res: Response) => {

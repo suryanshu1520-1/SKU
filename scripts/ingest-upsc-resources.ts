@@ -23,7 +23,7 @@ import { NODES } from "../server-lib/cron/ingest/syllabus/nodes.js";
 const GITHUB_RAW_BASE = "https://raw.githubusercontent.com/madhurimarawat/UPSC-Notes-Resources/main";
 const GITHUB_API_REPO = "https://api.github.com/repos/madhurimarawat/UPSC-Notes-Resources";
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
 export interface ResourceItem {

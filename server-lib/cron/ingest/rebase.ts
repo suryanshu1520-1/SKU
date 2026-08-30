@@ -32,8 +32,9 @@ function cleanEnv(val: any): string {
 }
 
 function getSupabase() {
-  const url = cleanEnv(process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co");
+  const url = cleanEnv(process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "");
   const key = cleanEnv(process.env.SUPABASE_SERVICE_ROLE_KEY || "");
+  if (!url) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing");
   if (!key) throw new Error("SUPABASE_SERVICE_ROLE_KEY is missing for Rebase ingestion");
   return createClient(url, key);
 }

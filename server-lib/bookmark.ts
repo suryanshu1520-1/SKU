@@ -12,11 +12,11 @@ function cleanEnvValue(val: any): string {
   return cleaned.trim();
 }
 
-const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
-const rawServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-if (!rawServiceKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
-
-const supabase = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawServiceKey));
+const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+if (!rawSupabaseUrl) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing.");
+const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (!rawSupabaseKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
+const supabase = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey));
 
 export default async function handler(req: any, res: any) {
   // Handle preflight requests

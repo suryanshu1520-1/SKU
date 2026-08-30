@@ -38,9 +38,9 @@ Output ONLY the clean translated English headline string without quotes or prefi
     }
   }
 
-  const supabaseUrl =
-    process.env.SUPABASE_URL ?? "https://ixngfxaerlkkcacrbdgc.supabase.co";
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
   const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+  if (!supabaseUrl) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing");
 
   const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 

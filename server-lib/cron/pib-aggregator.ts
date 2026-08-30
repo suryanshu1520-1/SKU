@@ -64,8 +64,7 @@ const EDITORIAL_SYSTEM_PROMPT = [
 // SUPABASE CLIENT INITIALIZATION
 // ============================================================
 function getSupabaseClient() {
-  const supabaseUrl =
-    process.env.SUPABASE_URL ?? "https://ixngfxaerlkkcacrbdgc.supabase.co";
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
   const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
 
   if (!supabaseServiceRoleKey) {

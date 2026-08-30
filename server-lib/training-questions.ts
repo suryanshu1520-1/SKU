@@ -19,8 +19,11 @@ function cleanEnvValue(val: any): string {
 let _supabaseAnon: ReturnType<typeof createClient> | null = null;
 function getSupabaseAnon() {
   if (_supabaseAnon) return _supabaseAnon;
-  const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
-  const anonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4bmdmeGFlcmxra2NhY3JiZGdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTY3NDQsImV4cCI6MjA5NTc5Mjc0NH0.G44wtBZZKGPb-ZTX3zaIPCXFcRtPP9Vtv-0saO0dEXE";
+  const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+  const anonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+  if (!url || !anonKey) {
+    throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL or Anon Key missing.");
+  }
   _supabaseAnon = createClient(cleanEnvValue(url), cleanEnvValue(anonKey));
   return _supabaseAnon;
 }
@@ -76,7 +79,7 @@ export default async function handler(req: any, res: any) {
     // Single query for all requested subjects
     let query = getSupabaseAnon()
       .from('static_questions')
-      .select('*')
+      .select('id, exam_origin_tag, subject_category, difficulty_level, question_text, options_matrix, ai_insights, conceptual_explanation, is_generated, created_at')
       .in('subject_category', subjects);
 
     if (examTrack.toLowerCase() === 'ssc') {
@@ -109,7 +112,7 @@ export default async function handler(req: any, res: any) {
       const excludedIds = [...seenIds, ...finalQuestions.map((q: any) => q.id)];
       let backfillQuery = getSupabaseAnon()
         .from('static_questions')
-        .select('*');
+        .select('id, exam_origin_tag, subject_category, difficulty_level, question_text, options_matrix, ai_insights, conceptual_explanation, is_generated, created_at');
 
       if (examTrack.toLowerCase() === 'ssc') {
         backfillQuery = backfillQuery.ilike('exam_origin_tag', 'SSC%');

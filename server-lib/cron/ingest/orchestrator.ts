@@ -55,8 +55,9 @@ const DEFAULTS = {
 };
 
 function sb() {
-  const url = process.env.SUPABASE_URL ?? "https://ixngfxaerlkkcacrbdgc.supabase.co";
+  const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+  if (!url) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing");
   return createClient(url, key);
 }
 

@@ -14,15 +14,11 @@ function cleanEnvValue(val: any): string {
   return cleaned.trim();
 }
 
-const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
-// SECURITY: never hardcode the service_role key. Sourced from env only.
-const rawServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  process.env.VITE_SUPABASE_SERVICE_ROLE_KEY ||
-  process.env.SUPABASE_ANON_KEY ||
-  process.env.VITE_SUPABASE_ANON_KEY ||
-  "";
-
-const supabase = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawServiceKey));
+const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+if (!rawSupabaseUrl) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing.");
+const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+if (!rawSupabaseKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
+const supabase = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey));
 
 const COOLDOWN_SECONDS = 300; // 5 minutes user-level throttle
 

@@ -63,8 +63,7 @@ export function getCronConfig(): CronConfig {
     "https://sku1-meta-llama-llama-3-1-8b-instruct.hf.space/run/chat_fn";
 
   const supabaseUrl =
-    env("SUPABASE_URL") ??
-    "https://ixngfxaerlkkcacrbdgc.supabase.co";
+    env("VITE_SUPABASE_URL") ?? env("SUPABASE_URL") ?? "";
 
   const supabaseServiceRoleKey = env("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 

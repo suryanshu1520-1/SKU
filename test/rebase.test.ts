@@ -29,7 +29,7 @@ function cleanEnv(val: any): string {
   return c.trim();
 }
 
-const supabaseUrl = cleanEnv(process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co");
+const supabaseUrl = cleanEnv(process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "");
 const supabaseKey = cleanEnv(process.env.SUPABASE_SERVICE_ROLE_KEY || "");
 const sb = createClient(supabaseUrl, supabaseKey);
 

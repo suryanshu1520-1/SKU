@@ -61,6 +61,7 @@ interface CachedSession {
   timeSpentMap: Record<string, number>;
   quizSubmitted: boolean;
   explanationCache: Record<string, string>;
+  revealedAnswers?: Record<string, string>;
   loadingExplanationMap: Record<string, boolean>;
   savedInsightIds: string[];
   userId: string;
@@ -205,6 +206,7 @@ export default function Arena({
 
   // Explanation cache states
   const [explanationCache, setExplanationCache] = useState<Record<string, string>>({});
+  const [revealedAnswers, setRevealedAnswers] = useState<Record<string, string>>({});
   const [loadingExplanationMap, setLoadingExplanationMap] = useState<Record<string, boolean>>({});
 
   // Bookmark states
@@ -267,6 +269,7 @@ export default function Arena({
         setTimeSpentMap(fullCached.timeSpentMap);
         setQuizSubmitted(fullCached.quizSubmitted);
         setExplanationCache(fullCached.explanationCache || {});
+        if (fullCached.revealedAnswers) setRevealedAnswers(fullCached.revealedAnswers);
         setLoadingExplanationMap(fullCached.loadingExplanationMap || {});
         setSavedInsightIds(new Set(fullCached.savedInsightIds || []));
         setIsRanked(fullCached.isRanked);
@@ -404,7 +407,10 @@ export default function Arena({
         const queryParams = new URLSearchParams();
         if (userId) queryParams.append('userId', userId);
         queryParams.append('examTrack', examTrack);
-        if (targetPillar?.id) queryParams.append('pillar', targetPillar.id);
+        if (targetPillar?.id) {
+          queryParams.append('pillar', targetPillar.id);
+          queryParams.append('subject', targetPillar.title || targetPillar.id);
+        }
 
         const url = `/api/questions?${queryParams.toString()}`;
         const response = await fetchWithAuth(url);
@@ -423,7 +429,6 @@ export default function Arena({
             difficulty_level: q.difficulty_level || 'medium',
             question_text: q.question_text,
             options_matrix: q.options_matrix,
-            correct_option: q.correct_option,
             conceptual_explanation: q.conceptual_explanation
           }));
         }
@@ -452,7 +457,6 @@ export default function Arena({
           difficulty_level: q.difficulty_level || 'medium',
           question_text: q.question_text,
           options_matrix: q.options_matrix,
-          correct_option: q.correct_option,
           conceptual_explanation: q.conceptual_explanation
         }));
 
@@ -488,6 +492,7 @@ export default function Arena({
       timeSpentMap,
       quizSubmitted,
       explanationCache,
+      revealedAnswers,
       loadingExplanationMap,
       savedInsightIds: Array.from(savedInsightIds),
       userId,
@@ -510,6 +515,7 @@ export default function Arena({
     timeSpentMap,
     quizSubmitted,
     explanationCache,
+    revealedAnswers,
     loadingExplanationMap,
     savedInsightIds,
     userId,
@@ -576,17 +582,11 @@ export default function Arena({
 
       setLoadingExplanationMap((prev) => ({ ...prev, [currentQuestionId]: true }));
 
-      const optionsStr = typeof currentQuestion.options_matrix === 'string'
-        ? JSON.parse(currentQuestion.options_matrix)
-        : currentQuestion.options_matrix;
-      const answerStr = optionsStr ? optionsStr[currentQuestion.correct_option] : 'Unknown';
-
       fetchWithAuth('/api/explanation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           question: currentQuestion.question_text,
-          answer: answerStr,
           questionId: currentQuestionId,
           userId,
         }),
@@ -602,6 +602,9 @@ export default function Arena({
         })
         .then((data) => {
           if (!data) return;
+          if (data.correct_option) {
+            setRevealedAnswers((prev) => ({ ...prev, [currentQuestionId]: data.correct_option }));
+          }
           if (data.explanation) {
             setExplanationCache((prev) => ({ ...prev, [currentQuestionId]: data.explanation }));
             setQuestions((prevQ) =>
@@ -748,7 +751,8 @@ export default function Arena({
 
     questions.forEach((q) => {
       const selected = userAnswers[q.id];
-      const isCorrect = selected === q.correct_option?.trim();
+      const revealedKey = revealedAnswers[q.id]?.trim();
+      const isCorrect = selected && revealedKey ? selected === revealedKey : false;
       const subj = q.subject_category || 'CORE';
 
       if (!finalSubjectStats[subj]) {
@@ -782,7 +786,6 @@ export default function Arena({
           questions: questions.map((q) => ({
             id: q.id,
             subject_category: q.subject_category,
-            correct_option: q.correct_option,
           })),
           subjectStats: finalSubjectStats,
           totalTimeSeconds: totalTime,
@@ -1218,7 +1221,7 @@ export default function Arena({
   if (!currentQuestion) return null;
 
   const options = getOptions(currentQuestion.options_matrix);
-  const correctOpt = currentQuestion.correct_option?.trim();
+  const correctOpt = revealedAnswers[currentQuestionId]?.trim();
   const hasUserAnswered = userAnswers[currentQuestionId] !== undefined;
   const isTimeout = !!timeouts[currentQuestionId];
   const isQuestionLocked = !!lockedMap[currentQuestionId] || isTimeout || quizSubmitted;
@@ -1340,7 +1343,8 @@ export default function Arena({
           const isAnswered = userAnswers[q.id] !== undefined;
           const isLocked = lockedMap[q.id];
           const isTimeOut = timeouts[q.id];
-          const isCorrect = isAnswered && userAnswers[q.id] === q.correct_option?.trim();
+          const correctForQ = revealedAnswers[q.id]?.trim();
+          const isCorrect = isAnswered && correctForQ ? userAnswers[q.id] === correctForQ : false;
 
           let statusStyle = 'bg-zinc-900/60 border-zinc-800 text-zinc-500';
           if (isCurrent) {

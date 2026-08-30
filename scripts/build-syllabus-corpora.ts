@@ -14,7 +14,7 @@ import { compareConfigs, laterPyqRecallAtK } from "../server-lib/cron/ingest/syl
 import { estimateTestability } from "../server-lib/cron/ingest/syllabus/testability.js";
 import type { Evidence, SyllabusNode } from "../server-lib/cron/ingest/syllabus/types.js";
 
-const SUPABASE_URL = process.env.SUPABASE_URL ?? "https://ixngfxaerlkkcacrbdgc.supabase.co";
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
 
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);

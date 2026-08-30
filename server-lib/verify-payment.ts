@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import * as crypto from "crypto";
+import Razorpay from "razorpay";
 
 function cleanEnvValue(val: any): string {
   if (typeof val !== 'string') return '';
@@ -13,7 +14,8 @@ function cleanEnvValue(val: any): string {
   return cleaned.trim();
 }
 
-const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
+const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+if (!rawSupabaseUrl) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing.");
 const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 if (!rawSupabaseKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
 const supabaseServer = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey));
@@ -69,6 +71,43 @@ export default async function handler(req: any, res: any) {
     }
 
     console.log(`[razorpay-verify] Signature verified successfully for payment ${razorpay_payment_id}`);
+
+    // ─── STEP 1.5: Cross-check order ownership (prevent misdirected upgrades) ──
+    const { data: pendingOrder } = await supabaseServer
+      .from('pending_orders')
+      .select('user_id')
+      .eq('order_id', razorpay_order_id)
+      .maybeSingle();
+
+    if (pendingOrder && pendingOrder.user_id !== userId) {
+      console.error(
+        `[razorpay-verify] USER MISMATCH — Order ${razorpay_order_id} was created for ` +
+        `${pendingOrder.user_id}, but verification was submitted for ${userId}`
+      );
+      return res.status(403).json({
+        error: "Payment order does not match authenticated user.",
+      });
+    }
+
+    const razorpayKeyId = cleanEnvValue(process.env.RAZORPAY_KEY_ID || '');
+    if (razorpayKeyId && razorpayKeySecret) {
+      try {
+        const razorpay = new Razorpay({ key_id: razorpayKeyId, key_secret: razorpayKeySecret });
+        const orderData = await razorpay.orders.fetch(razorpay_order_id);
+        const orderNotesUserId = orderData?.notes?.userId;
+        if (orderNotesUserId && orderNotesUserId !== userId) {
+          console.error(
+            `[razorpay-verify] RAZORPAY NOTES MISMATCH — Order ${razorpay_order_id} notes.userId ` +
+            `is ${orderNotesUserId}, but request specified ${userId}`
+          );
+          return res.status(403).json({
+            error: "Payment order does not match authenticated user.",
+          });
+        }
+      } catch (orderFetchErr) {
+        console.warn("[razorpay-verify] Order fetch from gateway warning:", orderFetchErr);
+      }
+    }
 
     // ─── STEP 2: Atomically upgrade user to premium via Supabase RPC ─────
     const { data: upgradeResult, error: upgradeError } = await supabaseServer.rpc(

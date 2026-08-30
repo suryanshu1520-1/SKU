@@ -4,8 +4,10 @@ let _supabase: ReturnType<typeof createClient> | null = null;
 
 function getSupabase() {
   if (!_supabase) {
-    const supabaseUrl = process.env.SUPABASE_URL ?? "https://ixngfxaerlkkcacrbdgc.supabase.co";
-    const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+    const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+    if (!supabaseUrl) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing.");
+    const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseServiceRoleKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
     _supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
   }
   return _supabase;

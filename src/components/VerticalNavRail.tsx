@@ -23,8 +23,8 @@ import {
 } from 'lucide-react';
 
 import BrandLogo, { TarkSigil } from './BrandLogo';
-
-export type NavTab = 'arena' | 'tracker' | 'library' | 'humanities' | 'observatory' | 'leaderboard' | 'profile';
+import { NAV_ITEMS, NavItem, NavTab } from '../lib/navItems';
+export type { NavTab, NavItem };
 
 export interface ContextActionItem {
   id: string;
@@ -40,15 +40,6 @@ export interface ContextActionItem {
   tooltip?: string;
 }
 
-interface NavItem {
-  id: NavTab | 'home';
-  label: string;
-  shortLabel: string;
-  icon: React.ComponentType<{ className?: string }>;
-  hotkey: string;
-  group: 'home' | 'intelligence' | 'arena' | 'vault' | 'system';
-}
-
 interface VerticalNavRailProps {
   activeTab: NavTab;
   isLanding: boolean;
@@ -61,16 +52,6 @@ interface VerticalNavRailProps {
   onOpenLogin: () => void;
   onSwitchToHorizontal: () => void;
 }
-
-const NAV_ITEMS: NavItem[] = [
-  { id: 'home', label: 'Home Sanctuary', shortLabel: 'Home', icon: House, hotkey: '1', group: 'home' },
-  { id: 'tracker', label: 'Daily Brief', shortLabel: 'Brief', icon: Globe, hotkey: '2', group: 'intelligence' },
-  { id: 'arena', label: 'Test Arena', shortLabel: 'Arena', icon: Swords, hotkey: '3', group: 'arena' },
-  { id: 'library', label: 'Syllabus Pillars', shortLabel: 'Pillars', icon: Layers, hotkey: '4', group: 'vault' },
-  { id: 'humanities', label: 'Humanities Canon', shortLabel: 'Canon', icon: BookOpen, hotkey: '5', group: 'vault' },
-  { id: 'observatory', label: 'The Observatory', shortLabel: 'Observatory', icon: Radio, hotkey: '6', group: 'vault' },
-  { id: 'leaderboard', label: 'Leaderboard', shortLabel: 'Rank', icon: Trophy, hotkey: '7', group: 'system' },
-];
 
 export default function VerticalNavRail({
   activeTab,

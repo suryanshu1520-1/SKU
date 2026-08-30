@@ -15,7 +15,7 @@ import {
   getDirectiveVerbScoringMatrix,
 } from "../server-lib/analytics/examiner_psyche.js";
 
-const SUPABASE_URL = process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
 if (!SUPABASE_SERVICE_ROLE_KEY) {

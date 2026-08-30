@@ -27,9 +27,25 @@ function cleanEnvValue(val: any): string {
 let _supabase: ReturnType<typeof createClient> | null = null;
 export function getSupabase() {
   if (!_supabase) {
-    const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
-    const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4bmdmeGFlcmxra2NhY3JiZGdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTY3NDQsImV4cCI6MjA5NTc5Mjc0NH0.G44wtBZZKGPb-ZTX3zaIPCXFcRtPP9Vtv-0saO0dEXE";
-    _supabase = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey), {
+    const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+    if (!rawSupabaseUrl) {
+      throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing.");
+    }
+
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const anonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+
+    let selectedKey = serviceKey;
+    if (!selectedKey) {
+      if (anonKey) {
+        console.warn("[examiner_psyche] SUPABASE_SERVICE_ROLE_KEY missing, degrading to SUPABASE_ANON_KEY");
+        selectedKey = anonKey;
+      } else {
+        throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase key missing (neither service_role nor anon key found).");
+      }
+    }
+
+    _supabase = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(selectedKey), {
       auth: { persistSession: false },
     });
   }

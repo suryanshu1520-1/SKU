@@ -12,7 +12,8 @@ function cleanEnvValue(val: any): string {
   return cleaned.trim();
 }
 
-const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
+const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+if (!rawSupabaseUrl) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing.");
 const rawServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 if (!rawServiceKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
 
@@ -93,15 +94,19 @@ export default async function handler(req: any, res: any) {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (profile) {
-        const isFounderOrPremium = profile.membership_tier === 'founder' || profile.membership_tier === 'premium';
-        // Note: For signed-in candidates, allow assessment evaluation
-        if (!isFounderOrPremium && (profile.vanguard_sessions_used || 0) >= 50) {
-          return res.status(403).json({
-            error: "QUOTA_EXCEEDED",
-            message: "Daily test quota reached. Upgrade to Founders Club for unlimited evaluations."
-          });
-        }
+      if (!profile) {
+        return res.status(403).json({
+          error: "QUOTA_EXCEEDED",
+          message: "Daily test quota reached. Upgrade to Founders Club for unlimited evaluations."
+        });
+      }
+
+      const isFounderOrPremium = profile.membership_tier === 'founder' || profile.membership_tier === 'premium';
+      if (!isFounderOrPremium && (profile.vanguard_sessions_used || 0) >= 50) {
+        return res.status(403).json({
+          error: "QUOTA_EXCEEDED",
+          message: "Daily test quota reached. Upgrade to Founders Club for unlimited evaluations."
+        });
       }
     }
 
@@ -124,18 +129,76 @@ export default async function handler(req: any, res: any) {
     }> = [];
 
     // 0. Fetch correct answers from DB to prevent client spoofing
-    const questionIds = payload.questions.map(q => q.id);
-    const { data: dbQuestions, error: dbError } = await supabase
-      .from('static_questions')
-      .select('id, correct_option, subject_category')
-      .in('id', questionIds);
+    const staticQuestionIds = payload.questions
+      .map(q => String(q.id))
+      .filter(id => !id.startsWith('ca_') && !id.startsWith('static_'));
 
-    if (dbError) {
-      console.error("DB Error fetching static questions:", dbError);
-      return res.status(500).json({ error: "Failed to verify questions against database." });
+    const caQuestionIds = payload.questions
+      .map(q => String(q.id))
+      .filter(id => id.startsWith('ca_'))
+      .map(id => id.replace(/^ca_/, ''));
+
+    let dbQuestions: any[] = [];
+    if (staticQuestionIds.length > 0) {
+      const { data: sData, error: dbError } = await supabase
+        .from('static_questions')
+        .select('id, correct_option, subject_category')
+        .in('id', staticQuestionIds);
+
+      if (dbError) {
+        console.error("DB Error fetching static questions:", dbError);
+        return res.status(500).json({ error: "Failed to verify questions against database." });
+      }
+      dbQuestions = sData || [];
     }
 
-    const questionMap = new Map(dbQuestions?.map(q => [String(q.id), q]) || []);
+    let caQuestions: any[] = [];
+    if (caQuestionIds.length > 0) {
+      const { data: cData, error: caError } = await supabase
+        .from('current_affairs_mcqs')
+        .select('id, correct_index, subject')
+        .in('id', caQuestionIds);
+
+      if (caError) {
+        console.error("DB Error fetching current affairs mcqs:", caError);
+        return res.status(500).json({ error: "Failed to verify current affairs questions against database." });
+      }
+      caQuestions = cData || [];
+    }
+
+    const questionMap = new Map<string, { correct_option: string; subject_category: string }>();
+
+    for (const q of dbQuestions) {
+      questionMap.set(String(q.id), {
+        correct_option: q.correct_option?.trim() || '',
+        subject_category: q.subject_category || 'CORE'
+      });
+    }
+
+    const optionKeys = ['A', 'B', 'C', 'D'];
+    for (const q of caQuestions) {
+      const correctOpt = optionKeys[q.correct_index] || 'A';
+      questionMap.set(`ca_${q.id}`, {
+        correct_option: correctOpt,
+        subject_category: q.subject || 'Current Affairs'
+      });
+      questionMap.set(String(q.id), {
+        correct_option: correctOpt,
+        subject_category: q.subject || 'Current Affairs'
+      });
+    }
+
+    // Static fallback questions
+    const STATIC_FALLBACK_ANSWERS: Record<string, string> = {
+      static_1: 'B', static_2: 'B', static_3: 'C', static_4: 'A', static_5: 'B',
+      static_6: 'B', static_7: 'B', static_8: 'B', static_9: 'B'
+    };
+    for (const [sId, cOpt] of Object.entries(STATIC_FALLBACK_ANSWERS)) {
+      questionMap.set(sId, {
+        correct_option: cOpt,
+        subject_category: 'General Studies'
+      });
+    }
 
     for (const q of payload.questions) {
       const qId = String(q.id);

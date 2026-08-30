@@ -492,15 +492,26 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
         >
           <CheckCircle2 className="w-6 h-6 text-emerald-400 mx-auto mb-2" />
           <p className="font-serif text-base text-[#e8e0cf] m-0">You're caught up on today's complete edition.</p>
-          <p className="text-[12px] text-[#9fb0c8] mt-1 m-0">Consolidate your retention by taking the 10-question practice test.</p>
+          <p className="text-[12px] text-[#9fb0c8] mt-1 m-0">Consolidate your retention by taking the daily current affairs test.</p>
           {quizCount > 0 && (
-            <button
-              onClick={openQuiz}
-              className="mt-3.5 inline-flex items-center gap-2 px-4 py-2 bg-[#e0d0ab] text-[#072e63] font-mono font-bold text-xs uppercase tracking-wider rounded-xs hover:bg-white transition-colors cursor-pointer"
-            >
-              <BrainCircuit className="w-4 h-4" />
-              Launch Daily Quiz ({quizCount} MCQs)
-            </button>
+            <div className="mt-3.5 flex flex-wrap items-center justify-center gap-3">
+              <button
+                onClick={openQuiz}
+                className="inline-flex items-center gap-2 px-3.5 py-2 bg-zinc-800/90 text-stone-200 border border-zinc-700 font-mono font-bold text-xs uppercase tracking-wider rounded-xs hover:bg-zinc-700 transition-colors cursor-pointer"
+              >
+                <BrainCircuit className="w-4 h-4 text-emerald-400" />
+                Quick Review ({quizCount} MCQs)
+              </button>
+              {onOpenArenaQuiz && (
+                <button
+                  onClick={onOpenArenaQuiz}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-[#e0d0ab] text-[#072e63] font-mono font-bold text-xs uppercase tracking-wider rounded-xs hover:bg-white transition-colors cursor-pointer shadow-sm"
+                >
+                  <Zap className="w-4 h-4 text-[#072e63]" />
+                  Launch Timed Arena Battle
+                </button>
+              )}
+            </div>
           )}
         </motion.div>
       )}

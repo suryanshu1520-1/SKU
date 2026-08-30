@@ -40,19 +40,12 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    // Initialize service-role Supabase client
-    const supabaseUrl = cleanEnvValue(
-      process.env.VITE_SUPABASE_URL ||
-      process.env.SUPABASE_URL ||
-      "https://ixngfxaerlkkcacrbdgc.supabase.co"
-    );
-    const serviceKey = cleanEnvValue(
-      process.env.SUPABASE_SERVICE_ROLE_KEY ||
-      process.env.VITE_SUPABASE_SERVICE_ROLE_KEY ||
-      ""
-    );
+    const rawUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+    if (!rawUrl) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing.");
+    const rawServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
+    if (!rawServiceKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
 
-    const supabase = createClient(supabaseUrl, serviceKey);
+    const supabase = createClient(cleanEnvValue(rawUrl), cleanEnvValue(rawServiceKey));
 
     // ----- EXECUTE ATOMIC RESET (Risk 2 mitigation) -----
     // All logic lives in the PostgreSQL SECURITY DEFINER RPC —

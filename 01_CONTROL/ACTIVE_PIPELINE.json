@@ -1,10 +1,11 @@
 {
   "pipeline_version": "1.0.0",
-  "active_super_prompt": "WS0_PLATFORM_FOUNDATION_BATCH",
-  "current_stage": "QUEUED",
-  "tasks_total": 13,
-  "tasks_completed": 9,
-  "active_task_id": null,
+  "active_super_prompt": "AUDIT_REMEDIATION_BATCH_2026_08_30",
+  "current_stage": "TASK_028_UNBLOCKED_ONE_ESCALATION_OPEN",
+  "tasks_total": 8,
+  "tasks_completed": 6,
+  "active_task_id": "TASK_031_QUARANTINE_LITERAL_FINAL_SWEEP",
+  "note_on_stale_counters_above": "These fields track ONE super-prompt batch at a time, not the whole pipeline lifetime. Prior values (WS0_PLATFORM_FOUNDATION_BATCH, tasks_total:13, tasks_completed:9) had already drifted from STATE.md's real count of 15 completed by 2026-08-30 -- found and reconciled here rather than left stale. The WS0 batch (TASK_010-013) is still real and still queued in 02_CONTRACTS/pending/ -- see STATE.md's Queue section, not this top-level counter, for its status. This file's per-task history array below is append-only and remains the accurate long-form record regardless of which batch these summary fields point at.",
   "history": [
     {
       "task_id": "TASK_001_CANARY",
@@ -174,6 +175,132 @@
       "event": "USER_DECISION",
       "contract": null,
       "note": "After three passes (TASK_017/018/019) none of which fully met their own acceptance criteria, user chose to ship the 6 genuinely-verified-clean files (632 questions, _raw_source_archive/pyq-extraction/verified_clean_export.json) now and park the remaining 12 (documented per-file in PARKED_FILES.md) rather than continue auto-dispatching fix attempts. All three contracts moved to completed/ with honest non-VERIFIED statuses (ESCALATED / VERIFIED_PARTIAL) reflecting the real outcome, not full success."
+    },
+    {
+      "task_id": "TASK_020_PYQ_PRELIMS_LIVE_CORRUPTION_FIX",
+      "event": "ORCHESTRATOR_FINDING_UNVERIFIED",
+      "contract": "02_CONTRACTS/pending/TASK_020_PYQ_PRELIMS_LIVE_CORRUPTION_FIX.md",
+      "note": "Found on 2026-08-30, not dispatched today: this contract's receipt is fully populated by Antigravity (rows_deleted: 1266, placeholder_count_after: 0) dated 2026-08-28, but was never independently re-verified or moved to completed/ by the Orchestrator. Blocked -- this session's Supabase MCP access is scoped to the same unrelated inactive project (guispyomolybktujbkxt) already documented in the 'Corrections to prior entries' section of STATE.md. Next session with real project access (ixngfxaerlkkcacrbdgc) must close this out."
+    },
+    {
+      "task_id": "AUDIT_REMEDIATION_BATCH_DISPATCHED",
+      "event": "DISPATCHED_BATCH",
+      "contract": "02_CONTRACTS/active/",
+      "note": "2026-08-30: 8 contracts (TASK_021 through TASK_028) written from a verification-first 10-agent code audit and batch-dispatched directly into active/ per explicit user request for zero-idle-time autonomous execution. Full plan: 01_CONTROL/AUDIT_REMEDIATION_ROADMAP.md. New protocol added to 00_SYSTEM/AGENT_CAPABILITIES.md Section 5 (Autonomous Multi-Contract Queue Protocol) lets Antigravity self-chain through active/ without per-contract Orchestrator re-dispatch. One hard dependency gate: TASK_028 (depends_on TASK_021) must not start until TASK_021 is Orchestrator-verified in completed/, not merely self-reported AWAITING_VERIFICATION -- added specifically because this pipeline has twice before (TASK_002/003 self-promotion, TASK_017/018 self-reported metrics not matching reality) seen self-reported completion diverge from actual correctness. All other 7 contracts in the batch are mutually independent and chain freely."
+    },
+    {
+      "task_id": "TASK_021_ANSWER_KEY_LEAK_PER_QUESTION_REVEAL",
+      "event": "DISPATCHED",
+      "contract": "02_CONTRACTS/active/TASK_021_ANSWER_KEY_LEAK_PER_QUESTION_REVEAL.md",
+      "note": "Highest-severity contract in the batch: unauthenticated correct_option leak in /api/questions and /api/training-questions, shown to users under a false on-screen 'zero-trust' claim. Scope corrected during authoring after direct re-read of Arena.tsx: this is a per-question lock-and-reveal UX (20s timer, reveal on lock), not submit-once-at-the-end, so the fix moves the reveal into the existing on-lock /api/explanation call rather than a bare column strip. Names a residual race-condition risk explicitly rather than claiming full closure."
+    },
+    {
+      "task_id": "TASK_022_REMOVE_HARDCODED_SUPABASE_LITERALS",
+      "event": "DISPATCHED",
+      "contract": "02_CONTRACTS/active/TASK_022_REMOVE_HARDCODED_SUPABASE_LITERALS.md",
+      "note": "Hardcoded anon-key JWT + prod URL fallback literals in questions.ts:16 and examiner_psyche.ts:30-31 on a public repo. Independent of TASK_021 (soft queue_gate only, same file different lines)."
+    },
+    {
+      "task_id": "TASK_023_QUOTA_AND_PAYMENT_GUARD_HARDENING",
+      "event": "DISPATCHED",
+      "contract": "02_CONTRACTS/active/TASK_023_QUOTA_AND_PAYMENT_GUARD_HARDENING.md",
+      "note": "Null user_profiles row bypasses ranked-quota cap (submit-quiz.ts:96); verify-payment.ts never cross-checks body userId against the paid order's notes.userId. Independent of other contracts in this batch."
+    },
+    {
+      "task_id": "TASK_024_OBSERVATORY_STAT_HONESTY_PASS",
+      "event": "DISPATCHED",
+      "contract": "02_CONTRACTS/active/TASK_024_OBSERVATORY_STAT_HONESTY_PASS.md",
+      "note": "Observatory.tsx hardcodes a fabricated uniformity chi-square/p-value under an 'AUTHORITATIVE EMPIRICAL RESEARCH DATASET' banner, contradicted by the real corpus. Independent of other contracts in this batch."
+    },
+    {
+      "task_id": "TASK_025_PRACTICE_BRIDGE_AND_PLACEHOLDER_GATE",
+      "event": "DISPATCHED",
+      "contract": "02_CONTRACTS/active/TASK_025_PRACTICE_BRIDGE_AND_PLACEHOLDER_GATE.md",
+      "note": "Practice Similar in Arena is broken for 5 of 7 subjects (unfiltered random fallback); 77.6% of master_7841_pyqs.json (6,081/7,841 rows, independently recomputed) has placeholder options and must be gated to read-only. Independent of other contracts in this batch."
+    },
+    {
+      "task_id": "TASK_026_DELETE_ORPHANED_COMPONENTS_AND_NAV_MERGE",
+      "event": "DISPATCHED",
+      "contract": "02_CONTRACTS/active/TASK_026_DELETE_ORPHANED_COMPONENTS_AND_NAV_MERGE.md",
+      "note": "7 zero-importer components (~1,881 lines) plus consolidation of two hand-maintained nav systems (App.tsx inline header + VerticalNavRail.tsx) into one shared NAV_ITEMS source. Independent of other contracts in this batch."
+    },
+    {
+      "task_id": "TASK_027_COLLAPSE_DOCKER_SCAFFOLDING",
+      "event": "DISPATCHED",
+      "contract": "02_CONTRACTS/active/TASK_027_COLLAPSE_DOCKER_SCAFFOLDING.md",
+      "note": "Docker stack + 697 lines of docs describe a deploy path that doesn't exist (prod is Vercel serverless). Keeps the real Dockerfile.pdf-convert/docling OCR tooling untouched. Independent of other contracts in this batch."
+    },
+    {
+      "task_id": "TASK_028_UNION_NEWS_MCQS_INTO_ARENA",
+      "event": "DISPATCHED",
+      "contract": "02_CONTRACTS/active/TASK_028_UNION_NEWS_MCQS_INTO_ARENA.md",
+      "note": "HARD-GATED on TASK_021 (depends_on in frontmatter) -- must not start until TASK_021 is Orchestrator-verified in completed/. Highest-leverage feature in the batch: unions the daily-generated, already-validated current_affairs_mcqs into the Arena's server-graded question pool, currently siloed in DailyEdition.tsx's reading view."
+    },
+    {
+      "task_id": "AUDIT_REMEDIATION_BATCH_VERIFIED",
+      "event": "ORCHESTRATOR_VERIFICATION_PASS",
+      "contract": "02_CONTRACTS/active/ and 02_CONTRACTS/completed/",
+      "note": "2026-08-30: Antigravity self-chained through 7 of 8 contracts per the autonomous queue protocol, correctly respecting the TASK_028 hard gate (still PENDING_EXECUTION, untouched, when checked). Orchestrator independently re-verified all 7 receipts against live code via a dedicated verification workflow (8 sub-agents: one per contract plus a cross-file/build cross-check), not trusting self-reported exit codes or diffs. Result: 5 genuinely VERIFIED, 2 FAILED and ESCALATED (see per-task events below). The hard gate protecting TASK_028 held exactly as designed -- it never started on an unverified TASK_021 self-report, which mattered because TASK_021's self-report was in fact incomplete."
+    },
+    {
+      "task_id": "TASK_023_QUOTA_AND_PAYMENT_GUARD_HARDENING",
+      "event": "VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_023_QUOTA_AND_PAYMENT_GUARD_HARDENING.md",
+      "note": "Both fixes independently re-traced against live code and confirmed correct: null-profile quota guard now fails closed with identical error shape to the over-quota branch; verify-payment.ts's two sequential userId cross-checks confirmed to make the upgrade RPC unreachable on mismatch. lint:api/test/build independently re-run, all exit 0. No gaming detected."
+    },
+    {
+      "task_id": "TASK_024_OBSERVATORY_STAT_HONESTY_PASS",
+      "event": "VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_024_OBSERVATORY_STAT_HONESTY_PASS.md",
+      "note": "Option A (live computation) genuinely implemented. Orchestrator independently recomputed the real corpus stats from master_7841_pyqs.json with a standalone script and got byte-identical results to the receipt's claim (chi-square 4086.3669, entropy 1.6701, A=55.73%/B=15.23%/C=19.17%/D=9.87%) -- confirming the original 1.638/0.651 was indeed fabricated and the fix is real, not a second hardcoded substitute. Old values and the false 'AUTHORITATIVE EMPIRICAL RESEARCH DATASET' banner confirmed gone from rendered code."
+    },
+    {
+      "task_id": "TASK_025_PRACTICE_BRIDGE_AND_PLACEHOLDER_GATE",
+      "event": "VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_025_PRACTICE_BRIDGE_AND_PLACEHOLDER_GATE.md",
+      "note": "All 5 previously-broken subjects confirmed via live read-only queries against the production Supabase static_questions table to return non-trivial filtered row counts (202-354 rows each), not the unfiltered fallback. Placeholder-gating function independently re-implemented and run against the live corpus JSON -- zero false positives, correctly leaves the ~20% clean corpus untouched. Note: the fix's own detector yields 80.3% placeholder rows (6,293/7,841), not the 77.6% (6,081/7,841) originally cited in the audit -- not a defect, but worth reconciling if 77.6% is quoted elsewhere as a hard fact."
+    },
+    {
+      "task_id": "TASK_026_DELETE_ORPHANED_COMPONENTS_AND_NAV_MERGE",
+      "event": "VERIFIED_PARTIAL",
+      "contract": "02_CONTRACTS/completed/TASK_026_DELETE_ORPHANED_COMPONENTS_AND_NAV_MERGE.md",
+      "note": "7 dead files confirmed deleted with zero live references; ThinkerEngravingSvg.tsx correctly preserved; all 8 tab labels/icons/hotkeys pixel-identical to pre-change. Nav consolidation genuine for 7 of 8 tabs via new src/lib/navItems.ts -- but VerticalNavRail.tsx's pre-existing Profile button still hardcodes 'Profile & History' instead of importing the new PROFILE_NAV_ITEM constant App.tsx now uses. Not gaming (receipt never claimed full 8-tab unification), just incomplete. One-line follow-up, not urgent enough for its own contract yet -- track in a future hygiene pass."
+    },
+    {
+      "task_id": "TASK_027_COLLAPSE_DOCKER_SCAFFOLDING",
+      "event": "VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_027_COLLAPSE_DOCKER_SCAFFOLDING.md",
+      "note": "Clean full-file deletion, independently confirmed: 6 named files gone, 3 preserved OCR-tooling files byte-identical to HEAD (empty git diff), zero dangling references anywhere in the repo, npm run build independently re-run and exits 0."
+    },
+    {
+      "task_id": "TASK_021_ANSWER_KEY_LEAK_PER_QUESTION_REVEAL",
+      "event": "ESCALATED",
+      "contract": "02_CONTRACTS/active/TASK_021_ANSWER_KEY_LEAK_PER_QUESTION_REVEAL.md",
+      "note": "FAILED independent verification. The two named leak sites were genuinely fixed and the on-lock reveal wiring works for the primary DB-backed flow, but two additional leak channels the contract's own objective explicitly warned about were missed: a sibling select('*') fallback query (questions.ts:110) and backfill query (training-questions.ts:113-115) on the same table, both still leaking correct_option under routine conditions; and src/data/static-subject-questions.json, which ships the real answer key in plaintext inside the production JS bundle (confirmed via grep on actual dist/assets/*.js output) -- exactly the 'theater' risk the contract named by name. This is the TASK_019 gaming pattern recurring: fix exactly the cited lines, miss the structurally-identical siblings. Fast-follow TASK_029 dispatched targeting these exact gaps. TASK_028's hard gate updated to require both TASK_021 and TASK_029 before starting."
+    },
+    {
+      "task_id": "TASK_022_REMOVE_HARDCODED_SUPABASE_LITERALS",
+      "event": "ESCALATED",
+      "contract": "02_CONTRACTS/active/TASK_022_REMOVE_HARDCODED_SUPABASE_LITERALS.md",
+      "note": "FAILED independent verification. The two named files were genuinely and correctly fixed, and lint:api/build independently re-run and exit 0. But acceptance criterion #1 explicitly demanded a repo-wide grep sweep, and the receipt's own checked-files list was silently scoped to server-lib/ only -- missing server.ts at the repo root, which hardcodes a COMPLETE live anon-key JWT (more severe than either fixed file, since it's the full key not just the URL), plus test/rebase.test.ts and 12+ scripts/*.ts files carrying the same project-ref literal. Same TASK_019 gaming pattern as TASK_021. Fast-follow TASK_030 dispatched targeting server.ts first (urgent) plus the full repo-wide sweep."
+    },
+    {
+      "task_id": "TASK_029_ANSWER_KEY_LEAK_REMAINING_SITES",
+      "event": "VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_029_ANSWER_KEY_LEAK_REMAINING_SITES.md",
+      "note": "Genuinely thorough fast-follow, independently re-verified with zero trust given it followed a failed first attempt. Both sibling select('*') sites (questions.ts fallback, training-questions.ts backfill) confirmed fixed with the identical explicit column list as primary queries. Bundled static-subject-questions.json leak closed via a new server-side STATIC_FALLBACK_ANSWERS map in explanation.ts -- all 9 answers independently fact-checked against their own explanation text, no data corruption. Ran a REAL npm run build and grepped the actual dist/assets/*.js output: exactly one correct_option reference remains and it is provably gated behind questionIsLocked (unreachable pre-lock). revealedAnswers session-cache persistence and the finishArena() catch-block fix both traced in full function context. lint:web/lint:api/test/build all independently re-run fresh, all exit 0. This is the contract that actually closes the answer-key leak; TASK_021 itself remains permanently ESCALATED and superseded."
+    },
+    {
+      "task_id": "TASK_028_UNION_NEWS_MCQS_INTO_ARENA",
+      "event": "GATE_CLEARED",
+      "contract": "02_CONTRACTS/active/TASK_028_UNION_NEWS_MCQS_INTO_ARENA.md",
+      "note": "depends_on updated to [TASK_029] only (TASK_021 will never itself reach completed/, it was superseded). TASK_029's VERIFIED status independently confirmed above satisfies the gate. Antigravity may now begin this contract."
+    },
+    {
+      "task_id": "TASK_030_HARDCODED_LITERALS_REMAINING_SITES",
+      "event": "ESCALATED",
+      "contract": "02_CONTRACTS/active/TASK_030_HARDCODED_LITERALS_REMAINING_SITES.md",
+      "note": "FAILED independent verification -- second failure in this pipeline for the identical category (self-compiled sweep list presented as exhaustive). server.ts's full JWT genuinely and correctly fixed (highest-priority target, confirmed via direct read: throw-before-use, no literal fallback). JWT-prefix sweep confirmed clean repo-wide. But scripts/quarantine/backfill-grounding.ts.quarantine (tracked, not gitignored) still hardcodes the project-ref URL literal and was never on the receipt's 33-file checked list, despite the receipt asserting full_repo_sweep_clean:true. This is the THIRD occurrence of this exact failure shape in this pipeline (TASK_019 historically, TASK_022, now TASK_030). New standing rule added to 00_SYSTEM/AGENT_CAPABILITIES.md Section 5: 'find every occurrence of X' contracts must include raw, unedited command output in the receipt, not a self-compiled checked-files list. Fast-follow TASK_031 dispatched -- deliberately narrow, single named file, single named command, verbatim output required."
     }
   ]
 }

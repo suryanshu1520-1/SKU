@@ -110,7 +110,29 @@ To maximize execution velocity and minimize token waste between the Orchestrator
 
 ---
 
-## 5. Anti-Patterns (What Orchestrator Must NOT Ask You To Do)
+## 5. Autonomous Multi-Contract Queue Protocol
+
+Added 2026-08-30 after the Orchestrator batch-dispatched 8 independently-scoped contracts (`TASK_021`-`TASK_028`) into `02_CONTRACTS/active/` at once, specifically so you do not sit idle between them waiting for a human to notice one finished and manually promote the next. This section is the standing protocol for **any** future batch dispatched the same way — multiple contracts sitting in `active/` simultaneously, numbered in intended execution order.
+
+**Default behavior:** when you finish a contract (written your receipt, set `status: AWAITING_VERIFICATION`), immediately check `02_CONTRACTS/active/` for the next contract in ascending numeric order and begin ingesting it. Do not wait for the Orchestrator to re-dispatch it — a contract sitting in `active/` is already dispatched. This is the "zero idle time" behavior the batch is designed for.
+
+**The one exception — `depends_on` and `queue_gate`:** a contract's frontmatter may carry a `depends_on: [...]` list and a `queue_gate` field. Read both before starting any contract that has them.
+- `queue_gate: "SOFT — ..."` means: no correctness dependency, just re-verify the cited line numbers/state yourself via `view_file` before editing, in case an earlier contract shifted them. Proceed immediately, do not wait.
+- `queue_gate: "HARD — ..."` means: **do not begin this contract at all** until the named `depends_on` contract is physically present in `02_CONTRACTS/completed/` — not `active/`, not a file with `status: AWAITING_VERIFICATION` sitting anywhere else. `AWAITING_VERIFICATION` is your own self-report; it is not verification (see the hard boundary below and in `CONTRACT_SCHEMA.md` — this exact distinction is why the rule exists, following a real incident where a delegate's self-reported success did not match independent re-checking). If you reach a hard-gated contract in queue order and its dependency is not yet in `completed/`, **stop and idle on that one contract only** — every other ungated contract in the batch remains fair game to execute in the meantime; do not block the whole queue on one gate.
+
+**What this protocol does NOT change:** every rule in `CONTRACT_SCHEMA.md`'s hard boundary still applies without exception, per-contract, regardless of queue automation:
+- You may still never set `status` above `AWAITING_VERIFICATION`.
+- You may still never move a contract file into `completed/` yourself.
+- You may still never write to `01_CONTROL/` or `03_MEMORY/`.
+- Chaining to the next contract automatically is purely about **not waiting for re-dispatch of already-active work** — it does not mean the Orchestrator's verification pass is skipped, batched away, or implied by your moving on. Each contract still gets independently re-verified before it is trusted, exactly as before; the only thing this protocol removes is idle time between your own execution steps.
+
+### Standing lesson — "sweep the repo for X" tasks (added 2026-08-30)
+
+This exact category of task — find every occurrence of a literal/pattern across the repo and confirm zero remain — has now failed independent Orchestrator re-verification **three times in a row**: `TASK_022`'s hardcoded-secret sweep (missed `server.ts`, the most severe instance), its fast-follow `TASK_030` (fixed `server.ts` but missed `scripts/quarantine/backfill-grounding.ts.quarantine`), and this traces back to the same shape of failure as `TASK_019`'s literal-string-only patch. The common cause: a **self-compiled "files checked" list presented as if it were the sweep**, when it was actually scoped to wherever you expected the pattern to live (e.g. `server-lib/` only, or the specific files a prior contract's evidence named) rather than the literal output of an actual repo-wide command.
+
+**Rule, not guidance, for any future "find every occurrence of X" contract:** do not report a self-compiled list of files checked as proof of a clean sweep. Run the actual search command the contract specifies (or the most obvious equivalent if none is given), and paste its **raw, complete, unedited output** into the receipt. If the contract asks for a specific command, run that exact command — do not substitute a narrower one you believe is equivalent. An empty/clean result must still show the command that was run, not just the word "clean."
+
+## 6. Anti-Patterns (What Orchestrator Must NOT Ask You To Do)
 
 1. **DO NOT** delegate holistic architectural discovery, roadmap ideation, or epic-level planning (Orchestrator domain).
 2. **DO NOT** dump entire raw 500+ line source files into contract instructions (pass targeted symbol names, file paths, and line slices instead).
