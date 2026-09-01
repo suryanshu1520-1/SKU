@@ -33,6 +33,16 @@ export default async function handler(req: any, res: any) {
       return res.status(400).json({ error: "userId query parameter is required" });
     }
 
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (userId === 'guest' || !UUID_REGEX.test(userId)) {
+      res.setHeader('Cache-Control', 'public, max-age=5, s-maxage=10, stale-while-revalidate=10');
+      return res.status(200).json({
+        tier: 'free',
+        vanguardUsed: 0,
+        insightsUsed: 0,
+      });
+    }
+
     const { data, error } = await supabaseServer
       .from('user_profiles')
       .select('membership_tier, vanguard_sessions_used, ai_autopsies_used')

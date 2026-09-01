@@ -13,6 +13,7 @@ import trainingQuestionsHandler from "./server-lib/training-questions.js";
 import createRazorpayOrderHandler from "./server-lib/create-razorpay-order.js";
 import verifyPaymentHandler from "./server-lib/verify-payment.js";
 import userLimitsHandler from "./server-lib/user-limits.js";
+import explanationHandler from "./server-lib/explanation.js";
 import questionsHandler from "./server-lib/questions.js";
 import { handleGetRebase, handlePostRebaseAck } from "./server-lib/rebase.js";
 import { analyticsRouter } from "./server-lib/analytics/routes.js";
@@ -238,96 +239,7 @@ Return ONLY valid JSON. Do not wrap in markdown \`\`\`json block.`,
     }
   });
 
-  app.post("/api/explanation", async (req, res) => {
-    const { question, answer, questionId } = req.body;
-    
-    // In-memory/file cache step removed to match Vercel deployment behavior
-    
-    const handleExplanationFallback = async () => {
-      if (questionId) {
-        try {
-          const { data: dbQuestion, error } = await supabaseAnon
-            .from('static_questions')
-            .select('conceptual_explanation')
-            .eq('id', questionId)
-            .maybeSingle();
-
-          if (!error && dbQuestion && dbQuestion.conceptual_explanation) {
-            res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
-            return res.json({ explanation: dbQuestion.conceptual_explanation });
-          }
-        } catch (dbErr) {
-          console.warn("Supabase explanation fallback error:", dbErr);
-        }
-      }
-      res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
-      return res.json({
-        explanation: "- Detailed AI insights are currently throttled or unavailable.\n- Please refer to core textbook materials or consult reference sources for this topic."
-      });
-    };
-
-    try {
-      // Step 1: Query the database first if we have a valid questionId
-      if (questionId) {
-        try {
-          const { data: dbQuestion, error } = await supabaseServer
-            .from('static_questions')
-            .select('ai_insights, conceptual_explanation, is_generated')
-            .eq('id', questionId)
-            .maybeSingle();
-
-          if (!error && dbQuestion && dbQuestion.ai_insights) {
-            res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
-            return res.json({
-              explanation: dbQuestion.ai_insights,
-              conceptual_explanation: dbQuestion.conceptual_explanation
-            });
-          }
-        } catch (dbErr) {
-          console.warn("Supabase query-first cache error:", dbErr);
-        }
-      }
-
-      const aiClient = getAI();
-      if (!aiClient) {
-        console.warn("GEMINI_API_KEY not configured. Using database fallback for explanation.");
-        return await handleExplanationFallback();
-      }
-
-      // Step 3: Call AI
-      const response = await generateContentWithRetry(aiClient, {
-        model: "gemini-3.5-flash",
-        contents: `You are an expert academic tutor. Provide a conceptual explanation for the following question and its correct answer.
-Question: ${question}
-Correct Answer: ${answer}
- 
-Requirement: Provide 2-3 insightful bullet points with highly credible information about the subject matter. Mention potential credible sources or origin of the concept if applicable. Be extremely concise. Format strictly in markdown without introductory fluff.`,
-      });
-
-      const generatedInsights = response.text;
-
-      if (questionId && generatedInsights) {
-        // Step 4: Write back to the database instantly to preserve it for all future users
-        try {
-          await supabaseServer
-            .from('static_questions')
-            .update({
-              ai_insights: generatedInsights,
-              is_generated: true
-            })
-            .eq('id', questionId);
-        } catch (dbWriteErr) {
-          console.error("Supabase write-back cache error:", dbWriteErr);
-        }
-      }
-
-      res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
-      res.json({ explanation: generatedInsights });
-    } catch (error: any) {
-      console.error("Gemini API Error (explanation):", error);
-      return await handleExplanationFallback();
-    }
-  });
+  app.post("/api/explanation", explanationHandler);
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {

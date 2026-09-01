@@ -194,7 +194,7 @@ export default function Landing({
             transition={{ duration: 0.5 }}
             className="space-y-4"
           >
-            <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#e0d0ab] drop-shadow-[0_4px_30px_rgba(224,208,171,0.22)] leading-[1.15]">
+            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#e0d0ab] drop-shadow-[0_4px_30px_rgba(224,208,171,0.22)] leading-[1.15]">
               The Analytical Crucible for India&apos;s Toughest Exam.
             </h1>
             <p className="text-[#c8b998] text-base sm:text-lg font-sans max-w-2xl mx-auto leading-relaxed">

@@ -152,7 +152,7 @@ export default function MobileLanding({
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-serif text-sm font-bold text-[#e8e0cf] truncate">
+                      <h3 className="font-serif text-sm font-bold text-[#e8e0cf] line-clamp-2">
                         {eng.title}
                       </h3>
                       <span className="text-[9.5px] font-sans px-1.5 py-0.2 rounded-xs bg-[rgba(1,148,168,0.15)] text-[#0194a8] border border-[rgba(1,148,168,0.3)] shrink-0">

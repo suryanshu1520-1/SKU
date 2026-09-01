@@ -1149,7 +1149,7 @@ export default function CurrentAffairs({ userId, onLaunchPractice }: CurrentAffa
               <motion.h2
                 layoutId={`dossier-headline-${leadItem.id}`}
                 onClick={() => setSelectedDossier(leadItem)}
-                className="font-serif text-xl sm:text-2xl md:text-3xl font-bold text-[#e8e0cf] group-hover:text-[#e0d0ab] transition-colors leading-tight mb-4 cursor-pointer"
+                className="font-serif text-xl sm:text-2xl md:text-2xl lg:text-3xl font-bold text-[#e8e0cf] group-hover:text-[#e0d0ab] transition-colors leading-tight mb-4 cursor-pointer"
               >
                 {leadItem.headline}
               </motion.h2>

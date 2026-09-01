@@ -389,7 +389,15 @@ export default function App() {
             </div>
 
             {/* Navigation Tabs - Animated Pill */}
-            <nav className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <nav
+              className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0"
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitMaskImage: 'linear-gradient(to right, black calc(100% - 32px), transparent 100%)',
+                maskImage: 'linear-gradient(to right, black calc(100% - 32px), transparent 100%)',
+              }}
+            >
               <LayoutGroup id="app-nav-pills">
                 {NAV_ITEMS.map((item) => {
                   const isActive = item.id === 'home' ? gameState === 'landing' : gameState !== 'landing' && activeTab === item.id;

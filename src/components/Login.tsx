@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mail, ArrowRight, Loader2, AlertCircle, Lock, Check, RefreshCw, Sparkles, Eye, EyeOff, Shield, Swords, Globe, BookOpen } from 'lucide-react';
+import { Mail, ArrowRight, Loader2, AlertCircle, Lock, Check, CheckCircle2, RefreshCw, Sparkles, Eye, EyeOff, Shield, Swords, Globe, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { fetchWithAuth } from '../lib/api';
 import { supabase } from '../lib/supabase';
@@ -263,7 +263,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
             )}
 
             {/* Form */}
-            <AnimatePresence mode="wait">
+            <AnimatePresence>
               <motion.form
                 key={forgotPasswordMode ? "forgot" : isSignUp ? "signup" : "signin"}
                 onSubmit={forgotPasswordMode ? handleForgotPassword : handleAuthentication}

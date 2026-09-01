@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 
 import BrandLogo, { TarkSigil } from './BrandLogo';
-import { NAV_ITEMS, NavItem, NavTab } from '../lib/navItems';
+import { NAV_ITEMS, PROFILE_NAV_ITEM, NavItem, NavTab } from '../lib/navItems';
 export type { NavTab, NavItem };
 
 export interface ContextActionItem {
@@ -217,33 +217,48 @@ export default function VerticalNavRail({
           })}
 
           {/* Profile Button (when signed in) */}
-          {userEmail && (
-            <button
-              onClick={() => onNavigateTab('profile')}
-              title="Profile & History"
-              className={`relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xs transition-all duration-200 group cursor-pointer ${
-                isExpanded ? 'justify-start' : 'justify-center'
-              } ${
-                !isLanding && activeTab === 'profile'
-                  ? 'bg-[rgba(224,208,171,0.12)] text-[#e0d0ab] font-medium'
-                  : 'text-[#8fa2bd] hover:text-[#e8e0cf] hover:bg-[rgba(11,61,120,0.35)]'
-              }`}
-            >
-              {!isLanding && activeTab === 'profile' && (
-                <motion.span
-                  layoutId="vertical-rail-active-edge"
-                  className="absolute left-0 top-1 bottom-1 w-1 bg-[#e0d0ab] rounded-r-xs"
-                  transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', bounce: 0.15, duration: 0.4 }}
+          {userEmail && (() => {
+            const ProfileIcon = PROFILE_NAV_ITEM.icon;
+            const active = !isLanding && activeTab === 'profile';
+            return (
+              <button
+                onClick={() => onNavigateTab('profile')}
+                title={`${PROFILE_NAV_ITEM.label} (Alt+${PROFILE_NAV_ITEM.hotkey})`}
+                className={`relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xs transition-all duration-200 group cursor-pointer ${
+                  isExpanded ? 'justify-start' : 'justify-center'
+                } ${
+                  active
+                    ? 'bg-[rgba(224,208,171,0.12)] text-[#e0d0ab] font-medium'
+                    : 'text-[#8fa2bd] hover:text-[#e8e0cf] hover:bg-[rgba(11,61,120,0.35)]'
+                }`}
+              >
+                {active && (
+                  <motion.span
+                    layoutId="vertical-rail-active-edge"
+                    className="absolute left-0 top-1 bottom-1 w-1 bg-[#e0d0ab] rounded-r-xs"
+                    transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', bounce: 0.15, duration: 0.4 }}
+                  />
+                )}
+                <ProfileIcon
+                  className={`w-4 h-4 shrink-0 transition-transform duration-200 ${
+                    active ? 'text-[#e0d0ab] scale-105' : 'text-[#8fa2bd] group-hover:text-[#e8e0cf] group-hover:scale-110'
+                  }`}
                 />
-              )}
-              <User className="w-4 h-4 shrink-0" />
-              {isExpanded && (
-                <motion.span initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} className="text-xs truncate">
-                  Profile & History
-                </motion.span>
-              )}
-            </button>
-          )}
+                {isExpanded && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -4 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex items-center justify-between flex-1 min-w-0"
+                  >
+                    <span className="text-xs truncate">{PROFILE_NAV_ITEM.label}</span>
+                    <span className="text-[9px] font-mono text-[#5c6f8a] opacity-70 border border-[rgba(19,108,153,0.4)] px-1 py-0.2 rounded-xs group-hover:text-[#8fa2bd]">
+                      {PROFILE_NAV_ITEM.hotkey}
+                    </span>
+                  </motion.div>
+                )}
+              </button>
+            );
+          })()}
         </nav>
 
         {/* ── Contextual Page Actions (Bracket Area - Dynamic per Page) ── */}

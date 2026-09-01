@@ -1426,6 +1426,7 @@ export default function Arena({
                   whileTap={isQuestionLocked ? undefined : { scale: 0.985 }}
                   onClick={() => handleSelect(key)}
                   disabled={isQuestionLocked}
+                  aria-label={`Option ${key}: ${typeof val === 'string' ? val : ''}`}
                   className={`w-full p-4 rounded-sm border text-left flex items-start gap-3 transition-all cursor-pointer ${optionStyle}`}
                 >
                   <span className="w-6 h-6 shrink-0 rounded-sm bg-zinc-900 border border-zinc-800 flex items-center justify-center font-mono text-xs font-bold text-[#e0d0ab]">

@@ -177,6 +177,7 @@ export default function DiagnosticPreview({ onLaunchFullArena }: DiagnosticPrevi
               whileTap={!hasAnswered ? { scale: 0.99 } : {}}
               onClick={() => handleSelect(idx)}
               disabled={hasAnswered}
+              aria-label={`Option ${String.fromCharCode(65 + idx)}: ${opt}`}
               className={`p-3.5 rounded-xs border text-left text-[13.5px] font-sans flex items-start gap-3 transition-all cursor-pointer select-none ${btnStyle}`}
             >
               <span className={`w-5 h-5 rounded-xs border flex items-center justify-center shrink-0 text-xs font-mono font-bold transition-colors ${letterStyle}`}>
