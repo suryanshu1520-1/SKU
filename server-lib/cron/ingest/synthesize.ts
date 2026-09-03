@@ -35,33 +35,72 @@ const HI_SYSTEM = [
 ].join("\n");
 
 const EN_STRUCTURED_SYSTEM = [
-  "You are a policy analyst and exam intelligence distiller for UPSC Civil Services aspirants.",
-  "Decide if this item belongs in a UPSC Civil Services current-affairs compilation (the kind Vision IAS / InsightsIAS / ForumIAS publish monthly). It qualifies ONLY if it maps to a General Studies syllabus node (GS1 society/geography/culture/history; GS2 polity/governance/IR/social-justice/schemes/health/education; GS3 economy/environment/science-tech/security/disaster). Routine crime, local incidents, protests or arrests as events, accidents, non-major sports, celebrity, stock-market moves, and corporate results are NOT UPSC-relevant → return NULL.",
+  "You are a policy analyst and elite exam intelligence distiller for UPSC Civil Services aspirants.",
+  "Decide if this item belongs in an authoritative UPSC Civil Services current affairs briefing. It qualifies ONLY if it maps to a General Studies syllabus node (GS1 Society/Geography/Culture; GS2 Polity/Governance/IR/Social Justice/Schemes; GS3 Economy/Environment/Science-Tech/Security). Routine crime, celebrity, local accidents, corporate quarterly earnings, and party political rhetoric are NOT UPSC-relevant → return NULL.",
   "If and only if the item is UPSC-relevant, distill it into structured JSON matching this schema:",
   "{",
-  '  "bullets": string[], // 1 to 3 compact, information-dense, factual sentences without markdown markers (-, *, #). Never pad to 3.',
-  '  "syllabus_tags": string[], // 1 to 3 relevant UPSC syllabus tags from: ["GS1 Society", "GS1 Geography", "GS1 History & Culture", "GS2 Polity", "GS2 Governance", "GS2 Social Justice", "GS2 International Relations", "GS3 Economy", "GS3 Environment & Ecology", "GS3 Science & Tech", "GS3 Internal Security", "GS3 Disaster Management"]',
-  '  "prelims_pointer": string, // A single concise pointer highlighting key factual/constitutional/statutory/metric data for Prelims, or empty string if none.',
-  '  "mains_pointer": string // A single concise pointer highlighting analytical significance, policy vector, or administrative impact for Mains, or empty string if none.',
+  '  "bullets": string[], // 2 to 3 compact, information-dense, factual sentences without markdown markers (-, *, #). Preserve numbers and scheme names.',
+  '  "syllabus_tags": string[], // 1 to 3 tags from: ["GS1 Society", "GS1 Geography", "GS1 History & Culture", "GS2 Polity", "GS2 Governance", "GS2 Social Justice", "GS2 International Relations", "GS3 Economy", "GS3 Environment & Ecology", "GS3 Science & Tech", "GS3 Internal Security", "GS3 Disaster Management"]',
+  '  "prelims_pointer": string, // Key factual/constitutional/statutory/metric data for Prelims.',
+  '  "mains_pointer": string, // Analytical significance, policy vector, or administrative impact for Mains.',
+  '  "revision_targets": {',
+  '    "data_metric": string, // The single most testable quantitative metric/outlay/timeline/quota, or empty string.',
+  '    "nodal_body": string, // The key executing Ministry, Statutory Authority, Commission, or Department.',
+  '    "statutory_legal": string // Key Act, Constitutional Article, Landmark Judgement, or Treaty.',
+  '  },',
+  '  "thematic_pillars": [ // 2 to 3 distinct thematic dimensions of this news',
+  '    { "title": string, "description": string }',
+  '  ],',
+  '  "mains_analysis": {',
+  '    "context": string, // 1-2 sentences on historical background or regulatory origin.',
+  '    "core_implications": string, // 2-3 sentences on core policy trade-offs, socio-economic impact, or federal dynamics.',
+  '    "way_forward": string // 1-2 sentences on constructive reform, administrative solution, or committee recommendation.',
+  '  },',
+  '  "static_linkages": [ // 1 to 3 essential textbook concepts (from NCERT/Laxmikanth/standard references) needed to master this topic',
+  '    { "concept": string, "textbook_context": string }',
+  '  ],',
+  '  "prelims_trap_radar": string, // Subtle distinction UPSC examiners use to set traps (e.g. Centrally Sponsored vs Central Sector, Statutory vs Executive body, Mandatory vs Advisory, Upper house vs Lower house).',
+  '  "prelims_relevance": "HIGH" | "MEDIUM" | "LOW",',
+  '  "mains_relevance": "HIGH" | "MEDIUM" | "LOW"',
   "}",
   "Guidelines:",
-  "- Strictly factual; no padding, no extrapolation.",
+  "- Strictly factual; zero extrapolation or fabricated metrics.",
   "- If not UPSC-relevant or if no syllabus tag applies, respond with exactly: {\"relevance\": \"NULL\"} or NULL.",
 ].join("\n");
 
 const HI_STRUCTURED_SYSTEM = [
-  "You are a policy analyst and exam intelligence distiller for UPSC Civil Services aspirants.",
-  "The source text below is an Indian GOVERNMENT press release in HINDI. Read the Hindi text accurately and judge UPSC relevance.",
-  "Decide if this item belongs in a UPSC Civil Services compilation. It qualifies ONLY if it maps to a General Studies syllabus node (GS1 society/geography/culture; GS2 polity/governance/IR/social-justice/schemes; GS3 economy/environment/science-tech/security). Ceremonial greetings, tributes, protocol notices without policy substance, or local events are NOT UPSC-relevant → return NULL.",
-  "If and only if UPSC-relevant, generate the structured distillation in clear ENGLISH matching this schema:",
+  "You are a policy analyst and elite exam intelligence distiller for UPSC Civil Services aspirants.",
+  "The source text below is an official Indian GOVERNMENT press release in HINDI. Read the Hindi text accurately and produce the intelligence synthesis in authoritative, flawless ENGLISH.",
+  "Judge UPSC relevance: ceremonial greetings, tributes, protocol notices without policy substance are NOT UPSC-relevant → return NULL.",
+  "If and only if UPSC-relevant, distill it into structured JSON matching this schema in ENGLISH:",
   "{",
-  '  "bullets": string[], // 1 to 3 compact, information-dense English sentences preserving scheme names, metrics, and dates.',
-  '  "syllabus_tags": string[], // 1 to 3 relevant UPSC syllabus tags e.g. ["GS2 Governance", "GS3 Agriculture", "GS2 Social Justice"]',
-  '  "prelims_pointer": string, // Key factual/constitutional/statutory data for Prelims, in English, or empty string.',
-  '  "mains_pointer": string // Analytical/policy impact pointer for Mains, in English, or empty string.',
+  '  "bullets": string[], // 2 to 3 compact, information-dense English sentences preserving exact scheme names, metrics, and dates.',
+  '  "syllabus_tags": string[], // 1 to 3 tags from: ["GS1 Society", "GS1 Geography", "GS1 History & Culture", "GS2 Polity", "GS2 Governance", "GS2 Social Justice", "GS2 International Relations", "GS3 Economy", "GS3 Environment & Ecology", "GS3 Science & Tech", "GS3 Internal Security", "GS3 Disaster Management"]',
+  '  "prelims_pointer": string,',
+  '  "mains_pointer": string,',
+  '  "revision_targets": {',
+  '    "data_metric": string, // Quantifiable outlays, beneficiaries, targets, or deadlines.',
+  '    "nodal_body": string, // Implementing Ministry/Department or Autonomous Body in English.',
+  '    "statutory_legal": string // Statutory Act or Constitutional basis.',
+  '  },',
+  '  "thematic_pillars": [',
+  '    { "title": string, "description": string }',
+  '  ],',
+  '  "mains_analysis": {',
+  '    "context": string, // Background of the scheme or policy decision.',
+  '    "core_implications": string, // Impact on governance, federalism, vulnerable sections, or macro-economy.',
+  '    "way_forward": string // Administrative execution, monitoring mechanism, or forward outlook.',
+  '  },',
+  '  "static_linkages": [',
+  '    { "concept": string, "textbook_context": string }',
+  '  ],',
+  '  "prelims_trap_radar": string, // Subtle distinction (e.g. 100% Central funding vs 60:40 Centre-State sharing, Statutory vs Executive body).',
+  '  "prelims_relevance": "HIGH" | "MEDIUM" | "LOW",',
+  '  "mains_relevance": "HIGH" | "MEDIUM" | "LOW"',
   "}",
   "Guidelines:",
-  "- If not exam-relevant or if purely ceremonial, respond with exactly: {\"relevance\": \"NULL\"} or NULL.",
+  "- Translate accurately from Hindi; do not hallucinate non-existent ministries or numbers.",
+  "- If purely ceremonial or non-exam-relevant, respond with: {\"relevance\": \"NULL\"} or NULL.",
 ].join("\n");
 
 const EN_GROUNDED_SYSTEM = [
@@ -72,7 +111,14 @@ const EN_GROUNDED_SYSTEM = [
   '  "bullets": [{ "text": string, "spans": number[] }], // 1-3 compact factual sentences; `spans` lists the indices of the numbered source sentences each bullet is derived from.',
   '  "syllabus_tags": string[], // 1-3 from: ["GS1 Society", "GS1 Geography", "GS1 History & Culture", "GS2 Polity", "GS2 Governance", "GS2 Social Justice", "GS2 International Relations", "GS3 Economy", "GS3 Environment & Ecology", "GS3 Science & Tech", "GS3 Internal Security", "GS3 Disaster Management"]',
   '  "prelims_pointer": string,',
-  '  "mains_pointer": string',
+  '  "mains_pointer": string,',
+  '  "revision_targets": { "data_metric": string, "nodal_body": string, "statutory_legal": string },',
+  '  "thematic_pillars": [{ "title": string, "description": string }],',
+  '  "mains_analysis": { "context": string, "core_implications": string, "way_forward": string },',
+  '  "static_linkages": [{ "concept": string, "textbook_context": string }],',
+  '  "prelims_trap_radar": string,',
+  '  "prelims_relevance": "HIGH" | "MEDIUM" | "LOW",',
+  '  "mains_relevance": "HIGH" | "MEDIUM" | "LOW"',
   "}",
   "HARD GROUNDING RULE: every figure, percentage, currency amount, date/year and acronym in a bullet MUST appear in its cited source sentences. If you cannot ground a fact in a specific numbered sentence, omit that fact or that bullet. Never introduce facts absent from the cited sentences.",
   "If not UPSC-relevant, respond with exactly: NULL.",
@@ -82,22 +128,58 @@ const HI_GROUNDED_SYSTEM = [
   "You are a policy analyst and exam intelligence distiller for UPSC Civil Services aspirants.",
   "The source is an Indian GOVERNMENT press release in HINDI, given as NUMBERED sentences. Read the Hindi accurately and write the distillation in clear ENGLISH.",
   "Judge UPSC relevance; ceremonial greetings, tributes or protocol notices without policy substance are NOT relevant → return NULL.",
-  "If and only if UPSC-relevant, produce structured JSON matching this schema:",
+  "If and only if UPSC-relevant, produce structured JSON matching this schema in ENGLISH:",
   "{",
   '  "bullets": [{ "text": string, "spans": number[] }], // 1-3 compact English sentences; `spans` = indices of the numbered Hindi source sentences each bullet is derived from.',
   '  "syllabus_tags": string[], // 1-3 relevant UPSC syllabus tags',
   '  "prelims_pointer": string,',
-  '  "mains_pointer": string',
+  '  "mains_pointer": string,',
+  '  "revision_targets": { "data_metric": string, "nodal_body": string, "statutory_legal": string },',
+  '  "thematic_pillars": [{ "title": string, "description": string }],',
+  '  "mains_analysis": { "context": string, "core_implications": string, "way_forward": string },',
+  '  "static_linkages": [{ "concept": string, "textbook_context": string }],',
+  '  "prelims_trap_radar": string,',
+  '  "prelims_relevance": "HIGH" | "MEDIUM" | "LOW",',
+  '  "mains_relevance": "HIGH" | "MEDIUM" | "LOW"',
   "}",
   "HARD GROUNDING RULE: preserve scheme names, figures, dates and acronyms exactly; every such fact in a bullet MUST appear in its cited source sentences. Omit any fact you cannot ground. Never invent details.",
   "If not exam-relevant or purely ceremonial, respond with exactly: NULL.",
 ].join("\n");
+
+export type RevisionTargets = {
+  data_metric?: string;
+  nodal_body?: string;
+  statutory_legal?: string;
+};
+
+export type MainsAnalysis = {
+  context?: string;
+  core_implications?: string;
+  way_forward?: string;
+};
+
+export type StaticLinkage = {
+  concept: string;
+  textbook_context: string;
+};
+
+export type ThematicPillar = {
+  title: string;
+  description: string;
+};
 
 export type StructuredSynthesis = {
   bullets: string[];
   tags: string[];
   prelims: string;
   mains: string;
+  revision_targets?: RevisionTargets;
+  thematic_pillars?: ThematicPillar[];
+  mains_analysis?: MainsAnalysis;
+  static_linkages?: StaticLinkage[];
+  prelims_trap_radar?: string;
+  prelims_relevance?: "HIGH" | "MEDIUM" | "LOW";
+  mains_relevance?: "HIGH" | "MEDIUM" | "LOW";
 };
 
 /** StructuredSynthesis + span-anchored, cite-or-drop verified claims (the ledger). */
@@ -276,8 +358,10 @@ export async function synthesizeStructured(params: {
           ? parsed.mains.trim()
           : "";
 
+        const rich = extractRichFields(parsed);
+
         console.log(`[ingest][llm] structured distillation (${tags.join(", ")}) via ${result.provider}/${result.model}`);
-        return { bullets, tags, prelims, mains };
+        return { bullets, tags, prelims, mains, ...rich };
       }
     }
   }
@@ -368,10 +452,92 @@ export async function synthesizeGrounded(params: {
       ? parsed.mains.trim()
       : "";
 
+  const rich = extractRichFields(parsed);
+
   // grounding = kept/total across ALL produced bullets (honest drop-rate gauge).
   const grounding = groundingScore(claims);
   console.log(
     `[ingest][llm] grounded (${kept.length}/${claims.length} bullets, ${tags.join(", ")}) via ${result.provider}/${result.model}`
   );
-  return { bullets: kept.map((c) => c.text), tags, prelims, mains, claims: kept, grounding };
+  return { bullets: kept.map((c) => c.text), tags, prelims, mains, claims: kept, grounding, ...rich };
+}
+
+/**
+ * Safely extracts high-density 6-layer intelligence fields from parsed JSON.
+ */
+function extractRichFields(parsed: any) {
+  const revision_targets: RevisionTargets | undefined =
+    parsed.revision_targets && typeof parsed.revision_targets === "object"
+      ? {
+          data_metric:
+            typeof parsed.revision_targets.data_metric === "string" && parsed.revision_targets.data_metric.trim()
+              ? parsed.revision_targets.data_metric.trim()
+              : undefined,
+          nodal_body:
+            typeof parsed.revision_targets.nodal_body === "string" && parsed.revision_targets.nodal_body.trim()
+              ? parsed.revision_targets.nodal_body.trim()
+              : undefined,
+          statutory_legal:
+            typeof parsed.revision_targets.statutory_legal === "string" && parsed.revision_targets.statutory_legal.trim()
+              ? parsed.revision_targets.statutory_legal.trim()
+              : undefined,
+        }
+      : undefined;
+
+  const thematic_pillars: ThematicPillar[] | undefined = Array.isArray(parsed.thematic_pillars)
+    ? parsed.thematic_pillars
+        .filter((p: any) => p && typeof p.title === "string" && typeof p.description === "string")
+        .map((p: any) => ({ title: String(p.title).trim(), description: String(p.description).trim() }))
+        .slice(0, 4)
+    : undefined;
+
+  const mains_analysis: MainsAnalysis | undefined =
+    parsed.mains_analysis && typeof parsed.mains_analysis === "object"
+      ? {
+          context:
+            typeof parsed.mains_analysis.context === "string" && parsed.mains_analysis.context.trim()
+              ? parsed.mains_analysis.context.trim()
+              : undefined,
+          core_implications:
+            typeof parsed.mains_analysis.core_implications === "string" && parsed.mains_analysis.core_implications.trim()
+              ? parsed.mains_analysis.core_implications.trim()
+              : undefined,
+          way_forward:
+            typeof parsed.mains_analysis.way_forward === "string" && parsed.mains_analysis.way_forward.trim()
+              ? parsed.mains_analysis.way_forward.trim()
+              : undefined,
+        }
+      : undefined;
+
+  const static_linkages: StaticLinkage[] | undefined = Array.isArray(parsed.static_linkages)
+    ? parsed.static_linkages
+        .filter((s: any) => s && typeof s.concept === "string" && typeof s.textbook_context === "string")
+        .map((s: any) => ({ concept: String(s.concept).trim(), textbook_context: String(s.textbook_context).trim() }))
+        .slice(0, 4)
+    : undefined;
+
+  const prelims_trap_radar =
+    typeof parsed.prelims_trap_radar === "string" && parsed.prelims_trap_radar.trim()
+      ? parsed.prelims_trap_radar.trim()
+      : undefined;
+
+  const rawPrelimsRel = String(parsed.prelims_relevance || "").toUpperCase();
+  const prelims_relevance = ["HIGH", "MEDIUM", "LOW"].includes(rawPrelimsRel)
+    ? (rawPrelimsRel as "HIGH" | "MEDIUM" | "LOW")
+    : undefined;
+
+  const rawMainsRel = String(parsed.mains_relevance || "").toUpperCase();
+  const mains_relevance = ["HIGH", "MEDIUM", "LOW"].includes(rawMainsRel)
+    ? (rawMainsRel as "HIGH" | "MEDIUM" | "LOW")
+    : undefined;
+
+  return {
+    ...(revision_targets ? { revision_targets } : {}),
+    ...(thematic_pillars && thematic_pillars.length ? { thematic_pillars } : {}),
+    ...(mains_analysis ? { mains_analysis } : {}),
+    ...(static_linkages && static_linkages.length ? { static_linkages } : {}),
+    ...(prelims_trap_radar ? { prelims_trap_radar } : {}),
+    ...(prelims_relevance ? { prelims_relevance } : {}),
+    ...(mains_relevance ? { mains_relevance } : {}),
+  };
 }

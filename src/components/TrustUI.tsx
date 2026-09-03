@@ -247,13 +247,22 @@ export function SourceAnchor({ claim }: { claim: VerifiedClaim }) {
 
 /**
  * GroundingBadge — Displays the verification percentage for a synthesized story.
+ * Clicking it triggers the interactive Grounding Verification Ledger.
  */
 export function GroundingBadge({
   grounding,
   verificationMethod,
+  onClick,
+  headline,
+  source,
+  claims,
 }: {
   grounding?: number;
   verificationMethod?: 'live_cite_or_drop_v1';
+  onClick?: () => void;
+  headline?: string;
+  source?: string;
+  claims?: VerifiedClaim[];
 }) {
   // Missing provenance is unknown, not 100%. Values outside 0..1 are legacy
   // corruption and must never be normalized into a reassuring badge.
@@ -266,21 +275,32 @@ export function GroundingBadge({
   ) return null;
 
   const pct = Math.round(grounding * 100);
+  const isInteractive = Boolean(onClick);
 
   return (
-    <span
-      className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[9px] font-mono font-semibold uppercase tracking-wider rounded-sm border ${
+    <button
+      type="button"
+      onClick={onClick ? (e: React.MouseEvent) => { e.stopPropagation(); onClick(); } : undefined}
+      disabled={!isInteractive}
+      className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[9px] font-mono font-semibold uppercase tracking-wider rounded-sm border transition-all ${
+        isInteractive ? 'cursor-pointer hover:scale-105 hover:shadow-xs active:scale-95' : 'cursor-default'
+      } ${
         pct >= 80
-          ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+          ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30 hover:border-emerald-500/60'
           : pct >= 50
-          ? 'bg-[#e0d0ab]/10 text-[#e0d0ab] border-[#e0d0ab]/30'
-          : 'bg-amber-500/10 text-amber-300 border-amber-500/30'
+          ? 'bg-[#e0d0ab]/10 text-[#e0d0ab] border-[#e0d0ab]/30 hover:border-[#e0d0ab]/60'
+          : 'bg-amber-500/10 text-amber-300 border-amber-500/30 hover:border-amber-500/60'
       }`}
-      title={`${pct}% of factual claims deterministically verified against primary source sentences`}
+      title={
+        isInteractive
+          ? `${pct}% Grounded — Click to inspect deterministic verification ledger`
+          : `${pct}% of factual claims deterministically verified against primary source sentences`
+      }
     >
-      <ShieldCheck className="w-2.5 h-2.5" />
+      <ShieldCheck className="w-2.5 h-2.5 shrink-0" />
       <span>{pct}% Grounded</span>
-    </span>
+      {isInteractive && <span className="w-1 h-1 rounded-full bg-current opacity-70 animate-pulse ml-0.5" />}
+    </button>
   );
 }
 

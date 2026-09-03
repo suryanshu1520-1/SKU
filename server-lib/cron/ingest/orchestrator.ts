@@ -20,7 +20,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { getSources } from "./sources.js";
-import { synthesizeStructured, synthesizeGrounded } from "./synthesize.js";
+import { synthesizeStructured, synthesizeGrounded, type StructuredSynthesis } from "./synthesize.js";
 import type { VerifiedClaim } from "./verify.js";
 import { deriveMinistry, isExcluded, policyConfidence } from "./classify.js";
 import { getEmbedder, cosine } from "./embeddings.js";
@@ -29,7 +29,7 @@ import { scoreStory } from "./significance.js";
 import { findContestedClaims } from "./contested.js";
 import { generateMcq } from "./mcq.js";
 import { upsertMcq } from "./mcq-db.js";
-import { upsertCurrentAffairs } from "../db.js";
+import { upsertCurrentAffairs, upsertPibDigest } from "../db.js";
 import { callUpdateSourceReputation } from "../../internal/reputation.js";
 import { llmAvailable } from "../../llm.js";
 import {
@@ -356,6 +356,7 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
       let tags: string[] = [];
       let prelims = "";
       let mains = "";
+      let structuredData: StructuredSynthesis | null = null;
       let claims: Array<VerifiedClaim & { source: string; url: string; verification_method?: string }> = [];
       let grounding: number | undefined;
 
@@ -391,6 +392,7 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
           }
           continue;
         }
+        structuredData = structured;
         bullets = structured.bullets;
         tags = structured.tags;
         prelims = structured.prelims;
@@ -459,6 +461,13 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
         cluster_size,
         edition_date: editionDate,
         has_quiz: hasQuiz,
+        ...(structuredData?.revision_targets ? { revision_targets: structuredData.revision_targets } : {}),
+        ...(structuredData?.thematic_pillars ? { thematic_pillars: structuredData.thematic_pillars } : {}),
+        ...(structuredData?.mains_analysis ? { mains_analysis: structuredData.mains_analysis } : {}),
+        ...(structuredData?.static_linkages ? { static_linkages: structuredData.static_linkages } : {}),
+        ...(structuredData?.prelims_trap_radar ? { prelims_trap_radar: structuredData.prelims_trap_radar } : {}),
+        ...(structuredData?.prelims_relevance ? { prelims_relevance: structuredData.prelims_relevance } : {}),
+        ...(structuredData?.mains_relevance ? { mains_relevance: structuredData.mains_relevance } : {}),
         // Evidence-span ledger: span-anchored, cite-or-drop claims +
         // the per-brief grounding gauge. Present only when grounding succeeded.
         ...(claims.length ? { claims, verification_method: "live_cite_or_drop_v1" } : {}),
@@ -494,6 +503,31 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
         const co = story.sources.length > 1 ? ` (+${story.sources.length - 1}: ${story.sources.slice(1).join(",")})` : "";
         const quizTag = hasQuiz ? " [MCQ ✓]" : "";
         console.log(`[ingest] ✓ (Sig:${significance}) ${lead.source} [${ministry}] ${lead.headline.slice(0, 50)}${co}${quizTag}`);
+
+        // If official government release from PIB, format and persist into pib_digests table
+        if (lead.source === "PIB") {
+          try {
+            const pibMarkdown = formatPibDossierMarkdown({
+              headline: lead.headline,
+              tags,
+              bullets,
+              revision_targets: structuredData?.revision_targets,
+              prelims_trap_radar: structuredData?.prelims_trap_radar,
+              mains_analysis: structuredData?.mains_analysis,
+              static_linkages: structuredData?.static_linkages,
+            });
+
+            void upsertPibDigest({
+              title: `PIB Policy Dossier: ${lead.headline}`,
+              date: editionDate,
+              content: pibMarkdown,
+              url: lead.url,
+            });
+            console.log(`[ingest] synchronized PIB Policy Dossier to pib_digests for: ${lead.headline.slice(0, 50)}`);
+          } catch (pibErr: any) {
+            console.warn(`[ingest] PIB digest sync warning: ${pibErr?.message ?? pibErr}`);
+          }
+        }
 
         if (runId) {
           void recordIngestDecision({
@@ -554,4 +588,69 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
   );
   return result;
 }
+
+/**
+ * Formats a high-density, authoritative Policy Intelligence Dossier in Markdown
+ * for the dedicated PIB Dossier viewer and archive.
+ */
+function formatPibDossierMarkdown(params: {
+  headline: string;
+  tags: string[];
+  bullets: string[];
+  revision_targets?: any;
+  prelims_trap_radar?: string;
+  mains_analysis?: any;
+  static_linkages?: any[];
+}): string {
+  const { headline, tags, bullets, revision_targets, prelims_trap_radar, mains_analysis, static_linkages } = params;
+  const sections: string[] = [];
+
+  sections.push(`### ${headline}`);
+  sections.push(`**Syllabus Mapping:** ${tags.join(" · ")}`);
+
+  // Sovereign Mandate / Executive Intent
+  if (bullets.length > 0) {
+    sections.push(`> ${bullets[0]}`);
+  }
+
+  // Key Quantitative Data Matrix
+  const tableRows: string[] = [];
+  if (revision_targets?.nodal_body) {
+    tableRows.push(`| **Nodal Authority** | ${revision_targets.nodal_body} |`);
+  }
+  if (revision_targets?.statutory_legal) {
+    tableRows.push(`| **Statutory / Legal Basis** | ${revision_targets.statutory_legal} |`);
+  }
+  if (revision_targets?.data_metric) {
+    tableRows.push(`| **Target Data / Fiscal Metric** | ${revision_targets.data_metric} |`);
+  }
+  if (tableRows.length > 0) {
+    sections.push(
+      ["| Parameter | Policy Specification |", "| --- | --- |", ...tableRows].join("\n")
+    );
+  }
+
+  // Prelims Trap Radar
+  if (prelims_trap_radar) {
+    sections.push(`**🎯 Prelims Trap Radar**\n- ${prelims_trap_radar}`);
+  }
+
+  // Mains 360 Dimensions
+  if (mains_analysis && (mains_analysis.context || mains_analysis.core_implications || mains_analysis.way_forward)) {
+    const mainsBullets: string[] = [];
+    if (mains_analysis.context) mainsBullets.push(`- **Context & Origin:** ${mains_analysis.context}`);
+    if (mains_analysis.core_implications) mainsBullets.push(`- **Core Implications & Trade-offs:** ${mains_analysis.core_implications}`);
+    if (mains_analysis.way_forward) mainsBullets.push(`- **Strategic Way Forward:** ${mains_analysis.way_forward}`);
+    sections.push(`**🏛️ Mains Analytical Dimensions**\n${mainsBullets.join("\n")}`);
+  }
+
+  // Static Linkages
+  if (static_linkages && static_linkages.length > 0) {
+    const staticBullets = static_linkages.map((s) => `- **${s.concept}:** ${s.textbook_context}`);
+    sections.push(`**📚 Static Textbook Linkages**\n${staticBullets.join("\n")}`);
+  }
+
+  return sections.join("\n\n");
+}
+
 

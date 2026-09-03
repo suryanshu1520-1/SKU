@@ -65,3 +65,37 @@ Output ONLY the clean translated English headline string without quotes or prefi
     return { ok: false, errorMessage: e?.message ?? String(e) };
   }
 }
+
+export async function upsertPibDigest(params: {
+  title: string;
+  date: string;
+  content: string;
+  url: string;
+}): Promise<{ ok: boolean; errorMessage?: string }> {
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
+  const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+  if (!supabaseUrl) return { ok: false, errorMessage: "CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing" };
+
+  const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
+
+  const formattedDate = params.date.includes("T") ? params.date.split("T")[0] : params.date;
+
+  const row = {
+    title: params.title,
+    date: formattedDate,
+    content: params.content,
+    url: params.url,
+    created_at: new Date().toISOString(),
+  };
+
+  try {
+    const { error } = await supabase
+      .from("pib_digests")
+      .upsert([row], { onConflict: "url" });
+
+    if (error) return { ok: false, errorMessage: error.message };
+    return { ok: true };
+  } catch (e: any) {
+    return { ok: false, errorMessage: e?.message ?? String(e) };
+  }
+}

@@ -134,5 +134,6 @@ export interface ArenaLaunchConfig {
   timePerQuestionSeconds?: number;
   autoStart?: boolean;
   contextTag?: string;
+  originTab?: 'arena' | 'tracker' | 'syllabus' | 'observatory' | 'library';
 }
 

@@ -15,10 +15,11 @@ import PublicProfile from './components/PublicProfile';
 import PasswordReset from './components/PasswordReset';
 import LegalModal, { LegalDocumentType } from './components/LegalModal';
 import VerticalNavRail, { ContextActionItem } from './components/VerticalNavRail';
+import { WebsiteTour } from './components/WebsiteTour';
 import Onboarding from './components/Onboarding';
 import BrandLogo from './components/BrandLogo';
 import { supabase } from './lib/supabase';
-import { Loader2, Trophy, Swords, Globe, User, House, LogIn, Layers, BookOpen, PanelLeftOpen, LayoutTemplate, Radio, Clock } from 'lucide-react';
+import { Loader2, Trophy, Swords, Globe, User, House, LogIn, Layers, BookOpen, PanelLeftOpen, LayoutTemplate, Radio, Clock, Compass } from 'lucide-react';
 import { NAV_ITEMS, PROFILE_NAV_ITEM, NavTab } from './lib/navItems';
 import AnimatedNavIcon from './components/AnimatedNavIcon';
 import type { CandidatePreferences, CandidateProfile, ArenaLaunchConfig } from './types';
@@ -43,6 +44,23 @@ export default function App() {
   const [viewingAnalystId, setViewingAnalystId] = useState<string | null>(null);
   const [showPasswordReset, setShowPasswordReset] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Website Tour State & First-Time Visitor Auto-Launch
+  const [isTourOpen, setIsTourOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      const tourCompleted = localStorage.getItem('tark_website_tour_completed');
+      if (!tourCompleted) {
+        const timer = setTimeout(() => {
+          setIsTourOpen(true);
+        }, 1200);
+        return () => clearTimeout(timer);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   // Manifesto modal overlay state
   const [showManifesto, setShowManifesto] = useState(false);
@@ -392,6 +410,7 @@ export default function App() {
             onOpenLogin={() => setGameState('login')}
             onSwitchToHorizontal={() => setNavOrientation('horizontal')}
             onRecalibrateTrack={() => setShowOnboarding(true)}
+            onStartTour={() => setIsTourOpen(true)}
           />
         </div>
       )}
@@ -448,6 +467,7 @@ export default function App() {
                   return (
                     <motion.button
                       key={item.id}
+                      data-tour={`nav-${item.id}`}
                       onClick={handleClick}
                       onMouseEnter={() => setHoveredNavId(item.id)}
                       onMouseLeave={() => setHoveredNavId(null)}
@@ -512,6 +532,7 @@ export default function App() {
               {/* Exam Countdown Pill */}
               {preferences && (
                 <button
+                  data-tour="candidate-track"
                   type="button"
                   onClick={() => setShowOnboarding(true)}
                   title={`UPSC Prep Clock: ${calculateExamCountdown(preferences.targetYear).daysRemaining} days remaining (${calculateExamCountdown(preferences.targetYear).label}). Click to recalibrate dossier.`}
@@ -522,6 +543,17 @@ export default function App() {
                   <span className="text-[#8fa2bd] hidden lg:inline">to {calculateExamCountdown(preferences.targetYear).label}</span>
                 </button>
               )}
+
+              {/* Product Tour Trigger (Horizontal mode) */}
+              <button
+                type="button"
+                onClick={() => setIsTourOpen(true)}
+                title="Start Interactive Product Tour"
+                className="hidden sm:inline-flex items-center gap-1.5 ml-1.5 px-3 py-1.5 bg-slate-900/60 hover:bg-slate-850 border border-slate-750 hover:border-[#e0d0ab]/40 text-[#8fa2bd] hover:text-[#e0d0ab] rounded-md text-xs font-sans transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80"
+              >
+                <Compass className="w-3.5 h-3.5 text-[#e0d0ab]" />
+                <span className="hidden lg:inline">Tour</span>
+              </button>
 
               {/* Layout Switcher Button (Switch to Left Vertical Rail) */}
               <button
@@ -621,7 +653,8 @@ export default function App() {
                   isRanked: false,
                   timePerQuestionSeconds: 60,
                   autoStart: true,
-                  contextTag: 'Daily Current Affairs'
+                  contextTag: 'Daily Current Affairs',
+                  originTab: 'tracker',
                 });
                 setGameState('arena');
                 setActiveTab('arena');
@@ -640,6 +673,7 @@ export default function App() {
                   isRanked: true,
                   timePerQuestionSeconds: 60,
                   autoStart: false,
+                  originTab: 'observatory',
                 });
                 setGameState('arena');
                 setActiveTab('arena');
@@ -656,7 +690,8 @@ export default function App() {
                   isRanked: false,
                   timePerQuestionSeconds: 60,
                   autoStart: true,
-                  contextTag: `${categoryOrId} Practice`
+                  contextTag: `${categoryOrId} Practice`,
+                  originTab: 'observatory',
                 });
                 setGameState('arena');
                 setActiveTab('arena');
@@ -684,7 +719,8 @@ export default function App() {
                   isRanked: false,
                   timePerQuestionSeconds: 60,
                   autoStart: true,
-                  contextTag: `${categoryOrId} Syllabus`
+                  contextTag: `${categoryOrId} Syllabus`,
+                  originTab: 'library',
                 });
                 setGameState('arena');
                 setActiveTab('arena');
@@ -703,7 +739,12 @@ export default function App() {
                 setTargetPillar(null);
                 setArenaConfig(null);
               }}
-              onReturnToDashboard={() => setActiveTab('tracker')}
+              onReturnToDashboard={(originTab) => {
+                setTargetPillar(null);
+                setArenaConfig(null);
+                setGameState('arena');
+                setActiveTab((originTab as any) || 'arena');
+              }}
               onNavigateManifesto={handleNavigateManifesto}
             />
           ) : (
@@ -807,6 +848,13 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ── First-Time Visitor Guided Website Tour ── */}
+      <WebsiteTour
+        isOpen={isTourOpen}
+        onClose={() => setIsTourOpen(false)}
+        onNavigateTab={navigateToTab}
+      />
     </div>
   );
 }

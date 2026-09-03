@@ -50,7 +50,7 @@ interface ArenaProps {
   arenaConfig?: ArenaLaunchConfig | null;
   candidatePreferences?: CandidatePreferences;
   onClearTargetPillar?: () => void;
-  onReturnToDashboard?: () => void;
+  onReturnToDashboard?: (originTab?: string) => void;
   onNavigateManifesto?: () => void;
 }
 
@@ -784,6 +784,13 @@ export default function Arena({
   const handleConfirmAbandon = () => {
     setShowAbandonModal(false);
     clearSessionCache();
+    try {
+      localStorage.removeItem(SESSION_STORAGE_KEY);
+      localStorage.removeItem(ACTIVE_SESSION_KEY);
+      localStorage.removeItem(RESULTS_STORAGE_KEY);
+    } catch {
+      // safe fallback if storage access restricted
+    }
     setArenaPhase('intro');
     setQuestions([]);
     setCurrentQuestionIndex(0);
@@ -797,7 +804,8 @@ export default function Arena({
     setSavedInsightIds(new Set());
     setPendingAnswersMap({});
     setLockedMap({});
-    if (onReturnToDashboard) onReturnToDashboard();
+    const origin = arenaConfig?.originTab || 'arena';
+    if (onReturnToDashboard) onReturnToDashboard(origin);
   };
 
   // Bookmark Insight

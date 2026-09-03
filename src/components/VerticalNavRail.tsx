@@ -21,7 +21,8 @@ import {
   Bookmark,
   Radio,
   Clock,
-  Target
+  Target,
+  Compass
 } from 'lucide-react';
 
 import BrandLogo, { TarkSigil } from './BrandLogo';
@@ -59,6 +60,7 @@ interface VerticalNavRailProps {
   onOpenLogin: () => void;
   onSwitchToHorizontal: () => void;
   onRecalibrateTrack?: () => void;
+  onStartTour?: () => void;
 }
 
 export default function VerticalNavRail({
@@ -74,6 +76,7 @@ export default function VerticalNavRail({
   onOpenLogin,
   onSwitchToHorizontal,
   onRecalibrateTrack,
+  onStartTour,
 }: VerticalNavRailProps) {
   const prefersReducedMotion = useReducedMotion();
   const [hoveredNavId, setHoveredNavId] = useState<string | null>(null);
@@ -169,6 +172,7 @@ export default function VerticalNavRail({
         {/* Brand Header */}
         <div className={`p-3.5 border-b border-[rgba(19,108,153,0.3)] flex items-center ${isExpanded ? 'justify-between' : 'justify-center'}`}>
           <div
+            data-tour="nav-brand"
             onClick={onNavigateHome}
             className="flex items-center gap-2.5 cursor-pointer group"
             title="Tark 1.0 — Analytical Test Arena"
@@ -207,6 +211,7 @@ export default function VerticalNavRail({
           const opt = getOptionalSubject(candidatePreferences.optionalSubject);
           return isExpanded ? (
             <button
+              data-tour="candidate-track"
               type="button"
               onClick={onRecalibrateTrack}
               title="Click to recalibrate candidate profile & track"
@@ -231,6 +236,7 @@ export default function VerticalNavRail({
             </button>
           ) : (
             <button
+              data-tour="candidate-track"
               type="button"
               onClick={onRecalibrateTrack}
               title={`Target: ${countdown.label} (${countdown.daysRemaining} days remaining) · ${opt?.shortName || 'Track'}. Click to recalibrate.`}
@@ -255,6 +261,7 @@ export default function VerticalNavRail({
             return (
               <motion.button
                 key={item.id}
+                data-tour={`nav-${item.id}`}
                 onClick={() => handleItemClick(item)}
                 onMouseEnter={() => setHoveredNavId(item.id)}
                 onMouseLeave={() => setHoveredNavId(null)}
@@ -434,6 +441,20 @@ export default function VerticalNavRail({
             <LogIn className="w-3.5 h-3.5 shrink-0" />
             {isExpanded && <span>Sign In</span>}
           </motion.button>
+        )}
+
+        {/* Product Tour Trigger */}
+        {onStartTour && (
+          <button
+            onClick={onStartTour}
+            title="Start Interactive Product Tour"
+            className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-md text-[#8fa2bd] hover:text-[#e0d0ab] hover:bg-[rgba(11,61,120,0.35)] text-xs font-sans transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80 ${
+              isExpanded ? 'justify-start' : 'justify-center'
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5 shrink-0 text-[#e0d0ab]" />
+            {isExpanded && <span className="text-xs">Product Tour</span>}
+          </button>
         )}
 
         {/* Layout Switcher (Switch to Top Horizontal Header) */}

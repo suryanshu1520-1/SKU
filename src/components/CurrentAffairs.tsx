@@ -20,6 +20,7 @@ import {
   Clock,
   Sparkles,
   Shield,
+  ShieldCheck,
   Layers,
   ArrowUpRight,
   ChevronRight,
@@ -46,6 +47,30 @@ import {
   type VerifiedClaim,
   type ContestedClaim,
 } from './TrustUI';
+import { TheHinduLogo, PibLogo, SourceBadge } from './SourceLogos';
+import { GroundingExplainerModal } from './GroundingExplainerModal';
+
+interface RevisionTargets {
+  data_metric?: string;
+  nodal_body?: string;
+  statutory_legal?: string;
+}
+
+interface MainsAnalysis {
+  context?: string;
+  core_implications?: string;
+  way_forward?: string;
+}
+
+interface StaticLinkage {
+  concept: string;
+  textbook_context: string;
+}
+
+interface ThematicPillar {
+  title: string;
+  description: string;
+}
 
 interface CurrentAffairsItem {
   id?: string;
@@ -67,6 +92,13 @@ interface CurrentAffairsItem {
     grounding?: number;
     verification_method?: 'live_cite_or_drop_v1';
     contested?: ContestedClaim;
+    revision_targets?: RevisionTargets;
+    thematic_pillars?: ThematicPillar[];
+    mains_analysis?: MainsAnalysis;
+    static_linkages?: StaticLinkage[];
+    prelims_trap_radar?: string;
+    prelims_relevance?: 'HIGH' | 'MEDIUM' | 'LOW';
+    mains_relevance?: 'HIGH' | 'MEDIUM' | 'LOW';
   };
   created_at?: string;
 }
@@ -196,6 +228,18 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
 
   // Active Dossier Modal
   const [selectedDossier, setSelectedDossier] = useState<CurrentAffairsItem | null>(null);
+  const [dossierTab, setDossierTab] = useState<'exam_lens' | 'mains_depth' | 'static_links' | 'evidence'>('exam_lens');
+
+  // Grounding Explainer Modal State
+  const [groundingExplainerData, setGroundingExplainerData] = useState<{
+    isOpen: boolean;
+    grounding?: number;
+    headline?: string;
+    source?: string;
+    claims?: VerifiedClaim[];
+  }>({
+    isOpen: false,
+  });
 
   // PIB Digest Modal State
   const [showPibModal, setShowPibModal] = useState(false);
@@ -681,12 +725,79 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
             </p>
           </div>
 
-          {/* Indexed status badge */}
+          {/* Indexed status badge & Grounding Explainer CTA */}
           <div className="flex items-center gap-2.5 shrink-0 font-sans">
+            <button
+              data-tour="grounding-info"
+              onClick={() =>
+                setGroundingExplainerData({
+                  isOpen: true,
+                  grounding: leadItem?.summary?.grounding || 0.67,
+                  headline: leadItem?.headline || 'Government Policy Gazette',
+                  source: leadItem?.source || 'Official Wire',
+                  claims: leadItem?.summary?.claims || [],
+                })
+              }
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(1,148,168,0.12)] border border-[rgba(1,148,168,0.35)] hover:border-[#e0d0ab] hover:bg-[rgba(1,148,168,0.25)] rounded-xs text-xs font-mono text-[#0194a8] hover:text-[#e0d0ab] transition-all cursor-pointer shadow-xs"
+              title="Inspect Tark's Zero-Hallucination Grounding Protocol"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>How Grounding Works</span>
+            </button>
+
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(3,18,42,0.8)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-mono text-[#8fa2bd]">
               <span className="text-[#e0d0ab] font-bold">{items.length}</span> dispatches indexed
             </span>
           </div>
+        </div>
+
+        {/* ── Verified Wire Streams Showcase (PIB, The Hindu, RBI, PRS) ── */}
+        <div className="mt-4 pt-3.5 border-t border-zinc-800/80 flex flex-wrap items-center justify-between gap-3 text-xs font-sans">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#e0d0ab]" />
+              Official Wire Streams:
+            </span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <SourceBadge
+                source="PIB"
+                active={selectedSource === 'PIB'}
+                onClick={() => setSelectedSource(selectedSource === 'PIB' ? 'ALL' : 'PIB')}
+              />
+              <SourceBadge
+                source="THE HINDU"
+                active={selectedSource === 'THE HINDU'}
+                onClick={() => setSelectedSource(selectedSource === 'THE HINDU' ? 'ALL' : 'THE HINDU')}
+              />
+              <SourceBadge
+                source="RBI"
+                active={selectedSource === 'RBI'}
+                onClick={() => setSelectedSource(selectedSource === 'RBI' ? 'ALL' : 'RBI')}
+              />
+              <SourceBadge
+                source="PRS"
+                active={selectedSource === 'PRS'}
+                onClick={() => {
+                  if (selectedSource === 'PRS') {
+                    setSelectedSource('ALL');
+                  } else {
+                    setSelectedSource('PRS');
+                    setActiveCategoryTab('PRS');
+                  }
+                }}
+              />
+            </div>
+          </div>
+
+          {selectedSource !== 'ALL' && (
+            <button
+              onClick={() => setSelectedSource('ALL')}
+              className="text-[11px] font-mono text-[#e0d0ab] hover:underline cursor-pointer flex items-center gap-1.5"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Reset Filter ({selectedSource})</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -909,9 +1020,10 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                 <div className="flex items-center gap-1.5 flex-wrap">
                   {[
                     { id: 'ALL', label: 'All Sources' },
-                    { id: 'PIB', label: '🏛️ PIB Official (Press Information Bureau)' },
-                    { id: 'RBI', label: '📈 RBI Notifications (Reserve Bank of India)' },
-                    { id: 'PRS', label: '⚖️ PRS Legislative Research (Bills & Acts)' },
+                    { id: 'PIB', label: 'PIB Official', isPib: true },
+                    { id: 'THE HINDU', label: 'The Hindu', isHindu: true },
+                    { id: 'RBI', label: '📈 RBI Notifications' },
+                    { id: 'PRS', label: '⚖️ PRS Legislative Research' },
                   ].map((src) => (
                     <button
                       key={src.id}
@@ -919,13 +1031,15 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                         setSelectedSource(src.id);
                         if (src.id === 'PRS') setActiveCategoryTab('PRS');
                       }}
-                      className={`px-3 py-1.5 rounded-xs text-xs font-mono transition-colors cursor-pointer border ${
+                      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xs text-xs font-mono transition-colors cursor-pointer border ${
                         selectedSource === src.id
                           ? 'bg-[#e0d0ab] text-[#072e63] border-[#e0d0ab] font-bold shadow-sm'
                           : 'bg-[rgba(4,25,54,0.8)] border-[rgba(19,108,153,0.4)] text-[#9fb0c8] hover:border-[#e0d0ab] hover:text-[#e0d0ab]'
                       }`}
                     >
-                      {src.label}
+                      {src.isPib && <PibLogo size={16} animated={false} />}
+                      {src.isHindu && <TheHinduLogo height={12} color={selectedSource === src.id ? '#072e63' : '#ffffff'} />}
+                      {!src.isHindu && <span>{src.label}</span>}
                     </button>
                   ))}
                 </div>
@@ -1155,10 +1269,36 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                   <span className="px-2.5 py-0.5 bg-[rgba(11,61,120,0.35)] text-[#e0d0ab] text-[10px] font-mono uppercase tracking-wider rounded-xs border border-[rgba(19,108,153,0.4)]">
                     {leadItem.ministry}
                   </span>
-                  <span className="text-[#8fa2bd] text-xs font-sans font-medium uppercase">
-                    {leadItem.source}
-                  </span>
-                  <GroundingBadge grounding={leadItem.summary?.grounding} verificationMethod={leadItem.summary?.verification_method} />
+                  {leadItem.source?.toUpperCase().includes('HINDU') ? (
+                    <span className="inline-flex items-center px-2.5 py-1 bg-zinc-900/90 border border-zinc-800 rounded-sm shadow-xs" title="The Hindu — National Newspaper of Record">
+                      <TheHinduLogo height={13} color="#ffffff" animated={true} />
+                    </span>
+                  ) : leadItem.source?.toUpperCase().includes('PIB') ? (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-zinc-900/90 border border-zinc-800 rounded-sm text-[#e0d0ab] shadow-xs" title="Press Information Bureau">
+                      <PibLogo size={16} animated={true} />
+                      <span className="text-[10px] font-mono font-bold tracking-wider">PIB OFFICIAL</span>
+                    </span>
+                  ) : (
+                    <span className="text-[#8fa2bd] text-xs font-sans font-medium uppercase">
+                      {leadItem.source}
+                    </span>
+                  )}
+                  <GroundingBadge
+                    grounding={leadItem.summary?.grounding}
+                    verificationMethod={leadItem.summary?.verification_method}
+                    headline={leadItem.headline}
+                    source={leadItem.source}
+                    claims={leadItem.summary?.claims}
+                    onClick={() =>
+                      setGroundingExplainerData({
+                        isOpen: true,
+                        grounding: leadItem.summary?.grounding,
+                        headline: leadItem.headline,
+                        source: leadItem.source,
+                        claims: leadItem.summary?.claims || [],
+                      })
+                    }
+                  />
 
                   {/* Candidate Optional Subject Cross-Over Anchor */}
                   {candidatePreferences && (() => {
@@ -1304,7 +1444,36 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                           <span className="px-2.5 py-0.5 bg-[rgba(11,61,120,0.3)] text-[#e0d0ab] text-xs font-sans rounded-md border border-[rgba(19,108,153,0.35)] truncate max-w-[180px]">
                             {item.ministry}
                           </span>
-                          <GroundingBadge grounding={item.summary?.grounding} verificationMethod={item.summary?.verification_method} />
+                          {item.source?.toUpperCase().includes('HINDU') ? (
+                            <span className="inline-flex items-center px-2 py-0.5 bg-zinc-900/90 border border-zinc-800 rounded-sm text-zinc-300" title="The Hindu — National Newspaper of Record">
+                              <TheHinduLogo height={10} color="#ffffff" />
+                            </span>
+                          ) : item.source?.toUpperCase().includes('PIB') ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-zinc-900/90 border border-zinc-800 rounded-sm text-[#e0d0ab]" title="Press Information Bureau">
+                              <PibLogo size={13} />
+                              <span className="text-[9px] font-mono font-bold">PIB</span>
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 bg-zinc-900/80 text-zinc-400 text-[10px] font-mono rounded-sm border border-zinc-800">
+                              {item.source}
+                            </span>
+                          )}
+                          <GroundingBadge
+                            grounding={item.summary?.grounding}
+                            verificationMethod={item.summary?.verification_method}
+                            headline={item.headline}
+                            source={item.source}
+                            claims={item.summary?.claims}
+                            onClick={() =>
+                              setGroundingExplainerData({
+                                isOpen: true,
+                                grounding: item.summary?.grounding,
+                                headline: item.headline,
+                                source: item.source,
+                                claims: item.summary?.claims || [],
+                              })
+                            }
+                          />
                           {candidatePreferences && (() => {
                             const syn = matchOptionalRelevance(item.headline, item.summary?.bullets, candidatePreferences.optionalSubject);
                             if (syn.matches) {
@@ -1446,9 +1615,9 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                 {/* Modal Top Bar */}
                 <div className="flex items-center justify-between pb-4 border-b border-zinc-800 font-sans">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                    <span className="text-[10px] font-sans uppercase tracking-wider text-[#e0d0ab] font-medium">
-                      Full Brief
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-[10px] font-sans uppercase tracking-wider text-[#e0d0ab] font-bold">
+                      Policy Intelligence Dossier
                     </span>
                   </div>
                   <button
@@ -1459,15 +1628,47 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                   </button>
                 </div>
 
-                {/* Metadata Pills */}
+                {/* Metadata Pills & Relevance Gauges */}
                 <div className="flex flex-wrap items-center gap-2 font-sans">
                   <span className="px-2.5 py-1 bg-zinc-900 text-[#e0d0ab] text-xs font-sans font-semibold rounded-sm border border-zinc-800">
                     {selectedDossier.ministry}
                   </span>
-                  <span className="px-2.5 py-1 bg-zinc-900 text-zinc-400 text-xs font-sans rounded-sm border border-zinc-800">
-                    {selectedDossier.source}
+                  {selectedDossier.source?.toUpperCase().includes('HINDU') ? (
+                    <span className="px-2.5 py-1 bg-zinc-900 text-white text-xs font-sans rounded-sm border border-zinc-800 inline-flex items-center" title="The Hindu — National Newspaper of Record">
+                      <TheHinduLogo height={13} color="#ffffff" animated={true} />
+                    </span>
+                  ) : selectedDossier.source?.toUpperCase().includes('PIB') ? (
+                    <span className="px-2.5 py-1 bg-zinc-900 text-[#e0d0ab] text-xs font-sans rounded-sm border border-zinc-800 inline-flex items-center gap-1.5" title="Press Information Bureau">
+                      <PibLogo size={16} animated={true} />
+                      <span className="font-mono font-bold tracking-wider">PIB Official</span>
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-1 bg-zinc-900 text-zinc-400 text-xs font-sans rounded-sm border border-zinc-800">
+                      {selectedDossier.source}
+                    </span>
+                  )}
+                  <span className="px-2 py-0.5 bg-amber-500/10 text-amber-300 text-[10px] font-mono font-bold uppercase tracking-wider rounded-sm border border-amber-500/30">
+                    Prelims: {selectedDossier.summary?.prelims_relevance || 'HIGH'}
                   </span>
-                  <GroundingBadge grounding={selectedDossier.summary?.grounding} verificationMethod={selectedDossier.summary?.verification_method} />
+                  <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-300 text-[10px] font-mono font-bold uppercase tracking-wider rounded-sm border border-emerald-500/30">
+                    Mains: {selectedDossier.summary?.mains_relevance || 'HIGH'}
+                  </span>
+                  <GroundingBadge
+                    grounding={selectedDossier.summary?.grounding}
+                    verificationMethod={selectedDossier.summary?.verification_method}
+                    headline={selectedDossier.headline}
+                    source={selectedDossier.source}
+                    claims={selectedDossier.summary?.claims}
+                    onClick={() =>
+                      setGroundingExplainerData({
+                        isOpen: true,
+                        grounding: selectedDossier.summary?.grounding,
+                        headline: selectedDossier.headline,
+                        source: selectedDossier.source,
+                        claims: selectedDossier.summary?.claims || [],
+                      })
+                    }
+                  />
                   {(selectedDossier.summary?.tags || []).map((t) => (
                     <span key={t} className="px-2 py-0.5 bg-[#e0d0ab]/10 text-[#e0d0ab] text-[10px] font-sans font-semibold uppercase tracking-wider rounded-sm border border-[#e0d0ab]/20">
                       {t}
@@ -1492,92 +1693,337 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                   {selectedDossier.headline}
                 </motion.h2>
 
-                {/* Structured Synthesis */}
-                <div className="space-y-4 pt-2 font-sans">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
-                      Key Policy Vectors & Exam Insights
-                    </h4>
-                    {typeof selectedDossier.summary?.grounding === 'number' && (
-                      <span className="text-[10px] font-mono text-zinc-500">
-                        Evidence Ledger Verified
+                {/* Dossier Tab Navigation Bar */}
+                <div className="flex border-b border-zinc-800 font-sans gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setDossierTab('exam_lens')}
+                    className={`flex items-center gap-1.5 px-3 py-2 text-xs font-sans font-bold uppercase tracking-wider transition-colors cursor-pointer border-b-2 -mb-px ${
+                      dossierTab === 'exam_lens'
+                        ? 'border-[#e0d0ab] text-[#e0d0ab] bg-[#e0d0ab]/5'
+                        : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                    }`}
+                  >
+                    <Target className="w-3.5 h-3.5" />
+                    <span>Exam Lens</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setDossierTab('mains_depth')}
+                    className={`flex items-center gap-1.5 px-3 py-2 text-xs font-sans font-bold uppercase tracking-wider transition-colors cursor-pointer border-b-2 -mb-px ${
+                      dossierTab === 'mains_depth'
+                        ? 'border-[#e0d0ab] text-[#e0d0ab] bg-[#e0d0ab]/5'
+                        : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                    }`}
+                  >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>Mains 360°</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setDossierTab('static_links')}
+                    className={`flex items-center gap-1.5 px-3 py-2 text-xs font-sans font-bold uppercase tracking-wider transition-colors cursor-pointer border-b-2 -mb-px ${
+                      dossierTab === 'static_links'
+                        ? 'border-[#e0d0ab] text-[#e0d0ab] bg-[#e0d0ab]/5'
+                        : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                    }`}
+                  >
+                    <Layers className="w-3.5 h-3.5" />
+                    <span>Static Linkage</span>
+                    {selectedDossier.summary?.static_linkages && selectedDossier.summary.static_linkages.length > 0 && (
+                      <span className="ml-0.5 px-1.5 py-0.2 rounded-full text-[9px] font-mono bg-[#e0d0ab]/20 text-[#e0d0ab]">
+                        {selectedDossier.summary.static_linkages.length}
                       </span>
                     )}
-                  </div>
-                  <div className="space-y-3 pl-3 border-l-2 border-[#e0d0ab]/30">
-                    {selectedDossier.summary?.bullets?.map((bullet, idx) => {
-                      const claim = (selectedDossier.summary?.claims || []).find((c) => c.text?.trim() === bullet?.trim()) || (selectedDossier.summary?.claims || [])[idx];
-                      return (
-                        <p key={idx} className="text-sm text-zinc-300 font-sans leading-relaxed">
-                          {bullet}
-                          {claim && <SourceAnchor claim={claim} />}
-                        </p>
-                      );
-                    })}
-                  </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setDossierTab('evidence')}
+                    className={`flex items-center gap-1.5 px-3 py-2 text-xs font-sans font-bold uppercase tracking-wider transition-colors cursor-pointer border-b-2 -mb-px ${
+                      dossierTab === 'evidence'
+                        ? 'border-[#e0d0ab] text-[#e0d0ab] bg-[#e0d0ab]/5'
+                        : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                    }`}
+                  >
+                    <Shield className="w-3.5 h-3.5" />
+                    <span>Evidence</span>
+                  </button>
                 </div>
 
-                {/* Contested Claim Disagreement (if present) */}
-                <ContestedCard contested={selectedDossier.summary?.contested} />
+                {/* ── TAB 1: EXAM LENS & 1-MINUTE REVISION ── */}
+                {dossierTab === 'exam_lens' && (
+                  <div className="space-y-4 font-sans pt-1">
+                    {/* 1-Minute Revision Targets */}
+                    {selectedDossier.summary?.revision_targets && (
+                      <div className="p-3.5 rounded-sm bg-[rgba(4,25,54,0.7)] border border-[rgba(224,208,171,0.25)] space-y-2.5">
+                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#e0d0ab] block">
+                          🎯 1-Minute High-Yield Targets
+                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-sans">
+                          {selectedDossier.summary.revision_targets.data_metric && (
+                            <div className="p-2 bg-zinc-900/70 border border-zinc-800 rounded-sm">
+                              <span className="text-[10px] uppercase font-mono text-amber-400 block mb-0.5">Target Data</span>
+                              <span className="text-zinc-200 font-medium">{selectedDossier.summary.revision_targets.data_metric}</span>
+                            </div>
+                          )}
+                          {selectedDossier.summary.revision_targets.nodal_body && (
+                            <div className="p-2 bg-zinc-900/70 border border-zinc-800 rounded-sm">
+                              <span className="text-[10px] uppercase font-mono text-cyan-400 block mb-0.5">Nodal Agency</span>
+                              <span className="text-zinc-200 font-medium">{selectedDossier.summary.revision_targets.nodal_body}</span>
+                            </div>
+                          )}
+                          {selectedDossier.summary.revision_targets.statutory_legal && (
+                            <div className="p-2 bg-zinc-900/70 border border-zinc-800 rounded-sm">
+                              <span className="text-[10px] uppercase font-mono text-purple-400 block mb-0.5">Statutory / Legal</span>
+                              <span className="text-zinc-200 font-medium">{selectedDossier.summary.revision_targets.statutory_legal}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
-                {/* Examination Context & Pointers */}
-                {(selectedDossier.summary?.prelims || selectedDossier.summary?.mains) ? (
-                  <div className="space-y-2.5 font-sans pt-2">
-                    {selectedDossier.summary.prelims && (
-                      <div className="p-3 bg-zinc-900/60 border border-zinc-800 rounded-sm space-y-1">
+                    {/* Prelims Trap Radar */}
+                    {selectedDossier.summary?.prelims_trap_radar && (
+                      <div className="p-3.5 bg-amber-950/20 border border-amber-500/40 rounded-sm space-y-1">
+                        <span className="text-[10px] font-mono uppercase text-amber-400 font-bold flex items-center gap-1.5">
+                          <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
+                          🎯 Prelims Trap Radar (Examiner Pitfall)
+                        </span>
+                        <p className="text-xs text-amber-200 font-sans leading-relaxed">
+                          {selectedDossier.summary.prelims_trap_radar}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Prelims Pointer */}
+                    {selectedDossier.summary?.prelims && (
+                      <div className="p-3 bg-zinc-900/70 border border-zinc-800 rounded-sm space-y-1">
                         <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold flex items-center gap-1">
-                          <Zap className="w-3 h-3 text-[#e0d0ab]" /> Prelims Pointer
+                          <Zap className="w-3 h-3 text-[#e0d0ab]" /> Prelims Factual Pointer
                         </span>
                         <p className="text-xs text-zinc-300 font-sans leading-relaxed">
                           {selectedDossier.summary.prelims}
                         </p>
                       </div>
                     )}
-                    {selectedDossier.summary.mains && (
-                      <div className="p-3 bg-zinc-900/60 border border-zinc-800 rounded-sm space-y-1">
-                        <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold flex items-center gap-1">
-                          <ChevronRight className="w-3 h-3 text-[#e0d0ab]" /> Mains Perspective
-                        </span>
-                        <p className="text-xs text-zinc-300 font-sans leading-relaxed">
-                          {selectedDossier.summary.mains}
-                        </p>
+
+                    {/* Executive Takeaways */}
+                    <div className="space-y-3 pt-2">
+                      <h4 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
+                        Executive Policy Highlights
+                      </h4>
+                      <div className="space-y-2.5 pl-3 border-l-2 border-[#e0d0ab]/30">
+                        {selectedDossier.summary?.bullets?.map((bullet, idx) => (
+                          <p key={idx} className="text-sm text-zinc-300 font-sans leading-relaxed">
+                            {bullet}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* ── TAB 2: MAINS 360° STRATEGIC DEPTH ── */}
+                {dossierTab === 'mains_depth' && (
+                  <div className="space-y-4 font-sans pt-1">
+                    {selectedDossier.summary?.mains_analysis ? (
+                      <div className="space-y-3">
+                        {selectedDossier.summary.mains_analysis.context && (
+                          <div className="p-3.5 bg-zinc-900/60 border border-zinc-800 rounded-sm space-y-1">
+                            <span className="text-[10px] font-mono uppercase text-[#e0d0ab] font-bold block">
+                              1. Context & Historical Timeline
+                            </span>
+                            <p className="text-xs text-zinc-300 font-sans leading-relaxed">
+                              {selectedDossier.summary.mains_analysis.context}
+                            </p>
+                          </div>
+                        )}
+
+                        {selectedDossier.summary.mains_analysis.core_implications && (
+                          <div className="p-3.5 bg-zinc-900/60 border border-zinc-800 rounded-sm space-y-1">
+                            <span className="text-[10px] font-mono uppercase text-cyan-300 font-bold block">
+                              2. Core Policy Implications & Federal Dynamics
+                            </span>
+                            <p className="text-xs text-zinc-300 font-sans leading-relaxed">
+                              {selectedDossier.summary.mains_analysis.core_implications}
+                            </p>
+                          </div>
+                        )}
+
+                        {selectedDossier.summary.mains_analysis.way_forward && (
+                          <div className="p-3.5 bg-zinc-900/60 border border-zinc-800 rounded-sm space-y-1">
+                            <span className="text-[10px] font-mono uppercase text-emerald-400 font-bold block">
+                              3. Strategic Way Forward & Reform Roadmap
+                            </span>
+                            <p className="text-xs text-zinc-300 font-sans leading-relaxed">
+                              {selectedDossier.summary.mains_analysis.way_forward}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      selectedDossier.summary?.mains ? (
+                        <div className="p-4 bg-zinc-900/60 border border-zinc-800 rounded-sm space-y-2">
+                          <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold flex items-center gap-1">
+                            <ChevronRight className="w-3.5 h-3.5 text-[#e0d0ab]" /> Mains Perspective
+                          </span>
+                          <p className="text-sm text-zinc-300 font-sans leading-relaxed">
+                            {selectedDossier.summary.mains}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="p-4 bg-zinc-900/40 border border-zinc-800 rounded-sm space-y-1">
+                          <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold">
+                            Mains Analysis Blueprint
+                          </span>
+                          <p className="text-xs text-zinc-400 font-sans leading-relaxed">
+                            Apply this policy development to GS Paper II (Governance, Executive & Judicial Accountability) and GS Paper III (Inclusive Growth & Macroeconomic Stability). Formulate arguments focusing on implementation bottlenecks, constitutional checks, and administrative efficacy.
+                          </p>
+                        </div>
+                      )
+                    )}
+
+                    {selectedDossier.summary?.mains && selectedDossier.summary?.mains_analysis && (
+                      <div className="p-3 bg-zinc-900/40 border border-zinc-800/80 rounded-sm">
+                        <span className="text-[10px] font-mono text-zinc-400 uppercase block mb-1">Analytical Thesis Pointer:</span>
+                        <p className="text-xs text-zinc-300 italic font-sans">{selectedDossier.summary.mains}</p>
                       </div>
                     )}
                   </div>
-                ) : (
-                  <div className="p-4 bg-zinc-900/40 border border-zinc-800 rounded-sm space-y-1 font-sans">
-                    <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold">
-                      Examination Context
-                    </span>
-                    <p className="text-xs text-zinc-400 font-sans leading-relaxed">
-                      Relevant for GS Paper II / III (Governance & Economic Framework) and Prelims Current Affairs. Recommended for revision before Mock Tests.
-                    </p>
+                )}
+
+                {/* ── TAB 3: STATIC SYLLABUS LINKAGES ── */}
+                {dossierTab === 'static_links' && (
+                  <div className="space-y-4 font-sans pt-1">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
+                        Standard Textbook & Syllabus Anchors
+                      </h4>
+                      <span className="text-[10px] font-mono text-zinc-500">NCERT / Laxmikanth Alignment</span>
+                    </div>
+
+                    {selectedDossier.summary?.static_linkages && selectedDossier.summary.static_linkages.length > 0 ? (
+                      <div className="space-y-2.5">
+                        {selectedDossier.summary.static_linkages.map((item, idx) => (
+                          <div key={idx} className="p-3.5 bg-zinc-900/70 border border-zinc-800 rounded-sm space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#e0d0ab]" />
+                              <h5 className="font-serif text-sm font-bold text-[#e0d0ab]">
+                                {item.concept}
+                              </h5>
+                            </div>
+                            <p className="text-xs text-zinc-300 font-sans leading-relaxed pl-3.5">
+                              {item.textbook_context}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="p-4 bg-zinc-900/40 border border-zinc-800 rounded-sm space-y-2 font-sans">
+                        <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold">
+                          Core General Studies Alignment
+                        </span>
+                        <p className="text-xs text-zinc-300 font-sans leading-relaxed">
+                          This development maps directly to {(selectedDossier.summary?.tags || ['General Studies']).join(', ')}. Review foundational constitutional provisions, statutory bodies, and standard economic metrics in your core notes.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Thematic Pillars */}
+                    {selectedDossier.summary?.thematic_pillars && selectedDossier.summary.thematic_pillars.length > 0 && (
+                      <div className="space-y-2 pt-2">
+                        <span className="text-[10px] font-mono uppercase text-[#e0d0ab] font-bold block">
+                          Key Thematic Dimensions
+                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {selectedDossier.summary.thematic_pillars.map((pillar, idx) => (
+                            <div key={idx} className="p-2.5 bg-zinc-900/50 border border-zinc-800 rounded-sm space-y-0.5">
+                              <span className="font-serif text-xs font-bold text-zinc-200 block">{pillar.title}</span>
+                              <p className="text-[11px] text-zinc-400 leading-snug">{pillar.description}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* ── TAB 4: EVIDENCE & GROUNDING LEDGER ── */}
+                {dossierTab === 'evidence' && (
+                  <div className="space-y-4 font-sans pt-1">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
+                        Span-Anchored Evidence Ledger
+                      </h4>
+                      {typeof selectedDossier.summary?.grounding === 'number' && (
+                        <span className="text-[10px] font-mono text-emerald-400">
+                          {selectedDossier.summary.grounding}% Facts Verified
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="space-y-3 pl-3 border-l-2 border-[#e0d0ab]/30">
+                      {selectedDossier.summary?.bullets?.map((bullet, idx) => {
+                        const claim = (selectedDossier.summary?.claims || []).find((c) => c.text?.trim() === bullet?.trim()) || (selectedDossier.summary?.claims || [])[idx];
+                        return (
+                          <p key={idx} className="text-sm text-zinc-300 font-sans leading-relaxed">
+                            {bullet}
+                            {claim && <SourceAnchor claim={claim} />}
+                          </p>
+                        );
+                      })}
+                    </div>
+
+                    {/* Contested Claim Disagreement (if present) */}
+                    <ContestedCard contested={selectedDossier.summary?.contested} />
+
+                    <div className="p-3 bg-zinc-900/40 border border-zinc-800 rounded-sm text-[11px] font-mono text-zinc-400 space-y-1">
+                      <div>Primary Source: <span className="text-zinc-200">{selectedDossier.source}</span></div>
+                      <div>Verification Protocol: <span className="text-[#e0d0ab]">{selectedDossier.summary?.verification_method || 'live_cite_or_drop_v1'}</span></div>
+                    </div>
                   </div>
                 )}
               </div>
 
-              {/* Modal Footer */}
-              <div className="flex items-center justify-between pt-6 mt-8 border-t border-zinc-800 font-sans">
+              {/* Modal Footer with Actions */}
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-6 mt-8 border-t border-zinc-800 font-sans">
                 <button
                   onClick={() => toggleBookmark(selectedDossier.id || '')}
-                  className={`inline-flex items-center gap-2 text-xs font-sans font-bold uppercase tracking-wider px-4 py-2 rounded-sm border transition-all cursor-pointer ${
+                  className={`inline-flex items-center gap-2 text-xs font-sans font-bold uppercase tracking-wider px-3.5 py-2 rounded-sm border transition-all cursor-pointer ${
                     savedArticleIds.has(selectedDossier.id || '')
                       ? 'border-emerald-500/60 bg-emerald-500/10 text-emerald-300'
                       : 'border-zinc-800 bg-zinc-900 text-zinc-300 hover:border-[#e0d0ab]'
                   }`}
                 >
                   <Bookmark className={`w-3.5 h-3.5 ${savedArticleIds.has(selectedDossier.id || '') ? 'fill-emerald-400' : ''}`} />
-                  <span>{savedArticleIds.has(selectedDossier.id || '') ? 'Saved to Profile' : 'Save Brief'}</span>
+                  <span>{savedArticleIds.has(selectedDossier.id || '') ? 'Saved' : 'Save Brief'}</span>
                 </button>
+
+                {onLaunchPractice && (
+                  <button
+                    onClick={() => {
+                      const tag = selectedDossier.summary?.tags?.[0] || 'CURRENT_AFFAIRS';
+                      setSelectedDossier(null);
+                      onLaunchPractice(tag);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#e0d0ab]/10 border border-[#e0d0ab]/50 text-[#e0d0ab] hover:bg-[#e0d0ab]/20 text-xs font-sans font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer"
+                  >
+                    <Target className="w-3.5 h-3.5" />
+                    <span>Practice MCQ Drill</span>
+                  </button>
+                )}
 
                 {selectedDossier.url && (
                   <a
                     href={selectedDossier.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#e0d0ab] text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-stone-100 transition-all cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#e0d0ab] text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-stone-100 transition-all cursor-pointer"
                   >
-                    <span>Read Primary Source</span>
+                    <span>Primary Source</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 )}
@@ -1610,11 +2056,16 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
               {/* Masthead Bar */}
               <div className="flex-shrink-0 flex flex-col border-b border-primary-container/20 bg-surface-dim relative">
                 <div className="flex items-center justify-between px-6 py-3.5 font-sans">
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-primary" />
-                    <span className="font-serif text-sm font-bold tracking-tight uppercase text-on-surface">
-                      PIB Intelligence Digest
-                    </span>
+                  <div className="flex items-center gap-2.5">
+                    <PibLogo size={26} animated={true} />
+                    <div className="flex flex-col">
+                      <span className="font-serif text-sm font-bold tracking-tight uppercase text-on-surface leading-none">
+                        PIB Intelligence Digest
+                      </span>
+                      <span className="text-[9px] font-mono text-[#e0d0ab] uppercase tracking-wider mt-0.5">
+                        Press Information Bureau &bull; Government of India
+                      </span>
+                    </div>
                   </div>
                   <div className="flex items-center gap-4 font-sans">
                     {pibDigests.length > 0 && (
@@ -1835,6 +2286,16 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ── Grounding Protocol & Verification Explainer Modal ── */}
+      <GroundingExplainerModal
+        isOpen={groundingExplainerData.isOpen}
+        onClose={() => setGroundingExplainerData((prev) => ({ ...prev, isOpen: false }))}
+        grounding={groundingExplainerData.grounding}
+        headline={groundingExplainerData.headline}
+        source={groundingExplainerData.source}
+        claims={groundingExplainerData.claims}
+      />
 
     </div>
   );
