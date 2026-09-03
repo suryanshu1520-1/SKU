@@ -1,6 +1,6 @@
 ---
 task_id: "TASK_042_FIRECRAWL_EXTRACTION_FALLBACK"
-status: "PENDING_EXECUTION"
+status: "AWAITING_VERIFICATION"
 assigned_to: "ANTIGRAVITY"
 target_model: "Gemini 3.7 Flash (Hybrid Reasoning / Thinking Mode)"
 thinking_tier: "medium"
@@ -57,9 +57,162 @@ _(filled in by Antigravity on completion — diff + telemetry YAML only, no pros
 
 ```yaml
 telemetry:
-  tools_invoked: []
-  duration_ms: 0
-  exit_codes: {}
+  tools_invoked:
+    - view_file
+    - replace_file_content
+    - grep_search
+    - run_command
+    - schedule
+    - manage_task
+  duration_ms: 1250000
+  exit_codes:
+    lint_api: 0
+    build: 0
+    test_firecrawl: 0
+  call_sites_raw_grep: |
+    c:\Users\bentn\OneDrive\Desktop\SKU\server-lib\cron\ingest\sources.ts:65:      const body = await extractFromUrl(ref.url, opts.selectors ?? []);
+    c:\Users\bentn\OneDrive\Desktop\SKU\server-lib\cron\ingest\sources.ts:94:    const body = await extractFromUrl(ref.url, [
+    c:\Users\bentn\OneDrive\Desktop\SKU\server-lib\cron\ingest\sources.ts:151:    const body = await extractFromUrl(ref.url, [
+    c:\Users\bentn\OneDrive\Desktop\SKU\server-lib\cron\ingest\extract.ts:278:export async function extractFromUrl(
+  call_sites_coverage:
+    - site: "sources.ts:65 (rssSource)"
+      status: "benefits — all wire sources (Hindu, Express, BS, LiveMint) automatically fall back to Firecrawl if cheerio/got body < 200 chars"
+    - site: "sources.ts:94 (PIB)"
+      status: "benefits — official PIB press releases fall back to Firecrawl if page body < 200 chars"
+    - site: "sources.ts:151 (PRS)"
+      status: "benefits — PRS blog & bill track articles fall back to Firecrawl if page body < 200 chars"
+  live_execution_demonstration:
+    url: "https://indianexpress.com/article/india/mha-himalayan-states-glof-snow-avalanche-preparedness-govind-mohan-10862145/"
+    before_fallback:
+      got_scraping_html_bytes: 0
+      cheerio_body_chars: 0
+      pipeline_action: "would be dropped by the < 200 char floor gate"
+    after_fallback:
+      firecrawl_extracted_chars: 2695
+      text_snippet: "The ministry of Home Affairs has asked Himalayan states and Union Territories to step up preparedness against glacial lake outburst floods (GLOFs) and snow avalanches, stressing the need to move from response-based planning to preventive mitigation and community-level readiness, an MHA spokesperson ..."
+  negative_path_demonstration:
+    key_status: "unset"
+    test_url: "https://httpstat.us/403"
+    result_chars: 0
+    threw: false
+    behavior: "Identical to previous behavior — returns empty string without throwing or hanging; 15s timeout bounded"
+  framing_calibration: "Resilience addition for documented intermittent risk, not a bug fix for broken ingestion. Live spot-checks on 2026-09-03 confirm Hindu, PIB, and Business Standard succeed on the primary path."
+  pib_aggregator_status: "Untouched (0 lines diff)"
 diff: |
-  <unified diff>
+  --- a/server-lib/cron/ingest/extract.ts
+  +++ b/server-lib/cron/ingest/extract.ts
+  @@ -187,15 +187,111 @@ export function extractBody(html: string, preferred: string[] = []): string {
+     return best;
+   }
+   
+  +// ============================================================
+  +// Firecrawl structured-extraction fallback
+  +// ============================================================
+  +const FIRECRAWL_BODY_FLOOR = 200;
+  +const FIRECRAWL_TIMEOUT_MS = 15_000;
+  +
+  +/**
+  + * Last-resort fallback: call Firecrawl's /scrape endpoint with a structured
+  + * jsonOptions extraction (schema + prompt) rather than raw markdown.
+  + *
+  + * Why jsonOptions and not raw markdown with onlyMainContent?
+  + * Verified live (2026-09-03): The Hindu's raw markdown output mixed real
+  + * article text with subscription/login/"We found a few errors"/comments
+  + * boilerplate even with onlyMainContent: true. A prompted, schema-constrained
+  + * extraction avoids reintroducing selector-style fragility.
+  + *
+  + * Returns "" on any failure — missing key, timeout, bad response, etc.
+  + * Never throws.
+  + */
+  +async function firecrawlFallback(url: string): Promise<string> {
+  +  const apiKey = process.env.FIRECRAWL_API_KEY;
+  +  if (!apiKey) return "";
+  +
+  +  const controller = new AbortController();
+  +  const timer = setTimeout(() => controller.abort(), FIRECRAWL_TIMEOUT_MS);
+  +
+  +  try {
+  +    const res = await fetch("https://api.firecrawl.dev/v2/scrape", {
+  +      method: "POST",
+  +      headers: {
+  +        "Content-Type": "application/json",
+  +        Authorization: `Bearer ${apiKey}`,
+  +      },
+  +      body: JSON.stringify({
+  +        url,
+  +        formats: [
+  +          {
+  +            type: "json",
+  +            schema: {
+  +              type: "object",
+  +              properties: {
+  +                body: { type: "string" },
+  +              },
+  +              required: ["body"],
+  +            },
+  +            prompt:
+  +              "Extract the full article body text only. Exclude navigation, headers, footers, ads, related articles, subscription prompts, login forms, comments, and any non-article content. Return the complete article text as a single string.",
+  +          },
+  +        ],
+  +        onlyMainContent: true,
+  +      }),
+  +      signal: controller.signal,
+  +    });
+  +
+  +    if (!res.ok) {
+  +      console.warn(`[ingest][firecrawl] ${url} -> HTTP ${res.status}`);
+  +      return "";
+  +    }
+  +
+  +    const payload: any = await res.json();
+  +    // v2 response: { success: true, data: { json: { body: "..." }, ... } }
+  +    const extracted = payload?.data?.json?.body;
+  +    if (typeof extracted === "string" && extracted.length > 0) {
+  +      console.log(`[ingest][firecrawl] recovered ${extracted.length} chars for ${url}`);
+  +      return collapse(extracted);
+  +    }
+  +    return "";
+  +  } catch (err: any) {
+  +    if (err?.name === "AbortError") {
+  +      console.warn(`[ingest][firecrawl] timeout after ${FIRECRAWL_TIMEOUT_MS}ms: ${url}`);
+  +    } else {
+  +      console.warn(`[ingest][firecrawl] failed ${url}: ${err?.message ?? err}`);
+  +    }
+  +    return "";
+  +  } finally {
+  +    clearTimeout(timer);
+  +  }
+  +}
+  +
+  +/**
+  + * Fetch a page and extract its body in one call.
+  *
+  * If the got-scraping + cheerio path returns text below the ~200-char floor
+  * that every call site already enforces, and a FIRECRAWL_API_KEY is available,
+  * a Firecrawl structured-extraction fallback fires. This can only ever recover
+  * an item that would otherwise be silently dropped — it cannot regress a
+  * currently-working path.
+  */
+  export async function extractFromUrl(
+    url: string,
+    preferred: string[] = [],
+    timeoutMs = 20_000
+  ): Promise<string> {
+    const html = await fetchText(url, timeoutMs);
+  -  if (!html) return "";
+  -  return extractBody(html, preferred);
+  +  const body = html ? extractBody(html, preferred) : "";
+  +
+  +  // Primary path returned enough text — use it directly.
+  +  if (body.length >= FIRECRAWL_BODY_FLOOR) return body;
+  +
+  +  // Firecrawl fallback: only fires when primary extraction is thin/empty.
+  +  const fallback = await firecrawlFallback(url);
+  +  if (fallback.length >= FIRECRAWL_BODY_FLOOR) return fallback;
+  +
+  +  // Both paths thin — return whatever we got (may be empty string).
+  +  return body;
+  }
+   
+   export { collapse, stripTags };
 ```
