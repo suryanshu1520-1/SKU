@@ -194,14 +194,15 @@ const FIRECRAWL_BODY_FLOOR = 200;
 const FIRECRAWL_TIMEOUT_MS = 15_000;
 
 /**
- * Last-resort fallback: call Firecrawl's /scrape endpoint with a structured
- * jsonOptions extraction (schema + prompt) rather than raw markdown.
+ * Last-resort fallback: call Firecrawl's /scrape endpoint with clean markdown
+ * extraction (`onlyMainContent: true` + `onlyCleanContent: true`).
  *
- * Why jsonOptions and not raw markdown with onlyMainContent?
- * Verified live (2026-09-03): The Hindu's raw markdown output mixed real
- * article text with subscription/login/"We found a few errors"/comments
- * boilerplate even with onlyMainContent: true. A prompted, schema-constrained
- * extraction avoids reintroducing selector-style fragility.
+ * Why onlyCleanContent?
+ * Benchmark verified (2026-09-03): Raw onlyMainContent leaks paywall modals on
+ * Indian media sites (The Hindu, Indian Express) because subscription gates sit
+ * inside <article>/<main>. Enabling onlyCleanContent uses Firecrawl's LLM cleaning
+ * pass to eliminate paywall/subscription overlays, ads, and cookie notices while
+ * preserving the real article text, headings, and structure.
  *
  * Returns "" on any failure — missing key, timeout, bad response, etc.
  * Never throws.
@@ -222,21 +223,9 @@ async function firecrawlFallback(url: string): Promise<string> {
       },
       body: JSON.stringify({
         url,
-        formats: [
-          {
-            type: "json",
-            schema: {
-              type: "object",
-              properties: {
-                body: { type: "string" },
-              },
-              required: ["body"],
-            },
-            prompt:
-              "Extract the full article body text only. Exclude navigation, headers, footers, ads, related articles, subscription prompts, login forms, comments, and any non-article content. Return the complete article text as a single string.",
-          },
-        ],
+        formats: ["markdown"],
         onlyMainContent: true,
+        onlyCleanContent: true,
       }),
       signal: controller.signal,
     });
@@ -247,10 +236,9 @@ async function firecrawlFallback(url: string): Promise<string> {
     }
 
     const payload: any = await res.json();
-    // v2 response: { success: true, data: { json: { body: "..." }, ... } }
-    const extracted = payload?.data?.json?.body;
+    const extracted = payload?.data?.markdown;
     if (typeof extracted === "string" && extracted.length > 0) {
-      console.log(`[ingest][firecrawl] recovered ${extracted.length} chars for ${url}`);
+      console.log(`[ingest][firecrawl] recovered ${extracted.length} chars (clean markdown) for ${url}`);
       return collapse(extracted);
     }
     return "";
@@ -278,7 +266,7 @@ async function firecrawlFallback(url: string): Promise<string> {
 export async function extractFromUrl(
   url: string,
   preferred: string[] = [],
-  timeoutMs = 20_000
+  timeoutMs = 10_000
 ): Promise<string> {
   const html = await fetchText(url, timeoutMs);
   const body = html ? extractBody(html, preferred) : "";

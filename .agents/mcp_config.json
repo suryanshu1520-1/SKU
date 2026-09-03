@@ -3,6 +3,10 @@
     "ux-design-engine": {
       "command": "npx",
       "args": ["-y", "@elsahafy/ux-mcp-server"]
+    },
+    "firecrawl": {
+      "command": "npx",
+      "args": ["-y", "firecrawl-mcp"]
     }
   }
 }
