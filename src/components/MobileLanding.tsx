@@ -9,6 +9,7 @@ import {
   Globe,
   Swords,
   BookOpen,
+  Radio,
   Layers,
   Target,
   ChevronDown,
@@ -27,6 +28,7 @@ interface MobileLandingProps {
   onNavigateProfile: () => void;
   onNavigateLibrary?: () => void;
   onNavigateHumanities?: () => void;
+  onNavigateObservatory?: () => void;
   onNavigateManifesto?: () => void;
   onNavigateLegal?: (type: 'privacy' | 'terms' | 'refund') => void;
   candidatePreferences?: CandidatePreferences;
@@ -43,20 +45,22 @@ export default function MobileLanding({
   onNavigateProfile,
   onNavigateLibrary,
   onNavigateHumanities,
+  onNavigateObservatory,
   onNavigateManifesto,
   onNavigateLegal,
   candidatePreferences,
   seatData,
 }: MobileLandingProps) {
   const [expandedEngine, setExpandedEngine] = useState<string | null>('arena');
+  const countdown = calculateExamCountdown(candidatePreferences?.targetYear || '2026');
 
   const engines = [
     {
       id: 'arena',
       title: 'The Test Arena',
-      badge: 'Real Exam Simulation',
+      badge: 'Zero-Trust Crucible',
       summary: 'Timed exam with authentic UPSC marking and AI mistake breakdown.',
-      details: 'Evaluates answers immediately and pinpoints exactly why you fell for the trap before the real exam.',
+      details: 'Evaluates answers immediately on the server and pinpoints exactly why you fell for the trap before the real exam.',
       action: onNavigateArena,
       cta: 'Start Mock Exam',
       icon: Swords,
@@ -65,7 +69,7 @@ export default function MobileLanding({
     {
       id: 'brief',
       title: 'The Daily Brief',
-      badge: 'Verified Policy Briefs',
+      badge: '100% Grounded Policy',
       summary: '10 curated policy dispatches in a 4-minute read with 100% official citations.',
       details: 'Stop reading 150-page monthly pdf magazines. Get verified cabinet releases, policy metrics, and a daily 10-MCQ practice test.',
       action: onNavigateTracker,
@@ -74,9 +78,20 @@ export default function MobileLanding({
       color: '#0194a8',
     },
     {
+      id: 'observatory',
+      title: 'The Observatory',
+      badge: '25-Year PYQ Vault',
+      summary: '7,841 authentic UPSC past questions, topic yields, and 50:50 guess risk math.',
+      details: 'Search verified past questions from 2000–2025 and master the 25 themes that generate over 75% of all Prelims marks.',
+      action: onNavigateObservatory || onNavigateArena,
+      cta: 'Explore Question Vault',
+      icon: Radio,
+      color: '#e0d0ab',
+    },
+    {
       id: 'canon',
       title: 'Primary Thinkers',
-      badge: 'Original Verbatim Texts',
+      badge: 'Verbatim Texts',
       summary: 'Original philosophical excerpts from Ambedkar, Gandhi, and Kant.',
       details: 'Read verbatim original passages with side-by-side thinker comparisons for GS-4 ethics and Mains essays.',
       action: onNavigateHumanities || onNavigateArena,
@@ -84,37 +99,20 @@ export default function MobileLanding({
       icon: BookOpen,
       color: '#e0d0ab',
     },
-    {
-      id: 'pillars',
-      title: 'Syllabus Pillars',
-      badge: '25-Year Syllabus Trends',
-      summary: 'Core GS subjects mapped against a quarter century of UPSC papers.',
-      details: 'Explore interactive concept flowcharts, topic trends, and examiner trap alerts for clean revision.',
-      action: onNavigateLibrary || onNavigateArena,
-      cta: 'Explore Syllabus',
-      icon: Layers,
-      color: '#c8b998',
-    },
   ];
 
   return (
     <div className="w-full font-sans text-stone-100 pb-32 space-y-8">
       
-      {/* ── 1. Top Scarcity Bar & Exam Countdown ── */}
-      <div className="flex flex-col items-center justify-center gap-1.5 pt-2 px-2">
-        {candidatePreferences && candidatePreferences.targetYear && (
-          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 bg-[rgba(11,61,120,0.45)] border border-[rgba(19,108,153,0.5)] rounded-xs text-[11px] font-mono text-[#e0d0ab] shadow-md">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#34d399] animate-pulse shrink-0" />
-            <span>{calculateExamCountdown(candidatePreferences.targetYear).label}: <strong className="text-white">{calculateExamCountdown(candidatePreferences.targetYear).daysRemaining}d Left</strong></span>
-          </div>
-        )}
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-[rgba(4,25,54,0.75)] border border-[rgba(19,108,153,0.45)] rounded-xs text-[11px] font-sans text-[#e8e0cf] shadow-md">
-          <span className="w-2 h-2 rounded-full bg-[#34d399] animate-pulse shrink-0" />
-          <span className="text-[#8fa2bd]">Founders Club:</span>
-          <span className="text-[#e0d0ab] font-semibold">
-            {seatData ? `${seatData.max_capacity} Lifetime Seats` : '500 Lifetime Seats'}
-          </span>
-          <span className="text-[#8fa2bd]">&bull; 15-Min Lock</span>
+      {/* ── 1. De-cluttered Single-Surface Telemetry Bar ── */}
+      <div className="flex items-center justify-center pt-2 px-2">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(4,25,54,0.75)] border border-[rgba(19,108,153,0.45)] text-[11px] font-mono shadow-md">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#34d399] animate-pulse shrink-0" />
+          <span className="text-white font-semibold">{countdown.label}</span>
+          <span className="text-[#136c99]">&bull;</span>
+          <span className="text-[#e0d0ab]">{countdown.daysRemaining}d to Prelims</span>
+          <span className="text-[#136c99]">&bull;</span>
+          <span className="text-[#9fb0c8] font-sans">4,150+ PYQs</span>
         </div>
       </div>
 

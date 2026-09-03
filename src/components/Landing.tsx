@@ -9,14 +9,16 @@ import {
   CheckCircle2,
   Lock,
   Trophy,
-  Layers,
   BookOpen,
   Globe,
   Swords,
   ChevronRight,
   Activity,
   Check,
-  Radio
+  Radio,
+  AlertOctagon,
+  FileText,
+  HelpCircle
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import InteractiveBackground from './InteractiveBackground';
@@ -28,10 +30,9 @@ import { calculateExamCountdown } from '../lib/candidatePreferences';
 
 const navIdMap: Record<string, NavIconId> = {
   arena: 'arena',
-  observatory: 'observatory',
   brief: 'tracker',
+  observatory: 'observatory',
   canon: 'humanities',
-  pillars: 'library',
 };
 
 interface LandingProps {
@@ -64,7 +65,7 @@ export default function Landing({
   candidatePreferences,
 }: LandingProps) {
   const [seatData, setSeatData] = useState<SeatCountData | null>(null);
-  const [activeFeatureTab, setActiveFeatureTab] = useState<'arena' | 'observatory' | 'brief' | 'canon' | 'pillars'>('arena');
+  const [activeFeatureTab, setActiveFeatureTab] = useState<'arena' | 'brief' | 'observatory' | 'canon'>('arena');
   const [hoveredFeatureTab, setHoveredFeatureTab] = useState<string | null>(null);
 
   useEffect(() => {
@@ -81,67 +82,77 @@ export default function Landing({
     fetchSeats();
   }, []);
 
+  const countdown = calculateExamCountdown(candidatePreferences?.targetYear || '2026');
+
   const features = [
     {
       id: 'arena' as const,
       label: 'The Test Arena',
+      tagline: 'Zero-Trust Exam Crucible',
       title: 'Real Exam Simulation & AI Mistake Analysis',
       subtitle: 'Timed recall under authentic UPSC prelims pressure (+2.00 / -0.66 marking).',
-      description: 'Generic mock tests give you static PDF keys with vague answers. Tark evaluates your test immediately and provides an AI mistake breakdown that pinpoints exactly why you fell for the examiner\'s trap.',
-      metrics: ['50-Question Timed Tests', 'Instant Verified Results', 'Mistake & Trap Breakdown'],
+      description: 'Generic mock portals evaluate answers on the client where keys leak, and give vague PDF solutions. Tark evaluates your test immediately on the server and provides an AI mistake breakdown that pinpoints exactly why you fell for the examiner\'s trap.',
+      highlights: [
+        'Strict +2.00 / -0.66 negative marking simulation',
+        'Instant cognitive trap & distracter diagnosis',
+        'Zero-trust server evaluation with atomic state locking'
+      ],
       cta: 'Start Mock Exam',
       icon: Swords,
       action: onNavigateArena,
       color: '#34d399'
     },
     {
+      id: 'brief' as const,
+      label: 'The Daily Brief',
+      tagline: '100% Grounded Intelligence',
+      title: 'Daily PIB & Policy Distillation (4-Min Read)',
+      subtitle: '10 curated policy dispatches delivered daily with verified government citations.',
+      description: 'Stop drowning in 150-page monthly coaching compilations stuffed with unverified opinions. Tark distills daily PIB releases, Cabinet decisions, and Ministry notifications into 10 high-yield briefs with sentence-level government citations and a daily 10-question practice drill.',
+      highlights: [
+        '10 daily distilled policy dispatches in under 4 minutes',
+        'Sentence-level official PIB & Hindu Gazette citations',
+        'Zero-hallucination Cite-or-Drop factual verification'
+      ],
+      cta: "Read Today's Brief",
+      icon: Globe,
+      action: onNavigateTracker,
+      color: '#0194a8'
+    },
+    {
       id: 'observatory' as const,
       label: 'The Observatory',
-      title: '25-Year Question Vault & Strategic Intelligence Engine',
+      tagline: '25-Year Strategic Intelligence',
+      title: '25-Year Question Vault & Elimination Math',
       subtitle: '7,841 authentic UPSC questions, real attempt risk math, and high-yield topic patterns.',
-      description: 'Search the complete 25-year question bank with verified explanations. Calculate your expected score and cutoff safety margin with our 50:50 guessing simulator, and master the 25 topics that yield over 75% of all Prelims marks.',
-      metrics: ['7,841 Question Bank', '50:50 Attempt Calculator', 'High-Yield Topic Matrix'],
+      description: 'Search the complete quarter-century question bank with verified explanations. Calculate your expected score and cutoff safety margin with our 50:50 guessing simulator, and master the 25 topics that yield over 75% of all Prelims marks.',
+      highlights: [
+        '7,841 verified questions mapped across 2000–2025',
+        'Empirical 50:50 elimination expected-value model',
+        'High-yield topic matrix showing where 75%+ marks originate'
+      ],
       cta: 'Explore Question Vault',
       icon: Radio,
       action: onNavigateObservatory || onNavigateArena,
       color: '#e0d0ab'
     },
     {
-      id: 'brief' as const,
-      label: 'The Daily Brief',
-      title: 'Daily PIB & Policy Briefs (4-Min Read)',
-      subtitle: '10 curated policy updates delivered daily with verified government sources.',
-      description: 'Stop drowning in 150-page monthly magazines. Tark distills daily PIB releases, Cabinet decisions, and Ministry notifications into 10 high-yield briefs with direct government citations and a daily 10-question practice drill.',
-      metrics: ['10 Daily Policy Briefs', 'Official Government Sources', 'Daily 10-Question Drill'],
-      cta: 'Read Today\'s Brief',
-      icon: Globe,
-      action: onNavigateTracker,
-      color: '#0194a8'
-    },
-    {
       id: 'canon' as const,
       label: 'Primary Thinkers',
+      tagline: 'GS-4 Ethics & Philosophy',
       title: 'Primary Thinkers & Ethics Reading Room',
       subtitle: 'Read the original writings of thinkers the UPSC repeatedly quotes in GS-4 and Essay.',
-      description: 'Secondary coaching notes often oversimplify deep ideas. Read verbatim original writings from Dr. B. R. Ambedkar, Mahatma Gandhi, and Immanuel Kant, with a side-by-side comparison tool to enrich your Mains essays and ethics answers.',
-      metrics: ['Original Verbatim Writings', 'Side-by-Side Comparison', 'GS-4 & Essay Quotes'],
+      description: 'Secondary coaching summaries flatten deep philosophical ideas into generic bullet points. Read verbatim original writings from Dr. B. R. Ambedkar, Mahatma Gandhi, and Immanuel Kant, with a side-by-side comparison tool to enrich your Mains essays and ethics answers.',
+      highlights: [
+        'Verbatim original writings from primary philosophical texts',
+        'Side-by-side concept comparison across schools of thought',
+        'Directly applicable quotes for GS-4 case studies & Essay'
+      ],
       cta: 'Open Reading Room',
       icon: BookOpen,
       action: onNavigateHumanities || onNavigateArena,
       color: '#e0d0ab'
     },
-    {
-      id: 'pillars' as const,
-      label: 'Syllabus Pillars',
-      title: 'Core Syllabus Subjects (GS 1 to 4)',
-      subtitle: 'Constitutional law, macroeconomic policy, environment, and modern history.',
-      description: 'Master the core syllabus mapped directly against 25 years of UPSC question papers. Explore interactive concept flowcharts, 10-year past question trends, and classic examiner trap alerts.',
-      metrics: ['Core GS Subjects', '25-Year Question Trends', 'Trap Alerts & Flowcharts'],
-      cta: 'Explore Syllabus Guide',
-      icon: Layers,
-      action: onNavigateLibrary || onNavigateArena,
-      color: '#0194a8'
-    }
   ];
 
   const activeFeature = features.find((f) => f.id === activeFeatureTab) || features[0];
@@ -176,36 +187,39 @@ export default function Landing({
             ══════════════════════════════════════════════════════════════════ */}
         <div className="w-full flex flex-col items-center text-center space-y-6 max-w-3xl mx-auto">
           
-          {/* Status Pill */}
+          {/* ── De-cluttered Single-Surface Telemetry Capsule ── */}
           <motion.div
-            initial={{ opacity: 0, y: -8 }}
+            initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="flex flex-wrap items-center justify-center gap-2.5"
+            className="inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 px-4 py-1.5 rounded-full bg-[rgba(4,25,54,0.75)] border border-[rgba(19,108,153,0.45)] backdrop-blur-md text-xs shadow-[0_4px_20px_rgba(3,16,38,0.5)]"
           >
-            {candidatePreferences && candidatePreferences.targetYear && (
-              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-[rgba(11,61,120,0.45)] border border-[rgba(19,108,153,0.5)] rounded-xs text-xs font-mono text-[#e0d0ab] backdrop-blur-md">
-                <Target className="w-3.5 h-3.5 text-[#34d399]" />
-                <span>{calculateExamCountdown(candidatePreferences.targetYear).label}: <strong className="text-white">{calculateExamCountdown(candidatePreferences.targetYear).daysRemaining} Days Left</strong></span>
-              </div>
-            )}
-
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-[rgba(4,25,54,0.7)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-[#e8e0cf] backdrop-blur-md">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#34d399] animate-pulse" />
-              <span className="text-[#8fa2bd]">Founders Club:</span>
-              <span className="text-[#e0d0ab] font-medium">
-                {seatData
-                  ? (seatData.claimed_seats >= 25
-                      ? `${seatData.claimed_seats} / ${seatData.max_capacity} Seats Claimed`
-                      : `${seatData.max_capacity} Lifetime Founding Seats`)
-                  : '500 Lifetime Founding Seats'}
+            {/* Live Horizon Target */}
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#34d399] animate-pulse shrink-0" />
+              <span className="font-semibold text-white font-sans">
+                {countdown.label}
               </span>
-              <span className="text-[#8fa2bd] hidden sm:inline">&bull; 15-Min Lock</span>
+              <span className="text-[#136c99]">&bull;</span>
+              <span className="font-mono text-[#e0d0ab] font-medium">
+                {countdown.daysRemaining} Days to Prelims
+              </span>
             </div>
 
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[rgba(4,25,54,0.5)] border border-[rgba(19,108,153,0.35)] rounded-xs text-xs font-sans text-[#8fa2bd] backdrop-blur-md">
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#34d399]" />
-              <span>4,150+ Verified MCQs</span>
+            <span className="text-[#136c99]/60 hidden sm:inline">&bull;</span>
+
+            {/* Verified MCQs Base */}
+            <div className="flex items-center gap-1.5 text-[#9fb0c8] font-sans">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#34d399] shrink-0" />
+              <span>4,150+ Verified PYQs</span>
+            </div>
+
+            <span className="text-[#136c99]/60 hidden md:inline">&bull;</span>
+
+            {/* Zero-Trust Architecture */}
+            <div className="hidden md:flex items-center gap-1.5 text-[#8fa2bd] font-sans">
+              <Shield className="w-3.5 h-3.5 text-[#0194a8] shrink-0" />
+              <span className="text-[#e8e0cf] font-mono">Zero-Trust Scored</span>
             </div>
           </motion.div>
 
@@ -287,8 +301,8 @@ export default function Landing({
             </p>
           </div>
 
-          {/* Interactive Feature Segmented Switcher */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 bg-[rgba(4,25,54,0.7)] p-1.5 rounded-md border border-[rgba(19,108,153,0.35)] backdrop-blur-md">
+          {/* Interactive Feature Segmented Switcher (Symmetrical 4-Engine Grid) */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 bg-[rgba(4,25,54,0.7)] p-1.5 rounded-md border border-[rgba(19,108,153,0.35)] backdrop-blur-md">
             {features.map((f) => {
               const active = activeFeatureTab === f.id;
               const isHovered = hoveredFeatureTab === f.id;
@@ -317,40 +331,43 @@ export default function Landing({
             })}
           </div>
 
-          {/* Active Engine Card */}
+          {/* Active Engine Living Showcase Card */}
           <div className="bg-[rgba(4,25,54,0.65)] backdrop-blur-xl border border-[rgba(19,108,153,0.45)] rounded-md p-6 md:p-8 shadow-[0_12px_36px_-6px_rgba(0,0,0,0.5)]">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
               
-              <div className="lg:col-span-7 space-y-4">
-                <span className="font-sans text-xs font-medium text-[#0194a8]">
-                  {activeFeature.subtitle}
-                </span>
+              {/* Left Column: Descriptive Value Propositions */}
+              <div className="lg:col-span-6 flex flex-col justify-between space-y-5">
+                <div className="space-y-3.5">
+                  <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[rgba(11,61,120,0.4)] border border-[rgba(19,108,153,0.4)] text-[11px] font-mono text-[#0194a8]">
+                    <span>{activeFeature.tagline}</span>
+                  </div>
 
-                <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#e8e0cf] tracking-tight">
-                  {activeFeature.title}
-                </h3>
+                  <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#e8e0cf] tracking-tight">
+                    {activeFeature.title}
+                  </h3>
 
-                <p className="text-sm font-sans text-[#9fb0c8] leading-relaxed">
-                  {activeFeature.description}
-                </p>
+                  <p className="text-sm font-sans text-[#9fb0c8] leading-relaxed">
+                    {activeFeature.description}
+                  </p>
 
-                {/* Metrics Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
-                  {activeFeature.metrics.map((m, idx) => (
-                    <div
-                      key={idx}
-                      className="p-2.5 rounded-md bg-[rgba(11,61,120,0.25)] border border-[rgba(19,108,153,0.35)] font-sans text-xs text-[#e0d0ab] flex items-center gap-2"
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[#34d399] shrink-0" />
-                      <span className="truncate">{m}</span>
-                    </div>
-                  ))}
+                  {/* Highlight Cards (Rich, full labels with no truncations) */}
+                  <div className="space-y-2 pt-1">
+                    {activeFeature.highlights.map((h, idx) => (
+                      <div
+                        key={idx}
+                        className="p-2.5 rounded-sm bg-[rgba(11,61,120,0.2)] border border-[rgba(19,108,153,0.3)] font-sans text-xs text-[#e8e0cf] flex items-center gap-2.5"
+                      >
+                        <CheckCircle2 className="w-4 h-4 text-[#34d399] shrink-0" />
+                        <span className="leading-snug">{h}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="pt-2">
                   <button
                     onClick={activeFeature.action}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[rgba(224,208,171,0.12)] hover:bg-[#e0d0ab] border border-[rgba(224,208,171,0.4)] text-[#e0d0ab] hover:text-[#072e63] text-xs font-sans font-semibold rounded-md transition-all cursor-pointer shadow-md"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#e0d0ab] hover:bg-white text-[#072e63] text-xs font-sans font-bold uppercase tracking-wider rounded-xs transition-all cursor-pointer shadow-md"
                   >
                     <span>{activeFeature.cta}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -358,38 +375,207 @@ export default function Landing({
                 </div>
               </div>
 
-              {/* Graphical Visual Anchor */}
-              <div className="lg:col-span-5 bg-[rgba(3,16,38,0.7)] border border-[rgba(19,108,153,0.35)] rounded-md p-6 flex flex-col justify-between min-h-[240px]">
+              {/* Right Column: Living Interactive Engine Preview */}
+              <div className="lg:col-span-6 bg-[rgba(3,16,38,0.8)] border border-[rgba(19,108,153,0.4)] rounded-md p-5 flex flex-col justify-between shadow-inner">
+                {/* Simulation Header */}
                 <div className="flex items-center justify-between border-b border-[rgba(19,108,153,0.25)] pb-3">
                   <div className="flex items-center gap-2">
-                    <AnimatedNavIcon
-                      id={navIdMap[activeFeatureTab] || 'arena'}
-                      isActive={true}
-                      isHovered={true}
-                      size={16}
-                      className="w-4 h-4 text-[#e0d0ab] shrink-0"
-                    />
-                    <span className="font-sans text-xs font-semibold text-[#e0d0ab]">
-                      Live Engine Simulation
+                    <ActiveIcon className="w-4 h-4 text-[#e0d0ab] shrink-0" />
+                    <span className="font-mono text-xs font-semibold text-[#e0d0ab] uppercase tracking-wider">
+                      Live Engine Preview &bull; {activeFeature.label}
                     </span>
                   </div>
                   <span className="w-2 h-2 rounded-full bg-[#34d399] animate-pulse" />
                 </div>
 
-                <div className="py-6 flex flex-col items-center justify-center text-center space-y-3">
-                  <div className="w-12 h-12 rounded-xs bg-[rgba(224,208,171,0.1)] border border-[rgba(224,208,171,0.3)] flex items-center justify-center text-[#e0d0ab]">
-                    <ActiveIcon className="w-6 h-6" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="font-serif text-sm font-bold text-[#e8e0cf]">{activeFeature.title}</p>
-                    <p className="font-sans text-xs text-[#8fa2bd]">Zero Lag &bull; Instant Evaluation</p>
-                  </div>
+                {/* Dynamic Content Container */}
+                <div className="py-4 flex-1 flex flex-col justify-center">
+                  <AnimatePresence mode="wait">
+                    {/* ── 1. ARENA SIMULATION ── */}
+                    {activeFeatureTab === 'arena' && (
+                      <motion.div
+                        key="arena-preview"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                        className="space-y-3.5"
+                      >
+                        <div className="flex items-center justify-between text-[11px] font-mono border-b border-[rgba(19,108,153,0.25)] pb-2">
+                          <span className="text-[#e0d0ab] font-semibold flex items-center gap-1.5">
+                            <Swords className="w-3.5 h-3.5 text-[#34d399]" />
+                            UPSC Prelims GS-1 Simulation
+                          </span>
+                          <span className="text-[#34d399] font-bold">+2.00 / -0.66</span>
+                        </div>
+
+                        <div className="space-y-2">
+                          <p className="text-xs font-serif text-[#f8fafc] leading-relaxed">
+                            &ldquo;Consider the following statements regarding the Delimitation Commission under Article 82:&rdquo;
+                          </p>
+                          <div className="space-y-1.5 text-xs">
+                            <div className="p-2.5 rounded-sm bg-[rgba(16,185,129,0.12)] border border-emerald-400/40 text-emerald-200 flex items-start gap-2">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                              <span className="leading-snug">1. Orders have the force of law and cannot be questioned in court (Art. 329).</span>
+                            </div>
+                            <div className="p-2.5 rounded-sm bg-[rgba(225,78,78,0.12)] border border-rose-400/40 text-rose-200 flex items-start gap-2">
+                              <AlertOctagon className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
+                              <span className="leading-snug">2. Modifications permitted by Parliament. <strong className="text-rose-300 font-mono text-[10px] block mt-0.5">[Examiner Trap: Finality Doctrine]</strong></span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-[rgba(19,108,153,0.25)] flex items-center justify-between text-[11px] font-mono text-[#8fa2bd]">
+                          <span>Evaluation: Zero-Trust Server Lock</span>
+                          <span className="text-emerald-400 font-semibold">Trap Diagnosed</span>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* ── 2. DAILY BRIEF SIMULATION ── */}
+                    {activeFeatureTab === 'brief' && (
+                      <motion.div
+                        key="brief-preview"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                        className="space-y-3.5"
+                      >
+                        <div className="flex items-center justify-between text-[11px] font-mono border-b border-[rgba(19,108,153,0.25)] pb-2">
+                          <span className="text-[#0194a8] font-semibold flex items-center gap-1.5">
+                            <Globe className="w-3.5 h-3.5 text-[#0194a8]" />
+                            PIB Delhi &bull; Official Gazette
+                          </span>
+                          <span className="px-2 py-0.5 rounded-xs bg-emerald-500/15 border border-emerald-400/30 text-emerald-400 font-bold">100% Grounded</span>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="text-xs font-serif font-bold text-[#f8fafc] leading-snug">
+                            Expansion of Central Sector Scheme under Agriculture Infrastructure Fund (AIF)
+                          </div>
+                          <div className="p-2.5 rounded-sm bg-[rgba(11,61,120,0.3)] border border-[rgba(19,108,153,0.35)] text-xs text-[#cad5e2] space-y-1.5">
+                            <div className="flex items-center gap-1.5 text-[10px] font-mono text-[#e0d0ab]">
+                              <span>PIB Span s2 &bull; Cabinet Committee on Economic Affairs</span>
+                            </div>
+                            <p className="italic font-serif text-[11.5px] text-[#e8e0cf] leading-relaxed">
+                              &ldquo;...progressive expansion with an outlay of <mark className="bg-[#0b3d78] text-[#e0d0ab] px-1 py-0.2 rounded font-bold not-italic">Rs. 1 lakh crore</mark> for post-harvest management infrastructure.&rdquo;
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-[rgba(19,108,153,0.25)] flex items-center justify-between text-[11px] font-mono text-[#8fa2bd]">
+                          <span>Cite-or-Drop: 0 Hallucinations</span>
+                          <span className="text-[#e0d0ab]">10 Daily MCQs Ready</span>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* ── 3. OBSERVATORY SIMULATION ── */}
+                    {activeFeatureTab === 'observatory' && (
+                      <motion.div
+                        key="observatory-preview"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                        className="space-y-3.5"
+                      >
+                        <div className="flex items-center justify-between text-[11px] font-mono border-b border-[rgba(19,108,153,0.25)] pb-2">
+                          <span className="text-[#e0d0ab] font-semibold flex items-center gap-1.5">
+                            <Radio className="w-3.5 h-3.5 text-[#e0d0ab]" />
+                            25-Year Empirical Vault
+                          </span>
+                          <span className="text-[#0194a8]">7,841 Questions</span>
+                        </div>
+
+                        <div className="space-y-2 text-xs">
+                          <div className="p-2.5 rounded-sm bg-[rgba(4,25,54,0.7)] border border-[rgba(19,108,153,0.35)] space-y-2">
+                            <div className="flex justify-between text-[11px] text-[#cad5e2]">
+                              <span>High-Yield Topic Density (76% of Marks)</span>
+                              <span className="font-mono text-[#e0d0ab]">25 Core Themes</span>
+                            </div>
+                            <div className="space-y-1.5">
+                              <div>
+                                <div className="flex items-center justify-between text-[10px] text-[#8fa2bd] mb-0.5">
+                                  <span>Macroeconomics &amp; Fiscal Schemes</span>
+                                  <span className="font-mono">22%</span>
+                                </div>
+                                <div className="w-full h-1.5 rounded-full bg-[#041936] overflow-hidden">
+                                  <div className="h-full bg-[#e0d0ab] w-[22%]" />
+                                </div>
+                              </div>
+
+                              <div>
+                                <div className="flex items-center justify-between text-[10px] text-[#8fa2bd] mb-0.5">
+                                  <span>Environment, Ecology &amp; Treaties</span>
+                                  <span className="font-mono">19%</span>
+                                </div>
+                                <div className="w-full h-1.5 rounded-full bg-[#041936] overflow-hidden">
+                                  <div className="h-full bg-[#0194a8] w-[19%]" />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="p-2 rounded-sm bg-[rgba(16,185,129,0.08)] border border-emerald-400/30 text-[11px] text-emerald-200">
+                            <strong>50:50 Guessing Simulator:</strong> Expected Value = <span className="font-mono font-bold text-emerald-400">+0.67 marks</span> per 2-option elimination.
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-[rgba(19,108,153,0.25)] flex items-center justify-between text-[11px] font-mono text-[#8fa2bd]">
+                          <span>Vault: 2000 &ndash; 2025</span>
+                          <span className="text-emerald-400 font-semibold">100% Verified Keys</span>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* ── 4. PRIMARY THINKERS SIMULATION ── */}
+                    {activeFeatureTab === 'canon' && (
+                      <motion.div
+                        key="canon-preview"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                        className="space-y-3.5"
+                      >
+                        <div className="flex items-center justify-between text-[11px] font-mono border-b border-[rgba(19,108,153,0.25)] pb-2">
+                          <span className="text-[#e0d0ab] font-semibold flex items-center gap-1.5">
+                            <BookOpen className="w-3.5 h-3.5 text-[#e0d0ab]" />
+                            Primary Philosophy Reading Room
+                          </span>
+                          <span className="text-[#8fa2bd]">GS-4 &amp; Essay</span>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="text-[11px] font-mono text-[#0194a8] font-bold uppercase">
+                            Dr. B.R. Ambedkar &bull; Annihilation of Caste (1936)
+                          </div>
+                          <blockquote className="p-3 rounded-sm bg-[rgba(11,61,120,0.25)] border-l-2 border-[#e0d0ab] text-xs font-serif italic text-[#f8fafc] leading-relaxed">
+                            &ldquo;Constitutional morality is not a natural sentiment. It has to be cultivated. We must realize that our people have yet to learn it.&rdquo;
+                          </blockquote>
+                          <div className="p-2 rounded-xs bg-[rgba(4,25,54,0.7)] border border-[rgba(19,108,153,0.3)] text-[11px] text-[#9fb0c8]">
+                            <strong className="text-[#e0d0ab]">Mains Application:</strong> Verbatim anchor for Constitutional Ethics &amp; Administrative Probity case studies.
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-[rgba(19,108,153,0.25)] flex items-center justify-between text-[11px] font-mono text-[#8fa2bd]">
+                          <span>Type: Verbatim Primary Text</span>
+                          <span className="text-[#e0d0ab]">Mains High-Yield</span>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                <div className="flex items-center justify-between pt-3 border-t border-[rgba(19,108,153,0.25)] text-xs font-sans text-[#8fa2bd]">
-                  <span>Latency: 12ms</span>
-                  <span>Grounding: 100%</span>
-                  <span className="text-[#34d399]">Active</span>
+                {/* Simulation Static Meta Footer */}
+                <div className="flex items-center justify-between pt-2.5 border-t border-[rgba(19,108,153,0.25)] text-[11px] font-mono text-[#8fa2bd]">
+                  <span>Engine Mode: Active Simulation</span>
+                  <span className="text-[#34d399] flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#34d399]" />
+                    Interactive
+                  </span>
                 </div>
               </div>
 
@@ -449,68 +635,85 @@ export default function Landing({
                   <td className="py-3.5 px-3 text-[#9fb0c8]">Second-hand coaching summaries prone to distortion and omissions.</td>
                   <td className="py-3.5 px-3 text-[#e8e0cf] font-medium flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-[#34d399] shrink-0" />
-                    Verbatim original writings with side-by-side thinker comparisons.
+                    Direct primary texts (Ambedkar, Gandhi, Kant) with side-by-side analysis.
                   </td>
                 </tr>
 
                 <tr className="hover:bg-[rgba(11,61,120,0.2)] transition-colors">
-                  <td className="py-3.5 px-3 font-sans text-[#e0d0ab] font-medium">Test Review & Mistake Breakdown</td>
-                  <td className="py-3.5 px-3 text-[#9fb0c8]">Static PDF answer keys with vague explanations.</td>
+                  <td className="py-3.5 px-3 font-sans text-[#e0d0ab] font-medium">PYQ Trend Analysis</td>
+                  <td className="py-3.5 px-3 text-[#9fb0c8]">Static PDF question banks without statistical pattern recognition.</td>
                   <td className="py-3.5 px-3 text-[#e8e0cf] font-medium flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-[#34d399] shrink-0" />
-                    AI mistake analysis isolating why you fell for the trap.
+                    25-year indexed question bank with 50:50 elimination expected-value model.
+                  </td>
+                </tr>
+
+                <tr className="hover:bg-[rgba(11,61,120,0.2)] transition-colors">
+                  <td className="py-3.5 px-3 font-sans text-[#e0d0ab] font-medium">Seat Transparency & Scarcity</td>
+                  <td className="py-3.5 px-3 text-[#9fb0c8]">Fake &lsquo;limited time&rsquo; countdown clocks that reset every 24 hours.</td>
+                  <td className="py-3.5 px-3 text-[#e8e0cf] font-medium flex items-center gap-1.5">
+                    <Check className="w-4 h-4 text-[#34d399] shrink-0" />
+                    Strict 500-seat lifetime limit backed by Postgres row-level locks.
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-
         </div>
 
         {/* ══════════════════════════════════════════════════════════════════
-            5. FOUNDERS CLUB ACCESS BANNER
+            5. FOUNDERS CLUB SEAT TRANSPARENCY
             ══════════════════════════════════════════════════════════════════ */}
-        <div className="w-full bg-gradient-to-r from-[rgba(11,61,120,0.45)] via-[rgba(4,25,54,0.7)] to-[rgba(11,61,120,0.45)] border border-[rgba(224,208,171,0.35)] rounded-xs p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_16px_40px_-8px_rgba(0,0,0,0.6)]">
-          <div className="space-y-2 text-center md:text-left">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-xs bg-[rgba(224,208,171,0.12)] border border-[rgba(224,208,171,0.35)] text-[#e0d0ab] font-sans text-xs font-medium">
-              <Shield className="w-3.5 h-3.5 text-[#e0d0ab]" />
-              Founders Club Lifetime Access
+        <div className="w-full bg-[rgba(4,25,54,0.65)] backdrop-blur-md border border-[rgba(19,108,153,0.4)] rounded-xs p-6 md:p-8 space-y-6 shadow-md text-center max-w-2xl mx-auto">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[rgba(11,61,120,0.35)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-mono text-[#e0d0ab]">
+              <Lock className="w-3.5 h-3.5 text-[#34d399]" />
+              <span>Cryptographically Enforced Scarcity</span>
             </div>
-            <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#e8e0cf]">
-              Claim Your Lifetime Analytical Seat
+            <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#e0d0ab] tracking-tight">
+              Founders Club: 500 Lifetime Founding Seats
             </h3>
-            <p className="text-xs font-sans text-[#9fb0c8] max-w-xl">
-              Strictly limited to 500 lifetime seats. Guaranteed access to all future question banks, AI mistake reviews, and syllabus guides.
+            <p className="text-xs text-[#9fb0c8] font-sans max-w-lg mx-auto leading-relaxed">
+              We do not run endless subscription churn. Tark offers exactly 500 lifetime seats with a 15-minute reservation hold. Once claimed, membership closes forever.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
             <button
               onClick={onNavigateArena}
-              className="px-6 py-2.5 bg-[#e0d0ab] hover:bg-white text-[#072e63] font-sans text-sm font-semibold rounded-xs shadow-lg transition-all cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3 bg-[#e0d0ab] hover:bg-white text-[#072e63] font-sans text-xs font-bold uppercase tracking-wider rounded-xs transition-colors shadow-md cursor-pointer"
             >
-              Enter Arena Now &rarr;
+              Verify Platform in Test Arena
+            </button>
+            <button
+              onClick={onNavigateManifesto}
+              className="w-full sm:w-auto px-5 py-3 bg-[rgba(4,25,54,0.5)] border border-[rgba(19,108,153,0.4)] hover:border-[#e0d0ab] text-[#e8e0cf] hover:text-[#e0d0ab] font-sans text-xs font-medium rounded-xs transition-colors cursor-pointer"
+            >
+              Read The Manifesto
             </button>
           </div>
         </div>
 
-        {/* ══════════════════════════════════════════════════════════════════
-            6. FOOTER & ZERO-NOISE PLEDGE
-            ══════════════════════════════════════════════════════════════════ */}
-        <footer className="w-full pt-8 pb-4 text-center space-y-4 border-t border-[rgba(19,108,153,0.3)]">
-          <p className="text-xs font-sans text-[#8fa2bd]">
-            No ads &bull; No affiliate links &bull; No sponsored content &bull; Pure analytical intelligence
-          </p>
-          <div className="flex items-center justify-center gap-4 text-xs font-sans text-[#8fa2bd]">
-            <button onClick={() => onNavigateLegal?.('terms')} className="hover:text-[#e0d0ab] transition-colors cursor-pointer">Terms of Service</button>
+        {/* Desktop Footer */}
+        <footer className="w-full pt-8 pb-4 border-t border-[rgba(19,108,153,0.3)] flex flex-col sm:flex-row items-center justify-between text-xs text-[#8fa2bd] gap-4">
+          <div className="flex items-center gap-2 font-mono text-[11px]">
+            <span className="text-[#e0d0ab] font-bold tracking-wider">TARK</span>
+            <span>&bull;</span>
+            <span>Zero-Trust Analytical Crucible</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <button onClick={onNavigateManifesto} className="hover:text-[#e0d0ab] transition-colors cursor-pointer">Manifesto</button>
             <span>&bull;</span>
             <button onClick={() => onNavigateLegal?.('privacy')} className="hover:text-[#e0d0ab] transition-colors cursor-pointer">Privacy Policy</button>
+            <span>&bull;</span>
+            <button onClick={() => onNavigateLegal?.('terms')} className="hover:text-[#e0d0ab] transition-colors cursor-pointer">Terms of Service</button>
             <span>&bull;</span>
             <button onClick={() => onNavigateLegal?.('refund')} className="hover:text-[#e0d0ab] transition-colors cursor-pointer">Refund Policy</button>
           </div>
         </footer>
 
       </div>
+
     </div>
   );
 }

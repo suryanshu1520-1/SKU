@@ -151,12 +151,25 @@ export interface ExamCountdown {
  */
 export function calculateExamCountdown(targetYear: TargetYear = '2026'): ExamCountdown {
   const config = TARGET_YEARS_CONFIG.find((y) => y.id === targetYear) || TARGET_YEARS_CONFIG[1];
-  const targetDate = new Date(config.targetDate + 'T09:30:00+05:30'); // 9:30 AM IST (Paper 1 start)
+  let targetDate = new Date(config.targetDate + 'T09:30:00+05:30'); // 9:30 AM IST (Paper 1 start)
   const now = new Date();
   
-  const diffTime = targetDate.getTime() - now.getTime();
-  const daysRemaining = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-  const isPast = diffTime < 0;
+  let diffTime = targetDate.getTime() - now.getTime();
+  let daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  let isPast = diffTime < 0;
+  let label = config.label;
+
+  // If target date is in the past (e.g. CSE 2026 Prelims has completed),
+  // dynamically advance to the upcoming examination cycle (CSE 2027) so candidates
+  // never see an awkward dead "0 Days Left" badge.
+  if (isPast) {
+    const nextPrelimsDate = new Date('2027-05-23T09:30:00+05:30');
+    diffTime = nextPrelimsDate.getTime() - now.getTime();
+    daysRemaining = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+    label = 'CSE 2027+';
+    targetDate = nextPrelimsDate;
+    isPast = false;
+  }
 
   const dateFormatted = targetDate.toLocaleDateString('en-IN', {
     month: 'short',
@@ -166,7 +179,7 @@ export function calculateExamCountdown(targetYear: TargetYear = '2026'): ExamCou
 
   return {
     targetYear,
-    label: config.label,
+    label,
     daysRemaining,
     dateFormatted,
     isPast
