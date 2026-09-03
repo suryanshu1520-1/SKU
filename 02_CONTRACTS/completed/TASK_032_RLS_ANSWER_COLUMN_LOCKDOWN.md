@@ -1,6 +1,6 @@
 ---
 task_id: "TASK_032_RLS_ANSWER_COLUMN_LOCKDOWN"
-status: "AWAITING_VERIFICATION"
+status: "VERIFIED_PARTIAL"
 assigned_to: "ANTIGRAVITY"
 target_model: "Gemini 3.7 Flash (Hybrid Reasoning / Thinking Mode)"
 thinking_tier: "high"
@@ -134,4 +134,15 @@ diff: |
   +    } finally { setRevealing(false); }
   +  };
 ```
+
+# 6. Orchestrator Verification Note
+
+Independently re-verified 2026-09-01 via direct read of the migration file, `grep` across the repo, a live `curl` against the real production Supabase REST API, and a 7-lane investigation workflow. Findings:
+
+1. **Migration is genuinely correct.** Read `supabase/migrations/20260830230000_lockdown_answer_columns.sql` in full (96 lines, not the receipt's claimed 78 — the receipt's diff was truncated, the actual file is larger but consistent with it). It correctly `REVOKE`s blanket `SELECT` from `anon`/`authenticated`/`public` on both `current_affairs_mcqs` and `static_questions`, replaces it with column-level `GRANT SELECT (...)` lists that exclude `correct_index`/`correct_option`/`explanation` (answer-adjacent columns), and additionally creates `_public` fallback views with the same column exclusion. This is a defense-in-depth pattern (column grants + views), stronger than either alone.
+2. **Service-role accounting: `questions.ts` was silently omitted from the receipt's 3-file list, but this is harmless.** The receipt's `service_role_verification` block names only `submit-quiz.ts` and `explanation.ts`. Independently checked `server-lib/questions.ts` as well — it also already uses the service-role client for its answer-column reads, unaffected by the anon-role revoke. The omission from the receipt is an incompleteness in the paperwork, not a functional gap.
+3. **Real gap found and closed via fast-follow: root `server.ts`'s duplicate legacy `/api/explanation` handler.** Root `server.ts:241-330` contains a second, un-synced implementation of the explanation endpoint (local-dev/self-hosted path only — production traffic goes through `api/server.ts`, which is unaffected). This duplicate still uses the anon client and was never updated alongside `server-lib/explanation.ts`'s fix in this same contract. Under the new column-level lockdown, this path will fail to retrieve answer data, breaking Quick Review's reveal for anyone running the app via that entry point. Confirmed via live testing that this is **not** connected to the separately-found Landing-page render-loop bug — two unrelated issues. Dispatched as [TASK_041](TASK_041_LEGACY_SERVER_EXPLANATION_HANDLER_SYNC.md).
+4. **Vulnerability is still live in production.** Confirmed via a real `curl` against the production Supabase REST API using live credentials: the pre-fix anon-key answer-leak (`GET .../current_affairs_mcqs?select=id,correct_index,subject` returning real answer data with just the public anon key) **still succeeds** as of this verification, because the migration has correctly never been applied to the live database — no contract has called `apply_migration`, matching the standing invariant and the receipt's own honest statement that it was not applied. Applying this migration to production remains an explicit user/Orchestrator decision, not yet made.
+
+**Disposition:** `VERIFIED_PARTIAL` — the code-side fix (migration file + application-layer callers) is correct and complete; the partial-ness is (a) the un-synced legacy handler, now fast-followed as TASK_041, and (b) the migration's application to production being a still-open decision for the user, separate from this contract's scope.
 

@@ -30,8 +30,10 @@ export interface PYQQueryParams {
   q?: string;
   subject?: string;
   era?: string;
+  year?: number | string;
   cognitiveType?: string;
   stage?: string;
+  quality?: 'verified' | 'all';
   page?: number;
   limit?: number;
 }
@@ -75,13 +77,17 @@ let cachedCorpus: PYQItem[] | null = null;
 
 function getCandidatePaths(): string[] {
   const candidates = [
+    path.join(process.cwd(), 'server-lib', 'analytics', 'data', 'verified_pyqs_15yr.json'),
     path.join(process.cwd(), 'server-lib', 'analytics', 'data', 'master_7841_pyqs.json'),
+    path.join(process.cwd(), 'dist', 'verified_pyqs_15yr.json'),
     path.join(process.cwd(), 'dist', 'master_7841_pyqs.json'),
   ];
 
   if (typeof __dirname !== 'undefined') {
     candidates.push(
+      path.join(__dirname, 'data', 'verified_pyqs_15yr.json'),
       path.join(__dirname, 'data', 'master_7841_pyqs.json'),
+      path.join(__dirname, '..', 'analytics', 'data', 'verified_pyqs_15yr.json'),
       path.join(__dirname, '..', 'analytics', 'data', 'master_7841_pyqs.json')
     );
   }
@@ -107,32 +113,73 @@ function loadCorpus(): PYQItem[] {
     cachedCorpus = [];
     return cachedCorpus;
   } catch (err) {
-    console.error('Error loading master 7841 PYQ corpus:', err);
+    console.error('Error loading master PYQ corpus:', err);
     return [];
   }
+}
+
+export function getPYQById(id: string): PYQItem | undefined {
+  const corpus = loadCorpus();
+  const cleanId = id.replace(/^pyq_/, '').replace(/^db_/, '');
+  return corpus.find((item) => item.id === cleanId || item.id === id || item.id === `db_${cleanId}` || item.id === `pyq_${cleanId}`);
 }
 
 export function queryMasterPYQs(params: PYQQueryParams): PYQQueryResult {
   const corpus = loadCorpus();
   const searchQ = (params.q || '').trim().toLowerCase();
   const subjectFilter = (params.subject || 'All').trim().toLowerCase();
-  const eraFilter = (params.era || 'All').trim();
+  const eraFilter = (params.era || '2011-2025').trim();
   const cognitiveFilter = (params.cognitiveType || 'All').trim().toLowerCase();
   const stageFilter = (params.stage || 'All').trim().toLowerCase();
+  const qualityFilter = params.quality || 'verified';
   const page = Math.max(1, Number(params.page) || 1);
   const limit = Math.min(50, Math.max(1, Number(params.limit) || 10));
 
   const filtered = corpus.filter((item) => {
-    // Subject filter
+    // Quality filter: exclude placeholder dummy options by default
+    if (qualityFilter === 'verified') {
+      if (!Array.isArray(item.options) || item.options.length < 4) return false;
+      if (item.options.some((opt) => /^\(?[a-d]\)?\s*Option\s+[A-D]$/i.test(opt.trim()))) return false;
+    }
+
+    // Subject filter with intelligent keyword & cross-subject categorization
     if (subjectFilter !== 'all') {
-      if (!item.subject.toLowerCase().includes(subjectFilter)) {
-        return false;
+      const itemSub = (item.subject || '').toLowerCase();
+      if (subjectFilter === 'polity') {
+        if (!itemSub.includes('polity') && !itemSub.includes('governance') && !itemSub.includes('constitution') && !itemSub.includes('law')) return false;
+      } else if (subjectFilter === 'economy') {
+        if (!itemSub.includes('economy') && !itemSub.includes('economics') && !itemSub.includes('finance') && !itemSub.includes('fiscal') && !itemSub.includes('monetary')) return false;
+      } else if (subjectFilter === 'environment') {
+        if (!itemSub.includes('environment') && !itemSub.includes('ecology') && !itemSub.includes('wildlife') && !itemSub.includes('biodiversity')) return false;
+      } else if (subjectFilter === 'geography') {
+        if (!itemSub.includes('geography') && !itemSub.includes('agriculture') && !itemSub.includes('climate')) return false;
+      } else if (subjectFilter === 'history') {
+        if (!itemSub.includes('history') && !itemSub.includes('culture') && !itemSub.includes('ancient') && !itemSub.includes('medieval') && !itemSub.includes('art')) return false;
+      } else if (subjectFilter === 'science') {
+        if (!itemSub.includes('science') && !itemSub.includes('tech') && !itemSub.includes('space') && !itemSub.includes('biotech')) return false;
+      } else if (subjectFilter === 'csat') {
+        if (!itemSub.includes('csat') && !itemSub.includes('reasoning') && !itemSub.includes('reading') && !itemSub.includes('quant') && !itemSub.includes('comprehension')) return false;
+      } else {
+        if (!itemSub.includes(subjectFilter)) return false;
       }
     }
 
-    // Era filter
-    if (eraFilter !== 'All') {
-      if (item.era !== eraFilter) {
+    // Era / Year range filter (Focus on Last 15 Years: 2011–2025)
+    if (eraFilter === '2011-2025' || eraFilter === 'recent15' || eraFilter === 'Last 15 Years') {
+      if (item.year < 2011 || item.year > 2025) return false;
+    } else if (eraFilter === '2020-2025' || eraFilter === 'recent5' || eraFilter === 'Latest 5 Years') {
+      if (item.year < 2020 || item.year > 2025) return false;
+    } else if (eraFilter === '2015-2019') {
+      if (item.year < 2015 || item.year > 2019) return false;
+    } else if (eraFilter === '2011-2014') {
+      if (item.year < 2011 || item.year > 2014) return false;
+    } else if (eraFilter === '2000-2010') {
+      if (item.year > 2010) return false;
+    } else if (eraFilter !== 'All' && eraFilter !== 'all') {
+      const parsedYear = parseInt(eraFilter, 10);
+      if (!isNaN(parsedYear)) {
+        if (item.year !== parsedYear) return false;
+      } else if (item.era !== eraFilter) {
         return false;
       }
     }

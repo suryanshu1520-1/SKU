@@ -178,15 +178,15 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
             </p>
           </div>
 
-          {/* 3 High-Yield Engine Steles */}
+          {/* Core Study Modules */}
           <div className="space-y-3 pt-2">
             <div className="flex items-start gap-3 p-3 rounded-xs bg-[rgba(11,61,120,0.2)] border border-[rgba(19,108,153,0.3)]">
               <div className="p-2 rounded-xs bg-[rgba(4,25,54,0.8)] border border-[rgba(224,208,171,0.3)] text-[#e0d0ab] shrink-0">
                 <Swords className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <h3 className="font-serif text-xs font-bold text-[#e8e0cf]">The Test Arena & Autopsy</h3>
-                <p className="text-xs text-[#9fb0c8] mt-0.5">Timed simulation with server-evaluated scoring and AI conceptual autopsy.</p>
+                <h3 className="font-serif text-xs font-bold text-[#e8e0cf]">The Test Arena & Instant Review</h3>
+                <p className="text-xs text-[#9fb0c8] mt-0.5">Timed exam simulation with instant verified scoring and AI mistake breakdown.</p>
               </div>
             </div>
 
@@ -196,7 +196,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
               </div>
               <div className="min-w-0">
                 <h3 className="font-serif text-xs font-bold text-[#e8e0cf]">The Daily Brief</h3>
-                <p className="text-xs text-[#9fb0c8] mt-0.5">10 curated policy signals daily with 100% grounded government citations.</p>
+                <p className="text-xs text-[#9fb0c8] mt-0.5">10 curated policy updates daily with 100% grounded government citations.</p>
               </div>
             </div>
 
@@ -205,8 +205,8 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
                 <BookOpen className="w-4 h-4 text-[#e0d0ab]" />
               </div>
               <div className="min-w-0">
-                <h3 className="font-serif text-xs font-bold text-[#e8e0cf]">The Humanities Canon</h3>
-                <p className="text-xs text-[#9fb0c8] mt-0.5">Verbatim primary texts from Ambedkar, Gandhi, and Kant with dialectic synthesis.</p>
+                <h3 className="font-serif text-xs font-bold text-[#e8e0cf]">Primary Thinkers & Ethics</h3>
+                <p className="text-xs text-[#9fb0c8] mt-0.5">Verbatim primary texts from Ambedkar, Gandhi, and Kant with thinker comparisons.</p>
               </div>
             </div>
           </div>

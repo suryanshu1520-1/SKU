@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import {
   House,
@@ -19,11 +19,17 @@ import {
   Zap,
   SlidersHorizontal,
   Bookmark,
-  Radio
+  Radio,
+  Clock,
+  Target
 } from 'lucide-react';
 
 import BrandLogo, { TarkSigil } from './BrandLogo';
 import { NAV_ITEMS, PROFILE_NAV_ITEM, NavItem, NavTab } from '../lib/navItems';
+import AnimatedNavIcon from './AnimatedNavIcon';
+import type { CandidatePreferences } from '../types';
+import { calculateExamCountdown, formatTrackBadge } from '../lib/candidatePreferences';
+import { getOptionalSubject } from '../data/optional-subjects';
 export type { NavTab, NavItem };
 
 export interface ContextActionItem {
@@ -45,12 +51,14 @@ interface VerticalNavRailProps {
   isLanding: boolean;
   userEmail: string | null;
   isExpanded: boolean;
+  candidatePreferences?: CandidatePreferences;
   contextActions?: ContextActionItem[];
   onToggleExpand: () => void;
   onNavigateTab: (tab: NavTab) => void;
   onNavigateHome: () => void;
   onOpenLogin: () => void;
   onSwitchToHorizontal: () => void;
+  onRecalibrateTrack?: () => void;
 }
 
 export default function VerticalNavRail({
@@ -58,14 +66,20 @@ export default function VerticalNavRail({
   isLanding,
   userEmail,
   isExpanded,
+  candidatePreferences,
   contextActions,
   onToggleExpand,
   onNavigateTab,
   onNavigateHome,
   onOpenLogin,
   onSwitchToHorizontal,
+  onRecalibrateTrack,
 }: VerticalNavRailProps) {
   const prefersReducedMotion = useReducedMotion();
+  const [hoveredNavId, setHoveredNavId] = useState<string | null>(null);
+  const countdown = calculateExamCountdown(candidatePreferences?.targetYear || '2026');
+  const trackBadge = candidatePreferences ? formatTrackBadge(candidatePreferences) : "CSE '26 · PSIR";
+
 
   const handleItemClick = (item: NavItem) => {
     if (item.id === 'home') {
@@ -142,61 +156,135 @@ export default function VerticalNavRail({
 
   return (
     <aside
-      className={`fixed top-0 left-0 bottom-0 z-50 flex flex-col justify-between border-r border-[rgba(19,108,153,0.45)] bg-[rgba(4,25,54,0.85)] backdrop-blur-xl font-sans text-stone-200 select-none transition-all duration-300 ${
+      aria-label="Candidate Command Rail"
+      className={`fixed top-0 left-0 bottom-0 z-40 bg-[rgba(4,25,54,0.85)] backdrop-blur-xl border-r border-[rgba(19,108,153,0.45)] flex flex-col justify-between transition-all duration-300 select-none shadow-2xl ${
         isExpanded ? 'w-56' : 'w-16'
       }`}
       style={{
-        boxShadow: '4px 0 24px -4px rgba(0, 0, 0, 0.45)',
         transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
       }}
     >
-      {/* ── Top Brand Header ── */}
-      <div className="flex flex-col">
-        <div
-          onClick={onNavigateHome}
-          className={`flex items-center px-4 py-4 border-b border-[rgba(19,108,153,0.35)] cursor-pointer group transition-colors ${
-            isExpanded ? 'justify-start' : 'justify-center'
-          }`}
-          title="Tark | तर्क — Home"
-        >
-          <BrandLogo
-            size="md"
-            isCompact={!isExpanded}
-            showSubtitle={true}
-          />
+      {/* Top Section: Brand Sigil + Candidate Horizon Command Card + Nav */}
+      <div className="flex flex-col flex-1 min-h-0 overflow-y-auto overflow-x-hidden scrollbar-none">
+        {/* Brand Header */}
+        <div className={`p-3.5 border-b border-[rgba(19,108,153,0.3)] flex items-center ${isExpanded ? 'justify-between' : 'justify-center'}`}>
+          <div
+            onClick={onNavigateHome}
+            className="flex items-center gap-2.5 cursor-pointer group"
+            title="Tark 1.0 — Analytical Test Arena"
+          >
+            <TarkSigil size={32} />
+            {isExpanded && (
+              <motion.div
+                initial={{ opacity: 0, x: -6 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex flex-col"
+              >
+                <span className="font-serif font-bold text-sm text-[#e0d0ab] tracking-wider leading-none">
+                  TARK
+                </span>
+                <span className="text-[10px] font-sans uppercase tracking-widest text-[#0194a8] leading-tight">
+                  Arena 1.0
+                </span>
+              </motion.div>
+            )}
+          </div>
+
+          {/* Expand / Collapse Rail Toggle */}
+          {isExpanded && (
+            <button
+              onClick={onToggleExpand}
+              title="Collapse Rail (Alt+[)"
+              className="p-1 rounded text-[#8fa2bd] hover:text-[#e0d0ab] hover:bg-[rgba(11,61,120,0.4)] transition-colors cursor-pointer"
+            >
+              <PanelLeftClose className="w-4 h-4" />
+            </button>
+          )}
         </div>
+
+        {/* ── Candidate Command Pill: Uncluttered Horizon & Track ── */}
+        {candidatePreferences && (() => {
+          const opt = getOptionalSubject(candidatePreferences.optionalSubject);
+          return isExpanded ? (
+            <button
+              type="button"
+              onClick={onRecalibrateTrack}
+              title="Click to recalibrate candidate profile & track"
+              className="mx-3 mt-3 p-3 rounded-md bg-[rgba(11,61,120,0.25)] hover:bg-[rgba(11,61,120,0.4)] border border-[rgba(19,108,153,0.35)] hover:border-[#e0d0ab]/50 transition-all text-left group cursor-pointer shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80"
+            >
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="flex items-center gap-1.5 text-xs font-mono font-bold text-[#e0d0ab] tracking-tight">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#34d399] animate-pulse shrink-0" />
+                  <span className="tabular-nums">{countdown.daysRemaining}d</span>
+                  <span className="text-[11px] font-sans font-normal text-[#8fa2bd]">to {countdown.label}</span>
+                </span>
+                {onRecalibrateTrack && (
+                  <span className="text-[11px] font-sans text-[#8fa2bd] group-hover:text-[#e0d0ab] flex items-center gap-0.5 transition-colors">
+                    Edit
+                    <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                  </span>
+                )}
+              </div>
+              <div className="text-[11px] font-medium text-[#cad5e2] truncate">
+                {opt?.shortName || 'General Studies'}
+              </div>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onRecalibrateTrack}
+              title={`Target: ${countdown.label} (${countdown.daysRemaining} days remaining) · ${opt?.shortName || 'Track'}. Click to recalibrate.`}
+              className="mx-auto mt-3 w-10 h-10 rounded-md bg-[rgba(11,61,120,0.25)] hover:bg-[rgba(11,61,120,0.4)] border border-[rgba(19,108,153,0.35)] hover:border-[#e0d0ab]/50 transition-all cursor-pointer flex flex-col items-center justify-center text-center group shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80"
+            >
+              <span className="font-mono text-[10px] font-bold text-[#e0d0ab] leading-none tabular-nums">
+                {countdown.daysRemaining}d
+              </span>
+              <span className="text-[9px] font-sans font-medium text-[#8fa2bd] group-hover:text-[#e0d0ab] mt-0.5 leading-none">
+                {candidatePreferences.targetYear === 'state-psc' ? 'PSC' : `'${candidatePreferences.targetYear.slice(2)}`}
+              </span>
+            </button>
+          );
+        })()}
 
         {/* ── Navigation Groupings ── */}
         <nav className="p-2 space-y-1 mt-2">
           {NAV_ITEMS.map((item) => {
             const active = isItemActive(item);
-            const Icon = item.icon;
+            const isItemHovered = hoveredNavId === item.id;
 
             return (
-              <button
+              <motion.button
                 key={item.id}
                 onClick={() => handleItemClick(item)}
+                onMouseEnter={() => setHoveredNavId(item.id)}
+                onMouseLeave={() => setHoveredNavId(null)}
+                whileHover={prefersReducedMotion ? undefined : { x: 2 }}
+                whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                 title={`${item.label} (Alt+${item.hotkey})`}
-                className={`relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xs transition-all duration-200 group cursor-pointer ${
+                className={`relative w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors duration-150 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80 ${
                   isExpanded ? 'justify-start' : 'justify-center'
                 } ${
                   active
-                    ? 'bg-[rgba(224,208,171,0.12)] text-[#e0d0ab] font-medium'
-                    : 'text-[#8fa2bd] hover:text-[#e8e0cf] hover:bg-[rgba(11,61,120,0.35)]'
+                    ? 'bg-[rgba(224,208,171,0.12)] text-[#e0d0ab] border border-[rgba(224,208,171,0.3)] font-semibold shadow-xs'
+                    : 'text-[#8fa2bd] hover:text-[#e8e0cf] hover:bg-[rgba(11,61,120,0.3)]'
                 }`}
               >
                 {/* Active Indicator Bar on left edge */}
                 {active && (
                   <motion.span
                     layoutId="vertical-rail-active-edge"
-                    className="absolute left-0 top-1 bottom-1 w-1 bg-[#e0d0ab] rounded-r-xs"
+                    className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#e0d0ab] rounded-r-xs"
                     transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', bounce: 0.15, duration: 0.4 }}
                   />
                 )}
 
-                <Icon
-                  className={`w-4 h-4 shrink-0 transition-transform duration-200 ${
-                    active ? 'text-[#e0d0ab] scale-105' : 'text-[#8fa2bd] group-hover:text-[#e8e0cf] group-hover:scale-110'
+                <AnimatedNavIcon
+                  id={item.id}
+                  isActive={active}
+                  isHovered={isItemHovered}
+                  size={18}
+                  className={`w-4 h-4 shrink-0 transition-transform duration-150 ${
+                    active ? 'text-[#e0d0ab]' : 'text-[#8fa2bd] group-hover:text-[#e8e0cf]'
                   }`}
                 />
 
@@ -206,42 +294,50 @@ export default function VerticalNavRail({
                     animate={{ opacity: 1, x: 0 }}
                     className="flex items-center justify-between flex-1 min-w-0"
                   >
-                    <span className="text-xs truncate">{item.label}</span>
-                    <span className="text-[9px] font-mono text-[#5c6f8a] opacity-70 border border-[rgba(19,108,153,0.4)] px-1 py-0.2 rounded-xs group-hover:text-[#8fa2bd]">
+                    <span className="text-xs font-sans truncate">{item.label}</span>
+                    <span className="text-[10px] font-sans text-[#7a8ea8] border border-[rgba(19,108,153,0.35)] bg-[rgba(3,18,42,0.6)] px-1.5 py-0.5 rounded group-hover:text-[#e8e0cf] group-hover:border-[#e0d0ab]/40 transition-colors">
                       {item.hotkey}
                     </span>
                   </motion.div>
                 )}
-              </button>
+              </motion.button>
             );
           })}
 
           {/* Profile Button (when signed in) */}
           {userEmail && (() => {
-            const ProfileIcon = PROFILE_NAV_ITEM.icon;
             const active = !isLanding && activeTab === 'profile';
+            const isItemHovered = hoveredNavId === 'profile';
             return (
-              <button
+              <motion.button
                 onClick={() => onNavigateTab('profile')}
+                onMouseEnter={() => setHoveredNavId('profile')}
+                onMouseLeave={() => setHoveredNavId(null)}
+                whileHover={prefersReducedMotion ? undefined : { x: 2 }}
+                whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
                 title={`${PROFILE_NAV_ITEM.label} (Alt+${PROFILE_NAV_ITEM.hotkey})`}
-                className={`relative w-full flex items-center gap-3 px-3 py-2.5 rounded-xs transition-all duration-200 group cursor-pointer ${
+                className={`relative w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors duration-150 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80 ${
                   isExpanded ? 'justify-start' : 'justify-center'
                 } ${
                   active
-                    ? 'bg-[rgba(224,208,171,0.12)] text-[#e0d0ab] font-medium'
-                    : 'text-[#8fa2bd] hover:text-[#e8e0cf] hover:bg-[rgba(11,61,120,0.35)]'
+                    ? 'bg-[rgba(224,208,171,0.12)] text-[#e0d0ab] border border-[rgba(224,208,171,0.3)] font-semibold shadow-xs'
+                    : 'text-[#8fa2bd] hover:text-[#e8e0cf] hover:bg-[rgba(11,61,120,0.3)]'
                 }`}
               >
                 {active && (
                   <motion.span
                     layoutId="vertical-rail-active-edge"
-                    className="absolute left-0 top-1 bottom-1 w-1 bg-[#e0d0ab] rounded-r-xs"
+                    className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#e0d0ab] rounded-r-xs"
                     transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', bounce: 0.15, duration: 0.4 }}
                   />
                 )}
-                <ProfileIcon
-                  className={`w-4 h-4 shrink-0 transition-transform duration-200 ${
-                    active ? 'text-[#e0d0ab] scale-105' : 'text-[#8fa2bd] group-hover:text-[#e8e0cf] group-hover:scale-110'
+                <AnimatedNavIcon
+                  id="profile"
+                  isActive={active}
+                  isHovered={isItemHovered}
+                  size={18}
+                  className={`w-4 h-4 shrink-0 transition-transform duration-150 ${
+                    active ? 'text-[#e0d0ab]' : 'text-[#8fa2bd] group-hover:text-[#e8e0cf]'
                   }`}
                 />
                 {isExpanded && (
@@ -250,22 +346,22 @@ export default function VerticalNavRail({
                     animate={{ opacity: 1, x: 0 }}
                     className="flex items-center justify-between flex-1 min-w-0"
                   >
-                    <span className="text-xs truncate">{PROFILE_NAV_ITEM.label}</span>
-                    <span className="text-[9px] font-mono text-[#5c6f8a] opacity-70 border border-[rgba(19,108,153,0.4)] px-1 py-0.2 rounded-xs group-hover:text-[#8fa2bd]">
+                    <span className="text-xs font-sans truncate">{PROFILE_NAV_ITEM.label}</span>
+                    <span className="text-[10px] font-sans text-[#7a8ea8] border border-[rgba(19,108,153,0.35)] bg-[rgba(3,18,42,0.6)] px-1.5 py-0.5 rounded group-hover:text-[#e8e0cf] group-hover:border-[#e0d0ab]/40 transition-colors">
                       {PROFILE_NAV_ITEM.hotkey}
                     </span>
                   </motion.div>
                 )}
-              </button>
+              </motion.button>
             );
           })()}
         </nav>
 
         {/* ── Contextual Page Actions (Bracket Area - Dynamic per Page) ── */}
         {!isLanding && effectiveActions && effectiveActions.length > 0 && (
-          <div className="p-2 border-t border-[rgba(19,108,153,0.3)] my-1 bg-[rgba(3,18,42,0.4)]">
+          <div className="p-2 border-t border-[rgba(19,108,153,0.3)] my-1">
             {isExpanded && (
-              <div className="px-2 py-1 mb-1 text-[9px] font-mono uppercase tracking-wider text-[#0194a8] font-bold flex items-center justify-between">
+              <div className="px-2 py-1 mb-1 text-[10px] font-sans uppercase tracking-wider text-[#0194a8] font-bold flex items-center justify-between">
                 <span className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#0194a8] animate-pulse" />
                   <span>Page Actions</span>
@@ -277,42 +373,44 @@ export default function VerticalNavRail({
                 const Icon = action.icon;
                 const active = !!action.isActive;
                 return (
-                  <button
+                  <motion.button
                     key={action.id}
                     onClick={action.onClick}
                     disabled={action.disabled}
+                    whileHover={prefersReducedMotion || action.disabled ? undefined : { x: 2 }}
+                    whileTap={prefersReducedMotion || action.disabled ? undefined : { scale: 0.98 }}
                     title={`${action.label}${action.tooltip ? ` — ${action.tooltip}` : ''}`}
-                    className={`relative w-full flex items-center gap-3 px-3 py-2 rounded-xs transition-all duration-200 group cursor-pointer ${
+                    className={`relative w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors duration-150 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80 ${
                       isExpanded ? 'justify-start' : 'justify-center'
                     } ${
                       active
-                        ? 'bg-[rgba(224,208,171,0.14)] text-[#e0d0ab] border border-[rgba(224,208,171,0.4)] font-medium shadow-sm'
-                        : 'text-[#8fa2bd] hover:text-[#e8e0cf] hover:bg-[rgba(11,61,120,0.35)]'
+                        ? 'bg-[rgba(224,208,171,0.12)] text-[#e0d0ab] border border-[rgba(224,208,171,0.3)] font-semibold shadow-xs'
+                        : 'text-[#8fa2bd] hover:text-[#e8e0cf] hover:bg-[rgba(11,61,120,0.3)]'
                     } ${action.disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
                   >
                     {active && (
                       <motion.span
                         layoutId="vertical-rail-context-active-edge"
-                        className="absolute left-0 top-1 bottom-1 w-1 bg-[#e0d0ab] rounded-r-xs"
+                        className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#e0d0ab] rounded-r-xs"
                         transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', bounce: 0.15, duration: 0.4 }}
                       />
                     )}
                     <Icon
-                      className={`w-4 h-4 shrink-0 transition-transform duration-200 ${
-                        active ? 'text-[#e0d0ab] scale-105' : 'text-[#8fa2bd] group-hover:text-[#e8e0cf] group-hover:scale-110'
+                      className={`w-4 h-4 shrink-0 transition-transform duration-150 ${
+                        active ? 'text-[#e0d0ab] scale-105' : 'text-[#8fa2bd] group-hover:text-[#e8e0cf] group-hover:scale-105'
                       }`}
                     />
                     {isExpanded && (
                       <div className="flex items-center justify-between flex-1 min-w-0">
-                        <span className="text-xs truncate">{action.label}</span>
+                        <span className="text-xs font-sans truncate">{action.label}</span>
                         {action.badge !== undefined && (
-                          <span className="text-[9px] font-mono px-1.5 py-0.2 rounded-xs bg-[rgba(11,61,120,0.6)] text-[#e0d0ab] border border-[rgba(19,108,153,0.4)]">
+                          <span className="text-[10px] font-sans px-1.5 py-0.5 rounded bg-[rgba(11,61,120,0.6)] text-[#e0d0ab] border border-[rgba(19,108,153,0.4)]">
                             {action.badge}
                           </span>
                         )}
                       </div>
                     )}
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
@@ -321,45 +419,47 @@ export default function VerticalNavRail({
       </div>
 
       {/* ── Bottom Controls & Layout Switcher ── */}
-      <div className="p-2 space-y-1 border-t border-[rgba(19,108,153,0.35)] bg-[rgba(3,16,38,0.5)]">
+      <div className="p-2 space-y-1.5 border-t border-[rgba(19,108,153,0.35)]">
         {/* Sign In Affordance if Logged Out */}
         {!userEmail && (
-          <button
+          <motion.button
             onClick={onOpenLogin}
+            whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}
+            whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
             title="Sign In to Tark"
-            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xs border border-[rgba(224,208,171,0.35)] bg-[rgba(224,208,171,0.08)] hover:bg-[#e0d0ab] text-[#e0d0ab] hover:text-[#072e63] text-xs font-mono font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+            className={`w-full flex items-center gap-2 px-3 py-2 rounded-md bg-[#e0d0ab] hover:bg-white text-[#072e63] font-sans text-xs font-semibold shadow-sm transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] ${
               isExpanded ? 'justify-start' : 'justify-center'
             }`}
           >
             <LogIn className="w-3.5 h-3.5 shrink-0" />
             {isExpanded && <span>Sign In</span>}
-          </button>
+          </motion.button>
         )}
 
         {/* Layout Switcher (Switch to Top Horizontal Header) */}
         <button
           onClick={onSwitchToHorizontal}
           title="Switch to Top Header Mode"
-          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xs text-[#8fa2bd] hover:text-[#e0d0ab] hover:bg-[rgba(11,61,120,0.35)] text-xs font-sans transition-colors cursor-pointer ${
+          className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-md text-[#8fa2bd] hover:text-[#e0d0ab] hover:bg-[rgba(11,61,120,0.35)] text-xs font-sans transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80 ${
             isExpanded ? 'justify-start' : 'justify-center'
           }`}
         >
           <LayoutTemplate className="w-3.5 h-3.5 shrink-0 text-[#0194a8]" />
-          {isExpanded && <span className="text-[11px]">Top Header Mode</span>}
+          {isExpanded && <span className="text-xs">Top Header Mode</span>}
         </button>
 
         {/* Rail Width Toggle */}
         <button
           onClick={onToggleExpand}
           title={isExpanded ? 'Collapse Rail' : 'Expand Rail'}
-          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xs text-[#8fa2bd] hover:text-[#e0d0ab] hover:bg-[rgba(11,61,120,0.35)] text-xs font-sans transition-colors cursor-pointer ${
+          className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-md text-[#8fa2bd] hover:text-[#e0d0ab] hover:bg-[rgba(11,61,120,0.35)] text-xs font-sans transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80 ${
             isExpanded ? 'justify-start' : 'justify-center'
           }`}
         >
           {isExpanded ? (
             <>
               <PanelLeftClose className="w-3.5 h-3.5 shrink-0" />
-              <span className="text-[11px]">Collapse Rail</span>
+              <span className="text-xs">Collapse Rail</span>
             </>
           ) : (
             <PanelLeftOpen className="w-3.5 h-3.5 shrink-0" />

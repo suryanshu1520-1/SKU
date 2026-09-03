@@ -40,3 +40,4 @@ The automated data extraction and synthesis machinery that scrapes government re
 ## 7. See
 - Source: [`server-lib/cron/pipeline.ts`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/server-lib/cron/pipeline.ts), [`server-lib/internal/worker.ts`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/server-lib/internal/worker.ts)
 - Doc: [`docs/ingestion-pipeline.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/docs/ingestion-pipeline.md), [`docs/news-feed-quality-roadmap.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/docs/news-feed-quality-roadmap.md)
+- Doc (Firecrawl integration): [`docs/firecrawl-ingestion-integration.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/docs/firecrawl-ingestion-integration.md)

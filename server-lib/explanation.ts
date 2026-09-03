@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { createClient } from "@supabase/supabase-js";
+import { getPYQById } from "./analytics/pyq_explorer.js";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -184,6 +185,23 @@ export default async function handler(req: any, res: any) {
         }
       } catch (caEx) {
         console.warn("Current affairs explanation fetch error:", caEx);
+      }
+    }
+
+    // Handle master PYQs
+    if (questionId && String(questionId).startsWith('pyq_')) {
+      const rawPyqId = String(questionId).replace(/^pyq_/, '');
+      try {
+        const pyq = getPYQById(rawPyqId);
+        if (pyq) {
+          res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=3600');
+          return res.status(200).json({
+            explanation: pyq.trapAnalysis || 'Official UPSC answer key and analysis.',
+            correct_option: pyq.correctKey?.trim().toUpperCase() || 'C'
+          });
+        }
+      } catch (pyqEx) {
+        console.warn("PYQ explanation fetch error:", pyqEx);
       }
     }
 

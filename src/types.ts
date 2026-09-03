@@ -77,3 +77,62 @@ export interface SubmitQuizResponse {
     subjectStats: Record<string, { correct: number; total: number; missedQuestions?: string[] }>;
   };
 }
+
+export type TargetYear = '2025' | '2026' | '2027' | '2028' | 'state-psc';
+export type AttemptStage = 'foundation' | 'intermediate' | 'veteran';
+export type AspirantPersona = 'full_time' | 'working_pro' | 'undergrad';
+export type OptionalSubjectId =
+  | 'psir'
+  | 'sociology'
+  | 'geography'
+  | 'pub_ad'
+  | 'history'
+  | 'anthropology'
+  | 'economics'
+  | 'philosophy'
+  | 'law'
+  | 'commerce'
+  | 'mathematics'
+  | 'literature'
+  | 'other';
+
+export type GsPillarId = 'gs1' | 'gs2' | 'gs3' | 'gs4' | 'csat';
+export type DailyMcqTarget = 10 | 25 | 50;
+export type DailyReadingMins = 4 | 7 | 15;
+
+export interface CandidatePreferences {
+  targetYear: TargetYear;
+  attemptStage: AttemptStage;
+  aspirantPersona?: AspirantPersona;
+  optionalSubject: OptionalSubjectId;
+  optionalCustomName?: string;
+  optionalStage: 'exploring' | 'foundation' | 'notes_pyq' | 'answer_writing';
+  focusPillars: GsPillarId[];
+  dailyMcqTarget: DailyMcqTarget;
+  dailyReadingMins: DailyReadingMins;
+  difficultyPreference: 'standard' | 'crucible';
+  onboardingCompleted: boolean;
+  inductionPledged: boolean;
+  updatedAt?: string;
+}
+
+export interface CandidateProfile {
+  name: string;
+  email?: string;
+  userId?: string;
+  membershipTier?: MembershipTier;
+  preferences: CandidatePreferences;
+}
+
+export interface ArenaLaunchConfig {
+  mode: 'full_mock' | 'daily_brief' | 'topic_drill' | 'subject_drill';
+  title: string;
+  subtitle?: string;
+  targetId?: string;
+  questionCount?: number;
+  isRanked?: boolean;
+  timePerQuestionSeconds?: number;
+  autoStart?: boolean;
+  contextTag?: string;
+}
+

@@ -100,7 +100,51 @@ export default async function handler(req: any, res: any) {
       return res.status(500).json({ error: "Failed to fetch questions from the database." });
     }
 
-    let allQuestions = data || [];
+    let allQuestions: any[] = data || [];
+
+    // Check if Current Affairs was requested
+    const hasCurrentAffairs = subjects.some(
+      (s: string) => s.toUpperCase() === 'CURRENT_AFFAIRS' || s.toLowerCase().includes('current affairs')
+    );
+    if (hasCurrentAffairs) {
+      try {
+        const { data: caData } = await getSupabaseAnon()
+          .from('current_affairs_mcqs')
+          .select('id, headline, question, options, explanation, subject, edition_date, created_at')
+          .order('created_at', { ascending: false })
+          .limit(count);
+
+        if (caData && caData.length > 0) {
+          const caFormatted = caData.map((row: any) => {
+            const matrix: Record<string, string> = {};
+            if (Array.isArray(row.options)) {
+              const keys = ['A', 'B', 'C', 'D'];
+              row.options.forEach((opt: string, idx: number) => {
+                if (keys[idx]) matrix[keys[idx]] = opt;
+              });
+            } else if (row.options && typeof row.options === 'object') {
+              Object.assign(matrix, row.options);
+            }
+            return {
+              id: `ca_${row.id}`,
+              exam_origin_tag: row.headline ? `Daily Intelligence (${row.edition_date || 'Today'})` : `Daily Current Affairs (${row.edition_date || 'Today'})`,
+              subject_category: row.subject || 'Current Affairs',
+              difficulty_level: 'intermediate',
+              question_text: row.question,
+              options_matrix: matrix,
+              conceptual_explanation: row.explanation,
+              ai_insights: row.explanation,
+              is_generated: true,
+              created_at: row.created_at,
+            };
+          });
+          allQuestions = [...caFormatted, ...allQuestions];
+        }
+      } catch (caErr) {
+        console.warn("[training-questions] CA fetch error:", caErr);
+      }
+    }
+
     let isBackfilled = false;
 
     // Shuffle the final set and return

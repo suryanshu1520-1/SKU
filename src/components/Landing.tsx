@@ -22,6 +22,17 @@ import { supabase } from '../lib/supabase';
 import InteractiveBackground from './InteractiveBackground';
 import DiagnosticPreview from './DiagnosticPreview';
 import MobileLanding from './MobileLanding';
+import AnimatedNavIcon, { NavIconId } from './AnimatedNavIcon';
+import type { CandidatePreferences } from '../types';
+import { calculateExamCountdown } from '../lib/candidatePreferences';
+
+const navIdMap: Record<string, NavIconId> = {
+  arena: 'arena',
+  observatory: 'observatory',
+  brief: 'tracker',
+  canon: 'humanities',
+  pillars: 'library',
+};
 
 interface LandingProps {
   onNavigateArena: () => void;
@@ -32,6 +43,7 @@ interface LandingProps {
   onNavigateObservatory?: () => void;
   onNavigateManifesto?: () => void;
   onNavigateLegal?: (type: 'privacy' | 'terms' | 'refund') => void;
+  candidatePreferences?: CandidatePreferences;
 }
 
 interface SeatCountData {
@@ -49,9 +61,11 @@ export default function Landing({
   onNavigateObservatory,
   onNavigateManifesto,
   onNavigateLegal,
+  candidatePreferences,
 }: LandingProps) {
   const [seatData, setSeatData] = useState<SeatCountData | null>(null);
   const [activeFeatureTab, setActiveFeatureTab] = useState<'arena' | 'observatory' | 'brief' | 'canon' | 'pillars'>('arena');
+  const [hoveredFeatureTab, setHoveredFeatureTab] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchSeats() {
@@ -71,11 +85,11 @@ export default function Landing({
     {
       id: 'arena' as const,
       label: 'The Test Arena',
-      title: 'High-Stakes Examination & Zero-Trust AI Autopsies',
+      title: 'Real Exam Simulation & AI Mistake Analysis',
       subtitle: 'Timed recall under authentic UPSC prelims pressure (+2.00 / -0.66 marking).',
-      description: 'Generic mock test series leak answer keys to client browsers and provide static PDF keys. Tark evaluates all 50 questions server-side and immediately deploys an AI conceptual autopsy that locates your cognitive trap before the examiner does.',
-      metrics: ['4,150+ Discrete MCQs', 'Server-Evaluated Scoring', 'Cognitive Trap Isolation'],
-      cta: 'Launch Mock Arena',
+      description: 'Generic mock tests give you static PDF keys with vague answers. Tark evaluates your test immediately and provides an AI mistake breakdown that pinpoints exactly why you fell for the examiner\'s trap.',
+      metrics: ['50-Question Timed Tests', 'Instant Verified Results', 'Mistake & Trap Breakdown'],
+      cta: 'Start Mock Exam',
       icon: Swords,
       action: onNavigateArena,
       color: '#34d399'
@@ -83,11 +97,11 @@ export default function Landing({
     {
       id: 'observatory' as const,
       label: 'The Observatory',
-      title: '25-Year Empirical Intelligence & Examiner Psyche Engine',
-      subtitle: '7,841 verified questions modeled via cognitive psychometrics & game theory.',
-      description: 'Explore mathematical derivations, working memory speededness curves, Bayesian modifier truth rates (81.4% false), and 50-50 elimination expected values (+13.4 marks gain).',
-      metrics: ['7,841 Question Corpus', 'Q-Matrix Factorization', 'Markov & Game Theory Models'],
-      cta: 'Launch 25-Yr Observatory',
+      title: '25-Year Question Vault & Strategic Intelligence Engine',
+      subtitle: '7,841 authentic UPSC questions, real attempt risk math, and high-yield topic patterns.',
+      description: 'Search the complete 25-year question bank with verified explanations. Calculate your expected score and cutoff safety margin with our 50:50 guessing simulator, and master the 25 topics that yield over 75% of all Prelims marks.',
+      metrics: ['7,841 Question Bank', '50:50 Attempt Calculator', 'High-Yield Topic Matrix'],
+      cta: 'Explore Question Vault',
       icon: Radio,
       action: onNavigateObservatory || onNavigateArena,
       color: '#e0d0ab'
@@ -95,23 +109,23 @@ export default function Landing({
     {
       id: 'brief' as const,
       label: 'The Daily Brief',
-      title: 'Signal Deck & Distilled Cabinet Policy Intelligence',
-      subtitle: '10 curated policy signals delivered daily in a 4-minute finite read.',
-      description: 'Stop drowning in 150-page generic monthly magazines. Tark distills daily PIB releases, Cabinet Committee decisions, and Ministry notifications into 10 high-yield briefs with 100% verifiable government citations and a daily 10-MCQ test.',
-      metrics: ['10 Daily Policy Signals', '100% Grounded Citations', 'Daily Practice 10-MCQs'],
-      cta: 'Explore Daily Brief',
+      title: 'Daily PIB & Policy Briefs (4-Min Read)',
+      subtitle: '10 curated policy updates delivered daily with verified government sources.',
+      description: 'Stop drowning in 150-page monthly magazines. Tark distills daily PIB releases, Cabinet decisions, and Ministry notifications into 10 high-yield briefs with direct government citations and a daily 10-question practice drill.',
+      metrics: ['10 Daily Policy Briefs', 'Official Government Sources', 'Daily 10-Question Drill'],
+      cta: 'Read Today\'s Brief',
       icon: Globe,
       action: onNavigateTracker,
       color: '#0194a8'
     },
     {
       id: 'canon' as const,
-      label: 'The Humanities Canon',
-      title: 'Verbatim Primary Sources & Dialectic Bench',
-      subtitle: 'Read the original words of thinkers the UPSC examiner repeatedly returns to.',
-      description: 'Secondary coaching summaries butcher philosophical nuance. Sit in a monastic reading chamber with verbatim primary excerpts from Dr. B. R. Ambedkar, Mahatma Gandhi, and Immanuel Kant, with an interactive Dialectic Bench for comparative synthesis.',
-      metrics: ['Verbatim Primary Excerpts', 'Dialectic Comparison Bench', 'Vector Engraved Portraits'],
-      cta: 'Enter Canon Chamber',
+      label: 'Primary Thinkers',
+      title: 'Primary Thinkers & Ethics Reading Room',
+      subtitle: 'Read the original writings of thinkers the UPSC repeatedly quotes in GS-4 and Essay.',
+      description: 'Secondary coaching notes often oversimplify deep ideas. Read verbatim original writings from Dr. B. R. Ambedkar, Mahatma Gandhi, and Immanuel Kant, with a side-by-side comparison tool to enrich your Mains essays and ethics answers.',
+      metrics: ['Original Verbatim Writings', 'Side-by-Side Comparison', 'GS-4 & Essay Quotes'],
+      cta: 'Open Reading Room',
       icon: BookOpen,
       action: onNavigateHumanities || onNavigateArena,
       color: '#e0d0ab'
@@ -119,14 +133,14 @@ export default function Landing({
     {
       id: 'pillars' as const,
       label: 'Syllabus Pillars',
-      title: '25-Year Empirical Spine & Static Vault Matrices',
-      subtitle: 'Constitutional jurisprudence, macroeconomic corridors, and environmental frontiers.',
-      description: 'Master the high-yield static syllabus mapped directly against a quarter century of UPSC CSE papers. Explore interactive branching mind maps, 10-year PYQ evidence matrices, and high-risk examiner trap warnings.',
-      metrics: ['6 GS Subject Pillars', '25-Year PYQ Mapping', 'Examiner Trap Warnings'],
-      cta: 'Inspect Syllabus Pillars',
+      title: 'Core Syllabus Subjects (GS 1 to 4)',
+      subtitle: 'Constitutional law, macroeconomic policy, environment, and modern history.',
+      description: 'Master the core syllabus mapped directly against 25 years of UPSC question papers. Explore interactive concept flowcharts, 10-year past question trends, and classic examiner trap alerts.',
+      metrics: ['Core GS Subjects', '25-Year Question Trends', 'Trap Alerts & Flowcharts'],
+      cta: 'Explore Syllabus Guide',
       icon: Layers,
       action: onNavigateLibrary || onNavigateArena,
-      color: '#c8b998'
+      color: '#0194a8'
     }
   ];
 
@@ -150,6 +164,7 @@ export default function Landing({
           onNavigateManifesto={onNavigateManifesto}
           onNavigateLegal={onNavigateLegal}
           seatData={seatData}
+          candidatePreferences={candidatePreferences}
         />
       </div>
 
@@ -168,6 +183,13 @@ export default function Landing({
             transition={{ duration: 0.4 }}
             className="flex flex-wrap items-center justify-center gap-2.5"
           >
+            {candidatePreferences && candidatePreferences.targetYear && (
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-[rgba(11,61,120,0.45)] border border-[rgba(19,108,153,0.5)] rounded-xs text-xs font-mono text-[#e0d0ab] backdrop-blur-md">
+                <Target className="w-3.5 h-3.5 text-[#34d399]" />
+                <span>{calculateExamCountdown(candidatePreferences.targetYear).label}: <strong className="text-white">{calculateExamCountdown(candidatePreferences.targetYear).daysRemaining} Days Left</strong></span>
+              </div>
+            )}
+
             <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-[rgba(4,25,54,0.7)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-[#e8e0cf] backdrop-blur-md">
               <span className="w-1.5 h-1.5 rounded-full bg-[#34d399] animate-pulse" />
               <span className="text-[#8fa2bd]">Founders Club:</span>
@@ -266,21 +288,29 @@ export default function Landing({
           </div>
 
           {/* Interactive Feature Segmented Switcher */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 bg-[rgba(4,25,54,0.7)] p-1.5 rounded-xs border border-[rgba(19,108,153,0.35)] backdrop-blur-md">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 bg-[rgba(4,25,54,0.7)] p-1.5 rounded-md border border-[rgba(19,108,153,0.35)] backdrop-blur-md">
             {features.map((f) => {
               const active = activeFeatureTab === f.id;
-              const Icon = f.icon;
+              const isHovered = hoveredFeatureTab === f.id;
               return (
                 <button
                   key={f.id}
                   onClick={() => setActiveFeatureTab(f.id)}
-                  className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xs font-sans text-xs font-medium transition-all cursor-pointer ${
+                  onMouseEnter={() => setHoveredFeatureTab(f.id)}
+                  onMouseLeave={() => setHoveredFeatureTab(null)}
+                  className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-md font-sans text-xs font-medium transition-all cursor-pointer ${
                     active
                       ? 'bg-[#e0d0ab] text-[#072e63] font-semibold shadow-md'
                       : 'text-[#8fa2bd] hover:text-[#e8e0cf] hover:bg-[rgba(11,61,120,0.3)]'
                   }`}
                 >
-                  <Icon className="w-4 h-4 shrink-0" />
+                  <AnimatedNavIcon
+                    id={navIdMap[f.id] || 'arena'}
+                    isActive={active}
+                    isHovered={isHovered}
+                    size={16}
+                    className="w-4 h-4 shrink-0"
+                  />
                   <span className="truncate">{f.label}</span>
                 </button>
               );
@@ -288,7 +318,7 @@ export default function Landing({
           </div>
 
           {/* Active Engine Card */}
-          <div className="bg-[rgba(4,25,54,0.65)] backdrop-blur-xl border border-[rgba(19,108,153,0.45)] rounded-xs p-6 md:p-8 shadow-[0_12px_36px_-6px_rgba(0,0,0,0.5)]">
+          <div className="bg-[rgba(4,25,54,0.65)] backdrop-blur-xl border border-[rgba(19,108,153,0.45)] rounded-md p-6 md:p-8 shadow-[0_12px_36px_-6px_rgba(0,0,0,0.5)]">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               
               <div className="lg:col-span-7 space-y-4">
@@ -309,7 +339,7 @@ export default function Landing({
                   {activeFeature.metrics.map((m, idx) => (
                     <div
                       key={idx}
-                      className="p-2.5 rounded-xs bg-[rgba(11,61,120,0.25)] border border-[rgba(19,108,153,0.35)] font-sans text-xs text-[#e0d0ab] flex items-center gap-2"
+                      className="p-2.5 rounded-md bg-[rgba(11,61,120,0.25)] border border-[rgba(19,108,153,0.35)] font-sans text-xs text-[#e0d0ab] flex items-center gap-2"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5 text-[#34d399] shrink-0" />
                       <span className="truncate">{m}</span>
@@ -320,7 +350,7 @@ export default function Landing({
                 <div className="pt-2">
                   <button
                     onClick={activeFeature.action}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[rgba(224,208,171,0.12)] hover:bg-[#e0d0ab] border border-[rgba(224,208,171,0.4)] text-[#e0d0ab] hover:text-[#072e63] text-xs font-sans font-semibold rounded-xs transition-all cursor-pointer shadow-md"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[rgba(224,208,171,0.12)] hover:bg-[#e0d0ab] border border-[rgba(224,208,171,0.4)] text-[#e0d0ab] hover:text-[#072e63] text-xs font-sans font-semibold rounded-md transition-all cursor-pointer shadow-md"
                   >
                     <span>{activeFeature.cta}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -329,10 +359,16 @@ export default function Landing({
               </div>
 
               {/* Graphical Visual Anchor */}
-              <div className="lg:col-span-5 bg-[rgba(3,16,38,0.7)] border border-[rgba(19,108,153,0.35)] rounded-xs p-6 flex flex-col justify-between min-h-[240px]">
+              <div className="lg:col-span-5 bg-[rgba(3,16,38,0.7)] border border-[rgba(19,108,153,0.35)] rounded-md p-6 flex flex-col justify-between min-h-[240px]">
                 <div className="flex items-center justify-between border-b border-[rgba(19,108,153,0.25)] pb-3">
                   <div className="flex items-center gap-2">
-                    <ActiveIcon className="w-4 h-4 text-[#e0d0ab]" />
+                    <AnimatedNavIcon
+                      id={navIdMap[activeFeatureTab] || 'arena'}
+                      isActive={true}
+                      isHovered={true}
+                      size={16}
+                      className="w-4 h-4 text-[#e0d0ab] shrink-0"
+                    />
                     <span className="font-sans text-xs font-semibold text-[#e0d0ab]">
                       Live Engine Simulation
                     </span>
@@ -410,19 +446,19 @@ export default function Landing({
 
                 <tr className="hover:bg-[rgba(11,61,120,0.2)] transition-colors">
                   <td className="py-3.5 px-3 font-sans text-[#e0d0ab] font-medium">Philosophy & Ethics (GS-4)</td>
-                  <td className="py-3.5 px-3 text-[#9fb0c8]">Second-hand summaries prone to distortion and errors.</td>
+                  <td className="py-3.5 px-3 text-[#9fb0c8]">Second-hand coaching summaries prone to distortion and omissions.</td>
                   <td className="py-3.5 px-3 text-[#e8e0cf] font-medium flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-[#34d399] shrink-0" />
-                    Verbatim primary canon texts with dialectic bench.
+                    Verbatim original writings with side-by-side thinker comparisons.
                   </td>
                 </tr>
 
                 <tr className="hover:bg-[rgba(11,61,120,0.2)] transition-colors">
-                  <td className="py-3.5 px-3 font-sans text-[#e0d0ab] font-medium">Autopsy & Diagnostic Logic</td>
-                  <td className="py-3.5 px-3 text-[#9fb0c8]">Static PDF answer keys with generic explanations.</td>
+                  <td className="py-3.5 px-3 font-sans text-[#e0d0ab] font-medium">Test Review & Mistake Breakdown</td>
+                  <td className="py-3.5 px-3 text-[#9fb0c8]">Static PDF answer keys with vague explanations.</td>
                   <td className="py-3.5 px-3 text-[#e8e0cf] font-medium flex items-center gap-1.5">
                     <Check className="w-4 h-4 text-[#34d399] shrink-0" />
-                    AI-powered cognitive autopsy isolating examiner traps.
+                    AI mistake analysis isolating why you fell for the trap.
                   </td>
                 </tr>
               </tbody>
@@ -444,7 +480,7 @@ export default function Landing({
               Claim Your Lifetime Analytical Seat
             </h3>
             <p className="text-xs font-sans text-[#9fb0c8] max-w-xl">
-              Strictly limited to 500 lifetime seats. Guaranteed access to all future question banks, AI autopsy models, and syllabus matrices.
+              Strictly limited to 500 lifetime seats. Guaranteed access to all future question banks, AI mistake reviews, and syllabus guides.
             </p>
           </div>
 

@@ -28,15 +28,23 @@ import {
   Activity,
   Target,
   FileSpreadsheet,
-  ChevronRight
+  ChevronRight,
+  Clock,
+  Compass,
+  RotateCcw
 } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
 import { EmptyState, SkeletonCard } from './shared';
+import type { CandidatePreferences } from '../types';
+import { calculateExamCountdown } from '../lib/candidatePreferences';
+import { getOptionalSubject } from '../data/optional-subjects';
 
 interface ProfileProps {
   userEmail: string;
   userId?: string;
   userName: string;
+  candidatePreferences?: CandidatePreferences;
+  onRecalibrateTrack?: () => void;
   onLogout: () => void;
 }
 
@@ -54,7 +62,14 @@ interface SavedArticle {
   };
 }
 
-export default function Profile({ userEmail, userId, userName, onLogout }: ProfileProps) {
+export default function Profile({
+  userEmail,
+  userId,
+  userName,
+  candidatePreferences,
+  onRecalibrateTrack,
+  onLogout
+}: ProfileProps) {
   const [history, setHistory] = useState<QuizSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
@@ -443,12 +458,12 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
 
                 {/* Membership Badge */}
                 {isPro ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-xs text-[10px] font-mono font-semibold uppercase tracking-wider bg-[rgba(224,208,171,0.12)] border border-[rgba(224,208,171,0.35)] text-[#e0d0ab]">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-sans font-semibold uppercase tracking-wider bg-[rgba(224,208,171,0.12)] border border-[rgba(224,208,171,0.35)] text-[#e0d0ab]">
                     <Shield className="w-3 h-3 text-[#e0d0ab]" />
                     Founders Club
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-xs text-[10px] font-mono font-medium uppercase tracking-wider bg-[rgba(19,108,153,0.2)] border border-[rgba(19,108,153,0.4)] text-[#8fa2bd]">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-sans font-medium uppercase tracking-wider bg-[rgba(19,108,153,0.2)] border border-[rgba(19,108,153,0.4)] text-[#8fa2bd]">
                     <Award className="w-3 h-3 text-[#0194a8]" />
                     Candidate Ledger
                   </span>
@@ -462,10 +477,12 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
           {/* Action Pills */}
           <div className="flex items-center gap-2 flex-wrap shrink-0">
             {/* Visibility Toggle */}
-            <button
+            <motion.button
               onClick={handleToggleVisibility}
               disabled={savingVisibility}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xs border text-xs font-mono transition-all cursor-pointer ${
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-xs font-sans font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] ${
                 isPublic
                   ? 'bg-[rgba(52,211,153,0.1)] border-[rgba(52,211,153,0.4)] text-[#34d399] hover:bg-[rgba(52,211,153,0.2)]'
                   : 'bg-[rgba(11,61,120,0.25)] border-[rgba(19,108,153,0.4)] text-[#8fa2bd] hover:text-[#e8e0cf]'
@@ -474,13 +491,15 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
             >
               {isPublic ? <Eye className="w-3.5 h-3.5 text-[#34d399]" /> : <EyeOff className="w-3.5 h-3.5" />}
               <span>{isPublic ? 'Public Dossier' : 'Private Mode'}</span>
-            </button>
+            </motion.button>
 
             {/* CSV Export */}
-            <button
+            <motion.button
               onClick={handleExportClick}
               disabled={history.length === 0 || loadingTier}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xs border text-xs font-mono transition-all cursor-pointer ${
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-xs font-sans font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] ${
                 isPro
                   ? 'bg-[rgba(224,208,171,0.1)] border-[rgba(224,208,171,0.35)] text-[#e0d0ab] hover:bg-[#e0d0ab] hover:text-[#072e63]'
                   : 'bg-[rgba(11,61,120,0.25)] border-[rgba(19,108,153,0.4)] text-[#8fa2bd] hover:text-[#e8e0cf]'
@@ -489,17 +508,19 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
             >
               <Download className="w-3.5 h-3.5" />
               <span>{isPro ? 'Export CSV' : 'Export CSV (Pro)'}</span>
-            </button>
+            </motion.button>
 
             {/* Sign Out */}
-            <button
+            <motion.button
               onClick={onLogout}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(225,78,78,0.1)] hover:bg-[rgba(225,78,78,0.2)] border border-[rgba(225,78,78,0.3)] text-[#e14e4e] rounded-xs text-xs font-mono transition-all cursor-pointer"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(225,78,78,0.12)] hover:bg-[rgba(225,78,78,0.22)] border border-[rgba(225,78,78,0.35)] text-[#e14e4e] rounded-md text-xs font-sans font-medium transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e14e4e]"
               title="Sign out of current workstation session"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Sign Out</span>
-            </button>
+            </motion.button>
           </div>
         </div>
 
@@ -508,61 +529,146 @@ export default function Profile({ userEmail, userId, userName, onLogout }: Profi
           
           {/* Total Assessments */}
           <div className="p-4 flex flex-col justify-between">
-            <div className="flex items-center justify-between text-[#8fa2bd] text-[11px] font-mono">
-              <span>ASSESSMENTS</span>
+            <div className="flex items-center justify-between text-[#8fa2bd] text-xs font-sans font-semibold uppercase tracking-wider">
+              <span>Assessments</span>
               <Layers className="w-3.5 h-3.5 text-[#0194a8]" />
             </div>
             <div className="mt-2">
               <span className="font-serif text-2xl font-bold text-[#e0d0ab]">{totalAttempts}</span>
-              <p className="text-[10px] font-mono text-[#8fa2bd] mt-0.5">Processed sessions</p>
+              <p className="text-xs font-sans text-[#8fa2bd] mt-0.5">Processed sessions</p>
             </div>
           </div>
 
           {/* Mean Accuracy */}
           <div className="p-4 flex flex-col justify-between">
-            <div className="flex items-center justify-between text-[#8fa2bd] text-[11px] font-mono">
-              <span>COHORT ACCURACY</span>
+            <div className="flex items-center justify-between text-[#8fa2bd] text-xs font-sans font-semibold uppercase tracking-wider">
+              <span>Cohort Accuracy</span>
               <TrendingUp className="w-3.5 h-3.5 text-[#34d399]" />
             </div>
             <div className="mt-2">
               <span className={`font-serif text-2xl font-bold ${averageAccuracy >= 70 ? 'text-[#34d399]' : 'text-[#0194a8]'}`}>
                 {averageAccuracy}%
               </span>
-              <p className="text-[10px] font-mono text-[#8fa2bd] mt-0.5">Weighted average</p>
+              <p className="text-xs font-sans text-[#8fa2bd] mt-0.5">All-time aggregate</p>
             </div>
           </div>
 
-          {/* Best Score */}
+          {/* Peak Score */}
           <div className="p-4 flex flex-col justify-between">
-            <div className="flex items-center justify-between text-[#8fa2bd] text-[11px] font-mono">
-              <span>PEAK SCORE</span>
-              <Award className="w-3.5 h-3.5 text-[#e0d0ab]" />
+            <div className="flex items-center justify-between text-[#8fa2bd] text-xs font-sans font-semibold uppercase tracking-wider">
+              <span>Peak Single Test</span>
+              <Target className="w-3.5 h-3.5 text-[#e0d0ab]" />
             </div>
             <div className="mt-2">
               <div className="flex items-baseline gap-1">
                 <span className="font-serif text-2xl font-bold text-[#e0d0ab]">{bestScore}</span>
-                <span className="text-xs font-mono text-[#8fa2bd]">/ 25</span>
+                <span className="text-xs font-sans text-[#8fa2bd]">/ 25</span>
               </div>
-              <p className="text-[10px] font-mono text-[#8fa2bd] mt-0.5">Highest single test</p>
+              <p className="text-xs font-sans text-[#8fa2bd] mt-0.5">Highest single test</p>
             </div>
           </div>
 
           {/* Recent Momentum */}
           <div className="p-4 flex flex-col justify-between">
-            <div className="flex items-center justify-between text-[#8fa2bd] text-[11px] font-mono">
-              <span>MOMENTUM</span>
+            <div className="flex items-center justify-between text-[#8fa2bd] text-xs font-sans font-semibold uppercase tracking-wider">
+              <span>Momentum</span>
               <Sparkles className="w-3.5 h-3.5 text-[#e0d0ab]" />
             </div>
             <div className="mt-2">
               <span className={`font-serif text-xl font-bold ${trajectoryTrend.positive ? 'text-[#34d399]' : 'text-[#e14e4e]'}`}>
                 {trajectoryTrend.label}
               </span>
-              <p className="text-[10px] font-mono text-[#8fa2bd] mt-0.5">Last 3 tests vs mean</p>
+              <p className="text-xs font-sans text-[#8fa2bd] mt-0.5">Last 3 tests vs mean</p>
             </div>
           </div>
 
         </div>
       </div>
+
+      {/* ── Candidate Track & Calibration Dossier ── */}
+      {candidatePreferences && (
+        <div className="mb-6 p-5 md:p-6 bg-gradient-to-br from-[rgba(4,25,54,0.85)] via-[rgba(7,36,75,0.7)] to-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.45)] rounded-md shadow-xl backdrop-blur-xl font-sans">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[rgba(19,108,153,0.3)] pb-4 mb-5">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-md bg-[rgba(224,208,171,0.15)] border border-[rgba(224,208,171,0.35)] text-[#e0d0ab]">
+                <Compass className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-sans uppercase tracking-wider font-bold px-2.5 py-0.5 rounded-md bg-[#e0d0ab] text-[#072e63]">
+                    Candidate Track Dossier
+                  </span>
+                  <span className="text-xs font-sans text-[#34d399] font-medium flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span className="font-mono tabular-nums font-bold">{calculateExamCountdown(candidatePreferences.targetYear).daysRemaining}</span> Days to {calculateExamCountdown(candidatePreferences.targetYear).label}
+                  </span>
+                </div>
+                <h3 className="font-serif text-lg font-bold text-white mt-1">
+                  Active Battle Station Calibration
+                </h3>
+              </div>
+            </div>
+
+            {onRecalibrateTrack && (
+              <motion.button
+                onClick={onRecalibrateTrack}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[rgba(3,18,42,0.8)] hover:bg-[#e0d0ab] text-[#e0d0ab] hover:text-[#072e63] border border-[rgba(19,108,153,0.4)] hover:border-[#e0d0ab] rounded-md text-xs font-sans font-bold uppercase tracking-wider transition-colors cursor-pointer self-start lg:self-auto shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]"
+                title="Recalibrate candidate persona, optional subject, target year, and daily cadence"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Recalibrate Track</span>
+              </motion.button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* 1. Target & Stage */}
+            <div className="p-4 bg-[rgba(3,18,42,0.6)] border border-[rgba(19,108,153,0.25)] rounded-md space-y-1">
+              <span className="text-xs font-sans text-[#8fa2bd] uppercase tracking-wider block font-medium">Target Horizon</span>
+              <p className="text-sm font-serif font-bold text-[#e0d0ab]">{calculateExamCountdown(candidatePreferences.targetYear).label}</p>
+              <p className="text-xs font-sans text-[#8fa2bd] capitalize">
+                {candidatePreferences.aspirantPersona ? candidatePreferences.aspirantPersona.replace('-', ' ') : 'Candidate'} &bull; {candidatePreferences.attemptStage ? candidatePreferences.attemptStage.replace('-', ' ') : 'Attempt 1'}
+              </p>
+            </div>
+
+            {/* 2. Optional Subject */}
+            <div className="p-4 bg-[rgba(3,18,42,0.6)] border border-[rgba(19,108,153,0.25)] rounded-md space-y-1">
+              <span className="text-xs font-sans text-[#8fa2bd] uppercase tracking-wider block font-medium">Optional Subject (500 M)</span>
+              <p className="text-sm font-serif font-bold text-white truncate">
+                {getOptionalSubject(candidatePreferences.optionalSubject)?.name || candidatePreferences.optionalSubject.toUpperCase()}
+              </p>
+              <p className="text-xs font-sans text-[#34d399] capitalize">
+                {candidatePreferences.optionalStage ? candidatePreferences.optionalStage.replace(/-/g, ' ') : 'In Progress'}
+              </p>
+            </div>
+
+            {/* 3. Focus GS Pillars */}
+            <div className="p-4 bg-[rgba(3,18,42,0.6)] border border-[rgba(19,108,153,0.25)] rounded-md space-y-1">
+              <span className="text-xs font-sans text-[#8fa2bd] uppercase tracking-wider block font-medium">Priority Pillars</span>
+              <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                {candidatePreferences.focusPillars?.map((p) => (
+                  <span key={p} className="px-2 py-0.5 rounded-md bg-[rgba(11,61,120,0.4)] border border-[rgba(19,108,153,0.35)] text-xs font-sans text-[#e0d0ab] font-bold uppercase">
+                    {p}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* 4. Daily Cadence */}
+            <div className="p-4 bg-[rgba(3,18,42,0.6)] border border-[rgba(19,108,153,0.25)] rounded-md space-y-1">
+              <span className="text-xs font-sans text-[#8fa2bd] uppercase tracking-wider block font-medium">Operating Cadence</span>
+              <p className="text-sm font-serif font-bold text-[#34d399]">
+                {candidatePreferences.dailyMcqTarget} MCQs / day
+              </p>
+              <p className="text-xs font-sans text-[#8fa2bd]">
+                {candidatePreferences.dailyReadingMins} mins intelligence reading
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ══════════════════════════════════════════════════════════════════
           2. TWO-COLUMN ANALYTICAL DECK

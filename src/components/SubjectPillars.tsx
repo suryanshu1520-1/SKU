@@ -38,8 +38,12 @@ import {
 } from 'lucide-react';
 import { SUBJECT_PILLARS, SubjectPillar, MindMapNode, StaticFactMatrix } from '../data/subject-pillars-data';
 import { ExaminerPsycheModal } from './ExaminerPsycheModal';
+import AnimatedNavIcon from './AnimatedNavIcon';
+import type { CandidatePreferences } from '../types';
+import { getOptionalSubject } from '../data/optional-subjects';
 
 interface SubjectPillarsProps {
+  candidatePreferences?: CandidatePreferences;
   onLaunchPractice?: (subjectCategory: string) => void;
   onNavigateArena?: () => void;
 }
@@ -223,8 +227,17 @@ function SequentialMindMap({
   );
 }
 
-export default function SubjectPillars({ onLaunchPractice, onNavigateArena }: SubjectPillarsProps) {
-  const [selectedPillarId, setSelectedPillarId] = useState<string>(SUBJECT_PILLARS[0].id);
+export default function SubjectPillars({ candidatePreferences, onLaunchPractice, onNavigateArena }: SubjectPillarsProps) {
+  const defaultPillarId = useMemo(() => {
+    if (candidatePreferences?.focusPillars && candidatePreferences.focusPillars.length > 0) {
+      const first = candidatePreferences.focusPillars[0].toLowerCase();
+      const match = SUBJECT_PILLARS.find((p) => p.paper.toLowerCase() === first || (first === 'csat' && p.paper === 'CSAT'));
+      if (match) return match.id;
+    }
+    return SUBJECT_PILLARS[0].id;
+  }, [candidatePreferences]);
+
+  const [selectedPillarId, setSelectedPillarId] = useState<string>(defaultPillarId);
   const [activeDossierTab, setActiveDossierTab] = useState<'concepts' | 'mindmaps' | 'pyq-evidence' | 'mains-blueprints' | 'static-vault'>('concepts');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isExaminerPsycheOpen, setIsExaminerPsycheOpen] = useState<boolean>(false);
@@ -232,6 +245,11 @@ export default function SubjectPillars({ onLaunchPractice, onNavigateArena }: Su
   const getActiveStep = (mindmapId: string) => activeMindmapSteps[mindmapId] ?? 0;
   const setActiveStep = (mindmapId: string, stepIdx: number) =>
     setActiveMindmapSteps((prev) => ({ ...prev, [mindmapId]: stepIdx }));
+
+  const candidateOptional = useMemo(() => {
+    if (!candidatePreferences?.optionalSubject) return null;
+    return getOptionalSubject(candidatePreferences.optionalSubject);
+  }, [candidatePreferences]);
 
   const selectedPillar = SUBJECT_PILLARS.find((p) => p.id === selectedPillarId) || SUBJECT_PILLARS[0];
 
@@ -313,20 +331,32 @@ export default function SubjectPillars({ onLaunchPractice, onNavigateArena }: Su
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
-            <button
+            <motion.button
               onClick={() => setIsExaminerPsycheOpen(true)}
-              className="flex items-center justify-center gap-2 px-5 py-3.5 bg-zinc-900 hover:bg-zinc-800 text-[#e0d0ab] border border-[#e0d0ab]/40 rounded-sm text-xs font-sans font-bold uppercase tracking-widest transition-all duration-300 shadow-lg active:scale-[0.98] cursor-pointer"
+              whileHover={{ scale: 1.02, y: -1 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex items-center justify-center gap-2 px-5 py-3 bg-zinc-900 hover:bg-zinc-800 text-[#e0d0ab] border border-[#e0d0ab]/40 hover:border-[#e0d0ab] rounded-md text-xs font-sans font-bold uppercase tracking-wider transition-colors shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]"
             >
               <Brain className="w-4 h-4 text-[#e0d0ab]" />
-              Examiner's Psyche
-            </button>
-            <button
+              <span>Examiner's Psyche</span>
+            </motion.button>
+            <motion.button
               onClick={() => onNavigateArena && onNavigateArena()}
-              className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#e0d0ab] hover:bg-[#ebdcb7] text-zinc-950 rounded-sm text-xs font-sans font-bold uppercase tracking-widest transition-all duration-300 shadow-xl hover:shadow-[#e0d0ab]/25 active:scale-[0.98] cursor-pointer"
+              whileHover={{ scale: 1.02, y: -1 }}
+              whileTap={{ scale: 0.98 }}
+              className="relative flex items-center justify-center gap-2 px-6 py-3 bg-[#e0d0ab] hover:bg-white text-[#072e63] rounded-md text-xs font-sans font-bold tracking-wider uppercase transition-colors shadow-lg hover:shadow-[#e0d0ab]/20 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 group overflow-hidden"
             >
-              <Swords className="w-4 h-4" />
-              Launch Test Arena
-            </button>
+              {/* Luminous Shimmer Light Wave */}
+              <motion.div
+                className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none"
+                animate={{ x: ['100%', '-100%'] }}
+                transition={{ repeat: Infinity, duration: 2.8, ease: 'easeInOut' }}
+              />
+              <motion.div whileHover={{ rotate: [0, -12, 12, 0] }} transition={{ duration: 0.4 }}>
+                <Swords className="w-4 h-4 text-[#072e63]" />
+              </motion.div>
+              <span className="relative z-10">Launch Test Arena</span>
+            </motion.button>
           </div>
         </div>
 
@@ -339,61 +369,53 @@ export default function SubjectPillars({ onLaunchPractice, onNavigateArena }: Su
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search concepts, articles, cases, passes, Ramsar sites..."
-              className="w-full pl-9 pr-4 py-2 rounded-sm bg-zinc-900/90 border border-zinc-800 text-xs text-stone-100 placeholder-zinc-500 focus:outline-none focus:border-[#e0d0ab]/60 transition-colors"
+              className="w-full pl-9 pr-4 py-2 rounded-md bg-zinc-900/90 border border-zinc-800 text-xs text-stone-100 placeholder-zinc-500 focus:outline-none focus:border-[#e0d0ab]/60 transition-colors"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-zinc-500 hover:text-zinc-300"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-sans text-zinc-400 hover:text-zinc-200"
               >
-                CLEAR
+                Clear
               </button>
             )}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 text-xs font-sans text-zinc-400">
-            <div className="flex items-center gap-2 p-2 rounded-sm bg-zinc-900/40 border border-zinc-800/60">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span className="font-mono text-[11px] text-stone-200">7,841 Verified PYQ Items (2000–2025)</span>
-            </div>
-            <div className="flex items-center gap-2 p-2 rounded-sm bg-zinc-900/40 border border-zinc-800/60">
-              <Database className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span className="font-mono text-[11px] text-stone-200">6 Architectural Pillars</span>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* ── 3D Architectural Knowledge Steles (6 Pillars) ── */}
+      {/* ── Core General Studies Subjects ── */}
       <div className="space-y-4">
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
-            <Layers className="w-4 h-4 text-[#e0d0ab]" />
-            <h2 className="text-xs font-mono uppercase tracking-widest text-[#e0d0ab] font-bold">
-              Architectural Knowledge Steles
+            <AnimatedNavIcon id="library" isActive={true} isHovered={true} size={16} className="w-4 h-4 text-[#e0d0ab] shrink-0" />
+            <h2 className="text-xs font-sans font-semibold uppercase tracking-wider text-[#e0d0ab]">
+              Core General Studies Subjects
             </h2>
           </div>
-          <span className="text-[11px] font-mono text-zinc-500">Select a pillar to inspect high-yield dossiers</span>
+          <span className="text-xs font-sans text-zinc-400">Select a pillar to inspect high-yield dossiers</span>
         </div>
 
         {/* 6 Column Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {SUBJECT_PILLARS.map((pillar, idx) => {
             const isSelected = pillar.id === selectedPillarId;
+            const isTrackPillar = candidatePreferences?.focusPillars?.some(
+              (fp) => fp.toLowerCase() === pillar.paper.toLowerCase() || (fp === 'csat' && pillar.paper === 'CSAT')
+            );
             return (
               <motion.div
                 key={pillar.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: idx * 0.06 }}
-                whileHover={{ y: -6, transition: { duration: 0.2 } }}
+                whileHover={{ y: -5, transition: { duration: 0.2 } }}
                 onClick={() => {
                   setSelectedPillarId(pillar.id);
                   if (pillar.paper === 'STATIC_GK' && activeDossierTab === 'mains-blueprints') {
                     setActiveDossierTab('static-vault');
                   }
                 }}
-                className={`relative p-5 rounded-sm border transition-all duration-300 cursor-pointer flex flex-col justify-between overflow-hidden group ${
+                className={`relative p-5 rounded-md border transition-all duration-300 cursor-pointer flex flex-col justify-between overflow-hidden group ${
                   isSelected
                     ? 'bg-zinc-900 border-[#e0d0ab] shadow-[0_16px_36px_-10px_rgba(224,208,171,0.2)] ring-1 ring-[#e0d0ab]/40'
                     : 'bg-zinc-950/70 border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-900/50'
@@ -407,35 +429,34 @@ export default function SubjectPillars({ onLaunchPractice, onNavigateArena }: Su
                   className="absolute top-0 left-0 right-0 h-1 transition-colors duration-300"
                 />
 
-                {/* Subtle vertical watermarked pillar code */}
-                <div className="absolute -right-2 top-8 text-[32px] font-mono font-black text-zinc-800/20 select-none pointer-events-none">
-                  {pillar.paper === 'STATIC_GK' ? 'GK' : pillar.paper}
-                </div>
-
-                <div className="space-y-3.5 relative z-10">
+                <div className="space-y-3 relative z-10">
                   <div className="flex items-center justify-between">
                     <div
                       style={{
                         color: pillar.colorTheme.primary,
                         borderColor: isSelected ? pillar.colorTheme.primary : 'rgba(39, 39, 42, 0.8)',
                       }}
-                      className="p-2 rounded-sm bg-zinc-900 border flex items-center justify-center transition-colors"
+                      className="p-2 rounded-md bg-zinc-900 border flex items-center justify-center transition-colors"
                     >
                       {getPillarIcon(pillar.paper)}
                     </div>
 
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400">
-                      {pillar.paper === 'STATIC_GK' ? 'STATIC' : pillar.paper}
-                    </span>
+                    {isTrackPillar ? (
+                      <span className="text-xs font-sans font-bold px-2.5 py-0.5 rounded-md bg-[#e0d0ab]/15 text-[#e0d0ab] border border-[#e0d0ab]/35 flex items-center gap-1 shadow-xs">
+                        <span>★</span>
+                        <span>{pillar.paper === 'STATIC_GK' ? 'STATIC' : pillar.paper}</span>
+                      </span>
+                    ) : (
+                      <span className="text-xs font-sans font-semibold px-2 py-0.5 rounded-md bg-zinc-900 border border-zinc-800 text-zinc-300">
+                        {pillar.paper === 'STATIC_GK' ? 'STATIC' : pillar.paper}
+                      </span>
+                    )}
                   </div>
 
                   <div>
                     <h3 className="font-serif font-bold text-stone-100 text-sm leading-snug group-hover:text-[#e0d0ab] transition-colors">
                       {pillar.title}
                     </h3>
-                    <p className="text-[11px] font-serif text-[#e0d0ab]/80 italic mt-0.5">
-                      {pillar.sanskritSubtitle}
-                    </p>
                   </div>
 
                   <p className="text-xs text-zinc-400 font-sans leading-relaxed line-clamp-2">
@@ -443,15 +464,26 @@ export default function SubjectPillars({ onLaunchPractice, onNavigateArena }: Su
                   </p>
                 </div>
 
-                {/* Bottom Telemetry Bar */}
-                <div className="pt-3 mt-4 border-t border-zinc-900 flex items-center justify-between text-[10px] font-mono relative z-10">
-                  <span className="text-zinc-500 font-medium">{pillar.keyMetrics.prelimsAvgQuestions.split(' ')[0]} Qs</span>
+                {/* Bottom Telemetry Bar - No Collisions */}
+                <div className="pt-3 mt-4 border-t border-zinc-800/60 flex items-center justify-between text-xs font-sans relative z-10 gap-2">
+                  <div className="flex items-baseline gap-1 min-w-0">
+                    <span className="font-mono tabular-nums font-bold text-zinc-200 text-xs shrink-0">
+                      {pillar.paper === 'GS4'
+                        ? '250M'
+                        : pillar.paper === 'CSAT'
+                        ? '80 Qs'
+                        : pillar.keyMetrics.prelimsAvgQuestions.split(' ')[0]}
+                    </span>
+                    <span className="text-zinc-500 text-[11px] truncate">
+                      {pillar.paper === 'GS4' ? 'Mains Core' : 'Prelims Avg'}
+                    </span>
+                  </div>
                   <span
                     style={{ color: isSelected ? pillar.colorTheme.primary : '#a1a1aa' }}
-                    className="flex items-center gap-1 font-bold group-hover:translate-x-0.5 transition-transform"
+                    className="flex items-center gap-1 font-semibold shrink-0 text-xs group-hover:translate-x-0.5 transition-transform"
                   >
                     {isSelected ? 'Active' : 'Inspect'}
-                    <ChevronRight className="w-3 h-3" />
+                    <ChevronRight className="w-3.5 h-3.5" />
                   </span>
                 </div>
               </motion.div>
@@ -460,6 +492,71 @@ export default function SubjectPillars({ onLaunchPractice, onNavigateArena }: Su
         </div>
       </div>
 
+      {/* ── Candidate Optional Subject Synergies Matrix ── */}
+      {candidateOptional && (
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-6 md:p-8 bg-gradient-to-br from-[rgba(4,25,54,0.85)] via-[rgba(7,36,75,0.7)] to-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.45)] rounded-md space-y-6 shadow-xl font-sans backdrop-blur-xl"
+        >
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[rgba(19,108,153,0.3)] pb-5">
+            <div>
+              <div className="flex items-center gap-2.5 mb-2">
+                <span className="px-2.5 py-0.5 rounded-md bg-[#e0d0ab] text-[#072e63] text-xs font-sans font-bold uppercase tracking-wider shadow-xs">
+                  Your Optional Track
+                </span>
+                <span className="text-xs font-sans text-[#e0d0ab] font-medium">
+                  500 Marks across Paper 1 &amp; 2
+                </span>
+              </div>
+              <h3 className="font-serif text-2xl font-bold text-white tracking-tight">
+                {candidateOptional.name}
+              </h3>
+              <p className="text-xs text-[#cad5e2] mt-1 max-w-2xl leading-relaxed">
+                {candidateOptional.paperStructure}
+              </p>
+            </div>
+
+            <div className="p-4 bg-[rgba(3,18,42,0.6)] border border-[rgba(19,108,153,0.3)] rounded-md max-w-md">
+              <span className="text-xs font-sans uppercase tracking-wider text-[#e0d0ab] font-bold block mb-1">
+                💡 Mains Strategy Advisory
+              </span>
+              <p className="text-xs text-[#cad5e2] leading-relaxed">
+                {candidateOptional.strategyTip}
+              </p>
+            </div>
+          </div>
+
+          {/* Synergies with General Studies */}
+          <div>
+            <h4 className="text-xs font-sans uppercase tracking-wider text-[#e0d0ab] font-bold mb-3">
+              General Studies &amp; Essay Cross-Over Synergies
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+              {[
+                { label: 'GS-1 Synergy', value: candidateOptional.gsSynergies.gs1 },
+                { label: 'GS-2 Synergy', value: candidateOptional.gsSynergies.gs2 },
+                { label: 'GS-3 Synergy', value: candidateOptional.gsSynergies.gs3 },
+                { label: 'GS-4 Ethics Synergy', value: candidateOptional.gsSynergies.gs4 },
+                { label: 'Mains Essay Synergy', value: candidateOptional.gsSynergies.essay },
+              ].map((syn, idx) => (
+                <div
+                  key={idx}
+                  className="p-3.5 bg-[rgba(3,18,42,0.65)] border border-[rgba(19,108,153,0.3)] rounded-md flex flex-col justify-between space-y-2 hover:border-[#e0d0ab]/50 transition-colors"
+                >
+                  <span className="text-xs font-sans uppercase tracking-wider font-bold text-[#e0d0ab]">
+                    {syn.label}
+                  </span>
+                  <p className="text-xs text-[#9fb0c8] leading-relaxed">
+                    {syn.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* ── Deep Interactive Pillar Dossier ── */}
       {selectedPillar && (
         <motion.div
@@ -467,19 +564,19 @@ export default function SubjectPillars({ onLaunchPractice, onNavigateArena }: Su
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="border border-zinc-800 bg-zinc-950/90 rounded-sm overflow-hidden shadow-2xl"
+          className="border border-zinc-800 bg-zinc-950/90 rounded-md overflow-hidden shadow-2xl"
         >
           {/* Pillar Header Card */}
           <div className="p-6 md:p-8 border-b border-zinc-800/80 bg-gradient-to-r from-zinc-900/80 via-zinc-900/40 to-zinc-950 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="space-y-2.5 max-w-3xl">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#e0d0ab]/10 text-[#e0d0ab] border border-[#e0d0ab]/20 uppercase">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span className="px-2.5 py-0.5 rounded-md text-xs font-sans font-bold bg-[#e0d0ab]/10 text-[#e0d0ab] border border-[#e0d0ab]/30 uppercase">
                   {selectedPillar.paper} • {selectedPillar.code}
                 </span>
-                <span className="text-xs font-mono text-zinc-400">
-                  Weightage: {selectedPillar.keyMetrics.totalMarksWeight}
+                <span className="text-xs font-sans text-zinc-300">
+                  Weightage: <strong className="text-stone-100 font-medium">{selectedPillar.keyMetrics.totalMarksWeight}</strong>
                 </span>
-                <span className="text-xs font-mono text-zinc-500">
+                <span className="text-xs font-sans text-zinc-400">
                   Corpus Coverage: {selectedPillar.keyMetrics.pyqCoverageYears}
                 </span>
               </div>
@@ -494,7 +591,7 @@ export default function SubjectPillars({ onLaunchPractice, onNavigateArena }: Su
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
-              <button
+              <motion.button
                 onClick={() => {
                   if (onLaunchPractice) {
                     onLaunchPractice(selectedPillar.paper);
@@ -502,11 +599,21 @@ export default function SubjectPillars({ onLaunchPractice, onNavigateArena }: Su
                     onNavigateArena();
                   }
                 }}
-                className="flex items-center justify-center gap-2 px-5 py-3 bg-[#e0d0ab] hover:bg-[#ebdcb7] text-zinc-950 rounded-sm text-xs font-sans font-bold uppercase tracking-wider transition-all shadow-md active:scale-[0.98] cursor-pointer"
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.98 }}
+                className="relative flex items-center justify-center gap-2 px-5 py-2.5 bg-[#e0d0ab] hover:bg-white text-[#072e63] rounded-md text-xs font-sans font-bold uppercase tracking-wider transition-colors shadow-md cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] overflow-hidden group"
               >
-                <Swords className="w-4 h-4" />
-                Practice {selectedPillar.paper === 'STATIC_GK' ? 'Static GK' : selectedPillar.paper} Arena
-              </button>
+                {/* Luminous Shimmer Light Wave */}
+                <motion.div
+                  className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none"
+                  animate={{ x: ['100%', '-100%'] }}
+                  transition={{ repeat: Infinity, duration: 2.8, ease: 'easeInOut' }}
+                />
+                <motion.div whileHover={{ rotate: [0, -10, 10, 0] }} transition={{ duration: 0.4 }}>
+                  <Swords className="w-4 h-4 text-[#072e63]" />
+                </motion.div>
+                <span className="relative z-10">Practice {selectedPillar.paper === 'STATIC_GK' ? 'Static GK' : selectedPillar.paper} Arena</span>
+              </motion.button>
             </div>
           </div>
 
@@ -514,59 +621,59 @@ export default function SubjectPillars({ onLaunchPractice, onNavigateArena }: Su
           <div className="bg-zinc-900/70 border-b border-zinc-800 px-6 py-2.5 flex items-center gap-2 overflow-x-auto">
             <button
               onClick={() => setActiveDossierTab('concepts')}
-              className={`px-4 py-2 rounded-sm text-xs font-sans font-semibold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+              className={`px-4 py-2 rounded-md text-xs font-sans font-medium transition-colors cursor-pointer flex items-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] ${
                 activeDossierTab === 'concepts'
-                  ? 'bg-[#e0d0ab] text-zinc-950 font-bold shadow-sm'
+                  ? 'bg-[#e0d0ab] text-[#072e63] font-bold shadow-xs'
                   : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/60'
               }`}
             >
               <BookOpen className="w-3.5 h-3.5" />
-              Foundational Architecture & Traps ({filteredConcepts.length})
+              <span>Foundational Architecture &amp; Traps ({filteredConcepts.length})</span>
             </button>
 
             {selectedPillar.staticMatrices && selectedPillar.staticMatrices.length > 0 && (
               <button
                 onClick={() => setActiveDossierTab('static-vault')}
-                className={`px-4 py-2 rounded-sm text-xs font-sans font-semibold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+                className={`px-4 py-2 rounded-md text-xs font-sans font-medium transition-colors cursor-pointer flex items-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] ${
                   activeDossierTab === 'static-vault'
-                    ? 'bg-[#e0d0ab] text-zinc-950 font-bold shadow-sm'
+                    ? 'bg-[#e0d0ab] text-[#072e63] font-bold shadow-xs'
                     : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/60'
                 }`}
               >
                 <Table className="w-3.5 h-3.5" />
-                Static Recall Matrices ({selectedPillar.staticMatrices.length})
+                <span>Static Recall Matrices ({selectedPillar.staticMatrices.length})</span>
               </button>
             )}
 
             <button
               onClick={() => setActiveDossierTab('mindmaps')}
-              className={`px-4 py-2 rounded-sm text-xs font-sans font-semibold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+              className={`px-4 py-2 rounded-md text-xs font-sans font-medium transition-colors cursor-pointer flex items-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] ${
                 activeDossierTab === 'mindmaps'
-                  ? 'bg-[#e0d0ab] text-zinc-950 font-bold shadow-sm'
+                  ? 'bg-[#e0d0ab] text-[#072e63] font-bold shadow-xs'
                   : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/60'
               }`}
             >
               <Network className="w-3.5 h-3.5" />
-              Visual Decision Trees ({selectedPillar.mindMaps.length})
+              <span>Visual Decision Trees ({selectedPillar.mindMaps.length})</span>
             </button>
 
             <button
               onClick={() => setActiveDossierTab('pyq-evidence')}
-              className={`px-4 py-2 rounded-sm text-xs font-sans font-semibold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+              className={`px-4 py-2 rounded-md text-xs font-sans font-medium transition-colors cursor-pointer flex items-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] ${
                 activeDossierTab === 'pyq-evidence'
-                  ? 'bg-[#e0d0ab] text-zinc-950 font-bold shadow-sm'
+                  ? 'bg-[#e0d0ab] text-[#072e63] font-bold shadow-xs'
                   : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/60'
               }`}
             >
               <BarChart3 className="w-3.5 h-3.5" />
-              Exam Relevance & Pitfalls ({selectedPillar.pyqEvidence.length})
+              <span>Exam Relevance &amp; Pitfalls ({selectedPillar.pyqEvidence.length})</span>
             </button>
 
             <button
               onClick={() => setActiveDossierTab('mains-blueprints')}
-              className={`px-4 py-2 rounded-sm text-xs font-sans font-semibold transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+              className={`px-4 py-2 rounded-md text-xs font-sans font-medium transition-colors cursor-pointer flex items-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] ${
                 activeDossierTab === 'mains-blueprints'
-                  ? 'bg-[#e0d0ab] text-zinc-950 font-bold shadow-sm'
+                  ? 'bg-[#e0d0ab] text-[#072e63] font-bold shadow-xs'
                   : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/60'
               }`}
             >

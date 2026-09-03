@@ -1,10 +1,10 @@
 {
   "pipeline_version": "1.0.0",
-  "active_super_prompt": "AUDIT_REMEDIATION_BATCH_2026_08_30",
-  "current_stage": "CRITICAL_RLS_LEAK_FOUND_TOP_PRIORITY_DISPATCHED",
-  "tasks_total": 9,
-  "tasks_completed": 7,
-  "active_task_id": "TASK_032_RLS_ANSWER_COLUMN_LOCKDOWN",
+  "active_super_prompt": "INTERFACE_REDESIGN_BATCH_2026_08_31",
+  "current_stage": "INTERFACE_AUDIT_FIXES_DISPATCHED",
+  "tasks_total": 8,
+  "tasks_completed": 0,
+  "active_task_id": "TASK_034_THROUGH_TASK_041",
   "note_on_stale_counters_above": "These fields track ONE super-prompt batch at a time, not the whole pipeline lifetime. Prior values (WS0_PLATFORM_FOUNDATION_BATCH, tasks_total:13, tasks_completed:9) had already drifted from STATE.md's real count of 15 completed by 2026-08-30 -- found and reconciled here rather than left stale. The WS0 batch (TASK_010-013) is still real and still queued in 02_CONTRACTS/pending/ -- see STATE.md's Queue section, not this top-level counter, for its status. This file's per-task history array below is append-only and remains the accurate long-form record regardless of which batch these summary fields point at.",
   "history": [
     {
@@ -325,6 +325,36 @@
       "event": "DISPATCHED",
       "contract": "02_CONTRACTS/active/TASK_033_PYQ_CORPUS_LOADCORPUS_DIRNAME_CRASH.md",
       "note": "User-reported: Question Bank paginates to only 3 pages (13 fallback questions) instead of the real 7,841. Orchestrator fully root-caused before dispatch (user explicitly asked for investigation-only, no fix): pyq_explorer.ts's loadCorpus() builds a possiblePaths array literal containing path.join(__dirname, ...) under package.json's \"type\":\"module\" -- __dirname is undefined in native ESM, array literals evaluate eagerly, so this throws before ever reaching the correct working path candidate. The ReferenceError is caught and memoizes cachedCorpus=[] permanently for the process lifetime (module-level singleton, never retried). Confirmed via live stack trace, direct curl of both /pyqs and /census endpoints (both return success:true with zero data), and a standalone script proving the data file + correct path are fine in isolation. Production's CJS-bundled server.ts does not reproduce this (consistent with TASK_024's earlier successful verification against that bundle); Vercel's api/server.ts entrypoint is unconfirmed and is in scope for this contract to check. Fix-only contract, no re-investigation needed."
+    },
+    {
+      "task_id": "TASK_033_PYQ_CORPUS_LOADCORPUS_DIRNAME_CRASH",
+      "event": "VERIFIED_PARTIAL",
+      "contract": "02_CONTRACTS/completed/TASK_033_PYQ_CORPUS_LOADCORPUS_DIRNAME_CRASH.md",
+      "note": "Independently re-verified via a live re-test against the running dev server: /api/analytics/observatory/pyqs now returns total:7841, totalPages:1307, confirming the typeof __dirname !== 'undefined' guard (refactored into a new getCandidatePaths() helper) genuinely fixes the crash. One minor, non-urgent gap: the secondary observability warning checks for sentinel 'ALL' but the real sentinel used elsewhere is 'All', so that warning branch can never fire -- not worth a fast-follow on its own."
+    },
+    {
+      "task_id": "TASK_032_RLS_ANSWER_COLUMN_LOCKDOWN",
+      "event": "VERIFIED_PARTIAL",
+      "contract": "02_CONTRACTS/completed/TASK_032_RLS_ANSWER_COLUMN_LOCKDOWN.md",
+      "note": "Independently re-verified a second time (direct migration read, repo-wide grep, live curl against the real production Supabase REST API) as part of the interface-redesign investigation pass. Migration and all 3 application-layer callers (submit-quiz.ts, explanation.ts, and questions.ts -- the last silently omitted from the receipt's own accounting but confirmed independently to already use the service-role client, harmless) are genuinely correct. One real gap found: a duplicate, un-synced legacy /api/explanation handler in root server.ts:241-330 (local-dev/self-hosted path only, production via api/server.ts unaffected) was never updated alongside the fixed server-lib/explanation.ts. Confirmed unrelated to the separately-found Landing-page render loop. Promoted to completed/ with a Section 6 Orchestrator Verification Note appended in-place. Migration remains unapplied to production -- still an open user/Orchestrator decision. Fast-follow TASK_041 dispatched to close the gap."
+    },
+    {
+      "task_id": "INTERFACE_REDESIGN_AUDIT_CORRECTION",
+      "event": "ORCHESTRATOR_SELF_CORRECTION",
+      "contract": null,
+      "note": "2026-08-31: /product:interface-redesign audit (whole-app primary-journey scope, user-approved 6-step plan, 'Let's go!') ran a 7-lane investigation workflow to pin down exact root causes before dispatching fixes. Found the Orchestrator's own earlier report of one '500 + infinite render loop on Daily Brief' bug was wrong on both counts: the render loop reproduces on the Landing page (unauthenticated default state), not Daily Brief, as a one-time mount burst that does not recur into Daily Edition or the quiz flow; and /api/user-limits's guest-UUID 500 is a separate, unrelated bug whose sole client caller (Arena.tsx) already handles the failure safely with no loop mechanism. Split into two correctly-scoped contracts (TASK_035, TASK_036) instead of one chasing a bug that wasn't where it was first reported. Corrected directly to the user before dispatching."
+    },
+    {
+      "task_id": "INTERFACE_REDESIGN_BATCH_DISPATCHED",
+      "event": "DISPATCHED_BATCH",
+      "contract": "02_CONTRACTS/active/",
+      "note": "2026-08-31: 8 contracts (TASK_034 through TASK_041) dispatched into active/ per the user's explicit approval of the sequenced 6-item interface-redesign fix plan (plus TASK_041, the TASK_032 fast-follow, folded into the same batch dispatch). All mutually independent, no hard dependency gates -- safe to auto-chain per the Autonomous Multi-Contract Queue Protocol (00_SYSTEM/AGENT_CAPABILITIES.md Section 5). TASK_034: Login.tsx AnimatePresence mode=\"wait\" removal + missing CheckCircle2 import, fully diagnosed. TASK_035: Landing.tsx render-loop, genuine investigate-then-fix (root cause not pinpointed pre-dispatch, unlike every other contract in this batch). TASK_036: user-limits.ts guest-UUID 500, fully diagnosed. TASK_037: headline type-scale coarse-jump fix on Landing.tsx and CurrentAffairs.tsx, fully diagnosed. TASK_038: nav consolidation (closes TASK_026's residual PROFILE_NAV_ITEM gap) + mobile scroll-fade affordance. TASK_039: a11y aria-labels on Arena/DiagnosticPreview option buttons + MobileLanding title truncation fix. TASK_040: delete vestigial broken PWA scaffold (manifest.json references a nonexistent icon, SW does nothing beyond registration). TASK_041: fast-follow syncing root server.ts's duplicate legacy /api/explanation handler onto the service-role client, closing TASK_032's gap."
+    },
+    {
+      "task_id": "OBSERVATORY_DEPTH_AND_ARENA_CTA_REWORK",
+      "event": "COMPLETED",
+      "contract": "docs/observatory-and-arena-rework-architecture.md",
+      "note": "2026-09-03: Completed full Test Arena rework unifying platform-wide CTAs (ArenaLaunchConfig, Drill Preflight Card, pacing modes: Standard 60s / Speed Blitz 20s / Untimed, PYQ ID verification in server evaluation, Autopsy contextTag). Rebuilt Observatory Question Vault: generated 1,549 verified 2011-2025 modern PYQs in verified_pyqs_15yr.json, fixed client pagination slice bug, added intelligent cross-category subject search. Fixed reload onboarding pop-up by decoupling restoreSession and onAuthStateChange from modal triggers."
     }
   ]
 }

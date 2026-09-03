@@ -18,17 +18,27 @@ import VerticalNavRail, { ContextActionItem } from './components/VerticalNavRail
 import Onboarding from './components/Onboarding';
 import BrandLogo from './components/BrandLogo';
 import { supabase } from './lib/supabase';
-import { Loader2, Trophy, Swords, Globe, User, House, LogIn, Layers, BookOpen, PanelLeftOpen, LayoutTemplate, Radio } from 'lucide-react';
+import { Loader2, Trophy, Swords, Globe, User, House, LogIn, Layers, BookOpen, PanelLeftOpen, LayoutTemplate, Radio, Clock } from 'lucide-react';
 import { NAV_ITEMS, PROFILE_NAV_ITEM, NavTab } from './lib/navItems';
+import AnimatedNavIcon from './components/AnimatedNavIcon';
+import type { CandidatePreferences, CandidateProfile, ArenaLaunchConfig } from './types';
+import {
+  loadStoredPreferences,
+  DEFAULT_PREFERENCES,
+  calculateExamCountdown,
+  formatTrackBadge
+} from './lib/candidatePreferences';
 
 export default function App() {
   const [userEmail, setUserEmail] = useState<string>('');
   const [userName, setUserName] = useState<string>('');
   const [userId, setUserId] = useState<string>('');
+  const [preferences, setPreferences] = useState<CandidatePreferences>(DEFAULT_PREFERENCES);
   const [loading, setLoading] = useState(true);
   const [gameState, setGameState] = useState<'login' | 'landing' | 'arena' | 'autopsy'>('landing');
 
   const [activeTab, setActiveTab] = useState<'arena' | 'tracker' | 'library' | 'humanities' | 'observatory' | 'profile' | 'leaderboard'>('arena');
+  const [hoveredNavId, setHoveredNavId] = useState<string | null>(null);
 
   const [viewingAnalystId, setViewingAnalystId] = useState<string | null>(null);
   const [showPasswordReset, setShowPasswordReset] = useState(false);
@@ -38,13 +48,16 @@ export default function App() {
   const [showManifesto, setShowManifesto] = useState(false);
   const [legalDocumentType, setLegalDocumentType] = useState<LegalDocumentType | null>(null);
   const [targetPillar, setTargetPillar] = useState<{ id: string; title: string } | null>(null);
+  const [arenaConfig, setArenaConfig] = useState<ArenaLaunchConfig | null>(null);
 
   const [arenaStats, setArenaStats] = useState({
     correct: 0,
     incorrect: 0,
     unattempted: 0,
     totalTimeSeconds: 0,
-    subjectStats: {} as Record<string, { correct: number; total: number }>
+    subjectStats: {} as Record<string, { correct: number; total: number }>,
+    isRanked: true as boolean | undefined,
+    contextTag: undefined as string | undefined,
   });
   const [percentile, setPercentile] = useState(0);
 
@@ -232,6 +245,11 @@ export default function App() {
             setUserName(cachedName);
             setUserId(cachedUserId || cachedEmail);
 
+            const effectiveUid = cachedUserId || cachedEmail;
+            loadStoredPreferences(effectiveUid).then((loadedPrefs) => {
+              setPreferences(loadedPrefs);
+            });
+
             const cachedResultsRaw = localStorage.getItem('tark_arena_results');
             if (cachedResultsRaw) {
               try {
@@ -250,6 +268,7 @@ export default function App() {
             }
           } else {
             // Cold visitor defaults to landing
+            loadStoredPreferences().then((loadedPrefs) => setPreferences(loadedPrefs));
             setGameState('landing');
           }
         }
@@ -278,6 +297,10 @@ export default function App() {
         localStorage.setItem('tark_session_email', matchedEmail);
         localStorage.setItem('tark_session_name', matchedName);
         localStorage.setItem('tark_session_user_id', matchedUserId);
+
+        loadStoredPreferences(matchedUserId).then((loadedPrefs) => {
+          setPreferences(loadedPrefs);
+        });
       }
 
       if (event === 'PASSWORD_RECOVERY' ||
@@ -300,10 +323,12 @@ export default function App() {
     localStorage.setItem('tark_session_name', name);
     localStorage.setItem('tark_session_user_id', resolvedUserId);
 
-    const hasCompletedOnboarding = localStorage.getItem('tark_onboarding_completed') === 'true';
-    if (!hasCompletedOnboarding) {
-      setShowOnboarding(true);
-    }
+    loadStoredPreferences(resolvedUserId).then((loadedPrefs) => {
+      setPreferences(loadedPrefs);
+      if (!loadedPrefs.onboardingCompleted && localStorage.getItem('tark_onboarding_completed') !== 'true') {
+        setShowOnboarding(true);
+      }
+    });
 
     setGameState('landing');
     setActiveTab('arena');
@@ -326,7 +351,7 @@ export default function App() {
     setLoading(false);
   };
 
-  const handleArenaComplete = (stats: { correct: number; incorrect: number; unattempted: number; totalTimeSeconds: number; subjectStats: Record<string, { correct: number; total: number }>; isRanked?: boolean }, perc: number) => {
+  const handleArenaComplete = (stats: { correct: number; incorrect: number; unattempted: number; totalTimeSeconds: number; subjectStats: Record<string, { correct: number; total: number }>; isRanked?: boolean; contextTag?: string }, perc: number) => {
     setArenaStats(stats);
     setPercentile(perc);
     setGameState('autopsy');
@@ -352,11 +377,13 @@ export default function App() {
             isLanding={gameState === 'landing'}
             userEmail={userEmail}
             isExpanded={isRailExpanded}
+            candidatePreferences={preferences}
             onToggleExpand={handleToggleRailExpand}
             onNavigateTab={navigateToTab}
             onNavigateHome={handleNavigateHome}
             onOpenLogin={() => setGameState('login')}
             onSwitchToHorizontal={() => setNavOrientation('horizontal')}
+            onRecalibrateTrack={() => setShowOnboarding(true)}
           />
         </div>
       )}
@@ -401,7 +428,7 @@ export default function App() {
               <LayoutGroup id="app-nav-pills">
                 {NAV_ITEMS.map((item) => {
                   const isActive = item.id === 'home' ? gameState === 'landing' : gameState !== 'landing' && activeTab === item.id;
-                  const Icon = item.icon;
+                  const isItemHovered = hoveredNavId === item.id;
                   const handleClick = () => {
                     if (item.id === 'home') {
                       handleNavigateHome();
@@ -411,56 +438,89 @@ export default function App() {
                   };
 
                   return (
-                    <button
+                    <motion.button
                       key={item.id}
                       onClick={handleClick}
-                      className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-xs outline-none group cursor-pointer"
+                      onMouseEnter={() => setHoveredNavId(item.id)}
+                      onMouseLeave={() => setHoveredNavId(null)}
+                      whileTap={{ scale: 0.98 }}
+                      className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-md outline-none group cursor-pointer focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80"
                       title={`${item.label} (Alt+${item.hotkey})`}
                     >
                       {isActive && (
                         <motion.div
                           layoutId="active-nav-pill"
-                          className="absolute inset-0 bg-[#e0d0ab] rounded-xs z-0 shadow-sm"
+                          className="absolute inset-0 bg-[#e0d0ab] rounded-md z-0 shadow-xs"
                           transition={{ type: 'spring', bounce: 0.15, duration: 0.45 }}
                         />
                       )}
-                      <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-200 ease-out ${isActive ? 'text-[#072e63] font-bold' : 'text-[#8fa2bd] group-hover:text-[#e0d0ab] group-hover:-translate-y-0.5'}`}>
-                        <Icon className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-200 ease-out ${!isActive ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
+                      <span className={`relative z-10 flex items-center gap-1.5 font-sans text-xs transition-all duration-150 ease-out ${isActive ? 'text-[#072e63] font-semibold' : 'text-[#8fa2bd] group-hover:text-[#e0d0ab]'}`}>
+                        <AnimatedNavIcon
+                          id={item.id}
+                          isActive={isActive}
+                          isHovered={isItemHovered}
+                          size={16}
+                          className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0 transition-transform duration-150 ease-out"
+                        />
                         <span className="hidden sm:inline">{item.label}</span>
                         <span className="sm:hidden">{item.shortLabel}</span>
                       </span>
-                    </button>
+                    </motion.button>
                   );
                 })}
 
                 {/* Profile tab only exists when signed in */}
                 {userEmail && (
-                  <button
+                  <motion.button
                     onClick={() => navigateToTab('profile')}
-                    className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-xs outline-none group cursor-pointer"
+                    onMouseEnter={() => setHoveredNavId('profile')}
+                    onMouseLeave={() => setHoveredNavId(null)}
+                    whileTap={{ scale: 0.98 }}
+                    className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-md outline-none group cursor-pointer focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80"
                     title={`${PROFILE_NAV_ITEM.label} (Alt+${PROFILE_NAV_ITEM.hotkey})`}
                   >
                     {gameState !== 'landing' && activeTab === 'profile' && (
                       <motion.div
                         layoutId="active-nav-pill"
-                        className="absolute inset-0 bg-[#e0d0ab] rounded-xs z-0 shadow-sm"
+                        className="absolute inset-0 bg-[#e0d0ab] rounded-md z-0 shadow-xs"
                         transition={{ type: 'spring', bounce: 0.15, duration: 0.45 }}
                       />
                     )}
-                    <span className={`relative z-10 flex items-center gap-1.5 transition-all duration-200 ease-out ${gameState !== 'landing' && activeTab === 'profile' ? 'text-[#072e63] font-bold' : 'text-[#8fa2bd] group-hover:text-[#e0d0ab] group-hover:-translate-y-0.5'}`}>
-                      <User className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-200 ease-out ${!(gameState !== 'landing' && activeTab === 'profile') ? 'group-hover:scale-110 drop-shadow-md' : ''}`} />
+                    <span className={`relative z-10 flex items-center gap-1.5 font-sans text-xs transition-all duration-150 ease-out ${gameState !== 'landing' && activeTab === 'profile' ? 'text-[#072e63] font-semibold' : 'text-[#8fa2bd] group-hover:text-[#e0d0ab]'}`}>
+                      <AnimatedNavIcon
+                        id="profile"
+                        isActive={gameState !== 'landing' && activeTab === 'profile'}
+                        isHovered={hoveredNavId === 'profile'}
+                        size={16}
+                        className="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0 transition-transform duration-150 ease-out"
+                      />
                       <span className="hidden sm:inline">{PROFILE_NAV_ITEM.label}</span>
                       <span className="sm:hidden">{PROFILE_NAV_ITEM.shortLabel}</span>
                     </span>
-                  </button>
+                  </motion.button>
                 )}
               </LayoutGroup>
 
+              {/* Exam Countdown Pill */}
+              {preferences && (
+                <button
+                  type="button"
+                  onClick={() => setShowOnboarding(true)}
+                  title={`UPSC Prep Clock: ${calculateExamCountdown(preferences.targetYear).daysRemaining} days remaining (${calculateExamCountdown(preferences.targetYear).label}). Click to recalibrate dossier.`}
+                  className="hidden sm:inline-flex items-center gap-1.5 ml-2 px-3 py-1.5 bg-[rgba(11,61,120,0.3)] hover:bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.35)] hover:border-[#e0d0ab]/50 text-[#e0d0ab] rounded-md text-xs font-sans transition-all duration-150 cursor-pointer shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#34d399] animate-pulse shrink-0" />
+                  <span className="font-mono tabular-nums font-bold">{calculateExamCountdown(preferences.targetYear).daysRemaining}d</span>
+                  <span className="text-[#8fa2bd] hidden lg:inline">to {calculateExamCountdown(preferences.targetYear).label}</span>
+                </button>
+              )}
+
               {/* Layout Switcher Button (Switch to Left Vertical Rail) */}
               <button
+                type="button"
                 onClick={() => setNavOrientation('vertical')}
                 title="Switch to Left Vertical Command Rail (Alt+[)"
-                className="hidden md:inline-flex items-center gap-1.5 ml-2 px-2.5 py-1.5 bg-zinc-900/80 border border-zinc-800 hover:border-[#e0d0ab]/50 text-[#8fa2bd] hover:text-[#e0d0ab] rounded-xs text-xs font-mono transition-all cursor-pointer"
+                className="hidden md:inline-flex items-center gap-1.5 ml-1.5 px-3 py-1.5 bg-slate-900/60 hover:bg-slate-850 border border-slate-750 hover:border-[#e0d0ab]/40 text-[#8fa2bd] hover:text-[#e0d0ab] rounded-md text-xs font-sans transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80"
               >
                 <PanelLeftOpen className="w-3.5 h-3.5 text-[#0194a8]" />
                 <span className="hidden lg:inline">Vertical Rail</span>
@@ -468,8 +528,9 @@ export default function App() {
 
               {!userEmail && (
                 <button
+                  type="button"
                   onClick={() => setGameState('login')}
-                  className="hidden md:inline-flex items-center gap-1.5 ml-2 px-3.5 py-1.5 bg-zinc-900 border border-zinc-800 text-[#e0d0ab] hover:border-[#e0d0ab]/50 rounded-sm text-xs font-sans font-medium transition-all cursor-pointer"
+                  className="hidden md:inline-flex items-center gap-1.5 ml-2 px-3.5 py-1.5 bg-[#e0d0ab] hover:bg-white text-[#072e63] font-sans font-semibold rounded-md text-xs shadow-xs transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]"
                 >
                   <LogIn className="w-3.5 h-3.5" />
                   Sign In
@@ -509,6 +570,7 @@ export default function App() {
             onNavigateObservatory={() => navigateToTab('observatory')}
             onNavigateManifesto={handleNavigateManifesto}
             onNavigateLegal={(type) => setLegalDocumentType(type)}
+            candidatePreferences={preferences}
           />
         </div>
       )}
@@ -525,15 +587,34 @@ export default function App() {
           style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
         >
           {activeTab === 'profile' && userEmail ? (
-            <Profile userEmail={userEmail} userId={userId} userName={userName} onLogout={handleLogout} />
+            <Profile
+              userEmail={userEmail}
+              userId={userId}
+              userName={userName}
+              candidatePreferences={preferences}
+              onRecalibrateTrack={() => setShowOnboarding(true)}
+              onLogout={handleLogout}
+            />
           ) : activeTab === 'leaderboard' ? (
             <Leaderboard onAnalystClick={setViewingAnalystId} />
           ) : activeTab === 'tracker' ? (
             <CurrentAffairs
               userId={userId || 'guest'}
+              candidatePreferences={preferences}
               onLaunchPractice={(categoryOrId) => {
                 localStorage.removeItem('tark_arena_results');
-                setTargetPillar({ id: categoryOrId, title: categoryOrId });
+                setTargetPillar({ id: 'CURRENT_AFFAIRS', title: 'Daily Current Affairs' });
+                setArenaConfig({
+                  mode: 'daily_brief',
+                  title: 'Daily Current Affairs Drill',
+                  subtitle: '10 Questions · Grounded PIB & Cabinet Policy Dispatches',
+                  targetId: 'CURRENT_AFFAIRS',
+                  questionCount: 10,
+                  isRanked: false,
+                  timePerQuestionSeconds: 60,
+                  autoStart: true,
+                  contextTag: 'Daily Current Affairs'
+                });
                 setGameState('arena');
                 setActiveTab('arena');
               }}
@@ -543,27 +624,60 @@ export default function App() {
               onNavigateArena={() => {
                 localStorage.removeItem('tark_arena_results');
                 setTargetPillar(null);
+                setArenaConfig({
+                  mode: 'full_mock',
+                  title: 'UPSC CSE Mock Arena',
+                  subtitle: 'Timed recall under authentic Prelims conditions',
+                  questionCount: 25,
+                  isRanked: true,
+                  timePerQuestionSeconds: 60,
+                  autoStart: false,
+                });
                 setGameState('arena');
                 setActiveTab('arena');
               }}
               onLaunchPractice={(categoryOrId) => {
                 localStorage.removeItem('tark_arena_results');
                 setTargetPillar({ id: categoryOrId, title: categoryOrId });
+                setArenaConfig({
+                  mode: 'topic_drill',
+                  title: `${categoryOrId} Practice Drill`,
+                  subtitle: 'Targeted High-Yield Matrix & 25-Year PYQ Bank',
+                  targetId: categoryOrId,
+                  questionCount: 10,
+                  isRanked: false,
+                  timePerQuestionSeconds: 60,
+                  autoStart: true,
+                  contextTag: `${categoryOrId} Practice`
+                });
                 setGameState('arena');
                 setActiveTab('arena');
               }}
             />
           ) : activeTab === 'library' ? (
             <SubjectPillars
+              candidatePreferences={preferences}
               onNavigateArena={() => {
                 localStorage.removeItem('tark_arena_results');
                 setTargetPillar(null);
+                setArenaConfig(null);
                 setGameState('arena');
                 setActiveTab('arena');
               }}
               onLaunchPractice={(categoryOrId) => {
                 localStorage.removeItem('tark_arena_results');
                 setTargetPillar({ id: categoryOrId, title: categoryOrId });
+                setArenaConfig({
+                  mode: 'subject_drill',
+                  title: `${categoryOrId} Syllabus Drill`,
+                  subtitle: 'Core General Studies Syllabus & Past Trends',
+                  targetId: categoryOrId,
+                  questionCount: 15,
+                  isRanked: false,
+                  timePerQuestionSeconds: 60,
+                  autoStart: true,
+                  contextTag: `${categoryOrId} Syllabus`
+                });
                 setGameState('arena');
                 setActiveTab('arena');
               }}
@@ -575,7 +689,12 @@ export default function App() {
               onComplete={handleArenaComplete}
               userId={userId || 'guest'}
               targetPillar={targetPillar}
-              onClearTargetPillar={() => setTargetPillar(null)}
+              arenaConfig={arenaConfig}
+              candidatePreferences={preferences}
+              onClearTargetPillar={() => {
+                setTargetPillar(null);
+                setArenaConfig(null);
+              }}
               onReturnToDashboard={() => setActiveTab('tracker')}
               onNavigateManifesto={handleNavigateManifesto}
             />
@@ -648,11 +767,18 @@ export default function App() {
         <Onboarding
           userName={userName}
           userEmail={userEmail}
+          userId={userId}
+          initialPreferences={preferences}
           onComplete={(profile) => {
             if (profile.name) setUserName(profile.name);
+            if (profile.preferences) setPreferences(profile.preferences);
+            try { localStorage.setItem('tark_onboarding_completed', 'true'); } catch {}
             setShowOnboarding(false);
           }}
-          onSkip={() => setShowOnboarding(false)}
+          onSkip={() => {
+            try { localStorage.setItem('tark_onboarding_completed', 'true'); } catch {}
+            setShowOnboarding(false);
+          }}
         />
       )}
 

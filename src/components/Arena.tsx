@@ -28,6 +28,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import { Modal, EmptyState, ConceptInsightRenderer, formatInsightToText } from './shared';
 import staticQuestionsData from '../data/static-subject-questions.json';
+import type { CandidatePreferences, ArenaLaunchConfig } from '../types';
 
 interface ArenaProps {
   onComplete: (
@@ -38,11 +39,14 @@ interface ArenaProps {
       totalTimeSeconds: number;
       subjectStats: Record<string, { correct: number; total: number; missedQuestions?: string[] }>;
       isRanked?: boolean;
+      contextTag?: string;
     },
     percentile: number
   ) => void;
   userId: string;
   targetPillar?: { id: string; title: string } | null;
+  arenaConfig?: ArenaLaunchConfig | null;
+  candidatePreferences?: CandidatePreferences;
   onClearTargetPillar?: () => void;
   onReturnToDashboard?: () => void;
   onNavigateManifesto?: () => void;
@@ -85,6 +89,7 @@ interface CachedResults {
     totalTimeSeconds: number;
     subjectStats: Record<string, { correct: number; total: number; missedQuestions?: string[] }>;
     isRanked?: boolean;
+    contextTag?: string;
   };
   percentile: number;
 }
@@ -173,12 +178,19 @@ export default function Arena({
   onComplete,
   userId,
   targetPillar,
+  arenaConfig,
+  candidatePreferences,
   onClearTargetPillar,
   onReturnToDashboard,
   onNavigateManifesto,
 }: ArenaProps) {
   const [arenaPhase, setArenaPhase] = useState<'intro' | 'quiz'>('intro');
   const [examTrack, setExamTrack] = useState<'upsc' | 'ssc'>('upsc');
+  const [pacingMode, setPacingMode] = useState<'standard' | 'blitz' | 'untimed'>(() => {
+    if (arenaConfig?.timePerQuestionSeconds === 20) return 'blitz';
+    if (arenaConfig?.timePerQuestionSeconds === 0) return 'untimed';
+    return 'standard';
+  });
   const [showPreflightModal, setShowPreflightModal] = useState(false);
   const [showAbandonModal, setShowAbandonModal] = useState(false);
   const [motivation, setMotivation] = useState('');
@@ -220,7 +232,7 @@ export default function Arena({
   const [showTrainingSetup, setShowTrainingSetup] = useState(false);
   const [allSubjects, setAllSubjects] = useState<string[]>([]);
   const [selectedSubjects, setSelectedSubjects] = useState<Set<string>>(new Set());
-  const [trainingLength, setTrainingLength] = useState<number>(25);
+  const [trainingLength, setTrainingLength] = useState<number>(() => candidatePreferences?.dailyMcqTarget || 25);
   const [loadingSubjects, setLoadingSubjects] = useState(false);
 
   const prefersReduced = useReducedMotion();
@@ -306,6 +318,51 @@ export default function Arena({
     setShowPreflightModal(true);
   };
 
+  const handleStartTargetedDrill = async () => {
+    const drillIsRanked = arenaConfig?.isRanked ?? false;
+    setIsRanked(drillIsRanked);
+    setArenaPhase('quiz');
+    setIsLoading(true);
+    setErrorMsg('');
+
+    try {
+      const targetId = arenaConfig?.targetId || targetPillar?.id || '';
+      const targetTitle = arenaConfig?.title || targetPillar?.title || targetId;
+      const targetCount = arenaConfig?.questionCount || 10;
+
+      const queryParams = new URLSearchParams();
+      if (userId) queryParams.append('userId', userId);
+      queryParams.append('examTrack', examTrack);
+      if (targetId) queryParams.append('pillar', targetId);
+      if (targetTitle) queryParams.append('subject', targetTitle);
+      queryParams.append('count', targetCount.toString());
+
+      const url = `/api/questions?${queryParams.toString()}`;
+      const response = await fetchWithAuth(url);
+      if (!response.ok) throw new Error(`Server returned status code ${response.status}`);
+      const data = await response.json();
+
+      if (data.error) throw new Error(data.error);
+
+      let questionsList = data.questions || [];
+      if (questionsList.length === 0) {
+        throw new Error('No questions found for this targeted drill.');
+      }
+
+      setQuestions(questionsList);
+      saveActiveSessionMeta({
+        currentQuestionIndex: 0,
+        isRanked: drillIsRanked,
+        mode: drillIsRanked ? 'vanguard' : 'training',
+      });
+    } catch (error: any) {
+      setErrorMsg('Failed to initialize drill: ' + (error.message || 'Unknown network error.'));
+      setArenaPhase('intro');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleTrainingGround = async () => {
     setIsRanked(false);
     setLoadingSubjects(true);
@@ -316,8 +373,43 @@ export default function Arena({
         .not('subject_category', 'is', null);
 
       if (data) {
-        const unique = [...new Set(data.map((q: any) => q.subject_category).filter(Boolean))].sort() as string[];
+        let unique = [...new Set(data.map((q: any) => q.subject_category).filter(Boolean))].sort() as string[];
+        if (!unique.includes('Current Affairs')) {
+          unique.push('Current Affairs');
+        }
         setAllSubjects(unique);
+
+        const activeTarget = arenaConfig?.targetId || targetPillar?.id || targetPillar?.title || '';
+        let matched = false;
+
+        if (activeTarget) {
+          const directMatch = unique.filter((s) =>
+            s.toLowerCase().includes(activeTarget.toLowerCase()) || activeTarget.toLowerCase().includes(s.toLowerCase())
+          );
+          if (directMatch.length > 0) {
+            setSelectedSubjects(new Set(directMatch));
+            matched = true;
+          } else if (activeTarget.toUpperCase() === 'CURRENT_AFFAIRS') {
+            setSelectedSubjects(new Set(['Current Affairs']));
+            matched = true;
+          }
+        }
+
+        if (!matched && candidatePreferences?.focusPillars && candidatePreferences.focusPillars.length > 0) {
+          const pillars = candidatePreferences.focusPillars;
+          const preselected = unique.filter((subj) => {
+            const s = subj.toLowerCase();
+            if (pillars.includes('gs2') && (s.includes('polity') || s.includes('governance') || s.includes('constitution') || s.includes('international') || s.includes('law'))) return true;
+            if (pillars.includes('gs3') && (s.includes('economy') || s.includes('environment') || s.includes('science') || s.includes('tech') || s.includes('agriculture'))) return true;
+            if (pillars.includes('gs1') && (s.includes('history') || s.includes('geography') || s.includes('culture') || s.includes('society'))) return true;
+            if (pillars.includes('gs4') && (s.includes('ethics') || s.includes('integrity') || s.includes('aptitude'))) return true;
+            if (pillars.includes('csat') && (s.includes('csat') || s.includes('reasoning') || s.includes('comprehension'))) return true;
+            return false;
+          });
+          if (preselected.length > 0) {
+            setSelectedSubjects(new Set(preselected));
+          }
+        }
       }
     } catch (err) {
       console.warn('Failed to fetch subjects:', err);
@@ -536,6 +628,9 @@ export default function Arena({
     }
   };
 
+  const defaultTimeForQuestion =
+    pacingMode === 'blitz' ? 20 : pacingMode === 'standard' ? (arenaConfig?.timePerQuestionSeconds || 60) : 999999;
+
   // Timer interval loop
   useEffect(() => {
     if (arenaPhase !== 'quiz' || isLoading || errorMsg || questions.length === 0 || !currentQuestionId || quizSubmitted) return;
@@ -543,7 +638,18 @@ export default function Arena({
     const isCurrentlyLocked = !!lockedMap[currentQuestionId];
     if (isCurrentlyLocked) return;
 
-    const currentTimeLeft = timeLeftMap[currentQuestionId] !== undefined ? timeLeftMap[currentQuestionId] : 20;
+    // Untimed mode: simply tally time spent without timeout auto-lock
+    if (pacingMode === 'untimed') {
+      const timer = setInterval(() => {
+        setTimeSpentMap((prev) => ({
+          ...prev,
+          [currentQuestionId]: (prev[currentQuestionId] || 0) + 1,
+        }));
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+
+    const currentTimeLeft = timeLeftMap[currentQuestionId] !== undefined ? timeLeftMap[currentQuestionId] : defaultTimeForQuestion;
 
     if (currentTimeLeft <= 0) {
       setLockedMap((prev) => ({ ...prev, [currentQuestionId]: true }));
@@ -554,7 +660,7 @@ export default function Arena({
     const timer = setInterval(() => {
       setTimeLeftMap((prev) => ({
         ...prev,
-        [currentQuestionId]: Math.max(0, (prev[currentQuestionId] !== undefined ? prev[currentQuestionId] : 20) - 1),
+        [currentQuestionId]: Math.max(0, (prev[currentQuestionId] !== undefined ? prev[currentQuestionId] : defaultTimeForQuestion) - 1),
       }));
       setTimeSpentMap((prev) => ({
         ...prev,
@@ -563,7 +669,7 @@ export default function Arena({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [arenaPhase, currentQuestionId, timeLeftMap, lockedMap, isLoading, errorMsg, questions, quizSubmitted]);
+  }, [arenaPhase, currentQuestionId, timeLeftMap, lockedMap, isLoading, errorMsg, questions, quizSubmitted, pacingMode, defaultTimeForQuestion]);
 
   // AI Conceptual Insights loop
   useEffect(() => {
@@ -802,6 +908,8 @@ export default function Arena({
       const result = await response.json();
       clearSessionCache();
 
+      const resolvedContextTag = arenaConfig?.contextTag || arenaConfig?.title || (targetPillar ? `${targetPillar.title} Review` : undefined);
+
       const resultsToCache: CachedResults = {
         status: 'reviewing',
         resultsData: {
@@ -811,6 +919,7 @@ export default function Arena({
           totalTimeSeconds: result.stats.totalTimeSeconds,
           subjectStats: result.stats.subjectStats,
           isRanked,
+          contextTag: resolvedContextTag,
         },
         percentile: result.percentile,
       };
@@ -827,12 +936,15 @@ export default function Arena({
           totalTimeSeconds: result.stats.totalTimeSeconds,
           subjectStats: result.stats.subjectStats,
           isRanked,
+          contextTag: resolvedContextTag,
         },
         result.percentile
       );
     } catch (err: any) {
       console.error(err);
       clearSessionCache();
+
+      const fallbackContextTag = arenaConfig?.contextTag || arenaConfig?.title || (targetPillar ? `${targetPillar.title} Review` : undefined);
 
       onComplete(
         {
@@ -842,6 +954,7 @@ export default function Arena({
           totalTimeSeconds: totalTime,
           subjectStats: finalSubjectStats,
           isRanked,
+          contextTag: fallbackContextTag,
         },
         0
       );
@@ -937,115 +1050,232 @@ export default function Arena({
           Time-bound competitive testing with zero-trust server evaluation and negative marking.
         </p>
 
-        {/* Targeted Syllabus Pillar Drill Banner (if active) */}
-        {targetPillar && (
-          <div className="w-full mb-6 p-4 rounded-sm bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 backdrop-blur-sm">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-sm bg-[#e0d0ab]/20 text-[#e0d0ab]">
-                <Target className="w-5 h-5" />
+        {/* If targeted drill active: Show dedicated preflight card */}
+        {arenaConfig && arenaConfig.mode !== 'full_mock' ? (
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full mb-6 p-6 rounded-md bg-[rgba(4,25,54,0.85)] border border-[rgba(224,208,171,0.35)] shadow-2xl backdrop-blur-xl space-y-5 text-left"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+              <div className="space-y-1.5">
+                <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-sm bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 text-[#e0d0ab] text-[10px] font-mono font-bold uppercase tracking-wider">
+                  <Target className="w-3.5 h-3.5" />
+                  <span>
+                    {arenaConfig.mode === 'daily_brief'
+                      ? 'Daily Intelligence Drill'
+                      : arenaConfig.mode === 'topic_drill'
+                      ? 'Topic Mastery Drill'
+                      : 'Syllabus Pillar Drill'}
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#e8e0cf]">
+                  {arenaConfig.title}
+                </h2>
+                <p className="text-xs text-[#9fb0c8] font-sans">
+                  {arenaConfig.subtitle || 'Targeted analytical assessment with zero-trust evaluation.'}
+                </p>
               </div>
-              <div>
-                <div className="text-[10px] font-mono uppercase text-[#e0d0ab] font-bold tracking-wider">
-                  Targeted Syllabus Pillar Drill
-                </div>
-                <div className="text-sm font-serif font-bold text-white">
-                  {targetPillar.title} ({targetPillar.id})
-                </div>
+
+              {onClearTargetPillar && (
+                <button
+                  type="button"
+                  onClick={onClearTargetPillar}
+                  className="self-start text-[11px] font-mono text-[#8fa2bd] hover:text-[#e0d0ab] border border-[rgba(19,108,153,0.35)] bg-[rgba(3,18,42,0.6)] px-2.5 py-1 rounded-sm cursor-pointer transition-colors"
+                >
+                  Comprehensive Mock [×]
+                </button>
+              )}
+            </div>
+
+            {/* Drill Parameters */}
+            <div className="grid grid-cols-3 gap-2.5 py-2 border-y border-[rgba(19,108,153,0.3)] text-center text-xs font-sans">
+              <div className="p-2.5 rounded-sm bg-[rgba(3,18,42,0.5)] border border-[rgba(19,108,153,0.2)]">
+                <span className="text-[10px] uppercase font-mono text-[#8fa2bd] block mb-0.5">MCQ Count</span>
+                <span className="font-mono text-base font-bold text-[#e0d0ab]">
+                  {arenaConfig.questionCount || 10} Questions
+                </span>
+              </div>
+              <div className="p-2.5 rounded-sm bg-[rgba(3,18,42,0.5)] border border-[rgba(19,108,153,0.2)]">
+                <span className="text-[10px] uppercase font-mono text-[#8fa2bd] block mb-0.5">Evaluation</span>
+                <span className="font-mono text-base font-bold text-emerald-400">+2.00 / -0.66</span>
+              </div>
+              <div className="p-2.5 rounded-sm bg-[rgba(3,18,42,0.5)] border border-[rgba(19,108,153,0.2)]">
+                <span className="text-[10px] uppercase font-mono text-[#8fa2bd] block mb-0.5">Selected Pace</span>
+                <span className="font-mono text-base font-bold text-[#0194a8]">
+                  {pacingMode === 'blitz' ? '20s Blitz' : pacingMode === 'untimed' ? 'Self-Paced' : '60s Prelims'}
+                </span>
               </div>
             </div>
-            {onClearTargetPillar && (
-              <button
-                onClick={onClearTargetPillar}
-                className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider bg-zinc-900 border border-zinc-700 hover:border-zinc-500 text-zinc-300 rounded-sm cursor-pointer transition-colors"
-              >
-                Comprehensive Mock [×]
-              </button>
+
+            {/* Pacing Mode Selector */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] uppercase font-mono tracking-wider text-[#0194a8] font-bold block">
+                Select Your Test Pacing
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPacingMode('standard')}
+                  className={`p-2.5 rounded-sm border text-xs font-sans font-semibold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
+                    pacingMode === 'standard'
+                      ? 'bg-[rgba(224,208,171,0.15)] border-[#e0d0ab] text-[#e0d0ab] shadow-sm'
+                      : 'bg-[rgba(3,16,38,0.7)] border-[rgba(19,108,153,0.3)] text-[#8fa2bd] hover:text-white'
+                  }`}
+                >
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Standard (60s)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPacingMode('blitz')}
+                  className={`p-2.5 rounded-sm border text-xs font-sans font-semibold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
+                    pacingMode === 'blitz'
+                      ? 'bg-[rgba(224,208,171,0.15)] border-[#e0d0ab] text-[#e0d0ab] shadow-sm'
+                      : 'bg-[rgba(3,16,38,0.7)] border-[rgba(19,108,153,0.3)] text-[#8fa2bd] hover:text-white'
+                  }`}
+                >
+                  <Zap className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Speed Blitz (20s)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPacingMode('untimed')}
+                  className={`p-2.5 rounded-sm border text-xs font-sans font-semibold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
+                    pacingMode === 'untimed'
+                      ? 'bg-[rgba(224,208,171,0.15)] border-[#e0d0ab] text-[#e0d0ab] shadow-sm'
+                      : 'bg-[rgba(3,16,38,0.7)] border-[rgba(19,108,153,0.3)] text-[#8fa2bd] hover:text-white'
+                  }`}
+                >
+                  <BookOpen className="w-3.5 h-3.5 text-[#0194a8]" />
+                  <span>Untimed Practice</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Primary Action Button */}
+            <button
+              type="button"
+              onClick={handleStartTargetedDrill}
+              className="w-full py-3.5 bg-[#e0d0ab] hover:bg-white text-[#072e63] font-sans text-sm font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(224,208,171,0.4)]"
+            >
+              <Swords className="w-4 h-4" />
+              <span>Begin {arenaConfig.title} &rarr;</span>
+            </button>
+          </motion.div>
+        ) : (
+          <>
+            {/* Targeted Syllabus Pillar Drill Banner (if active without arenaConfig) */}
+            {targetPillar && (
+              <div className="w-full mb-6 p-4 rounded-sm bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 backdrop-blur-sm">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-sm bg-[#e0d0ab]/20 text-[#e0d0ab]">
+                    <Target className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-mono uppercase text-[#e0d0ab] font-bold tracking-wider">
+                      Targeted Syllabus Pillar Drill
+                    </div>
+                    <div className="text-sm font-serif font-bold text-white">
+                      {targetPillar.title} ({targetPillar.id})
+                    </div>
+                  </div>
+                </div>
+                {onClearTargetPillar && (
+                  <button
+                    onClick={onClearTargetPillar}
+                    className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider bg-zinc-900 border border-zinc-700 hover:border-zinc-500 text-zinc-300 rounded-sm cursor-pointer transition-colors"
+                  >
+                    Comprehensive Mock [×]
+                  </button>
+                )}
+              </div>
             )}
-          </div>
+
+            {/* Exam Track Segregation Switcher */}
+            <div className="w-full mb-6 flex items-center p-1 bg-zinc-900/80 border border-zinc-800 rounded-md">
+              <button
+                onClick={() => setExamTrack('upsc')}
+                className={`flex-1 py-2 text-xs font-sans font-bold rounded-md transition-all cursor-pointer flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] ${
+                  examTrack === 'upsc'
+                    ? 'bg-[#e0d0ab] text-[#072e63] shadow-xs'
+                    : 'text-zinc-400 hover:text-stone-200'
+                }`}
+              >
+                <Shield className="w-3.5 h-3.5" />
+                <span>UPSC CSE Track (Default)</span>
+              </button>
+              <button
+                onClick={() => setExamTrack('ssc')}
+                className={`flex-1 py-2 text-xs font-sans font-bold rounded-md transition-all cursor-pointer flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0194a8] ${
+                  examTrack === 'ssc'
+                    ? 'bg-[#0194a8] text-white shadow-xs'
+                    : 'text-zinc-400 hover:text-stone-200'
+                }`}
+              >
+                <Target className="w-3.5 h-3.5" />
+                <span>SSC CGL Exam Track</span>
+              </button>
+            </div>
+
+            {/* Protocol Option Cards */}
+            <div className="w-full space-y-4">
+              {/* 1. Ranked Test */}
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 }}
+                whileHover={prefersReduced ? undefined : { y: -2 }}
+                onClick={handleBeginAssessment}
+                className="p-6 bg-zinc-900/30 hover:bg-zinc-900/50 border border-zinc-800 hover:border-[#0194a8]/50 rounded-sm cursor-pointer transition-all flex items-start gap-4 backdrop-blur-sm group"
+              >
+                <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-sm group-hover:border-[#0194a8]/40 transition-colors">
+                  <Swords className="w-6 h-6 text-[#0194a8]" />
+                </div>
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-serif text-base font-bold text-stone-100 group-hover:text-[#e0d0ab] transition-colors">
+                      Ranked Test
+                    </h3>
+                    <span className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-sans font-bold uppercase rounded-sm">
+                      Ranked + Points
+                    </span>
+                  </div>
+                  <p className="text-xs font-sans text-zinc-400 leading-relaxed">
+                    25 multi-domain questions &bull; 20s per question &bull; Negative marking (+2 / -0.66) &bull; Earns Rank Points.
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* 2. Training Ground Custom Setup */}
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                whileHover={prefersReduced ? undefined : { y: -2 }}
+                onClick={handleTrainingGround}
+                className="p-6 bg-zinc-900/30 hover:bg-zinc-900/50 border border-zinc-800 hover:border-[#e0d0ab]/50 rounded-sm cursor-pointer transition-all flex items-start gap-4 backdrop-blur-sm group"
+              >
+                <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-sm group-hover:border-[#e0d0ab]/40 transition-colors">
+                  <Target className="w-6 h-6 text-[#e0d0ab]" />
+                </div>
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-serif text-base font-bold text-stone-100 group-hover:text-[#e0d0ab] transition-colors">
+                      The Training Ground
+                    </h3>
+                    <span className="px-2 py-0.5 bg-zinc-800 border border-zinc-700 text-zinc-300 text-[10px] font-sans font-bold uppercase rounded-sm">
+                      Unranked
+                    </span>
+                  </div>
+                  <p className="text-xs font-sans text-zinc-400 leading-relaxed">
+                    Custom domain filtering & adjustable test lengths (25 / 35 / 50 questions) for deliberate conceptual practice.
+                  </p>
+                </div>
+              </motion.div>
+            </div>
+          </>
         )}
-
-        {/* Exam Track Segregation Switcher */}
-        <div className="w-full mb-6 flex items-center p-1 bg-zinc-900/80 border border-zinc-800 rounded-sm">
-          <button
-            onClick={() => setExamTrack('upsc')}
-            className={`flex-1 py-2 text-xs font-mono font-bold rounded-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
-              examTrack === 'upsc'
-                ? 'bg-[#e0d0ab] text-zinc-950 shadow-sm'
-                : 'text-zinc-400 hover:text-stone-200'
-            }`}
-          >
-            <Shield className="w-3.5 h-3.5" />
-            UPSC CSE Track (Default)
-          </button>
-          <button
-            onClick={() => setExamTrack('ssc')}
-            className={`flex-1 py-2 text-xs font-mono font-bold rounded-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
-              examTrack === 'ssc'
-                ? 'bg-[#0194a8] text-white shadow-sm'
-                : 'text-zinc-400 hover:text-stone-200'
-            }`}
-          >
-            <Target className="w-3.5 h-3.5" />
-            SSC CGL Exam Track
-          </button>
-        </div>
-
-        {/* Protocol Option Cards */}
-        <div className="w-full space-y-4">
-          {/* 1. Ranked Test */}
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 }}
-            whileHover={prefersReduced ? undefined : { y: -2 }}
-            onClick={handleBeginAssessment}
-            className="p-6 bg-zinc-900/30 hover:bg-zinc-900/50 border border-zinc-800 hover:border-[#0194a8]/50 rounded-sm cursor-pointer transition-all flex items-start gap-4 backdrop-blur-sm group"
-          >
-            <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-sm group-hover:border-[#0194a8]/40 transition-colors">
-              <Swords className="w-6 h-6 text-[#0194a8]" />
-            </div>
-            <div className="flex-1 space-y-1">
-              <div className="flex items-center justify-between">
-                <h3 className="font-serif text-base font-bold text-stone-100 group-hover:text-[#e0d0ab] transition-colors">
-                  Ranked Test
-                </h3>
-                <span className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-sans font-bold uppercase rounded-sm">
-                  Ranked + Points
-                </span>
-              </div>
-              <p className="text-xs font-sans text-zinc-400 leading-relaxed">
-                25 multi-domain questions &bull; 20s per question &bull; Negative marking (+2 / -0.66) &bull; Earns Rank Points.
-              </p>
-            </div>
-          </motion.div>
-
-          {/* 2. Training Ground Custom Setup */}
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            whileHover={prefersReduced ? undefined : { y: -2 }}
-            onClick={handleTrainingGround}
-            className="p-6 bg-zinc-900/30 hover:bg-zinc-900/50 border border-zinc-800 hover:border-[#e0d0ab]/50 rounded-sm cursor-pointer transition-all flex items-start gap-4 backdrop-blur-sm group"
-          >
-            <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-sm group-hover:border-[#e0d0ab]/40 transition-colors">
-              <Target className="w-6 h-6 text-[#e0d0ab]" />
-            </div>
-            <div className="flex-1 space-y-1">
-              <div className="flex items-center justify-between">
-                <h3 className="font-serif text-base font-bold text-stone-100 group-hover:text-[#e0d0ab] transition-colors">
-                  The Training Ground
-                </h3>
-                <span className="px-2 py-0.5 bg-zinc-800 border border-zinc-700 text-zinc-300 text-[10px] font-sans font-bold uppercase rounded-sm">
-                  Unranked
-                </span>
-              </div>
-              <p className="text-xs font-sans text-zinc-400 leading-relaxed">
-                Custom domain filtering & adjustable test lengths (25 / 35 / 50 questions) for deliberate conceptual practice.
-              </p>
-            </div>
-          </motion.div>
-        </div>
 
         {/* Pre-Flight Checklist Modal */}
         <Modal
@@ -1101,7 +1331,9 @@ export default function Arena({
   // RENDER: TRAINING GROUND SETUP
   // ----------------------------------------------------------------
   if (showTrainingSetup) {
-    const lengthOptions = [25, 35, 50];
+    const defaultLengths = [25, 35, 50];
+    const candidateTarget = candidatePreferences?.dailyMcqTarget;
+    const lengthOptions = Array.from(new Set(candidateTarget ? [candidateTarget, ...defaultLengths] : defaultLengths)).sort((a, b) => a - b);
 
     return (
       <div className="w-full max-w-2xl mx-auto font-sans p-4 sm:p-6 space-y-6">
@@ -1112,15 +1344,28 @@ export default function Arena({
 
         <h2 className="font-serif text-2xl font-bold text-white">Custom Domain & Volume Setup</h2>
 
+        {/* Candidate Focus Alignment Banner */}
+        {candidatePreferences?.focusPillars && candidatePreferences.focusPillars.length > 0 && (
+          <div className="p-3.5 bg-[rgba(11,61,120,0.25)] border border-[rgba(19,108,153,0.35)] rounded-md flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-sans">
+            <span className="text-[#8fa2bd] flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+              <span>Aligned with Candidate Track: <strong className="text-[#e0d0ab]">{candidatePreferences.focusPillars.map((p) => p.toUpperCase()).join(', ')}</strong></span>
+            </span>
+            <span className="text-xs text-[#e0d0ab] font-semibold shrink-0">
+              Daily Target: {candidatePreferences.dailyMcqTarget} MCQs
+            </span>
+          </div>
+        )}
+
         {/* Subject Selection */}
-        <div className="p-6 bg-zinc-900/30 border border-zinc-800 rounded-sm space-y-4">
+        <div className="p-6 bg-zinc-900/30 border border-zinc-800 rounded-md space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
               Select Focus Subjects ({selectedSubjects.size} Selected)
             </h3>
             <button
               onClick={() => setSelectedSubjects(new Set(allSubjects))}
-              className="text-[10px] font-sans text-[#0194a8] hover:text-[#e0d0ab] transition-colors cursor-pointer"
+              className="text-xs font-sans text-[#0194a8] hover:text-[#e0d0ab] transition-colors cursor-pointer"
             >
               Select All
             </button>
@@ -1131,7 +1376,7 @@ export default function Arena({
               <button
                 key={subject}
                 onClick={() => toggleSubject(subject)}
-                className={`px-3 py-1.5 text-xs font-sans font-medium rounded-sm border transition-all cursor-pointer ${
+                className={`px-3 py-1.5 text-xs font-sans font-medium rounded-md border transition-all cursor-pointer ${
                   selectedSubjects.has(subject)
                     ? 'bg-[#e0d0ab] text-zinc-950 border-[#e0d0ab] font-bold'
                     : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-stone-200'
@@ -1144,22 +1389,25 @@ export default function Arena({
         </div>
 
         {/* Question Count Selection */}
-        <div className="p-6 bg-zinc-900/30 border border-zinc-800 rounded-sm space-y-4">
+        <div className="p-6 bg-zinc-900/30 border border-zinc-800 rounded-md space-y-4">
           <h3 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
             Question Target
           </h3>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
             {lengthOptions.map((count) => (
               <button
                 key={count}
                 onClick={() => setTrainingLength(count)}
-                className={`py-3 text-sm font-sans font-bold uppercase rounded-sm border transition-all cursor-pointer ${
+                className={`py-3 text-sm font-sans font-bold uppercase rounded-md border transition-all cursor-pointer ${
                   trainingLength === count
                     ? 'bg-[#0194a8] text-white border-[#0194a8]'
                     : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-stone-200'
                 }`}
               >
-                <span className="font-mono">{count}</span> Questions
+                <span className="font-mono">{count}</span> MCQs
+                {candidateTarget === count && (
+                  <span className="block text-xs font-sans text-[#e0d0ab] capitalize font-medium">Daily Target</span>
+                )}
               </button>
             ))}
           </div>
@@ -1167,23 +1415,27 @@ export default function Arena({
 
         {/* Action Buttons */}
         <div className="flex gap-3">
-          <button
+          <motion.button
             onClick={() => {
               setShowTrainingSetup(false);
               setArenaPhase('intro');
             }}
-            className="flex-1 py-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-sans text-xs font-medium uppercase rounded-sm transition-all cursor-pointer"
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            className="flex-1 py-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-sans text-xs font-semibold uppercase tracking-wider rounded-md transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
           >
             Back
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             onClick={startTraining}
             disabled={selectedSubjects.size === 0}
-            className="flex-1 inline-flex items-center justify-center gap-2 py-3 bg-[#e0d0ab] hover:bg-stone-100 disabled:opacity-40 text-zinc-950 font-sans text-xs font-bold uppercase rounded-sm transition-all cursor-pointer"
+            whileHover={{ scale: 1.02, y: -1 }}
+            whileTap={{ scale: 0.98 }}
+            className="flex-1 inline-flex items-center justify-center gap-2 py-3 bg-[#e0d0ab] hover:bg-white disabled:opacity-40 text-[#072e63] font-sans text-xs font-bold uppercase tracking-wider rounded-md transition-colors cursor-pointer shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]"
           >
             <Target className="w-4 h-4" />
             <span>Launch Training Ground</span>
-          </button>
+          </motion.button>
         </div>
       </div>
     );
@@ -1233,10 +1485,10 @@ export default function Arena({
   const isBookmarked = savedInsightIds.has(String(currentQuestionId));
   const isBookmarkLoading = !!bookmarkToggling[String(currentQuestionId)];
 
-  const timeLeft = timeLeftMap[currentQuestionId] !== undefined ? timeLeftMap[currentQuestionId] : 20;
+  const timeLeft = timeLeftMap[currentQuestionId] !== undefined ? timeLeftMap[currentQuestionId] : defaultTimeForQuestion;
   const timerRadius = 18;
   const timerCircumference = 2 * Math.PI * timerRadius;
-  const timerProgress = Math.max(0, Math.min(1, timeLeft / 20));
+  const timerProgress = pacingMode === 'untimed' ? 1 : Math.max(0, Math.min(1, timeLeft / defaultTimeForQuestion));
   const strokeDashoffset = timerCircumference - timerProgress * timerCircumference;
 
   return (
@@ -1273,10 +1525,10 @@ export default function Arena({
             {isRanked ? 'Ranked' : 'Practice'}
           </span>
 
-          {targetPillar && (
-            <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-[10px] font-mono font-bold bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 text-[#e0d0ab] uppercase">
+          {(arenaConfig?.title || targetPillar) && (
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-sm text-[10px] font-mono font-bold bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 text-[#e0d0ab] uppercase">
               <Target className="w-3 h-3" />
-              {targetPillar.id}
+              {arenaConfig?.title || targetPillar?.title || targetPillar?.id}
             </span>
           )}
 
@@ -1287,7 +1539,12 @@ export default function Arena({
 
         {/* Right Action: Radial Countdown Timer & Abandon Button */}
         <div className="flex items-center gap-4">
-          {!isQuestionLocked ? (
+          {pacingMode === 'untimed' ? (
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-zinc-900 border border-zinc-800 text-xs font-mono text-zinc-300">
+              <Clock className="w-3.5 h-3.5 text-[#0194a8]" />
+              <span>{timeSpentMap[currentQuestionId] || 0}s</span>
+            </div>
+          ) : !isQuestionLocked ? (
             <div className="flex items-center gap-2">
               <div className="relative w-11 h-11 flex items-center justify-center">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 44 44">

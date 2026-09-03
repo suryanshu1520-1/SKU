@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { motion } from 'motion/react';
 import {
   Search,
   X
@@ -728,13 +729,22 @@ export default function HumanitiesReader() {
                       className="w-full h-full"
                     />
                   </div>
-                  <button
+                  <motion.button
                     onClick={() => openRead(activeThinker.id, 0)}
-                    className="mt-3 px-4 py-1.5 bg-[rgba(3,18,42,0.85)] hover:bg-[#e0d0ab] text-[#9fb0c8] hover:text-[#072e63] border border-[rgba(1,148,168,0.5)] hover:border-[#e0d0ab] text-[11px] font-mono rounded-xs uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="mt-3.5 px-4 py-2 bg-[rgba(3,18,42,0.85)] hover:bg-[#e0d0ab] text-[#9fb0c8] hover:text-[#072e63] border border-[rgba(1,148,168,0.5)] hover:border-[#e0d0ab] text-xs font-sans font-semibold rounded-md uppercase tracking-wider transition-colors cursor-pointer flex items-center gap-2 shadow-xs group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]"
                   >
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#34d399] animate-pulse" />
                     <span>Open Full Work</span>
-                    <span>→</span>
-                  </button>
+                    <motion.span
+                      className="inline-block"
+                      whileHover={{ x: 3 }}
+                      transition={{ type: 'spring', stiffness: 400 }}
+                    >
+                      →
+                    </motion.span>
+                  </motion.button>
                 </div>
 
                 {/* Col 2: Thinker Display, Work & Live Typewriter Voice */}
@@ -789,34 +799,49 @@ export default function HumanitiesReader() {
                 </div>
 
                 {/* Col 3: Direct Passage Jump Index & Quick Actions */}
-                <div className="lg:col-span-3 flex flex-col justify-between h-full p-4 bg-[rgba(3,18,42,0.7)] border border-[rgba(19,108,153,0.4)] rounded-xs gap-4 shadow-inner">
+                <div className="lg:col-span-3 flex flex-col justify-between h-full p-4 bg-[rgba(3,18,42,0.7)] border border-[rgba(19,108,153,0.35)] rounded-md gap-4 shadow-inner">
                   <div>
-                    <div className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-[#0194a8] mb-2.5 flex items-center justify-between">
+                    <div className="font-sans text-xs uppercase tracking-wider text-[#0194a8] font-semibold mb-2.5 flex items-center justify-between">
                       <span>Verbatim Passages</span>
-                      <span className="text-[#e0d0ab] font-bold">({activeThinker.ticks.length})</span>
+                      <span className="text-[#e0d0ab] font-bold font-mono">({activeThinker.ticks.length})</span>
                     </div>
-                    <div className="grid grid-cols-2 gap-1.5 max-h-[150px] overflow-y-auto pr-1">
+                    <div className="grid grid-cols-2 gap-2 max-h-[150px] overflow-y-auto pr-1">
                       {activeThinker.ticks.map((k, idx) => (
-                        <button
+                        <motion.button
                           key={k.id}
                           onClick={k.onClick}
-                          className="px-2.5 py-2 bg-[rgba(7,46,99,0.35)] hover:bg-[#e0d0ab]/15 border border-[rgba(19,108,153,0.4)] hover:border-[#e0d0ab] rounded-xs font-mono text-[10.5px] text-[#c8b998] hover:text-[#e0d0ab] flex items-center justify-between transition-colors cursor-pointer text-left"
+                          whileHover={{ scale: 1.03, y: -1 }}
+                          whileTap={{ scale: 0.97 }}
+                          className="px-2.5 py-2 bg-[rgba(7,46,99,0.35)] hover:bg-[#e0d0ab]/15 border border-[rgba(19,108,153,0.35)] hover:border-[#e0d0ab] rounded-md font-sans text-xs text-[#c8b998] hover:text-[#e0d0ab] flex items-center justify-between transition-colors cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]"
                         >
-                          <span className="font-bold">{k.label}</span>
-                          <span className="text-[9px] text-[#8fa2bd]">§{idx + 1}</span>
-                        </button>
+                          <span className="font-semibold">{k.label}</span>
+                          <span className="text-xs font-mono text-[#8fa2bd]">§{idx + 1}</span>
+                        </motion.button>
                       ))}
                     </div>
                   </div>
 
                   <div className="space-y-2 pt-2 border-t border-[rgba(19,108,153,0.3)]">
-                    <button
+                    <motion.button
                       onClick={() => openRead(activeThinker.id, 0)}
-                      className="w-full py-2.5 px-3 bg-[#e0d0ab] hover:bg-[#f0e2be] text-[#072e63] font-mono font-bold text-xs uppercase tracking-wider rounded-xs transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
+                      whileHover={{ scale: 1.02, y: -1 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="relative w-full py-2.5 px-4 bg-[#e0d0ab] hover:bg-white text-[#072e63] font-sans font-bold text-xs uppercase tracking-wider rounded-md transition-colors shadow-md cursor-pointer flex items-center justify-center gap-2 overflow-hidden group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]"
                     >
-                      <span>Enter Reading Chamber</span>
-                      <span>↵</span>
-                    </button>
+                      {/* Luminous Shimmer Wave */}
+                      <motion.div
+                        className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none"
+                        animate={{ x: ['100%', '-100%'] }}
+                        transition={{ repeat: Infinity, duration: 2.8, ease: 'easeInOut' }}
+                      />
+                      <span className="relative z-10">Enter Reading Chamber</span>
+                      <motion.span
+                        className="relative z-10 inline-block font-mono text-sm"
+                        whileHover={{ x: 2, y: 1 }}
+                      >
+                        ↵
+                      </motion.span>
+                    </motion.button>
                   </div>
                 </div>
               </div>

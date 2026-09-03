@@ -38,6 +38,7 @@ analyticsRouter.get("/observatory/pyqs", async (req: Request, res: Response) => 
       era: req.query.era as string,
       cognitiveType: req.query.cognitiveType as string,
       stage: req.query.stage as string,
+      quality: (req.query.quality as any) || 'verified',
       page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
       limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 10,
     });

@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { getPYQById } from "./analytics/pyq_explorer.js";
 
 function cleanEnvValue(val: any): string {
   if (typeof val !== 'string') return '';
@@ -131,12 +132,17 @@ export default async function handler(req: any, res: any) {
     // 0. Fetch correct answers from DB to prevent client spoofing
     const staticQuestionIds = payload.questions
       .map(q => String(q.id))
-      .filter(id => !id.startsWith('ca_') && !id.startsWith('static_'));
+      .filter(id => !id.startsWith('ca_') && !id.startsWith('static_') && !id.startsWith('pyq_'));
 
     const caQuestionIds = payload.questions
       .map(q => String(q.id))
       .filter(id => id.startsWith('ca_'))
       .map(id => id.replace(/^ca_/, ''));
+
+    const pyqQuestionIds = payload.questions
+      .map(q => String(q.id))
+      .filter(id => id.startsWith('pyq_'))
+      .map(id => id.replace(/^pyq_/, ''));
 
     let dbQuestions: any[] = [];
     if (staticQuestionIds.length > 0) {
@@ -186,6 +192,20 @@ export default async function handler(req: any, res: any) {
         correct_option: correctOpt,
         subject_category: q.subject || 'Current Affairs'
       });
+    }
+
+    for (const rawPyqId of pyqQuestionIds) {
+      const pyq = getPYQById(rawPyqId);
+      if (pyq) {
+        questionMap.set(`pyq_${rawPyqId}`, {
+          correct_option: pyq.correctKey?.trim().toUpperCase() || 'C',
+          subject_category: pyq.subject || 'General Studies'
+        });
+        questionMap.set(rawPyqId, {
+          correct_option: pyq.correctKey?.trim().toUpperCase() || 'C',
+          subject_category: pyq.subject || 'General Studies'
+        });
+      }
     }
 
     // Static fallback questions

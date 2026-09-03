@@ -26,9 +26,9 @@ export const NAV_ITEMS: NavItem[] = [
   { id: 'home', label: 'Home', shortLabel: 'Home', icon: House, hotkey: '1', group: 'home' },
   { id: 'arena', label: 'Test Arena', shortLabel: 'Arena', icon: Swords, hotkey: '3', group: 'arena' },
   { id: 'tracker', label: 'Daily Brief', shortLabel: 'Brief', icon: Globe, hotkey: '2', group: 'intelligence' },
-  { id: 'library', label: 'Syllabus Pillars', shortLabel: 'Pillars', icon: Layers, hotkey: '4', group: 'vault' },
-  { id: 'humanities', label: 'Humanities', shortLabel: 'Canon', icon: BookOpen, hotkey: '5', group: 'vault' },
-  { id: 'observatory', label: 'Observatory', shortLabel: 'Observatory', icon: Radio, hotkey: '6', group: 'vault' },
+  { id: 'library', label: 'Syllabus Pillars', shortLabel: 'Syllabus', icon: Layers, hotkey: '4', group: 'vault' },
+  { id: 'humanities', label: 'Primary Thinkers', shortLabel: 'Thinkers', icon: BookOpen, hotkey: '5', group: 'vault' },
+  { id: 'observatory', label: 'The Observatory', shortLabel: 'Observatory', icon: Radio, hotkey: '6', group: 'vault' },
   { id: 'leaderboard', label: 'Leaderboard', shortLabel: 'Rank', icon: Trophy, hotkey: '7', group: 'system' },
 ];
 

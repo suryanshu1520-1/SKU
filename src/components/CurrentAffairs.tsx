@@ -28,7 +28,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Zap,
-  Scale
+  Scale,
+  Target
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -36,6 +37,8 @@ import rehypeSanitize from 'rehype-sanitize';
 import DailyEdition from './DailyEdition';
 import RebaseEdition from './RebaseEdition';
 import prsVaultDossiers from '../data/prs-vault-dossiers.json';
+import type { CandidatePreferences } from '../types';
+import { matchOptionalRelevance } from '../lib/candidatePreferences';
 import {
   SourceAnchor,
   GroundingBadge,
@@ -79,6 +82,7 @@ interface PibDigestItem {
 
 interface CurrentAffairsProps {
   userId: string;
+  candidatePreferences?: CandidatePreferences;
   onLaunchPractice?: (pillarOrSubject: string) => void;
 }
 
@@ -93,11 +97,11 @@ const editionVariants = {
 
 const CATEGORY_TABS = [
   { id: 'ALL', label: 'All Signals' },
-  { id: 'Governance', label: 'Polity & Cabinet', keywords: ['Cabinet', 'Prime Minister', 'Home Affairs', 'Law', 'Personnel', 'Parliament', 'Governance'] },
-  { id: 'Economy', label: 'Economy & RBI', keywords: ['Finance', 'Commerce', 'RBI', 'Corporate Affairs', 'NITI Aayog', 'Revenue', 'Economy'] },
-  { id: 'SciTech', label: 'Science & Defence', keywords: ['Defence', 'Space', 'ISRO', 'Atomic Energy', 'Electronics', 'IT', 'Science', 'Technology'] },
-  { id: 'Environment', label: 'Climate & Ecology', keywords: ['Environment', 'Forest', 'Climate', 'Renewable', 'Earth Sciences', 'Agriculture', 'Water'] },
-  { id: 'Social', label: 'Social & Health', keywords: ['Health', 'Education', 'Social Justice', 'Women', 'Child', 'Tribal', 'Rural'] },
+  { id: 'Governance', label: 'Polity & Cabinet', keywords: ['Cabinet', 'Prime Minister', 'Home Affairs', 'Law', 'Personnel', 'Parliament', 'Governance', 'Supreme Court', 'Judiciary'] },
+  { id: 'Economy', label: 'Economy & RBI', keywords: ['Finance', 'Commerce', 'RBI', 'Corporate Affairs', 'NITI Aayog', 'Revenue', 'Economy', 'Budget', 'Tax'] },
+  { id: 'SciTech', label: 'Science & Defence', keywords: ['Defence', 'Space', 'ISRO', 'Atomic Energy', 'Electronics', 'IT', 'Science', 'Technology', 'Missile', 'AI'] },
+  { id: 'Environment', label: 'Climate & Ecology', keywords: ['Environment', 'Forest', 'Climate', 'Renewable', 'Earth Sciences', 'Agriculture', 'Water', 'Pollution', 'Wildlife'] },
+  { id: 'Social', label: 'Social & Health', keywords: ['Health', 'Education', 'Social Justice', 'Women', 'Child', 'Tribal', 'Rural', 'Welfare', 'Caste'] },
   { id: 'PRS', label: '⚖️ PRS Legislative Vault', isVault: true },
   { id: 'SAVED', label: '⭐ Saved Signals' },
 ];
@@ -115,7 +119,7 @@ const TOP_MINISTRIES = [
   'Ministry of External Affairs',
 ];
 
-export default function CurrentAffairs({ userId, onLaunchPractice }: CurrentAffairsProps) {
+export default function CurrentAffairs({ userId, candidatePreferences, onLaunchPractice }: CurrentAffairsProps) {
   const [items, setItems] = useState<CurrentAffairsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -524,6 +528,23 @@ export default function CurrentAffairs({ userId, onLaunchPractice }: CurrentAffa
       list = list.filter((item) => item.id && savedArticleIds.has(item.id));
     } else if (activeCategoryTab === 'PRS') {
       list = list.filter((item) => item.source === 'PRS');
+    } else if (activeCategoryTab === 'TRACK' && candidatePreferences) {
+      list = list.filter((item) => {
+        // 1. Check if matches candidate's optional subject
+        const syn = matchOptionalRelevance(item.headline, item.summary?.bullets, candidatePreferences.optionalSubject);
+        if (syn.matches) return true;
+
+        // 2. Check if matches candidate's focus pillars
+        const p = candidatePreferences.focusPillars || [];
+        const text = (item.ministry + ' ' + item.headline + ' ' + (item.summary?.tags?.join(' ') || '')).toLowerCase();
+        
+        if (p.includes('gs2') && ['cabinet', 'prime minister', 'home affairs', 'law', 'personnel', 'parliament', 'governance', 'external affairs', 'supreme court', 'judiciary', 'rights', 'constitution'].some((k) => text.includes(k))) return true;
+        if (p.includes('gs3') && ['finance', 'commerce', 'rbi', 'corporate affairs', 'niti aayog', 'revenue', 'economy', 'budget', 'tax', 'defence', 'space', 'isro', 'atomic', 'electronics', 'science', 'technology', 'environment', 'forest', 'climate', 'renewable', 'agriculture', 'water', 'security'].some((k) => text.includes(k))) return true;
+        if (p.includes('gs1') && ['culture', 'heritage', 'monuments', 'history', 'geography', 'urban', 'society', 'women', 'child', 'tribal'].some((k) => text.includes(k))) return true;
+        if (p.includes('gs4') && ['ethics', 'social justice', 'welfare', 'integrity', 'charter', 'administrative'].some((k) => text.includes(k))) return true;
+        
+        return false;
+      });
     } else if (activeCategoryTab !== 'ALL') {
       const tab = CATEGORY_TABS.find((t) => t.id === activeCategoryTab);
       if (tab?.keywords) {
@@ -571,6 +592,16 @@ export default function CurrentAffairs({ userId, onLaunchPractice }: CurrentAffa
 
   const leadItem = displayedItems[0] || null;
   const standardItems = displayedItems.slice(1);
+
+  const categoryTabs = useMemo(() => {
+    if (!candidatePreferences) return CATEGORY_TABS;
+    const yearStr = candidatePreferences.targetYear === 'state-psc' ? 'PSC' : `'${candidatePreferences.targetYear.slice(2)}`;
+    const trackTab = {
+      id: 'TRACK',
+      label: `🎯 For Your Track (${yearStr})`
+    };
+    return [CATEGORY_TABS[0], trackTab, ...CATEGORY_TABS.slice(1)];
+  }, [candidatePreferences]);
 
   const activeFilterCount =
     (selectedMinistry !== 'ALL' ? 1 : 0) +
@@ -704,13 +735,15 @@ export default function CurrentAffairs({ userId, onLaunchPractice }: CurrentAffa
                 </p>
               </div>
               {onLaunchPractice && (
-                <button
+                <motion.button
                   onClick={() => onLaunchPractice('CURRENT_AFFAIRS')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#e0d0ab] text-[#072e63] font-mono font-bold text-[11px] uppercase tracking-wider rounded-xs hover:bg-white transition-colors cursor-pointer shadow-sm self-start sm:self-auto shrink-0"
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#e0d0ab] text-[#072e63] font-sans font-bold text-xs uppercase tracking-wider rounded-md hover:bg-white transition-colors cursor-pointer shadow-sm self-start sm:self-auto shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]"
                 >
                   <Zap className="w-3.5 h-3.5 text-[#072e63]" />
-                  Today's Arena Battle
-                </button>
+                  <span>Today's Arena Battle</span>
+                </motion.button>
               )}
             </div>
           </div>
@@ -722,27 +755,30 @@ export default function CurrentAffairs({ userId, onLaunchPractice }: CurrentAffa
           {/* Category Tabs */}
           <LayoutGroup id="ca-category-tabs">
             <div className="flex items-center gap-1.5 overflow-x-auto pb-2 lg:pb-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              {CATEGORY_TABS.map((tab) => {
+              {categoryTabs.map((tab) => {
                 const isActive = activeCategoryTab === tab.id;
                 return (
-                  <button
+                  <motion.button
                     key={tab.id}
                     onClick={() => setActiveCategoryTab(tab.id)}
-                    className={`relative px-3.5 py-1.5 rounded-xs text-xs font-mono font-medium tracking-wide whitespace-nowrap transition-colors cursor-pointer border ${
-                      isActive ? 'border-transparent text-[#072e63] font-bold' : 'bg-[rgba(3,18,42,0.6)] border-[rgba(19,108,153,0.35)] text-[#8fa2bd] hover:text-[#e0d0ab] hover:border-[rgba(19,108,153,0.6)]'
+                    whileTap={{ scale: 0.97 }}
+                    className={`relative px-3.5 py-1.5 rounded-md text-xs font-sans font-medium whitespace-nowrap transition-colors cursor-pointer border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] ${
+                      isActive
+                        ? 'border-transparent text-[#072e63] font-bold'
+                        : 'bg-[rgba(3,18,42,0.55)] border-[rgba(19,108,153,0.3)] text-[#8fa2bd] hover:text-[#e8e0cf] hover:border-[#e0d0ab]/40'
                     }`}
                   >
                     {isActive && (
                       <motion.span
                         layoutId="ca-category-active-pill"
-                        className="absolute inset-0 bg-[#e0d0ab] rounded-xs shadow-sm"
+                        className="absolute inset-0 bg-[#e0d0ab] rounded-md shadow-xs"
                         transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', bounce: 0.15, duration: 0.45 }}
                       />
                     )}
                     <span className="relative z-10">
                       {tab.label}
                     </span>
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
@@ -1127,10 +1163,24 @@ export default function CurrentAffairs({ userId, onLaunchPractice }: CurrentAffa
                   <span className="px-2.5 py-0.5 bg-[rgba(11,61,120,0.35)] text-[#e0d0ab] text-[10px] font-mono uppercase tracking-wider rounded-xs border border-[rgba(19,108,153,0.4)]">
                     {leadItem.ministry}
                   </span>
-                  <span className="text-[#8fa2bd] text-[10px] font-mono uppercase">
+                  <span className="text-[#8fa2bd] text-xs font-sans font-medium uppercase">
                     {leadItem.source}
                   </span>
                   <GroundingBadge grounding={leadItem.summary?.grounding} verificationMethod={leadItem.summary?.verification_method} />
+
+                  {/* Candidate Optional Subject Cross-Over Anchor */}
+                  {candidatePreferences && (() => {
+                    const syn = matchOptionalRelevance(leadItem.headline, leadItem.summary?.bullets, candidatePreferences.optionalSubject);
+                    if (syn.matches) {
+                      return (
+                        <span className="px-2.5 py-0.5 bg-[rgba(224,208,171,0.15)] text-[#e0d0ab] border border-[rgba(224,208,171,0.35)] text-xs font-sans font-semibold rounded-md flex items-center gap-1.5 shadow-xs">
+                          <Target className="w-3 h-3 text-[#34d399]" />
+                          <span>{syn.optionalName} Paper 2 Anchor</span>
+                        </span>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
 
                 {leadItem.created_at && (
@@ -1259,16 +1309,29 @@ export default function CurrentAffairs({ userId, onLaunchPractice }: CurrentAffa
                       {/* Meta Tags */}
                       <div className="flex items-center justify-between gap-2 mb-3 font-sans">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="px-2 py-0.5 bg-[rgba(11,61,120,0.3)] text-[#e0d0ab] text-[10px] font-mono uppercase tracking-wider rounded-xs border border-[rgba(19,108,153,0.35)] truncate max-w-[180px]">
+                          <span className="px-2.5 py-0.5 bg-[rgba(11,61,120,0.3)] text-[#e0d0ab] text-xs font-sans rounded-md border border-[rgba(19,108,153,0.35)] truncate max-w-[180px]">
                             {item.ministry}
                           </span>
                           <GroundingBadge grounding={item.summary?.grounding} verificationMethod={item.summary?.verification_method} />
+                          {candidatePreferences && (() => {
+                            const syn = matchOptionalRelevance(item.headline, item.summary?.bullets, candidatePreferences.optionalSubject);
+                            if (syn.matches) {
+                              return (
+                                <span className="px-2 py-0.5 bg-[rgba(224,208,171,0.15)] text-[#e0d0ab] border border-[rgba(224,208,171,0.35)] text-xs font-sans font-semibold rounded-md flex items-center gap-1 shrink-0 shadow-xs">
+                                  <Target className="w-3 h-3 text-[#34d399]" />
+                                  <span>{syn.optionalName} Anchor</span>
+                                </span>
+                              );
+                            }
+                            return null;
+                          })()}
                         </div>
                         {item.created_at && (
-                          <span className="text-[10px] font-mono text-[#8fa2bd]">
+                          <span className="text-xs font-sans text-[#8fa2bd]">
                             {new Date(item.created_at).toLocaleDateString('en-GB', {
                               day: '2-digit',
                               month: 'short',
+                              year: 'numeric',
                             })}
                           </span>
                         )}

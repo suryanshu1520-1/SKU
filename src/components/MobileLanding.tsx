@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import DiagnosticPreview from './DiagnosticPreview';
 import BrandLogo from './BrandLogo';
+import type { CandidatePreferences } from '../types';
+import { calculateExamCountdown } from '../lib/candidatePreferences';
 
 interface MobileLandingProps {
   onNavigateArena: () => void;
@@ -27,6 +29,7 @@ interface MobileLandingProps {
   onNavigateHumanities?: () => void;
   onNavigateManifesto?: () => void;
   onNavigateLegal?: (type: 'privacy' | 'terms' | 'refund') => void;
+  candidatePreferences?: CandidatePreferences;
   seatData: {
     max_capacity: number;
     claimed_seats: number;
@@ -42,6 +45,7 @@ export default function MobileLanding({
   onNavigateHumanities,
   onNavigateManifesto,
   onNavigateLegal,
+  candidatePreferences,
   seatData,
 }: MobileLandingProps) {
   const [expandedEngine, setExpandedEngine] = useState<string | null>('arena');
@@ -50,19 +54,19 @@ export default function MobileLanding({
     {
       id: 'arena',
       title: 'The Test Arena',
-      badge: 'Zero-Trust Mock Simulator',
-      summary: 'Timed examination with +2.00 / -0.66 marking and AI conceptual autopsy.',
-      details: 'Evaluates answers server-side with zero client leaks, identifying your exact cognitive blindspots before the UPSC examiner strikes.',
+      badge: 'Real Exam Simulation',
+      summary: 'Timed exam with authentic UPSC marking and AI mistake breakdown.',
+      details: 'Evaluates answers immediately and pinpoints exactly why you fell for the trap before the real exam.',
       action: onNavigateArena,
-      cta: 'Launch Mock Arena',
+      cta: 'Start Mock Exam',
       icon: Swords,
       color: '#34d399',
     },
     {
       id: 'brief',
       title: 'The Daily Brief',
-      badge: 'Grounded Policy Signals',
-      summary: '10 curated policy dispatches in a 4-minute read with 100% PIB citations.',
+      badge: 'Verified Policy Briefs',
+      summary: '10 curated policy dispatches in a 4-minute read with 100% official citations.',
       details: 'Stop reading 150-page monthly pdf magazines. Get verified cabinet releases, policy metrics, and a daily 10-MCQ practice test.',
       action: onNavigateTracker,
       cta: 'Read Today’s Brief',
@@ -71,23 +75,23 @@ export default function MobileLanding({
     },
     {
       id: 'canon',
-      title: 'The Humanities Canon',
-      badge: 'Verbatim Primary Texts',
+      title: 'Primary Thinkers',
+      badge: 'Original Verbatim Texts',
       summary: 'Original philosophical excerpts from Ambedkar, Gandhi, and Kant.',
-      details: 'Read verbatim primary passages with a multi-thinker Dialectic Bench for comparative synthesis in GS-4 ethics and mains essays.',
+      details: 'Read verbatim original passages with side-by-side thinker comparisons for GS-4 ethics and Mains essays.',
       action: onNavigateHumanities || onNavigateArena,
-      cta: 'Enter Canon Chamber',
+      cta: 'Open Reading Room',
       icon: BookOpen,
       color: '#e0d0ab',
     },
     {
       id: 'pillars',
       title: 'Syllabus Pillars',
-      badge: '25-Year Empirical Spine',
-      summary: '6 GS subjects mapped against a quarter century of UPSC papers.',
-      details: 'Explore interactive mind maps, static vault matrices, and examiner trap warnings for foolproof revision.',
+      badge: '25-Year Syllabus Trends',
+      summary: 'Core GS subjects mapped against a quarter century of UPSC papers.',
+      details: 'Explore interactive concept flowcharts, topic trends, and examiner trap alerts for clean revision.',
       action: onNavigateLibrary || onNavigateArena,
-      cta: 'Inspect Pillars',
+      cta: 'Explore Syllabus',
       icon: Layers,
       color: '#c8b998',
     },
@@ -96,8 +100,14 @@ export default function MobileLanding({
   return (
     <div className="w-full font-sans text-stone-100 pb-32 space-y-8">
       
-      {/* ── 1. Top Scarcity Bar ── */}
-      <div className="flex items-center justify-center pt-2">
+      {/* ── 1. Top Scarcity Bar & Exam Countdown ── */}
+      <div className="flex flex-col items-center justify-center gap-1.5 pt-2 px-2">
+        {candidatePreferences && candidatePreferences.targetYear && (
+          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 bg-[rgba(11,61,120,0.45)] border border-[rgba(19,108,153,0.5)] rounded-xs text-[11px] font-mono text-[#e0d0ab] shadow-md">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#34d399] animate-pulse shrink-0" />
+            <span>{calculateExamCountdown(candidatePreferences.targetYear).label}: <strong className="text-white">{calculateExamCountdown(candidatePreferences.targetYear).daysRemaining}d Left</strong></span>
+          </div>
+        )}
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-[rgba(4,25,54,0.75)] border border-[rgba(19,108,153,0.45)] rounded-xs text-[11px] font-sans text-[#e8e0cf] shadow-md">
           <span className="w-2 h-2 rounded-full bg-[#34d399] animate-pulse shrink-0" />
           <span className="text-[#8fa2bd]">Founders Club:</span>

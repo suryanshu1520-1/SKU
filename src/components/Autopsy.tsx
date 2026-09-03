@@ -15,6 +15,7 @@ interface AutopsyProps {
     totalTimeSeconds?: number;
     subjectStats?: Record<string, { correct: number; total: number }>;
     isRanked?: boolean;
+    contextTag?: string;
   };
   percentile: number;
   onNavigateManifesto?: () => void;
@@ -98,7 +99,7 @@ export default function Autopsy({
             Your results
           </div>
           <h1 className="font-serif text-3xl sm:text-4xl font-bold text-white tracking-tight">
-            Performance Autopsy
+            {stats.contextTag || 'Test Review & Score Summary'}
           </h1>
           <p className="text-xs font-sans uppercase tracking-wider text-zinc-400">
             {isRanked ? 'Ranked test' : 'Practice test'} &bull; <span className="font-mono">{total}</span> Questions Evaluated
@@ -361,14 +362,14 @@ export default function Autopsy({
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-[#e0d0ab]" />
                 <h4 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
-                  Conceptual Autopsy Synthesis
+                  AI Mistake Breakdown & Insights
                 </h4>
               </div>
 
               {loadingInsights ? (
                 <div className="flex items-center gap-2.5 text-xs text-zinc-400 font-sans py-4">
                   <Loader2 className="w-4 h-4 animate-spin text-[#0194a8]" />
-                  <span>Synthesizing conceptual diagnostic feedback...</span>
+                  <span>Analyzing your mistakes and examiner traps...</span>
                 </div>
               ) : insights?.overallInsights ? (
                 <div className="bg-zinc-950/60 p-5 rounded-sm border border-zinc-800/80">
