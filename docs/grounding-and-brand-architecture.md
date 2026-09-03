@@ -39,8 +39,13 @@ Where:
 3. **Semantic Cross-Validation**: Each atomic claim is evaluated against the primary text using dual lexical-overlap and semantic cosine matching.
 4. **Sentence Evidence Ledger**: Sentences are color-coded in the UI. Users can click any citation pill `[©]` to reveal the exact excerpt from the source document.
 
-### 1.4 Frontend Integration
-* **`GroundingExplainerModal.tsx`**: 4-tab interactive modal (`Formula & Math`, `4-Stage Pipeline`, `Interactive Demo`, `Strict Safety Rules`) triggered via `[ 🛡️ How Grounding Works ]` or by clicking any `GroundingBadge`.
+### 1.4 Frontend Integration & Motion Graphics Architecture
+* **`GroundingExplainerModal.tsx`**: High-fidelity spatial interactive modal with real-time motion graphics:
+  * **Dynamic Radial Dial**: SVG circular gauge with fluid stroke transition and spring physics, displaying live grounding index.
+  * **Interactive Simulation Presets**: Allows candidates to scrub between `100% Fully Anchored`, `67% High Factual Density`, and `33% Contested Alert` to intuitively observe how score recalculates.
+  * **Live Laser Sentence Scanner**: Animated beam sweeps across claims and reveals verbatim quotes or strikes through hallucinated statistics with diagnostic reasons.
+  * **4-Stage Pipeline Visualizer**: Animated flow chart mapping ingestion $\to$ span decomposition $\to$ regex fact check $\to$ sentinel gate.
+  * **UPSC Risk Radar**: Side-by-side comparison illustrating the negative marking risks (-0.66) of generic AI digests vs. Tark's deterministic precision (+2.00).
 * **`GroundingBadge.tsx`**: Pill badge displaying grounding percentage with real-time color tokens:
   * **$\ge 90\%$**: Emerald (`#10b981`), `Verified First-Source`.
   * **$70\% - 89\%$**: Amber (`#f59e0b`), `Partially Grounded`.
