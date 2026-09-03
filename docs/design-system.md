@@ -46,6 +46,17 @@
 - **Location**: [`src/components/SyllabusMatrix.tsx`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/src/components/SyllabusMatrix.tsx)
 - **Functionality**: Interactive taxonomy browser across 6 core prelims subjects (Polity, Economy, Environment, Science & Tech, Geography, History) showcasing weightages and 1,720+ item coverage.
 
+### E. Policy Intelligence Dossier (`CurrentAffairs.tsx`)
+- **Location**: [`src/components/CurrentAffairs.tsx`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/src/components/CurrentAffairs.tsx)
+- **Hierarchy**:
+  - **Editorial Byline**: Quiet, unboxed metadata breadcrumb (`Source • Ministry • Date`) using authentic agency marks (`PibLogo`, `TheHinduLogo`) and muted typography (`#8fa2bd`).
+  - **Headline Prominence**: Elevates the authoritative serif headline immediately under the byline, eliminating badge-soup displacement.
+  - **Consolidated Telemetry Strip**: High-density glass bar (`bg-[rgba(3,18,42,0.7)] border border-[rgba(19,108,153,0.35)]`) uniting:
+    1. Deterministic Grounding audit ledger trigger (`<GroundingBadge />`).
+    2. Compact Prelims/Mains relevance indicator (`Prelims: MED • Mains: MED`).
+    3. Intelligent syllabus chips (`parseSyllabusTag`) condensing verbose 80-character strings into clean identifiers (`GS-II • Health & Social Sector`).
+  - **Verbatim Syllabus Drawer**: Interactive accordion that reveals exact, untruncated UPSC syllabus mapping on demand without visual clutter.
+
 ---
 
 ## 3. Color Palette & Typography Tokens
@@ -60,3 +71,4 @@
 | `--font-serif` | `Merriweather` / `Cinzel` | Authoritative academic headings |
 | `--font-mono` | `JetBrains Mono` | Telemetry, timers, keyboard HUD, question stats |
 | `--font-sans` | `Inter` | Body prose, question stems, explanations |
+

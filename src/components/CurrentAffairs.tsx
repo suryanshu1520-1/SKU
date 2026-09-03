@@ -151,6 +151,78 @@ const TOP_MINISTRIES = [
   'Ministry of External Affairs',
 ];
 
+export interface ParsedSyllabusTag {
+  paper: string;
+  topic: string;
+  full: string;
+}
+
+export function parseSyllabusTag(rawTag: string): ParsedSyllabusTag {
+  const clean = (rawTag || '').trim();
+  if (!clean) return { paper: 'UPSC', topic: 'General Studies', full: clean };
+
+  const match = clean.match(/^(GS[- ]?(?:I{1,3}|IV|[1-4])|CSAT|ESSAY|PRELIMS|MAINS)[:\s-]*(.*)/i);
+
+  if (match) {
+    let paper = match[1].toUpperCase().replace(/\s+/, '-');
+    paper = paper
+      .replace(/GS-?1\b/i, 'GS-I')
+      .replace(/GS-?2\b/i, 'GS-II')
+      .replace(/GS-?3\b/i, 'GS-III')
+      .replace(/GS-?4\b/i, 'GS-IV');
+
+    const remainder = match[2].trim();
+    let topic = remainder;
+
+    if (/SOCIAL SECTOR|HEALTH|EDUCATION|HUMAN RESOURCES/i.test(remainder)) {
+      topic = 'Health & Social Sector';
+    } else if (/SCIENCE AND TECHNOLOGY|APPLICATIONS IN EVERYDAY LIFE/i.test(remainder)) {
+      topic = 'Science & Technology';
+    } else if (/ENVIRONMENT|POLLUTION|BIODIVERSITY|CONSERVATION/i.test(remainder)) {
+      topic = 'Ecology & Environment';
+    } else if (/INDIAN CONSTITUTION|POLITY|PARLIAMENT|FEDERALISM/i.test(remainder)) {
+      topic = 'Polity & Governance';
+    } else if (/ECONOMIC DEVELOPMENT|INFLATION|GROWTH|FISCAL|AGRICULTURE/i.test(remainder)) {
+      topic = 'Economy & Agriculture';
+    } else if (/INTERNAL SECURITY|SECURITY CHALLENGES|DEFENCE|CYBER/i.test(remainder)) {
+      topic = 'Internal Security';
+    } else if (/INTERNATIONAL RELATIONS|BILATERAL|GLOBAL/i.test(remainder)) {
+      topic = 'International Relations';
+    } else if (/ETHICS|INTEGRITY|APTITUDE/i.test(remainder)) {
+      topic = 'Ethics & Integrity';
+    } else if (/DISASTER|DISASTER MANAGEMENT/i.test(remainder)) {
+      topic = 'Disaster Management';
+    } else if (remainder) {
+      const firstChunk = remainder.split(/[-–;,]/)[0].trim();
+      let formatted = firstChunk;
+      if (formatted === formatted.toUpperCase() && formatted.length > 3) {
+        formatted = formatted
+          .toLowerCase()
+          .split(' ')
+          .map((w) => (w.length > 2 ? w.charAt(0).toUpperCase() + w.slice(1) : w))
+          .join(' ');
+      }
+      topic = formatted.length > 24 ? formatted.slice(0, 22) + '…' : formatted;
+    } else {
+      topic = 'General Studies';
+    }
+
+    return { paper, topic, full: clean };
+  }
+
+  let formatted = clean;
+  if (formatted === formatted.toUpperCase() && formatted.length > 3) {
+    formatted = formatted
+      .toLowerCase()
+      .split(' ')
+      .map((w) => (w.length > 2 ? w.charAt(0).toUpperCase() + w.slice(1) : w))
+      .join(' ');
+  }
+  if (formatted.length > 22) formatted = formatted.slice(0, 20) + '…';
+
+  return { paper: 'UPSC', topic: formatted, full: clean };
+}
+
 export default function CurrentAffairs({ userId, candidatePreferences, onLaunchPractice }: CurrentAffairsProps) {
   const [items, setItems] = useState<CurrentAffairsItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -229,6 +301,16 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
   // Active Dossier Modal
   const [selectedDossier, setSelectedDossier] = useState<CurrentAffairsItem | null>(null);
   const [dossierTab, setDossierTab] = useState<'exam_lens' | 'mains_depth' | 'static_links' | 'evidence'>('exam_lens');
+  const [showVerbatimSyllabus, setShowVerbatimSyllabus] = useState(false);
+
+  const parsedSyllabusTags = useMemo(() => {
+    if (!selectedDossier?.summary?.tags || selectedDossier.summary.tags.length === 0) return [];
+    return selectedDossier.summary.tags.map(parseSyllabusTag);
+  }, [selectedDossier?.summary?.tags]);
+
+  useEffect(() => {
+    setShowVerbatimSyllabus(false);
+  }, [selectedDossier?.id]);
 
   // Grounding Explainer Modal State
   const [groundingExplainerData, setGroundingExplainerData] = useState<{
@@ -1609,11 +1691,11 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
               exit={{ x: '100%' }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-2xl h-full bg-zinc-950 border-l border-zinc-800 p-6 sm:p-8 overflow-y-auto flex flex-col justify-between shadow-2xl"
+              className="w-full max-w-2xl h-full bg-[#03122a] border-l border-[rgba(19,108,153,0.4)] p-6 sm:p-8 overflow-y-auto flex flex-col justify-between shadow-2xl backdrop-blur-2xl"
             >
-              <div className="space-y-6">
+              <div className="space-y-5">
                 {/* Modal Top Bar */}
-                <div className="flex items-center justify-between pb-4 border-b border-zinc-800 font-sans">
+                <div className="flex items-center justify-between pb-3.5 border-b border-[rgba(19,108,153,0.3)] font-sans">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                     <span className="text-[10px] font-sans uppercase tracking-wider text-[#e0d0ab] font-bold">
@@ -1622,79 +1704,160 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                   </div>
                   <button
                     onClick={() => setSelectedDossier(null)}
-                    className="p-1.5 text-zinc-500 hover:text-stone-100 transition-colors bg-zinc-900 rounded-sm cursor-pointer"
+                    className="p-1.5 text-zinc-400 hover:text-stone-100 transition-colors bg-[rgba(11,61,120,0.3)] hover:bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.3)] rounded-xs cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
 
-                {/* Metadata Pills & Relevance Gauges */}
-                <div className="flex flex-wrap items-center gap-2 font-sans">
-                  <span className="px-2.5 py-1 bg-zinc-900 text-[#e0d0ab] text-xs font-sans font-semibold rounded-sm border border-zinc-800">
-                    {selectedDossier.ministry}
-                  </span>
+                {/* 1. Quiet Editorial Byline */}
+                <div className="flex flex-wrap items-center gap-2 text-xs font-sans text-[#8fa2bd]">
                   {selectedDossier.source?.toUpperCase().includes('HINDU') ? (
-                    <span className="px-2.5 py-1 bg-zinc-900 text-white text-xs font-sans rounded-sm border border-zinc-800 inline-flex items-center" title="The Hindu — National Newspaper of Record">
+                    <span className="inline-flex items-center text-white" title="The Hindu — National Newspaper of Record">
                       <TheHinduLogo height={13} color="#ffffff" animated={true} />
                     </span>
                   ) : selectedDossier.source?.toUpperCase().includes('PIB') ? (
-                    <span className="px-2.5 py-1 bg-zinc-900 text-[#e0d0ab] text-xs font-sans rounded-sm border border-zinc-800 inline-flex items-center gap-1.5" title="Press Information Bureau">
-                      <PibLogo size={16} animated={true} />
-                      <span className="font-mono font-bold tracking-wider">PIB Official</span>
+                    <span className="inline-flex items-center gap-1.5 font-mono font-bold text-[#e0d0ab]" title="Press Information Bureau">
+                      <PibLogo size={15} animated={true} />
+                      <span className="text-[11px] tracking-wider uppercase">PIB Official</span>
                     </span>
                   ) : (
-                    <span className="px-2.5 py-1 bg-zinc-900 text-zinc-400 text-xs font-sans rounded-sm border border-zinc-800">
+                    <span className="font-mono text-[11px] font-semibold text-[#e0d0ab] uppercase">
                       {selectedDossier.source}
                     </span>
                   )}
-                  <span className="px-2 py-0.5 bg-amber-500/10 text-amber-300 text-[10px] font-mono font-bold uppercase tracking-wider rounded-sm border border-amber-500/30">
-                    Prelims: {selectedDossier.summary?.prelims_relevance || 'HIGH'}
-                  </span>
-                  <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-300 text-[10px] font-mono font-bold uppercase tracking-wider rounded-sm border border-emerald-500/30">
-                    Mains: {selectedDossier.summary?.mains_relevance || 'HIGH'}
-                  </span>
-                  <GroundingBadge
-                    grounding={selectedDossier.summary?.grounding}
-                    verificationMethod={selectedDossier.summary?.verification_method}
-                    headline={selectedDossier.headline}
-                    source={selectedDossier.source}
-                    claims={selectedDossier.summary?.claims}
-                    onClick={() =>
-                      setGroundingExplainerData({
-                        isOpen: true,
-                        grounding: selectedDossier.summary?.grounding,
-                        headline: selectedDossier.headline,
-                        source: selectedDossier.source,
-                        claims: selectedDossier.summary?.claims || [],
-                      })
-                    }
-                  />
-                  {(selectedDossier.summary?.tags || []).map((t) => (
-                    <span key={t} className="px-2 py-0.5 bg-[#e0d0ab]/10 text-[#e0d0ab] text-[10px] font-sans font-semibold uppercase tracking-wider rounded-sm border border-[#e0d0ab]/20">
-                      {t}
-                    </span>
-                  ))}
+
+                  {selectedDossier.ministry && (
+                    <>
+                      <span className="text-zinc-600 select-none">&bull;</span>
+                      <span className="text-[#9fb0c8] font-medium truncate max-w-[280px]">
+                        {selectedDossier.ministry}
+                      </span>
+                    </>
+                  )}
+
                   {selectedDossier.created_at && (
-                    <span className="text-xs font-mono text-zinc-500">
-                      {new Date(selectedDossier.created_at).toLocaleDateString('en-GB', {
-                        day: '2-digit',
-                        month: 'long',
-                        year: 'numeric',
-                      })}
-                    </span>
+                    <>
+                      <span className="text-zinc-600 select-none">&bull;</span>
+                      <span className="text-[#8fa2bd]/80 font-mono text-[11px]">
+                        {new Date(selectedDossier.created_at).toLocaleDateString('en-GB', {
+                          day: '2-digit',
+                          month: 'long',
+                          year: 'numeric',
+                        })}
+                      </span>
+                    </>
                   )}
                 </div>
 
-                {/* Title — morphs in from whichever card/hero headline was clicked via the shared layoutId */}
+                {/* 2. Authority Headline */}
                 <motion.h2
                   layoutId={`dossier-headline-${selectedDossier.id}`}
-                  className="font-serif text-2xl sm:text-3xl font-bold text-white leading-tight"
+                  className="font-serif text-2xl sm:text-3xl font-bold text-[#e8e0cf] leading-tight tracking-tight"
                 >
                   {selectedDossier.headline}
                 </motion.h2>
 
+                {/* 3. Consolidated Intelligence Telemetry Strip */}
+                <div className="p-2.5 sm:p-3 rounded-xs bg-[rgba(3,18,42,0.7)] border border-[rgba(19,108,153,0.35)] backdrop-blur-md space-y-2 font-sans shadow-sm">
+                  <div className="flex flex-wrap items-center justify-between gap-2.5">
+                    {/* Left: Truth Verification & Exam Gauge */}
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <GroundingBadge
+                        grounding={selectedDossier.summary?.grounding}
+                        verificationMethod={selectedDossier.summary?.verification_method}
+                        headline={selectedDossier.headline}
+                        source={selectedDossier.source}
+                        claims={selectedDossier.summary?.claims}
+                        onClick={() =>
+                          setGroundingExplainerData({
+                            isOpen: true,
+                            grounding: selectedDossier.summary?.grounding,
+                            headline: selectedDossier.headline,
+                            source: selectedDossier.source,
+                            claims: selectedDossier.summary?.claims || [],
+                          })
+                        }
+                      />
+
+                      <span className="h-3.5 w-px bg-zinc-700/60 hidden sm:inline-block" />
+
+                      {/* Compact Prelims / Mains Relevance Gauge */}
+                      <div className="inline-flex items-center gap-2 px-2 py-0.5 rounded-xs bg-[rgba(11,61,120,0.25)] border border-[rgba(19,108,153,0.3)] text-[10px] font-mono text-[#9fb0c8]">
+                        <span className="flex items-center gap-1">
+                          <span className="text-[#8fa2bd]">Prelims:</span>
+                          <span className={`font-semibold ${
+                            selectedDossier.summary?.prelims_relevance === 'HIGH' ? 'text-amber-300' :
+                            selectedDossier.summary?.prelims_relevance === 'LOW' ? 'text-zinc-400' : 'text-amber-200'
+                          }`}>
+                            {selectedDossier.summary?.prelims_relevance || 'MEDIUM'}
+                          </span>
+                        </span>
+                        <span className="text-zinc-600 select-none">&bull;</span>
+                        <span className="flex items-center gap-1">
+                          <span className="text-[#8fa2bd]">Mains:</span>
+                          <span className={`font-semibold ${
+                            selectedDossier.summary?.mains_relevance === 'HIGH' ? 'text-emerald-300' :
+                            selectedDossier.summary?.mains_relevance === 'LOW' ? 'text-zinc-400' : 'text-emerald-200'
+                          }`}>
+                            {selectedDossier.summary?.mains_relevance || 'MEDIUM'}
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Right: Condensed UPSC Syllabus Chips */}
+                    {parsedSyllabusTags.length > 0 && (
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {parsedSyllabusTags.map((tag, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setShowVerbatimSyllabus(!showVerbatimSyllabus)}
+                            title={`${tag.full} (Click to inspect verbatim UPSC mapping)`}
+                            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-xs bg-[rgba(11,61,120,0.3)] border border-[rgba(19,108,153,0.4)] text-[10px] font-mono text-[#e0d0ab] hover:border-[#e0d0ab]/60 hover:bg-[rgba(11,61,120,0.5)] transition-all cursor-pointer shadow-xs"
+                          >
+                            <span className="font-bold text-[#e8e0cf]">{tag.paper}</span>
+                            <span className="text-zinc-600 select-none">&bull;</span>
+                            <span className="text-[#9fb0c8]">{tag.topic}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Verbatim Syllabus Mapping Accordion */}
+                  <AnimatePresence>
+                    {showVerbatimSyllabus && parsedSyllabusTags.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden pt-2 border-t border-[rgba(19,108,153,0.25)] space-y-1.5"
+                      >
+                        <div className="flex items-center justify-between text-[10px] font-mono text-[#e0d0ab] uppercase tracking-wider font-bold">
+                          <span>Verbatim UPSC Syllabus Mapping</span>
+                          <button
+                            type="button"
+                            onClick={() => setShowVerbatimSyllabus(false)}
+                            className="text-zinc-500 hover:text-stone-200 cursor-pointer font-sans"
+                          >
+                            Close &times;
+                          </button>
+                        </div>
+                        {parsedSyllabusTags.map((t, i) => (
+                          <div key={i} className="text-[11px] font-sans text-stone-300 pl-2.5 border-l border-[#0194a8]/50 leading-relaxed">
+                            <span className="font-mono font-bold text-[#e0d0ab] mr-1">{t.paper}:</span>
+                            <span>{t.full.replace(new RegExp(`^${t.paper}[:\\s-]*`, 'i'), '') || t.full}</span>
+                          </div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
                 {/* Dossier Tab Navigation Bar */}
-                <div className="flex border-b border-zinc-800 font-sans gap-1">
+                <div className="flex border-b border-[rgba(19,108,153,0.3)] font-sans gap-1">
                   <button
                     type="button"
                     onClick={() => setDossierTab('exam_lens')}
