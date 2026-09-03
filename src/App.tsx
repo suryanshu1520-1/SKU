@@ -18,6 +18,7 @@ import VerticalNavRail, { ContextActionItem } from './components/VerticalNavRail
 import { WebsiteTour } from './components/WebsiteTour';
 import Onboarding from './components/Onboarding';
 import BrandLogo from './components/BrandLogo';
+import { Modal } from './components/shared';
 import { supabase } from './lib/supabase';
 import { Loader2, Trophy, Swords, Globe, User, House, LogIn, Layers, BookOpen, PanelLeftOpen, LayoutTemplate, Radio, Clock, Compass } from 'lucide-react';
 import { NAV_ITEMS, PROFILE_NAV_ITEM, NavTab } from './lib/navItems';
@@ -40,6 +41,11 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState<'arena' | 'tracker' | 'library' | 'humanities' | 'observatory' | 'profile' | 'leaderboard'>('arena');
   const [hoveredNavId, setHoveredNavId] = useState<string | null>(null);
+
+  // Active Arena Test Guard
+  const [isArenaQuizActive, setIsArenaQuizActive] = useState(false);
+  const [pendingNavAction, setPendingNavAction] = useState<(() => void) | null>(null);
+  const [showNavAbandonModal, setShowNavAbandonModal] = useState(false);
 
   const [viewingAnalystId, setViewingAnalystId] = useState<string | null>(null);
   const [showPasswordReset, setShowPasswordReset] = useState(false);
@@ -129,16 +135,10 @@ export default function App() {
     setShowManifesto(true);
   };
 
-  const handleNavigateHome = () => {
-    setGameState('landing');
-    setActiveTab('arena');
-    setShowManifesto(false);
-  };
-
-  const navigateToTab = (tab: 'arena' | 'tracker' | 'library' | 'humanities' | 'observatory' | 'profile' | 'leaderboard') => {
-    if (tab === 'profile' && !userEmail) {
-      setGameState('login');
-      return;
+  const executeTabNavigation = (tab: 'arena' | 'tracker' | 'library' | 'humanities' | 'observatory' | 'profile' | 'leaderboard') => {
+    if (tab !== 'arena') {
+      setTargetPillar(null);
+      setArenaConfig(null);
     }
     setActiveTab(tab);
     if (gameState === 'landing' || gameState === 'login') {
@@ -152,6 +152,58 @@ export default function App() {
     } else if (tab === 'arena') {
       setGameState('arena');
     }
+  };
+
+  const navigateToTab = (tab: 'arena' | 'tracker' | 'library' | 'humanities' | 'observatory' | 'profile' | 'leaderboard') => {
+    if (tab === 'profile' && !userEmail) {
+      setGameState('login');
+      return;
+    }
+    // Guard: if user is taking an active test in the Arena and attempts to navigate to another tab
+    if (activeTab === 'arena' && isArenaQuizActive && tab !== 'arena') {
+      setPendingNavAction(() => () => executeTabNavigation(tab));
+      setShowNavAbandonModal(true);
+      return;
+    }
+    executeTabNavigation(tab);
+  };
+
+  const executeNavigateHome = () => {
+    setTargetPillar(null);
+    setArenaConfig(null);
+    setGameState('landing');
+    setActiveTab('arena');
+    setShowManifesto(false);
+  };
+
+  const handleNavigateHome = () => {
+    if (activeTab === 'arena' && isArenaQuizActive) {
+      setPendingNavAction(() => executeNavigateHome);
+      setShowNavAbandonModal(true);
+      return;
+    }
+    executeNavigateHome();
+  };
+
+  const handleConfirmAbandonNavigation = () => {
+    try {
+      localStorage.removeItem('tark_arena_session');
+      localStorage.removeItem('tark_active_session');
+      localStorage.removeItem('tark_arena_results');
+    } catch {}
+    setIsArenaQuizActive(false);
+    setTargetPillar(null);
+    setArenaConfig(null);
+    setShowNavAbandonModal(false);
+    if (pendingNavAction) {
+      pendingNavAction();
+      setPendingNavAction(null);
+    }
+  };
+
+  const handleCancelAbandonNavigation = () => {
+    setShowNavAbandonModal(false);
+    setPendingNavAction(null);
   };
 
   // Keyboard Shortcuts: Alt+[ or Alt+V to toggle orientation, Alt+1..7 to switch tabs
@@ -742,10 +794,12 @@ export default function App() {
               onReturnToDashboard={(originTab) => {
                 setTargetPillar(null);
                 setArenaConfig(null);
+                setIsArenaQuizActive(false);
                 setGameState('arena');
                 setActiveTab((originTab as any) || 'arena');
               }}
               onNavigateManifesto={handleNavigateManifesto}
+              onTestStatusChange={setIsArenaQuizActive}
             />
           ) : (
             <Autopsy
@@ -855,6 +909,34 @@ export default function App() {
         onClose={() => setIsTourOpen(false)}
         onNavigateTab={navigateToTab}
       />
+
+      {/* ── Abandon Active Assessment Navigation Modal ── */}
+      <Modal
+        isOpen={showNavAbandonModal}
+        onClose={handleCancelAbandonNavigation}
+        title="Abandon Active Crucible?"
+        subtitle="Unsaved assessment progress will be discarded"
+      >
+        <div className="space-y-4 font-sans text-left">
+          <p className="text-xs text-zinc-300 leading-relaxed">
+            You are currently engaged in an active test session. Navigating away to another feature will permanently discard your progress in this crucible.
+          </p>
+          <div className="flex gap-3 pt-2">
+            <button
+              onClick={handleCancelAbandonNavigation}
+              className="flex-1 py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-sans text-xs font-medium uppercase rounded-sm transition-all cursor-pointer"
+            >
+              Resume Test
+            </button>
+            <button
+              onClick={handleConfirmAbandonNavigation}
+              className="flex-1 py-2.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-sans text-xs font-medium uppercase rounded-sm transition-all cursor-pointer"
+            >
+              Abandon & Leave
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

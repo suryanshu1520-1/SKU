@@ -52,6 +52,7 @@ interface ArenaProps {
   onClearTargetPillar?: () => void;
   onReturnToDashboard?: (originTab?: string) => void;
   onNavigateManifesto?: () => void;
+  onTestStatusChange?: (isActive: boolean) => void;
 }
 
 const SESSION_STORAGE_KEY = 'tark_arena_session';
@@ -185,8 +186,10 @@ export default function Arena({
   onClearTargetPillar,
   onReturnToDashboard,
   onNavigateManifesto,
+  onTestStatusChange,
 }: ArenaProps) {
   const [arenaPhase, setArenaPhase] = useState<'intro' | 'quiz'>('intro');
+  const [cachedSessionAvailable, setCachedSessionAvailable] = useState<CachedSession | null>(null);
   const [examTrack, setExamTrack] = useState<'upsc' | 'ssc'>('upsc');
   const [pacingMode, setPacingMode] = useState<'standard' | 'blitz' | 'untimed'>(() => {
     if (arenaConfig?.timePerQuestionSeconds === 20) return 'blitz';
@@ -275,28 +278,52 @@ export default function Arena({
     if (activeMeta) {
       const fullCached = loadSessionFromCache();
       if (fullCached && fullCached.userId === userId && fullCached.questions.length > 0 && !fullCached.quizSubmitted) {
-        setQuestions(fullCached.questions);
-        setCurrentQuestionIndex(fullCached.currentQuestionIndex);
-        setUserAnswers(fullCached.userAnswers);
-        setTimeouts(fullCached.timeouts);
-        setTimeLeftMap(fullCached.timeLeftMap);
-        setTimeSpentMap(fullCached.timeSpentMap);
-        setQuizSubmitted(fullCached.quizSubmitted);
-        setExplanationCache(fullCached.explanationCache || {});
-        if (fullCached.revealedAnswers) setRevealedAnswers(fullCached.revealedAnswers);
-        setLoadingExplanationMap(fullCached.loadingExplanationMap || {});
-        setSavedInsightIds(new Set(fullCached.savedInsightIds || []));
-        setIsRanked(fullCached.isRanked);
-        if (fullCached.pendingAnswersMap) setPendingAnswersMap(fullCached.pendingAnswersMap);
-        if (fullCached.lockedMap) setLockedMap(fullCached.lockedMap);
-        setIsLoading(false);
-        setShowResumeOverlay(true);
-        setResumeCountdown(3);
-        setArenaPhase('quiz');
+        // If an explicit new drill or pillar was requested via props, discard the old session and start fresh
+        if (arenaConfig?.autoStart || (targetPillar && targetPillar.id)) {
+          clearSessionCache();
+          setCachedSessionAvailable(null);
+        } else {
+          // Never forcibly trap the candidate on the abandoned question;
+          // save it in state to display an optional "Resume Test / Discard" banner in the lobby!
+          setCachedSessionAvailable(fullCached);
+        }
         return;
       }
     }
-  }, [userId, onComplete]);
+  }, [userId, onComplete, arenaConfig?.autoStart, targetPillar]);
+
+  const handleResumeSavedSession = () => {
+    if (!cachedSessionAvailable) return;
+    setQuestions(cachedSessionAvailable.questions);
+    setCurrentQuestionIndex(cachedSessionAvailable.currentQuestionIndex);
+    setUserAnswers(cachedSessionAvailable.userAnswers);
+    setTimeouts(cachedSessionAvailable.timeouts);
+    setTimeLeftMap(cachedSessionAvailable.timeLeftMap);
+    setTimeSpentMap(cachedSessionAvailable.timeSpentMap);
+    setQuizSubmitted(cachedSessionAvailable.quizSubmitted);
+    setExplanationCache(cachedSessionAvailable.explanationCache || {});
+    if (cachedSessionAvailable.revealedAnswers) setRevealedAnswers(cachedSessionAvailable.revealedAnswers);
+    setLoadingExplanationMap(cachedSessionAvailable.loadingExplanationMap || {});
+    setSavedInsightIds(new Set(cachedSessionAvailable.savedInsightIds || []));
+    setIsRanked(cachedSessionAvailable.isRanked);
+    if (cachedSessionAvailable.pendingAnswersMap) setPendingAnswersMap(cachedSessionAvailable.pendingAnswersMap);
+    if (cachedSessionAvailable.lockedMap) setLockedMap(cachedSessionAvailable.lockedMap);
+    setIsLoading(false);
+    setShowResumeOverlay(true);
+    setResumeCountdown(3);
+    setArenaPhase('quiz');
+    setCachedSessionAvailable(null);
+  };
+
+  const handleDiscardSavedSession = () => {
+    clearSessionCache();
+    try {
+      localStorage.removeItem(SESSION_STORAGE_KEY);
+      localStorage.removeItem(ACTIVE_SESSION_KEY);
+      localStorage.removeItem(RESULTS_STORAGE_KEY);
+    } catch {}
+    setCachedSessionAvailable(null);
+  };
 
   // Resume overlay countdown
   useEffect(() => {
@@ -313,14 +340,18 @@ export default function Arena({
     return () => clearTimeout(timer);
   }, [showResumeOverlay, resumeCountdown]);
 
-  // Start Assessment Triggers
+  // Start Assessment Triggers (always clears any stale cached session)
   const handleBeginAssessment = () => {
+    clearSessionCache();
+    setCachedSessionAvailable(null);
     setIsRanked(true);
     setMotivation(getRandomMotivation());
     setShowPreflightModal(true);
   };
 
   const handleStartTargetedDrill = async () => {
+    clearSessionCache();
+    setCachedSessionAvailable(null);
     const drillIsRanked = arenaConfig?.isRanked ?? false;
     setIsRanked(drillIsRanked);
     setArenaPhase('quiz');
@@ -366,6 +397,8 @@ export default function Arena({
   };
 
   const handleTrainingGround = async () => {
+    clearSessionCache();
+    setCachedSessionAvailable(null);
     setIsRanked(false);
     setLoadingSubjects(true);
     try {
@@ -618,6 +651,15 @@ export default function Arena({
     lockedMap,
   ]);
 
+  // Synchronize test active state with parent App (so navigation rail can guard against accidental abandonment)
+  useEffect(() => {
+    const isQuizActive = arenaPhase === 'quiz' && questions.length > 0 && !quizSubmitted;
+    onTestStatusChange?.(isQuizActive);
+    return () => {
+      onTestStatusChange?.(false);
+    };
+  }, [arenaPhase, questions.length, quizSubmitted, onTestStatusChange]);
+
   const currentQuestion = questions[currentQuestionIndex];
   const currentQuestionId = currentQuestion?.id;
 
@@ -784,6 +826,7 @@ export default function Arena({
   const handleConfirmAbandon = () => {
     setShowAbandonModal(false);
     clearSessionCache();
+    setCachedSessionAvailable(null);
     try {
       localStorage.removeItem(SESSION_STORAGE_KEY);
       localStorage.removeItem(ACTIVE_SESSION_KEY);
@@ -804,6 +847,7 @@ export default function Arena({
     setSavedInsightIds(new Set());
     setPendingAnswersMap({});
     setLockedMap({});
+    onTestStatusChange?.(false);
     const origin = arenaConfig?.originTab || 'arena';
     if (onReturnToDashboard) onReturnToDashboard(origin);
   };
@@ -1059,6 +1103,43 @@ export default function Arena({
         <p className="text-xs font-sans text-zinc-400 mb-8 text-center max-w-md">
           Time-bound competitive testing with zero-trust server evaluation and negative marking.
         </p>
+
+        {/* Unfinished Session Detected Banner */}
+        {cachedSessionAvailable && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full mb-6 p-4 rounded-xs bg-[rgba(11,61,120,0.35)] border border-[rgba(19,108,153,0.5)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md text-left"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-2.5 h-2.5 rounded-full bg-[#0194a8] animate-pulse shrink-0" />
+              <div className="space-y-0.5">
+                <div className="text-xs font-mono font-semibold text-[#e0d0ab]">
+                  Unfinished Session Detected
+                </div>
+                <div className="text-[11px] font-sans text-[#9fb0c8]">
+                  Question <span className="font-mono text-white">{cachedSessionAvailable.currentQuestionIndex + 1}</span> of <span className="font-mono text-white">{cachedSessionAvailable.questions.length}</span> &bull; {cachedSessionAvailable.isRanked ? 'Ranked Crucible' : 'Training Drill'}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+              <button
+                type="button"
+                onClick={handleResumeSavedSession}
+                className="px-3.5 py-1.5 bg-[#e0d0ab] hover:bg-white text-[#072e63] font-sans text-xs font-bold uppercase tracking-wider rounded-xs transition-colors shadow-sm cursor-pointer"
+              >
+                Resume Test &rarr;
+              </button>
+              <button
+                type="button"
+                onClick={handleDiscardSavedSession}
+                className="px-2.5 py-1.5 bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 font-sans text-xs font-medium uppercase rounded-xs transition-colors cursor-pointer"
+              >
+                Discard
+              </button>
+            </div>
+          </motion.div>
+        )}
 
         {/* If targeted drill active: Show dedicated preflight card */}
         {arenaConfig && arenaConfig.mode !== 'full_mock' ? (
