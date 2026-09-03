@@ -50,14 +50,22 @@ export default function App() {
   const [targetPillar, setTargetPillar] = useState<{ id: string; title: string } | null>(null);
   const [arenaConfig, setArenaConfig] = useState<ArenaLaunchConfig | null>(null);
 
-  const [arenaStats, setArenaStats] = useState({
+  const [arenaStats, setArenaStats] = useState<{
+    correct: number;
+    incorrect: number;
+    unattempted: number;
+    totalTimeSeconds: number;
+    subjectStats: Record<string, { correct: number; total: number }>;
+    isRanked?: boolean;
+    contextTag?: string;
+  }>({
     correct: 0,
     incorrect: 0,
     unattempted: 0,
     totalTimeSeconds: 0,
-    subjectStats: {} as Record<string, { correct: number; total: number }>,
-    isRanked: true as boolean | undefined,
-    contextTag: undefined as string | undefined,
+    subjectStats: {},
+    isRanked: true,
+    contextTag: undefined,
   });
   const [percentile, setPercentile] = useState(0);
 

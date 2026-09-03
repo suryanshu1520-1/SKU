@@ -35,7 +35,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import DailyEdition from './DailyEdition';
-import RebaseEdition from './RebaseEdition';
+
 import prsVaultDossiers from '../data/prs-vault-dossiers.json';
 import type { CandidatePreferences } from '../types';
 import { matchOptionalRelevance } from '../lib/candidatePreferences';
@@ -126,7 +126,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
   const [syncSuccess, setSyncSuccess] = useState<boolean | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [syncCooldown, setSyncCooldown] = useState(0);
-  const [editionRefreshKey, setEditionRefreshKey] = useState(0);
+
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const PAGE_SIZE = 45;
@@ -376,7 +376,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
         let finalData = data;
         if ((categoryTab === 'PRS' || filterSource === 'PRS') && pageIndex === 0) {
           const liveUrls = new Set(data.map((d: any) => d.url));
-          const supplementary = (prsVaultDossiers as CurrentAffairsItem[]).filter(
+          const supplementary = (prsVaultDossiers as unknown as CurrentAffairsItem[]).filter(
             (item) => !liveUrls.has(item.url)
           );
           finalData = [...data, ...supplementary];
@@ -443,7 +443,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
         setShowBackgroundToast(true);
         setSyncSuccess(true);
         setTimeout(() => {
-          void fetchPolicyData(false).finally(() => setEditionRefreshKey((key) => key + 1));
+          void fetchPolicyData(false);
         }, 10000);
         setTimeout(() => setSyncSuccess(null), 5000);
         return;
@@ -452,7 +452,6 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
 
       setSyncSuccess(true);
       await fetchPolicyData(false);
-      setEditionRefreshKey((key) => key + 1);
       setTimeout(() => setSyncSuccess(null), 5000);
     } catch (err: any) {
       console.error('Manual sync error:', err);
@@ -705,17 +704,10 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
       {/* ── MODE 1: FULL DAILY EDITION READER (When selected from sidebar) ── */}
       {briefViewMode === 'edition' && (
         <div className="max-w-4xl mx-auto pt-2">
-          <RebaseEdition
-            userId={userId}
-            refreshKey={editionRefreshKey}
+          <DailyEdition 
+            userId={userId} 
+            compactModeDefault={false} 
             onOpenArenaQuiz={() => onLaunchPractice?.('CURRENT_AFFAIRS')}
-            fallback={
-              <DailyEdition 
-                userId={userId} 
-                compactModeDefault={false} 
-                onOpenArenaQuiz={() => onLaunchPractice?.('CURRENT_AFFAIRS')}
-              />
-            }
           />
         </div>
       )}

@@ -219,7 +219,7 @@ export default function Profile({
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      const validArticles = (data || []).filter((item: any) => item.current_affairs != null) as SavedArticle[];
+      const validArticles = ((data || []).filter((item: any) => item.current_affairs != null) as unknown) as SavedArticle[];
       setSavedArticles(validArticles);
     } catch (err) {
       console.error('Error fetching saved articles:', err);

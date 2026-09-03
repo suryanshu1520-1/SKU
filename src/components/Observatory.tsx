@@ -182,6 +182,55 @@ const HIGH_YIELD_TOPICS: HighYieldTopic[] = [
 ];
 
 // ============================================================================
+// MAINS DIRECTIVE VERB RUBRICS & COGNITIVE DEPTH
+// ============================================================================
+interface MainsDirectiveRubric {
+  directive: string;
+  coreTone: string;
+  marksSplit: string;
+  trap: string;
+}
+
+const MAINS_DIRECTIVES: MainsDirectiveRubric[] = [
+  {
+    directive: 'Discuss',
+    coreTone: '360-degree exploratory overview — write a balanced, multi-dimensional narrative covering legal, administrative, economic, and social angles with constitutional grounding.',
+    marksSplit: '15% Contextual Introduction · 60% Multi-Dimensional Dimensions (Political/Social/Fiscal) · 25% Forward-Looking Synthesis',
+    trap: 'Writing a purely one-dimensional essay (e.g. only focusing on economic data) while ignoring grassroots social or constitutional implications.',
+  },
+  {
+    directive: 'Critically Analyze',
+    coreTone: 'Rigorous forensic deconstruction — dissect the thesis and antithesis, evaluate institutional bottlenecks, cite empirical evidence, and provide an actionable policy solution.',
+    marksSplit: '15% Statutory/Constitutional Anchor · 30% Merits & Systemic Strengths · 35% Inherent Flaws & Bottlenecks · 20% Committee Recommendations',
+    trap: 'One-sided praise or emotional criticism without empirical backing, Supreme Court precedents, or government committee roadmaps.',
+  },
+  {
+    directive: 'Evaluate / Assess',
+    coreTone: 'Outcome-oriented scorecard — benchmark actual ground implementation and empirical performance against stated statutory mandates and scheme targets.',
+    marksSplit: '15% Stated Mandate & Baseline Targets · 35% Quantifiable Successes · 35% Structural Implementation Deficits · 15% Strategic Course Corrections',
+    trap: 'Describing what the scheme is on paper rather than evaluating whether it achieved its stated objectives with real audit reports (CAG, NITI Aayog).',
+  },
+  {
+    directive: 'Elucidate / Explain',
+    coreTone: 'Clarity and pedagogical dissection — make a dense legal doctrine, policy mechanism, or scientific process transparent with step-by-step logic and clear examples.',
+    marksSplit: '20% Precise Conceptual Definition · 50% Step-by-Step Institutional Mechanics · 30% Concrete Case Studies & Impact Evidence',
+    trap: 'Diverging into unsolicited criticism or debate instead of giving a crystal-clear, step-by-step explanation of how the mechanism operates.',
+  },
+  {
+    directive: 'Examine',
+    coreTone: 'Investigative deep-dive — look beneath the surface to probe structural causes, latent institutional frictions, and systemic consequences.',
+    marksSplit: '20% Core Problem Statement · 50% Structural Root Causes & Mechanisms · 30% Systemic Implications & Remedial Imperatives',
+    trap: 'Superficial symptom-listing without probing the root institutional or socioeconomic causes behind the phenomenon.',
+  },
+  {
+    directive: 'Comment',
+    coreTone: 'Perspectival synthesis — take a reasoned, principled stance on a controversial proposition supported by constitutional philosophy and empirical evidence.',
+    marksSplit: '20% Interpretation of the Quote/Statement · 50% Balanced Analytical Justification with Evidence · 30% Principled Constitutional Stance',
+    trap: 'Vacillating without taking a stand, or taking an extreme ideological posture that contradicts basic constitutional values.',
+  },
+];
+
+// ============================================================================
 // 4 CLASSIC UPSC TRAPS WITH REAL VERIFIED QUESTIONS
 // ============================================================================
 interface TrapCaseStudy {
@@ -1735,7 +1784,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
               </div>
 
               {(() => {
-                const cur = MAINS_DIRECTIVES[selectedDirective];
+                const cur = MAINS_DIRECTIVES[selectedDirective] || MAINS_DIRECTIVES[0];
                 return (
                   <div className="p-5 rounded-sm bg-[rgba(3,16,38,0.8)] border border-[rgba(19,108,153,0.35)] space-y-4 text-xs">
                     <div className="space-y-1">

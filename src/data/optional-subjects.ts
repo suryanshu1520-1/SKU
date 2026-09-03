@@ -23,7 +23,7 @@ export interface OptionalSubject {
   paper1Focus: string;
   paper2Focus: string;
   gsSynergies: {
-    paper: 'GS1' | 'GS2' | 'GS3' | 'GS4' | 'ESSAY';
+    paper: 'GS1' | 'GS2' | 'GS3' | 'GS4' | 'ESSAY' | 'CSAT';
     domain: string;
     overlapDegree: 'HIGH' | 'MEDIUM' | 'MODERATE';
     details: string;

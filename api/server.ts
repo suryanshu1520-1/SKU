@@ -14,7 +14,7 @@ import resetLeaderboardHandler from "../server-lib/cron/reset-leaderboard.js";
 import createRazorpayOrderHandler from "../server-lib/create-razorpay-order.js";
 import verifyPaymentHandler from "../server-lib/verify-payment.js";
 import userLimitsHandler from "../server-lib/user-limits.js";
-import { handleGetRebase, handlePostRebaseAck } from "../server-lib/rebase.js";
+
 import { analyticsRouter } from "../server-lib/analytics/routes.js";
 
 const app = express();
@@ -40,8 +40,7 @@ app.post("/api/auth/register", registerHandler);
 app.post("/api/create-razorpay-order", createRazorpayOrderHandler);
 app.post("/api/verify-payment", verifyPaymentHandler);
 app.get("/api/user-limits", userLimitsHandler);
-app.get("/api/rebase", handleGetRebase);
-app.post("/api/rebase/ack", handlePostRebaseAck);
+
 app.use("/api/analytics", analyticsRouter);
 
 export default async function handler(req: any, res: any) {

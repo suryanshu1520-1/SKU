@@ -513,7 +513,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                 {candidateOptional.name}
               </h3>
               <p className="text-xs text-[#cad5e2] mt-1 max-w-2xl leading-relaxed">
-                {candidateOptional.paperStructure}
+                {candidateOptional.description}
               </p>
             </div>
 
@@ -522,7 +522,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                 💡 Mains Strategy Advisory
               </span>
               <p className="text-xs text-[#cad5e2] leading-relaxed">
-                {candidateOptional.strategyTip}
+                {candidateOptional.mainsStrategyTip}
               </p>
             </div>
           </div>
@@ -534,11 +534,11 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
               {[
-                { label: 'GS-1 Synergy', value: candidateOptional.gsSynergies.gs1 },
-                { label: 'GS-2 Synergy', value: candidateOptional.gsSynergies.gs2 },
-                { label: 'GS-3 Synergy', value: candidateOptional.gsSynergies.gs3 },
-                { label: 'GS-4 Ethics Synergy', value: candidateOptional.gsSynergies.gs4 },
-                { label: 'Mains Essay Synergy', value: candidateOptional.gsSynergies.essay },
+                { label: 'GS-1 Synergy', value: candidateOptional.gsSynergies.find((s) => s.paper === 'GS1')?.details || 'Foundational conceptual depth' },
+                { label: 'GS-2 Synergy', value: candidateOptional.gsSynergies.find((s) => s.paper === 'GS2')?.details || 'Governance and institutional analysis' },
+                { label: 'GS-3 Synergy', value: candidateOptional.gsSynergies.find((s) => s.paper === 'GS3')?.details || 'Empirical and policy relevance' },
+                { label: 'GS-4 Ethics Synergy', value: candidateOptional.gsSynergies.find((s) => s.paper === 'GS4')?.details || 'Philosophical reasoning and case studies' },
+                { label: 'Mains Essay Synergy', value: candidateOptional.gsSynergies.find((s) => s.paper === 'ESSAY')?.details || 'High-scoring thematic arguments and examples' },
               ].map((syn, idx) => (
                 <div
                   key={idx}

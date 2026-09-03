@@ -21,6 +21,8 @@ import {
   CheckCircle2,
   XCircle,
   Shield,
+  Zap,
+  BookOpen,
 } from 'lucide-react';
 import InfoTooltip from './InfoTooltip';
 import Markdown from 'react-markdown';

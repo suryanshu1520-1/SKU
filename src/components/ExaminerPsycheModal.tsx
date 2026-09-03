@@ -1382,7 +1382,7 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                       <Search className="w-3 h-3" />
                       {expandedNodeId === c.nodeId ? 'Hide base questions' : 'Show base questions'}
                     </button>
-                    {expandedNodeId === c.nodeId && <NodeLinkedPyqs detail={nodeDetails[c.nodeId]} />}
+                    {expandedNodeId === c.nodeId && <NodeLinkedPyqs nodeId={c.nodeId} detail={nodeDetails[c.nodeId]} />}
                   </div>
                 ))}
               </div>
