@@ -1,3 +1,4 @@
+import "./load-env.js";
 import { createClient } from "@supabase/supabase-js";
 import { waitUntil } from "@vercel/functions";
 import { getSources } from "./cron/ingest/sources.js";

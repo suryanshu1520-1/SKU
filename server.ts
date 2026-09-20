@@ -30,12 +30,12 @@ function cleanEnvValue(val: any): string {
   return cleaned.trim();
 }
 
-const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const rawSupabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "https://ixngfxaerlkkcacrbdgc.supabase.co";
+const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
+const rawSupabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-if (!rawSupabaseUrl || !rawSupabaseKey || !rawSupabaseAnonKey) {
-  throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase environment variables (URL, SERVICE_ROLE_KEY, ANON_KEY) missing.");
+if (!rawSupabaseKey || !rawSupabaseAnonKey) {
+  throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase server and anonymous keys are missing.");
 }
 
 const supabaseServer = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey));

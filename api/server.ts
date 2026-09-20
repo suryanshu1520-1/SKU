@@ -1,3 +1,4 @@
+import "../server-lib/load-env.js";
 import express from "express";
 import bookmarkHandler from "../server-lib/bookmark.js";
 import explanationHandler from "../server-lib/explanation.js";

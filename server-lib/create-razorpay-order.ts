@@ -1,3 +1,4 @@
+import "./load-env.js";
 import { createClient } from "@supabase/supabase-js";
 import Razorpay from "razorpay";
 
