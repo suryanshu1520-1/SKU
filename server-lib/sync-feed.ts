@@ -14,11 +14,22 @@ function cleanEnvValue(val: any): string {
   return cleaned.trim();
 }
 
-const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-if (!rawSupabaseUrl) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing.");
-const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-if (!rawSupabaseKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
-const supabase = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey));
+const SUPABASE_URL_FALLBACK = "https://ixngfxaerlkkcacrbdgc.supabase.co";
+
+function getSupabaseClient() {
+  const supabaseUrl = cleanEnvValue(
+    process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || SUPABASE_URL_FALLBACK,
+  );
+  const serviceRoleKey = cleanEnvValue(process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+  if (!serviceRoleKey) {
+    throw new Error("CRITICAL_ENVIRONMENT_FAULT: SUPABASE_SERVICE_ROLE_KEY missing.");
+  }
+
+  return createClient(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
 
 const COOLDOWN_SECONDS = 300; // 5 minutes user-level throttle
 
@@ -29,6 +40,17 @@ const ALL_SOURCES = getSources().map((s) => s.id);
 export default async function handler(req: any, res: any) {
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
+  }
+
+  let supabase;
+  try {
+    supabase = getSupabaseClient();
+  } catch (error) {
+    console.error('[sync-feed] Supabase configuration error:', error);
+    return res.status(503).json({
+      error: 'SERVICE_UNAVAILABLE',
+      message: 'Feed sync is temporarily unavailable.',
+    });
   }
 
   const authHeader = req.headers['authorization'] || '';
