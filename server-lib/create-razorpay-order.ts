@@ -13,11 +13,22 @@ function cleanEnvValue(val: any): string {
   return cleaned.trim();
 }
 
-const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-if (!rawSupabaseUrl) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing.");
-const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-if (!rawSupabaseKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
-const supabaseServer = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey));
+const SUPABASE_URL_FALLBACK = "https://ixngfxaerlkkcacrbdgc.supabase.co";
+
+function getSupabaseClient() {
+  const supabaseUrl = cleanEnvValue(
+    process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || SUPABASE_URL_FALLBACK,
+  );
+  const serviceRoleKey = cleanEnvValue(process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+  if (!serviceRoleKey) {
+    throw new Error("CRITICAL_ENVIRONMENT_FAULT: SUPABASE_SERVICE_ROLE_KEY missing.");
+  }
+
+  return createClient(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
 
 export default async function handler(req: any, res: any) {
   // Handle preflight requests
@@ -28,6 +39,17 @@ export default async function handler(req: any, res: any) {
   // Ensure it's a POST request
   if (req.method !== 'POST') {
     return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  let supabaseServer;
+  try {
+    supabaseServer = getSupabaseClient();
+  } catch (error) {
+    console.error("[razorpay] Supabase configuration error:", error);
+    return res.status(503).json({
+      error: "SERVICE_UNAVAILABLE",
+      message: "Payment service is temporarily unavailable.",
+    });
   }
 
   const { userId } = req.body || {};
