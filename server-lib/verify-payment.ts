@@ -15,19 +15,21 @@ function cleanEnvValue(val: any): string {
   return cleaned.trim();
 }
 
-const rawSupabaseUrl = process.env.VITE_SUPABASE_URL
-  || process.env.NEXT_PUBLIC_SUPABASE_URL
-  || process.env.SUPABASE_URL
-  || "https://ixngfxaerlkkcacrbdgc.supabase.co";
-const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
+function getSupabaseServer() {
+  const rawSupabaseUrl = process.env.VITE_SUPABASE_URL
+    || process.env.NEXT_PUBLIC_SUPABASE_URL
+    || process.env.SUPABASE_URL
+    || "https://ixngfxaerlkkcacrbdgc.supabase.co";
+  const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
 
-if (!rawSupabaseKey) {
-  throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase server key missing.");
+  if (!rawSupabaseKey) {
+    return null;
+  }
+
+  return createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey), {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
 }
-
-const supabaseServer = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey), {
-  auth: { persistSession: false, autoRefreshToken: false },
-});
 
 export default async function handler(req: any, res: any) {
   // Handle preflight requests
@@ -55,6 +57,12 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
+    const supabaseServer = getSupabaseServer();
+    if (!supabaseServer) {
+      console.error("[razorpay-verify] Supabase server key is unavailable");
+      return res.status(503).json({ error: "Payment service is temporarily unavailable." });
+    }
+
     // ─── STEP 1: Verify HMAC-SHA256 Signature ────────────────────────────
     const razorpayKeySecret = cleanEnvValue(process.env.RAZORPAY_KEY_SECRET || '');
 
