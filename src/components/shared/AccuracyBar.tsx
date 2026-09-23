@@ -30,12 +30,12 @@ export function AccuracyBar({
   return (
     <div className={`space-y-1.5 ${className} font-sans`}>
       <div className="flex items-center justify-between text-xs">
-        <span className="text-stone-300 font-medium truncate max-w-[220px]" title={label}>
+        <span className="text-primary font-medium truncate max-w-[220px]" title={label}>
           {label}
         </span>
         <div className="flex items-center gap-2">
           {totalCount !== undefined && correctCount !== undefined && (
-            <span className="text-[10px] font-mono text-zinc-500">
+            <span className="text-[10px] font-mono text-muted">
               ({correctCount}/{totalCount})
             </span>
           )}
@@ -46,7 +46,7 @@ export function AccuracyBar({
       </div>
 
       {/* Progress Track */}
-      <div className="w-full h-2 bg-zinc-900 border border-zinc-800 rounded-sm overflow-hidden p-0.5">
+      <div className="w-full h-2 bg-surface-elevated border border-border rounded-sm overflow-hidden p-0.5">
         <motion.div
           initial={prefersReduced ? { width: `${clampedAccuracy}%` } : { width: 0 }}
           animate={{ width: `${clampedAccuracy}%` }}

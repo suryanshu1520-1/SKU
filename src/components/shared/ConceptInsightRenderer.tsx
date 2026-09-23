@@ -152,7 +152,7 @@ export const ConceptInsightRenderer: React.FC<ConceptInsightRendererProps> = ({
 
   if (!parsed.displayText && !parsed.structured) {
     return (
-      <div className="p-4 bg-zinc-950/60 border border-zinc-800 rounded-sm text-xs font-sans text-zinc-500 italic">
+      <div className="p-4 bg-surface/60 border border-border rounded-sm text-xs font-sans text-muted italic">
         No conceptual explanation available for this question.
       </div>
     );
@@ -174,7 +174,7 @@ export const ConceptInsightRenderer: React.FC<ConceptInsightRendererProps> = ({
 
         {/* Primary Conceptual Explanation */}
         {structured.conceptualExplanation && (
-          <div className="prose prose-invert prose-p:text-xs sm:prose-p:text-sm prose-p:leading-relaxed max-w-none text-zinc-200 font-serif">
+          <div className="prose prose-invert prose-p:text-xs sm:prose-p:text-sm prose-p:leading-relaxed max-w-none text-primary font-serif">
             <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
               {structured.conceptualExplanation}
             </Markdown>
@@ -188,7 +188,7 @@ export const ConceptInsightRenderer: React.FC<ConceptInsightRendererProps> = ({
               <AlertTriangle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
               <span>Examiner Trap & Cognitive Pitfall</span>
             </div>
-            <p className="m-0 text-stone-200 leading-relaxed text-xs sm:text-[13px]">
+            <p className="m-0 text-primary leading-relaxed text-xs sm:text-[13px]">
               {structured.examinerTrap}
             </p>
           </div>
@@ -201,7 +201,7 @@ export const ConceptInsightRenderer: React.FC<ConceptInsightRendererProps> = ({
               <Target className="w-3.5 h-3.5 text-[#0194a8] shrink-0" />
               <span>Elimination Angle & Heuristic</span>
             </div>
-            <p className="m-0 text-stone-200 leading-relaxed text-xs sm:text-[13px]">
+            <p className="m-0 text-primary leading-relaxed text-xs sm:text-[13px]">
               {structured.eliminationTip}
             </p>
           </div>
@@ -209,14 +209,14 @@ export const ConceptInsightRenderer: React.FC<ConceptInsightRendererProps> = ({
 
         {/* High-Yield Notes */}
         {structured.highYieldNotes && structured.highYieldNotes.length > 0 && (
-          <div className="p-3.5 rounded-sm bg-zinc-900/60 border border-zinc-800 space-y-2">
+          <div className="p-3.5 rounded-sm bg-surface-elevated/60 border border-border space-y-2">
             <div className="flex items-center gap-1.5 text-[10.5px] font-mono font-bold uppercase tracking-wider text-[#e0d0ab]">
               <Lightbulb className="w-3.5 h-3.5 text-[#e0d0ab] shrink-0" />
               <span>High-Yield Retention Notes</span>
             </div>
             <ul className="m-0 p-0 list-none space-y-1.5">
               {structured.highYieldNotes.map((note, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-xs text-stone-300 font-sans leading-relaxed">
+                <li key={idx} className="flex items-start gap-2 text-xs text-primary font-sans leading-relaxed">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#e0d0ab] shrink-0 mt-0.5 opacity-80" />
                   <span>{note}</span>
                 </li>
@@ -230,7 +230,7 @@ export const ConceptInsightRenderer: React.FC<ConceptInsightRendererProps> = ({
 
   // Standard Markdown rendering with GFM + Sanitize
   return (
-    <div className={`prose prose-invert prose-p:text-xs sm:prose-p:text-sm prose-p:leading-relaxed prose-li:text-xs sm:prose-li:text-sm prose-strong:text-[#e0d0ab] max-w-none text-zinc-200 font-serif leading-relaxed ${className}`}>
+    <div className={`prose prose-invert prose-p:text-xs sm:prose-p:text-sm prose-p:leading-relaxed prose-li:text-xs sm:prose-li:text-sm prose-strong:text-[#e0d0ab] max-w-none text-primary font-serif leading-relaxed ${className}`}>
       <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
         {displayText}
       </Markdown>

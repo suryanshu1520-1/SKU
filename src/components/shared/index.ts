@@ -5,3 +5,4 @@ export * from './Modal';
 export * from './EmptyState';
 export * from './SkeletonCard';
 export * from './ConceptInsightRenderer';
+export * from './MetricWithInterpretation';

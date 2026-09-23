@@ -150,7 +150,7 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row text-stone-100 font-sans relative overflow-hidden selection:bg-[#e0d0ab] selection:text-[#072e63]">
+    <div className="min-h-screen flex flex-col md:flex-row text-primary font-sans relative overflow-hidden selection:bg-[#e0d0ab] selection:text-[#072e63]">
       
       {/* Background Interactive Constellations */}
       <InteractiveBackground />

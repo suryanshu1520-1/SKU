@@ -375,7 +375,7 @@ function NodeLinkedPyqs({
 
   if (!detail || detail.loading) {
     return (
-      <div className="p-6 rounded-md bg-gradient-to-b from-zinc-900/90 to-zinc-950 border border-zinc-800 shadow-xl space-y-4 animate-pulse">
+      <div className="p-6 rounded-md bg-gradient-to-b from-surface-elevated/90 to-surface border border-border shadow-xl space-y-4 animate-pulse">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-4 h-4 rounded-full border-2 border-[#e0d0ab] border-t-transparent animate-spin" />
@@ -383,9 +383,9 @@ function NodeLinkedPyqs({
               Retrieving Official UPSC Questions for {nodeId}…
             </span>
           </div>
-          <span className="text-[10px] font-mono text-zinc-500">Querying 2000–2025 Bank</span>
+          <span className="text-[10px] font-mono text-muted">Querying 2000–2025 Bank</span>
         </div>
-        <div className="h-20 bg-zinc-900/60 rounded border border-zinc-800/60" />
+        <div className="h-20 bg-surface-elevated/60 rounded border border-border/60" />
       </div>
     );
   }
@@ -403,13 +403,13 @@ function NodeLinkedPyqs({
 
   if (totalCount === 0) {
     return (
-      <div className="p-6 rounded-md bg-gradient-to-b from-zinc-900/90 to-zinc-950 border border-zinc-800/90 shadow-2xl space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800/80">
+      <div className="p-6 rounded-md bg-gradient-to-b from-surface-elevated/90 to-surface border border-border/90 shadow-2xl space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/80">
           <div className="flex items-center gap-2.5">
             <span className="px-2.5 py-1 rounded bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 text-[#e0d0ab] font-mono text-xs font-bold">
               {nodeId}
             </span>
-            <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 font-mono text-[10px]">
+            <span className="px-2 py-0.5 rounded bg-surface-elevated text-primary font-mono text-[10px]">
               {nodePaper || 'GS Syllabus Core'}
             </span>
           </div>
@@ -418,29 +418,29 @@ function NodeLinkedPyqs({
           </span>
         </div>
 
-        <p className="text-xs text-zinc-300 leading-relaxed font-sans">
+        <p className="text-xs text-primary leading-relaxed font-sans">
           {nodeGloss || 'Core empirical syllabus node across UPSC examination cycles.'}
         </p>
 
-        <div className="p-4 rounded bg-zinc-900/40 border border-zinc-800/80 space-y-2.5">
+        <div className="p-4 rounded bg-surface-elevated/40 border border-border/80 space-y-2.5">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-secondary font-bold">
               Empirical Testing Vectors & Concept Blueprint
             </span>
             <span className="text-[10px] font-mono text-[#e0d0ab]">Active in 2000–2025 Corpus</span>
           </div>
-          <p className="text-xs text-zinc-400 leading-relaxed">
+          <p className="text-xs text-secondary leading-relaxed">
             This syllabus domain forms an anchor for recurrent conceptual traps, statutory frameworks, and application-oriented reasoning in both Prelims GS-1 and Mains GS papers.
           </p>
           <div className="pt-2 flex items-center justify-between">
-            <span className="text-[11px] font-mono text-zinc-500">Ready for targeted practice</span>
+            <span className="text-[11px] font-mono text-muted">Ready for targeted practice</span>
             {onLaunchPractice && (
               <button
                 onClick={() => {
                   if (onClose) onClose();
                   onLaunchPractice(nodeGloss || nodeId);
                 }}
-                className="px-3 py-1.5 rounded bg-[#e0d0ab] hover:bg-[#e0d0ab]/90 text-zinc-950 font-mono text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="px-3 py-1.5 rounded bg-[#e0d0ab] hover:bg-[#e0d0ab]/90 text-surface font-mono text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <Swords className="w-3.5 h-3.5" />
                 Launch Target Drill on this Concept
@@ -453,15 +453,15 @@ function NodeLinkedPyqs({
   }
 
   return (
-    <div className="p-5 sm:p-6 rounded-md bg-gradient-to-b from-zinc-900/95 via-zinc-950 to-black border border-zinc-800 shadow-2xl space-y-5">
+    <div className="p-5 sm:p-6 rounded-md bg-gradient-to-b from-surface-elevated/95 via-surface to-black border border-border shadow-2xl space-y-5">
       {/* Node Header & Historical Frequency Dossier */}
-      <div className="space-y-3 pb-4 border-b border-zinc-800/80">
+      <div className="space-y-3 pb-4 border-b border-border/80">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 flex-wrap">
             <span className="px-2.5 py-1 rounded bg-[#e0d0ab]/15 border border-[#e0d0ab]/30 text-[#e0d0ab] font-mono text-xs font-bold tracking-wide">
               {nodeId}
             </span>
-            <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 font-mono text-[10px]">
+            <span className="px-2 py-0.5 rounded bg-surface-elevated text-primary font-mono text-[10px]">
               {nodePaper || 'GS Core'}
             </span>
             <span className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold">
@@ -475,7 +475,7 @@ function NodeLinkedPyqs({
                 if (onClose) onClose();
                 onLaunchPractice(nodeGloss || nodeId);
               }}
-              className="px-3 py-1 rounded bg-[#e0d0ab] hover:bg-[#e0d0ab]/90 text-zinc-950 font-mono text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer self-start sm:self-auto"
+              className="px-3 py-1 rounded bg-[#e0d0ab] hover:bg-[#e0d0ab]/90 text-surface font-mono text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer self-start sm:self-auto"
             >
               <Swords className="w-3.5 h-3.5" />
               Drill this Concept
@@ -484,7 +484,7 @@ function NodeLinkedPyqs({
         </div>
 
         {nodeGloss && (
-          <p className="text-xs text-stone-300 leading-relaxed font-sans">
+          <p className="text-xs text-primary leading-relaxed font-sans">
             {nodeGloss}
           </p>
         )}
@@ -492,7 +492,7 @@ function NodeLinkedPyqs({
         {/* Historical Testing Timeline / Recurrence Chips */}
         {allYears.length > 0 && (
           <div className="flex items-center gap-2 flex-wrap pt-1">
-            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
+            <span className="text-[10px] font-mono text-muted uppercase tracking-wider">
               Recurrence Timeline:
             </span>
             <div className="flex items-center gap-1.5 flex-wrap">
@@ -500,8 +500,8 @@ function NodeLinkedPyqs({
                 onClick={() => setSelectedYear('all')}
                 className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors cursor-pointer ${
                   selectedYear === 'all'
-                    ? 'bg-[#e0d0ab] text-zinc-950 font-bold'
-                    : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-400 border border-zinc-800'
+                    ? 'bg-[#e0d0ab] text-surface font-bold'
+                    : 'bg-surface-elevated hover:bg-surface-elevated text-secondary border border-border'
                 }`}
               >
                 All ({totalCount})
@@ -512,8 +512,8 @@ function NodeLinkedPyqs({
                   onClick={() => setSelectedYear(yr)}
                   className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors cursor-pointer ${
                     selectedYear === yr
-                      ? 'bg-[#e0d0ab] text-zinc-950 font-bold'
-                      : 'bg-zinc-900 hover:bg-zinc-800 text-stone-300 border border-zinc-800'
+                      ? 'bg-[#e0d0ab] text-surface font-bold'
+                      : 'bg-surface-elevated hover:bg-surface-elevated text-primary border border-border'
                   }`}
                 >
                   {yr}
@@ -531,8 +531,8 @@ function NodeLinkedPyqs({
             onClick={() => setFilter('all')}
             className={`px-3 py-1 rounded text-xs font-mono transition-all cursor-pointer ${
               filter === 'all'
-                ? 'bg-zinc-800 text-[#e0d0ab] font-bold border border-zinc-700'
-                : 'text-zinc-400 hover:text-stone-200'
+                ? 'bg-surface-elevated text-[#e0d0ab] font-bold border border-border'
+                : 'text-secondary hover:text-primary'
             }`}
           >
             All Questions ({totalCount})
@@ -542,8 +542,8 @@ function NodeLinkedPyqs({
               onClick={() => setFilter('prelims')}
               className={`px-3 py-1 rounded text-xs font-mono transition-all cursor-pointer ${
                 filter === 'prelims'
-                  ? 'bg-zinc-800 text-[#e0d0ab] font-bold border border-zinc-700'
-                  : 'text-zinc-400 hover:text-stone-200'
+                  ? 'bg-surface-elevated text-[#e0d0ab] font-bold border border-border'
+                  : 'text-secondary hover:text-primary'
               }`}
             >
               Prelims MCQs ({prelimsList.length})
@@ -554,8 +554,8 @@ function NodeLinkedPyqs({
               onClick={() => setFilter('mains')}
               className={`px-3 py-1 rounded text-xs font-mono transition-all cursor-pointer ${
                 filter === 'mains'
-                  ? 'bg-zinc-800 text-[#0194a8] font-bold border border-zinc-700'
-                  : 'text-zinc-400 hover:text-stone-200'
+                  ? 'bg-surface-elevated text-[#0194a8] font-bold border border-border'
+                  : 'text-secondary hover:text-primary'
               }`}
             >
               Mains Analytical ({mainsList.length})
@@ -563,7 +563,7 @@ function NodeLinkedPyqs({
           )}
         </div>
 
-        <span className="text-[10px] font-mono text-zinc-500">
+        <span className="text-[10px] font-mono text-muted">
           Showing {filter === 'all' ? totalCount : filter === 'prelims' ? filteredPrelims.length : filteredMains.length} items
         </span>
       </div>
@@ -579,7 +579,7 @@ function NodeLinkedPyqs({
             return (
               <div
                 key={q.id}
-                className="p-4 sm:p-5 rounded bg-zinc-950/80 border border-zinc-800/90 space-y-3.5 shadow-md hover:border-zinc-700/80 transition-all font-sans"
+                className="p-4 sm:p-5 rounded bg-surface/80 border border-border/90 space-y-3.5 shadow-md hover:border-border/80 transition-all font-sans"
               >
                 {/* Prelims Header */}
                 <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -588,7 +588,7 @@ function NodeLinkedPyqs({
                       Prelims {q.year} · {q.paper || 'GS-1'}
                     </span>
                     {q.question_type && (
-                      <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-400 font-mono text-[10px] uppercase">
+                      <span className="px-2 py-0.5 rounded bg-surface-elevated border border-border text-secondary font-mono text-[10px] uppercase">
                         {q.question_type.replace(/_/g, ' ')}
                       </span>
                     )}
@@ -605,7 +605,7 @@ function NodeLinkedPyqs({
                 </div>
 
                 {/* Question Stem */}
-                <div className="text-stone-200 text-xs sm:text-[13px] leading-relaxed font-sans">
+                <div className="text-primary text-xs sm:text-[13px] leading-relaxed font-sans">
                   {q.stem}
                 </div>
 
@@ -620,14 +620,14 @@ function NodeLinkedPyqs({
                           className={`p-2.5 rounded border text-xs flex items-start gap-2.5 transition-all ${
                             isCorrect
                               ? 'bg-emerald-950/25 border-emerald-500/50 text-emerald-100 font-medium shadow-sm'
-                              : 'bg-zinc-900/40 border-zinc-800/80 text-zinc-300'
+                              : 'bg-surface-elevated/40 border-border/80 text-primary'
                           }`}
                         >
                           <span
                             className={`w-5 h-5 rounded flex items-center justify-center font-mono text-[11px] font-bold shrink-0 ${
                               isCorrect
-                                ? 'bg-emerald-500 text-zinc-950'
-                                : 'bg-zinc-800 text-zinc-400'
+                                ? 'bg-emerald-500 text-surface'
+                                : 'bg-surface-elevated text-secondary'
                             }`}
                           >
                             {optKey.toUpperCase()}
@@ -654,7 +654,7 @@ function NodeLinkedPyqs({
           filteredMains.map((m: any) => (
             <div
               key={m.id}
-              className="p-4 sm:p-5 rounded bg-zinc-950/80 border border-zinc-800/90 space-y-3.5 shadow-md hover:border-zinc-700/80 transition-all font-sans"
+              className="p-4 sm:p-5 rounded bg-surface/80 border border-border/90 space-y-3.5 shadow-md hover:border-border/80 transition-all font-sans"
             >
               {/* Mains Header */}
               <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -670,42 +670,42 @@ function NodeLinkedPyqs({
                 </div>
 
                 {m.nature && (
-                  <span className="text-[10px] font-mono text-zinc-500 uppercase">
+                  <span className="text-[10px] font-mono text-muted uppercase">
                     {m.nature.replace(/_/g, ' ')}
                   </span>
                 )}
               </div>
 
               {/* Prompt */}
-              <div className="text-stone-100 font-serif text-sm sm:text-base leading-relaxed font-bold">
+              <div className="text-primary font-serif text-sm sm:text-base leading-relaxed font-bold">
                 "{m.prompt}"
               </div>
 
               {/* 3-Level Cognitive Scoring Rubrics */}
               {(m.rubric_level_1 || m.rubric_level_2 || m.rubric_level_3) && (
-                <div className="space-y-2 pt-2 border-t border-zinc-800/60">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-bold block">
+                <div className="space-y-2 pt-2 border-t border-border/60">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-muted font-bold block">
                     Examiner Multi-Tier Scoring Rubric:
                   </span>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
                     {m.rubric_level_1 && (
-                      <div className="p-2.5 rounded bg-zinc-900/40 border border-red-900/30 space-y-1">
+                      <div className="p-2.5 rounded bg-surface-elevated/40 border border-red-900/30 space-y-1">
                         <span className="text-[10px] font-mono text-red-400 font-bold uppercase block">
                           Level 1 (0–3m): Superficial
                         </span>
-                        <p className="text-zinc-400 text-[11px] leading-relaxed">{m.rubric_level_1}</p>
+                        <p className="text-secondary text-[11px] leading-relaxed">{m.rubric_level_1}</p>
                       </div>
                     )}
                     {m.rubric_level_2 && (
-                      <div className="p-2.5 rounded bg-zinc-900/40 border border-amber-900/30 space-y-1">
+                      <div className="p-2.5 rounded bg-surface-elevated/40 border border-amber-900/30 space-y-1">
                         <span className="text-[10px] font-mono text-amber-400 font-bold uppercase block">
                           Level 2 (4–6m): Foundational
                         </span>
-                        <p className="text-zinc-300 text-[11px] leading-relaxed">{m.rubric_level_2}</p>
+                        <p className="text-primary text-[11px] leading-relaxed">{m.rubric_level_2}</p>
                       </div>
                     )}
                     {m.rubric_level_3 && (
-                      <div className="p-2.5 rounded bg-zinc-900/40 border border-emerald-900/40 space-y-1">
+                      <div className="p-2.5 rounded bg-surface-elevated/40 border border-emerald-900/40 space-y-1">
                         <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase block">
                           Level 3 (7–10m): High-Density Synthesis
                         </span>
@@ -783,10 +783,10 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
         initial={{ opacity: 0, scale: 0.96, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 10 }}
-        className="w-full max-w-6xl max-h-[90vh] bg-zinc-950 border border-zinc-800 rounded-sm shadow-2xl flex flex-col overflow-hidden text-stone-200 font-sans"
+        className="w-full max-w-6xl max-h-[90vh] bg-surface border border-border rounded-sm shadow-2xl flex flex-col overflow-hidden text-primary font-sans"
       >
         {/* Header Bar */}
-        <div className="px-6 py-5 border-b border-zinc-800 bg-gradient-to-r from-zinc-900/90 via-zinc-900/60 to-zinc-950 flex items-center justify-between shrink-0">
+        <div className="px-6 py-5 border-b border-border bg-gradient-to-r from-surface-elevated/90 via-surface-elevated/60 to-surface flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-sm bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 text-[#e0d0ab]">
               <Brain className="w-5 h-5" />
@@ -796,9 +796,9 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#e0d0ab]/15 text-[#e0d0ab] border border-[#e0d0ab]/30 uppercase tracking-wider">
                   TARK EMPIRICAL ENGINE v2.5
                 </span>
-                <span className="text-xs font-mono text-zinc-400">4,150+ Discrete Item Bank (2000–2025)</span>
+                <span className="text-xs font-mono text-secondary">4,150+ Discrete Item Bank (2000–2025)</span>
               </div>
-              <h2 className="text-xl md:text-2xl font-serif font-bold text-stone-100 tracking-tight mt-0.5">
+              <h2 className="text-xl md:text-2xl font-serif font-bold text-primary tracking-tight mt-0.5">
                 The Examiner's Psyche & Question Bank Intelligence
               </h2>
             </div>
@@ -806,20 +806,20 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
 
           <button
             onClick={onClose}
-            className="p-2 rounded-sm text-zinc-400 hover:text-stone-100 hover:bg-zinc-800/60 transition-colors cursor-pointer"
+            className="p-2 rounded-sm text-secondary hover:text-primary hover:bg-surface-elevated/60 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="px-6 py-2.5 bg-zinc-900/50 border-b border-zinc-800/80 flex items-center gap-2 overflow-x-auto shrink-0">
+        <div className="px-6 py-2.5 bg-surface-elevated/50 border-b border-border/80 flex items-center gap-2 overflow-x-auto shrink-0">
           <button
             onClick={() => setActiveTab('trends')}
             className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeTab === 'trends'
-                ? 'bg-[#e0d0ab] text-zinc-950 font-bold shadow-sm'
-                : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/50'
+                ? 'bg-[#e0d0ab] text-surface font-bold shadow-sm'
+                : 'text-secondary hover:text-primary hover:bg-surface-elevated/50'
             }`}
           >
             <Activity className="w-3.5 h-3.5" />
@@ -830,8 +830,8 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
             onClick={() => setActiveTab('pareto')}
             className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeTab === 'pareto'
-                ? 'bg-[#e0d0ab] text-zinc-950 font-bold shadow-sm'
-                : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/50'
+                ? 'bg-[#e0d0ab] text-surface font-bold shadow-sm'
+                : 'text-secondary hover:text-primary hover:bg-surface-elevated/50'
             }`}
           >
             <PieChart className="w-3.5 h-3.5" />
@@ -842,8 +842,8 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
             onClick={() => setActiveTab('qualifiers')}
             className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeTab === 'qualifiers'
-                ? 'bg-[#e0d0ab] text-zinc-950 font-bold shadow-sm'
-                : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/50'
+                ? 'bg-[#e0d0ab] text-surface font-bold shadow-sm'
+                : 'text-secondary hover:text-primary hover:bg-surface-elevated/50'
             }`}
           >
             <Crosshair className="w-3.5 h-3.5" />
@@ -854,8 +854,8 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
             onClick={() => setActiveTab('shifts')}
             className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeTab === 'shifts'
-                ? 'bg-[#e0d0ab] text-zinc-950 font-bold shadow-sm'
-                : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/50'
+                ? 'bg-[#e0d0ab] text-surface font-bold shadow-sm'
+                : 'text-secondary hover:text-primary hover:bg-surface-elevated/50'
             }`}
           >
             <TrendingUp className="w-3.5 h-3.5" />
@@ -866,8 +866,8 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
             onClick={() => setActiveTab('cicada')}
             className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeTab === 'cicada'
-                ? 'bg-[#e0d0ab] text-zinc-950 font-bold shadow-sm'
-                : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/50'
+                ? 'bg-[#e0d0ab] text-surface font-bold shadow-sm'
+                : 'text-secondary hover:text-primary hover:bg-surface-elevated/50'
             }`}
           >
             <Flame className="w-3.5 h-3.5" />
@@ -878,8 +878,8 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
             onClick={() => setActiveTab('csat')}
             className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeTab === 'csat'
-                ? 'bg-[#e0d0ab] text-zinc-950 font-bold shadow-sm'
-                : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/50'
+                ? 'bg-[#e0d0ab] text-surface font-bold shadow-sm'
+                : 'text-secondary hover:text-primary hover:bg-surface-elevated/50'
             }`}
           >
             <BookOpen className="w-3.5 h-3.5" />
@@ -890,8 +890,8 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
             onClick={() => setActiveTab('dialectics')}
             className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeTab === 'dialectics'
-                ? 'bg-[#e0d0ab] text-zinc-950 font-bold shadow-sm'
-                : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/50'
+                ? 'bg-[#e0d0ab] text-surface font-bold shadow-sm'
+                : 'text-secondary hover:text-primary hover:bg-surface-elevated/50'
             }`}
           >
             <Scale className="w-3.5 h-3.5" />
@@ -902,8 +902,8 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
             onClick={() => setActiveTab('directives')}
             className={`px-3.5 py-1.5 rounded-sm text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeTab === 'directives'
-                ? 'bg-[#e0d0ab] text-zinc-950 font-bold shadow-sm'
-                : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/50'
+                ? 'bg-[#e0d0ab] text-surface font-bold shadow-sm'
+                : 'text-secondary hover:text-primary hover:bg-surface-elevated/50'
             }`}
           >
             <Sliders className="w-3.5 h-3.5" />
@@ -918,40 +918,40 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
             <div className="space-y-6">
               {/* Census Bar */}
               <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
-                <div className="p-3.5 rounded bg-zinc-900/60 border border-zinc-800 space-y-1">
-                  <span className="text-[10px] font-mono text-zinc-400 uppercase font-bold">Total Prelims Bank</span>
+                <div className="p-3.5 rounded bg-surface-elevated/60 border border-border space-y-1">
+                  <span className="text-[10px] font-mono text-secondary uppercase font-bold">Total Prelims Bank</span>
                   <div className="text-xl font-mono font-black text-[#e0d0ab]">{data.bankTrends.census.totalPrelimsQuestions}</div>
-                  <span className="text-[9px] text-zinc-500 block">MCQs Ingested</span>
+                  <span className="text-[9px] text-muted block">MCQs Ingested</span>
                 </div>
 
-                <div className="p-3.5 rounded bg-zinc-900/60 border border-zinc-800 space-y-1">
-                  <span className="text-[10px] font-mono text-zinc-400 uppercase font-bold">UPSC CSE Items</span>
+                <div className="p-3.5 rounded bg-surface-elevated/60 border border-border space-y-1">
+                  <span className="text-[10px] font-mono text-secondary uppercase font-bold">UPSC CSE Items</span>
                   <div className="text-xl font-mono font-black text-emerald-400">{data.bankTrends.census.upscQuestionsCount}</div>
-                  <span className="text-[9px] text-zinc-500 block">Dedicated Track</span>
+                  <span className="text-[9px] text-muted block">Dedicated Track</span>
                 </div>
 
-                <div className="p-3.5 rounded bg-zinc-900/60 border border-zinc-800 space-y-1">
-                  <span className="text-[10px] font-mono text-zinc-400 uppercase font-bold">SSC CGL Items</span>
+                <div className="p-3.5 rounded bg-surface-elevated/60 border border-border space-y-1">
+                  <span className="text-[10px] font-mono text-secondary uppercase font-bold">SSC CGL Items</span>
                   <div className="text-xl font-mono font-black text-blue-400">{data.bankTrends.census.sscQuestionsCount}</div>
-                  <span className="text-[9px] text-zinc-500 block">Segregated Track</span>
+                  <span className="text-[9px] text-muted block">Segregated Track</span>
                 </div>
 
-                <div className="p-3.5 rounded bg-zinc-900/60 border border-zinc-800 space-y-1">
-                  <span className="text-[10px] font-mono text-zinc-400 uppercase font-bold">Mains Blueprints</span>
+                <div className="p-3.5 rounded bg-surface-elevated/60 border border-border space-y-1">
+                  <span className="text-[10px] font-mono text-secondary uppercase font-bold">Mains Blueprints</span>
                   <div className="text-xl font-mono font-black text-amber-400">{data.bankTrends.census.totalMainsQuestions}</div>
-                  <span className="text-[9px] text-zinc-500 block">3-Tier Rubrics</span>
+                  <span className="text-[9px] text-muted block">3-Tier Rubrics</span>
                 </div>
 
-                <div className="p-3.5 rounded bg-zinc-900/60 border border-zinc-800 space-y-1">
-                  <span className="text-[10px] font-mono text-zinc-400 uppercase font-bold">Syllabus Nodes</span>
-                  <div className="text-xl font-mono font-black text-stone-200">{data.bankTrends.census.totalSyllabusNodes}</div>
-                  <span className="text-[9px] text-zinc-500 block">Hierarchical Graph</span>
+                <div className="p-3.5 rounded bg-surface-elevated/60 border border-border space-y-1">
+                  <span className="text-[10px] font-mono text-secondary uppercase font-bold">Syllabus Nodes</span>
+                  <div className="text-xl font-mono font-black text-primary">{data.bankTrends.census.totalSyllabusNodes}</div>
+                  <span className="text-[9px] text-muted block">Hierarchical Graph</span>
                 </div>
 
-                <div className="p-3.5 rounded bg-zinc-900/60 border border-zinc-800 space-y-1">
-                  <span className="text-[10px] font-mono text-zinc-400 uppercase font-bold">Zero Null-Key</span>
+                <div className="p-3.5 rounded bg-surface-elevated/60 border border-border space-y-1">
+                  <span className="text-[10px] font-mono text-secondary uppercase font-bold">Zero Null-Key</span>
                   <div className="text-xl font-mono font-black text-emerald-400">100%</div>
-                  <span className="text-[9px] text-zinc-500 block">Relational Guardrail</span>
+                  <span className="text-[9px] text-muted block">Relational Guardrail</span>
                 </div>
               </div>
 
@@ -962,12 +962,12 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                     <BarChart3 className="w-4 h-4" />
                     Empirical Subject Distribution in Question Bank
                   </h4>
-                  <span className="text-[11px] font-mono text-zinc-400">Sorted by Weightage</span>
+                  <span className="text-[11px] font-mono text-secondary">Sorted by Weightage</span>
                 </div>
 
-                <div className="overflow-x-auto border border-zinc-800 rounded-sm bg-zinc-950/60">
+                <div className="overflow-x-auto border border-border rounded-sm bg-surface/60">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-zinc-900/80 border-b border-zinc-800 font-mono text-zinc-400">
+                    <thead className="bg-surface-elevated/80 border-b border-border font-mono text-secondary">
                       <tr>
                         <th className="p-3">Subject Domain</th>
                         <th className="p-3">Syllabus Pillar</th>
@@ -977,21 +977,21 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                         <th className="p-3 text-right">Arena Drill</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-zinc-800/60 font-sans">
+                    <tbody className="divide-y divide-border font-sans">
                       {data.bankTrends.subjectDistribution.map((sub: any, idx: number) => (
-                        <tr key={idx} className="hover:bg-zinc-900/40 transition-colors">
-                          <td className="p-3 font-medium text-stone-100">{sub.subject}</td>
+                        <tr key={idx} className="hover:bg-surface-elevated/40 transition-colors">
+                          <td className="p-3 font-medium text-primary">{sub.subject}</td>
                           <td className="p-3 font-mono text-[11px] text-[#e0d0ab]">{sub.pillar}</td>
-                          <td className="p-3 text-center font-mono font-bold text-stone-200">{sub.count}</td>
+                          <td className="p-3 text-center font-mono font-bold text-primary">{sub.count}</td>
                           <td className="p-3 text-center font-mono font-bold text-emerald-400">{sub.sharePct}%</td>
-                          <td className="p-3 text-zinc-400 text-[11px]">{sub.highYieldFocus}</td>
+                          <td className="p-3 text-secondary text-[11px]">{sub.highYieldFocus}</td>
                           <td className="p-3 text-right">
                             <button
                               onClick={() => {
                                 onClose();
                                 if (onLaunchPractice) onLaunchPractice(sub.subject);
                               }}
-                              className="px-2 py-1 rounded bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-[10px] font-mono text-[#e0d0ab] inline-flex items-center gap-1 transition-colors cursor-pointer"
+                              className="px-2 py-1 rounded bg-surface-elevated hover:bg-surface-elevated border border-border text-[10px] font-mono text-[#e0d0ab] inline-flex items-center gap-1 transition-colors cursor-pointer"
                             >
                               <Swords className="w-3 h-3" />
                               Drill
@@ -1005,30 +1005,30 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
               </div>
 
               {/* UPSC vs SSC CGL Comparative Architecture */}
-              <div className="space-y-3 pt-4 border-t border-zinc-800/80">
+              <div className="space-y-3 pt-4 border-t border-border/80">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-mono uppercase tracking-wider text-[#0194a8] font-bold flex items-center gap-2">
                     <Shield className="w-4 h-4" />
                     UPSC CSE vs SSC CGL Structural Architecture Matrix
                   </h4>
-                  <span className="text-[11px] font-mono text-zinc-400">Strictly Segregated in Tark Arena</span>
+                  <span className="text-[11px] font-mono text-secondary">Strictly Segregated in Tark Arena</span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {data.bankTrends.examTrackComparison.map((comp: any, idx: number) => (
-                    <div key={idx} className="p-4 rounded-sm bg-zinc-900/40 border border-zinc-800 space-y-2.5">
-                      <h5 className="font-serif font-bold text-stone-100 text-sm">{comp.feature}</h5>
+                    <div key={idx} className="p-4 rounded-sm bg-surface-elevated/40 border border-border space-y-2.5">
+                      <h5 className="font-serif font-bold text-primary text-sm">{comp.feature}</h5>
                       <div className="space-y-2 text-xs">
-                        <div className="p-2.5 rounded bg-zinc-950 border border-zinc-800/80">
+                        <div className="p-2.5 rounded bg-surface border border-border/80">
                           <span className="font-mono text-[10px] text-[#e0d0ab] font-bold uppercase block mb-0.5">UPSC CSE Track:</span>
-                          <p className="text-zinc-300">{comp.upscCseTrack}</p>
+                          <p className="text-primary">{comp.upscCseTrack}</p>
                         </div>
-                        <div className="p-2.5 rounded bg-zinc-950 border border-zinc-800/80">
+                        <div className="p-2.5 rounded bg-surface border border-border/80">
                           <span className="font-mono text-[10px] text-[#0194a8] font-bold uppercase block mb-0.5">SSC CGL Track:</span>
-                          <p className="text-zinc-300">{comp.sscCglTrack}</p>
+                          <p className="text-primary">{comp.sscCglTrack}</p>
                         </div>
                       </div>
-                      <p className="text-[11px] text-zinc-400 italic pt-1 border-t border-zinc-800/60">
+                      <p className="text-[11px] text-secondary italic pt-1 border-t border-border/60">
                         <strong>Takeaway:</strong> {comp.strategicTakeaway}
                       </p>
                     </div>
@@ -1047,12 +1047,12 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                     <Sparkles className="w-4 h-4" />
                     The 80/20 Law of UPSC Testing Weightage
                   </h3>
-                  <p className="text-xs text-zinc-400">
-                    Empirical analysis proves that <strong className="text-stone-200">{data.paretoDrought.summary.core80PctNodeCount} syllabus nodes</strong> account for over 85% of total Prelims questions and Mains marks across 2000–2025.
+                  <p className="text-xs text-secondary">
+                    Empirical analysis proves that <strong className="text-primary">{data.paretoDrought.summary.core80PctNodeCount} syllabus nodes</strong> account for over 85% of total Prelims questions and Mains marks across 2000–2025.
                   </p>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
-                  <span className="px-3 py-1.5 rounded bg-zinc-900 border border-zinc-800 text-[11px] font-mono text-zinc-300">
+                  <span className="px-3 py-1.5 rounded bg-surface-elevated border border-border text-[11px] font-mono text-primary">
                     Evaluated Nodes: <strong className="text-[#e0d0ab]">{data.paretoDrought.totalNodesEvaluated}</strong>
                   </span>
                 </div>
@@ -1060,13 +1060,13 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
 
               {/* Core Nodes Table */}
               <div className="space-y-3">
-                <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-bold flex items-center gap-2">
+                <h4 className="text-xs font-mono uppercase tracking-wider text-secondary font-bold flex items-center gap-2">
                   <Target className="w-3.5 h-3.5 text-[#e0d0ab]" />
                   High-Yield Pareto Core Syllabus Nodes
                 </h4>
-                <div className="overflow-x-auto border border-zinc-800 rounded-sm bg-zinc-950/60">
+                <div className="overflow-x-auto border border-border rounded-sm bg-surface/60">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-zinc-900/80 border-b border-zinc-800 font-mono text-zinc-400">
+                    <thead className="bg-surface-elevated/80 border-b border-border font-mono text-secondary">
                       <tr>
                         <th className="p-3">Node ID & Scope</th>
                         <th className="p-3">Paper</th>
@@ -1077,17 +1077,17 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                         <th className="p-3 text-right">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-zinc-800/60 font-sans">
+                    <tbody className="divide-y divide-border font-sans">
                       {data.paretoDrought.paretoCoreNodes.slice(0, 15).map((node: any, idx: number) => (
                         <React.Fragment key={idx}>
-                          <tr className="hover:bg-zinc-900/40 transition-colors">
+                          <tr className="hover:bg-surface-elevated/40 transition-colors">
                             <td className="p-3">
                               <div className="font-mono text-[#e0d0ab] font-bold text-[11px]">{node.nodeId}</div>
-                              <div className="text-zinc-400 text-[11px] line-clamp-1 mt-0.5">{node.gloss}</div>
+                              <div className="text-secondary text-[11px] line-clamp-1 mt-0.5">{node.gloss}</div>
                             </td>
-                            <td className="p-3 font-mono text-[11px] text-zinc-300">{node.paper}</td>
-                            <td className="p-3 text-center font-mono font-bold text-stone-200">{node.totalPrelims}</td>
-                            <td className="p-3 text-center font-mono text-zinc-400">{node.totalMains}</td>
+                            <td className="p-3 font-mono text-[11px] text-primary">{node.paper}</td>
+                            <td className="p-3 text-center font-mono font-bold text-primary">{node.totalPrelims}</td>
+                            <td className="p-3 text-center font-mono text-secondary">{node.totalMains}</td>
                             <td className="p-3 text-center font-mono text-[#e0d0ab] font-bold">{node.totalMarks}</td>
                             <td className="p-3 text-right font-mono text-emerald-400 font-bold">{node.cumulativeWeightPct}%</td>
                             <td className="p-3 text-right">
@@ -1096,8 +1096,8 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                                   onClick={() => toggleNodeLinks(node.nodeId)}
                                   className={`px-2 py-1 rounded border text-[10px] font-mono inline-flex items-center gap-1 transition-colors cursor-pointer ${
                                     expandedNodeId === node.nodeId
-                                      ? 'bg-[#e0d0ab] text-zinc-950 border-[#e0d0ab] font-bold'
-                                      : 'bg-zinc-900 hover:bg-zinc-800 border-zinc-700 text-[#e0d0ab]'
+                                      ? 'bg-[#e0d0ab] text-surface border-[#e0d0ab] font-bold'
+                                      : 'bg-surface-elevated hover:bg-surface-elevated border-border text-[#e0d0ab]'
                                   }`}
                                 >
                                   <Search className="w-3 h-3" />
@@ -1108,7 +1108,7 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                                     onClose();
                                     if (onLaunchPractice) onLaunchPractice(node.gloss);
                                   }}
-                                  className="px-2 py-1 rounded bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-[10px] font-mono text-[#e0d0ab] inline-flex items-center gap-1 transition-colors cursor-pointer"
+                                  className="px-2 py-1 rounded bg-surface-elevated hover:bg-surface-elevated border border-border text-[10px] font-mono text-[#e0d0ab] inline-flex items-center gap-1 transition-colors cursor-pointer"
                                 >
                                   <Swords className="w-3 h-3" />
                                   Drill
@@ -1118,7 +1118,7 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                           </tr>
                           {expandedNodeId === node.nodeId && (
                             <tr>
-                              <td colSpan={7} className="p-3 bg-zinc-950/60">
+                              <td colSpan={7} className="p-3 bg-surface/60">
                                 <NodeLinkedPyqs
                                   nodeId={node.nodeId}
                                   nodeGloss={node.gloss}
@@ -1138,29 +1138,29 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
               </div>
 
               {/* Drought Nodes Section */}
-              <div className="space-y-3 pt-4 border-t border-zinc-800/80">
+              <div className="space-y-3 pt-4 border-t border-border/80">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold flex items-center gap-2">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     Dormant Topic & Drought Radar (Surge Probability)
                   </h4>
-                  <span className="text-[11px] font-mono text-zinc-400">
+                  <span className="text-[11px] font-mono text-secondary">
                     {data.paretoDrought.droughtNodes.length} Dormant Nodes Detected
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {data.paretoDrought.droughtNodes.slice(0, 6).map((d: any, idx: number) => (
-                    <div key={idx} className="p-4 rounded-sm bg-zinc-900/40 border border-zinc-800 space-y-2.5">
+                    <div key={idx} className="p-4 rounded-sm bg-surface-elevated/40 border border-border space-y-2.5">
                       <div className="flex items-center justify-between">
                         <span className="font-mono text-[11px] font-bold text-amber-400">{d.nodeId}</span>
                         <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-400/10 text-amber-300 border border-amber-400/20">
                           Dormant: {d.yearsDormant} Years
                         </span>
                       </div>
-                      <p className="text-xs text-zinc-300 line-clamp-2">{d.gloss}</p>
-                      <div className="flex items-center justify-between pt-2 border-t border-zinc-800/60 text-[11px] font-mono">
-                        <span className="text-zinc-400">Surge Probability: <strong className="text-emerald-400">{d.droughtProbabilityScore}%</strong></span>
+                      <p className="text-xs text-primary line-clamp-2">{d.gloss}</p>
+                      <div className="flex items-center justify-between pt-2 border-t border-border/60 text-[11px] font-mono">
+                        <span className="text-secondary">Surge Probability: <strong className="text-emerald-400">{d.droughtProbabilityScore}%</strong></span>
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => toggleNodeLinks(d.nodeId)}
@@ -1174,7 +1174,7 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                               onClose();
                               if (onLaunchPractice) onLaunchPractice(d.gloss);
                             }}
-                            className="text-stone-300 hover:text-white flex items-center gap-1 cursor-pointer text-[10px] font-mono"
+                            className="text-primary hover:text-white flex items-center gap-1 cursor-pointer text-[10px] font-mono"
                           >
                             Practice <ChevronRight className="w-3 h-3" />
                           </button>
@@ -1202,12 +1202,12 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
           {/* TAB 2: QUALIFIER TRAP CORRELATION */}
           {activeTab === 'qualifiers' && data?.qualifiers && (
             <div className="space-y-6">
-              <div className="p-5 rounded-sm bg-zinc-900/50 border border-zinc-800 space-y-2">
+              <div className="p-5 rounded-sm bg-surface-elevated/50 border border-border space-y-2">
                 <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
                   <Crosshair className="w-4 h-4" />
                   Examiner Qualifier Linguistics & Trap Mechanics
                 </h3>
-                <p className="text-xs text-zinc-300 leading-relaxed">
+                <p className="text-xs text-primary leading-relaxed">
                   Statistical correlation of linguistic qualifiers in UPSC Prelims question statements (2000–2025) reveals stark deterministic polarity: extreme qualifiers exhibit a <strong className="text-red-400 font-mono">86.4% historical falsehood rate</strong>, while contingent qualifiers hold a <strong className="text-emerald-400 font-mono">79.8% truth rate</strong>.
                 </p>
               </div>
@@ -1219,9 +1219,9 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                     <AlertTriangle className="w-3.5 h-3.5" />
                     Extreme Qualifiers (High Falsehood Risk)
                   </h4>
-                  <div className="overflow-x-auto border border-zinc-800 rounded-sm bg-zinc-950/60">
+                  <div className="overflow-x-auto border border-border rounded-sm bg-surface/60">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-zinc-900/80 border-b border-zinc-800 font-mono text-zinc-400">
+                      <thead className="bg-surface-elevated/80 border-b border-border font-mono text-secondary">
                         <tr>
                           <th className="p-3">Qualifier Token</th>
                           <th className="p-3 text-center">Historical Sample</th>
@@ -1229,11 +1229,11 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                           <th className="p-3 text-right">Trap Rating</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-zinc-800/60 font-sans">
+                      <tbody className="divide-y divide-border font-sans">
                         {data.qualifiers.extremeQualifiers.map((q: any, idx: number) => (
-                          <tr key={idx} className="hover:bg-zinc-900/40">
+                          <tr key={idx} className="hover:bg-surface-elevated/40">
                             <td className="p-3 font-mono font-bold text-red-400">"{q.token}"</td>
-                            <td className="p-3 text-center font-mono text-zinc-400">{q.sampleSize}</td>
+                            <td className="p-3 text-center font-mono text-secondary">{q.sampleSize}</td>
                             <td className="p-3 text-center font-mono font-bold text-red-300">{q.falseStatementPct}%</td>
                             <td className="p-3 text-right font-mono text-[10px] text-red-400 uppercase font-bold">
                               {q.examinerTrapIndex.replace('_', ' ')}
@@ -1251,9 +1251,9 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     Contingent Qualifiers (High Truth Reliability)
                   </h4>
-                  <div className="overflow-x-auto border border-zinc-800 rounded-sm bg-zinc-950/60">
+                  <div className="overflow-x-auto border border-border rounded-sm bg-surface/60">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-zinc-900/80 border-b border-zinc-800 font-mono text-zinc-400">
+                      <thead className="bg-surface-elevated/80 border-b border-border font-mono text-secondary">
                         <tr>
                           <th className="p-3">Qualifier Token</th>
                           <th className="p-3 text-center">Historical Sample</th>
@@ -1261,11 +1261,11 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                           <th className="p-3 text-right">Reliability</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-zinc-800/60 font-sans">
+                      <tbody className="divide-y divide-border font-sans">
                         {data.qualifiers.contingentQualifiers.map((q: any, idx: number) => (
-                          <tr key={idx} className="hover:bg-zinc-900/40">
+                          <tr key={idx} className="hover:bg-surface-elevated/40">
                             <td className="p-3 font-mono font-bold text-emerald-400">"{q.token}"</td>
-                            <td className="p-3 text-center font-mono text-zinc-400">{q.sampleSize}</td>
+                            <td className="p-3 text-center font-mono text-secondary">{q.sampleSize}</td>
                             <td className="p-3 text-center font-mono font-bold text-emerald-300">{q.trueStatementPct}%</td>
                             <td className="p-3 text-right font-mono text-[10px] text-emerald-400 uppercase font-bold">
                               {q.reliabilityScore.replace('_', ' ')}
@@ -1289,43 +1289,43 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
           {/* TAB 3: FORMAT SHIFT CHRONOLOGY */}
           {activeTab === 'shifts' && data?.formatShifts && (
             <div className="space-y-6">
-              <div className="p-5 rounded-sm bg-zinc-900/50 border border-zinc-800 space-y-1">
+              <div className="p-5 rounded-sm bg-surface-elevated/50 border border-border space-y-1">
                 <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
                   <TrendingUp className="w-4 h-4" />
                   Quarter-Century Exam Format Evolutionary Vector (2000–2025)
                 </h3>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-secondary">
                   Tracking how the Union Public Service Commission systematically restructured testing mechanics to penalize rote tutoring and test genuine administrative reasoning.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {data.formatShifts.map((shift: any, idx: number) => (
-                  <div key={idx} className="p-5 rounded-sm bg-zinc-900/40 border border-zinc-800 space-y-4">
-                    <div className="flex items-center justify-between border-b border-zinc-800 pb-2.5">
-                      <span className="font-serif font-bold text-stone-100 text-sm">{shift.era}</span>
+                  <div key={idx} className="p-5 rounded-sm bg-surface-elevated/40 border border-border space-y-4">
+                    <div className="flex items-center justify-between border-b border-border pb-2.5">
+                      <span className="font-serif font-bold text-primary text-sm">{shift.era}</span>
                       <span className="font-mono text-[11px] font-bold text-[#e0d0ab] px-2 py-0.5 rounded bg-[#e0d0ab]/10 border border-[#e0d0ab]/20">
                         {shift.yearSpan}
                       </span>
                     </div>
 
                     <div className="space-y-1">
-                      <span className="text-[10px] font-mono text-zinc-400 uppercase font-bold">Structural Pivot:</span>
-                      <p className="text-xs text-zinc-200 leading-relaxed font-serif italic">{shift.structuralPivot}</p>
+                      <span className="text-[10px] font-mono text-secondary uppercase font-bold">Structural Pivot:</span>
+                      <p className="text-xs text-primary leading-relaxed font-serif italic">{shift.structuralPivot}</p>
                     </div>
 
                     {/* Prelims Format Breakdown */}
-                    <div className="space-y-1.5 pt-2 border-t border-zinc-800/60">
-                      <span className="text-[10px] font-mono text-zinc-400 uppercase font-bold">Prelims Format Mix:</span>
+                    <div className="space-y-1.5 pt-2 border-t border-border/60">
+                      <span className="text-[10px] font-mono text-secondary uppercase font-bold">Prelims Format Mix:</span>
                       <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
-                        <span className="text-zinc-400">Single Choice: <strong className="text-stone-200">{shift.prelimsFormatDistribution.singleChoicePct}%</strong></span>
-                        <span className="text-zinc-400">Multi-Statement: <strong className="text-stone-200">{shift.prelimsFormatDistribution.multiStatementPct}%</strong></span>
-                        <span className="text-zinc-400">Pair Matching: <strong className="text-stone-200">{shift.prelimsFormatDistribution.pairMatchingPct}%</strong></span>
-                        <span className="text-zinc-400">Assertion-Reason: <strong className="text-stone-200">{shift.prelimsFormatDistribution.assertionReasonPct}%</strong></span>
+                        <span className="text-secondary">Single Choice: <strong className="text-primary">{shift.prelimsFormatDistribution.singleChoicePct}%</strong></span>
+                        <span className="text-secondary">Multi-Statement: <strong className="text-primary">{shift.prelimsFormatDistribution.multiStatementPct}%</strong></span>
+                        <span className="text-secondary">Pair Matching: <strong className="text-primary">{shift.prelimsFormatDistribution.pairMatchingPct}%</strong></span>
+                        <span className="text-secondary">Assertion-Reason: <strong className="text-primary">{shift.prelimsFormatDistribution.assertionReasonPct}%</strong></span>
                       </div>
                     </div>
 
-                    <div className="p-3 rounded bg-zinc-950/80 border border-zinc-800 text-xs text-zinc-300 leading-relaxed">
+                    <div className="p-3 rounded bg-surface/80 border border-border text-xs text-primary leading-relaxed">
                       <strong className="text-[#e0d0ab] font-mono text-[10px] uppercase block mb-1">Core Takeaway:</strong>
                       {shift.pedagogicalTakeaway}
                     </div>
@@ -1338,45 +1338,45 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
           {/* TAB: CICADA 2-YEAR HARMONIC CYCLES */}
           {activeTab === 'cicada' && data?.cicadaTopics && (
             <div className="space-y-6">
-              <div className="p-5 rounded-sm bg-zinc-900/50 border border-zinc-800 space-y-1">
+              <div className="p-5 rounded-sm bg-surface-elevated/50 border border-border space-y-1">
                 <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
                   <Flame className="w-4 h-4 text-amber-400" />
                   Cicada Topics: 1.8–2.5 Year Mathematical Recurrence Waves
                 </h3>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-secondary">
                   UPSC's testing board operates on periodic cyclical rotations where specific statutory boundaries and scientific mechanisms reappear every alternate year.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {data.cicadaTopics.map((c: any, idx: number) => (
-                  <div key={idx} className="p-5 rounded-sm bg-zinc-900/40 border border-zinc-800 space-y-3">
-                    <div className="flex items-start justify-between gap-2 border-b border-zinc-800 pb-2.5">
+                  <div key={idx} className="p-5 rounded-sm bg-surface-elevated/40 border border-border space-y-3">
+                    <div className="flex items-start justify-between gap-2 border-b border-border pb-2.5">
                       <div>
                         <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30">
                           {c.pillar} • Harmonic Cycle: {c.harmonicCycleYears}
                         </span>
-                        <h4 className="font-serif font-bold text-stone-100 text-sm mt-1.5">{c.topic}</h4>
+                        <h4 className="font-serif font-bold text-primary text-sm mt-1.5">{c.topic}</h4>
                       </div>
                       <div className="text-right">
                         <span className="text-xs font-mono font-black text-emerald-400">{c.recurrenceScore}%</span>
-                        <span className="text-[9px] text-zinc-500 block">Cycle Fidelity</span>
+                        <span className="text-[9px] text-muted block">Cycle Fidelity</span>
                       </div>
                     </div>
 
-                    <p className="text-xs text-zinc-300 leading-relaxed font-sans">{c.coreInsight}</p>
+                    <p className="text-xs text-primary leading-relaxed font-sans">{c.coreInsight}</p>
 
-                    <div className="pt-2 border-t border-zinc-800/60 flex items-center justify-between text-[11px] font-mono text-zinc-400">
+                    <div className="pt-2 border-t border-border/60 flex items-center justify-between text-[11px] font-mono text-secondary">
                       <span>Tested Years:</span>
-                      <strong className="text-stone-200">{(c.historicalTestYears || []).join(', ')}</strong>
+                      <strong className="text-primary">{(c.historicalTestYears || []).join(', ')}</strong>
                     </div>
 
                     <button
                       onClick={() => toggleNodeLinks(c.nodeId)}
                       className={`w-full px-2.5 py-1.5 rounded border text-[10px] font-mono inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
                         expandedNodeId === c.nodeId
-                          ? 'bg-[#e0d0ab] text-zinc-950 border-[#e0d0ab] font-bold'
-                          : 'bg-zinc-950/60 hover:bg-zinc-900 border-zinc-800 text-[#e0d0ab]'
+                          ? 'bg-[#e0d0ab] text-surface border-[#e0d0ab] font-bold'
+                          : 'bg-surface/60 hover:bg-surface-elevated border-border text-[#e0d0ab]'
                       }`}
                     >
                       <Search className="w-3 h-3" />
@@ -1392,46 +1392,46 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
           {/* TAB: CSAT PAPER-2 EMPIRICAL ANATOMY */}
           {activeTab === 'csat' && data?.csatAnatomy && (
             <div className="space-y-6">
-              <div className="p-5 rounded-sm bg-zinc-900/50 border border-zinc-800 space-y-1">
+              <div className="p-5 rounded-sm bg-surface-elevated/50 border border-border space-y-1">
                 <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-blue-400" />
                   CSAT Paper-2: 15-Year Empirical Anatomy (2011–2025)
                 </h3>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-secondary">
                   Comprehensive breakdown of 600+ CSAT questions across Reading Comprehension, Quantitative Aptitude, and Logical Reasoning.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-5 rounded-sm bg-zinc-900/40 border border-zinc-800 space-y-3">
-                  <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
-                    <h4 className="font-serif font-bold text-stone-100 text-sm">Reading Comprehension</h4>
+                <div className="p-5 rounded-sm bg-surface-elevated/40 border border-border space-y-3">
+                  <div className="flex items-center justify-between border-b border-border pb-2">
+                    <h4 className="font-serif font-bold text-primary text-sm">Reading Comprehension</h4>
                     <span className="text-xs font-mono font-bold text-blue-400">{data.csatAnatomy.readingComprehension.sharePct}%</span>
                   </div>
-                  <div className="space-y-2 text-xs text-zinc-300">
+                  <div className="space-y-2 text-xs text-primary">
                     <p><strong>Avg Length:</strong> {data.csatAnatomy.readingComprehension.averagePassageWordLength} words</p>
                     <p><strong>Dominant Focus:</strong> {data.csatAnatomy.readingComprehension.dominantQuestionType}</p>
                     <p className="text-red-300/90 text-[11px] pt-1"><strong>Examiner Trap:</strong> {data.csatAnatomy.readingComprehension.examinerTrapProfile}</p>
                   </div>
                 </div>
 
-                <div className="p-5 rounded-sm bg-zinc-900/40 border border-zinc-800 space-y-3">
-                  <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
-                    <h4 className="font-serif font-bold text-stone-100 text-sm">Quantitative Aptitude</h4>
+                <div className="p-5 rounded-sm bg-surface-elevated/40 border border-border space-y-3">
+                  <div className="flex items-center justify-between border-b border-border pb-2">
+                    <h4 className="font-serif font-bold text-primary text-sm">Quantitative Aptitude</h4>
                     <span className="text-xs font-mono font-bold text-amber-400">{data.csatAnatomy.quantitativeAptitude.sharePct}%</span>
                   </div>
-                  <div className="space-y-2 text-xs text-zinc-300">
+                  <div className="space-y-2 text-xs text-primary">
                     <p><strong>Core Focus:</strong> {data.csatAnatomy.quantitativeAptitude.coreFocusAreas}</p>
                     <p className="text-amber-300/90 text-[11px] pt-1"><strong>Pacing Profile:</strong> {data.csatAnatomy.quantitativeAptitude.pacingProfile}</p>
                   </div>
                 </div>
 
-                <div className="p-5 rounded-sm bg-zinc-900/40 border border-zinc-800 space-y-3">
-                  <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
-                    <h4 className="font-serif font-bold text-stone-100 text-sm">Logical Reasoning</h4>
+                <div className="p-5 rounded-sm bg-surface-elevated/40 border border-border space-y-3">
+                  <div className="flex items-center justify-between border-b border-border pb-2">
+                    <h4 className="font-serif font-bold text-primary text-sm">Logical Reasoning</h4>
                     <span className="text-xs font-mono font-bold text-emerald-400">{data.csatAnatomy.logicalReasoning.sharePct}%</span>
                   </div>
-                  <div className="space-y-2 text-xs text-zinc-300">
+                  <div className="space-y-2 text-xs text-primary">
                     <p><strong>Core Focus:</strong> {data.csatAnatomy.logicalReasoning.coreFocusAreas}</p>
                     <p className="text-emerald-300/90 text-[11px] pt-1"><strong>Pacing Profile:</strong> {data.csatAnatomy.logicalReasoning.pacingProfile}</p>
                   </div>
@@ -1443,24 +1443,24 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
           {/* TAB 4: GS-4 & ESSAY DIALECTICAL AXES */}
           {activeTab === 'dialectics' && data?.dialecticalAxes && (
             <div className="space-y-6">
-              <div className="p-5 rounded-sm bg-zinc-900/50 border border-zinc-800 space-y-1">
+              <div className="p-5 rounded-sm bg-surface-elevated/50 border border-border space-y-1">
                 <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
                   <Scale className="w-4 h-4" />
                   The 4 Fundamental Dialectical Axes of GS-4 & Essay Papers
                 </h3>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-secondary">
                   UPSC Mains GS-4 Section A and Essay prompts deliberately position candidates in the tension between competing philosophical virtues.
                 </p>
               </div>
 
               <div className="space-y-4">
                 {data.dialecticalAxes.map((axis: any, idx: number) => (
-                  <div key={idx} className="p-5 rounded-sm bg-zinc-900/40 border border-zinc-800 space-y-3">
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 pb-2.5">
-                      <h4 className="font-serif font-bold text-stone-100 text-base">{axis.title}</h4>
+                  <div key={idx} className="p-5 rounded-sm bg-surface-elevated/40 border border-border space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-2.5">
+                      <h4 className="font-serif font-bold text-primary text-base">{axis.title}</h4>
                       <div className="flex gap-1.5">
                         {axis.recurrentPapers.map((p: string, pIdx: number) => (
-                          <span key={pIdx} className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-zinc-900 border border-zinc-700 text-[#e0d0ab]">
+                          <span key={pIdx} className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-surface-elevated border border-border text-[#e0d0ab]">
                             {p}
                           </span>
                         ))}
@@ -1468,13 +1468,13 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed">
-                      <div className="p-3.5 rounded bg-zinc-950/70 border border-zinc-800/80 space-y-1">
+                      <div className="p-3.5 rounded bg-surface/70 border border-border/80 space-y-1">
                         <span className="font-mono text-[10px] font-bold text-blue-400 uppercase">Thesis (Perspective A):</span>
-                        <p className="text-zinc-300">{axis.thesis}</p>
+                        <p className="text-primary">{axis.thesis}</p>
                       </div>
-                      <div className="p-3.5 rounded bg-zinc-950/70 border border-zinc-800/80 space-y-1">
+                      <div className="p-3.5 rounded bg-surface/70 border border-border/80 space-y-1">
                         <span className="font-mono text-[10px] font-bold text-amber-400 uppercase">Antithesis (Perspective B):</span>
-                        <p className="text-zinc-300">{axis.antithesis}</p>
+                        <p className="text-primary">{axis.antithesis}</p>
                       </div>
                     </div>
 
@@ -1483,7 +1483,7 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                         <Sparkles className="w-3.5 h-3.5" />
                         Examiner Expected Synthesis Framework:
                       </span>
-                      <p className="text-xs text-stone-200 leading-relaxed font-sans">{axis.synthesisFramework}</p>
+                      <p className="text-xs text-primary leading-relaxed font-sans">{axis.synthesisFramework}</p>
                     </div>
                   </div>
                 ))}
@@ -1494,35 +1494,35 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
           {/* TAB 5: DIRECTIVE VERB SCORING MATRIX */}
           {activeTab === 'directives' && data?.directiveRubrics && (
             <div className="space-y-6">
-              <div className="p-5 rounded-sm bg-zinc-900/50 border border-zinc-800 space-y-1">
+              <div className="p-5 rounded-sm bg-surface-elevated/50 border border-border space-y-1">
                 <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
                   <Sliders className="w-4 h-4" />
                   Directive Verb Cognitive Rubrics & Mark Allocation Blueprints
                 </h3>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-secondary">
                   UPSC examiners evaluate candidate responses against pre-defined cognitive depth tiers corresponding to the command directive.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {data.directiveRubrics.map((r: any, idx: number) => (
-                  <div key={idx} className="p-5 rounded-sm bg-zinc-900/40 border border-zinc-800 space-y-4">
-                    <div className="flex items-center justify-between border-b border-zinc-800 pb-2.5">
+                  <div key={idx} className="p-5 rounded-sm bg-surface-elevated/40 border border-border space-y-4">
+                    <div className="flex items-center justify-between border-b border-border pb-2.5">
                       <span className="font-serif font-bold text-lg text-[#e0d0ab]">"{r.directive}"</span>
-                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-zinc-900 border border-zinc-700 text-zinc-300">
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-surface-elevated border border-border text-primary">
                         {r.cognitiveDepth}
                       </span>
                     </div>
 
-                    <p className="text-xs text-zinc-300 leading-relaxed">{r.coreIntent}</p>
+                    <p className="text-xs text-primary leading-relaxed">{r.coreIntent}</p>
 
                     {/* Expected Dimensions */}
-                    <div className="space-y-1.5 pt-2 border-t border-zinc-800/60">
-                      <span className="text-[10px] font-mono text-zinc-400 uppercase font-bold">Mark Allocation Blueprint:</span>
+                    <div className="space-y-1.5 pt-2 border-t border-border/60">
+                      <span className="text-[10px] font-mono text-secondary uppercase font-bold">Mark Allocation Blueprint:</span>
                       <div className="space-y-1">
                         {r.markAllocationBlueprint.map((comp: any, cIdx: number) => (
                           <div key={cIdx} className="flex items-center justify-between text-xs font-mono">
-                            <span className="text-zinc-400">{comp.component}</span>
+                            <span className="text-secondary">{comp.component}</span>
                             <strong className="text-[#e0d0ab]">{comp.weightPct}%</strong>
                           </div>
                         ))}
@@ -1541,11 +1541,11 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
         </div>
 
         {/* Footer Bar */}
-        <div className="px-6 py-4 bg-zinc-900 border-t border-zinc-800 flex items-center justify-between text-xs font-mono text-zinc-400 shrink-0">
+        <div className="px-6 py-4 bg-surface-elevated border-t border-border flex items-center justify-between text-xs font-mono text-secondary shrink-0">
           <span>Tark Intelligence Engine • Official UPSC Historical Grounding</span>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-stone-200 rounded-sm font-sans text-xs font-bold transition-colors cursor-pointer"
+            className="px-4 py-2 bg-surface-elevated hover:bg-surface-elevated text-primary rounded-sm font-sans text-xs font-bold transition-colors cursor-pointer"
           >
             Close Dossier
           </button>

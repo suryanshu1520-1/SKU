@@ -170,7 +170,7 @@ export function SourceAnchor({ claim }: { claim: VerifiedClaim }) {
                         }
                   }
                 >
-                  <div className="rounded-xs border border-[rgba(224,208,171,0.45)] bg-[rgba(4,25,54,0.96)] backdrop-blur-xl p-3.5 shadow-[0_20px_50px_rgba(0,0,0,0.85)] font-sans text-stone-100">
+                  <div className="rounded-xs border border-[rgba(224,208,171,0.45)] bg-[rgba(4,25,54,0.96)] backdrop-blur-xl p-3.5 shadow-[0_20px_50px_rgba(0,0,0,0.85)] font-sans text-primary">
                     {/* Header */}
                     <div className="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-[rgba(19,108,153,0.35)]">
                       <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-[#e0d0ab]">
@@ -319,7 +319,7 @@ export function ContestedCard({ contested }: { contested?: ContestedClaim }) {
   const [sideA, sideB] = contested.sides;
 
   return (
-    <div className="my-3 rounded-sm border border-amber-500/40 bg-gradient-to-br from-amber-950/20 via-zinc-950/80 to-zinc-950 p-3.5 shadow-lg">
+    <div className="my-3 rounded-sm border border-amber-500/40 bg-gradient-to-br from-amber-950/20 via-surface/80 to-surface p-3.5 shadow-lg">
       {/* Header */}
       <div className="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-amber-500/20">
         <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-amber-300">
@@ -336,25 +336,25 @@ export function ContestedCard({ contested }: { contested?: ContestedClaim }) {
       {/* Two Column Disagreement Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2.5">
         {/* Side A */}
-        <div className="rounded-sm bg-zinc-900/80 border border-zinc-800 p-2.5 flex flex-col justify-between">
+        <div className="rounded-sm bg-surface-elevated/80 border border-border p-2.5 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[10px] font-bold uppercase text-[#e0d0ab]">{sideA.source}</span>
-              <span className="text-xs font-mono font-bold text-white px-1.5 py-0.5 bg-zinc-800 rounded">
+              <span className="text-xs font-mono font-bold text-white px-1.5 py-0.5 bg-surface-elevated rounded">
                 {sideA.value}
               </span>
             </div>
-            <p className="text-[11px] font-serif italic text-zinc-300 leading-snug line-clamp-3">
+            <p className="text-[11px] font-serif italic text-primary leading-snug line-clamp-3">
               &ldquo;{sideA.quote}&rdquo;
             </p>
           </div>
           {sideA.url && (
-            <div className="mt-2 pt-1 border-t border-zinc-800 flex justify-end">
+            <div className="mt-2 pt-1 border-t border-border flex justify-end">
               <a
                 href={sideA.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[9px] font-mono text-zinc-400 hover:text-[#e0d0ab]"
+                className="inline-flex items-center gap-1 text-[9px] font-mono text-secondary hover:text-[#e0d0ab]"
               >
                 <span>Verify Source</span>
                 <ExternalLink className="w-2.5 h-2.5" />
@@ -364,25 +364,25 @@ export function ContestedCard({ contested }: { contested?: ContestedClaim }) {
         </div>
 
         {/* Side B */}
-        <div className="rounded-sm bg-zinc-900/80 border border-zinc-800 p-2.5 flex flex-col justify-between">
+        <div className="rounded-sm bg-surface-elevated/80 border border-border p-2.5 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[10px] font-bold uppercase text-[#e0d0ab]">{sideB.source}</span>
-              <span className="text-xs font-mono font-bold text-white px-1.5 py-0.5 bg-zinc-800 rounded">
+              <span className="text-xs font-mono font-bold text-white px-1.5 py-0.5 bg-surface-elevated rounded">
                 {sideB.value}
               </span>
             </div>
-            <p className="text-[11px] font-serif italic text-zinc-300 leading-snug line-clamp-3">
+            <p className="text-[11px] font-serif italic text-primary leading-snug line-clamp-3">
               &ldquo;{sideB.quote}&rdquo;
             </p>
           </div>
           {sideB.url && (
-            <div className="mt-2 pt-1 border-t border-zinc-800 flex justify-end">
+            <div className="mt-2 pt-1 border-t border-border flex justify-end">
               <a
                 href={sideB.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[9px] font-mono text-zinc-400 hover:text-[#e0d0ab]"
+                className="inline-flex items-center gap-1 text-[9px] font-mono text-secondary hover:text-[#e0d0ab]"
               >
                 <span>Verify Source</span>
                 <ExternalLink className="w-2.5 h-2.5" />
@@ -393,7 +393,7 @@ export function ContestedCard({ contested }: { contested?: ContestedClaim }) {
       </div>
 
       {/* Analytical Note */}
-      <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
+      <div className="flex items-center gap-1.5 text-[10px] text-secondary">
         <AlertTriangle className="w-3 h-3 text-amber-400 shrink-0" />
         <span>UPSC Strategy: When sources differ, cite the primary government figure with secondary wire context.</span>
       </div>

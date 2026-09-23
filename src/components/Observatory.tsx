@@ -759,7 +759,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
   ];
 
   return (
-    <div className="min-h-screen bg-[#041936] text-stone-100 font-sans relative overflow-x-hidden selection:bg-[#e0d0ab] selection:text-[#041936] pb-24">
+    <div className="min-h-screen bg-[#041936] text-primary font-sans relative overflow-x-hidden selection:bg-[#e0d0ab] selection:text-[#041936] pb-24">
       {/* Subtle ambient lighting */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(1,148,168,0.12),transparent)] pointer-events-none z-0" />
 
@@ -1090,7 +1090,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                             {q?.cognitiveType || 'Prelims MCQ'}
                           </span>
                           {isPlaceholder && (
-                            <span className="px-2 py-0.5 rounded-sm bg-zinc-800 text-zinc-400 border border-zinc-700 flex items-center gap-1 text-[11px]">
+                            <span className="px-2 py-0.5 rounded-sm bg-surface-elevated text-secondary border border-border flex items-center gap-1 text-[11px]">
                               <Archive className="w-3 h-3" /> Historical Reference Only
                             </span>
                           )}
@@ -1149,7 +1149,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                                 optionStyle =
                                   'bg-red-950/40 border-red-500/70 text-red-300 font-semibold shadow-xs';
                               } else {
-                                optionStyle = 'bg-[rgba(3,16,38,0.4)] border-zinc-800/60 text-[#7a8ea8] opacity-60';
+                                optionStyle = 'bg-[rgba(3,16,38,0.4)] border-border/60 text-[#7a8ea8] opacity-60';
                               }
                             }
                             return (
@@ -1294,7 +1294,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                     max="80"
                     value={calcCertain}
                     onChange={(e) => setCalcCertain(parseInt(e.target.value))}
-                    className="w-full h-1.5 bg-zinc-800 rounded appearance-none cursor-pointer accent-[#e0d0ab]"
+                    className="w-full h-1.5 bg-surface-elevated rounded appearance-none cursor-pointer accent-[#e0d0ab]"
                   />
                   <div className="flex justify-between text-[10px] text-[#7a8ea8]">
                     <span>Minimum threshold: 35</span>
@@ -1314,7 +1314,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                     max="40"
                     value={calcTwoOptions}
                     onChange={(e) => setCalcTwoOptions(parseInt(e.target.value))}
-                    className="w-full h-1.5 bg-zinc-800 rounded appearance-none cursor-pointer accent-[#34d399]"
+                    className="w-full h-1.5 bg-surface-elevated rounded appearance-none cursor-pointer accent-[#34d399]"
                   />
                   <div className="flex justify-between text-[10px] text-[#7a8ea8]">
                     <span>Expected Net Gain: +{calcResults.twoOptionGain} marks</span>
@@ -1334,7 +1334,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                     max="30"
                     value={calcThreeOptions}
                     onChange={(e) => setCalcThreeOptions(parseInt(e.target.value))}
-                    className="w-full h-1.5 bg-zinc-800 rounded appearance-none cursor-pointer accent-amber-400"
+                    className="w-full h-1.5 bg-surface-elevated rounded appearance-none cursor-pointer accent-amber-400"
                   />
                   <div className="flex justify-between text-[10px] text-[#7a8ea8]">
                     <span>Expected Net Gain: +{calcResults.threeOptionGain} marks</span>
@@ -1354,7 +1354,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                     max="20"
                     value={calcBlind}
                     onChange={(e) => setCalcBlind(parseInt(e.target.value))}
-                    className="w-full h-1.5 bg-zinc-800 rounded appearance-none cursor-pointer accent-red-400"
+                    className="w-full h-1.5 bg-surface-elevated rounded appearance-none cursor-pointer accent-red-400"
                   />
                   <div className="flex justify-between text-[10px] text-[#7a8ea8]">
                     <span>Expected Net Gain: +{calcResults.blindGain} marks</span>
@@ -1417,7 +1417,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                       <AlertTriangle className="w-3.5 h-3.5" />
                       Status: {calcResults.safetyZone.toUpperCase()}
                     </div>
-                    <p className="leading-relaxed text-[11px] text-stone-200">{calcResults.safetyText}</p>
+                    <p className="leading-relaxed text-[11px] text-primary">{calcResults.safetyText}</p>
                   </div>
 
                   {/* Historical Cutoff Reference */}
@@ -1715,7 +1715,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                   step="10"
                   value={readingWpm}
                   onChange={(e) => setReadingWpm(parseInt(e.target.value))}
-                  className="w-full h-1.5 bg-zinc-800 rounded appearance-none cursor-pointer accent-[#e0d0ab]"
+                  className="w-full h-1.5 bg-surface-elevated rounded appearance-none cursor-pointer accent-[#e0d0ab]"
                 />
                 <div className="flex justify-between text-[10px] text-[#7a8ea8]">
                   <span>Slow & Deliberate (120 wpm)</span>

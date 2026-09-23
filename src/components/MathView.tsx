@@ -33,13 +33,13 @@ export function BlockMath({ math, className = '' }: MathViewProps) {
     });
     return (
       <div
-        className={`block-katex my-3 overflow-x-auto py-2 px-3 rounded bg-zinc-950/60 border border-zinc-800/80 text-center text-[#e0d0ab] select-all scrollbar-thin ${className}`}
+        className={`block-katex my-3 overflow-x-auto py-2 px-3 rounded bg-surface/60 border border-border/80 text-center text-[#e0d0ab] select-all scrollbar-thin ${className}`}
         dangerouslySetInnerHTML={{ __html: html }}
       />
     );
   } catch (e) {
     return (
-      <pre className={`font-mono text-xs bg-zinc-950/80 p-3 rounded text-zinc-300 overflow-x-auto ${className}`}>
+      <pre className={`font-mono text-xs bg-surface/80 p-3 rounded text-primary overflow-x-auto ${className}`}>
         {math}
       </pre>
     );

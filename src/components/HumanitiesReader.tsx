@@ -570,7 +570,7 @@ export default function HumanitiesReader() {
   const showClear = lensOn;
 
   return (
-    <div className="relative w-full text-stone-200 font-sans pb-28 selection:bg-[#e0d0ab] selection:text-[#072e63]">
+    <div className="relative w-full text-primary font-sans pb-28 selection:bg-[#e0d0ab] selection:text-[#072e63]">
 
       {/* ── Keyframe Animations embedded ── */}
       <style>{`

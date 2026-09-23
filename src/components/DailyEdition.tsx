@@ -235,7 +235,7 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
   const quizCount = items.filter((i) => i.summary.has_quiz).length;
 
   return (
-    <section className="mb-10 font-sans text-stone-100">
+    <section className="mb-10 font-sans text-primary">
       {/* ── Masthead & Completion Bar ── */}
       <div className="p-4 sm:p-5 rounded-sm border border-[rgba(19,108,153,0.45)] bg-[rgba(4,25,54,0.6)] backdrop-blur-sm mb-6">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
@@ -248,7 +248,7 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
               <Clock className="w-3.5 h-3.5 text-[#0194a8]" />
               {new Date(today).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
             </span>
-            <span className="text-zinc-600 hidden sm:inline">&bull;</span>
+            <span className="text-muted hidden sm:inline">&bull;</span>
             <span className="text-[11.5px] font-mono text-[#8fa2bd]">
               {items.length} curated briefs &bull; ~{minutes} min
             </span>
@@ -499,7 +499,7 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
             <div className="mt-3.5 flex flex-wrap items-center justify-center gap-3">
               <button
                 onClick={openQuiz}
-                className="inline-flex items-center gap-2 px-3.5 py-2 bg-zinc-800/90 text-stone-200 border border-zinc-700 font-mono font-bold text-xs uppercase tracking-wider rounded-xs hover:bg-zinc-700 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-2 px-3.5 py-2 bg-surface-elevated/90 text-primary border border-border font-mono font-bold text-xs uppercase tracking-wider rounded-xs hover:bg-surface-elevated transition-colors cursor-pointer"
               >
                 <BrainCircuit className="w-4 h-4 text-emerald-400" />
                 Quick Review ({quizCount} MCQs)
@@ -602,7 +602,7 @@ function QuizModal({
         initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 8 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 8 }}
-        className="w-full max-w-2xl rounded-xs border border-[rgba(19,108,153,0.5)] bg-[#072e63] p-6 shadow-2xl text-stone-100"
+        className="w-full max-w-2xl rounded-xs border border-[rgba(19,108,153,0.5)] bg-[#072e63] p-6 shadow-2xl text-primary"
       >
         <div className="flex items-center justify-between pb-3 mb-4 border-b border-[rgba(19,108,153,0.4)]">
           <div className="flex items-center gap-2">
@@ -662,10 +662,10 @@ function QuizModal({
                   if (revealedData) {
                     if (isCorrect) optStyle = 'border-emerald-500 bg-emerald-500/15 text-emerald-200';
                     else if (isSelected) optStyle = 'border-rose-500 bg-rose-500/15 text-rose-200';
-                    else optStyle = 'border-zinc-800 bg-zinc-900/30 text-zinc-500';
+                    else optStyle = 'border-border bg-surface-elevated/30 text-muted';
                   } else {
-                    if (isSelected) optStyle = 'border-[#e0d0ab] bg-[#e0d0ab]/10 text-stone-100';
-                    else optStyle = 'border-zinc-800 bg-zinc-900/30 text-zinc-500';
+                    if (isSelected) optStyle = 'border-[#e0d0ab] bg-[#e0d0ab]/10 text-primary';
+                    else optStyle = 'border-border bg-surface-elevated/30 text-muted';
                   }
                 }
                 return (

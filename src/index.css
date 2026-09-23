@@ -10,129 +10,120 @@
 @import "@fontsource/jetbrains-mono/400.css";
 @import "@fontsource/jetbrains-mono/500.css";
 @import "@fontsource/jetbrains-mono/700.css";
-@import "@fontsource/cinzel/500.css";
-@import "@fontsource/cinzel/600.css";
-@import "@fontsource/cinzel/700.css";
 @import "katex/dist/katex.min.css";
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Merriweather", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --font-cinzel: "Cinzel", ui-serif, Georgia, serif;
+  --font-sans: "Bricolage Grotesque", system-ui, sans-serif;
+  --font-serif: "Newsreader", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-  /* ── Chamber System Core Grounds & Inks ── */
-  --color-chamber-ground: #041d40;
-  --color-chamber-surface: #072e63;
-  --color-chamber-elevated: #0b3d78;
-  --color-chamber-shell: #041936;
-  --color-chamber-slate-body: #9fb0c8;
-  --color-chamber-slate-dim: #8fa2bd;
-  --color-chamber-divider: #41536e;
-  --color-chamber-cyan-border: #136c99;
+  /* ── Chamber System Core Grounds & Inks (DesignV2) ── */
+  --color-chamber-void: #050b1a;
+  --color-chamber-ground: #071630;
+  --color-chamber-surface: #071630;
+  --color-chamber-elevated: #0a2148;
+  --color-chamber-shell: #041228;
+  --color-chamber-slate-body: #b5c1d1;
+  --color-chamber-slate-dim: #6e7d94;
+  --color-chamber-divider: rgba(224, 208, 171, 0.10);
+  --color-chamber-cyan-border: rgba(224, 208, 171, 0.14);
   --color-chamber-gold: #e0d0ab;
   --color-chamber-gold-dim: #c8b998;
-
-  --color-zinc-950: #072e63;
-  --color-zinc-900: #136c99;
-  --color-zinc-800: #0194a8;
-  --color-zinc-700: #0194a8;
-  --color-zinc-600: #a69a7f;
-  --color-zinc-500: #a69a7f;
-  --color-zinc-400: #c8b998;
-  --color-zinc-300: #e0d0ab;
-  --color-zinc-200: #e0d0ab;
-  --color-zinc-100: #e0d0ab;
-  --color-zinc-50: #e0d0ab;
-
-  --color-neutral-950: #072e63;
-  --color-neutral-900: #136c99;
-  --color-neutral-800: #0194a8;
-  --color-neutral-700: #0194a8;
-  --color-neutral-600: #a69a7f;
-  --color-neutral-500: #a69a7f;
-  --color-neutral-400: #c8b998;
-  --color-neutral-300: #e0d0ab;
-  --color-neutral-200: #e0d0ab;
-  --color-neutral-100: #e0d0ab;
-  --color-neutral-50: #e0d0ab;
-
-  --color-stone-950: #072e63;
-  --color-stone-900: #136c99;
-  --color-stone-800: #0194a8;
-  --color-stone-700: #0194a8;
-  --color-stone-600: #a69a7f;
-  --color-stone-500: #a69a7f;
-  --color-stone-400: #c8b998;
-  --color-stone-300: #e0d0ab;
-  --color-stone-200: #e0d0ab;
-  --color-stone-100: #e0d0ab;
-  --color-stone-50: #e0d0ab;
 
   --color-emerald-400: #34d399;
   --color-emerald-500: #10b981;
   --color-green-400: #34d399;
   --color-green-500: #10b981;
 
-  --color-rose-400: #e14e4e;
-  --color-rose-500: #ad0202;
-  --color-red-400: #e14e4e;
-  --color-red-500: #ad0202;
+  --color-rose-400: #f87171;
+  --color-rose-500: #ef4444;
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
 
-  --color-white: #e0d0ab;
-  --color-black: #0e577a;
+  --color-white: #f4ecd8;
+  --color-black: #050b1a;
 
   /* ── Ground Truth Semantic Tokens (Naval Instrument) ── */
-  --ground: #072e63;
-  --surface: #136c99;
-  --surface-elevated: #1b85b8;
+  --ground: #071630;
+  --surface: #071630;
+  --surface-elevated: #0a2148;
+  --surface-shell: #041228;
   --accent-teal: #0194a8;
   --ink-gold: #e0d0ab;
   --ink-sand: #c8b998;
-  --ink-muted: #a69a7f;
+  --ink-muted: #6e7d94;
   --integrity: #34d399;
-  --penalty: #e14e4e;
+  --penalty: #f87171;
+
+  /* ── UX North Star Chamber Semantic Tokens ── */
+  --color-surface: #071630;
+  --color-surface-elevated: #0a2148;
+  --color-surface-shell: #041228;
+  --color-border: rgba(224, 208, 171, 0.14);
+  --color-border-subtle: rgba(224, 208, 171, 0.08);
+  --color-text-primary: #f4ecd8;
+  --color-text-secondary: #b5c1d1;
+  --color-text-muted: #6e7d94;
+  --color-accent: #e0d0ab;
+  --color-accent-foreground: #050b1a;
+  --color-success: #34d399;
+  --color-warning: #f59e0b;
+  --color-danger: #f87171;
+  --color-focus-ring: #e0d0ab;
 
   /* ── PIB Dossier semantic tokens ── */
-  --color-surface: #002113;
   --color-surface-dim: #001a0e;
   --color-surface-container-highest: #00301c;
   --color-surface-container-lowest: #001108;
   --color-on-surface: #e0d0ab;
   --color-on-surface-variant: #c8b998;
   --color-primary: #e0d0ab;
+  --color-secondary: #b5c1d1;
+  --color-muted: #6e7d94;
   --color-primary-container: #e0d0ab;
 }
 
 :root {
+  /* ── UX North Star Semantic Design Tokens ── */
+  --surface: #071630;
+  --surface-elevated: #0a2148;
+  --surface-shell: #041228;
+  --border: rgba(224, 208, 171, 0.14);
+  --border-subtle: rgba(224, 208, 171, 0.08);
+  --text-primary: #f4ecd8;
+  --text-secondary: #b5c1d1;
+  --text-muted: #6e7d94;
+  --accent: #e0d0ab;
+  --accent-foreground: #050b1a;
+  --success: #34d399;
+  --warning: #f59e0b;
+  --danger: #f87171;
+  --focus-ring: #e0d0ab;
+
   /* ── 1. Surfaces & Depths ── */
-  --bg-base: #041d40;
-  --bg-surface: rgba(4, 25, 54, 0.65);
-  --bg-elevated: rgba(11, 61, 120, 0.45);
-  --bg-overlay: rgba(3, 16, 38, 0.85);
+  --bg-base: #050b1a;
+  --bg-surface: #071630;
+  --bg-elevated: #0a2148;
+  --bg-overlay: rgba(5, 11, 26, 0.85);
 
   /* ── 2. Semantic Text Tokens ── */
-  --text-primary: #e8e0cf;
-  --text-secondary: #9fb0c8;
-  --text-muted: #8fa2bd;
   --text-accent: #e0d0ab;
   --text-accent-muted: #c8b998;
   --text-integrity: #34d399;
-  --text-penalty: #e14e4e;
+  --text-penalty: #f87171;
 
   /* ── 3. Translucent Borders ── */
-  --border-subtle: rgba(19, 108, 153, 0.35);
-  --border-hover: rgba(224, 208, 171, 0.45);
+  --border-hover: rgba(224, 208, 171, 0.35);
   --border-active: rgba(224, 208, 171, 0.7);
 
   /* ── 4. Diffuse Shadows ── */
   --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.12), 0 8px 24px -4px rgba(0, 0, 0, 0.28);
   --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.25), 0 16px 36px -6px rgba(0, 0, 0, 0.45);
-  --shadow-gold-glow: 0 0 26px rgba(224, 208, 171, 0.22);
+  --shadow-gold-glow: 0 0 32px rgba(224, 208, 171, 0.25);
 
-  /* ── 5. Motion Choreography & Spring Easing ── */
+  /* ── 5. Motion Choreography & Spring Easing (DesignV2) ── */
   --ease-snappy: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-layout: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-decay: cubic-bezier(0.25, 1, 0.5, 1);
@@ -147,26 +138,91 @@
   --font-h3: clamp(1.2rem, 1.8vw + 0.2rem, 1.5rem);
 
   /* Legacy aliases preserved for backward compatibility */
-  --color-ground: #072e63;
-  --color-surface-base: #136c99;
+  --color-ground: #071630;
+  --color-surface-base: #071630;
   --color-accent-teal: #0194a8;
   --color-ink-gold: #e0d0ab;
   --color-ink-sand: #c8b998;
-  --color-ink-muted: #a69a7f;
+  --color-ink-muted: #6e7d94;
   --color-integrity: #34d399;
-  --color-penalty: #e14e4e;
+  --color-penalty: #f87171;
 }
 
 body {
   margin: 0;
-  background-color: var(--bg-base);
-  background-image: radial-gradient(120% 78% at 50% 0%, #0b3d78 0%, #072e63 40%, #041d40 100%);
-  background-attachment: fixed;
-  color: var(--text-primary);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  background-color: #050b1a;
+  color: #f4ecd8;
+  font-family: 'Newsreader', Georgia, serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── DesignV2 Micro-interactions & Affordances ── */
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 300ms cubic-bezier(0.32, 0.72, 0, 1), transform 300ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.cta-primary {
+  transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1), box-shadow 500ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.cta-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 20px 60px -12px rgba(224, 208, 171, 0.65);
+}
+.cta-primary:active {
+  transform: scale(0.98);
+}
+.cta-arrow {
+  transition: transform 400ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.cta-primary:hover .cta-arrow {
+  transform: translate(3px, -1px);
+}
+
+.text-link {
+  border-bottom: 1px solid transparent;
+  transition: border-color 400ms cubic-bezier(0.32, 0.72, 0, 1), color 300ms;
+  padding-bottom: 2px;
+}
+.text-link:hover {
+  border-bottom-color: rgba(224, 208, 171, 0.6);
+  color: #f0dfb8;
+}
+
+.room-cell {
+  transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1), border-color 500ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.room-cell:hover {
+  border-color: rgba(224, 208, 171, 0.32) !important;
+  transform: translateY(-2px);
+}
+
+.option {
+  transition: border-color 400ms cubic-bezier(0.32, 0.72, 0, 1), background 400ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.option:hover {
+  border-color: rgba(224, 208, 171, 0.38) !important;
+  background: rgba(224, 208, 171, 0.04);
+}
+
+/* Double-bezel hardware enclosures */
+.double-bezel-outer {
+  padding: 8px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(224, 208, 171, 0.10) 0%, rgba(224, 208, 171, 0.02) 100%);
+  border: 1px solid rgba(224, 208, 171, 0.14);
+  box-shadow: 0 40px 100px -30px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.double-bezel-inner {
+  background: #071630;
+  border-radius: 17px;
+  border: 1px solid rgba(224, 208, 171, 0.10);
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 @keyframes shake {

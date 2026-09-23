@@ -140,7 +140,7 @@ export default function RebaseEdition({ userId, refreshKey, fallback, onOpenAren
           <ShieldAlert className="w-4 h-4 text-amber-400 mt-0.5 shrink-0" />
           <div>
             <p className="text-xs font-semibold text-amber-200">Rebase verification is incomplete.</p>
-            <p className="text-[11px] text-zinc-400 mt-0.5">
+            <p className="text-[11px] text-secondary mt-0.5">
               Tark will not advance your checkpoint while a source or ledger stage is degraded.
             </p>
           </div>
@@ -194,13 +194,13 @@ export default function RebaseEdition({ userId, refreshKey, fallback, onOpenAren
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300">Tark Rebase</p>
               <h3 className="font-serif text-lg text-white mt-1">No verified knowledge changes.</h3>
-              <p className="text-[11px] text-zinc-400 mt-1">Public record checked through {formatIst(patch.verifiedThrough)} IST.</p>
+              <p className="text-[11px] text-secondary mt-1">Public record checked through {formatIst(patch.verifiedThrough)} IST.</p>
             </div>
           </div>
           <button
             onClick={confirmPatch}
             disabled={patch.hasMore || completion === 'saving' || completion === 'server'}
-            className="px-4 py-2 rounded-sm bg-[#e0d0ab] text-zinc-950 text-[10px] font-bold uppercase tracking-wider disabled:opacity-50 cursor-pointer"
+            className="px-4 py-2 rounded-sm bg-[#e0d0ab] text-surface text-[10px] font-bold uppercase tracking-wider disabled:opacity-50 cursor-pointer"
           >
             {completion === 'saving' ? 'Saving…' : completion === 'server' ? 'Checkpoint saved' : 'Confirm checkpoint'}
           </button>
@@ -211,20 +211,20 @@ export default function RebaseEdition({ userId, refreshKey, fallback, onOpenAren
 
   return (
     <section className="mb-10 font-sans">
-      <div className="rounded-sm border border-[#e0d0ab]/25 bg-gradient-to-br from-zinc-900/70 via-zinc-950 to-zinc-950 p-5 mb-4">
+      <div className="rounded-sm border border-[#e0d0ab]/25 bg-gradient-to-br from-surface-elevated/70 via-surface to-surface p-5 mb-4">
         <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-[#e0d0ab] text-zinc-950 text-[10px] font-bold uppercase tracking-[0.2em]">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-[#e0d0ab] text-surface text-[10px] font-bold uppercase tracking-[0.2em]">
                 <Sparkles className="w-3 h-3" /> Tark Rebase
               </span>
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-mono text-zinc-400">
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-mono text-secondary">
                 <ShieldCheck className="w-3 h-3 text-emerald-400" />
                 Evidence verified through {formatIst(patch.verifiedThrough)} IST
               </span>
             </div>
             <h2 className="font-serif text-xl sm:text-2xl font-bold text-white">What changed since your last checkpoint</h2>
-            <p className="text-xs text-zinc-400 mt-1.5 max-w-2xl">
+            <p className="text-xs text-secondary mt-1.5 max-w-2xl">
               A minimal patch of new and replaced facts. Repeated coverage and unchanged values have been removed.
             </p>
           </div>
@@ -239,7 +239,7 @@ export default function RebaseEdition({ userId, refreshKey, fallback, onOpenAren
                 Learn {counts.learn}
               </span>
             )}
-            <span className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-sm border border-zinc-800 bg-zinc-900 text-zinc-400 text-[10px] font-mono">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-sm border border-border bg-surface-elevated text-secondary text-[10px] font-mono">
               <Clock className="w-3 h-3" /> ~{minutes} min
             </span>
           </div>
@@ -247,10 +247,10 @@ export default function RebaseEdition({ userId, refreshKey, fallback, onOpenAren
 
         <div className="mt-5">
           <div className="flex items-center justify-between text-[10px] uppercase tracking-wider mb-2">
-            <span className="text-zinc-500">{processedCount} of {patch.items.length} changes processed</span>
-            <span className={allProcessed ? 'text-emerald-400' : 'text-zinc-500'}>{allProcessed ? 'Patch ready to close' : 'Checkpoint open'}</span>
+            <span className="text-muted">{processedCount} of {patch.items.length} changes processed</span>
+            <span className={allProcessed ? 'text-emerald-400' : 'text-muted'}>{allProcessed ? 'Patch ready to close' : 'Checkpoint open'}</span>
           </div>
-          <div className="h-1 rounded-full bg-zinc-800 overflow-hidden">
+          <div className="h-1 rounded-full bg-surface-elevated overflow-hidden">
             <motion.div
               className="h-full bg-[#e0d0ab]"
               initial={false}
@@ -273,7 +273,7 @@ export default function RebaseEdition({ userId, refreshKey, fallback, onOpenAren
               className={`rounded-sm border p-5 ${
                 item.action === 'replace'
                   ? 'border-amber-500/25 bg-amber-950/10'
-                  : 'border-zinc-800 bg-zinc-950/50'
+                  : 'border-border bg-surface/50'
               }`}
             >
               <div className="flex flex-col sm:flex-row sm:items-start gap-4">
@@ -291,7 +291,7 @@ export default function RebaseEdition({ userId, refreshKey, fallback, onOpenAren
                       {copy.eyebrow}
                     </span>
                     {item.syllabus.tags.slice(0, 3).map((tag) => (
-                      <span key={tag} className="px-1.5 py-0.5 rounded-sm bg-zinc-900 text-zinc-500 text-[9px] uppercase tracking-wider">
+                      <span key={tag} className="px-1.5 py-0.5 rounded-sm bg-surface-elevated text-muted text-[9px] uppercase tracking-wider">
                         {tag}
                       </span>
                     ))}
@@ -301,32 +301,32 @@ export default function RebaseEdition({ userId, refreshKey, fallback, onOpenAren
 
                   {item.action === 'replace' ? (
                     <div className="space-y-2 mb-3">
-                      <div className="rounded-sm border border-zinc-800 bg-zinc-950/70 px-3 py-2">
-                        <span className="text-[9px] uppercase tracking-wider text-zinc-600">Previous</span>
-                        <p className="text-xs text-zinc-500 line-through mt-0.5">{item.previousText}</p>
+                      <div className="rounded-sm border border-border bg-surface/70 px-3 py-2">
+                        <span className="text-[9px] uppercase tracking-wider text-muted">Previous</span>
+                        <p className="text-xs text-muted line-through mt-0.5">{item.previousText}</p>
                       </div>
                       <div className="flex items-center gap-2 text-[9px] uppercase tracking-wider text-amber-300">
                         <ArrowRight className="w-3 h-3" /> Replace with
                       </div>
                       <div className="rounded-sm border border-amber-500/25 bg-amber-500/5 px-3 py-2">
-                        <p className="text-sm text-zinc-100 leading-relaxed">{item.currentText}</p>
+                        <p className="text-sm text-primary leading-relaxed">{item.currentText}</p>
                       </div>
                     </div>
                   ) : (
-                    <p className="text-sm text-zinc-200 leading-relaxed mb-3">{item.currentText}</p>
+                    <p className="text-sm text-primary leading-relaxed mb-3">{item.currentText}</p>
                   )}
 
-                  <p className="text-[11px] text-zinc-500 mb-3">{item.reason}</p>
+                  <p className="text-[11px] text-muted mb-3">{item.reason}</p>
 
-                  <details className="rounded-sm border border-zinc-800 bg-zinc-950/60 px-3 py-2 group">
+                  <details className="rounded-sm border border-border bg-surface/60 px-3 py-2 group">
                     <summary className="list-none cursor-pointer flex items-center justify-between gap-2 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
                       <span className="inline-flex items-center gap-1.5"><ShieldCheck className="w-3 h-3" /> Inspect verified evidence</span>
-                      <span className="font-mono text-zinc-600">{item.evidence.length} span{item.evidence.length === 1 ? '' : 's'}</span>
+                      <span className="font-mono text-muted">{item.evidence.length} span{item.evidence.length === 1 ? '' : 's'}</span>
                     </summary>
-                    <div className="mt-2 pt-2 border-t border-zinc-800 space-y-2">
+                    <div className="mt-2 pt-2 border-t border-border space-y-2">
                       {item.evidence.map((evidence, evidenceIndex) => (
                         <div key={`${evidence.url}:${evidenceIndex}`}>
-                          <p className="border-l-2 border-emerald-500/40 pl-2 text-[11px] font-serif italic text-zinc-300 leading-relaxed">
+                          <p className="border-l-2 border-emerald-500/40 pl-2 text-[11px] font-serif italic text-primary leading-relaxed">
                             &ldquo;{evidence.quote}&rdquo;
                           </p>
                           <a
@@ -342,13 +342,13 @@ export default function RebaseEdition({ userId, refreshKey, fallback, onOpenAren
                     </div>
                   </details>
 
-                  <div className="mt-3 pt-3 border-t border-zinc-800/70 flex items-center justify-between gap-3">
-                    <span className="text-[9px] font-mono text-zinc-600">Observed {formatIst(item.observedAt)} IST</span>
+                  <div className="mt-3 pt-3 border-t border-border/70 flex items-center justify-between gap-3">
+                    <span className="text-[9px] font-mono text-muted">Observed {formatIst(item.observedAt)} IST</span>
                     <button
                       onClick={() => acknowledge(item.mutationId)}
-                      className={`inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider cursor-pointer ${done ? 'text-emerald-400' : 'text-zinc-400 hover:text-[#e0d0ab]'}`}
+                      className={`inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider cursor-pointer ${done ? 'text-emerald-400' : 'text-secondary hover:text-[#e0d0ab]'}`}
                     >
-                      <span className={`w-4 h-4 rounded-sm border flex items-center justify-center ${done ? 'border-emerald-400 bg-emerald-400/10' : 'border-zinc-600'}`}>
+                      <span className={`w-4 h-4 rounded-sm border flex items-center justify-center ${done ? 'border-emerald-400 bg-emerald-400/10' : 'border-border'}`}>
                         {done && <Check className="w-3 h-3" />}
                       </span>
                       {copy.button}
@@ -384,7 +384,7 @@ export default function RebaseEdition({ userId, refreshKey, fallback, onOpenAren
             <button
               onClick={confirmPatch}
               disabled={completion === 'saving'}
-              className="mt-3 px-4 py-2 rounded-sm bg-[#e0d0ab] text-zinc-950 text-[10px] font-bold uppercase tracking-wider disabled:opacity-50 cursor-pointer"
+              className="mt-3 px-4 py-2 rounded-sm bg-[#e0d0ab] text-surface text-[10px] font-bold uppercase tracking-wider disabled:opacity-50 cursor-pointer"
             >
               {completion === 'saving' ? 'Saving checkpoint…' : 'Confirm rebase'}
             </button>

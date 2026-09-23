@@ -41,12 +41,12 @@ export function StatCard({
       transition={{ duration: 0.3, delay }}
       whileHover={prefersReduced ? undefined : { y: -2, scale: 1.01 }}
       onClick={onClick}
-      className={`bg-zinc-900/30 hover:bg-zinc-900/50 border border-zinc-800/80 hover:border-[#0194a8]/50 p-5 rounded-sm flex flex-col justify-between transition-colors shadow-sm backdrop-blur-sm group ${
+      className={`bg-surface-elevated/30 hover:bg-surface-elevated/50 border border-border/80 hover:border-[#0194a8]/50 p-5 rounded-sm flex flex-col justify-between transition-colors shadow-sm backdrop-blur-sm group ${
         onClick ? 'cursor-pointer' : ''
       } ${className}`}
     >
       <div className="flex items-center justify-between gap-2 mb-2.5">
-        <span className="text-[10px] font-sans uppercase tracking-wider text-zinc-400 font-bold group-hover:text-zinc-300 transition-colors">
+        <span className="text-[10px] font-sans uppercase tracking-wider text-secondary font-bold group-hover:text-primary transition-colors">
           {label}
         </span>
         {Icon && <Icon className={`w-4 h-4 ${accentColor} opacity-80 group-hover:opacity-100 transition-opacity`} />}
@@ -64,7 +64,7 @@ export function StatCard({
         </div>
 
         {subtext && (
-          <p className="text-[11px] font-sans text-zinc-500 leading-tight">
+          <p className="text-[11px] font-sans text-muted leading-tight">
             {subtext}
           </p>
         )}

@@ -381,7 +381,7 @@ export default function Profile({
   const initialLetter = (localUserName || userEmail || 'C').charAt(0).toUpperCase();
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-6 font-sans text-stone-100 pb-20">
+    <div className="w-full max-w-6xl mx-auto space-y-6 font-sans text-primary pb-20">
       
       {/* ══════════════════════════════════════════════════════════════════
           1. COMPACT CANDIDATE DOSSIER & INTEGRATED TELEMETRY STRIP
@@ -431,7 +431,7 @@ export default function Profile({
                     </button>
                     <button
                       onClick={() => setEditingName(false)}
-                      className="p-1 bg-zinc-800 text-zinc-400 rounded-xs cursor-pointer hover:text-white"
+                      className="p-1 bg-surface-elevated text-secondary rounded-xs cursor-pointer hover:text-white"
                       title="Cancel"
                     >
                       <X className="w-3.5 h-3.5" />

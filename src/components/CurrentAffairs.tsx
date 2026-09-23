@@ -787,10 +787,10 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
   }, []);
 
   return (
-    <div className="w-full min-h-screen text-stone-100 font-sans pb-24">
+    <div className="w-full min-h-screen text-primary font-sans pb-24">
       
       {/* ── Editorial Masthead Header ── */}
-      <div className="border-b border-zinc-800/80 pb-5 mb-6">
+      <div className="border-b border-border/80 pb-5 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -802,7 +802,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
             <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">
               The Daily Brief <span className="font-serif font-normal text-[#e0d0ab] text-2xl sm:text-3xl">| दैनिक नीति संकेत</span>
             </h1>
-            <p className="text-zinc-400 text-xs sm:text-sm font-sans mt-2 max-w-2xl leading-relaxed">
+            <p className="text-secondary text-xs sm:text-sm font-sans mt-2 max-w-2xl leading-relaxed">
               Every press release, cabinet decision, and policy notification that matters, distilled into a few honest minutes for UPSC and State PSC prep.
             </p>
           </div>
@@ -834,9 +834,9 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
         </div>
 
         {/* ── Verified Wire Streams Showcase (PIB, The Hindu, RBI, PRS) ── */}
-        <div className="mt-4 pt-3.5 border-t border-zinc-800/80 flex flex-wrap items-center justify-between gap-3 text-xs font-sans">
+        <div className="mt-4 pt-3.5 border-t border-border/80 flex flex-wrap items-center justify-between gap-3 text-xs font-sans">
           <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold flex items-center gap-1.5">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-secondary font-bold flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#e0d0ab]" />
               Official Wire Streams:
             </span>
@@ -978,12 +978,12 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                 placeholder="Search policy briefs, ministries, keywords..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 bg-[rgba(3,18,42,0.85)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-stone-200 placeholder-[#8fa2bd]/60 focus:outline-none focus:border-[#e0d0ab] focus:ring-1 focus:ring-[#e0d0ab]/30"
+                className="w-full pl-9 pr-3 py-1.5 bg-[rgba(3,18,42,0.85)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-primary placeholder-[#8fa2bd]/60 focus:outline-none focus:border-[#e0d0ab] focus:ring-1 focus:ring-[#e0d0ab]/30"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#8fa2bd] hover:text-stone-200 cursor-pointer"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#8fa2bd] hover:text-primary cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -995,7 +995,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xs border text-xs font-mono font-medium transition-all cursor-pointer ${
                 activeFilterCount > 0 || isFilterDrawerOpen
                   ? 'bg-[rgba(11,61,120,0.4)] border-[#e0d0ab] text-[#e0d0ab]'
-                  : 'bg-[rgba(3,18,42,0.6)] border-[rgba(19,108,153,0.35)] text-[#8fa2bd] hover:border-[rgba(19,108,153,0.6)] hover:text-stone-200'
+                  : 'bg-[rgba(3,18,42,0.6)] border-[rgba(19,108,153,0.35)] text-[#8fa2bd] hover:border-[rgba(19,108,153,0.6)] hover:text-primary'
               }`}
             >
               <SlidersHorizontal className="w-3.5 h-3.5 text-[#0194a8]" />
@@ -1054,14 +1054,14 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                         type="date"
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
-                        className="px-2.5 py-1.5 bg-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-stone-200 [color-scheme:dark]"
+                        className="px-2.5 py-1.5 bg-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-primary [color-scheme:dark]"
                       />
                       <span className="text-xs text-[#8fa2bd] font-mono">to</span>
                       <input
                         type="date"
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
-                        className="px-2.5 py-1.5 bg-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-stone-200 [color-scheme:dark]"
+                        className="px-2.5 py-1.5 bg-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-primary [color-scheme:dark]"
                       />
                     </div>
                   )}
@@ -1149,7 +1149,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                     className={`px-2.5 py-1 rounded-xs text-xs font-sans transition-colors cursor-pointer border ${
                       selectedMinistry === 'ALL'
                         ? 'bg-[#e0d0ab] text-[#072e63] border-[#e0d0ab] font-bold shadow-sm'
-                        : 'bg-[rgba(4,25,54,0.7)] border-[rgba(19,108,153,0.35)] text-[#8fa2bd] hover:text-stone-200'
+                        : 'bg-[rgba(4,25,54,0.7)] border-[rgba(19,108,153,0.35)] text-[#8fa2bd] hover:text-primary'
                     }`}
                   >
                     All Ministries ({items.length})
@@ -1258,38 +1258,38 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
       {loading ? (
         <div className="space-y-6">
           {/* Hero skeleton */}
-          <div className="p-8 bg-zinc-900/20 border border-zinc-800 rounded-sm animate-pulse space-y-4">
-            <div className="h-4 w-32 bg-zinc-800 rounded" />
-            <div className="h-8 w-3/4 bg-zinc-800 rounded" />
+          <div className="p-8 bg-surface-elevated/20 border border-border rounded-sm animate-pulse space-y-4">
+            <div className="h-4 w-32 bg-surface-elevated rounded" />
+            <div className="h-8 w-3/4 bg-surface-elevated rounded" />
             <div className="space-y-2 pt-2">
-              <div className="h-3.5 w-full bg-zinc-800/60 rounded" />
-              <div className="h-3.5 w-5/6 bg-zinc-800/60 rounded" />
+              <div className="h-3.5 w-full bg-surface-elevated/60 rounded" />
+              <div className="h-3.5 w-5/6 bg-surface-elevated/60 rounded" />
             </div>
           </div>
           {/* List skeleton */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[1, 2, 3, 4].map((n) => (
-              <div key={n} className="p-5 bg-zinc-900/10 border border-zinc-800/60 rounded-sm animate-pulse space-y-3">
-                <div className="h-3.5 w-24 bg-zinc-800 rounded" />
-                <div className="h-5 w-4/5 bg-zinc-800 rounded" />
-                <div className="h-3 w-full bg-zinc-800/50 rounded" />
+              <div key={n} className="p-5 bg-surface-elevated/10 border border-border/60 rounded-sm animate-pulse space-y-3">
+                <div className="h-3.5 w-24 bg-surface-elevated rounded" />
+                <div className="h-5 w-4/5 bg-surface-elevated rounded" />
+                <div className="h-3 w-full bg-surface-elevated/50 rounded" />
               </div>
             ))}
           </div>
         </div>
       ) : displayedItems.length === 0 ? (
         /* ── Empty State ── */
-        <div className="flex flex-col items-center justify-center p-16 border border-dashed border-zinc-800 rounded-sm bg-zinc-900/10 text-center font-sans">
-          <Inbox className="w-10 h-10 text-zinc-600 mb-3" />
-          <h3 className="font-serif text-sm font-bold tracking-tight text-stone-200 mb-1">
+        <div className="flex flex-col items-center justify-center p-16 border border-dashed border-border rounded-sm bg-surface-elevated/10 text-center font-sans">
+          <Inbox className="w-10 h-10 text-muted mb-3" />
+          <h3 className="font-serif text-sm font-bold tracking-tight text-primary mb-1">
             No Dispatches Ingested For Selected Parameters
           </h3>
-          <p className="text-zinc-500 text-xs max-w-md mx-auto mb-4">
+          <p className="text-muted text-xs max-w-md mx-auto mb-4">
             Try adjusting your search keywords, switching category tabs, or clearing your date filters.
           </p>
           <button
             onClick={resetAllFilters}
-            className="px-4 py-2 bg-zinc-900 border border-zinc-700 text-[#e0d0ab] text-xs font-sans rounded-sm hover:border-[#e0d0ab] transition-all cursor-pointer"
+            className="px-4 py-2 bg-surface-elevated border border-border text-[#e0d0ab] text-xs font-sans rounded-sm hover:border-[#e0d0ab] transition-all cursor-pointer"
           >
             Clear All Filters
           </button>
@@ -1352,11 +1352,11 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                     {leadItem.ministry}
                   </span>
                   {leadItem.source?.toUpperCase().includes('HINDU') ? (
-                    <span className="inline-flex items-center px-2.5 py-1 bg-zinc-900/90 border border-zinc-800 rounded-sm shadow-xs" title="The Hindu — National Newspaper of Record">
+                    <span className="inline-flex items-center px-2.5 py-1 bg-surface-elevated/90 border border-border rounded-sm shadow-xs" title="The Hindu — National Newspaper of Record">
                       <TheHinduLogo height={13} color="#ffffff" animated={true} />
                     </span>
                   ) : leadItem.source?.toUpperCase().includes('PIB') ? (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-zinc-900/90 border border-zinc-800 rounded-sm text-[#e0d0ab] shadow-xs" title="Press Information Bureau">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-surface-elevated/90 border border-border rounded-sm text-[#e0d0ab] shadow-xs" title="Press Information Bureau">
                       <PibLogo size={16} animated={true} />
                       <span className="text-[10px] font-mono font-bold tracking-wider">PIB OFFICIAL</span>
                     </span>
@@ -1527,16 +1527,16 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                             {item.ministry}
                           </span>
                           {item.source?.toUpperCase().includes('HINDU') ? (
-                            <span className="inline-flex items-center px-2 py-0.5 bg-zinc-900/90 border border-zinc-800 rounded-sm text-zinc-300" title="The Hindu — National Newspaper of Record">
+                            <span className="inline-flex items-center px-2 py-0.5 bg-surface-elevated/90 border border-border rounded-sm text-primary" title="The Hindu — National Newspaper of Record">
                               <TheHinduLogo height={10} color="#ffffff" />
                             </span>
                           ) : item.source?.toUpperCase().includes('PIB') ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-zinc-900/90 border border-zinc-800 rounded-sm text-[#e0d0ab]" title="Press Information Bureau">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-surface-elevated/90 border border-border rounded-sm text-[#e0d0ab]" title="Press Information Bureau">
                               <PibLogo size={13} />
                               <span className="text-[9px] font-mono font-bold">PIB</span>
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 bg-zinc-900/80 text-zinc-400 text-[10px] font-mono rounded-sm border border-zinc-800">
+                            <span className="px-2 py-0.5 bg-surface-elevated/80 text-secondary text-[10px] font-mono rounded-sm border border-border">
                               {item.source}
                             </span>
                           )}
@@ -1664,7 +1664,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
             <div className="flex justify-center pt-8 font-sans">
               <button
                 onClick={() => setPage((prev) => prev + 1)}
-                className="px-8 py-3 bg-zinc-900 border border-zinc-800 hover:border-[#e0d0ab] text-stone-200 hover:text-[#e0d0ab] text-xs font-sans font-bold uppercase tracking-wider rounded-sm transition-all shadow-md cursor-pointer"
+                className="px-8 py-3 bg-surface-elevated border border-border hover:border-[#e0d0ab] text-primary hover:text-[#e0d0ab] text-xs font-sans font-bold uppercase tracking-wider rounded-sm transition-all shadow-md cursor-pointer"
               >
                 [ Retrieve Older Dispatches ]
               </button>
@@ -1704,7 +1704,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                   </div>
                   <button
                     onClick={() => setSelectedDossier(null)}
-                    className="p-1.5 text-zinc-400 hover:text-stone-100 transition-colors bg-[rgba(11,61,120,0.3)] hover:bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.3)] rounded-xs cursor-pointer"
+                    className="p-1.5 text-secondary hover:text-primary transition-colors bg-[rgba(11,61,120,0.3)] hover:bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.3)] rounded-xs cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -1729,7 +1729,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
 
                   {selectedDossier.ministry && (
                     <>
-                      <span className="text-zinc-600 select-none">&bull;</span>
+                      <span className="text-muted select-none">&bull;</span>
                       <span className="text-[#9fb0c8] font-medium truncate max-w-[280px]">
                         {selectedDossier.ministry}
                       </span>
@@ -1738,7 +1738,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
 
                   {selectedDossier.created_at && (
                     <>
-                      <span className="text-zinc-600 select-none">&bull;</span>
+                      <span className="text-muted select-none">&bull;</span>
                       <span className="text-[#8fa2bd]/80 font-mono text-[11px]">
                         {new Date(selectedDossier.created_at).toLocaleDateString('en-GB', {
                           day: '2-digit',
@@ -1780,7 +1780,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                         }
                       />
 
-                      <span className="h-3.5 w-px bg-zinc-700/60 hidden sm:inline-block" />
+                      <span className="h-3.5 w-px bg-surface-elevated/60 hidden sm:inline-block" />
 
                       {/* Compact Prelims / Mains Relevance Gauge */}
                       <div className="inline-flex items-center gap-2 px-2 py-0.5 rounded-xs bg-[rgba(11,61,120,0.25)] border border-[rgba(19,108,153,0.3)] text-[10px] font-mono text-[#9fb0c8]">
@@ -1788,17 +1788,17 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                           <span className="text-[#8fa2bd]">Prelims:</span>
                           <span className={`font-semibold ${
                             selectedDossier.summary?.prelims_relevance === 'HIGH' ? 'text-amber-300' :
-                            selectedDossier.summary?.prelims_relevance === 'LOW' ? 'text-zinc-400' : 'text-amber-200'
+                            selectedDossier.summary?.prelims_relevance === 'LOW' ? 'text-secondary' : 'text-amber-200'
                           }`}>
                             {selectedDossier.summary?.prelims_relevance || 'MEDIUM'}
                           </span>
                         </span>
-                        <span className="text-zinc-600 select-none">&bull;</span>
+                        <span className="text-muted select-none">&bull;</span>
                         <span className="flex items-center gap-1">
                           <span className="text-[#8fa2bd]">Mains:</span>
                           <span className={`font-semibold ${
                             selectedDossier.summary?.mains_relevance === 'HIGH' ? 'text-emerald-300' :
-                            selectedDossier.summary?.mains_relevance === 'LOW' ? 'text-zinc-400' : 'text-emerald-200'
+                            selectedDossier.summary?.mains_relevance === 'LOW' ? 'text-secondary' : 'text-emerald-200'
                           }`}>
                             {selectedDossier.summary?.mains_relevance || 'MEDIUM'}
                           </span>
@@ -1818,7 +1818,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                             className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-xs bg-[rgba(11,61,120,0.3)] border border-[rgba(19,108,153,0.4)] text-[10px] font-mono text-[#e0d0ab] hover:border-[#e0d0ab]/60 hover:bg-[rgba(11,61,120,0.5)] transition-all cursor-pointer shadow-xs"
                           >
                             <span className="font-bold text-[#e8e0cf]">{tag.paper}</span>
-                            <span className="text-zinc-600 select-none">&bull;</span>
+                            <span className="text-muted select-none">&bull;</span>
                             <span className="text-[#9fb0c8]">{tag.topic}</span>
                           </button>
                         ))}
@@ -1840,13 +1840,13 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                           <button
                             type="button"
                             onClick={() => setShowVerbatimSyllabus(false)}
-                            className="text-zinc-500 hover:text-stone-200 cursor-pointer font-sans"
+                            className="text-muted hover:text-primary cursor-pointer font-sans"
                           >
                             Close &times;
                           </button>
                         </div>
                         {parsedSyllabusTags.map((t, i) => (
-                          <div key={i} className="text-[11px] font-sans text-stone-300 pl-2.5 border-l border-[#0194a8]/50 leading-relaxed">
+                          <div key={i} className="text-[11px] font-sans text-primary pl-2.5 border-l border-[#0194a8]/50 leading-relaxed">
                             <span className="font-mono font-bold text-[#e0d0ab] mr-1">{t.paper}:</span>
                             <span>{t.full.replace(new RegExp(`^${t.paper}[:\\s-]*`, 'i'), '') || t.full}</span>
                           </div>
@@ -1864,7 +1864,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                     className={`flex items-center gap-1.5 px-3 py-2 text-xs font-sans font-bold uppercase tracking-wider transition-colors cursor-pointer border-b-2 -mb-px ${
                       dossierTab === 'exam_lens'
                         ? 'border-[#e0d0ab] text-[#e0d0ab] bg-[#e0d0ab]/5'
-                        : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                        : 'border-transparent text-secondary hover:text-primary'
                     }`}
                   >
                     <Target className="w-3.5 h-3.5" />
@@ -1877,7 +1877,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                     className={`flex items-center gap-1.5 px-3 py-2 text-xs font-sans font-bold uppercase tracking-wider transition-colors cursor-pointer border-b-2 -mb-px ${
                       dossierTab === 'mains_depth'
                         ? 'border-[#e0d0ab] text-[#e0d0ab] bg-[#e0d0ab]/5'
-                        : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                        : 'border-transparent text-secondary hover:text-primary'
                     }`}
                   >
                     <BookOpen className="w-3.5 h-3.5" />
@@ -1890,7 +1890,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                     className={`flex items-center gap-1.5 px-3 py-2 text-xs font-sans font-bold uppercase tracking-wider transition-colors cursor-pointer border-b-2 -mb-px ${
                       dossierTab === 'static_links'
                         ? 'border-[#e0d0ab] text-[#e0d0ab] bg-[#e0d0ab]/5'
-                        : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                        : 'border-transparent text-secondary hover:text-primary'
                     }`}
                   >
                     <Layers className="w-3.5 h-3.5" />
@@ -1908,7 +1908,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                     className={`flex items-center gap-1.5 px-3 py-2 text-xs font-sans font-bold uppercase tracking-wider transition-colors cursor-pointer border-b-2 -mb-px ${
                       dossierTab === 'evidence'
                         ? 'border-[#e0d0ab] text-[#e0d0ab] bg-[#e0d0ab]/5'
-                        : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                        : 'border-transparent text-secondary hover:text-primary'
                     }`}
                   >
                     <Shield className="w-3.5 h-3.5" />
@@ -1927,21 +1927,21 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-sans">
                           {selectedDossier.summary.revision_targets.data_metric && (
-                            <div className="p-2 bg-zinc-900/70 border border-zinc-800 rounded-sm">
+                            <div className="p-2 bg-surface-elevated/70 border border-border rounded-sm">
                               <span className="text-[10px] uppercase font-mono text-amber-400 block mb-0.5">Target Data</span>
-                              <span className="text-zinc-200 font-medium">{selectedDossier.summary.revision_targets.data_metric}</span>
+                              <span className="text-primary font-medium">{selectedDossier.summary.revision_targets.data_metric}</span>
                             </div>
                           )}
                           {selectedDossier.summary.revision_targets.nodal_body && (
-                            <div className="p-2 bg-zinc-900/70 border border-zinc-800 rounded-sm">
+                            <div className="p-2 bg-surface-elevated/70 border border-border rounded-sm">
                               <span className="text-[10px] uppercase font-mono text-cyan-400 block mb-0.5">Nodal Agency</span>
-                              <span className="text-zinc-200 font-medium">{selectedDossier.summary.revision_targets.nodal_body}</span>
+                              <span className="text-primary font-medium">{selectedDossier.summary.revision_targets.nodal_body}</span>
                             </div>
                           )}
                           {selectedDossier.summary.revision_targets.statutory_legal && (
-                            <div className="p-2 bg-zinc-900/70 border border-zinc-800 rounded-sm">
+                            <div className="p-2 bg-surface-elevated/70 border border-border rounded-sm">
                               <span className="text-[10px] uppercase font-mono text-purple-400 block mb-0.5">Statutory / Legal</span>
-                              <span className="text-zinc-200 font-medium">{selectedDossier.summary.revision_targets.statutory_legal}</span>
+                              <span className="text-primary font-medium">{selectedDossier.summary.revision_targets.statutory_legal}</span>
                             </div>
                           )}
                         </div>
@@ -1963,11 +1963,11 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
 
                     {/* Prelims Pointer */}
                     {selectedDossier.summary?.prelims && (
-                      <div className="p-3 bg-zinc-900/70 border border-zinc-800 rounded-sm space-y-1">
+                      <div className="p-3 bg-surface-elevated/70 border border-border rounded-sm space-y-1">
                         <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold flex items-center gap-1">
                           <Zap className="w-3 h-3 text-[#e0d0ab]" /> Prelims Factual Pointer
                         </span>
-                        <p className="text-xs text-zinc-300 font-sans leading-relaxed">
+                        <p className="text-xs text-primary font-sans leading-relaxed">
                           {selectedDossier.summary.prelims}
                         </p>
                       </div>
@@ -1980,7 +1980,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                       </h4>
                       <div className="space-y-2.5 pl-3 border-l-2 border-[#e0d0ab]/30">
                         {selectedDossier.summary?.bullets?.map((bullet, idx) => (
-                          <p key={idx} className="text-sm text-zinc-300 font-sans leading-relaxed">
+                          <p key={idx} className="text-sm text-primary font-sans leading-relaxed">
                             {bullet}
                           </p>
                         ))}
@@ -1995,33 +1995,33 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                     {selectedDossier.summary?.mains_analysis ? (
                       <div className="space-y-3">
                         {selectedDossier.summary.mains_analysis.context && (
-                          <div className="p-3.5 bg-zinc-900/60 border border-zinc-800 rounded-sm space-y-1">
+                          <div className="p-3.5 bg-surface-elevated/60 border border-border rounded-sm space-y-1">
                             <span className="text-[10px] font-mono uppercase text-[#e0d0ab] font-bold block">
                               1. Context & Historical Timeline
                             </span>
-                            <p className="text-xs text-zinc-300 font-sans leading-relaxed">
+                            <p className="text-xs text-primary font-sans leading-relaxed">
                               {selectedDossier.summary.mains_analysis.context}
                             </p>
                           </div>
                         )}
 
                         {selectedDossier.summary.mains_analysis.core_implications && (
-                          <div className="p-3.5 bg-zinc-900/60 border border-zinc-800 rounded-sm space-y-1">
+                          <div className="p-3.5 bg-surface-elevated/60 border border-border rounded-sm space-y-1">
                             <span className="text-[10px] font-mono uppercase text-cyan-300 font-bold block">
                               2. Core Policy Implications & Federal Dynamics
                             </span>
-                            <p className="text-xs text-zinc-300 font-sans leading-relaxed">
+                            <p className="text-xs text-primary font-sans leading-relaxed">
                               {selectedDossier.summary.mains_analysis.core_implications}
                             </p>
                           </div>
                         )}
 
                         {selectedDossier.summary.mains_analysis.way_forward && (
-                          <div className="p-3.5 bg-zinc-900/60 border border-zinc-800 rounded-sm space-y-1">
+                          <div className="p-3.5 bg-surface-elevated/60 border border-border rounded-sm space-y-1">
                             <span className="text-[10px] font-mono uppercase text-emerald-400 font-bold block">
                               3. Strategic Way Forward & Reform Roadmap
                             </span>
-                            <p className="text-xs text-zinc-300 font-sans leading-relaxed">
+                            <p className="text-xs text-primary font-sans leading-relaxed">
                               {selectedDossier.summary.mains_analysis.way_forward}
                             </p>
                           </div>
@@ -2029,20 +2029,20 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                       </div>
                     ) : (
                       selectedDossier.summary?.mains ? (
-                        <div className="p-4 bg-zinc-900/60 border border-zinc-800 rounded-sm space-y-2">
+                        <div className="p-4 bg-surface-elevated/60 border border-border rounded-sm space-y-2">
                           <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold flex items-center gap-1">
                             <ChevronRight className="w-3.5 h-3.5 text-[#e0d0ab]" /> Mains Perspective
                           </span>
-                          <p className="text-sm text-zinc-300 font-sans leading-relaxed">
+                          <p className="text-sm text-primary font-sans leading-relaxed">
                             {selectedDossier.summary.mains}
                           </p>
                         </div>
                       ) : (
-                        <div className="p-4 bg-zinc-900/40 border border-zinc-800 rounded-sm space-y-1">
+                        <div className="p-4 bg-surface-elevated/40 border border-border rounded-sm space-y-1">
                           <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold">
                             Mains Analysis Blueprint
                           </span>
-                          <p className="text-xs text-zinc-400 font-sans leading-relaxed">
+                          <p className="text-xs text-secondary font-sans leading-relaxed">
                             Apply this policy development to GS Paper II (Governance, Executive & Judicial Accountability) and GS Paper III (Inclusive Growth & Macroeconomic Stability). Formulate arguments focusing on implementation bottlenecks, constitutional checks, and administrative efficacy.
                           </p>
                         </div>
@@ -2050,9 +2050,9 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                     )}
 
                     {selectedDossier.summary?.mains && selectedDossier.summary?.mains_analysis && (
-                      <div className="p-3 bg-zinc-900/40 border border-zinc-800/80 rounded-sm">
-                        <span className="text-[10px] font-mono text-zinc-400 uppercase block mb-1">Analytical Thesis Pointer:</span>
-                        <p className="text-xs text-zinc-300 italic font-sans">{selectedDossier.summary.mains}</p>
+                      <div className="p-3 bg-surface-elevated/40 border border-border/80 rounded-sm">
+                        <span className="text-[10px] font-mono text-secondary uppercase block mb-1">Analytical Thesis Pointer:</span>
+                        <p className="text-xs text-primary italic font-sans">{selectedDossier.summary.mains}</p>
                       </div>
                     )}
                   </div>
@@ -2065,31 +2065,31 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                       <h4 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
                         Standard Textbook & Syllabus Anchors
                       </h4>
-                      <span className="text-[10px] font-mono text-zinc-500">NCERT / Laxmikanth Alignment</span>
+                      <span className="text-[10px] font-mono text-muted">NCERT / Laxmikanth Alignment</span>
                     </div>
 
                     {selectedDossier.summary?.static_linkages && selectedDossier.summary.static_linkages.length > 0 ? (
                       <div className="space-y-2.5">
                         {selectedDossier.summary.static_linkages.map((item, idx) => (
-                          <div key={idx} className="p-3.5 bg-zinc-900/70 border border-zinc-800 rounded-sm space-y-1">
+                          <div key={idx} className="p-3.5 bg-surface-elevated/70 border border-border rounded-sm space-y-1">
                             <div className="flex items-center gap-2">
                               <span className="w-1.5 h-1.5 rounded-full bg-[#e0d0ab]" />
                               <h5 className="font-serif text-sm font-bold text-[#e0d0ab]">
                                 {item.concept}
                               </h5>
                             </div>
-                            <p className="text-xs text-zinc-300 font-sans leading-relaxed pl-3.5">
+                            <p className="text-xs text-primary font-sans leading-relaxed pl-3.5">
                               {item.textbook_context}
                             </p>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div className="p-4 bg-zinc-900/40 border border-zinc-800 rounded-sm space-y-2 font-sans">
+                      <div className="p-4 bg-surface-elevated/40 border border-border rounded-sm space-y-2 font-sans">
                         <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold">
                           Core General Studies Alignment
                         </span>
-                        <p className="text-xs text-zinc-300 font-sans leading-relaxed">
+                        <p className="text-xs text-primary font-sans leading-relaxed">
                           This development maps directly to {(selectedDossier.summary?.tags || ['General Studies']).join(', ')}. Review foundational constitutional provisions, statutory bodies, and standard economic metrics in your core notes.
                         </p>
                       </div>
@@ -2103,9 +2103,9 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                           {selectedDossier.summary.thematic_pillars.map((pillar, idx) => (
-                            <div key={idx} className="p-2.5 bg-zinc-900/50 border border-zinc-800 rounded-sm space-y-0.5">
-                              <span className="font-serif text-xs font-bold text-zinc-200 block">{pillar.title}</span>
-                              <p className="text-[11px] text-zinc-400 leading-snug">{pillar.description}</p>
+                            <div key={idx} className="p-2.5 bg-surface-elevated/50 border border-border rounded-sm space-y-0.5">
+                              <span className="font-serif text-xs font-bold text-primary block">{pillar.title}</span>
+                              <p className="text-[11px] text-secondary leading-snug">{pillar.description}</p>
                             </div>
                           ))}
                         </div>
@@ -2132,7 +2132,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                       {selectedDossier.summary?.bullets?.map((bullet, idx) => {
                         const claim = (selectedDossier.summary?.claims || []).find((c) => c.text?.trim() === bullet?.trim()) || (selectedDossier.summary?.claims || [])[idx];
                         return (
-                          <p key={idx} className="text-sm text-zinc-300 font-sans leading-relaxed">
+                          <p key={idx} className="text-sm text-primary font-sans leading-relaxed">
                             {bullet}
                             {claim && <SourceAnchor claim={claim} />}
                           </p>
@@ -2143,8 +2143,8 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                     {/* Contested Claim Disagreement (if present) */}
                     <ContestedCard contested={selectedDossier.summary?.contested} />
 
-                    <div className="p-3 bg-zinc-900/40 border border-zinc-800 rounded-sm text-[11px] font-mono text-zinc-400 space-y-1">
-                      <div>Primary Source: <span className="text-zinc-200">{selectedDossier.source}</span></div>
+                    <div className="p-3 bg-surface-elevated/40 border border-border rounded-sm text-[11px] font-mono text-secondary space-y-1">
+                      <div>Primary Source: <span className="text-primary">{selectedDossier.source}</span></div>
                       <div>Verification Protocol: <span className="text-[#e0d0ab]">{selectedDossier.summary?.verification_method || 'live_cite_or_drop_v1'}</span></div>
                     </div>
                   </div>
@@ -2152,13 +2152,13 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
               </div>
 
               {/* Modal Footer with Actions */}
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-6 mt-8 border-t border-zinc-800 font-sans">
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-6 mt-8 border-t border-border font-sans">
                 <button
                   onClick={() => toggleBookmark(selectedDossier.id || '')}
                   className={`inline-flex items-center gap-2 text-xs font-sans font-bold uppercase tracking-wider px-3.5 py-2 rounded-sm border transition-all cursor-pointer ${
                     savedArticleIds.has(selectedDossier.id || '')
                       ? 'border-emerald-500/60 bg-emerald-500/10 text-emerald-300'
-                      : 'border-zinc-800 bg-zinc-900 text-zinc-300 hover:border-[#e0d0ab]'
+                      : 'border-border bg-surface-elevated text-primary hover:border-[#e0d0ab]'
                   }`}
                 >
                   <Bookmark className={`w-3.5 h-3.5 ${savedArticleIds.has(selectedDossier.id || '') ? 'fill-emerald-400' : ''}`} />
@@ -2184,7 +2184,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                     href={selectedDossier.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#e0d0ab] text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-stone-100 transition-all cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#e0d0ab] text-surface font-sans text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-primary transition-all cursor-pointer"
                   >
                     <span>Primary Source</span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -2426,9 +2426,9 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[700] px-6 py-3 bg-zinc-900 border border-zinc-700/80 rounded-sm shadow-2xl"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[700] px-6 py-3 bg-surface-elevated border border-border/80 rounded-sm shadow-2xl"
           >
-            <p className="text-xs text-stone-200 font-sans whitespace-nowrap">{toastMsg}</p>
+            <p className="text-xs text-primary font-sans whitespace-nowrap">{toastMsg}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -2440,7 +2440,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[700] px-6 py-3 bg-zinc-900 border border-emerald-800/80 rounded-sm shadow-2xl"
+            className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[700] px-6 py-3 bg-surface-elevated border border-emerald-800/80 rounded-sm shadow-2xl"
           >
             <p className="text-xs text-emerald-300 font-sans whitespace-nowrap flex items-center gap-2">
               <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-400" />

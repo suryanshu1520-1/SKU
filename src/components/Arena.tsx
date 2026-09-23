@@ -1,38 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { fetchWithAuth } from '../lib/api';
-import { supabase } from '../lib/supabase';
+import React from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
-import type { Question } from '../types';
 import {
   Loader2,
-  ChevronLeft,
-  ChevronRight,
-  Check,
+  Sparkles,
+  AlertTriangle,
   Bookmark,
   BookmarkCheck,
-  Sparkles,
-  ArrowRight,
-  Lock,
-  Swords,
-  Target,
-  AlertTriangle,
-  HelpCircle,
-  Clock,
-  CheckCircle2,
-  XCircle,
-  Shield,
-  Zap,
-  BookOpen,
 } from 'lucide-react';
-import InfoTooltip from './InfoTooltip';
-import Markdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeSanitize from 'rehype-sanitize';
-import { Modal, EmptyState, ConceptInsightRenderer, formatInsightToText } from './shared';
-import staticQuestionsData from '../data/static-subject-questions.json';
+import { Modal, ConceptInsightRenderer } from './shared';
 import type { CandidatePreferences, ArenaLaunchConfig } from '../types';
+import { useArenaSession } from './arena/useArenaSession';
+import { ArenaLobby } from './arena/ArenaLobby';
+import { TrainingSetup } from './arena/TrainingSetup';
+import { QuestionHeader } from './arena/QuestionHeader';
+import { QuestionPalette } from './arena/QuestionPalette';
+import { QuestionBody } from './arena/QuestionBody';
+import { AnswerOption } from './arena/AnswerOption';
+import { ReviewControls } from './arena/ReviewControls';
 
-interface ArenaProps {
+export interface ArenaProps {
   onComplete: (
     stats: {
       correct: number;
@@ -55,128 +41,6 @@ interface ArenaProps {
   onTestStatusChange?: (isActive: boolean) => void;
 }
 
-const SESSION_STORAGE_KEY = 'tark_arena_session';
-const ACTIVE_SESSION_KEY = 'tark_active_session';
-const RESULTS_STORAGE_KEY = 'tark_arena_results';
-
-interface CachedSession {
-  questions: Question[];
-  currentQuestionIndex: number;
-  userAnswers: Record<string, string>;
-  timeouts: Record<string, boolean>;
-  timeLeftMap: Record<string, number>;
-  timeSpentMap: Record<string, number>;
-  quizSubmitted: boolean;
-  explanationCache: Record<string, string>;
-  revealedAnswers?: Record<string, string>;
-  loadingExplanationMap: Record<string, boolean>;
-  savedInsightIds: string[];
-  userId: string;
-  isRanked: boolean;
-  pendingAnswersMap: Record<string, string>;
-  lockedMap: Record<string, boolean>;
-}
-
-interface ActiveSessionMeta {
-  currentQuestionIndex: number;
-  isRanked: boolean;
-  mode: 'vanguard' | 'training';
-}
-
-interface CachedResults {
-  status: 'reviewing';
-  resultsData: {
-    correct: number;
-    incorrect: number;
-    unattempted: number;
-    totalTimeSeconds: number;
-    subjectStats: Record<string, { correct: number; total: number; missedQuestions?: string[] }>;
-    isRanked?: boolean;
-    contextTag?: string;
-  };
-  percentile: number;
-}
-
-const MOTIVATIONAL_STRINGS = [
-  "Deep breaths, fastened seatbelts.",
-  "Remember to hydrate.",
-  "Clear your mind, focus the signal.",
-  "Trust your preparation, not your anxiety.",
-  "Each question is a step toward mastery.",
-  "The only competition is yesterday's you.",
-  "Precision over speed. Clarity over guesswork.",
-  "You've trained for this. Now execute.",
-  "Breathe. Assess. Answer. Advance.",
-  "Let your reasoning be your compass.",
-  "Patience is the mark of a true analyst.",
-  "Steady hands, sharp mind.",
-  "Every expert was once a beginner.",
-  "Focus on the question, not the outcome.",
-  "The arena rewards the disciplined.",
-];
-
-function getRandomMotivation(): string {
-  return MOTIVATIONAL_STRINGS[Math.floor(Math.random() * MOTIVATIONAL_STRINGS.length)];
-}
-
-function saveSessionToCache(data: Partial<CachedSession>) {
-  try {
-    const existing = loadSessionFromCache() || {};
-    const merged = { ...existing, ...data };
-    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(merged));
-  } catch (e) {
-    console.warn("Failed to save arena session cache:", e);
-  }
-}
-
-function loadSessionFromCache(): CachedSession | null {
-  try {
-    const raw = localStorage.getItem(SESSION_STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw) as CachedSession;
-  } catch (e) {
-    console.warn("Failed to load arena session cache:", e);
-    return null;
-  }
-}
-
-function clearSessionCache() {
-  try {
-    localStorage.removeItem(SESSION_STORAGE_KEY);
-    localStorage.removeItem(ACTIVE_SESSION_KEY);
-  } catch (e) {
-    console.warn("Failed to clear arena session cache:", e);
-  }
-}
-
-function saveActiveSessionMeta(meta: ActiveSessionMeta) {
-  try {
-    localStorage.setItem(ACTIVE_SESSION_KEY, JSON.stringify(meta));
-  } catch (e) {
-    console.warn("Failed to save active session meta:", e);
-  }
-}
-
-function loadActiveSessionMeta(): ActiveSessionMeta | null {
-  try {
-    const raw = localStorage.getItem(ACTIVE_SESSION_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw) as ActiveSessionMeta;
-  } catch {
-    return null;
-  }
-}
-
-function loadCachedResults(): CachedResults | null {
-  try {
-    const raw = localStorage.getItem(RESULTS_STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw) as CachedResults;
-  } catch {
-    return null;
-  }
-}
-
 export default function Arena({
   onComplete,
   userId,
@@ -188,1373 +52,87 @@ export default function Arena({
   onNavigateManifesto,
   onTestStatusChange,
 }: ArenaProps) {
-  const [arenaPhase, setArenaPhase] = useState<'intro' | 'quiz'>('intro');
-  const [cachedSessionAvailable, setCachedSessionAvailable] = useState<CachedSession | null>(null);
-  const [examTrack, setExamTrack] = useState<'upsc' | 'ssc'>('upsc');
-  const [pacingMode, setPacingMode] = useState<'standard' | 'blitz' | 'untimed'>(() => {
-    if (arenaConfig?.timePerQuestionSeconds === 20) return 'blitz';
-    if (arenaConfig?.timePerQuestionSeconds === 0) return 'untimed';
-    return 'standard';
+  const session = useArenaSession({
+    onComplete,
+    userId,
+    targetPillar,
+    arenaConfig,
+    candidatePreferences,
+    onClearTargetPillar,
+    onReturnToDashboard,
+    onNavigateManifesto,
+    onTestStatusChange,
   });
-  const [showPreflightModal, setShowPreflightModal] = useState(false);
-  const [showAbandonModal, setShowAbandonModal] = useState(false);
-  const [motivation, setMotivation] = useState('');
-  const [userLimits, setUserLimits] = useState<{ vanguardUsed: number; insightsUsed: number; tier: string } | null>(null);
-
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState('');
-
-  // Resume overlay state
-  const [showResumeOverlay, setShowResumeOverlay] = useState(false);
-  const [resumeCountdown, setResumeCountdown] = useState(3);
-
-  // Per-Question Answers & Timing State
-  const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
-  const [timeouts, setTimeouts] = useState<Record<string, boolean>>({});
-  const [timeLeftMap, setTimeLeftMap] = useState<Record<string, number>>({});
-  const [timeSpentMap, setTimeSpentMap] = useState<Record<string, number>>({});
-  const [quizSubmitted, setQuizSubmitted] = useState(false);
-
-  // Two-Step Lock State
-  const [pendingAnswersMap, setPendingAnswersMap] = useState<Record<string, string>>({});
-  const [lockedMap, setLockedMap] = useState<Record<string, boolean>>({});
-
-  // Explanation cache states
-  const [explanationCache, setExplanationCache] = useState<Record<string, any>>({});
-  const [revealedAnswers, setRevealedAnswers] = useState<Record<string, string>>({});
-  const [loadingExplanationMap, setLoadingExplanationMap] = useState<Record<string, boolean>>({});
-
-  // Bookmark states
-  const [savedInsightIds, setSavedInsightIds] = useState<Set<string>>(new Set());
-  const [bookmarkToggling, setBookmarkToggling] = useState<Record<string, boolean>>({});
-  const [isAIFrostedGlass, setIsAIFrostedGlass] = useState(false);
-  const [toastMsg, setToastMsg] = useState('');
-
-  // Mode and Training Ground states
-  const [isRanked, setIsRanked] = useState(true);
-  const [showTrainingSetup, setShowTrainingSetup] = useState(false);
-  const [allSubjects, setAllSubjects] = useState<string[]>([]);
-  const [selectedSubjects, setSelectedSubjects] = useState<Set<string>>(new Set());
-  const [trainingLength, setTrainingLength] = useState<number>(() => candidatePreferences?.dailyMcqTarget || 25);
-  const [loadingSubjects, setLoadingSubjects] = useState(false);
 
   const prefersReduced = useReducedMotion();
 
-  // Fetch user limits on mount if in intro
-  useEffect(() => {
-    if (arenaPhase === 'intro' && userId) {
-      fetchWithAuth(`/api/user-limits?userId=${encodeURIComponent(userId)}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (!data.error) {
-            setUserLimits(data);
-          }
-        })
-        .catch((err) => console.warn('Failed to fetch user limits:', err));
-    }
-  }, [arenaPhase, userId]);
-
-  // Check for cached results or active session on mount
-  useEffect(() => {
-    const cached = loadCachedResults();
-    if (cached) {
-      onComplete(
-        {
-          correct: cached.resultsData.correct,
-          incorrect: cached.resultsData.incorrect,
-          unattempted: cached.resultsData.unattempted,
-          totalTimeSeconds: cached.resultsData.totalTimeSeconds,
-          subjectStats: cached.resultsData.subjectStats,
-          isRanked: cached.resultsData.isRanked,
-        },
-        cached.percentile
-      );
-      return;
-    }
-
-    const activeMeta = loadActiveSessionMeta();
-    if (activeMeta) {
-      const fullCached = loadSessionFromCache();
-      if (fullCached && fullCached.userId === userId && fullCached.questions.length > 0 && !fullCached.quizSubmitted) {
-        // If an explicit new drill or pillar was requested via props, discard the old session and start fresh
-        if (arenaConfig?.autoStart || (targetPillar && targetPillar.id)) {
-          clearSessionCache();
-          setCachedSessionAvailable(null);
-        } else {
-          // Never forcibly trap the candidate on the abandoned question;
-          // save it in state to display an optional "Resume Test / Discard" banner in the lobby!
-          setCachedSessionAvailable(fullCached);
-        }
-        return;
-      }
-    }
-  }, [userId, onComplete, arenaConfig?.autoStart, targetPillar]);
-
-  const handleResumeSavedSession = () => {
-    if (!cachedSessionAvailable) return;
-    setQuestions(cachedSessionAvailable.questions);
-    setCurrentQuestionIndex(cachedSessionAvailable.currentQuestionIndex);
-    setUserAnswers(cachedSessionAvailable.userAnswers);
-    setTimeouts(cachedSessionAvailable.timeouts);
-    setTimeLeftMap(cachedSessionAvailable.timeLeftMap);
-    setTimeSpentMap(cachedSessionAvailable.timeSpentMap);
-    setQuizSubmitted(cachedSessionAvailable.quizSubmitted);
-    setExplanationCache(cachedSessionAvailable.explanationCache || {});
-    if (cachedSessionAvailable.revealedAnswers) setRevealedAnswers(cachedSessionAvailable.revealedAnswers);
-    setLoadingExplanationMap(cachedSessionAvailable.loadingExplanationMap || {});
-    setSavedInsightIds(new Set(cachedSessionAvailable.savedInsightIds || []));
-    setIsRanked(cachedSessionAvailable.isRanked);
-    if (cachedSessionAvailable.pendingAnswersMap) setPendingAnswersMap(cachedSessionAvailable.pendingAnswersMap);
-    if (cachedSessionAvailable.lockedMap) setLockedMap(cachedSessionAvailable.lockedMap);
-    setIsLoading(false);
-    setShowResumeOverlay(true);
-    setResumeCountdown(3);
-    setArenaPhase('quiz');
-    setCachedSessionAvailable(null);
-  };
-
-  const handleDiscardSavedSession = () => {
-    clearSessionCache();
-    try {
-      localStorage.removeItem(SESSION_STORAGE_KEY);
-      localStorage.removeItem(ACTIVE_SESSION_KEY);
-      localStorage.removeItem(RESULTS_STORAGE_KEY);
-    } catch {}
-    setCachedSessionAvailable(null);
-  };
-
-  // Resume overlay countdown
-  useEffect(() => {
-    if (!showResumeOverlay || resumeCountdown <= 0) return;
-    const timer = setTimeout(() => {
-      setResumeCountdown((prev) => {
-        if (prev <= 1) {
-          setShowResumeOverlay(false);
-          return 3;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [showResumeOverlay, resumeCountdown]);
-
-  // Start Assessment Triggers (always clears any stale cached session)
-  const handleBeginAssessment = () => {
-    clearSessionCache();
-    setCachedSessionAvailable(null);
-    setIsRanked(true);
-    setMotivation(getRandomMotivation());
-    setShowPreflightModal(true);
-  };
-
-  const handleStartTargetedDrill = async () => {
-    clearSessionCache();
-    setCachedSessionAvailable(null);
-    const drillIsRanked = arenaConfig?.isRanked ?? false;
-    setIsRanked(drillIsRanked);
-    setArenaPhase('quiz');
-    setIsLoading(true);
-    setErrorMsg('');
-
-    try {
-      const targetId = arenaConfig?.targetId || targetPillar?.id || '';
-      const targetTitle = arenaConfig?.title || targetPillar?.title || targetId;
-      const targetCount = arenaConfig?.questionCount || 10;
-
-      const queryParams = new URLSearchParams();
-      if (userId) queryParams.append('userId', userId);
-      queryParams.append('examTrack', examTrack);
-      if (targetId) queryParams.append('pillar', targetId);
-      if (targetTitle) queryParams.append('subject', targetTitle);
-      queryParams.append('count', targetCount.toString());
-
-      const url = `/api/questions?${queryParams.toString()}`;
-      const response = await fetchWithAuth(url);
-      if (!response.ok) throw new Error(`Server returned status code ${response.status}`);
-      const data = await response.json();
-
-      if (data.error) throw new Error(data.error);
-
-      let questionsList = data.questions || [];
-      if (questionsList.length === 0) {
-        throw new Error('No questions found for this targeted drill.');
-      }
-
-      setQuestions(questionsList);
-      saveActiveSessionMeta({
-        currentQuestionIndex: 0,
-        isRanked: drillIsRanked,
-        mode: drillIsRanked ? 'vanguard' : 'training',
-      });
-    } catch (error: any) {
-      setErrorMsg('Failed to initialize drill: ' + (error.message || 'Unknown network error.'));
-      setArenaPhase('intro');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleTrainingGround = async () => {
-    clearSessionCache();
-    setCachedSessionAvailable(null);
-    setIsRanked(false);
-    setLoadingSubjects(true);
-    try {
-      const { data } = await supabase
-        .from('static_questions')
-        .select('subject_category')
-        .not('subject_category', 'is', null);
-
-      if (data) {
-        let unique = [...new Set(data.map((q: any) => q.subject_category).filter(Boolean))].sort() as string[];
-        if (!unique.includes('Current Affairs')) {
-          unique.push('Current Affairs');
-        }
-        setAllSubjects(unique);
-
-        const activeTarget = arenaConfig?.targetId || targetPillar?.id || targetPillar?.title || '';
-        let matched = false;
-
-        if (activeTarget) {
-          const directMatch = unique.filter((s) =>
-            s.toLowerCase().includes(activeTarget.toLowerCase()) || activeTarget.toLowerCase().includes(s.toLowerCase())
-          );
-          if (directMatch.length > 0) {
-            setSelectedSubjects(new Set(directMatch));
-            matched = true;
-          } else if (activeTarget.toUpperCase() === 'CURRENT_AFFAIRS') {
-            setSelectedSubjects(new Set(['Current Affairs']));
-            matched = true;
-          }
-        }
-
-        if (!matched && candidatePreferences?.focusPillars && candidatePreferences.focusPillars.length > 0) {
-          const pillars = candidatePreferences.focusPillars;
-          const preselected = unique.filter((subj) => {
-            const s = subj.toLowerCase();
-            if (pillars.includes('gs2') && (s.includes('polity') || s.includes('governance') || s.includes('constitution') || s.includes('international') || s.includes('law'))) return true;
-            if (pillars.includes('gs3') && (s.includes('economy') || s.includes('environment') || s.includes('science') || s.includes('tech') || s.includes('agriculture'))) return true;
-            if (pillars.includes('gs1') && (s.includes('history') || s.includes('geography') || s.includes('culture') || s.includes('society'))) return true;
-            if (pillars.includes('gs4') && (s.includes('ethics') || s.includes('integrity') || s.includes('aptitude'))) return true;
-            if (pillars.includes('csat') && (s.includes('csat') || s.includes('reasoning') || s.includes('comprehension'))) return true;
-            return false;
-          });
-          if (preselected.length > 0) {
-            setSelectedSubjects(new Set(preselected));
-          }
-        }
-      }
-    } catch (err) {
-      console.warn('Failed to fetch subjects:', err);
-    } finally {
-      setLoadingSubjects(false);
-    }
-    setShowTrainingSetup(true);
-  };
-
-  const toggleSubject = (subject: string) => {
-    setSelectedSubjects((prev) => {
-      const next = new Set(prev);
-      if (next.has(subject)) next.delete(subject);
-      else next.add(subject);
-      return next;
-    });
-  };
-
-  const startTraining = async () => {
-    if (selectedSubjects.size === 0) return;
-
-    setShowTrainingSetup(false);
-    setShowPreflightModal(false);
-    setArenaPhase('quiz');
-    setIsLoading(true);
-
-    try {
-      const response = await fetchWithAuth('/api/training-questions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          subjects: Array.from(selectedSubjects),
-          count: trainingLength,
-          userId,
-          examTrack,
-        }),
-      });
-
-      if (!response.ok) throw new Error(`Server returned ${response.status}`);
-
-      const data = await response.json();
-      const questionsList = data.questions || [];
-
-      if (data.isBackfilled) {
-        if (!localStorage.getItem('tark_backfill_seen')) {
-          localStorage.setItem('tark_backfill_seen', 'true');
-          setToastMsg('Diagnostic notice: Additional questions added to complete your set.');
-        }
-      }
-
-      if (questionsList.length === 0) {
-        setErrorMsg('No questions found for the selected subjects.');
-        setIsLoading(false);
-        setArenaPhase('intro');
-        return;
-      }
-
-      setQuestions(questionsList);
-      saveActiveSessionMeta({
-        currentQuestionIndex: 0,
-        isRanked: false,
-        mode: 'training',
-      });
-      setIsLoading(false);
-    } catch (err: any) {
-      setErrorMsg('Failed to load training questions: ' + (err.message || 'Unknown error'));
-      setIsLoading(false);
-      setArenaPhase('intro');
-    }
-  };
-
-  const handleReady = () => {
-    setShowPreflightModal(false);
-    setArenaPhase('quiz');
-  };
-
-  // Fetch questions for ranked Vanguard
-  useEffect(() => {
-    if (arenaPhase !== 'quiz') return;
-    if (!isRanked) return;
-    if (questions.length > 0) return;
-
-    const fetchQuestions = async () => {
-      setIsLoading(true);
-      setErrorMsg('');
-      try {
-        const queryParams = new URLSearchParams();
-        if (userId) queryParams.append('userId', userId);
-        queryParams.append('examTrack', examTrack);
-        if (targetPillar?.id) {
-          queryParams.append('pillar', targetPillar.id);
-          queryParams.append('subject', targetPillar.title || targetPillar.id);
-        }
-
-        const url = `/api/questions?${queryParams.toString()}`;
-        const response = await fetchWithAuth(url);
-        if (!response.ok) throw new Error(`Server returned status code ${response.status}`);
-        const data = await response.json();
-
-        if (data.error) throw new Error(data.error);
-
-        let questionsList = data.questions || [];
-        if (questionsList.length === 0) {
-          // Fallback to locally ingested static subject questions
-          questionsList = (staticQuestionsData.questions || []).map((q: any, i: number) => ({
-            id: q.id || `static_${i + 1}`,
-            exam_origin_tag: q.exam_origin_tag || 'UPSC CSE Practice',
-            subject_category: q.subject_category || 'General Studies',
-            difficulty_level: q.difficulty_level || 'medium',
-            question_text: q.question_text,
-            options_matrix: q.options_matrix,
-            conceptual_explanation: q.conceptual_explanation
-          }));
-        }
-
-        if (questionsList.length === 0) {
-          setErrorMsg('No questions found in the origin database.');
-          setIsLoading(false);
-          return;
-        }
-
-        const shuffled = [...questionsList].sort(() => 0.5 - Math.random());
-        const selected = shuffled.slice(0, 25);
-        setQuestions(selected);
-
-        saveActiveSessionMeta({
-          currentQuestionIndex: 0,
-          isRanked: true,
-          mode: 'vanguard',
-        });
-      } catch (error: any) {
-        // Fallback to locally ingested static questions on network error
-        const fallbackList = (staticQuestionsData.questions || []).map((q: any, i: number) => ({
-          id: q.id || `static_${i + 1}`,
-          exam_origin_tag: q.exam_origin_tag || 'UPSC CSE Practice',
-          subject_category: q.subject_category || 'General Studies',
-          difficulty_level: q.difficulty_level || 'medium',
-          question_text: q.question_text,
-          options_matrix: q.options_matrix,
-          conceptual_explanation: q.conceptual_explanation
-        }));
-
-        if (fallbackList.length > 0) {
-          const shuffled = [...fallbackList].sort(() => 0.5 - Math.random());
-          setQuestions(shuffled.slice(0, 25));
-          saveActiveSessionMeta({
-            currentQuestionIndex: 0,
-            isRanked: true,
-            mode: 'vanguard',
-          });
-        } else {
-          setErrorMsg('Failed to initialize arena: ' + (error.message || 'Unknown network error.'));
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchQuestions();
-  }, [arenaPhase, userId, isRanked, questions.length]);
-
-  // Persist session to cache
-  useEffect(() => {
-    if (arenaPhase !== 'quiz') return;
-    if (questions.length === 0) return;
-    saveSessionToCache({
-      questions,
-      currentQuestionIndex,
-      userAnswers,
-      timeouts,
-      timeLeftMap,
-      timeSpentMap,
-      quizSubmitted,
-      explanationCache,
-      revealedAnswers,
-      loadingExplanationMap,
-      savedInsightIds: Array.from(savedInsightIds),
-      userId,
-      isRanked,
-      pendingAnswersMap,
-      lockedMap,
-    });
-    saveActiveSessionMeta({
-      currentQuestionIndex,
-      isRanked,
-      mode: isRanked ? 'vanguard' : 'training',
-    });
-  }, [
-    arenaPhase,
-    questions,
-    currentQuestionIndex,
-    userAnswers,
-    timeouts,
-    timeLeftMap,
-    timeSpentMap,
-    quizSubmitted,
-    explanationCache,
-    revealedAnswers,
-    loadingExplanationMap,
-    savedInsightIds,
-    userId,
-    isRanked,
-    pendingAnswersMap,
-    lockedMap,
-  ]);
-
-  // Synchronize test active state with parent App (so navigation rail can guard against accidental abandonment)
-  useEffect(() => {
-    const isQuizActive = arenaPhase === 'quiz' && questions.length > 0 && !quizSubmitted;
-    onTestStatusChange?.(isQuizActive);
-    return () => {
-      onTestStatusChange?.(false);
-    };
-  }, [arenaPhase, questions.length, quizSubmitted, onTestStatusChange]);
-
-  const currentQuestion = questions[currentQuestionIndex];
-  const currentQuestionId = currentQuestion?.id;
-
-  const getOptions = (matrix: any) => {
-    try {
-      if (typeof matrix === 'string') return JSON.parse(matrix);
-      return matrix;
-    } catch {
-      return {};
-    }
-  };
-
-  const defaultTimeForQuestion =
-    pacingMode === 'blitz' ? 20 : pacingMode === 'standard' ? (arenaConfig?.timePerQuestionSeconds || 60) : 999999;
-
-  // Timer interval loop
-  useEffect(() => {
-    if (arenaPhase !== 'quiz' || isLoading || errorMsg || questions.length === 0 || !currentQuestionId || quizSubmitted) return;
-
-    const isCurrentlyLocked = !!lockedMap[currentQuestionId];
-    if (isCurrentlyLocked) return;
-
-    // Untimed mode: simply tally time spent without timeout auto-lock
-    if (pacingMode === 'untimed') {
-      const timer = setInterval(() => {
-        setTimeSpentMap((prev) => ({
-          ...prev,
-          [currentQuestionId]: (prev[currentQuestionId] || 0) + 1,
-        }));
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-
-    const currentTimeLeft = timeLeftMap[currentQuestionId] !== undefined ? timeLeftMap[currentQuestionId] : defaultTimeForQuestion;
-
-    if (currentTimeLeft <= 0) {
-      setLockedMap((prev) => ({ ...prev, [currentQuestionId]: true }));
-      setTimeouts((prev) => ({ ...prev, [currentQuestionId]: true }));
-      return;
-    }
-
-    const timer = setInterval(() => {
-      setTimeLeftMap((prev) => ({
-        ...prev,
-        [currentQuestionId]: Math.max(0, (prev[currentQuestionId] !== undefined ? prev[currentQuestionId] : defaultTimeForQuestion) - 1),
-      }));
-      setTimeSpentMap((prev) => ({
-        ...prev,
-        [currentQuestionId]: (prev[currentQuestionId] || 0) + 1,
-      }));
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [arenaPhase, currentQuestionId, timeLeftMap, lockedMap, isLoading, errorMsg, questions, quizSubmitted, pacingMode, defaultTimeForQuestion]);
-
-  // AI Conceptual Insights loop
-  useEffect(() => {
-    if (arenaPhase !== 'quiz') return;
-    if (!currentQuestionId || quizSubmitted) return;
-
-    const questionIsLocked = !!lockedMap[currentQuestionId] || !!timeouts[currentQuestionId];
-
-    if (questionIsLocked) {
-      if (currentQuestion?.ai_insights) {
-        setExplanationCache((prev) => ({ ...prev, [currentQuestionId]: currentQuestion.ai_insights }));
-        return;
-      }
-
-      if (explanationCache[currentQuestionId] || loadingExplanationMap[currentQuestionId]) return;
-
-      setLoadingExplanationMap((prev) => ({ ...prev, [currentQuestionId]: true }));
-
-      fetchWithAuth('/api/explanation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question: currentQuestion.question_text,
-          questionId: currentQuestionId,
-          userId,
-        }),
-      })
-        .then(async (res) => {
-          const data = await res.json();
-          if (res.status === 403 && (data.error === 'PAYWALL_REACHED' || data.error === 'limit_reached')) {
-            if (data.error === 'limit_reached') setIsAIFrostedGlass(true);
-            else if (onNavigateManifesto) onNavigateManifesto();
-            return null;
-          }
-          return data;
-        })
-        .then((data) => {
-          if (!data) return;
-          if (data.correct_option) {
-            setRevealedAnswers((prev) => ({ ...prev, [currentQuestionId]: data.correct_option }));
-          }
-          if (data.explanation) {
-            setExplanationCache((prev) => ({ ...prev, [currentQuestionId]: data.explanation }));
-            setQuestions((prevQ) =>
-              prevQ.map((q) => (q.id === currentQuestionId ? { ...q, ai_insights: data.explanation, is_generated: true } : q))
-            );
-          }
-        })
-        .catch((err) => console.error('Insight fetch failure:', err))
-        .finally(() => {
-          setLoadingExplanationMap((prev) => ({ ...prev, [currentQuestionId]: false }));
-        });
-    }
-  }, [arenaPhase, currentQuestionId, lockedMap, timeouts, quizSubmitted, currentQuestion, explanationCache, loadingExplanationMap, onNavigateManifesto, userId]);
-
-  // Select Option (Two-Step pending state)
-  const handleSelect = (key: string) => {
-    if (!currentQuestionId) return;
-    const alreadyLocked = !!lockedMap[currentQuestionId] || !!timeouts[currentQuestionId] || quizSubmitted;
-    if (alreadyLocked) return;
-    setPendingAnswersMap((prev) => ({ ...prev, [currentQuestionId]: key }));
-  };
-
-  // Lock Answer Commit
-  const handleLock = () => {
-    if (!currentQuestionId) return;
-    const pending = pendingAnswersMap[currentQuestionId];
-    if (!pending) return;
-
-    setUserAnswers((prev) => ({ ...prev, [currentQuestionId]: pending }));
-    setLockedMap((prev) => ({ ...prev, [currentQuestionId]: true }));
-    saveActiveSessionMeta({
-      currentQuestionIndex,
-      isRanked,
-      mode: isRanked ? 'vanguard' : 'training',
-    });
-  };
-
-  const handlePrevious = () => {
-    if (currentQuestionIndex <= 0) return;
-    setCurrentQuestionIndex((prev) => prev - 1);
-    saveActiveSessionMeta({
-      currentQuestionIndex: currentQuestionIndex - 1,
-      isRanked,
-      mode: isRanked ? 'vanguard' : 'training',
-    });
-  };
-
-  const handleNext = () => {
-    if (!currentQuestionId) return;
-
-    const pending = pendingAnswersMap[currentQuestionId];
-    if (pending && !userAnswers[currentQuestionId]) {
-      setUserAnswers((prev) => ({ ...prev, [currentQuestionId]: pending }));
-    }
-
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex((prev) => prev + 1);
-      saveActiveSessionMeta({
-        currentQuestionIndex: currentQuestionIndex + 1,
-        isRanked,
-        mode: isRanked ? 'vanguard' : 'training',
-      });
-    } else {
-      finishArena();
-    }
-  };
-
-  // Abandon Dialog Confirm
-  const handleConfirmAbandon = () => {
-    setShowAbandonModal(false);
-    clearSessionCache();
-    setCachedSessionAvailable(null);
-    try {
-      localStorage.removeItem(SESSION_STORAGE_KEY);
-      localStorage.removeItem(ACTIVE_SESSION_KEY);
-      localStorage.removeItem(RESULTS_STORAGE_KEY);
-    } catch {
-      // safe fallback if storage access restricted
-    }
-    setArenaPhase('intro');
-    setQuestions([]);
-    setCurrentQuestionIndex(0);
-    setUserAnswers({});
-    setTimeouts({});
-    setTimeLeftMap({});
-    setTimeSpentMap({});
-    setQuizSubmitted(false);
-    setExplanationCache({});
-    setLoadingExplanationMap({});
-    setSavedInsightIds(new Set());
-    setPendingAnswersMap({});
-    setLockedMap({});
-    onTestStatusChange?.(false);
-    const origin = arenaConfig?.originTab || 'arena';
-    if (onReturnToDashboard) onReturnToDashboard(origin);
-  };
-
-  // Bookmark Insight
-  const toggleBookmark = async () => {
-    if (!currentQuestionId || !userId) return;
-
-    const qId = String(currentQuestionId);
-    const isSaved = savedInsightIds.has(qId);
-    const rawInsight = explanationCache[currentQuestionId] || currentQuestion.ai_insights || currentQuestion.conceptual_explanation || '';
-    const insightText = formatInsightToText(rawInsight, currentQuestion.conceptual_explanation);
-
-    if (!insightText) return;
-
-    setBookmarkToggling((prev) => ({ ...prev, [qId]: true }));
-
-    try {
-      if (isSaved) {
-        await fetchWithAuth('/api/bookmark', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, questionId: currentQuestionId, action: 'delete' }),
-        });
-        setSavedInsightIds((prev) => {
-          const next = new Set(prev);
-          next.delete(qId);
-          return next;
-        });
-        setToastMsg('Flashcard removed from bookmarks.');
-      } else {
-        await fetchWithAuth('/api/bookmark', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId,
-            questionId: currentQuestionId,
-            questionText: currentQuestion.question_text,
-            insightText,
-            action: 'save',
-          }),
-        });
-        setSavedInsightIds((prev) => new Set(prev).add(qId));
-        setToastMsg('Conceptual flashcard saved to dossier.');
-      }
-    } catch (err) {
-      console.error('Bookmark toggle fail:', err);
-    } finally {
-      setBookmarkToggling((prev) => ({ ...prev, [qId]: false }));
-    }
-  };
-
-  const finishArena = async () => {
-    setIsLoading(true);
-    setQuizSubmitted(true);
-
-    let correctCount = 0;
-    let incorrectCount = 0;
-    let unattemptedCount = 0;
-    let totalTime = 0;
-    const finalSubjectStats: Record<string, { correct: number; total: number; missedQuestions: string[] }> = {};
-
-    questions.forEach((q) => {
-      const selected = userAnswers[q.id];
-      const revealedKey = revealedAnswers[q.id]?.trim();
-      const isCorrect = selected && revealedKey ? selected === revealedKey : false;
-      const subj = q.subject_category || 'CORE';
-
-      if (!finalSubjectStats[subj]) {
-        finalSubjectStats[subj] = { correct: 0, total: 0, missedQuestions: [] };
-      }
-      finalSubjectStats[subj].total += 1;
-
-      if (!selected) {
-        unattemptedCount += 1;
-        if (q.question_text) finalSubjectStats[subj].missedQuestions.push(q.question_text);
-      } else if (isCorrect) {
-        correctCount += 1;
-        finalSubjectStats[subj].correct += 1;
-      } else {
-        incorrectCount += 1;
-        if (q.question_text) finalSubjectStats[subj].missedQuestions.push(q.question_text);
-      }
-
-      totalTime += timeSpentMap[q.id] || 0;
-    });
-
-    try {
-      const response = await fetchWithAuth('/api/submit-quiz', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId,
-          answers: userAnswers,
-          timeouts,
-          timeSpentMap,
-          questions: questions.map((q) => ({
-            id: q.id,
-            subject_category: q.subject_category,
-          })),
-          subjectStats: finalSubjectStats,
-          totalTimeSeconds: totalTime,
-          isRanked,
-        }),
-      });
-
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({ error: 'Server non-JSON response' }));
-        throw new Error(errData.error || `Server responded with ${response.status}`);
-      }
-
-      const result = await response.json();
-      clearSessionCache();
-
-      const resolvedContextTag = arenaConfig?.contextTag || arenaConfig?.title || (targetPillar ? `${targetPillar.title} Review` : undefined);
-
-      const resultsToCache: CachedResults = {
-        status: 'reviewing',
-        resultsData: {
-          correct: result.stats.correct,
-          incorrect: result.stats.incorrect,
-          unattempted: result.stats.unattempted,
-          totalTimeSeconds: result.stats.totalTimeSeconds,
-          subjectStats: result.stats.subjectStats,
-          isRanked,
-          contextTag: resolvedContextTag,
-        },
-        percentile: result.percentile,
-      };
-
-      try {
-        localStorage.setItem(RESULTS_STORAGE_KEY, JSON.stringify(resultsToCache));
-      } catch {}
-
-      onComplete(
-        {
-          correct: result.stats.correct,
-          incorrect: result.stats.incorrect,
-          unattempted: result.stats.unattempted,
-          totalTimeSeconds: result.stats.totalTimeSeconds,
-          subjectStats: result.stats.subjectStats,
-          isRanked,
-          contextTag: resolvedContextTag,
-        },
-        result.percentile
-      );
-    } catch (err: any) {
-      console.error(err);
-      clearSessionCache();
-
-      const fallbackContextTag = arenaConfig?.contextTag || arenaConfig?.title || (targetPillar ? `${targetPillar.title} Review` : undefined);
-
-      onComplete(
-        {
-          correct: correctCount,
-          incorrect: incorrectCount,
-          unattempted: unattemptedCount,
-          totalTimeSeconds: totalTime,
-          subjectStats: finalSubjectStats,
-          isRanked,
-          contextTag: fallbackContextTag,
-        },
-        0
-      );
-    }
-  };
-
-  // Keyboard Shortcuts during Arena Quiz
-  useEffect(() => {
-    if (arenaPhase !== 'quiz') return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (
-        target instanceof HTMLInputElement ||
-        target instanceof HTMLTextAreaElement ||
-        target?.isContentEditable
-      ) {
-        return;
-      }
-
-      // Ignore if modifier keys (like Alt or Ctrl or Meta) are held, to allow global app shortcuts
-      if (e.altKey || e.ctrlKey || e.metaKey) return;
-
-      const key = e.key.toUpperCase();
-      const code = e.code;
-
-      if (key === 'A' || code === 'KeyA' || key === '1' || code === 'Digit1' || code === 'Numpad1') {
-        e.preventDefault();
-        handleSelect('A');
-      } else if (key === 'B' || code === 'KeyB' || key === '2' || code === 'Digit2' || code === 'Numpad2') {
-        e.preventDefault();
-        handleSelect('B');
-      } else if (key === 'C' || code === 'KeyC' || key === '3' || code === 'Digit3' || code === 'Numpad3') {
-        e.preventDefault();
-        handleSelect('C');
-      } else if (key === 'D' || code === 'KeyD' || key === '4' || code === 'Digit4' || code === 'Numpad4') {
-        e.preventDefault();
-        handleSelect('D');
-      } else if (key === 'L' || code === 'KeyL') {
-        e.preventDefault();
-        handleLock();
-      } else if (key === 'ARROWLEFT' || code === 'ArrowLeft' || key === 'P' || code === 'KeyP') {
-        e.preventDefault();
-        handlePrevious();
-      } else if (key === 'ARROWRIGHT' || code === 'ArrowRight' || key === 'N' || code === 'KeyN') {
-        e.preventDefault();
-        handleNext();
-      } else if (key === 'ENTER' || code === 'Enter' || key === ' ' || code === 'Space') {
-        e.preventDefault();
-        if (currentQuestionId) {
-          const pending = pendingAnswersMap[currentQuestionId];
-          const locked = lockedMap[currentQuestionId];
-          if (pending && !locked) {
-            handleLock();
-          } else {
-            handleNext();
-          }
-        }
-      } else if (key === 'M' || code === 'KeyM') {
-        e.preventDefault();
-        toggleBookmark();
-      } else if (key === 'ESCAPE' || code === 'Escape') {
-        e.preventDefault();
-        setShowAbandonModal(true);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [arenaPhase, currentQuestionId, pendingAnswersMap, lockedMap, currentQuestionIndex, questions.length]);
-
-  // ----------------------------------------------------------------
-  // RENDER: INTRO PHASE
-  // ----------------------------------------------------------------
-  if (arenaPhase === 'intro' && !showTrainingSetup) {
+  // 1. RENDER: INTRO LOBBY
+  if (session.arenaPhase === 'intro' && !session.showTrainingSetup) {
     return (
-      <div className="w-full max-w-2xl mx-auto font-sans flex flex-col items-center justify-center p-4 sm:p-6 min-h-[75vh]">
-        
-        {/* Pre-Flight Tag */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-sm text-[10px] uppercase font-sans font-medium text-[#e0d0ab] tracking-wider mb-6">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>Analytical Test Arena</span>
-        </div>
-
-        <motion.h1
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-white mb-2 text-center"
-        >
-          Choose Your Test
-        </motion.h1>
-        <p className="text-xs font-sans text-zinc-400 mb-8 text-center max-w-md">
-          Time-bound competitive testing with zero-trust server evaluation and negative marking.
-        </p>
-
-        {/* Unfinished Session Detected Banner */}
-        {cachedSessionAvailable && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="w-full mb-6 p-4 rounded-xs bg-[rgba(11,61,120,0.35)] border border-[rgba(19,108,153,0.5)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md text-left"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#0194a8] animate-pulse shrink-0" />
-              <div className="space-y-0.5">
-                <div className="text-xs font-mono font-semibold text-[#e0d0ab]">
-                  Unfinished Session Detected
-                </div>
-                <div className="text-[11px] font-sans text-[#9fb0c8]">
-                  Question <span className="font-mono text-white">{cachedSessionAvailable.currentQuestionIndex + 1}</span> of <span className="font-mono text-white">{cachedSessionAvailable.questions.length}</span> &bull; {cachedSessionAvailable.isRanked ? 'Ranked Crucible' : 'Training Drill'}
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-              <button
-                type="button"
-                onClick={handleResumeSavedSession}
-                className="px-3.5 py-1.5 bg-[#e0d0ab] hover:bg-white text-[#072e63] font-sans text-xs font-bold uppercase tracking-wider rounded-xs transition-colors shadow-sm cursor-pointer"
-              >
-                Resume Test &rarr;
-              </button>
-              <button
-                type="button"
-                onClick={handleDiscardSavedSession}
-                className="px-2.5 py-1.5 bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 font-sans text-xs font-medium uppercase rounded-xs transition-colors cursor-pointer"
-              >
-                Discard
-              </button>
-            </div>
-          </motion.div>
-        )}
-
-        {/* If targeted drill active: Show dedicated preflight card */}
-        {arenaConfig && arenaConfig.mode !== 'full_mock' ? (
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="w-full mb-6 p-6 rounded-md bg-[rgba(4,25,54,0.85)] border border-[rgba(224,208,171,0.35)] shadow-2xl backdrop-blur-xl space-y-5 text-left"
-          >
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-              <div className="space-y-1.5">
-                <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-sm bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 text-[#e0d0ab] text-[10px] font-mono font-bold uppercase tracking-wider">
-                  <Target className="w-3.5 h-3.5" />
-                  <span>
-                    {arenaConfig.mode === 'daily_brief'
-                      ? 'Daily Intelligence Drill'
-                      : arenaConfig.mode === 'topic_drill'
-                      ? 'Topic Mastery Drill'
-                      : 'Syllabus Pillar Drill'}
-                  </span>
-                </div>
-                <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#e8e0cf]">
-                  {arenaConfig.title}
-                </h2>
-                <p className="text-xs text-[#9fb0c8] font-sans">
-                  {arenaConfig.subtitle || 'Targeted analytical assessment with zero-trust evaluation.'}
-                </p>
-              </div>
-
-              {onClearTargetPillar && (
-                <button
-                  type="button"
-                  onClick={onClearTargetPillar}
-                  className="self-start text-[11px] font-mono text-[#8fa2bd] hover:text-[#e0d0ab] border border-[rgba(19,108,153,0.35)] bg-[rgba(3,18,42,0.6)] px-2.5 py-1 rounded-sm cursor-pointer transition-colors"
-                >
-                  Comprehensive Mock [×]
-                </button>
-              )}
-            </div>
-
-            {/* Drill Parameters */}
-            <div className="grid grid-cols-3 gap-2.5 py-2 border-y border-[rgba(19,108,153,0.3)] text-center text-xs font-sans">
-              <div className="p-2.5 rounded-sm bg-[rgba(3,18,42,0.5)] border border-[rgba(19,108,153,0.2)]">
-                <span className="text-[10px] uppercase font-mono text-[#8fa2bd] block mb-0.5">MCQ Count</span>
-                <span className="font-mono text-base font-bold text-[#e0d0ab]">
-                  {arenaConfig.questionCount || 10} Questions
-                </span>
-              </div>
-              <div className="p-2.5 rounded-sm bg-[rgba(3,18,42,0.5)] border border-[rgba(19,108,153,0.2)]">
-                <span className="text-[10px] uppercase font-mono text-[#8fa2bd] block mb-0.5">Evaluation</span>
-                <span className="font-mono text-base font-bold text-emerald-400">+2.00 / -0.66</span>
-              </div>
-              <div className="p-2.5 rounded-sm bg-[rgba(3,18,42,0.5)] border border-[rgba(19,108,153,0.2)]">
-                <span className="text-[10px] uppercase font-mono text-[#8fa2bd] block mb-0.5">Selected Pace</span>
-                <span className="font-mono text-base font-bold text-[#0194a8]">
-                  {pacingMode === 'blitz' ? '20s Blitz' : pacingMode === 'untimed' ? 'Self-Paced' : '60s Prelims'}
-                </span>
-              </div>
-            </div>
-
-            {/* Pacing Mode Selector */}
-            <div className="space-y-1.5">
-              <label className="text-[10px] uppercase font-mono tracking-wider text-[#0194a8] font-bold block">
-                Select Your Test Pacing
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setPacingMode('standard')}
-                  className={`p-2.5 rounded-sm border text-xs font-sans font-semibold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
-                    pacingMode === 'standard'
-                      ? 'bg-[rgba(224,208,171,0.15)] border-[#e0d0ab] text-[#e0d0ab] shadow-sm'
-                      : 'bg-[rgba(3,16,38,0.7)] border-[rgba(19,108,153,0.3)] text-[#8fa2bd] hover:text-white'
-                  }`}
-                >
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>Standard (60s)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPacingMode('blitz')}
-                  className={`p-2.5 rounded-sm border text-xs font-sans font-semibold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
-                    pacingMode === 'blitz'
-                      ? 'bg-[rgba(224,208,171,0.15)] border-[#e0d0ab] text-[#e0d0ab] shadow-sm'
-                      : 'bg-[rgba(3,16,38,0.7)] border-[rgba(19,108,153,0.3)] text-[#8fa2bd] hover:text-white'
-                  }`}
-                >
-                  <Zap className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Speed Blitz (20s)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPacingMode('untimed')}
-                  className={`p-2.5 rounded-sm border text-xs font-sans font-semibold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
-                    pacingMode === 'untimed'
-                      ? 'bg-[rgba(224,208,171,0.15)] border-[#e0d0ab] text-[#e0d0ab] shadow-sm'
-                      : 'bg-[rgba(3,16,38,0.7)] border-[rgba(19,108,153,0.3)] text-[#8fa2bd] hover:text-white'
-                  }`}
-                >
-                  <BookOpen className="w-3.5 h-3.5 text-[#0194a8]" />
-                  <span>Untimed Practice</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Primary Action Button */}
-            <button
-              type="button"
-              onClick={handleStartTargetedDrill}
-              className="w-full py-3.5 bg-[#e0d0ab] hover:bg-white text-[#072e63] font-sans text-sm font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer shadow-lg flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(224,208,171,0.4)]"
-            >
-              <Swords className="w-4 h-4" />
-              <span>Begin {arenaConfig.title} &rarr;</span>
-            </button>
-          </motion.div>
-        ) : (
-          <>
-            {/* Targeted Syllabus Pillar Drill Banner (if active without arenaConfig) */}
-            {targetPillar && (
-              <div className="w-full mb-6 p-4 rounded-sm bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 backdrop-blur-sm">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-sm bg-[#e0d0ab]/20 text-[#e0d0ab]">
-                    <Target className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-[10px] font-mono uppercase text-[#e0d0ab] font-bold tracking-wider">
-                      Targeted Syllabus Pillar Drill
-                    </div>
-                    <div className="text-sm font-serif font-bold text-white">
-                      {targetPillar.title} ({targetPillar.id})
-                    </div>
-                  </div>
-                </div>
-                {onClearTargetPillar && (
-                  <button
-                    onClick={onClearTargetPillar}
-                    className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider bg-zinc-900 border border-zinc-700 hover:border-zinc-500 text-zinc-300 rounded-sm cursor-pointer transition-colors"
-                  >
-                    Comprehensive Mock [×]
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* Exam Track Segregation Switcher */}
-            <div className="w-full mb-6 flex items-center p-1 bg-zinc-900/80 border border-zinc-800 rounded-md">
-              <button
-                onClick={() => setExamTrack('upsc')}
-                className={`flex-1 py-2 text-xs font-sans font-bold rounded-md transition-all cursor-pointer flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] ${
-                  examTrack === 'upsc'
-                    ? 'bg-[#e0d0ab] text-[#072e63] shadow-xs'
-                    : 'text-zinc-400 hover:text-stone-200'
-                }`}
-              >
-                <Shield className="w-3.5 h-3.5" />
-                <span>UPSC CSE Track (Default)</span>
-              </button>
-              <button
-                onClick={() => setExamTrack('ssc')}
-                className={`flex-1 py-2 text-xs font-sans font-bold rounded-md transition-all cursor-pointer flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0194a8] ${
-                  examTrack === 'ssc'
-                    ? 'bg-[#0194a8] text-white shadow-xs'
-                    : 'text-zinc-400 hover:text-stone-200'
-                }`}
-              >
-                <Target className="w-3.5 h-3.5" />
-                <span>SSC CGL Exam Track</span>
-              </button>
-            </div>
-
-            {/* Protocol Option Cards */}
-            <div className="w-full space-y-4">
-              {/* 1. Ranked Test */}
-              <motion.div
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.05 }}
-                whileHover={prefersReduced ? undefined : { y: -2 }}
-                onClick={handleBeginAssessment}
-                className="p-6 bg-zinc-900/30 hover:bg-zinc-900/50 border border-zinc-800 hover:border-[#0194a8]/50 rounded-sm cursor-pointer transition-all flex items-start gap-4 backdrop-blur-sm group"
-              >
-                <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-sm group-hover:border-[#0194a8]/40 transition-colors">
-                  <Swords className="w-6 h-6 text-[#0194a8]" />
-                </div>
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-serif text-base font-bold text-stone-100 group-hover:text-[#e0d0ab] transition-colors">
-                      Ranked Test
-                    </h3>
-                    <span className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-sans font-bold uppercase rounded-sm">
-                      Ranked + Points
-                    </span>
-                  </div>
-                  <p className="text-xs font-sans text-zinc-400 leading-relaxed">
-                    25 multi-domain questions &bull; 20s per question &bull; Negative marking (+2 / -0.66) &bull; Earns Rank Points.
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* 2. Training Ground Custom Setup */}
-              <motion.div
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                whileHover={prefersReduced ? undefined : { y: -2 }}
-                onClick={handleTrainingGround}
-                className="p-6 bg-zinc-900/30 hover:bg-zinc-900/50 border border-zinc-800 hover:border-[#e0d0ab]/50 rounded-sm cursor-pointer transition-all flex items-start gap-4 backdrop-blur-sm group"
-              >
-                <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-sm group-hover:border-[#e0d0ab]/40 transition-colors">
-                  <Target className="w-6 h-6 text-[#e0d0ab]" />
-                </div>
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-serif text-base font-bold text-stone-100 group-hover:text-[#e0d0ab] transition-colors">
-                      The Training Ground
-                    </h3>
-                    <span className="px-2 py-0.5 bg-zinc-800 border border-zinc-700 text-zinc-300 text-[10px] font-sans font-bold uppercase rounded-sm">
-                      Unranked
-                    </span>
-                  </div>
-                  <p className="text-xs font-sans text-zinc-400 leading-relaxed">
-                    Custom domain filtering & adjustable test lengths (25 / 35 / 50 questions) for deliberate conceptual practice.
-                  </p>
-                </div>
-              </motion.div>
-            </div>
-          </>
-        )}
-
-        {/* Pre-Flight Checklist Modal */}
-        <Modal
-          isOpen={showPreflightModal}
-          onClose={() => setShowPreflightModal(false)}
-          title="Before You Begin"
-          subtitle="Timed ranked test"
-        >
-          <div className="space-y-5 font-sans">
-            <div className="p-4 bg-zinc-900/70 border border-zinc-800 rounded-sm space-y-2">
-              <h4 className="font-serif text-xs font-bold text-[#e0d0ab]">
-                Focus Rule
-              </h4>
-              <p className="text-sm font-serif italic text-stone-200 leading-relaxed">
-                "{motivation}"
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 text-xs font-sans">
-              <div className="p-3 bg-zinc-900/40 border border-zinc-800 rounded-sm">
-                <span className="text-[10px] text-zinc-500 uppercase block mb-0.5 font-medium">Length</span>
-                <span className="font-bold text-stone-200"><span className="font-mono">25</span> Questions</span>
-              </div>
-              <div className="p-3 bg-zinc-900/40 border border-zinc-800 rounded-sm">
-                <span className="text-[10px] text-zinc-500 uppercase block mb-0.5 font-medium">Pacing</span>
-                <span className="font-bold text-stone-200"><span className="font-mono">20s</span> Per Question</span>
-              </div>
-            </div>
-
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={() => setShowPreflightModal(false)}
-                className="flex-1 py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 font-sans text-xs font-medium uppercase rounded-sm transition-all cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleReady}
-                className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 bg-[#e0d0ab] hover:bg-stone-100 text-zinc-950 font-sans text-xs font-bold uppercase rounded-sm transition-all shadow-md shadow-[#e0d0ab]/10 cursor-pointer"
-              >
-                <span>Enter Arena</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-        </Modal>
-
-      </div>
+      <ArenaLobby
+        arenaConfig={arenaConfig}
+        targetPillar={targetPillar}
+        cachedSessionAvailable={session.cachedSessionAvailable}
+        examTrack={session.examTrack}
+        setExamTrack={session.setExamTrack}
+        pacingMode={session.pacingMode}
+        setPacingMode={session.setPacingMode}
+        prefersReduced={prefersReduced}
+        showPreflightModal={session.showPreflightModal}
+        setShowPreflightModal={session.setShowPreflightModal}
+        motivation={session.motivation}
+        onClearTargetPillar={onClearTargetPillar}
+        onResumeSavedSession={session.handleResumeSavedSession}
+        onDiscardSavedSession={session.handleDiscardSavedSession}
+        onStartTargetedDrill={session.handleStartTargetedDrill}
+        onBeginAssessment={session.handleBeginAssessment}
+        onTrainingGround={session.handleTrainingGround}
+        onReady={session.handleReady}
+      />
     );
   }
 
-  // ----------------------------------------------------------------
-  // RENDER: TRAINING GROUND SETUP
-  // ----------------------------------------------------------------
-  if (showTrainingSetup) {
-    const defaultLengths = [25, 35, 50];
-    const candidateTarget = candidatePreferences?.dailyMcqTarget;
-    const lengthOptions = Array.from(new Set(candidateTarget ? [candidateTarget, ...defaultLengths] : defaultLengths)).sort((a, b) => a - b);
-
+  // 2. RENDER: TRAINING GROUND SETUP
+  if (session.showTrainingSetup) {
     return (
-      <div className="w-full max-w-2xl mx-auto font-sans p-4 sm:p-6 space-y-6">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-sm text-[10px] uppercase font-sans font-medium text-[#e0d0ab] tracking-wider">
-          <Target className="w-3 h-3 text-[#e0d0ab]" />
-          <span>Training Ground Configuration</span>
-        </div>
-
-        <h2 className="font-serif text-2xl font-bold text-white">Custom Domain & Volume Setup</h2>
-
-        {/* Candidate Focus Alignment Banner */}
-        {candidatePreferences?.focusPillars && candidatePreferences.focusPillars.length > 0 && (
-          <div className="p-3.5 bg-[rgba(11,61,120,0.25)] border border-[rgba(19,108,153,0.35)] rounded-md flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-sans">
-            <span className="text-[#8fa2bd] flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-              <span>Aligned with Candidate Track: <strong className="text-[#e0d0ab]">{candidatePreferences.focusPillars.map((p) => p.toUpperCase()).join(', ')}</strong></span>
-            </span>
-            <span className="text-xs text-[#e0d0ab] font-semibold shrink-0">
-              Daily Target: {candidatePreferences.dailyMcqTarget} MCQs
-            </span>
-          </div>
-        )}
-
-        {/* Subject Selection */}
-        <div className="p-6 bg-zinc-900/30 border border-zinc-800 rounded-md space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
-              Select Focus Subjects ({selectedSubjects.size} Selected)
-            </h3>
-            <button
-              onClick={() => setSelectedSubjects(new Set(allSubjects))}
-              className="text-xs font-sans text-[#0194a8] hover:text-[#e0d0ab] transition-colors cursor-pointer"
-            >
-              Select All
-            </button>
-          </div>
-
-          <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
-            {allSubjects.map((subject) => (
-              <button
-                key={subject}
-                onClick={() => toggleSubject(subject)}
-                className={`px-3 py-1.5 text-xs font-sans font-medium rounded-md border transition-all cursor-pointer ${
-                  selectedSubjects.has(subject)
-                    ? 'bg-[#e0d0ab] text-zinc-950 border-[#e0d0ab] font-bold'
-                    : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-stone-200'
-                }`}
-              >
-                {subject}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Question Count Selection */}
-        <div className="p-6 bg-zinc-900/30 border border-zinc-800 rounded-md space-y-4">
-          <h3 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
-            Question Target
-          </h3>
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-            {lengthOptions.map((count) => (
-              <button
-                key={count}
-                onClick={() => setTrainingLength(count)}
-                className={`py-3 text-sm font-sans font-bold uppercase rounded-md border transition-all cursor-pointer ${
-                  trainingLength === count
-                    ? 'bg-[#0194a8] text-white border-[#0194a8]'
-                    : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-stone-200'
-                }`}
-              >
-                <span className="font-mono">{count}</span> MCQs
-                {candidateTarget === count && (
-                  <span className="block text-xs font-sans text-[#e0d0ab] capitalize font-medium">Daily Target</span>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-3">
-          <motion.button
-            onClick={() => {
-              setShowTrainingSetup(false);
-              setArenaPhase('intro');
-            }}
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.98 }}
-            className="flex-1 py-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-sans text-xs font-semibold uppercase tracking-wider rounded-md transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
-          >
-            Back
-          </motion.button>
-          <motion.button
-            onClick={startTraining}
-            disabled={selectedSubjects.size === 0}
-            whileHover={{ scale: 1.02, y: -1 }}
-            whileTap={{ scale: 0.98 }}
-            className="flex-1 inline-flex items-center justify-center gap-2 py-3 bg-[#e0d0ab] hover:bg-white disabled:opacity-40 text-[#072e63] font-sans text-xs font-bold uppercase tracking-wider rounded-md transition-colors cursor-pointer shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]"
-          >
-            <Target className="w-4 h-4" />
-            <span>Launch Training Ground</span>
-          </motion.button>
-        </div>
-      </div>
+      <TrainingSetup
+        candidatePreferences={candidatePreferences}
+        allSubjects={session.allSubjects}
+        selectedSubjects={session.selectedSubjects}
+        toggleSubject={session.toggleSubject}
+        setSelectedSubjects={session.setSelectedSubjects}
+        trainingLength={session.trainingLength}
+        setTrainingLength={session.setTrainingLength}
+        onBack={() => {
+          session.setShowTrainingSetup(false);
+          session.setArenaPhase('intro');
+        }}
+        onLaunch={session.startTraining}
+      />
     );
   }
 
-  // ----------------------------------------------------------------
-  // RENDER: QUIZ PHASE
-  // ----------------------------------------------------------------
-  if (isLoading) {
+  // 3. RENDER: LOADING / ERROR
+  if (session.isLoading) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center text-zinc-500 font-sans text-xs gap-3">
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-muted font-sans text-xs gap-3">
         <Loader2 className="w-6 h-6 text-[#0194a8] animate-spin" />
         <span>Initializing examination state...</span>
       </div>
     );
   }
 
-  if (errorMsg) {
+  if (session.errorMsg) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center font-sans">
         <AlertTriangle className="w-10 h-10 text-rose-400 mb-3" />
-        <p className="text-sm font-sans text-rose-400 font-bold">{errorMsg}</p>
+        <p className="text-sm font-sans text-rose-400 font-bold">{session.errorMsg}</p>
         <button
           onClick={() => {
-            setErrorMsg('');
-            setArenaPhase('intro');
+            session.setErrorMsg('');
+            session.setArenaPhase('intro');
           }}
-          className="mt-4 px-4 py-2 bg-zinc-900 border border-zinc-800 text-[#e0d0ab] font-sans text-xs uppercase rounded-sm cursor-pointer hover:bg-zinc-800 transition-colors"
+          className="mt-4 px-4 py-2 bg-surface-elevated border border-border text-[#e0d0ab] font-sans text-xs uppercase rounded-sm cursor-pointer hover:bg-surface-elevated transition-colors"
         >
           Return to Selection
         </button>
@@ -1562,32 +140,38 @@ export default function Arena({
     );
   }
 
-  if (!currentQuestion) return null;
+  if (!session.currentQuestion) return null;
 
-  const options = getOptions(currentQuestion.options_matrix);
-  const correctOpt = revealedAnswers[currentQuestionId]?.trim();
-  const hasUserAnswered = userAnswers[currentQuestionId] !== undefined;
-  const isTimeout = !!timeouts[currentQuestionId];
-  const isQuestionLocked = !!lockedMap[currentQuestionId] || isTimeout || quizSubmitted;
-  const hasLockedWithAnswer = isQuestionLocked && (hasUserAnswered || !!pendingAnswersMap[currentQuestionId] || isTimeout);
+  const currentQ = session.currentQuestion;
+  const currentQId = session.currentQuestionId!;
+  const options: Record<string, string> = (() => {
+    try {
+      if (typeof currentQ.options_matrix === 'string') return JSON.parse(currentQ.options_matrix);
+      return currentQ.options_matrix || {};
+    } catch {
+      return {};
+    }
+  })();
 
-  const currentExplanation = explanationCache[currentQuestionId] || currentQuestion.ai_insights;
-  const isLoadingExplanation = !!loadingExplanationMap[currentQuestionId];
-  const isBookmarked = savedInsightIds.has(String(currentQuestionId));
-  const isBookmarkLoading = !!bookmarkToggling[String(currentQuestionId)];
+  const correctOpt = session.revealedAnswers[currentQId]?.trim();
+  const hasUserAnswered = session.userAnswers[currentQId] !== undefined;
+  const isTimeout = !!session.timeouts[currentQId];
+  const isQuestionLocked = !!session.lockedMap[currentQId] || isTimeout || session.quizSubmitted;
+  const hasLockedWithAnswer = isQuestionLocked && (hasUserAnswered || !!session.pendingAnswersMap[currentQId] || isTimeout);
 
-  const timeLeft = timeLeftMap[currentQuestionId] !== undefined ? timeLeftMap[currentQuestionId] : defaultTimeForQuestion;
-  const timerRadius = 18;
-  const timerCircumference = 2 * Math.PI * timerRadius;
-  const timerProgress = pacingMode === 'untimed' ? 1 : Math.max(0, Math.min(1, timeLeft / defaultTimeForQuestion));
-  const strokeDashoffset = timerCircumference - timerProgress * timerCircumference;
+  const currentExplanation = session.explanationCache[currentQId] || currentQ.ai_insights;
+  const isLoadingExplanation = !!session.loadingExplanationMap[currentQId];
+  const isBookmarked = session.savedInsightIds.has(String(currentQId));
+  const isBookmarkLoading = !!session.bookmarkToggling[String(currentQId)];
+
+  const timeLeft = session.timeLeftMap[currentQId] !== undefined ? session.timeLeftMap[currentQId] : session.defaultTimeForQuestion;
+  const timeSpent = session.timeSpentMap[currentQId] || 0;
 
   return (
-    <div className="w-full max-w-3xl mx-auto font-sans p-4 sm:p-6 pb-24 text-stone-100">
-      
+    <div className="w-full max-w-3xl mx-auto font-sans p-4 sm:p-6 pb-24 text-primary">
       {/* Resume Overlay */}
       <AnimatePresence>
-        {showResumeOverlay && (
+        {session.showResumeOverlay && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -1596,212 +180,91 @@ export default function Arena({
           >
             <div className="text-center space-y-3">
               <h2 className="font-serif text-2xl font-bold text-[#e0d0ab]">Resuming Assessment</h2>
-              <p className="text-6xl font-mono font-bold text-white">{resumeCountdown}</p>
-              <p className="text-xs font-sans uppercase tracking-widest text-zinc-400">Restoring active session state...</p>
+              <p className="text-6xl font-mono font-bold text-white">{session.resumeCountdown}</p>
+              <p className="text-xs font-sans uppercase tracking-widest text-secondary">
+                Restoring active session state...
+              </p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Top Protocol Header & Timer Bar */}
-      <div className="flex items-center justify-between gap-4 border-b border-zinc-800 pb-4 mb-6">
-        <div className="flex items-center gap-3">
-          <span
-            className={`px-2.5 py-1 rounded-sm text-[10px] font-sans font-bold uppercase tracking-wider border ${
-              isRanked
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                : 'bg-[#e0d0ab]/10 border-[#e0d0ab]/30 text-[#e0d0ab]'
-            }`}
-          >
-            {isRanked ? 'Ranked' : 'Practice'}
-          </span>
+      <QuestionHeader
+        isRanked={session.isRanked}
+        arenaConfig={arenaConfig}
+        targetPillar={targetPillar}
+        currentQuestionIndex={session.currentQuestionIndex}
+        totalQuestions={session.questions.length}
+        pacingMode={session.pacingMode}
+        isQuestionLocked={isQuestionLocked}
+        isTimeout={isTimeout}
+        timeLeft={timeLeft}
+        defaultTimeForQuestion={session.defaultTimeForQuestion}
+        timeSpent={timeSpent}
+        onAbandon={() => session.setShowAbandonModal(true)}
+      />
 
-          {(arenaConfig?.title || targetPillar) && (
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-sm text-[10px] font-mono font-bold bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 text-[#e0d0ab] uppercase">
-              <Target className="w-3 h-3" />
-              {arenaConfig?.title || targetPillar?.title || targetPillar?.id}
-            </span>
-          )}
-
-          <span className="text-xs font-sans text-zinc-400">
-            Question <span className="font-mono">{currentQuestionIndex + 1}</span> of <span className="font-mono">{questions.length}</span>
-          </span>
-        </div>
-
-        {/* Right Action: Radial Countdown Timer & Abandon Button */}
-        <div className="flex items-center gap-4">
-          {pacingMode === 'untimed' ? (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-zinc-900 border border-zinc-800 text-xs font-mono text-zinc-300">
-              <Clock className="w-3.5 h-3.5 text-[#0194a8]" />
-              <span>{timeSpentMap[currentQuestionId] || 0}s</span>
-            </div>
-          ) : !isQuestionLocked ? (
-            <div className="flex items-center gap-2">
-              <div className="relative w-11 h-11 flex items-center justify-center">
-                <svg className="w-full h-full -rotate-90" viewBox="0 0 44 44">
-                  <circle
-                    cx="22"
-                    cy="22"
-                    r={timerRadius}
-                    fill="none"
-                    stroke="#136c99"
-                    strokeWidth="3"
-                    strokeOpacity="0.4"
-                  />
-                  <circle
-                    cx="22"
-                    cy="22"
-                    r={timerRadius}
-                    fill="none"
-                    stroke={timeLeft <= 5 ? '#e14e4e' : '#0194a8'}
-                    strokeWidth="3"
-                    strokeDasharray={timerCircumference}
-                    strokeDashoffset={strokeDashoffset}
-                    strokeLinecap="round"
-                    className="transition-all duration-1000 ease-linear"
-                  />
-                </svg>
-                <span
-                  className={`absolute font-mono text-xs font-bold ${
-                    timeLeft <= 5 ? 'text-rose-400 animate-pulse' : 'text-stone-100'
-                  }`}
-                >
-                  {timeLeft}s
-                </span>
-              </div>
-            </div>
-          ) : (
-            <span className="text-[11px] font-sans text-zinc-500">
-              {isTimeout ? 'Timed Out' : <><span className="font-mono">{timeSpentMap[currentQuestionId] || 0}s</span> elapsed</>}
-            </span>
-          )}
-
-          <button
-            onClick={() => setShowAbandonModal(true)}
-            className="text-[10px] font-sans uppercase tracking-wider text-zinc-500 hover:text-rose-400 transition-colors cursor-pointer"
-          >
-            Abandon
-          </button>
-        </div>
-      </div>
-
-      {/* Segmented Question Navigator Palette (Touch-Accessible) */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-3 mb-6 custom-scrollbar">
-        {questions.map((q, idx) => {
-          const isCurrent = idx === currentQuestionIndex;
-          const isAnswered = userAnswers[q.id] !== undefined;
-          const isLocked = lockedMap[q.id];
-          const isTimeOut = timeouts[q.id];
-          const correctForQ = revealedAnswers[q.id]?.trim();
-          const isCorrect = isAnswered && correctForQ ? userAnswers[q.id] === correctForQ : false;
-
-          let statusStyle = 'bg-zinc-900/60 border-zinc-800 text-zinc-500';
-          if (isCurrent) {
-            statusStyle = 'bg-[#e0d0ab] text-zinc-950 font-bold border-[#e0d0ab] shadow-sm';
-          } else if (isTimeOut) {
-            statusStyle = 'bg-rose-950/40 border-rose-800/60 text-rose-400 font-bold';
-          } else if (isLocked && isAnswered) {
-            statusStyle = isCorrect
-              ? 'bg-emerald-950/40 border-emerald-800/60 text-emerald-400 font-bold'
-              : 'bg-rose-950/40 border-rose-800/60 text-rose-400 font-bold';
-          }
-
-          return (
-            <button
-              key={q.id || idx}
-              onClick={() => setCurrentQuestionIndex(idx)}
-              className={`min-w-[32px] h-8 flex items-center justify-center rounded-sm border text-xs font-mono transition-all cursor-pointer ${statusStyle}`}
-              title={`Jump to Question ${idx + 1}`}
-            >
-              {idx + 1}
-            </button>
-          );
-        })}
-      </div>
+      {/* Segmented Question Navigator Palette */}
+      <QuestionPalette
+        questions={session.questions}
+        currentQuestionIndex={session.currentQuestionIndex}
+        userAnswers={session.userAnswers}
+        lockedMap={session.lockedMap}
+        timeouts={session.timeouts}
+        revealedAnswers={session.revealedAnswers}
+        markedForReviewMap={session.markedForReviewMap}
+        onSelectIndex={(idx) => session.setCurrentQuestionIndex(idx)}
+      />
 
       {/* Main Question Card with Animated Transitions */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={currentQuestionId}
+          key={currentQId}
           initial={prefersReduced ? undefined : { opacity: 0, x: 8 }}
           animate={{ opacity: 1, x: 0 }}
           exit={prefersReduced ? undefined : { opacity: 0, x: -8 }}
           transition={{ duration: 0.25 }}
-          className="p-6 sm:p-8 bg-zinc-900/30 border border-zinc-800 rounded-sm space-y-6 backdrop-blur-sm"
+          className="p-6 sm:p-8 bg-surface-elevated/30 border border-border rounded-sm space-y-6 backdrop-blur-sm min-h-[60vh] flex flex-col justify-between"
         >
-          {/* Question Metadata Tags */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="px-2.5 py-0.5 text-[9px] font-sans uppercase tracking-wider font-bold bg-zinc-900 text-[#e0d0ab] border border-zinc-800 rounded-sm">
-              {currentQuestion.subject_category || 'CORE DOMAIN'}
-            </span>
-            {currentQuestion.exam_origin_tag && (
-              <span className="px-2.5 py-0.5 text-[9px] font-sans text-zinc-400 border border-zinc-800 rounded-sm">
-                {currentQuestion.exam_origin_tag}
-              </span>
-            )}
+          <div className="space-y-6 flex-1">
+            {/* Question Metadata & Stem */}
+            <QuestionBody
+              subjectCategory={currentQ.subject_category}
+              examOriginTag={currentQ.exam_origin_tag}
+              questionText={currentQ.question_text}
+            />
+
+            {/* Options Grid */}
+            <div className="space-y-3 pt-2">
+              {Object.entries(options).map(([key, val]) => {
+                const pending = session.pendingAnswersMap[currentQId];
+                const isSelected = pending === key || session.userAnswers[currentQId] === key;
+                const isOptionCorrect = key === correctOpt;
+
+                return (
+                  <AnswerOption
+                    key={key}
+                    optionKey={key}
+                    optionVal={val}
+                    isSelected={isSelected}
+                    isQuestionLocked={isQuestionLocked}
+                    isOptionCorrect={isOptionCorrect}
+                    onSelect={session.handleSelect}
+                  />
+                );
+              })}
+            </div>
           </div>
 
-          {/* Question Stem Typography */}
-          <div className="font-serif text-base sm:text-lg leading-relaxed text-white prose prose-invert max-w-none">
-            <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
-              {currentQuestion.question_text}
-            </Markdown>
-          </div>
-
-          {/* Options Grid */}
-          <div className="space-y-3 pt-2">
-            {Object.entries(options).map(([key, val]) => {
-              const pending = pendingAnswersMap[currentQuestionId];
-              const isSelected = pending === key || userAnswers[currentQuestionId] === key;
-              const isOptionCorrect = key === correctOpt;
-
-              let optionStyle = 'bg-zinc-900/40 border-zinc-800 text-stone-200 hover:border-[#0194a8]/60';
-              if (isQuestionLocked) {
-                if (isOptionCorrect) {
-                  optionStyle = 'bg-emerald-950/40 border-emerald-500/80 text-emerald-300';
-                } else if (isSelected && !isOptionCorrect) {
-                  optionStyle = 'bg-rose-950/40 border-rose-500/80 text-rose-300';
-                } else {
-                  optionStyle = 'bg-zinc-900/20 border-zinc-900 text-zinc-600 opacity-40';
-                }
-              } else if (isSelected) {
-                optionStyle = 'bg-[#0194a8]/15 border-[#0194a8] text-[#e0d0ab] shadow-sm';
-              }
-
-              return (
-                <motion.button
-                  key={key}
-                  whileTap={isQuestionLocked ? undefined : { scale: 0.985 }}
-                  onClick={() => handleSelect(key)}
-                  disabled={isQuestionLocked}
-                  aria-label={`Option ${key}: ${typeof val === 'string' ? val : ''}`}
-                  className={`w-full p-4 rounded-sm border text-left flex items-start gap-3 transition-all cursor-pointer ${optionStyle}`}
-                >
-                  <span className="w-6 h-6 shrink-0 rounded-sm bg-zinc-900 border border-zinc-800 flex items-center justify-center font-mono text-xs font-bold text-[#e0d0ab]">
-                    {key}
-                  </span>
-                  <div className="font-sans text-xs sm:text-sm leading-relaxed flex-1 pt-0.5">
-                    <Markdown
-                      remarkPlugins={[remarkGfm]}
-                      rehypePlugins={[rehypeSanitize]}
-                      components={{ p: ({ node, ...props }: any) => <span {...props} /> }}
-                    >
-                      {val as string}
-                    </Markdown>
-                  </div>
-                </motion.button>
-              );
-            })}
-          </div>
-
-          {/* AI Conceptual Insights Flashcard (Revealed after lock or timeout) */}
+          {/* AI Conceptual Insights Flashcard */}
           <AnimatePresence>
             {hasLockedWithAnswer && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="pt-6 border-t border-zinc-800 space-y-3 overflow-hidden"
+                className="pt-6 border-t border-border space-y-3 overflow-hidden"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -1812,12 +275,12 @@ export default function Arena({
                   </div>
 
                   <button
-                    onClick={toggleBookmark}
+                    onClick={session.toggleBookmark}
                     disabled={isBookmarkLoading || isLoadingExplanation}
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-sans font-bold uppercase rounded-sm border transition-all cursor-pointer ${
                       isBookmarked
                         ? 'bg-[#e0d0ab]/15 text-[#e0d0ab] border-[#e0d0ab]/40'
-                        : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-stone-200'
+                        : 'bg-surface-elevated text-secondary border-border hover:text-primary'
                     }`}
                   >
                     {isBookmarkLoading ? (
@@ -1831,16 +294,16 @@ export default function Arena({
                   </button>
                 </div>
 
-                {isLoadingExplanation && !currentExplanation && !currentQuestion.conceptual_explanation ? (
-                  <div className="p-4 bg-zinc-950/60 border border-zinc-800 rounded-sm flex items-center gap-2 text-xs font-sans text-zinc-400">
+                {isLoadingExplanation && !currentExplanation && !currentQ.conceptual_explanation ? (
+                  <div className="p-4 bg-surface/60 border border-border rounded-sm flex items-center gap-2 text-xs font-sans text-secondary">
                     <Loader2 className="w-4 h-4 animate-spin text-[#0194a8]" />
                     <span>Synthesizing conceptual analysis...</span>
                   </div>
                 ) : (
-                  <div className="p-5 bg-zinc-950/60 border border-zinc-800 rounded-sm">
+                  <div className="p-5 bg-surface/60 border border-border rounded-sm">
                     <ConceptInsightRenderer
                       content={currentExplanation}
-                      fallbackText={currentQuestion.conceptual_explanation}
+                      fallbackText={currentQ.conceptual_explanation}
                       showBadges={true}
                     />
                   </div>
@@ -1850,67 +313,41 @@ export default function Arena({
           </AnimatePresence>
 
           {/* Navigation & Two-Step Lock Footer */}
-          <div className="flex items-center justify-between gap-3 pt-6 border-t border-zinc-800/80">
-            <button
-              onClick={handlePrevious}
-              disabled={currentQuestionIndex === 0}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 disabled:opacity-30 border border-zinc-800 text-zinc-300 font-sans text-xs font-medium uppercase rounded-sm transition-all cursor-pointer"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Previous</span>
-            </button>
-
-            {!isQuestionLocked ? (
-              <button
-                onClick={handleLock}
-                disabled={!pendingAnswersMap[currentQuestionId]}
-                className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#e0d0ab] hover:bg-stone-100 disabled:opacity-40 text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded-sm transition-all shadow-md shadow-[#e0d0ab]/10 cursor-pointer"
-              >
-                <Lock className="w-4 h-4" />
-                <span>Lock Answer</span>
-              </button>
-            ) : (
-              <button
-                onClick={handleNext}
-                className="inline-flex items-center gap-2 px-6 py-2.5 bg-emerald-400 hover:bg-emerald-300 text-zinc-950 font-sans text-xs font-bold uppercase tracking-wider rounded-sm transition-all shadow-md shadow-emerald-400/10 cursor-pointer"
-              >
-                {currentQuestionIndex < questions.length - 1 ? (
-                  <>
-                    <span>Next Question</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </>
-                ) : (
-                  <>
-                    <Check className="w-4 h-4" />
-                    <span>Submit Assessment</span>
-                  </>
-                )}
-              </button>
-            )}
-          </div>
+          <ReviewControls
+            currentQuestionIndex={session.currentQuestionIndex}
+            totalQuestions={session.questions.length}
+            isQuestionLocked={isQuestionLocked}
+            hasPendingAnswer={!!session.pendingAnswersMap[currentQId]}
+            isMarkedForReview={!!session.markedForReviewMap[currentQId]}
+            onToggleMarkForReview={() => session.toggleMarkForReview(currentQId)}
+            onSkip={session.handleSkip}
+            onPrevious={session.handlePrevious}
+            onLock={session.handleLock}
+            onNext={session.handleNext}
+          />
         </motion.div>
       </AnimatePresence>
 
       {/* Abandon Confirmation Modal */}
       <Modal
-        isOpen={showAbandonModal}
-        onClose={() => setShowAbandonModal(false)}
+        isOpen={session.showAbandonModal}
+        onClose={() => session.setShowAbandonModal(false)}
         title="Abandon Active Assessment?"
         subtitle="Unsaved progress will be terminated"
       >
         <div className="space-y-4 font-sans">
-          <p className="text-xs text-zinc-400 leading-relaxed">
+          <p className="text-xs text-secondary leading-relaxed">
             Exiting the arena now will reset your active session. This run will not be recorded on the leaderboard.
           </p>
           <div className="flex gap-3 pt-2">
             <button
-              onClick={() => setShowAbandonModal(false)}
-              className="flex-1 py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-sans text-xs font-medium uppercase rounded-sm transition-all cursor-pointer"
+              onClick={() => session.setShowAbandonModal(false)}
+              className="flex-1 py-2.5 bg-surface-elevated hover:bg-surface-elevated border border-border text-primary font-sans text-xs font-medium uppercase rounded-sm transition-all cursor-pointer"
             >
               Resume Test
             </button>
             <button
-              onClick={handleConfirmAbandon}
+              onClick={session.handleConfirmAbandon}
               className="flex-1 py-2.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-sans text-xs font-medium uppercase rounded-sm transition-all cursor-pointer"
             >
               Confirm Exit
@@ -1921,18 +358,20 @@ export default function Arena({
 
       {/* Toast Notification */}
       <AnimatePresence>
-        {toastMsg && (
+        {session.toastMsg && (
           <motion.div
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[500] px-5 py-2.5 bg-zinc-900 border border-zinc-700 rounded-sm shadow-2xl font-sans text-xs text-stone-200"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[500] px-5 py-2.5 bg-surface-elevated border border-border rounded-sm shadow-2xl font-sans text-xs text-primary"
           >
-            {toastMsg}
+            {session.toastMsg}
           </motion.div>
         )}
       </AnimatePresence>
-
     </div>
   );
 }

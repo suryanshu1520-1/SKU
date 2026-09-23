@@ -124,16 +124,16 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 12 }}
         transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-        className="w-full max-w-lg bg-zinc-950 border border-zinc-800 rounded-sm shadow-2xl overflow-hidden"
+        className="w-full max-w-lg bg-surface border border-border rounded-sm shadow-2xl overflow-hidden"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-zinc-900/30 font-sans">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-surface-elevated/30 font-sans">
           <h2 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
             Analyst Profile
           </h2>
           <button
             onClick={onClose}
-            className="p-1 text-zinc-500 hover:text-stone-100 transition-colors cursor-pointer rounded-sm"
+            className="p-1 text-muted hover:text-primary transition-colors cursor-pointer rounded-sm"
             title="Close"
           >
             <X className="w-4 h-4" />
@@ -143,7 +143,7 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
         {/* Content */}
         <div className="p-6 font-sans">
           {dossierState === 'LOADING' && (
-            <div className="flex flex-col items-center justify-center py-12 text-zinc-500 font-sans">
+            <div className="flex flex-col items-center justify-center py-12 text-muted font-sans">
               <Loader2 className="w-6 h-6 animate-spin text-[#0194a8] mb-3" />
               <p className="text-xs font-sans uppercase tracking-wider">Loading profile...</p>
             </div>
@@ -153,17 +153,17 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
             <div className="flex flex-col items-center justify-center py-12 text-center font-sans">
               <Shield className="w-10 h-10 text-rose-400 mb-3" />
               <p className="text-xs text-rose-400 font-sans">{error}</p>
-              <p className="text-[10px] text-zinc-500 mt-2 font-sans">Unable to retrieve the requested record.</p>
+              <p className="text-[10px] text-muted mt-2 font-sans">Unable to retrieve the requested record.</p>
             </div>
           )}
 
           {dossierState === 'EQUIVALENT_EXCHANGE_BLOCKED' && (
             <div className="flex flex-col items-center justify-center py-12 text-center font-sans">
               <Shield className="w-12 h-12 text-[#0194a8] mb-4" />
-              <p className="text-sm text-stone-200 font-sans leading-relaxed font-bold">
+              <p className="text-sm text-primary font-sans leading-relaxed font-bold">
                 Equivalent Exchange Enforced
               </p>
-              <p className="text-xs text-zinc-400 font-sans mt-2 max-w-xs">
+              <p className="text-xs text-secondary font-sans mt-2 max-w-xs">
                 You must make your own profile public in Profile Settings before viewing other aspirants' stats.
               </p>
               <p className="text-[10px] text-[#e0d0ab] mt-4 uppercase tracking-wider font-sans font-medium">
@@ -174,11 +174,11 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
 
           {dossierState === 'TARGET_PRIVATE' && (
             <div className="flex flex-col items-center justify-center py-12 text-center font-sans">
-              <Shield className="w-12 h-12 text-zinc-600 mb-4" />
-              <p className="text-sm text-zinc-300 font-sans leading-relaxed font-bold">
+              <Shield className="w-12 h-12 text-muted mb-4" />
+              <p className="text-sm text-primary font-sans leading-relaxed font-bold">
                 Private Profile
               </p>
-              <p className="text-xs text-zinc-500 mt-1 font-sans">
+              <p className="text-xs text-muted mt-1 font-sans">
                 This contender has configured their analytical history to remain private.
               </p>
             </div>
@@ -187,8 +187,8 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
           {dossierState === 'PUBLIC_DOSSIER' && dossier && (
             <div className="space-y-6 font-sans">
               {/* Identity Header */}
-              <div className="flex items-center gap-3 pb-4 border-b border-zinc-800">
-                <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-sm">
+              <div className="flex items-center gap-3 pb-4 border-b border-border">
+                <div className="p-3 bg-surface-elevated border border-border rounded-sm">
                   <Award className="w-6 h-6 text-[#e0d0ab]" />
                 </div>
                 <div>
@@ -219,7 +219,7 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
                   label="Assessments"
                   value={dossier.total_assessments ?? 0}
                   icon={BookOpen}
-                  accentColor="text-stone-300"
+                  accentColor="text-primary"
                 />
                 <StatCard
                   label="Avg Accuracy"
@@ -233,29 +233,29 @@ export default function PublicProfile({ analystId, currentUserId, onClose }: Pub
               </div>
 
               {/* Advanced Telemetry / Radar Chart Section */}
-              <div className="pt-4 border-t border-zinc-800">
+              <div className="pt-4 border-t border-border">
                 <div className="flex items-center gap-2 mb-4">
                   <TrendingUp className="w-4 h-4 text-[#0194a8]" />
-                  <h4 className="font-serif text-sm font-bold tracking-tight text-stone-200">
+                  <h4 className="font-serif text-sm font-bold tracking-tight text-primary">
                     Domain Mastery Radar
                   </h4>
                 </div>
 
                 {!isPremium ? (
-                  <div className="flex flex-col items-center justify-center p-8 bg-zinc-900/30 border border-zinc-800 rounded-sm text-center font-sans">
+                  <div className="flex flex-col items-center justify-center p-8 bg-surface-elevated/30 border border-border rounded-sm text-center font-sans">
                     <Shield className="w-8 h-8 text-[#e0d0ab] mb-2.5" />
-                    <p className="text-xs text-stone-200 font-sans font-bold uppercase tracking-wider">
+                    <p className="text-xs text-primary font-sans font-bold uppercase tracking-wider">
                       Founders Club Clearance Required
                     </p>
-                    <p className="text-[10px] text-zinc-500 mt-1 font-sans">
+                    <p className="text-[10px] text-muted mt-1 font-sans">
                       Subject radar and skill breakdown are unlocked for members.
                     </p>
                   </div>
                 ) : (
-                  <div className="p-4 bg-zinc-900/40 border border-zinc-800 rounded-sm font-sans">
+                  <div className="p-4 bg-surface-elevated/40 border border-border rounded-sm font-sans">
                     {radarData.length === 0 ? (
                       <div className="flex items-center justify-center py-10">
-                        <p className="text-xs font-sans text-zinc-500 tracking-wider">
+                        <p className="text-xs font-sans text-muted tracking-wider">
                           [ Insufficient data to render radar ]
                         </p>
                       </div>

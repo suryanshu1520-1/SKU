@@ -114,7 +114,7 @@ export function PibLogo({
           <span className="text-[9px] font-mono text-[#e0d0ab] uppercase tracking-wider mt-0.5">
             Press Information Bureau
           </span>
-          <span className="text-[8px] font-mono text-zinc-400 uppercase tracking-widest">
+          <span className="text-[8px] font-mono text-secondary uppercase tracking-widest">
             Government of India
           </span>
         </div>
@@ -124,7 +124,7 @@ export function PibLogo({
 
   if (variant === 'badge') {
     return (
-      <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-xs bg-zinc-900/90 border border-zinc-800 text-[#e0d0ab] ${className}`}>
+      <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-xs bg-surface-elevated/90 border border-border text-[#e0d0ab] ${className}`}>
         {sealImage}
         <span className="text-[10px] font-mono font-bold tracking-wider">PIB OFFICIAL</span>
         <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
@@ -176,7 +176,7 @@ export function SourceBadge({
   const baseStyle = `inline-flex items-center gap-2 px-2.5 py-1 rounded-sm border transition-all cursor-pointer font-sans select-none ${
     active
       ? 'border-[#e0d0ab] bg-[#e0d0ab]/15 text-[#e0d0ab] shadow-sm shadow-[#e0d0ab]/10'
-      : 'border-zinc-800/80 bg-zinc-900/60 text-zinc-300 hover:border-[#e0d0ab]/50 hover:text-white hover:bg-zinc-800/60'
+      : 'border-border/80 bg-surface-elevated/60 text-primary hover:border-[#e0d0ab]/50 hover:text-white hover:bg-surface-elevated/60'
   } ${className}`;
 
   if (isTheHindu) {

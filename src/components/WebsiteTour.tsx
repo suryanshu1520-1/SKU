@@ -346,7 +346,7 @@ export function WebsiteTour({
           exit={{ opacity: 0, scale: 0.94, y: 8 }}
           transition={{ type: 'spring', stiffness: 380, damping: 26 }}
           onClick={(e) => e.stopPropagation()}
-          className="fixed z-[820] w-[340px] sm:w-[380px] bg-zinc-950/95 border border-[#e0d0ab]/40 rounded-sm p-4 sm:p-5 shadow-[0_25px_60px_rgba(0,0,0,0.85)] backdrop-blur-2xl text-zinc-200"
+          className="fixed z-[820] w-[340px] sm:w-[380px] bg-surface/95 border border-[#e0d0ab]/40 rounded-sm p-4 sm:p-5 shadow-[0_25px_60px_rgba(0,0,0,0.85)] backdrop-blur-2xl text-primary"
           style={{
             top: bubblePosition.top,
             left: bubblePosition.left,
@@ -359,14 +359,14 @@ export function WebsiteTour({
                 <span className="w-1.5 h-1.5 rounded-full bg-[#34d399] animate-pulse" />
                 <span>STEP {currentStepIndex + 1} OF {steps.length}</span>
               </span>
-              <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+              <span className="text-[10px] font-mono text-muted uppercase tracking-widest">
                 {step.category}
               </span>
             </div>
 
             <button
               onClick={handleFinish}
-              className="p-1 text-zinc-500 hover:text-white transition-colors rounded-xs hover:bg-zinc-900 cursor-pointer"
+              className="p-1 text-muted hover:text-white transition-colors rounded-xs hover:bg-surface-elevated cursor-pointer"
               title="Close Tour (Esc)"
             >
               <X className="w-4 h-4" />
@@ -384,24 +384,24 @@ export function WebsiteTour({
           </div>
 
           {/* Body Text */}
-          <p className="text-xs text-zinc-300 font-sans leading-relaxed mb-3">
+          <p className="text-xs text-primary font-sans leading-relaxed mb-3">
             {step.body}
           </p>
 
           {/* Pro Tip Box */}
           {step.proTip && (
-            <div className="p-2.5 bg-zinc-900/80 border border-zinc-800 rounded-sm mb-4 text-[11px] text-[#e0d0ab] flex items-start gap-2">
+            <div className="p-2.5 bg-surface-elevated/80 border border-border rounded-sm mb-4 text-[11px] text-[#e0d0ab] flex items-start gap-2">
               <Zap className="w-3.5 h-3.5 text-[#e0d0ab] shrink-0 mt-0.5" />
               <span className="leading-snug">{step.proTip}</span>
             </div>
           )}
 
           {/* Footer Controls: Dots, Back, Next */}
-          <div className="flex items-center justify-between pt-2 border-t border-zinc-800/80">
+          <div className="flex items-center justify-between pt-2 border-t border-border/80">
             {/* Skip Button */}
             <button
               onClick={handleFinish}
-              className="text-[11px] font-mono text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
+              className="text-[11px] font-mono text-muted hover:text-primary transition-colors cursor-pointer"
             >
               Skip Tour
             </button>
@@ -417,7 +417,7 @@ export function WebsiteTour({
                       ? 'bg-[#e0d0ab] w-5'
                       : idx < currentStepIndex
                       ? 'bg-[#0194a8]'
-                      : 'bg-zinc-800 hover:bg-zinc-700'
+                      : 'bg-surface-elevated hover:bg-surface-elevated'
                   }`}
                   title={`Jump to step ${idx + 1}: ${s.title}`}
                 />
@@ -429,7 +429,7 @@ export function WebsiteTour({
               {currentStepIndex > 0 && (
                 <button
                   onClick={handlePrev}
-                  className="px-2.5 py-1.5 rounded-sm bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-sans font-medium transition-colors cursor-pointer flex items-center gap-1"
+                  className="px-2.5 py-1.5 rounded-sm bg-surface-elevated hover:bg-surface-elevated border border-border text-primary text-xs font-sans font-medium transition-colors cursor-pointer flex items-center gap-1"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                   <span>Back</span>
@@ -438,7 +438,7 @@ export function WebsiteTour({
 
               <button
                 onClick={handleNext}
-                className="px-3.5 py-1.5 rounded-sm bg-[#e0d0ab] hover:bg-white text-zinc-950 text-xs font-sans font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1"
+                className="px-3.5 py-1.5 rounded-sm bg-[#e0d0ab] hover:bg-white text-surface text-xs font-sans font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1"
               >
                 {currentStepIndex === steps.length - 1 ? (
                   <>

@@ -155,7 +155,7 @@ export function GroundingExplainerModal({
                   <span className="text-xs font-mono font-bold text-[#e0d0ab] uppercase tracking-wider block">
                     Mathematical Proof Formula:
                   </span>
-                  <div className="text-sm text-zinc-100">
+                  <div className="text-sm text-primary">
                     <strong className="text-emerald-400 font-mono text-base">2 Verified Sentences</strong> ÷{' '}
                     <strong className="text-white font-mono text-base">3 Proposed Claims</strong> ={' '}
                     <strong className="text-[#e0d0ab] font-mono text-lg font-bold">67% Grounding Score</strong>
@@ -185,7 +185,7 @@ export function GroundingExplainerModal({
                       <AlertOctagon className="w-4 h-4" />
                       <span>Claim 2: DROPPED &amp; QUARANTINED</span>
                     </div>
-                    <p className="text-sm text-zinc-300 line-through">
+                    <p className="text-sm text-primary line-through">
                       Projected to increase farmer incomes by 35% by 2027.
                     </p>
                     <span className="text-xs font-mono text-rose-300 block">
@@ -359,7 +359,7 @@ export function GroundingExplainerModal({
                               Claim 2 — Hallucination Intercepted &amp; Dropped
                             </span>
                           </div>
-                          <p className="text-sm text-zinc-300 line-through opacity-80">
+                          <p className="text-sm text-primary line-through opacity-80">
                             Projected to increase farmer incomes by 35% by 2027.
                           </p>
                           <div className="p-2 rounded-xs bg-[rgba(4,25,54,0.9)] border border-rose-400/30 text-xs font-mono text-rose-300">
@@ -417,9 +417,9 @@ export function GroundingExplainerModal({
                         <span className="text-xs font-mono text-[#e0d0ab] uppercase tracking-wider font-bold">
                           Mathematical Grounding Index
                         </span>
-                        <div className="text-base text-zinc-200">
+                        <div className="text-base text-primary">
                           <strong className="text-emerald-400 font-mono text-xl font-bold">2 Verified</strong> ÷{' '}
-                          <strong className="text-zinc-300 font-mono text-xl font-bold">3 Total</strong> ={' '}
+                          <strong className="text-primary font-mono text-xl font-bold">3 Total</strong> ={' '}
                           <strong className="text-[#e0d0ab] font-mono text-2xl font-bold">67%</strong>
                         </div>
                       </div>
@@ -446,7 +446,7 @@ export function GroundingExplainerModal({
                         <span className="text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider block">
                           With Tark Grounding
                         </span>
-                        <p className="text-xs text-zinc-200 leading-relaxed">
+                        <p className="text-xs text-primary leading-relaxed">
                           Every fact has a verbatim sentence citation. <strong className="text-emerald-300">Safe to quote in Mains GS papers</strong>.
                         </p>
                       </div>
@@ -466,7 +466,7 @@ export function GroundingExplainerModal({
                   disabled={step === 1}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xs text-xs font-medium transition-colors ${
                     step === 1
-                      ? 'text-zinc-600 cursor-not-allowed'
+                      ? 'text-muted cursor-not-allowed'
                       : 'text-[#9fb0c8] hover:text-white hover:bg-[#0b3d78]/40 cursor-pointer'
                   }`}
                 >

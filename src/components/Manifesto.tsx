@@ -172,7 +172,7 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start p-6 pt-24 md:pt-28 bg-zinc-950 text-stone-50 font-sans relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-start p-6 pt-24 md:pt-28 bg-surface text-primary font-sans relative overflow-hidden">
       {/* Background grid overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f1f23_1px,transparent_1px),linear-gradient(to_bottom,#1f1f23_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-25 pointer-events-none" />
 
@@ -180,7 +180,7 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-0 right-0 p-2 rounded-sm text-zinc-500 hover:text-[#e0d0ab] hover:bg-zinc-900/60 transition-all border border-transparent hover:border-zinc-800/60 cursor-pointer"
+          className="absolute top-0 right-0 p-2 rounded-sm text-muted hover:text-[#e0d0ab] hover:bg-surface-elevated/60 transition-all border border-transparent hover:border-border/60 cursor-pointer"
           title="Close Manifesto"
         >
           <X className="w-5 h-5" />
@@ -193,7 +193,7 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="mb-12"
         >
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-zinc-900 border border-zinc-800 rounded-sm text-[10px] uppercase font-sans font-medium text-zinc-400 tracking-wider mb-4 select-none">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-surface-elevated border border-border rounded-sm text-[10px] uppercase font-sans font-medium text-secondary tracking-wider mb-4 select-none">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             CORE PHILOSOPHY
           </div>
@@ -202,7 +202,7 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
             THE TARK MANIFESTO
           </h1>
 
-          <p className="text-xs uppercase tracking-[0.25em] text-zinc-400 font-sans">
+          <p className="text-xs uppercase tracking-[0.25em] text-secondary font-sans">
             The War on Noise &bull; Return on Time
           </p>
         </motion.div>
@@ -212,17 +212,17 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
-          className="mb-10 p-4 bg-zinc-900/40 border border-[#e0d0ab]/30 rounded-sm flex items-center justify-between gap-4"
+          className="mb-10 p-4 bg-surface-elevated/40 border border-[#e0d0ab]/30 rounded-sm flex items-center justify-between gap-4"
         >
           <div className="space-y-0.5">
             <p className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold tracking-wider">
               Founders Club &bull; Strictly Capped Capacity
             </p>
-            <p className="text-xs text-zinc-300 font-sans">
+            <p className="text-xs text-primary font-sans">
               {seatData ? `${seatData.claimed_seats} of ${seatData.max_capacity} lifetime seats claimed.` : 'Capped strictly at 500 members.'}
             </p>
           </div>
-          <div className="shrink-0 font-mono text-xs px-2.5 py-1 bg-zinc-800 text-emerald-400 border border-zinc-700 rounded-sm">
+          <div className="shrink-0 font-mono text-xs px-2.5 py-1 bg-surface-elevated text-emerald-400 border border-border rounded-sm">
             {seatData ? `${seatData.remaining_seats} remaining` : '500 seats max'}
           </div>
         </motion.div>
@@ -234,9 +234,9 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-zinc-900/20 border border-zinc-800/60 p-6 md:p-8 rounded-sm"
+            className="bg-surface-elevated/20 border border-border/60 p-6 md:p-8 rounded-sm"
           >
-            <p className="text-sm md:text-base text-zinc-300 leading-relaxed font-sans">
+            <p className="text-sm md:text-base text-primary leading-relaxed font-sans">
               Your time is your most finite resource. Traditional EdTech is engineered to maximize your screen time through addictive gamification, intrusive ads, and endless video lecture playlists. We reject this entirely. Tark is built exclusively to maximize your <span className="text-[#e0d0ab] font-semibold">return on time</span>.
             </p>
           </motion.section>
@@ -250,7 +250,7 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
               <Shield className="w-4 h-4 text-emerald-400" />
               1. The Intelligence Advantage
             </h2>
-            <p className="text-sm text-zinc-400 leading-relaxed font-sans">
+            <p className="text-sm text-secondary leading-relaxed font-sans">
               Instead of spending 3 hours deciphering bureaucratic jargon and political press releases, our ingestion engine distills 40+ daily government dispatches into ultra-focused, 4-minute analytical briefs. You bypass the noise and retain the exact factual baseline tested in the examination.
             </p>
           </motion.section>
@@ -264,7 +264,7 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
               <Sparkles className="w-4 h-4 text-[#e0d0ab]" />
               2. An Ad-Free, Noise-Free Sanctuary
             </h2>
-            <p className="text-sm text-zinc-400 leading-relaxed font-sans">
+            <p className="text-sm text-secondary leading-relaxed font-sans">
               Tark is engineered for deep focus. You will never see an advertisement, a third-party affiliate link, or a cartoon mascot demanding your attention. We provide a pristine analytical environment so 100% of your cognitive capacity is deployed on retention and reasoning.
             </p>
           </motion.section>
@@ -278,7 +278,7 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />
               3. The Provable Scarcity Guarantee
             </h2>
-            <p className="text-sm text-zinc-400 leading-relaxed font-sans">
+            <p className="text-sm text-secondary leading-relaxed font-sans">
               Because we refuse to monetize attention or sell candidate data, Tark is funded purely by its members. To maintain low server latencies, immediate AI diagnostic generations, and direct support, Founders Club memberships are hard-capped at 500 members. No recurring subscriptions. One price, lifetime access.
             </p>
           </motion.section>
@@ -287,7 +287,7 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
-            className="bg-zinc-900/30 border border-zinc-800/80 p-6 rounded-sm text-center"
+            className="bg-surface-elevated/30 border border-border/80 p-6 rounded-sm text-center"
           >
             <p className="font-serif text-lg sm:text-xl text-[#e0d0ab] font-bold tracking-wide">
               Enter the arena. Do the work. Exit.
@@ -304,7 +304,7 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
             <button
               onClick={handleJoinFoundersClub}
               disabled={processingPayment}
-              className="w-full sm:w-auto group inline-flex items-center justify-center gap-2.5 py-3.5 px-8 bg-[#e0d0ab] text-zinc-950 font-sans text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-stone-100 transition-all shadow-lg shadow-[#e0d0ab]/10 hover:shadow-[#e0d0ab]/20 disabled:opacity-50 cursor-pointer"
+              className="w-full sm:w-auto group inline-flex items-center justify-center gap-2.5 py-3.5 px-8 bg-[#e0d0ab] text-surface font-sans text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-primary transition-all shadow-lg shadow-[#e0d0ab]/10 hover:shadow-[#e0d0ab]/20 disabled:opacity-50 cursor-pointer"
             >
               {processingPayment ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -317,7 +317,7 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
 
             <button
               onClick={onClose}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 py-3.5 px-6 border border-zinc-800 text-zinc-300 font-sans text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-zinc-900/60 hover:text-[#e0d0ab] transition-all cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 py-3.5 px-6 border border-border text-primary font-sans text-xs font-bold uppercase tracking-widest rounded-sm hover:bg-surface-elevated/60 hover:text-[#e0d0ab] transition-all cursor-pointer"
             >
               Back to Overview
             </button>
@@ -332,9 +332,9 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
-          className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] px-6 py-3 bg-zinc-900 border border-zinc-700 rounded-sm shadow-2xl"
+          className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] px-6 py-3 bg-surface-elevated border border-border rounded-sm shadow-2xl"
         >
-          <p className="text-xs text-stone-200 font-sans whitespace-nowrap">
+          <p className="text-xs text-primary font-sans whitespace-nowrap">
             {toastMsg}
           </p>
         </motion.div>

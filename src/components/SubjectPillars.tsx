@@ -119,19 +119,19 @@ function BranchingMindMap({
               onClick={() => onSelectLeaf(idx)}
               className={`cursor-pointer rounded-sm border p-4 transition-all duration-200 ${
                 isActive
-                  ? 'bg-zinc-900 border-[#e0d0ab] shadow-[0_10px_28px_-10px_rgba(224,208,171,0.3)] ring-1 ring-[#e0d0ab]/30'
-                  : 'bg-zinc-950/60 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900/40'
+                  ? 'bg-surface-elevated border-[#e0d0ab] shadow-[0_10px_28px_-10px_rgba(224,208,171,0.3)] ring-1 ring-[#e0d0ab]/30'
+                  : 'bg-surface/60 border-border hover:border-border hover:bg-surface-elevated/40'
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className={`text-[10px] font-mono uppercase tracking-wider font-bold ${isActive ? 'text-[#e0d0ab]' : 'text-zinc-500'}`}>
+                <span className={`text-[10px] font-mono uppercase tracking-wider font-bold ${isActive ? 'text-[#e0d0ab]' : 'text-muted'}`}>
                   Branch {idx + 1}
                 </span>
                 {isActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-[#e0d0ab] animate-pulse" />
                 )}
               </div>
-              <p className={`mt-2 text-xs md:text-sm font-sans leading-relaxed ${isActive ? 'text-stone-100' : 'text-zinc-400'}`}>
+              <p className={`mt-2 text-xs md:text-sm font-sans leading-relaxed ${isActive ? 'text-primary' : 'text-secondary'}`}>
                 {leaf}
               </p>
             </motion.div>
@@ -179,26 +179,26 @@ function SequentialMindMap({
                 transition={{ duration: 0.25 }}
                 className="mt-3 shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center shadow-sm"
               >
-                <span className={`text-[10px] font-mono font-bold ${isDone ? 'text-zinc-950' : 'text-zinc-500'}`}>
+                <span className={`text-[10px] font-mono font-bold ${isDone ? 'text-surface' : 'text-muted'}`}>
                   {sIdx + 1}
                 </span>
               </motion.div>
               <div
                 className={`flex-1 p-4 rounded-sm border transition-all duration-200 ${
                   isActive
-                    ? 'bg-zinc-900 border-[#e0d0ab] shadow-[0_8px_24px_-8px_rgba(224,208,171,0.25)] ring-1 ring-[#e0d0ab]/30'
+                    ? 'bg-surface-elevated border-[#e0d0ab] shadow-[0_8px_24px_-8px_rgba(224,208,171,0.25)] ring-1 ring-[#e0d0ab]/30'
                     : isDone
-                      ? 'bg-zinc-900/50 border-zinc-700'
-                      : 'bg-zinc-950/60 border-zinc-800 group-hover:border-zinc-700'
+                      ? 'bg-surface-elevated/50 border-border'
+                      : 'bg-surface/60 border-border group-hover:border-border'
                 }`}
               >
-                <p className={`text-xs md:text-sm font-sans leading-relaxed ${isDone ? 'text-stone-100' : 'text-zinc-500'}`}>
+                <p className={`text-xs md:text-sm font-sans leading-relaxed ${isDone ? 'text-primary' : 'text-muted'}`}>
                   {step}
                 </p>
                 {isActive && mm.examples?.[sIdx] && (
-                  <div className="mt-2.5 pt-2.5 border-t border-zinc-800/80">
+                  <div className="mt-2.5 pt-2.5 border-t border-border/80">
                     <span className="text-[9px] font-mono uppercase tracking-wider text-[#e0d0ab]">Worked example</span>
-                    <p className="text-[11px] md:text-xs text-zinc-400 leading-relaxed font-sans mt-1 italic">
+                    <p className="text-[11px] md:text-xs text-secondary leading-relaxed font-sans mt-1 italic">
                       {mm.examples[sIdx]}
                     </p>
                   </div>
@@ -211,7 +211,7 @@ function SequentialMindMap({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: sIdx * 0.06 + 0.15 }}
-                  className={sIdx < activeStep ? 'text-[#e0d0ab]' : 'text-zinc-700'}
+                  className={sIdx < activeStep ? 'text-[#e0d0ab]' : 'text-surface'}
                 >
                   <ArrowDown className="w-4 h-4 my-1" />
                 </motion.div>
@@ -220,7 +220,7 @@ function SequentialMindMap({
           </React.Fragment>
         );
       })}
-      <p className="mt-3 text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
+      <p className="mt-3 text-[11px] font-mono text-muted uppercase tracking-wider">
         Step {activeStep + 1} of {mm.details.length} — click any step to focus
       </p>
     </div>
@@ -303,7 +303,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
   return (
     <div className="space-y-12 animate-in fade-in duration-700 pb-24 max-w-7xl mx-auto font-sans">
       {/* ── Spatial Hero & Sovereign Grounding Header ── */}
-      <div className="relative border border-zinc-800/90 bg-zinc-950/80 p-6 md:p-10 rounded-sm overflow-hidden shadow-2xl backdrop-blur-2xl">
+      <div className="relative border border-border/90 bg-surface/80 p-6 md:p-10 rounded-sm overflow-hidden shadow-2xl backdrop-blur-2xl">
         {/* Dynamic ambient radial gradients */}
         <div className="absolute top-0 right-1/4 w-[600px] h-[350px] bg-[#e0d0ab]/5 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute -bottom-10 -left-10 w-[400px] h-[300px] bg-[#0194a8]/10 rounded-full blur-[100px] pointer-events-none" />
@@ -325,7 +325,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
               Syllabus Knowledge Pillars & Static Vault
             </h1>
 
-            <p className="text-sm md:text-base text-zinc-300 leading-relaxed font-sans max-w-2xl">
+            <p className="text-sm md:text-base text-primary leading-relaxed font-sans max-w-2xl">
               An analytical decomposition of the UPSC General Studies, CSAT, and Static GK domains. Formulated from 25 years of authentic PYQ frequency patterns, Supreme Court constitutional bench rulings, Ramsar treaties, and 2nd ARC administrative doctrines.
             </p>
           </div>
@@ -335,7 +335,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
               onClick={() => setIsExaminerPsycheOpen(true)}
               whileHover={{ scale: 1.02, y: -1 }}
               whileTap={{ scale: 0.98 }}
-              className="flex items-center justify-center gap-2 px-5 py-3 bg-zinc-900 hover:bg-zinc-800 text-[#e0d0ab] border border-[#e0d0ab]/40 hover:border-[#e0d0ab] rounded-md text-xs font-sans font-bold uppercase tracking-wider transition-colors shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]"
+              className="flex items-center justify-center gap-2 px-5 py-3 bg-surface-elevated hover:bg-surface-elevated text-[#e0d0ab] border border-[#e0d0ab]/40 hover:border-[#e0d0ab] rounded-md text-xs font-sans font-bold uppercase tracking-wider transition-colors shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]"
             >
               <Brain className="w-4 h-4 text-[#e0d0ab]" />
               <span>Examiner's Psyche</span>
@@ -344,7 +344,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
               onClick={() => onNavigateArena && onNavigateArena()}
               whileHover={{ scale: 1.02, y: -1 }}
               whileTap={{ scale: 0.98 }}
-              className="relative flex items-center justify-center gap-2 px-6 py-3 bg-[#e0d0ab] hover:bg-white text-[#072e63] rounded-md text-xs font-sans font-bold tracking-wider uppercase transition-colors shadow-lg hover:shadow-[#e0d0ab]/20 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 group overflow-hidden"
+              className="relative flex items-center justify-center gap-2 px-6 py-3 bg-[#e0d0ab] hover:bg-white text-[#072e63] rounded-md text-xs font-sans font-bold tracking-wider uppercase transition-colors shadow-lg hover:shadow-[#e0d0ab]/20 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] focus-visible:ring-offset-2 focus-visible:ring-offset-surface group overflow-hidden"
             >
               {/* Luminous Shimmer Light Wave */}
               <motion.div
@@ -361,20 +361,20 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
         </div>
 
         {/* Search & Empirical Metrics Grid */}
-        <div className="mt-8 pt-6 border-t border-zinc-900 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        <div className="mt-8 pt-6 border-t border-border flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
           <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-muted absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search concepts, articles, cases, passes, Ramsar sites..."
-              className="w-full pl-9 pr-4 py-2 rounded-md bg-zinc-900/90 border border-zinc-800 text-xs text-stone-100 placeholder-zinc-500 focus:outline-none focus:border-[#e0d0ab]/60 transition-colors"
+              className="w-full pl-9 pr-4 py-2 rounded-md bg-surface-elevated/90 border border-border text-xs text-primary placeholder-muted focus:outline-none focus:border-[#e0d0ab]/60 transition-colors"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-sans text-zinc-400 hover:text-zinc-200"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-sans text-secondary hover:text-primary"
               >
                 Clear
               </button>
@@ -392,7 +392,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
               Core General Studies Subjects
             </h2>
           </div>
-          <span className="text-xs font-sans text-zinc-400">Select a pillar to inspect high-yield dossiers</span>
+          <span className="text-xs font-sans text-secondary">Select a pillar to inspect high-yield dossiers</span>
         </div>
 
         {/* 6 Column Grid */}
@@ -417,8 +417,8 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                 }}
                 className={`relative p-5 rounded-md border transition-all duration-300 cursor-pointer flex flex-col justify-between overflow-hidden group ${
                   isSelected
-                    ? 'bg-zinc-900 border-[#e0d0ab] shadow-[0_16px_36px_-10px_rgba(224,208,171,0.2)] ring-1 ring-[#e0d0ab]/40'
-                    : 'bg-zinc-950/70 border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-900/50'
+                    ? 'bg-surface-elevated border-[#e0d0ab] shadow-[0_16px_36px_-10px_rgba(224,208,171,0.2)] ring-1 ring-[#e0d0ab]/40'
+                    : 'bg-surface/70 border-border/80 hover:border-border hover:bg-surface-elevated/50'
                 }`}
               >
                 {/* Top Pillar Capstone Indicator */}
@@ -436,7 +436,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                         color: pillar.colorTheme.primary,
                         borderColor: isSelected ? pillar.colorTheme.primary : 'rgba(39, 39, 42, 0.8)',
                       }}
-                      className="p-2 rounded-md bg-zinc-900 border flex items-center justify-center transition-colors"
+                      className="p-2 rounded-md bg-surface-elevated border flex items-center justify-center transition-colors"
                     >
                       {getPillarIcon(pillar.paper)}
                     </div>
@@ -447,34 +447,34 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                         <span>{pillar.paper === 'STATIC_GK' ? 'STATIC' : pillar.paper}</span>
                       </span>
                     ) : (
-                      <span className="text-xs font-sans font-semibold px-2 py-0.5 rounded-md bg-zinc-900 border border-zinc-800 text-zinc-300">
+                      <span className="text-xs font-sans font-semibold px-2 py-0.5 rounded-md bg-surface-elevated border border-border text-primary">
                         {pillar.paper === 'STATIC_GK' ? 'STATIC' : pillar.paper}
                       </span>
                     )}
                   </div>
 
                   <div>
-                    <h3 className="font-serif font-bold text-stone-100 text-sm leading-snug group-hover:text-[#e0d0ab] transition-colors">
+                    <h3 className="font-serif font-bold text-primary text-sm leading-snug group-hover:text-[#e0d0ab] transition-colors">
                       {pillar.title}
                     </h3>
                   </div>
 
-                  <p className="text-xs text-zinc-400 font-sans leading-relaxed line-clamp-2">
+                  <p className="text-xs text-secondary font-sans leading-relaxed line-clamp-2">
                     {pillar.shortDescription}
                   </p>
                 </div>
 
                 {/* Bottom Telemetry Bar - No Collisions */}
-                <div className="pt-3 mt-4 border-t border-zinc-800/60 flex items-center justify-between text-xs font-sans relative z-10 gap-2">
+                <div className="pt-3 mt-4 border-t border-border/60 flex items-center justify-between text-xs font-sans relative z-10 gap-2">
                   <div className="flex items-baseline gap-1 min-w-0">
-                    <span className="font-mono tabular-nums font-bold text-zinc-200 text-xs shrink-0">
+                    <span className="font-mono tabular-nums font-bold text-primary text-xs shrink-0">
                       {pillar.paper === 'GS4'
                         ? '250M'
                         : pillar.paper === 'CSAT'
                         ? '80 Qs'
                         : pillar.keyMetrics.prelimsAvgQuestions.split(' ')[0]}
                     </span>
-                    <span className="text-zinc-500 text-[11px] truncate">
+                    <span className="text-muted text-[11px] truncate">
                       {pillar.paper === 'GS4' ? 'Mains Core' : 'Prelims Avg'}
                     </span>
                   </div>
@@ -564,19 +564,19 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="border border-zinc-800 bg-zinc-950/90 rounded-md overflow-hidden shadow-2xl"
+          className="border border-border bg-surface/90 rounded-md overflow-hidden shadow-2xl"
         >
           {/* Pillar Header Card */}
-          <div className="p-6 md:p-8 border-b border-zinc-800/80 bg-gradient-to-r from-zinc-900/80 via-zinc-900/40 to-zinc-950 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="p-6 md:p-8 border-b border-border/80 bg-gradient-to-r from-surface-elevated/80 via-surface-elevated/40 to-surface flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="space-y-2.5 max-w-3xl">
               <div className="flex flex-wrap items-center gap-2.5">
                 <span className="px-2.5 py-0.5 rounded-md text-xs font-sans font-bold bg-[#e0d0ab]/10 text-[#e0d0ab] border border-[#e0d0ab]/30 uppercase">
                   {selectedPillar.paper} • {selectedPillar.code}
                 </span>
-                <span className="text-xs font-sans text-zinc-300">
-                  Weightage: <strong className="text-stone-100 font-medium">{selectedPillar.keyMetrics.totalMarksWeight}</strong>
+                <span className="text-xs font-sans text-primary">
+                  Weightage: <strong className="text-primary font-medium">{selectedPillar.keyMetrics.totalMarksWeight}</strong>
                 </span>
-                <span className="text-xs font-sans text-zinc-400">
+                <span className="text-xs font-sans text-secondary">
                   Corpus Coverage: {selectedPillar.keyMetrics.pyqCoverageYears}
                 </span>
               </div>
@@ -585,7 +585,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                 {selectedPillar.title}
               </h2>
 
-              <p className="text-xs md:text-sm text-zinc-300 font-sans leading-relaxed">
+              <p className="text-xs md:text-sm text-primary font-sans leading-relaxed">
                 {selectedPillar.empiricalBasis}
               </p>
             </div>
@@ -618,13 +618,13 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
           </div>
 
           {/* Dossier Navigation Pills */}
-          <div className="bg-zinc-900/70 border-b border-zinc-800 px-6 py-2.5 flex items-center gap-2 overflow-x-auto">
+          <div className="bg-surface-elevated/70 border-b border-border px-6 py-2.5 flex items-center gap-2 overflow-x-auto">
             <button
               onClick={() => setActiveDossierTab('concepts')}
               className={`px-4 py-2 rounded-md text-xs font-sans font-medium transition-colors cursor-pointer flex items-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] ${
                 activeDossierTab === 'concepts'
                   ? 'bg-[#e0d0ab] text-[#072e63] font-bold shadow-xs'
-                  : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/60'
+                  : 'text-secondary hover:text-primary hover:bg-surface-elevated/60'
               }`}
             >
               <BookOpen className="w-3.5 h-3.5" />
@@ -637,7 +637,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                 className={`px-4 py-2 rounded-md text-xs font-sans font-medium transition-colors cursor-pointer flex items-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] ${
                   activeDossierTab === 'static-vault'
                     ? 'bg-[#e0d0ab] text-[#072e63] font-bold shadow-xs'
-                    : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/60'
+                    : 'text-secondary hover:text-primary hover:bg-surface-elevated/60'
                 }`}
               >
                 <Table className="w-3.5 h-3.5" />
@@ -650,7 +650,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
               className={`px-4 py-2 rounded-md text-xs font-sans font-medium transition-colors cursor-pointer flex items-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] ${
                 activeDossierTab === 'mindmaps'
                   ? 'bg-[#e0d0ab] text-[#072e63] font-bold shadow-xs'
-                  : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/60'
+                  : 'text-secondary hover:text-primary hover:bg-surface-elevated/60'
               }`}
             >
               <Network className="w-3.5 h-3.5" />
@@ -662,7 +662,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
               className={`px-4 py-2 rounded-md text-xs font-sans font-medium transition-colors cursor-pointer flex items-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] ${
                 activeDossierTab === 'pyq-evidence'
                   ? 'bg-[#e0d0ab] text-[#072e63] font-bold shadow-xs'
-                  : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/60'
+                  : 'text-secondary hover:text-primary hover:bg-surface-elevated/60'
               }`}
             >
               <BarChart3 className="w-3.5 h-3.5" />
@@ -674,7 +674,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
               className={`px-4 py-2 rounded-md text-xs font-sans font-medium transition-colors cursor-pointer flex items-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] ${
                 activeDossierTab === 'mains-blueprints'
                   ? 'bg-[#e0d0ab] text-[#072e63] font-bold shadow-xs'
-                  : 'text-zinc-400 hover:text-stone-200 hover:bg-zinc-800/60'
+                  : 'text-secondary hover:text-primary hover:bg-surface-elevated/60'
               }`}
             >
               <FileCheck2 className="w-3.5 h-3.5" />
@@ -688,9 +688,9 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
             {activeDossierTab === 'concepts' && (
               <div className="space-y-6">
                 {filteredConcepts.length === 0 ? (
-                  <div className="p-12 text-center border border-dashed border-zinc-800 rounded-sm">
-                    <Search className="w-8 h-8 text-zinc-600 mx-auto mb-3" />
-                    <p className="text-sm font-sans text-zinc-400">No concepts found matching "{searchQuery}"</p>
+                  <div className="p-12 text-center border border-dashed border-border rounded-sm">
+                    <Search className="w-8 h-8 text-muted mx-auto mb-3" />
+                    <p className="text-sm font-sans text-secondary">No concepts found matching "{searchQuery}"</p>
                     <button
                       onClick={() => setSearchQuery('')}
                       className="mt-3 text-xs font-mono text-[#e0d0ab] hover:underline"
@@ -702,21 +702,21 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                   filteredConcepts.map((concept, idx) => (
                     <div
                       key={idx}
-                      className="p-6 rounded-sm bg-zinc-900/40 border border-zinc-800/90 space-y-5"
+                      className="p-6 rounded-sm bg-surface-elevated/40 border border-border/90 space-y-5"
                     >
-                      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800/80 pb-3">
+                      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-3">
                         <div>
                           <span className="text-[10px] font-mono text-[#e0d0ab] bg-[#e0d0ab]/10 border border-[#e0d0ab]/20 px-2 py-0.5 rounded font-bold mr-2">
                             {concept.syllabusTag}
                           </span>
-                          <h3 className="text-lg font-serif font-bold text-stone-100 inline-block mt-1">
+                          <h3 className="text-lg font-serif font-bold text-primary inline-block mt-1">
                             {concept.title}
                           </h3>
                         </div>
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => onLaunchPractice && onLaunchPractice(concept.title)}
-                            className="px-2.5 py-1 rounded bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-[10px] font-mono text-[#e0d0ab] flex items-center gap-1 transition-colors"
+                            className="px-2.5 py-1 rounded bg-surface-elevated hover:bg-surface-elevated border border-border text-[10px] font-mono text-[#e0d0ab] flex items-center gap-1 transition-colors"
                           >
                             <Swords className="w-3 h-3" />
                             Drill Qs
@@ -724,7 +724,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                         </div>
                       </div>
 
-                      <p className="text-sm text-zinc-300 font-sans leading-relaxed">
+                      <p className="text-sm text-primary font-sans leading-relaxed">
                         {concept.coreTheory}
                       </p>
 
@@ -737,7 +737,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                           {concept.criticalProvisions.map((prov, pIdx) => (
                             <div
                               key={pIdx}
-                              className="p-3 rounded-sm bg-zinc-950/80 border border-zinc-800/90 text-xs text-zinc-300 font-sans leading-relaxed flex items-start gap-2.5"
+                              className="p-3 rounded-sm bg-surface/80 border border-border/90 text-xs text-primary font-sans leading-relaxed flex items-start gap-2.5"
                             >
                               <span className="w-1.5 h-1.5 rounded-full bg-[#e0d0ab] mt-1.5 shrink-0" />
                               <span>{prov}</span>
@@ -766,22 +766,22 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
             {activeDossierTab === 'static-vault' && (
               <div className="space-y-8">
                 {filteredMatrices.length === 0 ? (
-                  <div className="p-12 text-center border border-dashed border-zinc-800 rounded-sm">
-                    <Database className="w-8 h-8 text-zinc-600 mx-auto mb-3" />
-                    <p className="text-sm font-sans text-zinc-400">No static matrices match your current filter.</p>
+                  <div className="p-12 text-center border border-dashed border-border rounded-sm">
+                    <Database className="w-8 h-8 text-muted mx-auto mb-3" />
+                    <p className="text-sm font-sans text-secondary">No static matrices match your current filter.</p>
                   </div>
                 ) : (
                   filteredMatrices.map((matrix) => (
                     <div
                       key={matrix.id}
-                      className="p-6 md:p-8 rounded-sm bg-zinc-900/40 border border-zinc-800 space-y-5"
+                      className="p-6 md:p-8 rounded-sm bg-surface-elevated/40 border border-border space-y-5"
                     >
-                      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800/80 pb-4">
+                      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-4">
                         <div>
                           <span className="text-[10px] font-mono text-[#e0d0ab] bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 px-2 py-0.5 rounded font-bold mr-2 uppercase">
                             {matrix.category}
                           </span>
-                          <h3 className="text-xl font-serif font-bold text-stone-100 inline-block mt-1">
+                          <h3 className="text-xl font-serif font-bold text-primary inline-block mt-1">
                             {matrix.title}
                           </h3>
                         </div>
@@ -791,9 +791,9 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                       </div>
 
                       {/* Responsive Data Table */}
-                      <div className="overflow-x-auto border border-zinc-800 rounded-sm">
+                      <div className="overflow-x-auto border border-border rounded-sm">
                         <table className="w-full text-left text-xs font-sans">
-                          <thead className="bg-zinc-950 text-zinc-400 font-mono text-[11px] uppercase tracking-wider border-b border-zinc-800">
+                          <thead className="bg-surface text-secondary font-mono text-[11px] uppercase tracking-wider border-b border-border">
                             <tr>
                               {matrix.headers.map((header, hIdx) => (
                                 <th key={hIdx} className="px-4 py-3 font-semibold">
@@ -802,16 +802,16 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                               ))}
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-zinc-900 bg-zinc-950/60">
+                          <tbody className="divide-y divide-border bg-surface/60">
                             {matrix.rows.map((row, rIdx) => (
-                              <tr key={rIdx} className="hover:bg-zinc-900/60 transition-colors">
+                              <tr key={rIdx} className="hover:bg-surface-elevated/60 transition-colors">
                                 {row.map((cell, cIdx) => (
                                   <td
                                     key={cIdx}
                                     className={`px-4 py-3 leading-relaxed ${
                                       cIdx === 0
-                                        ? 'font-bold text-stone-100 font-serif'
-                                        : 'text-zinc-300'
+                                        ? 'font-bold text-primary font-serif'
+                                        : 'text-primary'
                                     }`}
                                   >
                                     {cell}
@@ -845,20 +845,20 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                 {selectedPillar.mindMaps.map((mm, mmIdx) => (
                   <div
                     key={mm.id}
-                    className="p-6 md:p-8 rounded-sm bg-zinc-900/40 border border-zinc-800 space-y-6"
+                    className="p-6 md:p-8 rounded-sm bg-surface-elevated/40 border border-border space-y-6"
                   >
-                    <div className="border-b border-zinc-800/80 pb-4 flex items-center justify-between">
+                    <div className="border-b border-border/80 pb-4 flex items-center justify-between">
                       <div>
                         <span className="text-[10px] font-mono text-[#e0d0ab] uppercase tracking-widest font-bold">
                           Visual Decision Tree #{mmIdx + 1}
                         </span>
-                        <h3 className="text-xl font-serif font-bold text-stone-100 mt-1">
+                        <h3 className="text-xl font-serif font-bold text-primary mt-1">
                           {mm.title}
                         </h3>
-                        <p className="text-xs text-zinc-400 mt-0.5">{mm.subtitle}</p>
+                        <p className="text-xs text-secondary mt-0.5">{mm.subtitle}</p>
                       </div>
 
-                      <span className="text-[10px] font-mono text-zinc-500 px-2 py-1 bg-zinc-950 border border-zinc-800 rounded flex items-center gap-1.5">
+                      <span className="text-[10px] font-mono text-muted px-2 py-1 bg-surface border border-border rounded flex items-center gap-1.5">
                         {mm.structureType === 'branching' ? (
                           <><GitFork className="w-3 h-3" /> Branching</>
                         ) : (
@@ -888,7 +888,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
             {/* ── TAB 4: 25-YEAR EMPIRICAL FREQUENCY & HEATMAP ── */}
             {activeDossierTab === 'pyq-evidence' && (
               <div className="space-y-6">
-                <div className="p-4 rounded-sm bg-zinc-900/60 border border-zinc-800 text-xs font-sans text-zinc-300 leading-relaxed">
+                <div className="p-4 rounded-sm bg-surface-elevated/60 border border-border text-xs font-sans text-primary leading-relaxed">
                   <span className="font-mono font-bold text-[#e0d0ab] block mb-1 uppercase tracking-wider text-[10px]">
                     25-Year Empirical Distractor & Trap Analysis:
                   </span>
@@ -899,17 +899,17 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                   {selectedPillar.pyqEvidence.map((ev, eIdx) => (
                     <div
                       key={eIdx}
-                      className="p-6 rounded-sm bg-zinc-900/30 border border-zinc-800/90 space-y-4"
+                      className="p-6 rounded-sm bg-surface-elevated/30 border border-border/90 space-y-4"
                     >
-                      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800/80 pb-3">
-                        <h4 className="font-serif font-bold text-stone-100 text-base md:text-lg">
+                      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-3">
+                        <h4 className="font-serif font-bold text-primary text-base md:text-lg">
                           {ev.theme}
                         </h4>
                         <div className="flex items-center gap-2">
                           <span className="px-2.5 py-1 rounded text-[10px] font-mono font-bold bg-emerald-950/40 text-emerald-300 border border-emerald-800/40">
                             Editorial Priority: {ev.testabilityScore}
                           </span>
-                          <span className="px-2.5 py-1 rounded text-[10px] font-mono text-zinc-400 bg-zinc-900 border border-zinc-800">
+                          <span className="px-2.5 py-1 rounded text-[10px] font-mono text-secondary bg-surface-elevated border border-border">
                             Anchors: {ev.recentYearAnchors.join(', ')}
                           </span>
                         </div>
@@ -933,47 +933,47 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                 {selectedPillar.mainsBlueprints.map((mb, mIdx) => (
                   <div
                     key={mIdx}
-                    className="p-6 md:p-8 rounded-sm bg-zinc-900/40 border border-zinc-800 space-y-6"
+                    className="p-6 md:p-8 rounded-sm bg-surface-elevated/40 border border-border space-y-6"
                   >
-                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800/80 pb-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-4">
                       <div>
-                        <span className="px-2.5 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-[#e0d0ab] border border-zinc-700 mr-2 font-bold">
+                        <span className="px-2.5 py-0.5 rounded text-[10px] font-mono bg-surface-elevated text-[#e0d0ab] border border-border mr-2 font-bold">
                           {mb.marks} Marks Blueprint
                         </span>
-                        <span className="text-xs font-mono text-zinc-400">{mb.yearContext}</span>
+                        <span className="text-xs font-mono text-secondary">{mb.yearContext}</span>
                       </div>
                       <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider">
                         Standard Scoring Rubric
                       </span>
                     </div>
 
-                    <h3 className="text-lg md:text-xl font-serif font-bold text-stone-100 leading-snug">
+                    <h3 className="text-lg md:text-xl font-serif font-bold text-primary leading-snug">
                       "{mb.questionTitle}"
                     </h3>
 
                     {/* Step 1: Introduction */}
-                    <div className="space-y-2 p-4 bg-zinc-950/90 border border-zinc-800 rounded-sm text-xs font-sans">
+                    <div className="space-y-2 p-4 bg-surface/90 border border-border rounded-sm text-xs font-sans">
                       <span className="font-mono font-bold text-[#e0d0ab] uppercase text-[10px] tracking-widest block">
                         1. Introduction (Definitional & Constitutional Hook)
                       </span>
-                      <p className="text-zinc-300 leading-relaxed">{mb.structure.introduction}</p>
+                      <p className="text-primary leading-relaxed">{mb.structure.introduction}</p>
                     </div>
 
                     {/* Step 2: Body Arguments */}
                     <div className="space-y-3">
-                      <span className="font-mono font-bold text-zinc-400 uppercase text-[10px] tracking-widest block">
+                      <span className="font-mono font-bold text-secondary uppercase text-[10px] tracking-widest block">
                         2. Multi-Dimensional Body Matrix
                       </span>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                         {mb.structure.bodyArguments.map((arg, aIdx) => (
                           <div
                             key={aIdx}
-                            className="p-4 bg-zinc-950/70 border border-zinc-800/90 rounded-sm space-y-2 text-xs font-sans"
+                            className="p-4 bg-surface/70 border border-border/90 rounded-sm space-y-2 text-xs font-sans"
                           >
                             <h4 className="font-bold text-[#e0d0ab] text-xs font-serif">
                               {arg.heading}
                             </h4>
-                            <ul className="space-y-1.5 text-zinc-300">
+                            <ul className="space-y-1.5 text-primary">
                               {arg.points.map((pt, pIdx) => (
                                 <li key={pIdx} className="flex items-start gap-2">
                                   <span className="text-[#e0d0ab] mt-0.5">•</span>
@@ -988,13 +988,13 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
 
                     {/* Step 3: Statutory Citations */}
                     <div className="flex flex-wrap items-center gap-2 pt-1">
-                      <span className="text-[10px] font-mono uppercase text-zinc-500 mr-1">
+                      <span className="text-[10px] font-mono uppercase text-muted mr-1">
                         Authoritative Citations:
                       </span>
                       {mb.structure.statutoryAnchors.map((sa, sIdx) => (
                         <span
                           key={sIdx}
-                          className="px-2.5 py-1 rounded text-[10px] font-mono bg-zinc-900 border border-zinc-800 text-stone-300"
+                          className="px-2.5 py-1 rounded text-[10px] font-mono bg-surface-elevated border border-border text-primary"
                         >
                           § {sa}
                         </span>

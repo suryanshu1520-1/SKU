@@ -83,6 +83,15 @@ export default function VerticalNavRail({
   const countdown = calculateExamCountdown(candidatePreferences?.targetYear || '2026');
   const trackBadge = candidatePreferences ? formatTrackBadge(candidatePreferences) : "CSE '26 · PSIR";
 
+  React.useEffect(() => {
+    const handlePeek = (e: Event) => {
+      const custom = e as CustomEvent<{ id?: string | null }>;
+      setHoveredNavId(custom.detail?.id || null);
+    };
+    window.addEventListener('tark:rail-peek', handlePeek);
+    return () => window.removeEventListener('tark:rail-peek', handlePeek);
+  }, []);
+
 
   const handleItemClick = (item: NavItem) => {
     if (item.id === 'home') {
@@ -267,6 +276,8 @@ export default function VerticalNavRail({
                 onMouseLeave={() => setHoveredNavId(null)}
                 whileHover={prefersReducedMotion ? undefined : { x: 2 }}
                 whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+                aria-current={active ? 'page' : undefined}
+                aria-label={item.label}
                 title={`${item.label} (Alt+${item.hotkey})`}
                 className={`relative w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors duration-150 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80 ${
                   isExpanded ? 'justify-start' : 'justify-center'
@@ -322,6 +333,8 @@ export default function VerticalNavRail({
                 onMouseLeave={() => setHoveredNavId(null)}
                 whileHover={prefersReducedMotion ? undefined : { x: 2 }}
                 whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+                aria-current={active ? 'page' : undefined}
+                aria-label={PROFILE_NAV_ITEM.label}
                 title={`${PROFILE_NAV_ITEM.label} (Alt+${PROFILE_NAV_ITEM.hotkey})`}
                 className={`relative w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors duration-150 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80 ${
                   isExpanded ? 'justify-start' : 'justify-center'
@@ -448,6 +461,7 @@ export default function VerticalNavRail({
           <button
             onClick={onStartTour}
             title="Start Interactive Product Tour"
+            aria-label="Start Interactive Product Tour"
             className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-md text-[#8fa2bd] hover:text-[#e0d0ab] hover:bg-[rgba(11,61,120,0.35)] text-xs font-sans transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80 ${
               isExpanded ? 'justify-start' : 'justify-center'
             }`}
@@ -461,6 +475,7 @@ export default function VerticalNavRail({
         <button
           onClick={onSwitchToHorizontal}
           title="Switch to Top Header Mode"
+          aria-label="Switch to Top Header Mode"
           className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-md text-[#8fa2bd] hover:text-[#e0d0ab] hover:bg-[rgba(11,61,120,0.35)] text-xs font-sans transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80 ${
             isExpanded ? 'justify-start' : 'justify-center'
           }`}
@@ -473,6 +488,7 @@ export default function VerticalNavRail({
         <button
           onClick={onToggleExpand}
           title={isExpanded ? 'Collapse Rail' : 'Expand Rail'}
+          aria-label={isExpanded ? 'Collapse Rail' : 'Expand Rail'}
           className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-md text-[#8fa2bd] hover:text-[#e0d0ab] hover:bg-[rgba(11,61,120,0.35)] text-xs font-sans transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80 ${
             isExpanded ? 'justify-start' : 'justify-center'
           }`}

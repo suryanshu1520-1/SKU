@@ -70,16 +70,16 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
 
   const getRankBadge = (rank: number) => {
     if (rank === 1) return { color: 'text-[#e0d0ab] border-[#e0d0ab]/40 bg-[#e0d0ab]/10', label: '1ST', icon: Trophy };
-    if (rank === 2) return { color: 'text-stone-300 border-stone-400/40 bg-stone-400/10', label: '2ND', icon: Medal };
+    if (rank === 2) return { color: 'text-primary border-border/40 bg-primary/10', label: '2ND', icon: Medal };
     if (rank === 3) return { color: 'text-amber-500 border-amber-600/40 bg-amber-600/10', label: '3RD', icon: Medal };
-    return { color: 'text-zinc-500 border-zinc-800 bg-zinc-900', label: `${rank}`, icon: null };
+    return { color: 'text-muted border-border bg-surface-elevated', label: `${rank}`, icon: null };
   };
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8 font-sans pb-24">
       
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-zinc-800 pb-6 font-sans">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border pb-6 font-sans">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="w-2 h-2 rounded-full bg-[#e0d0ab] animate-pulse" />
@@ -90,14 +90,14 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
           <h1 className="font-serif text-2xl sm:text-3xl font-bold text-white tracking-tight">
             Tark Rankings
           </h1>
-          <p className="text-xs font-sans text-zinc-400 mt-1">
+          <p className="text-xs font-sans text-secondary mt-1">
             Resets every Sunday at 14:00 IST &bull; scored server-side
           </p>
         </div>
 
         <button
           onClick={() => setShowInfoModal(true)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 border border-zinc-800 hover:border-[#0194a8] text-zinc-300 hover:text-[#e0d0ab] rounded-sm text-xs font-sans font-medium transition-all self-start sm:self-auto cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-surface-elevated border border-border hover:border-[#0194a8] text-primary hover:text-[#e0d0ab] rounded-sm text-xs font-sans font-medium transition-all self-start sm:self-auto cursor-pointer"
         >
           <Info className="w-3.5 h-3.5 text-[#0194a8]" />
           <span>Scoring Rules</span>
@@ -106,7 +106,7 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
 
       {/* Loading State */}
       {loading && (
-        <div className="flex flex-col items-center justify-center py-20 text-zinc-500 font-sans">
+        <div className="flex flex-col items-center justify-center py-20 text-muted font-sans">
           <Loader2 className="w-6 h-6 animate-spin text-[#0194a8] mb-3" />
           <p className="text-xs font-sans uppercase tracking-wider">Loading rankings...</p>
         </div>
@@ -151,10 +151,10 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
                     onClick={() => onAnalystClick(entry.user_id)}
                     className={`relative p-5 rounded-sm border flex flex-col justify-between transition-all cursor-pointer backdrop-blur-sm ${
                       rank === 1
-                        ? 'bg-gradient-to-b from-zinc-900/60 via-zinc-900/40 to-zinc-950 border-[#e0d0ab]/50 shadow-lg shadow-[#e0d0ab]/10 order-first sm:order-2 sm:-translate-y-2'
+                        ? 'bg-gradient-to-b from-surface-elevated/60 via-surface-elevated/40 to-surface border-[#e0d0ab]/50 shadow-lg shadow-[#e0d0ab]/10 order-first sm:order-2 sm:-translate-y-2'
                         : rank === 2
-                        ? 'bg-zinc-900/30 border-zinc-800 hover:border-stone-400/40 order-2 sm:order-1'
-                        : 'bg-zinc-900/30 border-zinc-800 hover:border-amber-600/40 order-3'
+                        ? 'bg-surface-elevated/30 border-border hover:border-border/40 order-2 sm:order-1'
+                        : 'bg-surface-elevated/30 border-border hover:border-amber-600/40 order-3'
                     } ${isCurrentUser ? 'ring-1 ring-[#0194a8]' : ''}`}
                   >
                     <div className="flex items-center justify-between gap-2 mb-3">
@@ -170,16 +170,16 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
                     </div>
 
                     <div className="space-y-1">
-                      <h3 className="font-serif text-base font-bold text-stone-100 group-hover:text-[#e0d0ab] transition-colors truncate">
+                      <h3 className="font-serif text-base font-bold text-primary group-hover:text-[#e0d0ab] transition-colors truncate">
                         {displayName(entry)}
                       </h3>
-                      <p className="text-[10px] font-sans text-zinc-500 uppercase tracking-wider">
+                      <p className="text-[10px] font-sans text-muted uppercase tracking-wider">
                         {isCurrentUser ? 'You (Current Session)' : 'Ranked Aspirant'}
                       </p>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between">
-                      <span className="text-[10px] font-sans text-zinc-500 uppercase">Points</span>
+                    <div className="mt-4 pt-3 border-t border-border/80 flex items-center justify-between">
+                      <span className="text-[10px] font-sans text-muted uppercase">Points</span>
                       <span className="font-mono text-xl font-bold text-[#e0d0ab]">
                         {entry.contender_points} CP
                       </span>
@@ -191,12 +191,12 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
           )}
 
           {/* Full Contender Ledger Table */}
-          <div className="bg-zinc-900/20 border border-zinc-800 rounded-sm overflow-hidden backdrop-blur-sm">
-            <div className="px-5 py-3 border-b border-zinc-800 bg-zinc-900/40 flex items-center justify-between">
+          <div className="bg-surface-elevated/20 border border-border rounded-sm overflow-hidden backdrop-blur-sm">
+            <div className="px-5 py-3 border-b border-border bg-surface-elevated/40 flex items-center justify-between">
               <h3 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
                 All Ranked Aspirants <span className="font-mono">({entries.length})</span>
               </h3>
-              <span className="text-[10px] font-sans text-zinc-500">
+              <span className="text-[10px] font-sans text-muted">
                 Click any row for full stats
               </span>
             </div>
@@ -204,14 +204,14 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-zinc-800 text-zinc-500 text-[10px] font-sans uppercase tracking-wider font-bold">
+                  <tr className="border-b border-border text-muted text-[10px] font-sans uppercase tracking-wider font-bold">
                     <th className="py-3 px-5 w-16">Rank</th>
                     <th className="py-3 px-5">Candidate</th>
                     <th className="py-3 px-5 text-center">Trophies</th>
                     <th className="py-3 px-5 text-right">Rank Points</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-800/60 font-sans text-xs">
+                <tbody className="divide-y divide-border font-sans text-xs">
                   {entries.map((entry, index) => {
                     const rank = index + 1;
                     const isCurrentUser = currentUserId && entry.user_id === currentUserId;
@@ -223,7 +223,7 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.2, delay: Math.min(index * 0.02, 0.3) }}
                         onClick={() => onAnalystClick(entry.user_id)}
-                        className={`hover:bg-zinc-900/50 text-stone-300 transition-colors cursor-pointer group ${
+                        className={`hover:bg-surface-elevated/50 text-primary transition-colors cursor-pointer group ${
                           isCurrentUser ? 'bg-[#0194a8]/10' : ''
                         }`}
                       >
@@ -234,10 +234,10 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
                               rank === 1
                                 ? 'text-[#e0d0ab]'
                                 : rank === 2
-                                ? 'text-stone-300'
+                                ? 'text-primary'
                                 : rank === 3
                                 ? 'text-amber-500'
-                                : 'text-zinc-500'
+                                : 'text-muted'
                             }`}
                           >
                             #{rank}
@@ -247,7 +247,7 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
                         {/* Name */}
                         <td className="py-3.5 px-5">
                           <div className="flex items-center gap-2">
-                            <span className="font-medium text-stone-200 group-hover:text-[#e0d0ab] transition-colors">
+                            <span className="font-medium text-primary group-hover:text-[#e0d0ab] transition-colors">
                               {displayName(entry)}
                             </span>
                             {isCurrentUser && (
@@ -266,12 +266,12 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
                               <span>{entry.trophy_count}</span>
                             </span>
                           ) : (
-                            <span className="text-zinc-600 font-mono">&mdash;</span>
+                            <span className="text-muted font-mono">&mdash;</span>
                           )}
                         </td>
 
                         {/* Points */}
-                        <td className="py-3.5 px-5 text-right font-mono font-bold text-stone-100 group-hover:text-[#e0d0ab] transition-colors">
+                        <td className="py-3.5 px-5 text-right font-mono font-bold text-primary group-hover:text-[#e0d0ab] transition-colors">
                           {entry.contender_points} CP
                         </td>
                       </motion.tr>
@@ -291,12 +291,12 @@ export default function Leaderboard({ onAnalystClick, currentUserId }: Leaderboa
         title="How Ranking & Points Work"
         subtitle="Zero-Trust Competitive Protocol Rules"
       >
-        <div className="space-y-4 text-xs text-zinc-300 leading-relaxed font-sans">
-          <div className="p-4 bg-zinc-900/60 border border-zinc-800 rounded-sm space-y-3">
+        <div className="space-y-4 text-xs text-primary leading-relaxed font-sans">
+          <div className="p-4 bg-surface-elevated/60 border border-border rounded-sm space-y-3">
             <h4 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
               Tactical Yield Calculations
             </h4>
-            <ul className="space-y-2 text-zinc-300">
+            <ul className="space-y-2 text-primary">
               <li className="flex items-start gap-2">
                 <span className="text-emerald-400 font-bold mt-0.5">&bull;</span>
                 <span><strong>Correct Assessment Item:</strong> Earn <strong>+3 CP</strong> for every validated correct response.</span>

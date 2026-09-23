@@ -439,14 +439,22 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-zinc-500 animate-spin" />
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <Loader2 className="w-6 h-6 text-muted animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen relative font-sans text-stone-100 selection:bg-[#e0d0ab] selection:text-[#072e63]">
+    <div className="min-h-screen relative font-sans text-primary selection:bg-[#e0d0ab] selection:text-[#072e63]">
+      {/* Skip to Main Content Link (A11y) */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-[#e0d0ab] focus:text-[#072e63] focus:font-bold focus:rounded-sm focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#072e63]"
+      >
+        Skip to main content
+      </a>
+
       {/* ── Mode 1: Left Vertical Command Rail (Desktop) ── */}
       {gameState !== 'login' && navOrientation === 'vertical' && (
         <div className="hidden md:block">
@@ -486,7 +494,7 @@ export default function App() {
               {!userEmail && (
                 <button
                   onClick={() => setGameState('login')}
-                  className="md:hidden flex items-center gap-1 px-3 py-1 bg-zinc-900 border border-zinc-800 text-[#e0d0ab] rounded-sm text-xs font-sans font-medium"
+                  className="md:hidden flex items-center gap-1 px-3 py-1 bg-surface-elevated border border-border text-[#e0d0ab] rounded-sm text-xs font-sans font-medium"
                 >
                   <LogIn className="w-3.5 h-3.5" />
                   Sign In
@@ -524,6 +532,8 @@ export default function App() {
                       onMouseEnter={() => setHoveredNavId(item.id)}
                       onMouseLeave={() => setHoveredNavId(null)}
                       whileTap={{ scale: 0.98 }}
+                      aria-current={isActive ? 'page' : undefined}
+                      aria-label={item.label}
                       className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-md outline-none group cursor-pointer focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80"
                       title={`${item.label} (Alt+${item.hotkey})`}
                     >
@@ -556,6 +566,8 @@ export default function App() {
                     onMouseEnter={() => setHoveredNavId('profile')}
                     onMouseLeave={() => setHoveredNavId(null)}
                     whileTap={{ scale: 0.98 }}
+                    aria-current={gameState !== 'landing' && activeTab === 'profile' ? 'page' : undefined}
+                    aria-label={PROFILE_NAV_ITEM.label}
                     className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-md outline-none group cursor-pointer focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80"
                     title={`${PROFILE_NAV_ITEM.label} (Alt+${PROFILE_NAV_ITEM.hotkey})`}
                   >
@@ -643,33 +655,44 @@ export default function App() {
       )}
 
       {gameState === 'landing' && (
-        <div
-          className={`transition-all duration-300 ${
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className={`transition-all duration-300 outline-none pt-[104px] md:pt-0 ${
             navOrientation === 'vertical'
               ? isRailExpanded
-                ? 'md:pl-56 pt-6'
-                : 'md:pl-16 pt-6'
-              : ''
+                ? 'md:pl-56'
+                : 'md:pl-16'
+              : 'pt-24'
           }`}
           style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
         >
           <Landing
             onNavigateArena={() => navigateToTab('arena')}
             onNavigateTracker={() => navigateToTab('tracker')}
-            onNavigateProfile={() => navigateToTab('profile')}
+            onNavigateProfile={() => {
+              if (userEmail) {
+                navigateToTab('profile');
+              } else {
+                setGameState('login');
+              }
+            }}
             onNavigateLibrary={() => navigateToTab('library')}
             onNavigateHumanities={() => navigateToTab('humanities')}
             onNavigateObservatory={() => navigateToTab('observatory')}
+            onNavigateLeaderboard={() => navigateToTab('leaderboard')}
             onNavigateManifesto={handleNavigateManifesto}
             onNavigateLegal={(type) => setLegalDocumentType(type)}
             candidatePreferences={preferences}
           />
-        </div>
+        </main>
       )}
 
       {gameState !== 'login' && gameState !== 'landing' && (
         <main
-          className={`w-full transition-all duration-300 ${
+          id="main-content"
+          tabIndex={-1}
+          className={`w-full transition-all duration-300 outline-none ${
             navOrientation === 'vertical'
               ? isRailExpanded
                 ? 'md:pl-56 pt-6 pb-12'
@@ -853,7 +876,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/90 backdrop-blur-sm flex justify-center items-start pt-12"
+            className="fixed inset-0 z-50 overflow-y-auto bg-surface/90 backdrop-blur-sm flex justify-center items-start pt-12"
           >
             <Manifesto
               onNavigateArena={() => { setGameState('arena'); setActiveTab('arena'); setShowManifesto(false); }}
@@ -893,7 +916,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 overflow-y-auto bg-zinc-950/90 backdrop-blur-sm flex justify-center items-start pt-4 md:pt-12"
+            className="fixed inset-0 z-50 overflow-y-auto bg-surface/90 backdrop-blur-sm flex justify-center items-start pt-4 md:pt-12"
           >
             <LegalModal
               documentType={legalDocumentType}
@@ -918,13 +941,13 @@ export default function App() {
         subtitle="Unsaved assessment progress will be discarded"
       >
         <div className="space-y-4 font-sans text-left">
-          <p className="text-xs text-zinc-300 leading-relaxed">
+          <p className="text-xs text-primary leading-relaxed">
             You are currently engaged in an active test session. Navigating away to another feature will permanently discard your progress in this crucible.
           </p>
           <div className="flex gap-3 pt-2">
             <button
               onClick={handleCancelAbandonNavigation}
-              className="flex-1 py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-sans text-xs font-medium uppercase rounded-sm transition-all cursor-pointer"
+              className="flex-1 py-2.5 bg-surface-elevated hover:bg-surface-elevated border border-border text-primary font-sans text-xs font-medium uppercase rounded-sm transition-all cursor-pointer"
             >
               Resume Test
             </button>

@@ -153,7 +153,7 @@ export default function Onboarding({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[rgba(3,16,38,0.94)] backdrop-blur-2xl flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto font-sans text-stone-100 selection:bg-[#e0d0ab] selection:text-[#072e63]">
+    <div className="fixed inset-0 z-50 bg-[rgba(3,16,38,0.94)] backdrop-blur-2xl flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto font-sans text-primary selection:bg-[#e0d0ab] selection:text-[#072e63]">
       <div className="w-full max-w-2xl bg-[rgba(4,25,54,0.96)] border border-[rgba(224,208,171,0.35)] rounded-xs shadow-[0_24px_70px_rgba(0,0,0,0.9)] p-5 sm:p-7 md:p-8 relative overflow-hidden my-auto">
         
         {/* Subtle decorative grid background */}

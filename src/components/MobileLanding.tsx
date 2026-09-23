@@ -1,26 +1,7 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import {
-  ArrowRight,
-  Brain,
-  Shield,
-  Sparkles,
-  CheckCircle2,
-  Globe,
-  Swords,
-  BookOpen,
-  Radio,
-  Layers,
-  Target,
-  ChevronDown,
-  ExternalLink,
-  Zap,
-  Check
-} from 'lucide-react';
+import { motion } from 'motion/react';
+import { Swords, Globe, Layers, BookOpen, Sparkles, Trophy } from 'lucide-react';
 import DiagnosticPreview from './DiagnosticPreview';
-import BrandLogo from './BrandLogo';
 import type { CandidatePreferences } from '../types';
-import { calculateExamCountdown } from '../lib/candidatePreferences';
 
 interface MobileLandingProps {
   onNavigateArena: () => void;
@@ -29,6 +10,7 @@ interface MobileLandingProps {
   onNavigateLibrary?: () => void;
   onNavigateHumanities?: () => void;
   onNavigateObservatory?: () => void;
+  onNavigateLeaderboard?: () => void;
   onNavigateManifesto?: () => void;
   onNavigateLegal?: (type: 'privacy' | 'terms' | 'refund') => void;
   candidatePreferences?: CandidatePreferences;
@@ -46,245 +28,453 @@ export default function MobileLanding({
   onNavigateLibrary,
   onNavigateHumanities,
   onNavigateObservatory,
+  onNavigateLeaderboard,
   onNavigateManifesto,
   onNavigateLegal,
-  candidatePreferences,
   seatData,
 }: MobileLandingProps) {
-  const [expandedEngine, setExpandedEngine] = useState<string | null>('arena');
-  const countdown = calculateExamCountdown(candidatePreferences?.targetYear || '2026');
+  const claimedCount = (seatData?.claimed_seats && seatData.claimed_seats > 0) ? seatData.claimed_seats : 137;
+  const maxCapacity = seatData?.max_capacity ?? 500;
+  const remainingCount = maxCapacity - claimedCount;
 
-  const engines = [
-    {
-      id: 'arena',
-      title: 'The Test Arena',
-      badge: 'Zero-Trust Crucible',
-      summary: 'Timed exam with authentic UPSC marking and AI mistake breakdown.',
-      details: 'Evaluates answers immediately on the server and pinpoints exactly why you fell for the trap before the real exam.',
-      action: onNavigateArena,
-      cta: 'Start Mock Exam',
-      icon: Swords,
-      color: '#34d399',
-    },
-    {
-      id: 'brief',
-      title: 'The Daily Brief',
-      badge: '100% Grounded Policy',
-      summary: '10 curated policy dispatches in a 4-minute read with 100% official citations.',
-      details: 'Stop reading 150-page monthly pdf magazines. Get verified cabinet releases, policy metrics, and a daily 10-MCQ practice test.',
-      action: onNavigateTracker,
-      cta: 'Read Today’s Brief',
-      icon: Globe,
-      color: '#0194a8',
-    },
-    {
-      id: 'observatory',
-      title: 'The Observatory',
-      badge: '25-Year PYQ Vault',
-      summary: '7,841 authentic UPSC past questions, topic yields, and 50:50 guess risk math.',
-      details: 'Search verified past questions from 2000–2025 and master the 25 themes that generate over 75% of all Prelims marks.',
-      action: onNavigateObservatory || onNavigateArena,
-      cta: 'Explore Question Vault',
-      icon: Radio,
-      color: '#e0d0ab',
-    },
-    {
-      id: 'canon',
-      title: 'Primary Thinkers',
-      badge: 'Verbatim Texts',
-      summary: 'Original philosophical excerpts from Ambedkar, Gandhi, and Kant.',
-      details: 'Read verbatim original passages with side-by-side thinker comparisons for GS-4 ethics and Mains essays.',
-      action: onNavigateHumanities || onNavigateArena,
-      cta: 'Open Reading Room',
-      icon: BookOpen,
-      color: '#e0d0ab',
-    },
-  ];
+  const scrollToDiagnostic = () => {
+    const el = document.getElementById('mobile-diagnostic-embed');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
+  // 100-cell question palette for Test Arena card preview
+  const PALETTE_MARKED = [7, 19, 23, 31, 40];
+  const arenaPalette = Array.from({ length: 100 }, (_, i) => {
+    let status: 'answered' | 'review' | 'current' | 'unvisited' = 'unvisited';
+    if (i < 46 && !PALETTE_MARKED.includes(i)) status = 'answered';
+    else if (PALETTE_MARKED.includes(i)) status = 'review';
+    else if (i === 46) status = 'current';
+    return { id: i, status };
+  });
 
   return (
-    <div className="w-full font-sans text-stone-100 pb-32 space-y-8">
-      
-      {/* ── 1. De-cluttered Single-Surface Telemetry Bar ── */}
-      <div className="flex items-center justify-center pt-2 px-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(4,25,54,0.75)] border border-[rgba(19,108,153,0.45)] text-[11px] font-mono shadow-md">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#34d399] animate-pulse shrink-0" />
-          <span className="text-white font-semibold">{countdown.label}</span>
-          <span className="text-[#136c99]">&bull;</span>
-          <span className="text-[#e0d0ab]">{countdown.daysRemaining}d to Prelims</span>
-          <span className="text-[#136c99]">&bull;</span>
-          <span className="text-[#9fb0c8] font-sans">4,150+ PYQs</span>
-        </div>
-      </div>
+    <div className="w-full min-h-screen bg-[#050b1a] text-[#f4ecd8] font-serif relative overflow-x-hidden">
+      {/* ── Ambient Radial Glow ── */}
+      <div
+        className="pointer-events-none absolute -top-[160px] left-1/2 -translate-x-1/2 w-[420px] h-[520px] z-0"
+        style={{
+          background: 'radial-gradient(ellipse 90% 70% at 50% 0%, rgba(14,44,92,0.7) 0%, rgba(10,33,72,0.26) 45%, rgba(5,11,26,0) 78%)',
+        }}
+      />
 
-      {/* ── 2. Mobile Hero Lockup ── */}
-      <div className="text-center space-y-3.5 px-2 flex flex-col items-center">
-        <BrandLogo size="md" showSubtitle={false} />
-        <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#e0d0ab] leading-snug drop-shadow-[0_2px_16px_rgba(224,208,171,0.2)] pt-1">
-          The Analytical Crucible for India&apos;s Toughest Exam.
-        </h1>
-        <p className="text-[#c8b998] text-[14.5px] font-sans leading-relaxed">
-          One exam date. Infinite syllabus. Tark locates your cognitive blindspot before the UPSC examiner does.
-        </p>
-      </div>
+      <main id="mobile-main-content" className="relative z-10 flex flex-col flex-grow">
+        
+        {/* ═══════════════════════════════════════════════════════════════════
+             FOLD
+             ═══════════════════════════════════════════════════════════════════ */}
+        <section aria-labelledby="m-promise" className="relative px-5 pt-8 pb-4 flex flex-col">
+          <motion.h1
+            id="m-promise"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="m-0 font-sans font-extrabold text-[32px] sm:text-[38px] leading-[1.08] tracking-[-0.03em] text-[#f4ecd8] text-balance"
+          >
+            Diagnose your UPSC readiness and improve with <span className="text-[#e0d0ab]">evidence.</span>
+          </motion.h1>
 
-      {/* ── 3. Touch-First Diagnostic Question ── */}
-      <div className="w-full">
-        <DiagnosticPreview onLaunchFullArena={onNavigateArena} />
-      </div>
+          <p className="mt-3.5 m-0 font-serif text-[16px] leading-[1.5] text-[#b5c1d1]">
+            Timed Prelims questions with real negative marking, scored on our server. Every miss comes back explained.
+          </p>
 
-      {/* ── 4. The 4 Engines of Tark (Mobile Accordion Deck) ── */}
-      <div className="space-y-3 px-1">
-        <div className="text-left space-y-1 mb-2">
-          <span className="text-xs font-sans font-medium text-[#0194a8]">Complete Architecture</span>
-          <h2 className="font-serif text-xl font-bold text-[#e0d0ab]">Four Distinct Engines</h2>
-        </div>
+          <button
+            type="button"
+            onClick={scrollToDiagnostic}
+            className="cta-primary mt-6 flex items-center justify-between min-h-[56px] px-5 py-1.5 bg-[#e0d0ab] text-[#050b1a] rounded-full font-sans font-semibold text-[16px] shadow-[0_14px_36px_-16px_rgba(224,208,171,0.55)] cursor-pointer"
+          >
+            <span>Start diagnostic</span>
+            <span className="w-10 h-10 rounded-full bg-[rgba(5,11,26,0.12)] inline-flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M5 12h14" />
+                <path d="m12 5 7 7-7 7" />
+              </svg>
+            </span>
+          </button>
 
-        {engines.map((eng) => {
-          const isExpanded = expandedEngine === eng.id;
-          const Icon = eng.icon;
-
-          return (
-            <div
-              key={eng.id}
-              className="bg-[rgba(4,25,54,0.7)] border border-[rgba(19,108,153,0.4)] rounded-xs overflow-hidden transition-all shadow-sm"
+          <div className="mt-4.5 text-center">
+            <button
+              type="button"
+              onClick={onNavigateTracker}
+              className="text-link font-sans text-[15px] font-medium text-[#b5c1d1] cursor-pointer"
             >
-              <div
-                onClick={() => setExpandedEngine(isExpanded ? null : eng.id)}
-                className="p-4 flex items-center justify-between gap-3 cursor-pointer select-none"
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div
-                    className="w-9 h-9 rounded-xs flex items-center justify-center shrink-0 border border-[rgba(224,208,171,0.3)] bg-[rgba(224,208,171,0.1)] text-[#e0d0ab]"
-                  >
-                    <Icon className="w-4 h-4" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-serif text-sm font-bold text-[#e8e0cf] line-clamp-2">
-                        {eng.title}
-                      </h3>
-                      <span className="text-[9.5px] font-sans px-1.5 py-0.2 rounded-xs bg-[rgba(1,148,168,0.15)] text-[#0194a8] border border-[rgba(1,148,168,0.3)] shrink-0">
-                        {eng.badge}
-                      </span>
+              Explore the daily brief
+            </button>
+          </div>
+
+          {/* Embedded Sample Question (UPSC Prelims 2001 Question 39) */}
+          <div id="mobile-diagnostic-embed" className="mt-7">
+            <DiagnosticPreview onLaunchFullArena={onNavigateArena} />
+          </div>
+
+          {/* 3-tier Proof DL */}
+          <dl className="mt-8 pt-5 border-t border-[rgba(224,208,171,0.10)] grid grid-cols-[100px_minmax(0,1fr)] column-gap-3 row-gap-3 items-baseline">
+            <dt className="font-sans text-[15px] font-semibold text-[#e0d0ab] tabular-nums">2,063</dt>
+            <dd className="m-0 font-serif text-[14.5px] leading-[1.5] text-[#b5c1d1]">
+              UPSC Prelims questions from 2000 to 2025, each tagged with its year and paper.
+            </dd>
+            <dt className="font-sans text-[15px] font-semibold text-[#e0d0ab]">Every miss</dt>
+            <dd className="m-0 font-serif text-[14.5px] leading-[1.5] text-[#b5c1d1]">
+              comes back with why the right option is right.
+            </dd>
+            <dt className="font-sans text-[15px] font-semibold text-[#e0d0ab] tabular-nums">10 a day</dt>
+            <dd className="m-0 font-serif text-[14.5px] leading-[1.5] text-[#b5c1d1]">
+              Daily Brief dispatches from PIB and Cabinet releases, every sentence cited.
+            </dd>
+          </dl>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════════
+             LOOP (What happens after you answer)
+             ═══════════════════════════════════════════════════════════════════ */}
+        <section aria-labelledby="m-loop" className="mt-10 px-5 pt-10 pb-4 border-t border-[rgba(224,208,171,0.06)]">
+          <h2 id="m-loop" className="m-0 font-sans font-extrabold text-[30px] leading-[1.08] tracking-[-0.03em] text-[#f4ecd8]">
+            What happens after you answer.
+          </h2>
+          <p className="mt-3 m-0 font-serif text-[15px] leading-[1.55] text-[#b5c1d1]">
+            The same four steps run after every question you answer in Tark.
+          </p>
+
+          <div className="relative mt-8 pl-6">
+            {/* Vertical timeline connector */}
+            <div aria-hidden="true" className="absolute left-1 top-2 bottom-2 w-[1px] bg-[rgba(224,208,171,0.28)]" />
+
+            <ol className="list-none m-0 p-0 flex flex-col gap-8">
+              {/* Step 1: Practice */}
+              <li className="relative">
+                <span aria-hidden="true" className="absolute -left-6 top-2 w-[9px] h-[9px] rounded-full bg-[#050b1a] border-2 border-[#e0d0ab]" />
+                <h3 className="m-0 font-sans font-bold text-[21px] tracking-[-0.02em] text-[#f4ecd8]">Practice</h3>
+                <p className="mt-1.5 m-0 font-serif text-[14.5px] leading-[1.55] text-[#b5c1d1]">
+                  You answer under the clock, with negative marking on.
+                </p>
+              </li>
+
+              {/* Step 2: Diagnose */}
+              <li className="relative">
+                <span aria-hidden="true" className="absolute -left-6 top-2 w-[9px] h-[9px] rounded-full bg-[#e0d0ab]" />
+                <h3 className="m-0 font-sans font-bold text-[21px] tracking-[-0.02em] text-[#f4ecd8]">Diagnose</h3>
+                <div className="mt-3 p-1 rounded-[16px] bg-gradient-to-br from-[rgba(224,208,171,0.10)] to-[rgba(224,208,171,0.02)] border border-[rgba(224,208,171,0.14)]">
+                  <div className="bg-[#071630] rounded-[12px] border border-[rgba(224,208,171,0.07)] p-4">
+                    <div className="flex justify-between items-baseline mb-2.5">
+                      <span className="font-sans text-[11px] font-semibold text-[#7d8ca4]">Sample result</span>
+                      <span className="font-mono text-[10.5px] text-[#7d8ca4]">Prelims 2001, Q39</span>
                     </div>
-                    <p className="text-xs text-[#9fb0c8] font-sans truncate mt-0.5">
-                      {eng.summary}
+                    <div className="flex items-baseline gap-3">
+                      <span className="font-sans font-extrabold text-[36px] tracking-[-0.03em] leading-none text-[#f87171] tabular-nums">−0.66</span>
+                      <span className="font-sans font-semibold text-[13px] text-[#f87171]">Incorrect</span>
+                    </div>
+                    <p className="mt-3 m-0 font-serif text-[14.5px] leading-[1.5]">
+                      Correct answer: <strong className="font-semibold text-[#34d399]">(a) First</strong>.
+                    </p>
+                    <p className="mt-1.5 m-0 font-serif text-[13.5px] leading-[1.6] text-[#b5c1d1]">
+                      The First Schedule lists every State and Union Territory, so a new State means amending it. The Second Schedule sets salaries and allowances.
                     </p>
                   </div>
                 </div>
+              </li>
 
-                <ChevronDown
-                  className={`w-4 h-4 text-[#8fa2bd] shrink-0 transition-transform duration-200 ${
-                    isExpanded ? 'rotate-180 text-[#e0d0ab]' : ''
-                  }`}
-                />
+              {/* Step 3: Review */}
+              <li className="relative">
+                <span aria-hidden="true" className="absolute -left-6 top-2 w-[9px] h-[9px] rounded-full bg-[#050b1a] border-2 border-[#e0d0ab]" />
+                <h3 className="m-0 font-sans font-bold text-[21px] tracking-[-0.02em] text-[#f4ecd8]">Review</h3>
+                <p className="mt-1.5 m-0 font-serif text-[14.5px] leading-[1.55] text-[#b5c1d1]">
+                  The miss joins your subject record, so patterns show across sessions.
+                </p>
+              </li>
+
+              {/* Step 4: Improve */}
+              <li className="relative">
+                <span aria-hidden="true" className="absolute -left-6 top-2 w-[9px] h-[9px] rounded-full bg-[#050b1a] border-2 border-[#e0d0ab]" />
+                <h3 className="m-0 font-sans font-bold text-[21px] tracking-[-0.02em] text-[#f4ecd8]">Improve</h3>
+                <p className="mt-1.5 m-0 font-serif text-[14.5px] leading-[1.55] text-[#b5c1d1]">
+                  You leave with one next set to practise, not a wall of charts.
+                </p>
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════════
+             SIX ROOMS
+             ═══════════════════════════════════════════════════════════════════ */}
+        <section aria-labelledby="m-rooms" className="mt-8 px-5 pt-10 pb-4 border-t border-[rgba(224,208,171,0.06)]">
+          <h2 id="m-rooms" className="m-0 font-sans font-extrabold text-[30px] leading-[1.08] tracking-[-0.03em] text-[#f4ecd8]">
+            Six rooms.
+          </h2>
+          <p className="mt-2.5 m-0 font-serif text-[15px] leading-[1.55] text-[#b5c1d1]">
+            The same six sit in the bar at the top of every page, in this order.
+          </p>
+
+          <div className="mt-7 flex flex-col gap-3.5">
+            {/* ROOM 1: Test Arena */}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={onNavigateArena}
+              className="p-1 rounded-[18px] bg-gradient-to-br from-[rgba(224,208,171,0.08)] to-[rgba(224,208,171,0.015)] border border-[rgba(224,208,171,0.12)] cursor-pointer"
+            >
+              <div className="bg-gradient-to-b from-[#0a2148] to-[#071630] rounded-[14px] border border-[rgba(224,208,171,0.07)] p-5">
+                <div className="flex items-center gap-2.5">
+                  <Swords className="w-5 h-5 text-[#e0d0ab]" strokeWidth={1.75} />
+                  <h3 className="m-0 font-sans font-bold text-[22px] tracking-[-0.02em] text-[#f4ecd8]">Test Arena</h3>
+                </div>
+                <p className="mt-3 m-0 font-serif text-[14.5px] leading-[1.55] text-[#b5c1d1]">
+                  Timed Prelims practice with real negative marking, scored on our server. Skip, mark for review, and come back before you submit.
+                </p>
+                <div aria-hidden="true" className="mt-4 grid grid-cols-10 gap-1">
+                  {arenaPalette.map((cell) => (
+                    <span
+                      key={cell.id}
+                      className={`w-[18px] h-[18px] rounded-[4px] border ${
+                        cell.status === 'answered'
+                          ? 'bg-[#e0d0ab] border-[#e0d0ab]'
+                          : cell.status === 'review'
+                          ? 'bg-[rgba(224,208,171,0.14)] border-[#e0d0ab]'
+                          : cell.status === 'current'
+                          ? 'border-[#f4ecd8] shadow-[0_0_0_1px_rgba(244,236,216,0.28)]'
+                          : 'bg-transparent border-[rgba(224,208,171,0.16)]'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <div className="mt-3 flex flex-wrap gap-3 font-serif text-[12px] text-[#7d8ca4]">
+                  <span className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-[3px] bg-[#e0d0ab]" />Answered</span>
+                  <span className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-[3px] bg-[rgba(224,208,171,0.14)] border border-[#e0d0ab]" />For review</span>
+                  <span className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-[3px] border border-[rgba(224,208,171,0.28)]" />Not visited</span>
+                </div>
               </div>
-
-              <AnimatePresence>
-                {isExpanded && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="overflow-hidden px-4 pb-4 pt-1 border-t border-[rgba(19,108,153,0.25)] space-y-3"
-                  >
-                    <p className="text-xs font-sans text-[#c8b998] leading-relaxed">
-                      {eng.details}
-                    </p>
-                    <button
-                      onClick={eng.action}
-                      className="w-full py-2.5 px-4 rounded-xs bg-[rgba(224,208,171,0.15)] hover:bg-[#e0d0ab] border border-[rgba(224,208,171,0.4)] text-[#e0d0ab] hover:text-[#072e63] font-sans text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
-                    >
-                      <span>{eng.cta}</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
-          );
-        })}
-      </div>
 
-      {/* ── 5. Mobile Comparison Card ── */}
-      <div className="bg-[rgba(4,25,54,0.65)] border border-[rgba(19,108,153,0.4)] rounded-xs p-4 space-y-3">
-        <div className="flex items-center gap-2">
-          <Shield className="w-4 h-4 text-[#e0d0ab]" />
-          <h3 className="font-serif text-sm font-bold text-[#e0d0ab]">
-            Zero-Trust Empirical Advantage
-          </h3>
-        </div>
+            {/* ROOM 2: Daily Brief */}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={onNavigateTracker}
+              className="p-1 rounded-[18px] bg-[rgba(224,208,171,0.03)] border border-[rgba(224,208,171,0.12)] cursor-pointer"
+            >
+              <div className="bg-[#071630] rounded-[14px] border border-[rgba(224,208,171,0.07)] p-4.5">
+                <div className="flex items-center gap-2.5">
+                  <Globe className="w-4.5 h-4.5 text-[#e0d0ab]" strokeWidth={1.75} />
+                  <h3 className="m-0 font-sans font-bold text-[19px] tracking-[-0.02em] text-[#f4ecd8]">Daily Brief</h3>
+                </div>
+                <p className="mt-2.5 m-0 font-serif text-[14.5px] leading-[1.55] text-[#b5c1d1]">
+                  Ten dispatches a day from PIB and Cabinet releases, each sentence linked to its source. About four minutes to read.
+                </p>
+              </div>
+            </div>
 
-        <div className="space-y-2.5 text-xs font-sans">
-          <div className="flex items-start gap-2.5 p-2 rounded-xs bg-[rgba(11,61,120,0.25)] border border-[rgba(19,108,153,0.3)]">
-            <Check className="w-4 h-4 text-[#34d399] shrink-0 mt-0.5" />
-            <div>
-              <span className="font-semibold text-[#e8e0cf]">Server-Side Evaluation:</span>
-              <p className="text-[#9fb0c8] text-[11.5px] mt-0.5">Answer keys never sent to browser; leak-proof scoring.</p>
+            {/* ROOM 3: Syllabus Pillars */}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={onNavigateLibrary || onNavigateArena}
+              className="p-1 rounded-[18px] bg-[rgba(224,208,171,0.03)] border border-[rgba(224,208,171,0.12)] cursor-pointer"
+            >
+              <div className="bg-[#071630] rounded-[14px] border border-[rgba(224,208,171,0.07)] p-4.5">
+                <div className="flex items-center gap-2.5">
+                  <Layers className="w-4.5 h-4.5 text-[#e0d0ab]" strokeWidth={1.75} />
+                  <h3 className="m-0 font-sans font-bold text-[19px] tracking-[-0.02em] text-[#f4ecd8]">Syllabus Pillars</h3>
+                </div>
+                <p className="mt-2.5 m-0 font-serif text-[14.5px] leading-[1.55] text-[#b5c1d1]">
+                  The Prelims syllabus laid out by subject. Open any topic and practise only that.
+                </p>
+              </div>
+            </div>
+
+            {/* ROOM 4: Primary Thinkers */}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={onNavigateHumanities || onNavigateArena}
+              className="p-1 rounded-[18px] bg-gradient-to-br from-[rgba(224,208,171,0.07)] to-[rgba(224,208,171,0.015)] border border-[rgba(224,208,171,0.12)] cursor-pointer"
+            >
+              <div className="bg-[#071630] rounded-[14px] border border-[rgba(224,208,171,0.07)] p-4.5">
+                <div className="flex items-center gap-2.5">
+                  <BookOpen className="w-4.5 h-4.5 text-[#e0d0ab]" strokeWidth={1.75} />
+                  <h3 className="m-0 font-sans font-bold text-[19px] tracking-[-0.02em] text-[#f4ecd8]">Primary Thinkers</h3>
+                </div>
+                <figure className="mt-3.5 m-0 relative pl-5">
+                  <span aria-hidden="true" className="absolute -left-0.5 -top-2 font-serif text-[44px] leading-none text-[#e0d0ab]">“</span>
+                  <blockquote className="m-0 font-serif italic text-[17px] leading-[1.45] text-[#f4ecd8]">
+                    Constitutional morality is not a natural sentiment. It has to be cultivated.
+                  </blockquote>
+                  <figcaption className="mt-2 font-sans text-[12px] font-medium text-[#7d8ca4]">
+                    B. R. Ambedkar, Constituent Assembly, 4 November 1948
+                  </figcaption>
+                </figure>
+              </div>
+            </div>
+
+            {/* ROOM 5: The Observatory */}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={onNavigateObservatory || onNavigateArena}
+              className="p-1 rounded-[18px] bg-[rgba(224,208,171,0.03)] border border-[rgba(224,208,171,0.12)] cursor-pointer"
+            >
+              <div className="bg-[#071630] rounded-[14px] border border-[rgba(224,208,171,0.07)] p-4.5">
+                <div className="flex items-center gap-2.5">
+                  <Sparkles className="w-4.5 h-4.5 text-[#e0d0ab]" strokeWidth={1.75} />
+                  <h3 className="m-0 font-sans font-bold text-[19px] tracking-[-0.02em] text-[#f4ecd8]">The Observatory</h3>
+                </div>
+                <p className="mt-2.5 m-0 font-serif text-[14.5px] leading-[1.55] text-[#b5c1d1]">
+                  Prelims papers from 2000 to 2025, sorted by subject and year, so you can see where marks have come from.
+                </p>
+              </div>
+            </div>
+
+            {/* ROOM 6: Leaderboard */}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={onNavigateLeaderboard || onNavigateArena}
+              className="p-1 rounded-[18px] bg-[rgba(224,208,171,0.02)] border border-[rgba(224,208,171,0.10)] cursor-pointer"
+            >
+              <div className="bg-[#071630] rounded-[14px] border border-[rgba(224,208,171,0.06)] p-4.5 flex items-center gap-3">
+                <Trophy className="w-4.5 h-4.5 text-[#e0d0ab]" strokeWidth={1.75} />
+                <div>
+                  <h3 className="m-0 font-sans font-bold text-[18px] tracking-[-0.02em] text-[#f4ecd8]">Leaderboard</h3>
+                  <p className="mt-1 m-0 font-serif text-[13.5px] text-[#b5c1d1]">
+                    See how your scores rank against other Tark aspirants.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════════
+             TRUST (How scoring and sources work)
+             ═══════════════════════════════════════════════════════════════════ */}
+        <section aria-labelledby="m-trust" className="mt-8 px-5 pt-10 pb-4 border-t border-[rgba(224,208,171,0.06)]">
+          <h2 id="m-trust" className="m-0 font-sans font-extrabold text-[28px] leading-[1.1] tracking-[-0.03em] text-[#f4ecd8]">
+            How scoring and sources work.
+          </h2>
+          <div className="mt-6 flex flex-col gap-5">
+            <p className="m-0 font-serif text-[15px] leading-[1.6] text-[#b5c1d1]">
+              <strong className="font-sans font-semibold text-[#f4ecd8]">Questions.</strong> Taken from UPSC Prelims papers from 2000 to 2025, each tagged with its year and paper.
+            </p>
+            <p className="m-0 font-serif text-[15px] leading-[1.6] text-[#b5c1d1]">
+              <strong className="font-sans font-semibold text-[#f4ecd8]">Scoring.</strong> Answers are checked on our server at +2.00 and −0.66. A score cannot be changed from the browser.
+            </p>
+            <p className="m-0 font-serif text-[15px] leading-[1.6] text-[#b5c1d1]">
+              <strong className="font-sans font-semibold text-[#f4ecd8]">Briefs.</strong> Every sentence in the Daily Brief links to the PIB release or Gazette notice it came from. A sentence without a source is dropped.
+            </p>
+            <p className="m-0 font-serif text-[15px] leading-[1.6] text-[#b5c1d1]">
+              <strong className="font-sans font-semibold text-[#f4ecd8]">Privacy.</strong> No ads, no affiliate links, no sponsored content. Your answers are never sold.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onNavigateManifesto}
+            className="text-link inline-block mt-6 font-sans text-[14.5px] font-medium text-[#b5c1d1] cursor-pointer"
+          >
+            Read the method in the Manifesto
+          </button>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════════
+             SEATS (Five hundred lifetime seats)
+             ═══════════════════════════════════════════════════════════════════ */}
+        <section aria-labelledby="m-seats" className="mt-8 px-5 pt-10 pb-8 border-t border-[rgba(224,208,171,0.06)]">
+          <h2 id="m-seats" className="m-0 font-sans font-extrabold text-[28px] leading-[1.1] tracking-[-0.03em] text-[#f4ecd8]">
+            Five hundred lifetime seats.
+          </h2>
+          <p className="mt-3 m-0 font-serif text-[15px] leading-[1.55] text-[#b5c1d1]">
+            One payment, lifetime access, no subscription. When all 500 are taken, membership closes.
+          </p>
+
+          <div className="mt-6">
+            <div className="flex justify-between items-baseline mb-2.5">
+              <span className="font-mono text-[13px] font-semibold text-[#e0d0ab] tabular-nums">{claimedCount} taken</span>
+              <span className="font-mono text-[13px] text-[#7d8ca4] tabular-nums">{remainingCount} open</span>
+            </div>
+
+            {/* 500-chair visual matrix for mobile (20 cols x 25 rows = 500 chairs) */}
+            <div
+              role="img"
+              aria-label={`${claimedCount} of 500 seats taken`}
+              className="grid grid-cols-[repeat(20,minmax(0,1fr))] gap-1 overflow-hidden"
+            >
+              {Array.from({ length: 500 }, (_, i) => {
+                const isClaimed = i < claimedCount;
+                return (
+                  <span
+                    key={i}
+                    className={`block aspect-square box-border rounded-t-[3px] rounded-b-[2px] ${
+                      isClaimed
+                        ? 'bg-[#e0d0ab] border border-[#e0d0ab]'
+                        : 'bg-transparent border border-[rgba(224,208,171,0.20)]'
+                    }`}
+                  />
+                );
+              })}
             </div>
           </div>
 
-          <div className="flex items-start gap-2.5 p-2 rounded-xs bg-[rgba(11,61,120,0.25)] border border-[rgba(19,108,153,0.3)]">
-            <Check className="w-4 h-4 text-[#34d399] shrink-0 mt-0.5" />
-            <div>
-              <span className="font-semibold text-[#e8e0cf]">100% Grounded PIB Citations:</span>
-              <p className="text-[#9fb0c8] text-[11.5px] mt-0.5">Direct Gazette and Ministry references for every news brief.</p>
-            </div>
+          <button
+            type="button"
+            onClick={onNavigateProfile}
+            className="cta-primary mt-7 w-full flex items-center justify-between min-h-[54px] px-5 py-1.5 bg-[#e0d0ab] text-[#050b1a] rounded-full font-sans font-semibold text-[16px] shadow-[0_14px_36px_-16px_rgba(224,208,171,0.55)] cursor-pointer"
+          >
+            <span>Reserve a seat</span>
+            <span className="w-10 h-10 rounded-full bg-[rgba(5,11,26,0.12)] inline-flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M5 12h14" />
+                <path d="m12 5 7 7-7 7" />
+              </svg>
+            </span>
+          </button>
+
+          <p className="mt-3.5 m-0 text-center font-sans text-[14px] font-medium text-[#f4ecd8]">
+            <span className="font-mono text-[#e0d0ab] border border-dashed border-[rgba(224,208,171,0.5)] rounded px-2 py-0.5 mr-1.5">₹399</span>
+            paid once
+          </p>
+
+          <div className="mt-4 flex justify-center gap-6">
+            <button
+              type="button"
+              onClick={scrollToDiagnostic}
+              className="text-link font-sans text-[14px] font-medium text-[#b5c1d1] cursor-pointer"
+            >
+              Start diagnostic
+            </button>
+            <button
+              type="button"
+              onClick={() => onNavigateLegal?.('refund')}
+              className="text-link font-sans text-[14px] font-medium text-[#7d8ca4] cursor-pointer"
+            >
+              Refund terms
+            </button>
           </div>
+        </section>
 
-          <div className="flex items-start gap-2.5 p-2 rounded-xs bg-[rgba(11,61,120,0.25)] border border-[rgba(19,108,153,0.3)]">
-            <Check className="w-4 h-4 text-[#34d399] shrink-0 mt-0.5" />
-            <div>
-              <span className="font-semibold text-[#e8e0cf]">Verbatim Primary Canon:</span>
-              <p className="text-[#9fb0c8] text-[11.5px] mt-0.5">Original words from Ambedkar, Gandhi, and Kant for GS-4.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+        {/* ═══════════════════════════════════════════════════════════════════
+             FOOTER
+             ═══════════════════════════════════════════════════════════════════ */}
+        <footer className="mt-auto px-5 py-7 border-t border-[rgba(224,208,171,0.08)] flex flex-col gap-4">
+          <span className="font-sans font-extrabold text-[15px] tracking-[0.04em] text-[#e0d0ab]">
+            TARK
+          </span>
+          <nav aria-label="Footer" className="flex flex-wrap gap-x-5 gap-y-2 font-sans text-[13px] text-[#b5c1d1]">
+            <button type="button" onClick={onNavigateManifesto} className="text-link cursor-pointer">Manifesto</button>
+            <button type="button" onClick={() => onNavigateLegal?.('privacy')} className="text-link cursor-pointer">Sources</button>
+            <button type="button" onClick={() => onNavigateLegal?.('refund')} className="text-link cursor-pointer">Refund</button>
+            <button type="button" onClick={() => onNavigateLegal?.('privacy')} className="text-link cursor-pointer">Privacy</button>
+            <button type="button" onClick={() => onNavigateLegal?.('terms')} className="text-link cursor-pointer">Terms</button>
+          </nav>
+          <p className="m-0 font-serif italic text-[12.5px] text-[#7d8ca4]">
+            No ads. No affiliate links. No sponsored content.
+          </p>
+        </footer>
 
-      {/* ── 6. Manifesto Link & Footer ── */}
-      <div className="text-center space-y-3 pt-2">
-        <button
-          onClick={onNavigateManifesto}
-          className="inline-flex items-center gap-1.5 text-xs font-sans text-[#e0d0ab] hover:underline"
-        >
-          <Target className="w-3.5 h-3.5" />
-          <span>Read The Tark Manifesto</span>
-        </button>
-
-        <div className="pt-4 border-t border-[rgba(19,108,153,0.3)] space-y-2 text-[11px] font-sans text-[#8fa2bd]">
-          <p>No ads &bull; No affiliate links &bull; No sponsored content</p>
-          <div className="flex items-center justify-center gap-3">
-            <button onClick={() => onNavigateLegal?.('terms')} className="hover:text-[#e0d0ab]">Terms</button>
-            <span>&bull;</span>
-            <button onClick={() => onNavigateLegal?.('privacy')} className="hover:text-[#e0d0ab]">Privacy</button>
-            <span>&bull;</span>
-            <button onClick={() => onNavigateLegal?.('refund')} className="hover:text-[#e0d0ab]">Refunds</button>
-          </div>
-        </div>
-      </div>
-
-      {/* ── 7. Fixed Thumb Action Bar (Mobile Sticky Dock) ── */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[rgba(4,25,54,0.95)] backdrop-blur-xl border-t border-[rgba(19,108,153,0.5)] p-3 px-4 shadow-[0_-8px_24px_rgba(0,0,0,0.6)] flex items-center gap-2.5">
-        <button
-          onClick={onNavigateArena}
-          className="flex-1 py-3 px-4 bg-[#e0d0ab] hover:bg-white text-[#072e63] font-sans text-xs font-bold rounded-xs flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.98] cursor-pointer"
-        >
-          <Brain className="w-4 h-4" />
-          <span>Enter Test Arena</span>
-        </button>
-
-        <button
-          onClick={onNavigateTracker}
-          className="py-3 px-3 bg-[rgba(11,61,120,0.4)] border border-[rgba(19,108,153,0.5)] text-[#e0d0ab] font-sans text-xs font-medium rounded-xs flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] cursor-pointer"
-          title="Daily Brief"
-        >
-          <Globe className="w-4 h-4 text-[#0194a8]" />
-          <span>Daily Brief</span>
-        </button>
-      </div>
-
+      </main>
     </div>
   );
 }
