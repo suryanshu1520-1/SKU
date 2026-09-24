@@ -75,6 +75,7 @@ export default function Arena({
 
   const [examLaunch, setExamLaunch] = React.useState<ExamLaunch | null>(null);
   const [examKey, setExamKey] = React.useState(0);
+  const isGuest = !userId || userId === 'guest' || userId === 'anonymous';
 
   if (examLaunch) {
     return (
@@ -84,6 +85,7 @@ export default function Arena({
           launch={examLaunch}
           userId={userId}
           candidateName={candidateName ?? null}
+          onRequestLogin={onRequestLogin}
           onExit={() => setExamLaunch(null)}
           onSittingChange={(active) => onTestStatusChange?.(active, 'exam')}
           onStartPaper={(paperCode, subject) => {
@@ -110,8 +112,12 @@ export default function Arena({
         showPreflightModal={session.showPreflightModal}
         setShowPreflightModal={session.setShowPreflightModal}
         motivation={session.motivation}
-        isGuest={userId === 'guest'}
+        isGuest={isGuest}
         onOpenExam={(launch) => {
+          if (isGuest) {
+            onRequestLogin?.();
+            return;
+          }
           setExamLaunch(launch);
           setExamKey((k) => k + 1);
         }}

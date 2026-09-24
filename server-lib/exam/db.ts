@@ -112,6 +112,9 @@ export async function getUserIdFromToken(token: string): Promise<string | null> 
 }
 
 export async function findInProgressAttempt(userId: string): Promise<AttemptRow | null> {
+  if (!isUuid(userId)) {
+    return null;
+  }
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from('mock_attempts')
@@ -144,7 +147,7 @@ export async function insertAttempt(row: NewAttempt): Promise<AttemptRow> {
 }
 
 export async function getAttempt(attemptId: string, userId: string): Promise<AttemptRow | null> {
-  if (!isUuid(attemptId)) {
+  if (!isUuid(attemptId) || !isUuid(userId)) {
     return null;
   }
   const supabase = getSupabaseAdmin();
@@ -167,7 +170,7 @@ export async function saveCheckpoint(
   sheet: ResponseSheet,
   atIso: string
 ): Promise<boolean> {
-  if (!isUuid(attemptId)) return false;
+  if (!isUuid(attemptId) || !isUuid(userId)) return false;
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from('mock_attempts')
@@ -194,7 +197,7 @@ export async function markSubmitted(
     sheet: ResponseSheet;
   }
 ): Promise<AttemptRow | null> {
-  if (!isUuid(attemptId)) return null;
+  if (!isUuid(attemptId) || !isUuid(userId)) return null;
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from('mock_attempts')
@@ -219,6 +222,9 @@ export async function markSubmitted(
 }
 
 export async function listSubmittedAttempts(userId: string, limit: number): Promise<AttemptRow[]> {
+  if (!isUuid(userId)) {
+    return [];
+  }
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from('mock_attempts')
@@ -236,6 +242,9 @@ export async function listSubmittedAttempts(userId: string, limit: number): Prom
 
 export async function getSeenQuestionIds(userId: string): Promise<Set<string>> {
   const seen = new Set<string>();
+  if (!isUuid(userId)) {
+    return seen;
+  }
   let supabase: SupabaseClient;
   try {
     supabase = getSupabaseAdmin();

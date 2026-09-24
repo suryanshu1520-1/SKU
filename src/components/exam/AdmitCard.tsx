@@ -21,6 +21,8 @@ export interface AdmitCardProps {
   prefs: ExamPrefs;
   starting: boolean;
   error: string | null;
+  isGuest?: boolean;
+  onRequestLogin?: () => void;
   onPrefsChange: (patch: Partial<ExamPrefs>) => void;
   onStart: (rules: RulesPreset, opts: { fullscreen: boolean }) => void;
   onBack: () => void;
@@ -42,6 +44,8 @@ export const AdmitCard: React.FC<AdmitCardProps> = ({
   prefs,
   starting,
   error,
+  isGuest = false,
+  onRequestLogin,
   onPrefsChange,
   onStart,
   onBack,
@@ -294,17 +298,27 @@ export const AdmitCard: React.FC<AdmitCardProps> = ({
 
         {/* 8. Buttons */}
         <div className="mt-5 flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            disabled={!canStart}
-            onClick={() => {
-              primeBell();
-              onStart(localRules, { fullscreen });
-            }}
-            className="bg-[var(--eh-ink)] text-[var(--eh-paper)] px-[18px] py-2.5 rounded-md font-sans font-bold disabled:opacity-40 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]"
-          >
-            {starting ? 'Distributing your booklet…' : 'Break the seal and start'}
-          </button>
+          {isGuest || error?.toLowerCase().includes('sign in') ? (
+            <button
+              type="button"
+              onClick={() => onRequestLogin?.()}
+              className="bg-[var(--gold,#e0d0ab)] text-[#041228] px-5 py-2.5 rounded-md font-sans font-bold hover:opacity-90 cursor-pointer shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]"
+            >
+              Sign in to start paper
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled={!canStart}
+              onClick={() => {
+                primeBell();
+                onStart(localRules, { fullscreen });
+              }}
+              className="bg-[var(--eh-ink)] text-[var(--eh-paper)] px-[18px] py-2.5 rounded-md font-sans font-bold disabled:opacity-40 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]"
+            >
+              {starting ? 'Distributing your booklet…' : 'Break the seal and start'}
+            </button>
+          )}
           <button
             type="button"
             onClick={onBack}

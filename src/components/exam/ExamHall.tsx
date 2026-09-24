@@ -38,6 +38,7 @@ export interface ExamHallProps {
   launch: ExamLaunch;
   userId: string;
   candidateName?: string | null;
+  onRequestLogin?: () => void;
   onExit: () => void;
   onSittingChange?: (active: boolean) => void;
   onStartPaper: (paperCode: PaperCode, subject?: SectionSubject) => void;
@@ -467,6 +468,8 @@ export default function ExamHall(props: ExamHallProps): React.ReactElement {
   }
 
   if (session.phase === 'load-error') {
+    const isGuest = !props.userId || props.userId === 'guest' || props.userId === 'anonymous';
+    const isAuthError = session.error?.toLowerCase().includes('sign in') || isGuest;
     return (
       <div
         ref={rootRef}
@@ -476,13 +479,23 @@ export default function ExamHall(props: ExamHallProps): React.ReactElement {
         <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4 text-center px-4">
           <p className="text-sm text-[var(--eh-danger)] max-w-md">{session.error}</p>
           <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={session.retry}
-              className="px-4 py-2 rounded-md bg-[var(--eh-ink)] text-[var(--eh-paper)] font-sans font-semibold text-sm hover:opacity-90 cursor-pointer"
-            >
-              Try again
-            </button>
+            {isAuthError && props.onRequestLogin ? (
+              <button
+                type="button"
+                onClick={props.onRequestLogin}
+                className="px-4 py-2 rounded-md bg-[var(--gold,#e0d0ab)] text-[#041228] font-sans font-bold text-sm hover:opacity-90 cursor-pointer shadow-sm"
+              >
+                Sign in
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={session.retry}
+                className="px-4 py-2 rounded-md bg-[var(--eh-ink)] text-[var(--eh-paper)] font-sans font-semibold text-sm hover:opacity-90 cursor-pointer"
+              >
+                Try again
+              </button>
+            )}
             <button
               type="button"
               onClick={props.onExit}
@@ -497,6 +510,7 @@ export default function ExamHall(props: ExamHallProps): React.ReactElement {
   }
 
   if (session.phase === 'admit' || session.phase === 'starting') {
+    const isGuest = !props.userId || props.userId === 'guest' || props.userId === 'anonymous';
     return (
       <div
         ref={rootRef}
@@ -513,6 +527,8 @@ export default function ExamHall(props: ExamHallProps): React.ReactElement {
           prefs={session.prefs}
           starting={session.phase === 'starting'}
           error={session.error}
+          isGuest={isGuest}
+          onRequestLogin={props.onRequestLogin}
           onPrefsChange={session.updatePrefs}
           onStart={handleStartFromAdmit}
           onBack={props.onExit}

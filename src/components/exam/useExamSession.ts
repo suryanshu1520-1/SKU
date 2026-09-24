@@ -316,11 +316,28 @@ export function useExamSession({
         if (!mountedRef.current || gen !== loadGenRef.current) return;
         setSubmitResponse(resp);
         setPhase('scorecard');
-      } catch {
+      } catch (err) {
         if (!mountedRef.current || gen !== loadGenRef.current) return;
+        if (err instanceof ExamApiError && err.status === 401) {
+          setPhase('admit');
+          setError('Sign in to view your exam result.');
+          return;
+        }
         setPhase('load-error');
         setError("We couldn't load that result. Check your connection and try again.");
       }
+      return;
+    }
+
+    const isGuest = !userId || userId === 'guest' || userId === 'anonymous';
+    if (isGuest) {
+      if (!mountedRef.current || gen !== loadGenRef.current) return;
+      setPaperChoice(
+        launch.kind === 'new'
+          ? { paperCode: launch.paperCode, subject: launch.subject }
+          : { paperCode: 'GS1_FULL' }
+      );
+      setPhase('admit');
       return;
     }
 
@@ -343,12 +360,22 @@ export function useExamSession({
         );
         setPhase('admit');
       }
-    } catch {
+    } catch (err) {
       if (!mountedRef.current || gen !== loadGenRef.current) return;
+      if (err instanceof ExamApiError && err.status === 401) {
+        setPaperChoice(
+          launch.kind === 'new'
+            ? { paperCode: launch.paperCode, subject: launch.subject }
+            : { paperCode: 'GS1_FULL' }
+        );
+        setPhase('admit');
+        setError('Sign in to sit a paper.');
+        return;
+      }
       setPhase('load-error');
       setError("We couldn't reach the exam hall. Check your connection and try again.");
     }
-  }, [launch]);
+  }, [launch, userId]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -361,6 +388,12 @@ export function useExamSession({
       updatePrefs({ rules });
       setError(null);
       setPhase('starting');
+
+      if (!userId || userId === 'guest' || userId === 'anonymous') {
+        setPhase('admit');
+        setError('Sign in to start this paper.');
+        return;
+      }
 
       try {
         const res = await examApi.start({
@@ -386,7 +419,7 @@ export function useExamSession({
         setError(msg);
       }
     },
-    [updatePrefs, paperChoice, series, beginSitting, load]
+    [updatePrefs, paperChoice, series, beginSitting, load, userId]
   );
 
   const resumePaper = useCallback(async () => {
@@ -411,8 +444,13 @@ export function useExamSession({
       } else {
         setPhase('admit');
       }
-    } catch {
+    } catch (err) {
       if (!mountedRef.current) return;
+      if (err instanceof ExamApiError && err.status === 401) {
+        setPhase('admit');
+        setError('Sign in to resume your paper.');
+        return;
+      }
       setError("We couldn't reach the exam hall. Check your connection and try again.");
     }
   }, [beginSitting]);
