@@ -1,6 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
-import { Swords, Target, Clock, Zap, BookOpen, ArrowRight } from 'lucide-react';
+import {
+  Swords,
+  Target,
+  Clock,
+  Zap,
+  BookOpen,
+  ArrowRight,
+  ChevronDown,
+  ShieldCheck,
+  Timer,
+  FileText,
+} from 'lucide-react';
 import { Modal } from '../shared';
 import type { ArenaLaunchConfig } from '../../types';
 import type { CachedSession } from './useArenaSession';
@@ -330,149 +341,247 @@ export const ArenaLobby: React.FC<ArenaLobbyProps> = ({
           {/* 2. Exam Hall Card */}
           <section
             aria-labelledby="hall-title"
-            className="w-full border border-[rgba(224,208,171,0.28)] bg-gradient-to-b from-[#0a2148] to-[#071630] rounded-[14px] p-6 sm:p-7 grid gap-4 text-left shadow-[0_12px_48px_rgba(0,0,0,0.4)]"
+            className="w-full relative border border-[rgba(224,208,171,0.25)] bg-gradient-to-b from-[#0a234d] via-[#071936] to-[#041228] rounded-2xl p-6 sm:p-8 grid gap-5 text-left shadow-[0_16px_48px_rgba(0,0,0,0.45)] overflow-hidden"
           >
-            <div className="text-xs text-muted flex items-center">
-              <span className="inline-flex gap-1.5 mr-2.5 items-center" aria-hidden="true">
-                <i className="w-3.5 h-3.5 rounded-full border border-[rgba(224,208,171,0.55)] inline-block" />
-                <i className="w-3.5 h-3.5 rounded-full border border-[var(--gold,#e0d0ab)] bg-[var(--gold,#e0d0ab)] inline-block" />
-                <i className="w-3.5 h-3.5 rounded-full border border-[rgba(224,208,171,0.55)] inline-block" />
-                <i className="w-3.5 h-3.5 rounded-full border border-[rgba(224,208,171,0.55)] inline-block" />
+            {/* Top accent line */}
+            <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--gold,#e0d0ab)]/40 to-transparent" />
+
+            {/* Header: OMR Eyebrow & Arena badge */}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[rgba(224,208,171,0.08)] border border-[rgba(224,208,171,0.2)] text-[11px] font-mono tracking-wider text-[var(--gold,#e0d0ab)]">
+                <span className="flex items-center gap-1 font-mono text-[9px] font-bold text-muted/70" aria-hidden="true">
+                  <span className="w-3.5 h-3.5 rounded-full border border-current grid place-items-center">A</span>
+                  <span className="w-3.5 h-3.5 rounded-full bg-[var(--gold,#e0d0ab)] text-[#041228] font-bold grid place-items-center">B</span>
+                  <span className="w-3.5 h-3.5 rounded-full border border-current grid place-items-center">C</span>
+                  <span className="w-3.5 h-3.5 rounded-full border border-current grid place-items-center">D</span>
+                </span>
+                <span className="text-muted/40">|</span>
+                <span className="font-semibold uppercase tracking-wider">UPSC CSE Prelims · GS Paper I</span>
+              </div>
+              <span className="text-[11px] font-mono text-[#8fa2bd] uppercase tracking-wider hidden sm:inline-block">
+                Simulation Hall
               </span>
-              UPSC CSE Prelims · GS Paper I
             </div>
 
-            <h2
-              id="hall-title"
-              className="m-0 font-serif font-semibold text-[26px] sm:text-[28px] leading-[1.15] text-[#f4ecd8]"
-            >
-              Sit the paper the way UPSC sets it
-            </h2>
+            <div>
+              <h2
+                id="hall-title"
+                className="m-0 font-serif font-semibold text-[26px] sm:text-[30px] leading-[1.2] text-[#f4ecd8] tracking-tight"
+              >
+                Sit the paper the way UPSC sets it
+              </h2>
+              <p className="mt-2 text-secondary text-[14px] sm:text-[15px] max-w-[64ch] leading-relaxed">
+                One clock for the whole paper. Read in the booklet, bubble on the answer sheet, lose 0.66 for every wrong answer. Results only after you hand in.
+              </p>
+            </div>
 
-            <p className="m-0 text-secondary text-[14.5px] sm:text-[15px] max-w-[62ch] leading-relaxed">
-              One clock for the whole paper. Read in the booklet, bubble on the answer sheet, lose 0.66 for every wrong answer. Results only after you hand in.
-            </p>
-
+            {/* Paper Selection Cards */}
             <div
-              className="grid grid-cols-1 sm:grid-cols-3 gap-2.5"
+              className="grid grid-cols-1 sm:grid-cols-3 gap-3"
               role="radiogroup"
               aria-label="Choose a paper"
             >
+              {/* Full Paper */}
               <button
                 type="button"
                 role="radio"
                 aria-checked={selectedPaper === 'GS1_FULL'}
                 onClick={() => setSelectedPaper('GS1_FULL')}
-                className={`p-3 sm:p-3.5 rounded-[10px] text-left grid gap-1 border transition-all cursor-pointer ${
+                className={`p-4 rounded-xl text-left flex flex-col justify-between border transition-all cursor-pointer ${
                   selectedPaper === 'GS1_FULL'
-                    ? 'border-[var(--gold,#e0d0ab)] shadow-[inset_0_0_0_1px_var(--gold,#e0d0ab)] bg-[#041228]/80'
-                    : 'border-border bg-[#041228]/40 hover:border-border/80'
+                    ? 'border-[var(--gold,#e0d0ab)] bg-[rgba(224,208,171,0.08)] shadow-[0_0_0_1px_rgba(224,208,171,0.4),0_8px_20px_rgba(0,0,0,0.3)]'
+                    : 'border-[rgba(19,108,153,0.3)] bg-[#031228]/50 hover:border-[rgba(224,208,171,0.3)] hover:bg-[#031228]/80'
                 }`}
               >
-                <b className="text-[15px] font-sans font-bold text-primary">Full paper</b>
-                <small className="text-muted font-mono text-[12px]">100 questions · 2 hours</small>
+                <div className="flex items-center justify-between w-full">
+                  <b className="text-[15px] font-sans font-bold text-primary">Full paper</b>
+                  <span
+                    className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${
+                      selectedPaper === 'GS1_FULL'
+                        ? 'border-[var(--gold,#e0d0ab)] bg-[var(--gold,#e0d0ab)]'
+                        : 'border-[rgba(19,108,153,0.5)] bg-transparent'
+                    }`}
+                  >
+                    {selectedPaper === 'GS1_FULL' && <span className="w-1.5 h-1.5 rounded-full bg-[#041228]" />}
+                  </span>
+                </div>
+                <small className="text-[#8fa2bd] font-mono text-xs mt-2 block">
+                  100 questions · 2 hours
+                </small>
               </button>
 
+              {/* Half Paper */}
               <button
                 type="button"
                 role="radio"
                 aria-checked={selectedPaper === 'GS1_HALF'}
                 onClick={() => setSelectedPaper('GS1_HALF')}
-                className={`p-3 sm:p-3.5 rounded-[10px] text-left grid gap-1 border transition-all cursor-pointer ${
+                className={`p-4 rounded-xl text-left flex flex-col justify-between border transition-all cursor-pointer ${
                   selectedPaper === 'GS1_HALF'
-                    ? 'border-[var(--gold,#e0d0ab)] shadow-[inset_0_0_0_1px_var(--gold,#e0d0ab)] bg-[#041228]/80'
-                    : 'border-border bg-[#041228]/40 hover:border-border/80'
+                    ? 'border-[var(--gold,#e0d0ab)] bg-[rgba(224,208,171,0.08)] shadow-[0_0_0_1px_rgba(224,208,171,0.4),0_8px_20px_rgba(0,0,0,0.3)]'
+                    : 'border-[rgba(19,108,153,0.3)] bg-[#031228]/50 hover:border-[rgba(224,208,171,0.3)] hover:bg-[#031228]/80'
                 }`}
               >
-                <b className="text-[15px] font-sans font-bold text-primary">Half paper</b>
-                <small className="text-muted font-mono text-[12px]">50 questions · 1 hour</small>
+                <div className="flex items-center justify-between w-full">
+                  <b className="text-[15px] font-sans font-bold text-primary">Half paper</b>
+                  <span
+                    className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${
+                      selectedPaper === 'GS1_HALF'
+                        ? 'border-[var(--gold,#e0d0ab)] bg-[var(--gold,#e0d0ab)]'
+                        : 'border-[rgba(19,108,153,0.5)] bg-transparent'
+                    }`}
+                  >
+                    {selectedPaper === 'GS1_HALF' && <span className="w-1.5 h-1.5 rounded-full bg-[#041228]" />}
+                  </span>
+                </div>
+                <small className="text-[#8fa2bd] font-mono text-xs mt-2 block">
+                  50 questions · 1 hour
+                </small>
               </button>
 
-              <div
+              {/* Sectional */}
+              <button
+                type="button"
                 role="radio"
-                tabIndex={-1}
                 aria-checked={selectedPaper === 'GS1_SECTION'}
                 onClick={() => setSelectedPaper('GS1_SECTION')}
-                className={`p-3 sm:p-3.5 rounded-[10px] text-left grid gap-1 border transition-all cursor-pointer ${
+                className={`p-4 rounded-xl text-left flex flex-col justify-between border transition-all cursor-pointer ${
                   selectedPaper === 'GS1_SECTION'
-                    ? 'border-[var(--gold,#e0d0ab)] shadow-[inset_0_0_0_1px_var(--gold,#e0d0ab)] bg-[#041228]/80'
-                    : 'border-border bg-[#041228]/40 hover:border-border/80'
+                    ? 'border-[var(--gold,#e0d0ab)] bg-[rgba(224,208,171,0.08)] shadow-[0_0_0_1px_rgba(224,208,171,0.4),0_8px_20px_rgba(0,0,0,0.3)]'
+                    : 'border-[rgba(19,108,153,0.3)] bg-[#031228]/50 hover:border-[rgba(224,208,171,0.3)] hover:bg-[#031228]/80'
                 }`}
               >
-                <b className="text-[15px] font-sans font-bold text-primary">Sectional</b>
-                <small className="text-muted font-mono text-[12px]">25 questions · 30 minutes</small>
-                <label htmlFor="exam-section-subject" className="sr-only">
-                  Sectional subject
-                </label>
-                <select
-                  id="exam-section-subject"
-                  value={selectedSubject}
-                  onClick={(e) => e.stopPropagation()}
-                  onChange={(e) => {
-                    setSelectedSubject(e.target.value as SectionSubject);
-                    setSelectedPaper('GS1_SECTION');
-                  }}
-                  className="mt-1.5 px-2 py-1 bg-surface text-primary border border-border rounded-md text-xs font-sans cursor-pointer focus:outline-none focus:border-[var(--gold,#e0d0ab)]"
-                >
-                  <option value="Mixed">Mixed</option>
-                  {(catalog?.sectionSubjects ?? [])
-                    .filter((s) => s.subject !== 'Mixed')
-                    .map((s) => (
-                      <option key={s.subject} value={s.subject}>
-                        {SUBJECT_LABELS[s.subject] ?? s.subject}
-                      </option>
-                    ))}
-                </select>
-              </div>
+                <div>
+                  <div className="flex items-center justify-between w-full">
+                    <b className="text-[15px] font-sans font-bold text-primary">Sectional</b>
+                    <span
+                      className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${
+                        selectedPaper === 'GS1_SECTION'
+                          ? 'border-[var(--gold,#e0d0ab)] bg-[var(--gold,#e0d0ab)]'
+                          : 'border-[rgba(19,108,153,0.5)] bg-transparent'
+                      }`}
+                    >
+                      {selectedPaper === 'GS1_SECTION' && <span className="w-1.5 h-1.5 rounded-full bg-[#041228]" />}
+                    </span>
+                  </div>
+                  <small className="text-[#8fa2bd] font-mono text-xs mt-2 block">
+                    25 questions · 30 minutes
+                  </small>
+                </div>
+
+                {/* Sleek subject selector revealed ONLY when Sectional is active */}
+                {selectedPaper === 'GS1_SECTION' && (
+                  <div
+                    className="mt-3 pt-2.5 border-t border-[rgba(224,208,171,0.2)] w-full"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <label htmlFor="exam-section-subject" className="text-[10px] uppercase font-mono tracking-wider text-[var(--gold,#e0d0ab)] font-bold">
+                        Subject
+                      </label>
+                      <span className="text-[10px] font-mono text-muted">
+                        {selectedSubject === 'Mixed' ? 'All GS' : (catalog?.sectionSubjects?.find(s => s.subject === selectedSubject)?.available ?? '') + ' Qs'}
+                      </span>
+                    </div>
+                    <div className="relative w-full">
+                      <select
+                        id="exam-section-subject"
+                        value={selectedSubject}
+                        onChange={(e) => setSelectedSubject(e.target.value as SectionSubject)}
+                        className="w-full pl-2.5 pr-7 py-1 bg-[#031228] text-primary border border-[rgba(224,208,171,0.35)] rounded-md text-xs font-sans cursor-pointer focus:outline-none focus:border-[var(--gold,#e0d0ab)] focus:ring-1 focus:ring-[var(--gold,#e0d0ab)] transition-colors appearance-none"
+                      >
+                        <option value="Mixed">Mixed (All Subjects)</option>
+                        {(catalog?.sectionSubjects ?? [])
+                          .filter((s) => s.subject !== 'Mixed')
+                          .map((s) => (
+                            <option key={s.subject} value={s.subject}>
+                              {SUBJECT_LABELS[s.subject] ?? s.subject} ({s.available})
+                            </option>
+                          ))}
+                      </select>
+                      <ChevronDown className="w-3.5 h-3.5 text-[var(--gold,#e0d0ab)] absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    </div>
+                  </div>
+                )}
+              </button>
             </div>
 
-            <div className="flex flex-wrap gap-3 items-center pt-1">
-              {isGuest ? (
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            {/* Action Bar & Trust Badges */}
+            <div className="space-y-4 pt-1">
+              <div className="flex flex-wrap items-center gap-3">
+                {isGuest ? (
                   <button
                     type="button"
                     onClick={() => onRequestLogin?.()}
-                    className="px-5 py-2.5 rounded-md bg-[var(--gold,#e0d0ab)] text-[#041228] font-sans font-bold text-sm hover:opacity-90 cursor-pointer shadow-sm transition-all"
+                    className="px-6 py-2.5 rounded-lg bg-[var(--gold,#e0d0ab)] hover:bg-[#ebdcc0] text-[#041228] font-sans font-bold text-sm hover:opacity-95 cursor-pointer shadow-[0_4px_16px_rgba(224,208,171,0.25)] transition-all flex items-center gap-2 group"
                   >
-                    Sign in to sit a paper
+                    <span>Sign in to sit a paper</span>
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                   </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onOpenExam({
+                        kind: 'new',
+                        paperCode: selectedPaper,
+                        subject: selectedPaper === 'GS1_SECTION' ? selectedSubject : undefined,
+                      })
+                    }
+                    className="px-6 py-2.5 rounded-lg bg-[var(--gold,#e0d0ab)] hover:bg-[#ebdcc0] text-[#041228] font-sans font-bold text-sm hover:opacity-95 cursor-pointer shadow-[0_4px_16px_rgba(224,208,171,0.25)] transition-all flex items-center gap-2 group"
+                  >
+                    <span>Go to the exam hall</span>
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                  </button>
+                )}
+                {isGuest && (
                   <span className="text-xs text-secondary">
                     Your answer sheet is saved to your account, so a closed tab never costs you the paper.
                   </span>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() =>
-                    onOpenExam({
-                      kind: 'new',
-                      paperCode: selectedPaper,
-                      subject: selectedPaper === 'GS1_SECTION' ? selectedSubject : undefined,
-                    })
-                  }
-                  className="px-5 py-2.5 rounded-md bg-[var(--gold,#e0d0ab)] text-[#041228] font-sans font-bold text-sm hover:opacity-90 cursor-pointer shadow-sm transition-all"
-                >
-                  Go to the exam hall
-                </button>
-              )}
-              <span className="text-[12.5px] text-muted">
-                Real UPSC GS-I questions, 2011–2023 · scored on our server · your sheet saves as you write
-              </span>
+                )}
+              </div>
+
+              {/* Trust Badges */}
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#8fa2bd] pt-3 border-t border-[rgba(19,108,153,0.25)]">
+                <span className="flex items-center gap-1.5 font-sans">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>Real UPSC GS-I (2011–2023)</span>
+                </span>
+                <span className="flex items-center gap-1.5 font-sans">
+                  <Zap className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>Zero-Trust Server Grading</span>
+                </span>
+                <span className="flex items-center gap-1.5 font-sans">
+                  <Clock className="w-3.5 h-3.5 text-[#0194a8] shrink-0" />
+                  <span>Continuous Cloud Autosave</span>
+                </span>
+              </div>
             </div>
           </section>
 
           {/* 3. Your Papers */}
           {!isGuest && attempts !== null && (
-            <section className="grid gap-2 w-full text-left" aria-labelledby="yours-title">
-              <h3 id="yours-title" className="m-0 text-sm font-semibold text-primary">
-                Your papers
-              </h3>
+            <section className="w-full text-left rounded-xl border border-[rgba(19,108,153,0.25)] bg-[#041228]/50 p-4 space-y-3" aria-labelledby="yours-title">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-[var(--gold,#e0d0ab)]" />
+                  <h3 id="yours-title" className="m-0 text-sm font-semibold text-primary">
+                    Your Paper History
+                  </h3>
+                </div>
+                {attempts.length > 0 && (
+                  <span className="text-xs font-mono text-muted">
+                    {attempts.length} {attempts.length === 1 ? 'attempt' : 'attempts'} recorded
+                  </span>
+                )}
+              </div>
+
               {attempts.length === 0 ? (
-                <p className="text-xs text-secondary m-0">
-                  No papers yet. Your first full paper sets your baseline.
+                <p className="text-xs text-secondary m-0 py-2">
+                  No papers yet. Your first full paper sets your baseline and ranking.
                 </p>
               ) : (
-                <ul className="list-none m-0 p-0 border border-border/60 rounded-lg divide-y divide-border/40 overflow-hidden bg-[#041228]/30">
+                <ul className="list-none m-0 p-0 border border-border/50 rounded-lg divide-y divide-border/30 overflow-hidden bg-[#031126]/60">
                   {attempts.slice(0, 5).map((a) => {
                     const dateStr = new Date(a.submittedAt).toLocaleDateString('en-IN', {
                       day: 'numeric',
@@ -488,21 +597,21 @@ export const ArenaLobby: React.FC<ArenaLobbyProps> = ({
                     return (
                       <li
                         key={a.attemptId}
-                        className="flex items-center gap-3 px-3.5 py-2.5 text-[13.5px] text-secondary"
+                        className="flex items-center gap-3 px-3.5 py-2.5 text-[13.5px] text-secondary hover:bg-surface-elevated/30 transition-colors"
                       >
-                        <span>
+                        <span className="truncate">
                           {dateStr} · {title}
                           {subj}
                         </span>
-                        <b className="ml-auto font-mono text-primary font-medium">
+                        <b className="ml-auto font-mono text-primary font-medium shrink-0">
                           {formatMarks(a.netHundredths)} / {maxMarks}
                         </b>
                         <button
                           type="button"
                           onClick={() => onOpenExam({ kind: 'result', attemptId: a.attemptId })}
-                          className="text-xs text-[var(--gold,#e0d0ab)] hover:underline cursor-pointer ml-1"
+                          className="text-xs text-[var(--gold,#e0d0ab)] hover:underline cursor-pointer ml-1 shrink-0"
                         >
-                          View
+                          View scorecard &rarr;
                         </button>
                       </li>
                     );
@@ -512,69 +621,122 @@ export const ArenaLobby: React.FC<ArenaLobbyProps> = ({
             </section>
           )}
 
-          {/* 4. Quick Practice */}
-          <section className="grid gap-2.5 w-full text-left" aria-labelledby="quick-title">
-            <h3 id="quick-title" className="m-0 text-sm font-semibold text-primary">
-              Quick practice
-            </h3>
-            <div
-              className="inline-flex border border-border rounded-md overflow-hidden w-max"
-              role="group"
-              aria-label="Exam track"
-            >
-              <button
-                type="button"
-                aria-pressed={examTrack === 'upsc'}
-                onClick={() => setExamTrack('upsc')}
-                className={`px-3 py-1 text-xs font-sans transition-colors cursor-pointer ${
-                  examTrack === 'upsc'
-                    ? 'bg-[var(--gold,#e0d0ab)] text-[#072e63] font-bold'
-                    : 'text-secondary hover:text-primary'
-                }`}
-              >
-                UPSC CSE
-              </button>
-              <button
-                type="button"
-                aria-pressed={examTrack === 'ssc'}
-                onClick={() => setExamTrack('ssc')}
-                className={`px-3 py-1 text-xs font-sans transition-colors cursor-pointer ${
-                  examTrack === 'ssc'
-                    ? 'bg-[var(--gold,#e0d0ab)] text-[#072e63] font-bold'
-                    : 'text-secondary hover:text-primary'
-                }`}
-              >
-                SSC CGL
-              </button>
+          {/* 4. Quick Practice & Targeted Drills */}
+          <section className="grid gap-3.5 w-full text-left" aria-labelledby="quick-title">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-[rgba(19,108,153,0.2)]">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-[var(--gold,#e0d0ab)]" />
+                  <h3 id="quick-title" className="m-0 text-sm font-semibold text-primary">
+                    Quick Practice & Targeted Drills
+                  </h3>
+                </div>
+                <p className="m-0 text-xs text-muted mt-0.5">
+                  High-speed analytical MCQ practice with instant solutions after every question.
+                </p>
+              </div>
+
+              {/* Unified Track Toggle */}
+              <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+                <span className="text-[11px] font-mono text-[#8fa2bd] uppercase tracking-wider hidden sm:inline">
+                  Track:
+                </span>
+                <div
+                  className="inline-flex p-0.5 bg-[#031228] border border-[rgba(19,108,153,0.35)] rounded-lg overflow-hidden"
+                  role="group"
+                  aria-label="Exam track"
+                >
+                  <button
+                    type="button"
+                    aria-pressed={examTrack === 'upsc'}
+                    onClick={() => setExamTrack('upsc')}
+                    className={`px-3 py-1 text-xs font-sans rounded-md transition-all cursor-pointer font-semibold ${
+                      examTrack === 'upsc'
+                        ? 'bg-[var(--gold,#e0d0ab)] text-[#041228] shadow-sm'
+                        : 'text-[#8fa2bd] hover:text-primary hover:bg-surface-elevated/40'
+                    }`}
+                  >
+                    UPSC CSE
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={examTrack === 'ssc'}
+                    onClick={() => setExamTrack('ssc')}
+                    className={`px-3 py-1 text-xs font-sans rounded-md transition-all cursor-pointer font-semibold ${
+                      examTrack === 'ssc'
+                        ? 'bg-[var(--gold,#e0d0ab)] text-[#041228] shadow-sm'
+                        : 'text-[#8fa2bd] hover:text-primary hover:bg-surface-elevated/40'
+                    }`}
+                  >
+                    SSC CGL
+                  </button>
+                </div>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              {/* Timed Drill Card */}
               <button
                 type="button"
                 onClick={onBeginAssessment}
-                className="border border-border/60 hover:border-[rgba(224,208,171,0.4)] rounded-[10px] p-3 sm:p-3.5 grid gap-1 bg-[#041228]/40 hover:bg-[#041228]/70 text-left transition-all cursor-pointer"
+                className="group relative rounded-xl border border-[rgba(19,108,153,0.35)] hover:border-[rgba(224,208,171,0.5)] bg-gradient-to-b from-[#061a38] to-[#031126] p-4 sm:p-5 text-left transition-all duration-200 hover:shadow-[0_8px_24px_rgba(0,0,0,0.35)] cursor-pointer flex flex-col justify-between gap-3"
               >
-                <b className="text-sm font-sans font-bold text-primary">Timed drill · ranked</b>
-                <small className="text-muted text-[12.5px] font-sans">
-                  25 mixed questions ·{' '}
-                  {pacingMode === 'blitz'
-                    ? '20 s each'
-                    : pacingMode === 'untimed'
-                    ? 'untimed'
-                    : '60 s each'}{' '}
-                  · answer shown after each question
-                </small>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="p-2 rounded-lg bg-[rgba(224,208,171,0.1)] text-[var(--gold,#e0d0ab)]">
+                      <Timer className="w-4 h-4" />
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                      Ranked
+                    </span>
+                  </div>
+                  <h4 className="text-base font-sans font-bold text-primary group-hover:text-[var(--gold,#e0d0ab)] transition-colors">
+                    Timed Speed Drill
+                  </h4>
+                  <p className="text-xs text-secondary mt-1 leading-relaxed">
+                    25 mixed MCQs with Prelims time pressure. Answers and detailed analytics revealed immediately after each question.
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between pt-2.5 border-t border-[rgba(19,108,153,0.2)] text-[11px] font-mono text-[#8fa2bd]">
+                  <span>
+                    {pacingMode === 'blitz' ? '20s blitz' : pacingMode === 'untimed' ? 'Untimed' : '60s per MCQ'} · +2.00 / −0.66
+                  </span>
+                  <span className="text-[var(--gold,#e0d0ab)] flex items-center gap-1 group-hover:translate-x-1 transition-transform font-sans font-semibold text-xs">
+                    Start drill &rarr;
+                  </span>
+                </div>
               </button>
 
+              {/* Training Ground Card */}
               <button
                 type="button"
                 onClick={onTrainingGround}
-                className="border border-border/60 hover:border-[rgba(224,208,171,0.4)] rounded-[10px] p-3 sm:p-3.5 grid gap-1 bg-[#041228]/40 hover:bg-[#041228]/70 text-left transition-all cursor-pointer"
+                className="group relative rounded-xl border border-[rgba(19,108,153,0.35)] hover:border-[rgba(224,208,171,0.5)] bg-gradient-to-b from-[#061a38] to-[#031126] p-4 sm:p-5 text-left transition-all duration-200 hover:shadow-[0_8px_24px_rgba(0,0,0,0.35)] cursor-pointer flex flex-col justify-between gap-3"
               >
-                <b className="text-sm font-sans font-bold text-primary">Training ground</b>
-                <small className="text-muted text-[12.5px] font-sans">
-                  Pick subjects · 25, 35 or 50 questions · untimed
-                </small>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="p-2 rounded-lg bg-[rgba(1,148,168,0.1)] text-[#0194a8]">
+                      <Target className="w-4 h-4" />
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider font-bold bg-[#0194a8]/15 text-[#0194a8] border border-[#0194a8]/30">
+                      Self-Paced
+                    </span>
+                  </div>
+                  <h4 className="text-base font-sans font-bold text-primary group-hover:text-[var(--gold,#e0d0ab)] transition-colors">
+                    Training Ground
+                  </h4>
+                  <p className="text-xs text-secondary mt-1 leading-relaxed">
+                    Customize your session by subject and question volume. Learn at your own pace without ticking clocks.
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between pt-2.5 border-t border-[rgba(19,108,153,0.2)] text-[11px] font-mono text-[#8fa2bd]">
+                  <span>Custom subjects · 25, 35 or 50 Qs</span>
+                  <span className="text-[var(--gold,#e0d0ab)] flex items-center gap-1 group-hover:translate-x-1 transition-transform font-sans font-semibold text-xs">
+                    Configure &rarr;
+                  </span>
+                </div>
               </button>
             </div>
           </section>
