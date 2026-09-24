@@ -7,6 +7,7 @@ export interface ResumePromptProps {
   info: ActiveAttempt;
   secondsLeft: number;
   submitting: boolean;
+  error?: string | null;
   onResume: () => void;
   onHandIn: () => void;
   onBack: () => void;
@@ -16,6 +17,7 @@ export const ResumePrompt: React.FC<ResumePromptProps> = ({
   info,
   secondsLeft,
   submitting,
+  error,
   onResume,
   onHandIn,
   onBack,
@@ -33,6 +35,12 @@ export const ResumePrompt: React.FC<ResumePromptProps> = ({
           {info.paper.title} · Series {seriesLabel}. {formatTimeLeft(secondsLeft)} left on the
           clock. It kept running while you were away.
         </p>
+
+        {error && (
+          <p role="alert" className="mt-4 font-sans text-sm text-[#e06c75] font-medium">
+            {error}
+          </p>
+        )}
 
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <button

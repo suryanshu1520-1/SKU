@@ -1,5 +1,6 @@
 import { DEFAULT_PREFS, PREFS_STORAGE_KEY, sheetStorageKey } from '../types.js';
 import type { BookletTheme, ExamPrefs, ResponseSheet, RulesPreset } from '../types.js';
+import { normalizeLocalSheet } from './sessionHelpers.js';
 
 export function loadPrefs(): ExamPrefs {
   try {
@@ -34,17 +35,7 @@ export function loadLocalSheet(attemptId: string): ResponseSheet | null {
   try {
     const raw = localStorage.getItem(sheetStorageKey(attemptId));
     if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (
-      typeof parsed === 'object' &&
-      parsed !== null &&
-      parsed.v === 1 &&
-      typeof parsed.bubbles === 'object' &&
-      parsed.bubbles !== null
-    ) {
-      return parsed as ResponseSheet;
-    }
-    return null;
+    return normalizeLocalSheet(JSON.parse(raw));
   } catch {
     return null;
   }

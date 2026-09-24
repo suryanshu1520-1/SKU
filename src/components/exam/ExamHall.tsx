@@ -104,6 +104,16 @@ export default function ExamHall(props: ExamHallProps): React.ReactElement {
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
 
+  const rules: RulesPreset = session.attempt?.paper.rules ?? session.prefs.rules;
+
+  useEffect(() => {
+    if (session.phase !== 'sitting') {
+      setHandInOpen(false);
+      setShortcutsOpen(false);
+      setSheetOpen(false);
+    }
+  }, [session.phase]);
+
   const items = session.attempt?.paper.items ?? (EMPTY_ITEMS as PaperItem[]);
   const firstQid = items[0]?.qid ?? null;
   const [activeQid, setActiveQid] = useState<string | null>(null);
@@ -370,7 +380,7 @@ export default function ExamHall(props: ExamHallProps): React.ReactElement {
 
   useExamKeyboard({
     enabled: keyboardEnabled,
-    rules: session.prefs.rules,
+    rules,
     onChoose: handleKeyboardChoose,
     onStrike: handleKeyboardStrike,
     onTransfer: handleKeyboardTransfer,
@@ -523,6 +533,7 @@ export default function ExamHall(props: ExamHallProps): React.ReactElement {
             info={session.resumeInfo}
             secondsLeft={resumeSecondsLeft}
             submitting={false}
+            error={session.error}
             onResume={session.resumePaper}
             onHandIn={session.handInSavedPaper}
             onBack={props.onExit}
@@ -626,7 +637,7 @@ export default function ExamHall(props: ExamHallProps): React.ReactElement {
           circledOnly: sheetTallies.circledOnly,
           flagged: sheetTallies.flagged,
         }}
-        rules={session.prefs.rules}
+        rules={rules}
         saveState={session.saveState}
         prefs={session.prefs}
         fullscreen={fullscreen}
@@ -648,7 +659,7 @@ export default function ExamHall(props: ExamHallProps): React.ReactElement {
         <Booklet
           mode="sitting"
           items={items}
-          rules={session.prefs.rules}
+          rules={rules}
           sheet={session.sheetState.sheet}
           activeQid={activeQid}
           graceQids={session.graceQids}
@@ -663,7 +674,7 @@ export default function ExamHall(props: ExamHallProps): React.ReactElement {
             variant="panel"
             items={items}
             sheet={session.sheetState.sheet}
-            rules={session.prefs.rules}
+            rules={rules}
             activeQid={activeQid}
             roll={session.roll}
             series={session.series}
@@ -687,7 +698,7 @@ export default function ExamHall(props: ExamHallProps): React.ReactElement {
           variant="sheet"
           items={items}
           sheet={session.sheetState.sheet}
-          rules={session.prefs.rules}
+          rules={rules}
           activeQid={activeQid}
           roll={session.roll}
           series={session.series}

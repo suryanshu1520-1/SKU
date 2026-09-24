@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "tark-dev-verify",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "set PORT=3107&& npm run dev"],
+      "port": 3107
     }
   ]
 }

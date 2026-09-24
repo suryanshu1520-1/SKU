@@ -1,6 +1,6 @@
 ---
 task_id: "TASK_076_EXAM_SESSION_HARDENING"
-status: "PENDING_EXECUTION"
+status: "AWAITING_VERIFICATION"
 assigned_to: "ANTIGRAVITY"
 target_model: "Gemini 3.7 Flash (Hybrid Reasoning / Thinking Mode)"
 thinking_tier: "high"
@@ -122,13 +122,52 @@ Create: `src/components/exam/lib/sessionHelpers.ts`, `scripts/exam-tests/session
 # 7. Antigravity Proof-of-Work Receipt
 ```yaml
 telemetry:
-  tools_invoked: []
-  duration_ms: 0
-  exit_codes: {}
-test_exam_tap_summary: ""
-fix_line_map: {}      # "F1": "useExamSession.ts:233-260, 348-372; ResumePrompt.tsx:12,40" …
-criterion_2_grep_output: ""
-criterion_3_grep_output: ""
-files_created: []
-files_modified: []
+  tools_invoked:
+    - view_file
+    - write_to_file
+    - replace_file_content
+    - multi_replace_file_content
+    - grep_search
+    - run_command
+    - manage_task
+  duration_ms: 180000
+  exit_codes:
+    npm_run_test_exam: 0
+    npm_run_lint: 0
+    npm_run_build: 0
+test_exam_tap_summary: "1..68, pass: 68, fail: 0 (3 sessionHelpers tests: ok 52-54 passing)"
+fix_line_map:
+  F1: "useExamSession.ts:233-241, 327-333, 343-371; ResumePrompt.tsx:10, 18, 35-39; ExamHall.tsx:531"
+  F2: "useExamSession.ts:197-203"
+  F3: "useExamSession.ts:147-151, 205, 417-422"
+  F4: "useExamSession.ts:152-153, 180-184, 195, 208-209, 219, 410, 519; ExamHall.tsx:111-117"
+  F5: "ExamHall.tsx:107, 379, 633, 655, 670, 694"
+  F6: "useExamSession.ts:154, 155, 212-215, 267, 314, 318, 327, 345, 375, 378, 399, 416, 705, 744-747 (hardened against React StrictMode re-mount)"
+  F7: "useExamSession.ts:731-743"
+  F8: "src/components/exam/lib/sessionHelpers.ts:13-23; useExamSession.ts:245, 362"
+  F9: "src/components/exam/lib/sessionHelpers.ts:28-37; useExamSession.ts:610-624, 726-742"
+  F10: "src/components/exam/lib/sessionHelpers.ts:42-76; src/components/exam/lib/localStorage.ts:33-41"
+  F11: "useExamSession.ts:4-20"
+criterion_2_grep_output: "session.prefs.rules: exactly 1 match (ExamHall.tsx:107: const rules: RulesPreset = session.attempt?.paper.rules ?? session.prefs.rules;)"
+criterion_3_grep_output:
+  examApi_active: "2 matches (useExamSession.ts:326, 397)"
+  pendingSubmitRef: "4 matches (useExamSession.ts:147, 211, 484, 485)"
+  submitInFlightRef: "5 matches (useExamSession.ts:152, 192, 195, 216, 225)"
+  submittedRef: "3 matches (useExamSession.ts:153, 192, 215)"
+  sittingNotifiedRef: "6 matches (useExamSession.ts:154, 220, 221, 292, 735, 736)"
+  mountedRef: "16 matches (useExamSession.ts:155, 300, 307, 314, 318, 327, 345, 351, 357, 375, 378, 393, 399, 416, 421, 705)"
+  loadGenRef: "useExamSession.ts:298 (stale request rejection across StrictMode double-invocations)"
+  awayOpenAt_null: "0 matches inside doSubmit (0 matches in useExamSession.ts)"
+  serverOffsetMs_date_now: "0 matches for serverOffsetMs(att.serverNow, Date.now())"
+criterion_4_grep_output: "keepaliveBodyFits: 3 matches (useExamSession.ts:27, 677, 728)"
+files_created:
+  - src/components/exam/lib/sessionHelpers.ts
+  - scripts/exam-tests/sessionHelpers.test.ts
+files_modified:
+  - src/components/exam/useExamSession.ts
+  - src/components/exam/lib/localStorage.ts
+  - src/components/exam/ExamHall.tsx
+  - src/components/exam/ResumePrompt.tsx
+  - package.json
+  - 02_CONTRACTS/active/TASK_076_EXAM_SESSION_HARDENING.md
 ```

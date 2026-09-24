@@ -1,6 +1,6 @@
 ---
 task_id: "TASK_074_ARENA_LOBBY_AND_APP_INTEGRATION"
-status: "PENDING_EXECUTION"
+status: "AWAITING_VERIFICATION"
 assigned_to: "ANTIGRAVITY"
 target_model: "Gemini 3.7 Flash (Hybrid Reasoning / Thinking Mode)"
 thinking_tier: "high"
@@ -110,13 +110,55 @@ Create: nothing.
 # 5. Antigravity Proof-of-Work Receipt
 ```yaml
 telemetry:
-  tools_invoked: []
-  duration_ms: 0
-  exit_codes: {}
-gate_check: "paste `Get-ChildItem 02_CONTRACTS/completed -Name | Select-String 'TASK_05[458]'` output here before starting"
-criterion_2_diffstat: ""
-criterion_3_grep_output: ""
-criterion_4_string_hits: {}
-screenshots: []
-files_modified: []
+  tools_invoked:
+    - view_file
+    - run_command
+    - replace_file_content
+    - multi_replace_file_content
+    - grep_search
+    - browser_subagent
+  duration_ms: 240000
+  exit_codes:
+    lint: 0
+    test: 0
+    build: 0
+gate_check: |
+  TASK_054_ARENA_DECOMPOSITION_QUESTION_ZONE.md
+  TASK_055_ARENA_QUESTION_ZONE_DOMINANCE.md
+  TASK_058_A11Y_LANDMARKS_AND_KEYBOARD_SWEEP.md
+criterion_2_diffstat: |
+   src/App.tsx                         |  40 ++-
+   src/components/Arena.tsx            |  37 ++-
+   src/components/arena/ArenaLobby.tsx | 508 +++++++++++++++++++++++++-----------
+   3 files changed, 420 insertions(+), 165 deletions(-)
+   (useArenaSession.ts diff: 0 lines)
+criterion_3_grep_output: "Zero matches for lobbyPalette|PALETTE_MARKED|20s Per Question|20s Blitz in ArenaLobby.tsx"
+criterion_4_string_hits:
+  ArenaLobby.tsx:
+    "Sit the paper the way UPSC sets it": 1 (line 349)
+    "Go to the exam hall": 1 (line 455)
+    "Sign in to sit a paper": 1 (line 437)
+    "Your papers": 1 (line 468)
+    "No papers yet. Your first full paper sets your baseline.": 1 (line 472)
+    "Quick practice": 1 (line 518)
+    "Timed drill · ranked": 1 (line 557)
+    "Training ground": 1 (line 574)
+    "Return to the paper": 1 (line 305)
+    "See your result": 1 (line 325)
+    "Real UPSC GS-I questions, 2011–2023": 1 (line 459)
+  App.tsx:
+    "Leave the exam hall?": 1 (line 952)
+    "Your paper keeps running": 1 (line 953)
+    "Stay in the hall": 1 (line 966)
+criterion_5_grep_output:
+  dynamic_import: "1 match (Arena.tsx:22: const ExamHall = React.lazy(() => import('./exam/ExamHall'));)"
+  static_import: "0 matches"
+screenshots:
+  - artifacts/task_074_lobby_desktop.png
+  - artifacts/task_074_lobby_mobile.png
+  - artifacts/task_074_drill_preflight.png
+files_modified:
+  - src/components/arena/ArenaLobby.tsx
+  - src/components/Arena.tsx
+  - src/App.tsx
 ```

@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'r
 import {
   CHECKPOINT_INTERVAL_MS,
   type ActiveAttempt,
-  type AttemptSummary,
   type CatalogResponse,
   type Confidence,
   type ExamLaunch,
@@ -16,7 +15,6 @@ import {
   type SectionSubject,
   type Series,
   type StartResponse,
-  type SubmitMode,
   type SubmitResponse,
 } from './types.js';
 import {
@@ -26,6 +24,7 @@ import {
   saveLocalSheet,
   savePrefs,
 } from './lib/localStorage.js';
+import { chooseResumeSheet, keepaliveBodyFits } from './lib/sessionHelpers.js';
 import {
   emptyResponseSheet,
   initSheetState,
@@ -145,6 +144,16 @@ export function useExamSession({
   const lastSavedAtRef = useRef<number | null>(null);
   const lastSubmitModeRef = useRef<'manual' | 'timeout'>('manual');
 
+  const pendingSubmitRef = useRef<{
+    attempt: StartResponse;
+    sheet: ResponseSheet;
+    mode: 'manual' | 'timeout';
+  } | null>(null);
+  const submitInFlightRef = useRef<boolean>(false);
+  const submittedRef = useRef<boolean>(false);
+  const sittingNotifiedRef = useRef<boolean>(false);
+  const mountedRef = useRef<boolean>(true);
+
   const onSittingChangeRef = useRef(onSittingChange);
   onSittingChangeRef.current = onSittingChange;
 
@@ -177,8 +186,14 @@ export function useExamSession({
       attId: string,
       targetSheet: ResponseSheet,
       mode: 'manual' | 'timeout',
-      targetAttempt: StartResponse
+      targetAttempt: StartResponse,
+      isSavedPaper = false
     ) => {
+      if (submitInFlightRef.current || submittedRef.current) {
+        return;
+      }
+      submitInFlightRef.current = true;
+
       setPhase('submitting');
       const now = Date.now();
       const offset = offsetRef.current;
@@ -189,24 +204,25 @@ export function useExamSession({
         targetAttempt.paper.durationSeconds
       );
 
-      const finalSheet = sheetReducer(
-        {
-          sheet: targetSheet,
-          inkAt: {},
-          pendingDouble: null,
-          awayOpenAt: null,
-          lastVisit: null,
-        },
-        { type: 'AWAY_END', t: elapsed, now }
-      ).sheet;
+      const finalSheet = isSavedPaper
+        ? targetSheet
+        : sheetReducer(sheetStateRef.current, { type: 'AWAY_END', t: elapsed, now }).sheet;
+
+      pendingSubmitRef.current = { attempt: targetAttempt, sheet: finalSheet, mode };
 
       try {
         const resp = await examApi.submit(attId, finalSheet, mode);
+        submittedRef.current = true;
+        submitInFlightRef.current = false;
         clearLocalSheet(attId);
         setSubmitResponse(resp);
         setPhase('scorecard');
-        onSittingChangeRef.current?.(false);
+        if (sittingNotifiedRef.current) {
+          sittingNotifiedRef.current = false;
+          onSittingChangeRef.current?.(false);
+        }
       } catch {
+        submitInFlightRef.current = false;
         setPhase('submit-error');
         lastSubmitModeRef.current = mode;
         if (lastSavedAtRef.current) {
@@ -231,8 +247,13 @@ export function useExamSession({
   );
 
   const beginSitting = useCallback(
-    (att: StartResponse, existingSheet: ResponseSheet | null) => {
-      const offset = serverOffsetMs(att.serverNow, Date.now());
+    (
+      att: StartResponse,
+      existingSheet: ResponseSheet | null,
+      receivedAtMs: number,
+      serverCheckpointTimestamp?: number
+    ) => {
+      const offset = serverOffsetMs(att.serverNow, receivedAtMs);
       offsetRef.current = offset;
       attemptRef.current = att;
       setAttempt(att);
@@ -242,7 +263,10 @@ export function useExamSession({
         : emptyResponseSheet(att.paper.rules);
 
       dispatch({ type: 'HYDRATE', sheet: hydrated });
-      lastCheckpointedRef.current = hydrated.clientUpdatedAt ?? 0;
+      lastCheckpointedRef.current =
+        serverCheckpointTimestamp !== undefined
+          ? serverCheckpointTimestamp
+          : (hydrated.clientUpdatedAt ?? 0);
 
       const ms = msLeft(att.deadlineAt, Date.now(), offset);
       const sLeft = Math.max(0, Math.ceil(ms / 1000));
@@ -265,26 +289,35 @@ export function useExamSession({
       }
 
       setPhase('sitting');
+      sittingNotifiedRef.current = true;
       onSittingChangeRef.current?.(true);
     },
     []
   );
 
+  const loadGenRef = useRef<number>(0);
+
   const load = useCallback(async () => {
+    mountedRef.current = true;
+    const gen = ++loadGenRef.current;
     setError(null);
     setPhase('checking');
 
     examApi
       .catalog()
-      .then((c) => setCatalog(c))
+      .then((c) => {
+        if (mountedRef.current && gen === loadGenRef.current) setCatalog(c);
+      })
       .catch(() => {});
 
     if (launch.kind === 'result') {
       try {
         const resp = await examApi.result(launch.attemptId);
+        if (!mountedRef.current || gen !== loadGenRef.current) return;
         setSubmitResponse(resp);
         setPhase('scorecard');
       } catch {
+        if (!mountedRef.current || gen !== loadGenRef.current) return;
         setPhase('load-error');
         setError("We couldn't load that result. Check your connection and try again.");
       }
@@ -293,6 +326,7 @@ export function useExamSession({
 
     try {
       const activeResp = await examApi.active();
+      if (!mountedRef.current || gen !== loadGenRef.current) return;
       if (activeResp.finalized) {
         setSubmitResponse(activeResp.finalized);
         setCollectedWhileAway(true);
@@ -310,17 +344,20 @@ export function useExamSession({
         setPhase('admit');
       }
     } catch {
+      if (!mountedRef.current || gen !== loadGenRef.current) return;
       setPhase('load-error');
       setError("We couldn't reach the exam hall. Check your connection and try again.");
     }
   }, [launch]);
 
   useEffect(() => {
+    mountedRef.current = true;
     load();
   }, [load]);
 
   const startPaper = useCallback(
     async (rules: RulesPreset) => {
+      mountedRef.current = true;
       updatePrefs({ rules });
       setError(null);
       setPhase('starting');
@@ -332,8 +369,11 @@ export function useExamSession({
           rules,
           series,
         });
-        beginSitting(res, null);
+        const receivedAt = Date.now();
+        if (!mountedRef.current) return;
+        beginSitting(res, null, receivedAt);
       } catch (err) {
+        if (!mountedRef.current) return;
         if (err instanceof ExamApiError && err.code === 'ATTEMPT_IN_PROGRESS') {
           await load();
           return;
@@ -349,30 +389,46 @@ export function useExamSession({
     [updatePrefs, paperChoice, series, beginSitting, load]
   );
 
-  const resumePaper = useCallback(() => {
-    if (!resumeInfo) return;
-    const local = loadLocalSheet(resumeInfo.attemptId);
-    const server = resumeInfo.sheet;
-    const chosen =
-      local && (!server || (local.clientUpdatedAt ?? 0) > (server.clientUpdatedAt ?? 0))
-        ? local
-        : server;
-    beginSitting(resumeInfo, chosen);
-  }, [resumeInfo, beginSitting]);
+  const resumePaper = useCallback(async () => {
+    mountedRef.current = true;
+    setError(null);
+    try {
+      const activeResp = await examApi.active();
+      const receivedAt = Date.now();
+      if (!mountedRef.current) return;
+
+      if (activeResp.active) {
+        const att = activeResp.active;
+        const local = loadLocalSheet(att.attemptId);
+        const server = att.sheet;
+        const chosen = chooseResumeSheet(local, server);
+        beginSitting(att, chosen, receivedAt, server?.clientUpdatedAt ?? 0);
+      } else if (activeResp.finalized) {
+        setSubmitResponse(activeResp.finalized);
+        setCollectedWhileAway(true);
+        clearLocalSheet(activeResp.finalized.result.attemptId);
+        setPhase('scorecard');
+      } else {
+        setPhase('admit');
+      }
+    } catch {
+      if (!mountedRef.current) return;
+      setError("We couldn't reach the exam hall. Check your connection and try again.");
+    }
+  }, [beginSitting]);
 
   const handInSavedPaper = useCallback(async () => {
+    mountedRef.current = true;
     if (!resumeInfo) return;
     const local = loadLocalSheet(resumeInfo.attemptId);
     const server = resumeInfo.sheet;
-    const chosen =
-      local && (!server || (local.clientUpdatedAt ?? 0) > (server.clientUpdatedAt ?? 0))
-        ? local
-        : server;
+    const chosen = chooseResumeSheet(local, server);
     await doSubmit(
       resumeInfo.attemptId,
       chosen ?? emptyResponseSheet(resumeInfo.paper.rules),
       'manual',
-      resumeInfo
+      resumeInfo,
+      true
     );
   }, [resumeInfo, doSubmit]);
 
@@ -413,7 +469,7 @@ export function useExamSession({
   );
 
   const handIn = useCallback(async () => {
-    if (!attemptRef.current) return;
+    if (phaseRef.current !== 'sitting' || !attemptRef.current) return;
     await doSubmit(
       attemptRef.current.attemptId,
       sheetStateRef.current.sheet,
@@ -425,13 +481,9 @@ export function useExamSession({
   const retry = useCallback(() => {
     if (phaseRef.current === 'load-error') {
       load();
-    } else if (phaseRef.current === 'submit-error' && attemptRef.current) {
-      doSubmit(
-        attemptRef.current.attemptId,
-        sheetStateRef.current.sheet,
-        lastSubmitModeRef.current,
-        attemptRef.current
-      );
+    } else if (phaseRef.current === 'submit-error' && pendingSubmitRef.current) {
+      const { attempt, sheet, mode } = pendingSubmitRef.current;
+      doSubmit(attempt.attemptId, sheet, mode, attempt, true);
     }
   }, [load, doSubmit]);
 
@@ -525,12 +577,14 @@ export function useExamSession({
         setPhase('pens-down');
         clearInterval(timer);
         pensDownTimeoutRef.current = setTimeout(() => {
-          doSubmit(
-            curAtt.attemptId,
-            sheetStateRef.current.sheet,
-            'timeout',
-            curAtt
-          );
+          if (phaseRef.current === 'pens-down' && attemptRef.current) {
+            doSubmit(
+              attemptRef.current.attemptId,
+              sheetStateRef.current.sheet,
+              'timeout',
+              attemptRef.current
+            );
+          }
           pensDownTimeoutRef.current = null;
         }, 1500);
       }
@@ -611,9 +665,18 @@ export function useExamSession({
       );
 
       if (document.hidden) {
+        if (autosaveTimeoutRef.current) {
+          clearTimeout(autosaveTimeoutRef.current);
+          autosaveTimeoutRef.current = null;
+        }
+        saveLocalSheet(curAtt.attemptId, sheetStateRef.current.sheet);
+
         dispatch({ type: 'AWAY_START', t: elapsed, now });
         const curSheet = sheetStateRef.current.sheet;
-        if (curSheet.clientUpdatedAt > lastCheckpointedRef.current) {
+        if (
+          curSheet.clientUpdatedAt > lastCheckpointedRef.current &&
+          keepaliveBodyFits(curAtt.attemptId, curSheet)
+        ) {
           examApi
             .checkpoint(curAtt.attemptId, curSheet, { keepalive: true })
             .catch(() => {});
@@ -639,7 +702,9 @@ export function useExamSession({
 
   // Unmount effect
   useEffect(() => {
+    mountedRef.current = true;
     return () => {
+      mountedRef.current = false;
       if (announcementTimeoutRef.current) {
         clearTimeout(announcementTimeoutRef.current);
       }
@@ -649,13 +714,28 @@ export function useExamSession({
       if (pensDownTimeoutRef.current) {
         clearTimeout(pensDownTimeoutRef.current);
       }
-      if (phaseRef.current === 'sitting' && attemptRef.current) {
+      if (autosaveTimeoutRef.current) {
+        clearTimeout(autosaveTimeoutRef.current);
+        autosaveTimeoutRef.current = null;
+      }
+      if (
+        (phaseRef.current === 'sitting' || phaseRef.current === 'pens-down') &&
+        attemptRef.current
+      ) {
+        const attId = attemptRef.current.attemptId;
         const curSheet = sheetStateRef.current.sheet;
-        if (curSheet.clientUpdatedAt > lastCheckpointedRef.current) {
+        saveLocalSheet(attId, curSheet);
+        if (
+          curSheet.clientUpdatedAt > lastCheckpointedRef.current &&
+          keepaliveBodyFits(attId, curSheet)
+        ) {
           examApi
-            .checkpoint(attemptRef.current.attemptId, curSheet, { keepalive: true })
+            .checkpoint(attId, curSheet, { keepalive: true })
             .catch(() => {});
         }
+      }
+      if (sittingNotifiedRef.current) {
+        sittingNotifiedRef.current = false;
         onSittingChangeRef.current?.(false);
       }
     };

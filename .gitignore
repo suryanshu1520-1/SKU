@@ -50,6 +50,7 @@ lerna-debug.log*
 
 # ── Diagnostics & Test Artifacts ──
 coverage/
+artifacts/
 *.lcov
 test-output.md
 ts_trace.txt

@@ -17,6 +17,9 @@ import { QuestionPalette } from './arena/QuestionPalette';
 import { QuestionBody } from './arena/QuestionBody';
 import { AnswerOption } from './arena/AnswerOption';
 import { ReviewControls } from './arena/ReviewControls';
+import type { ExamLaunch } from './exam/types';
+
+const ExamHall = React.lazy(() => import('./exam/ExamHall'));
 
 export interface ArenaProps {
   onComplete: (
@@ -32,18 +35,22 @@ export interface ArenaProps {
     percentile: number
   ) => void;
   userId: string;
+  candidateName?: string | null;
+  onRequestLogin?: () => void;
   targetPillar?: { id: string; title: string } | null;
   arenaConfig?: ArenaLaunchConfig | null;
   candidatePreferences?: CandidatePreferences;
   onClearTargetPillar?: () => void;
   onReturnToDashboard?: (originTab?: string) => void;
   onNavigateManifesto?: () => void;
-  onTestStatusChange?: (isActive: boolean) => void;
+  onTestStatusChange?: (isActive: boolean, kind?: 'drill' | 'exam') => void;
 }
 
 export default function Arena({
   onComplete,
   userId,
+  candidateName,
+  onRequestLogin,
   targetPillar,
   arenaConfig,
   candidatePreferences,
@@ -66,6 +73,28 @@ export default function Arena({
 
   const prefersReduced = useReducedMotion();
 
+  const [examLaunch, setExamLaunch] = React.useState<ExamLaunch | null>(null);
+  const [examKey, setExamKey] = React.useState(0);
+
+  if (examLaunch) {
+    return (
+      <React.Suspense fallback={<div className="min-h-[50vh] grid place-items-center text-sm text-muted">Opening the exam hall…</div>}>
+        <ExamHall
+          key={examKey}
+          launch={examLaunch}
+          userId={userId}
+          candidateName={candidateName ?? null}
+          onExit={() => setExamLaunch(null)}
+          onSittingChange={(active) => onTestStatusChange?.(active, 'exam')}
+          onStartPaper={(paperCode, subject) => {
+            setExamLaunch({ kind: 'new', paperCode, subject });
+            setExamKey((k) => k + 1);
+          }}
+        />
+      </React.Suspense>
+    );
+  }
+
   // 1. RENDER: INTRO LOBBY
   if (session.arenaPhase === 'intro' && !session.showTrainingSetup) {
     return (
@@ -81,6 +110,12 @@ export default function Arena({
         showPreflightModal={session.showPreflightModal}
         setShowPreflightModal={session.setShowPreflightModal}
         motivation={session.motivation}
+        isGuest={userId === 'guest'}
+        onOpenExam={(launch) => {
+          setExamLaunch(launch);
+          setExamKey((k) => k + 1);
+        }}
+        onRequestLogin={onRequestLogin}
         onClearTargetPillar={onClearTargetPillar}
         onResumeSavedSession={session.handleResumeSavedSession}
         onDiscardSavedSession={session.handleDiscardSavedSession}

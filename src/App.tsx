@@ -44,6 +44,7 @@ export default function App() {
 
   // Active Arena Test Guard
   const [isArenaQuizActive, setIsArenaQuizActive] = useState(false);
+  const [activeTestKind, setActiveTestKind] = useState<'drill' | 'exam' | null>(null);
   const [pendingNavAction, setPendingNavAction] = useState<(() => void) | null>(null);
   const [showNavAbandonModal, setShowNavAbandonModal] = useState(false);
 
@@ -110,6 +111,8 @@ export default function App() {
       return false;
     }
   });
+
+  const railExpanded = isRailExpanded && !isArenaQuizActive;
 
   const handleToggleNavOrientation = () => {
     const next = navOrientation === 'horizontal' ? 'vertical' : 'horizontal';
@@ -186,12 +189,15 @@ export default function App() {
   };
 
   const handleConfirmAbandonNavigation = () => {
-    try {
-      localStorage.removeItem('tark_arena_session');
-      localStorage.removeItem('tark_active_session');
-      localStorage.removeItem('tark_arena_results');
-    } catch {}
+    if (activeTestKind !== 'exam') {
+      try {
+        localStorage.removeItem('tark_arena_session');
+        localStorage.removeItem('tark_active_session');
+        localStorage.removeItem('tark_arena_results');
+      } catch {}
+    }
     setIsArenaQuizActive(false);
+    setActiveTestKind(null);
     setTargetPillar(null);
     setArenaConfig(null);
     setShowNavAbandonModal(false);
@@ -462,7 +468,7 @@ export default function App() {
             activeTab={activeTab}
             isLanding={gameState === 'landing'}
             userEmail={userEmail}
-            isExpanded={isRailExpanded}
+            isExpanded={railExpanded}
             candidatePreferences={preferences}
             onToggleExpand={handleToggleRailExpand}
             onNavigateTab={navigateToTab}
@@ -694,7 +700,7 @@ export default function App() {
           tabIndex={-1}
           className={`w-full transition-all duration-300 outline-none ${
             navOrientation === 'vertical'
-              ? isRailExpanded
+              ? railExpanded
                 ? 'md:pl-56 pt-6 pb-12'
                 : 'md:pl-16 pt-6 pb-12'
               : 'pt-28 md:pt-24 pb-12'
@@ -807,6 +813,8 @@ export default function App() {
             <Arena
               onComplete={handleArenaComplete}
               userId={userId || 'guest'}
+              candidateName={userEmail ? userEmail.split('@')[0] : null}
+              onRequestLogin={() => setGameState('login')}
               targetPillar={targetPillar}
               arenaConfig={arenaConfig}
               candidatePreferences={preferences}
@@ -818,11 +826,15 @@ export default function App() {
                 setTargetPillar(null);
                 setArenaConfig(null);
                 setIsArenaQuizActive(false);
+                setActiveTestKind(null);
                 setGameState('arena');
                 setActiveTab((originTab as any) || 'arena');
               }}
               onNavigateManifesto={handleNavigateManifesto}
-              onTestStatusChange={setIsArenaQuizActive}
+              onTestStatusChange={(active, kind) => {
+                setIsArenaQuizActive(active);
+                setActiveTestKind(active ? (kind ?? 'drill') : null);
+              }}
             />
           ) : (
             <Autopsy
@@ -937,25 +949,27 @@ export default function App() {
       <Modal
         isOpen={showNavAbandonModal}
         onClose={handleCancelAbandonNavigation}
-        title="Abandon Active Crucible?"
-        subtitle="Unsaved assessment progress will be discarded"
+        title={activeTestKind === 'exam' ? 'Leave the exam hall?' : 'Abandon Active Crucible?'}
+        subtitle={activeTestKind === 'exam' ? 'Your paper keeps running' : 'Unsaved assessment progress will be discarded'}
       >
         <div className="space-y-4 font-sans text-left">
           <p className="text-xs text-primary leading-relaxed">
-            You are currently engaged in an active test session. Navigating away to another feature will permanently discard your progress in this crucible.
+            {activeTestKind === 'exam'
+              ? "The clock doesn't stop when you leave. Your answers are saved; come back to Arena to continue before time runs out."
+              : 'You are currently engaged in an active test session. Navigating away to another feature will permanently discard your progress in this crucible.'}
           </p>
           <div className="flex gap-3 pt-2">
             <button
               onClick={handleCancelAbandonNavigation}
               className="flex-1 py-2.5 bg-surface-elevated hover:bg-surface-elevated border border-border text-primary font-sans text-xs font-medium uppercase rounded-sm transition-all cursor-pointer"
             >
-              Resume Test
+              {activeTestKind === 'exam' ? 'Stay in the hall' : 'Resume Test'}
             </button>
             <button
               onClick={handleConfirmAbandonNavigation}
               className="flex-1 py-2.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-sans text-xs font-medium uppercase rounded-sm transition-all cursor-pointer"
             >
-              Abandon & Leave
+              {activeTestKind === 'exam' ? 'Leave' : 'Abandon & Leave'}
             </button>
           </div>
         </div>
