@@ -114,7 +114,7 @@ export const ExamBar: React.FC<ExamBarProps> = ({
       : 'text-primary';
 
   return (
-    <header className="sticky top-[104px] md:top-0 z-30 -mx-4 md:-mx-8 px-4 md:px-8 py-2 min-h-[52px] md:min-h-[56px] flex flex-wrap items-center gap-x-4 gap-y-1 bg-surface/95 backdrop-blur-sm border-b border-border">
+    <header className="sticky top-[108px] md:top-0 z-30 -mx-4 md:-mx-8 px-4 md:px-8 py-2 min-h-[52px] md:min-h-[56px] flex flex-wrap items-center gap-x-4 gap-y-1 bg-surface/95 backdrop-blur-sm border-b border-border">
       {/* Left: Paper identity and Series */}
       <div className="flex items-center gap-2 mr-auto sm:mr-0">
         <b className="font-semibold text-primary">GS Paper I</b>

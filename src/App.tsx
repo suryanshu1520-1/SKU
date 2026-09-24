@@ -510,12 +510,10 @@ export default function App() {
 
             {/* Navigation Tabs - Animated Pill */}
             <nav
-              className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0"
+              className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 scroll-smooth"
               style={{
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none',
-                WebkitMaskImage: 'linear-gradient(to right, black calc(100% - 32px), transparent 100%)',
-                maskImage: 'linear-gradient(to right, black calc(100% - 32px), transparent 100%)',
               }}
             >
               <LayoutGroup id="app-nav-pills">
@@ -540,7 +538,7 @@ export default function App() {
                       whileTap={{ scale: 0.98 }}
                       aria-current={isActive ? 'page' : undefined}
                       aria-label={item.label}
-                      className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-md outline-none group cursor-pointer focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80"
+                      className="relative px-2.5 sm:px-3 py-1.5 flex items-center justify-center shrink-0 rounded-md outline-none group cursor-pointer focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80"
                       title={`${item.label} (Alt+${item.hotkey})`}
                     >
                       {isActive && (
@@ -574,7 +572,7 @@ export default function App() {
                     whileTap={{ scale: 0.98 }}
                     aria-current={gameState !== 'landing' && activeTab === 'profile' ? 'page' : undefined}
                     aria-label={PROFILE_NAV_ITEM.label}
-                    className="relative px-3 py-1.5 flex items-center justify-center shrink-0 rounded-md outline-none group cursor-pointer focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80"
+                    className="relative px-2.5 sm:px-3 py-1.5 flex items-center justify-center shrink-0 rounded-md outline-none group cursor-pointer focus-visible:ring-2 focus-visible:ring-[#e0d0ab]/80"
                     title={`${PROFILE_NAV_ITEM.label} (Alt+${PROFILE_NAV_ITEM.hotkey})`}
                   >
                     {gameState !== 'landing' && activeTab === 'profile' && (
@@ -664,12 +662,12 @@ export default function App() {
         <main
           id="main-content"
           tabIndex={-1}
-          className={`transition-all duration-300 outline-none pt-[104px] md:pt-0 ${
+          className={`transition-all duration-300 outline-none pt-[108px] md:pt-0 ${
             navOrientation === 'vertical'
               ? isRailExpanded
                 ? 'md:pl-56'
                 : 'md:pl-16'
-              : 'pt-24'
+              : 'md:pt-24'
           }`}
           style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
         >
@@ -698,12 +696,12 @@ export default function App() {
         <main
           id="main-content"
           tabIndex={-1}
-          className={`w-full transition-all duration-300 outline-none ${
+          className={`w-full transition-all duration-300 outline-none pt-[108px] ${
             navOrientation === 'vertical'
               ? railExpanded
-                ? 'md:pl-56 pt-6 pb-12'
-                : 'md:pl-16 pt-6 pb-12'
-              : 'pt-28 md:pt-24 pb-12'
+                ? 'md:pl-56 md:pt-6 pb-12'
+                : 'md:pl-16 md:pt-6 pb-12'
+              : 'md:pt-24 pb-12'
           } ${activeTab === 'humanities' || activeTab === 'observatory' ? 'max-w-none px-0' : 'max-w-7xl mx-auto px-4 md:px-8'}`}
           style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
         >
