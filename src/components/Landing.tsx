@@ -81,17 +81,23 @@ export default function Landing({
 
   return (
     <div className="w-full min-h-screen bg-[#050b1a] text-[#f4ecd8] font-serif relative overflow-x-hidden selection:bg-[#e0d0ab] selection:text-[#050b1a]">
-      {/* ── Ambient Radial Glows ── */}
+      {/* ── Ambient Radial Glows (Seamless Full-Bleed Atmosphere, Zero Hard Seams) ── */}
       <div
-        className="pointer-events-none absolute -top-[400px] left-1/2 -translate-x-1/2 w-[1600px] h-[900px] z-0"
+        className="pointer-events-none absolute -top-[280px] left-1/2 -translate-x-1/2 w-[1920px] h-[980px] z-0"
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(14,44,92,0.85) 0%, rgba(10,33,72,0.4) 35%, rgba(7,22,48,0.0) 65%)',
+          background: 'radial-gradient(ellipse 70% 60% at 50% 35%, rgba(14,44,92,0.78) 0%, rgba(10,33,72,0.36) 42%, rgba(5,11,26,0) 72%)',
         }}
       />
       <div
-        className="pointer-events-none absolute top-[200px] -right-[200px] w-[800px] h-[800px] z-0"
+        className="pointer-events-none absolute top-[60px] left-[5%] w-[1100px] h-[750px] z-0 opacity-70"
         style={{
-          background: 'radial-gradient(circle, rgba(224,208,171,0.06) 0%, rgba(224,208,171,0.0) 60%)',
+          background: 'radial-gradient(ellipse 60% 50% at center, rgba(14,44,92,0.50) 0%, rgba(10,33,72,0.18) 48%, transparent 72%)',
+        }}
+      />
+      <div
+        className="pointer-events-none absolute top-[180px] -right-[150px] w-[800px] h-[800px] z-0"
+        style={{
+          background: 'radial-gradient(circle at center, rgba(224,208,171,0.06) 0%, rgba(224,208,171,0.0) 60%)',
         }}
       />
 
@@ -120,14 +126,12 @@ export default function Landing({
              SECTION 1: FOLD (Hero Promise + Diagnostic Preview)
              ═══════════════════════════════════════════════════════════════════ */}
         <section aria-labelledby="h-promise" className="relative px-10 lg:px-16 pt-16 lg:pt-20 pb-16">
-          <div aria-hidden="true" className="absolute left-0 top-0 w-[1100px] h-[720px] bg-[radial-gradient(ellipse_70%_70%_at_0%_0%,rgba(14,44,92,0.72)_0%,rgba(10,33,72,0.28)_45%,rgba(5,11,26,0)_75%)] pointer-events-none" />
-
           <motion.h1
             id="h-promise"
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
-            className="m-0 max-w-[1120px] font-sans font-extrabold text-[58px] lg:text-[76px] leading-[1.0] tracking-[-0.035em] text-[#f4ecd8] text-balance"
+            className="m-0 max-w-[1120px] font-sans font-extrabold text-[58px] lg:text-[76px] leading-[1.06] tracking-[-0.035em] text-[#f4ecd8] text-balance"
           >
             Diagnose your UPSC readiness and improve with <span className="text-[#e0d0ab]">evidence.</span>
           </motion.h1>
@@ -139,7 +143,7 @@ export default function Landing({
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1, ease: [0.32, 0.72, 0, 1] }}
-                className="m-0 max-w-[440px] font-serif text-[19px] lg:text-[20px] leading-[1.5] text-[#b5c1d1]"
+                className="m-0 max-w-[440px] font-serif text-[19px] lg:text-[20px] leading-[1.55] text-[#b5c1d1]"
               >
                 Timed Prelims questions with real negative marking, scored on our server. Every miss comes back explained.
               </motion.p>
