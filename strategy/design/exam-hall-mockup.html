@@ -1,0 +1,1080 @@
+<title>Tark Exam Hall</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+  :root {
+    color-scheme: dark;
+    --desk: #041228;
+    --surface: #071630;
+    --elev: #0a2148;
+    --rail: #041936;
+    --border: rgba(224, 208, 171, 0.14);
+    --border-subtle: rgba(224, 208, 171, 0.08);
+    --text: #f4ecd8;
+    --text-2: #b5c1d1;
+    --muted: #8fa2bd;
+    --gold: #e0d0ab;
+    --amber: #f59e0b;
+    --rose: #f87171;
+    --emerald: #34d399;
+    --sans: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --serif: "Newsreader", Georgia, "Times New Roman", serif;
+    --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+  .exam-hall {
+    --eh-desk: #041228;
+    --eh-paper: #f7f2e6;
+    --eh-paper-edge: #e3d9c2;
+    --eh-sheet: #f1ead8;
+    --eh-ink: #1a2130;
+    --eh-ink-soft: #475063;
+    --eh-ink-faint: #6b7282;
+    --eh-print: rgba(7, 46, 99, 0.62);
+    --eh-print-faint: rgba(7, 46, 99, 0.16);
+    --eh-bubble-ink: #111a2b;
+    --eh-bubble-letter: #f1ead8;
+    --eh-pencil: #8a6a22;
+    --eh-pencil-text: #6f5418;
+    --eh-flag: #b45309;
+    --eh-warn: #b45309;
+    --eh-danger: #b91c1c;
+    --eh-correct: #047857;
+  }
+  .exam-hall[data-booklet="night"] {
+    --eh-paper: #0c1f3f;
+    --eh-paper-edge: rgba(224, 208, 171, 0.14);
+    --eh-sheet: #0a1a36;
+    --eh-ink: #efe7d3;
+    --eh-ink-soft: #b5c1d1;
+    --eh-ink-faint: #8fa2bd;
+    --eh-print: rgba(224, 208, 171, 0.55);
+    --eh-print-faint: rgba(224, 208, 171, 0.14);
+    --eh-bubble-ink: #e0d0ab;
+    --eh-bubble-letter: #0a1a36;
+    --eh-pencil: #e0d0ab;
+    --eh-pencil-text: #e0d0ab;
+    --eh-flag: #f59e0b;
+    --eh-warn: #f59e0b;
+    --eh-danger: #f87171;
+    --eh-correct: #34d399;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body {
+    margin: 0;
+    background: var(--desk);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.5;
+    padding-inline: 16px;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 4px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+  /* ── Mockup chrome (not product UI) ── */
+  .mock-wrap { max-width: 1440px; margin: 0 auto; padding-block: 20px 48px; display: grid; gap: 16px; }
+  .mock-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+  .mock-title { font-weight: 700; font-size: 18px; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+  .mock-title small { display: block; font-weight: 500; font-size: 12px; color: var(--muted); letter-spacing: 0; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+  .tabs button { padding: 6px 12px; border-radius: 6px; color: var(--text-2); font-size: 13px; font-weight: 500; }
+  .tabs button[aria-selected="true"] { background: var(--gold); color: #050b1a; }
+  .mock-tools { display: flex; align-items: center; gap: 10px; margin-left: auto; font-size: 12px; color: var(--muted); }
+  .pill-toggle { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+  .pill-toggle button { padding: 4px 10px; font-size: 12px; color: var(--text-2); }
+  .pill-toggle button[aria-pressed="true"] { background: var(--elev); color: var(--gold); }
+  .note { border: 1px dashed rgba(224, 208, 171, 0.3); border-radius: 8px; padding: 10px 14px; font-size: 13px; color: var(--text-2); background: rgba(10, 33, 72, 0.4); }
+  .note b { color: var(--gold); font-weight: 600; }
+  .note ol { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 2px; }
+  .sample-tag { display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(245, 158, 11, 0.45); color: #fcd9a0; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+
+  /* ── App shell depiction ── */
+  .app { display: grid; grid-template-columns: 64px minmax(0, 1fr); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--desk); min-height: 780px; }
+  .rail { background: var(--rail); border-right: 1px solid rgba(19, 108, 153, 0.35); display: flex; flex-direction: column; align-items: center; gap: 6px; padding-block: 14px; }
+  .rail .logo { width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center; background: rgba(224, 208, 171, 0.12); color: var(--gold); font-family: var(--serif); font-weight: 600; font-size: 18px; margin-bottom: 14px; }
+  .rail .ic { width: 40px; height: 40px; border-radius: 8px; display: grid; place-items: center; color: #8fa2bd; position: relative; }
+  .rail .ic.on { color: var(--gold); background: rgba(224, 208, 171, 0.1); }
+  .rail .ic.on::before { content: ""; position: absolute; left: -12px; top: 10px; bottom: 10px; width: 3px; border-radius: 2px; background: var(--gold); }
+  .rail svg { width: 18px; height: 18px; }
+  .main { min-width: 0; display: flex; flex-direction: column; }
+
+  /* ── Exam bar ── */
+  .bar { position: sticky; top: 0; z-index: 6; display: flex; align-items: center; gap: 18px; min-height: 56px; padding: 8px 20px; background: rgba(7, 22, 48, 0.96); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .bar .paper-id { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+  .bar .paper-id b { font-weight: 600; }
+  .bar .paper-id .sub { color: var(--muted); }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); font-size: 11px; color: var(--text-2); font-family: var(--mono); }
+  .readouts { display: flex; gap: 22px; margin-inline: auto; }
+  .readout { display: grid; gap: 0; }
+  .readout .lbl { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .readout .val { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 18px; line-height: 1.2; color: var(--text); }
+  .readout .val.warn { color: var(--amber); }
+  .tallies { display: flex; gap: 12px; font-size: 12.5px; color: var(--text-2); }
+  .tallies .amber { color: var(--amber); }
+  .save { font-size: 12px; color: var(--muted); display: inline-flex; align-items: center; gap: 5px; }
+  .save::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--emerald); }
+  .btn-outline { padding: 7px 14px; border: 1px solid var(--gold); color: var(--gold); border-radius: 6px; font-weight: 600; font-size: 13px; }
+  .btn-outline:hover { background: rgba(224, 208, 171, 0.1); }
+  .btn-gold { padding: 10px 18px; background: var(--gold); color: #050b1a; border-radius: 6px; font-weight: 700; font-size: 14px; }
+  .btn-gold:hover { background: #f4ecd8; }
+  .btn-gold:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ghost { padding: 7px 12px; border: 1px solid var(--border); border-radius: 6px; color: var(--text-2); font-size: 13px; }
+  .more { width: 34px; height: 34px; border: 1px solid var(--border); border-radius: 6px; color: var(--text-2); display: grid; place-items: center; }
+
+  .announce { margin: 12px 20px 0; padding: 10px 14px; border: 1px solid rgba(245, 158, 11, 0.35); background: rgba(245, 158, 11, 0.08); color: #fcd9a0; border-radius: 6px; display: flex; align-items: center; gap: 12px; font-size: 13.5px; }
+  .announce span { flex: 1; }
+  .announce button { font-size: 12px; color: #fcd9a0; text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ── Desk + booklet ── */
+  .desk { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 360px); gap: 24px; padding: 20px; align-items: start; }
+  .booklet { background: var(--eh-paper); color: var(--eh-ink); border: 1px solid var(--eh-paper-edge); border-radius: 6px; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04), 0 12px 32px rgba(0, 0, 0, 0.35); padding: 34px 44px 26px; font-family: var(--serif); font-size: 17px; line-height: 1.65; }
+  .q { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr); padding-block: 18px; position: relative; }
+  .q.active::before { content: ""; position: absolute; left: -22px; top: 22px; bottom: 22px; width: 2px; background: var(--eh-print); border-radius: 2px; }
+  .qn { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .qb { max-width: 68ch; }
+  .qb p { margin: 0 0 10px; }
+  .qb ol.stmts { list-style: decimal; padding-left: 1.5rem; margin: 10px 0; display: grid; gap: 4px; }
+  table.pairs { border-collapse: collapse; width: 100%; font-size: 15px; margin: 12px 0 14px; }
+  table.pairs th, table.pairs td { border: 1px solid var(--eh-paper-edge); padding: 6px 12px; text-align: left; vertical-align: top; }
+  table.pairs th { font-weight: 600; }
+  .opts { display: grid; gap: 2px 24px; margin-top: 10px; }
+  .opts.two { grid-template-columns: 1fr 1fr; }
+  .opt { display: flex; align-items: flex-start; gap: 10px; min-height: 44px; padding: 5px 6px; border-radius: 6px; }
+  .opt:hover { background: rgba(7, 46, 99, 0.045); }
+  .exam-hall[data-booklet="night"] .opt:hover { background: rgba(224, 208, 171, 0.05); }
+  .opt .choose { display: flex; align-items: flex-start; gap: 10px; flex: 1; text-align: left; padding: 0; }
+  .lab { width: 30px; height: 30px; flex: none; display: grid; place-items: center; border-radius: 999px; font-family: var(--serif); font-size: 16px; color: var(--eh-ink-soft); transition: box-shadow 0.12s, background 0.12s; }
+  .txt { padding-top: 2px; }
+  .opt.circled .lab { box-shadow: 0 0 0 1.5px var(--eh-pencil); color: var(--eh-ink); font-weight: 600; }
+  .opt.circled .txt { font-weight: 600; }
+  .opt.bubbled .lab { background: var(--eh-bubble-ink); color: var(--eh-bubble-letter); box-shadow: none; }
+  .opt.struck .txt { text-decoration: line-through; color: var(--eh-ink-faint); opacity: 0.55; }
+  .strike { width: 32px; height: 32px; flex: none; border-radius: 6px; display: grid; place-items: center; color: var(--eh-ink-faint); opacity: 0.45; }
+  .strike:hover, .strike:focus-visible, .strike[aria-pressed="true"] { opacity: 1; color: var(--eh-ink); }
+  .strike svg { width: 16px; height: 16px; }
+  .tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: 8px; font-family: var(--sans); font-size: 12px; color: var(--eh-ink-soft); }
+  .seg { display: inline-flex; border: 1px solid var(--eh-paper-edge); border-radius: 999px; overflow: hidden; }
+  .seg button { padding: 3px 10px; font-size: 12px; color: var(--eh-ink-soft); }
+  .seg button[aria-checked="true"] { background: var(--eh-ink); color: var(--eh-paper); }
+  .flagbtn { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--eh-paper-edge); color: var(--eh-ink-soft); font-size: 12px; }
+  .flagbtn[aria-pressed="true"] { color: var(--eh-flag); border-color: var(--eh-flag); }
+  .flagbtn svg { width: 12px; height: 12px; }
+  .state { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; }
+  .state.pencil { color: var(--eh-pencil-text); font-weight: 600; }
+  .state.bad { color: var(--eh-danger); font-weight: 600; }
+  .state .mini { padding: 3px 9px; border-radius: 999px; background: var(--eh-ink); color: var(--eh-paper); font-size: 11.5px; font-weight: 600; }
+  .state .kbd { font-family: var(--mono); font-size: 10.5px; opacity: 0.75; }
+  .pagemark { text-align: center; font-family: var(--mono); font-size: 11px; color: var(--eh-ink-faint); padding: 14px 0 2px; }
+
+  /* ── Answer sheet ── */
+  .sheet { position: sticky; top: 72px; background: var(--eh-sheet); color: var(--eh-ink); border: 1px solid var(--eh-paper-edge); border-radius: 6px; padding: 14px 12px 12px; max-height: calc(100vh - 96px); overflow: auto; }
+  .sheet h2 { margin: 0; font: 600 11px/1.2 var(--sans); letter-spacing: 0.14em; color: var(--eh-print); }
+  .sheet .parts { margin: 6px 0 10px; font: 11px/1.4 var(--mono); color: var(--eh-print); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
+  .row { display: grid; grid-template-columns: 24px repeat(4, 20px) 12px; gap: 5px; align-items: center; height: 26px; padding-left: 4px; border-left: 2px solid transparent; position: relative; }
+  .row.g5 { border-bottom: 1px solid var(--eh-print-faint); }
+  .row.active { background: var(--eh-print-faint); border-left-color: var(--eh-print); }
+  .num { font: 11px/1 var(--mono); text-align: right; color: var(--eh-print); padding: 0; }
+  .row.invalid .num { text-decoration: line-through; color: var(--eh-danger); }
+  .bub { width: 20px; height: 20px; border-radius: 50%; border: 1.25px solid var(--eh-print); display: grid; place-items: center; font: 10px/1 var(--mono); color: var(--eh-print); padding: 0; transition: transform 0.12s ease-out; }
+  .bub.on { background: var(--eh-bubble-ink); border-color: var(--eh-bubble-ink); color: var(--eh-bubble-letter); }
+  .bub.pop-in { transform: scale(0.8); }
+  .marks { display: flex; align-items: center; gap: 2px; }
+  .ring { width: 6px; height: 6px; border-radius: 50%; box-shadow: 0 0 0 1.5px var(--eh-pencil); }
+  .fl { width: 9px; height: 9px; color: var(--eh-flag); }
+  .legend { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--eh-print-faint); display: flex; flex-wrap: wrap; gap: 4px 12px; font: 10.5px/1.4 var(--sans); color: var(--eh-ink-soft); }
+  .hint { margin-top: 8px; font: 11.5px/1.4 var(--sans); color: var(--eh-pencil-text); min-height: 16px; }
+  .popover { position: absolute; z-index: 10; left: 34px; top: 30px; width: 250px; background: var(--elev); color: var(--text); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5); padding: 12px; font: 12.5px/1.45 var(--sans); }
+  .popover p { margin: 0 0 10px; }
+  .popover .acts { display: flex; gap: 8px; }
+  .popover .acts button { flex: 1; padding: 6px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+  .popover .keep { background: var(--gold); color: #050b1a; }
+  .popover .add { border: 1px solid rgba(248, 113, 113, 0.5); color: #fecaca; }
+
+  /* ── Dialog ── */
+  .scrim { position: fixed; inset: 0; background: rgba(2, 8, 20, 0.72); display: grid; place-items: center; padding: 16px; z-index: 50; }
+  .dialog { width: min(520px, 100%); background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55); }
+  .dialog h3 { margin: 0 0 14px; font-size: 18px; font-weight: 600; }
+  .stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+  .stat { border: 1px solid var(--border-subtle); border-radius: 8px; padding: 10px 12px; background: rgba(10, 33, 72, 0.5); }
+  .stat .k { font-size: 11px; color: var(--muted); }
+  .stat .v { font: 600 20px/1.2 var(--mono); }
+  .stat.amber .v { color: var(--amber); }
+  .stat.rose .v { color: var(--rose); }
+  .qchips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .qchips span { font: 11px var(--mono); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(245, 158, 11, 0.4); color: #fcd9a0; }
+  .dialog .line { font-size: 13px; color: var(--text-2); margin: 4px 0 16px; }
+  .dialog .acts { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+
+  /* ── Admit slip ── */
+  .center-desk { padding: 28px 20px 40px; display: grid; place-items: start center; }
+  .admit { width: min(760px, 100%); background: var(--eh-paper); color: var(--eh-ink); border: 1px solid var(--eh-paper-edge); border-radius: 6px; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35); padding: 32px 40px; font-family: var(--serif); }
+  .eyebrow { font: 600 11px/1.3 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--eh-print); }
+  .admit h1 { margin: 6px 0 2px; font: 600 28px/1.2 var(--serif); letter-spacing: -0.01em; text-wrap: balance; }
+  .admit .subt { font: 14px var(--sans); color: var(--eh-ink-soft); margin: 0 0 18px; }
+  .parts-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border: 1px solid var(--eh-paper-edge); border-radius: 4px; margin-bottom: 20px; }
+  .parts-grid div { padding: 8px 12px; border-bottom: 1px solid var(--eh-paper-edge); display: flex; justify-content: space-between; gap: 10px; font-size: 15px; }
+  .parts-grid div:nth-child(odd) { border-right: 1px solid var(--eh-paper-edge); }
+  .parts-grid div:nth-last-child(-n+2) { border-bottom: 0; }
+  .parts-grid span { font: 12px var(--sans); color: var(--eh-ink-faint); padding-top: 3px; }
+  .parts-grid b { font-family: var(--mono); font-weight: 500; font-size: 14px; }
+  .admit h2 { font: 600 13px/1.3 var(--sans); letter-spacing: 0.02em; margin: 18px 0 8px; color: var(--eh-ink); }
+  .rules-seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--eh-paper-edge); border-radius: 8px; overflow: hidden; }
+  .rules-seg button { padding: 10px 12px; text-align: left; font-family: var(--sans); color: var(--eh-ink-soft); }
+  .rules-seg button b { display: block; color: var(--eh-ink); font-size: 14px; }
+  .rules-seg button small { font-size: 12px; line-height: 1.4; display: block; margin-top: 2px; }
+  .rules-seg button[aria-checked="true"] { background: rgba(7, 46, 99, 0.08); box-shadow: inset 0 0 0 1.5px var(--eh-print); }
+  .exam-hall[data-booklet="night"] .rules-seg button[aria-checked="true"] { background: rgba(224, 208, 171, 0.08); }
+  .instr { margin: 0; padding-left: 20px; font-size: 15.5px; line-height: 1.6; display: grid; gap: 4px; }
+  .series-row { display: flex; align-items: center; gap: 10px; margin-top: 4px; flex-wrap: wrap; }
+  .series-row .bub { width: 26px; height: 26px; font-size: 12px; }
+  .series-row .help { font: 12.5px/1.45 var(--sans); color: var(--eh-ink-soft); flex: 1 1 260px; }
+  .opts-row { display: flex; flex-wrap: wrap; gap: 10px 22px; font: 13px var(--sans); color: var(--eh-ink-soft); align-items: center; }
+  .opts-row label { display: inline-flex; align-items: center; gap: 6px; }
+  .decl { display: flex; align-items: center; gap: 8px; font: 14px var(--sans); margin: 18px 0 14px; color: var(--eh-ink); }
+  .admit-acts { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .admit-acts .back { font: 13px var(--sans); color: var(--eh-ink-soft); text-decoration: underline; text-underline-offset: 3px; }
+  .admit .btn-gold { background: var(--eh-ink); color: var(--eh-paper); }
+  .admit .foot { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--eh-paper-edge); font: 12.5px/1.55 var(--sans); color: var(--eh-ink-soft); display: grid; gap: 6px; }
+
+  /* ── Scorecard ── */
+  .score { padding: 24px 28px 40px; display: grid; gap: 22px; max-width: 1080px; }
+  .score h1 { margin: 0; font-size: 22px; font-weight: 600; text-wrap: balance; }
+  .score .meta { color: var(--muted); font-size: 13px; }
+  .block { border-top: 1px solid var(--border); padding-top: 18px; display: grid; gap: 10px; }
+  .block h2 { margin: 0; font-size: 15px; font-weight: 600; }
+  .interp { color: var(--text-2); font-size: 14px; margin: 0; max-width: 72ch; }
+  .hero { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 28px; }
+  .hero .net { font: 600 52px/1 var(--mono); letter-spacing: -0.02em; }
+  .hero .net small { font-size: 20px; color: var(--muted); font-weight: 500; }
+  .hero .split { font-size: 14px; color: var(--text-2); }
+  .hero .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .hero .chips span { font: 12px var(--mono); padding: 3px 9px; border-radius: 999px; border: 1px solid var(--border); }
+  .hero .chips .earn { color: var(--emerald); border-color: rgba(52, 211, 153, 0.35); }
+  .hero .chips .lost { color: var(--rose); border-color: rgba(248, 113, 113, 0.35); }
+  .table-wrap { overflow-x: auto; }
+  table.data { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 560px; }
+  table.data th { text-align: left; font-weight: 500; color: var(--muted); font-size: 12px; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  table.data td { padding: 8px 10px; border-bottom: 1px solid var(--border-subtle); font-variant-numeric: tabular-nums; }
+  table.data td.num, table.data th.num { text-align: right; font-family: var(--mono); }
+  .verdict { font-size: 12px; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .verdict.good { color: var(--emerald); background: rgba(52, 211, 153, 0.1); }
+  .verdict.even { color: #fcd9a0; background: rgba(245, 158, 11, 0.1); }
+  .verdict.bad { color: var(--rose); background: rgba(248, 113, 113, 0.1); }
+  .verdict.few { color: var(--muted); background: rgba(143, 162, 189, 0.1); }
+  .explainer { font-size: 13px; color: var(--muted); margin: 0; }
+  .accbar { width: 90px; height: 6px; background: rgba(224, 208, 171, 0.12); border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 8px; }
+  .accbar i { display: block; height: 100%; background: var(--gold); }
+  .disc { margin: 0; padding-left: 18px; display: grid; gap: 4px; color: var(--text-2); font-size: 14px; }
+  svg.chart text { fill: var(--muted); font-family: var(--mono); font-size: 10px; }
+  details summary { cursor: pointer; color: var(--gold); font-size: 13px; }
+  .next { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .filters { display: flex; flex-wrap: wrap; gap: 6px; }
+  .filters button { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); font-size: 12px; color: var(--text-2); }
+  .filters button[aria-pressed="true"] { background: var(--elev); color: var(--gold); border-color: rgba(224, 208, 171, 0.4); }
+  .review .booklet { padding: 22px 28px; }
+  .rv-head { font: 12.5px/1.4 var(--sans); color: var(--eh-ink-soft); display: flex; flex-wrap: wrap; gap: 6px 14px; margin-bottom: 4px; }
+  .rv-head .v-bad { color: var(--eh-danger); font-family: var(--mono); font-weight: 700; }
+  .opt.correct { box-shadow: inset 3px 0 0 var(--eh-correct); }
+  .tag { font: 600 11px var(--sans); padding: 1px 7px; border-radius: 999px; margin-left: 8px; white-space: nowrap; }
+  .tag.ok { color: var(--eh-correct); border: 1px solid var(--eh-correct); }
+  .tag.no { color: var(--eh-danger); border: 1px solid var(--eh-danger); }
+  .expl { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--eh-paper-edge); font-size: 15px; }
+  .expl .lbl { font: 600 11.5px var(--sans); color: var(--eh-ink-faint); letter-spacing: 0.02em; }
+  .expl p { margin: 6px 0; }
+
+  /* ── Lobby ── */
+  .lobby { padding: 26px 28px 40px; display: grid; gap: 18px; max-width: 980px; }
+  .resume { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 14px; border: 1px solid rgba(1, 148, 168, 0.45); background: rgba(11, 61, 120, 0.35); border-radius: 8px; }
+  .resume span { flex: 1 1 240px; font-size: 13.5px; color: var(--text-2); }
+  .resume b { color: var(--text); font-family: var(--mono); }
+  .hall-card { border: 1px solid rgba(224, 208, 171, 0.28); background: linear-gradient(180deg, #0a2148, #071630); border-radius: 14px; padding: 26px 28px; display: grid; gap: 16px; }
+  .hall-card .eyebrow { color: var(--muted); }
+  .hall-card h2 { margin: 0; font: 600 28px/1.15 var(--serif); letter-spacing: -0.01em; color: var(--text); text-wrap: balance; }
+  .hall-card p { margin: 0; color: var(--text-2); font-size: 15px; max-width: 62ch; }
+  .papers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .paper-opt { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; text-align: left; display: grid; gap: 2px; background: rgba(4, 18, 40, 0.5); }
+  .paper-opt b { font-size: 15px; }
+  .paper-opt small { color: var(--muted); font-size: 12.5px; font-family: var(--mono); }
+  .paper-opt[aria-checked="true"] { border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold); }
+  .paper-opt select { margin-top: 6px; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 4px 6px; font: 12.5px var(--sans); }
+  .trust { font-size: 12.5px; color: var(--muted); }
+  .omr-motif { display: inline-flex; gap: 5px; margin-right: 8px; vertical-align: middle; }
+  .omr-motif i { width: 14px; height: 14px; border-radius: 50%; border: 1.25px solid rgba(224, 208, 171, 0.55); display: inline-block; }
+  .omr-motif i.on { background: var(--gold); border-color: var(--gold); }
+  .yours { display: grid; gap: 6px; }
+  .yours h3, .quick h3 { margin: 0; font-size: 14px; font-weight: 600; color: var(--text); }
+  .yours ul { list-style: none; margin: 0; padding: 0; border: 1px solid var(--border-subtle); border-radius: 8px; }
+  .yours li { display: flex; align-items: center; gap: 12px; padding: 9px 12px; border-bottom: 1px solid var(--border-subtle); font-size: 13.5px; color: var(--text-2); }
+  .yours li:last-child { border-bottom: 0; }
+  .yours li b { color: var(--text); font-family: var(--mono); font-weight: 500; margin-left: auto; }
+  .yours li button { color: var(--gold); font-size: 12.5px; }
+  .quick { display: grid; gap: 8px; }
+  .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .qcard { border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px 14px; display: grid; gap: 3px; background: rgba(4, 18, 40, 0.4); text-align: left; }
+  .qcard b { font-size: 14px; }
+  .qcard small { color: var(--muted); font-size: 12.5px; }
+  .track { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; width: max-content; }
+  .track button { padding: 4px 10px; font-size: 12px; color: var(--text-2); }
+  .track button[aria-pressed="true"] { background: var(--gold); color: #072e63; font-weight: 600; }
+
+  /* ── Mobile depiction ── */
+  .mobile-stage { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; }
+  .phone { width: 390px; max-width: 100%; height: 820px; border-radius: 38px; border: 10px solid #0b1020; overflow: hidden; background: var(--desk); position: relative; display: flex; flex-direction: column; }
+  .m-head { height: 104px; flex: none; background: rgba(4, 25, 54, 0.9); border-bottom: 1px solid rgba(19, 108, 153, 0.5); padding: 14px 16px 10px; display: grid; gap: 10px; }
+  .m-head .brand { font: 600 17px var(--serif); color: var(--gold); }
+  .m-head .pills { display: flex; gap: 6px; overflow: hidden; }
+  .m-head .pills span { font-size: 12px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); color: var(--text-2); white-space: nowrap; }
+  .m-head .pills span.on { background: var(--gold); color: #072e63; border-color: var(--gold); font-weight: 600; }
+  .m-bar { height: 52px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: rgba(7, 22, 48, 0.96); border-bottom: 1px solid var(--border); }
+  .m-bar .readout .val { font-size: 16px; }
+  .m-bar .count { font: 12px var(--mono); color: var(--text-2); margin-left: 4px; }
+  .m-bar .sp { flex: 1; }
+  .m-bar .btn-ghost, .m-bar .btn-outline { padding: 6px 9px; font-size: 12px; }
+  .m-scroll { flex: 1; overflow: auto; padding: 12px; }
+  .m-scroll .booklet { padding: 16px 16px 10px; font-size: 16px; }
+  .m-scroll .q { grid-template-columns: 2rem minmax(0, 1fr); }
+  .m-scroll .opts.two { grid-template-columns: 1fr; }
+  .inline-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; padding: 8px 10px; border-radius: 8px; background: var(--eh-sheet); border: 1px solid var(--eh-paper-edge); font: 11px var(--sans); color: var(--eh-print); letter-spacing: 0.08em; text-transform: uppercase; }
+  .inline-row .bub { width: 30px; height: 30px; font-size: 12px; letter-spacing: 0; text-transform: none; }
+  .inline-row .bubs { display: flex; gap: 8px; margin-left: auto; }
+  .peek { flex: none; height: 56px; background: var(--eh-sheet); color: var(--eh-ink); border-top: 1px solid var(--eh-paper-edge); display: flex; align-items: center; justify-content: space-between; padding: 0 18px; font: 600 13px var(--sans); border-radius: 14px 14px 0 0; }
+  .peek span { color: var(--eh-ink-soft); font-weight: 500; }
+  .m-notes { flex: 1 1 280px; max-width: 460px; }
+
+  @media (max-width: 1100px) {
+    .desk { grid-template-columns: minmax(0, 1fr); }
+    .sheet { position: static; max-height: none; }
+    .readouts { margin-inline: 0; }
+  }
+  @media (max-width: 760px) {
+    .app { grid-template-columns: minmax(0, 1fr); }
+    .rail { display: none; }
+    .booklet { padding: 20px 16px; font-size: 16px; }
+    .q { grid-template-columns: 2rem minmax(0, 1fr); }
+    .q.active::before { left: -10px; }
+    .opts.two { grid-template-columns: 1fr; }
+    .papers, .quick-grid, .parts-grid, .rules-seg { grid-template-columns: minmax(0, 1fr); }
+    .parts-grid div:nth-child(odd) { border-right: 0; }
+    .parts-grid div:nth-last-child(2) { border-bottom: 1px solid var(--eh-paper-edge); }
+    .admit { padding: 22px 18px; }
+    .tallies, .save { display: none; }
+    .score, .lobby { padding: 18px 14px 32px; }
+    .hero .net { font-size: 40px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bub, .lab { transition: none; }
+  }
+</style>
+
+<div class="mock-wrap">
+  <div class="mock-bar">
+    <h1 class="mock-title">Tark Exam Hall<small>Design mockup for TASK_059–075 · UPSC Prelims GS Paper I simulation</small></h1>
+    <div class="tabs" role="tablist" aria-label="Mockup screens">
+      <button role="tab" aria-selected="true" data-tab="sitting" id="tab-sitting">Sitting</button>
+      <button role="tab" aria-selected="false" data-tab="admit" id="tab-admit">Admit slip</button>
+      <button role="tab" aria-selected="false" data-tab="scorecard" id="tab-scorecard">Scorecard</button>
+      <button role="tab" aria-selected="false" data-tab="lobby" id="tab-lobby">Lobby</button>
+      <button role="tab" aria-selected="false" data-tab="mobile" id="tab-mobile">Mobile</button>
+    </div>
+    <div class="mock-tools">
+      <span>Booklet</span>
+      <div class="pill-toggle" role="group" aria-label="Booklet theme">
+        <button type="button" aria-pressed="true" data-theme-btn="paper">Paper</button>
+        <button type="button" aria-pressed="false" data-theme-btn="night">Night</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ SITTING ════════════════ -->
+  <section class="screen" id="screen-sitting" data-screen="sitting" role="tabpanel" aria-labelledby="tab-sitting">
+    <div class="note">
+      <b>Sitting, final 10 minutes.</b> Questions are real UPSC GS-I items from the pool. The answer states on the sheet are illustrative. Try the mechanic:
+      <ol>
+        <li>Tap an option in the booklet to <b>circle</b> it. Circles are rough work and aren't scored.</li>
+        <li>Fill its bubble on the answer sheet, or press "Bubble it". <b>Only bubbles are scored.</b></li>
+        <li>You have 5 seconds to lift the pen. After that, a second bubble in the row asks first, then makes the row invalid (−0.66).</li>
+      </ol>
+    </div>
+    <div class="app exam-hall" data-booklet="paper">
+      <nav class="rail" aria-label="App rail (collapsed during the paper)">
+        <div class="logo" aria-hidden="true">T</div>
+        <span class="ic on" title="Arena"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="m19 21 2-2"/></svg></span>
+        <span class="ic" title="Daily Brief"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg></span>
+        <span class="ic" title="Observatory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></span>
+        <span class="ic" title="Profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+      </nav>
+      <div class="main">
+        <header class="bar">
+          <div class="paper-id"><b>GS Paper I</b><span class="sub">· Full paper</span><span class="chip">Series C</span></div>
+          <div class="readouts">
+            <div class="readout"><span class="lbl">Hall clock</span><span class="val" id="hallClock">11:20</span></div>
+            <div class="readout"><span class="lbl">Time left</span><span class="val warn" id="timeLeft">09:48</span></div>
+          </div>
+          <div class="tallies"><span><span class="mono" id="tBub">81</span> bubbled</span><span class="amber"><span class="mono" id="tCirc">3</span> circled only</span><span><span class="mono" id="tRev">5</span> to revisit</span></div>
+          <span class="save">Saved</span>
+          <button type="button" class="btn-outline" id="openHandIn">Hand in</button>
+          <button type="button" class="more" aria-label="More options"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
+        </header>
+        <div class="announce" role="status"><span id="annText">10 minutes left. Only bubbled answers are scored. 3 circled answers are not on your sheet yet.</span><button type="button" id="annDismiss">Dismiss</button></div>
+
+        <div class="desk">
+          <section class="booklet" aria-label="Question booklet" id="booklet"></section>
+          <aside class="sheet" aria-label="Answer sheet">
+            <h2>ANSWER SHEET</h2>
+            <div class="parts">Roll TK4821907 · Series C · GS-I</div>
+            <div class="cols" id="sheetCols"></div>
+            <div class="hint" id="sheetHint" aria-live="polite"></div>
+            <div class="legend"><span>Filled = answered</span><span>Ring = circled in booklet</span><span>Flag = revisit</span><span>Struck number = invalid</span></div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════ ADMIT ════════════════ -->
+  <section class="screen" id="screen-admit" data-screen="admit" role="tabpanel" aria-labelledby="tab-admit" hidden>
+    <div class="note"><b>Admit slip.</b> Before the clock starts: particulars, rules for this sitting, instructions, and encoding the booklet series, as on a real OMR. "Break the seal" starts the server clock.</div>
+    <div class="app exam-hall" data-booklet="paper">
+      <nav class="rail" aria-label="App rail">
+        <div class="logo" aria-hidden="true">T</div>
+        <span class="ic on" title="Arena"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="m19 21 2-2"/></svg></span>
+        <span class="ic" title="Daily Brief"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg></span>
+        <span class="ic" title="Observatory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></span>
+        <span class="ic" title="Profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+      </nav>
+      <div class="main">
+        <div class="center-desk">
+          <article class="admit" aria-labelledby="admit-title">
+            <div class="eyebrow">Tark Exam Hall · Admit slip</div>
+            <h1 id="admit-title">General Studies Paper I · Full paper</h1>
+            <p class="subt">100 questions · 2 hours · Series C</p>
+            <div class="parts-grid">
+              <div><span>Candidate</span><b>Suryanshu</b></div>
+              <div><span>Roll No.</span><b>TK4821907</b></div>
+              <div><span>Booklet series</span><b>C</b></div>
+              <div><span>Hall clock</span><b>09:30 – 11:30</b></div>
+              <div><span>Marking</span><b>+2 · −0.66 · 0</b></div>
+              <div><span>Paper</span><b>GS-I</b></div>
+            </div>
+
+            <h2>Rules for this sitting</h2>
+            <div class="rules-seg" role="radiogroup" aria-label="Rules for this sitting">
+              <button type="button" role="radio" aria-checked="true" data-rules="exam"><b>Exam-day rules</b><small>Circle in the booklet, commit on the answer sheet. Ink is permanent after 5 seconds.</small></button>
+              <button type="button" role="radio" aria-checked="false" data-rules="practice"><b>Practice rules</b><small>Tap an option to bubble it. You can erase and change answers.</small></button>
+            </div>
+
+            <h2>Instructions</h2>
+            <ol class="instr" id="instr">
+              <li>This booklet has 100 questions, each with four options. Choose the single best answer.</li>
+              <li>Only the answer sheet is scored. An answer counts when its bubble is filled.</li>
+              <li>A wrong answer costs 0.66 marks. A blank costs nothing. Two bubbles in one row count as a wrong answer.</li>
+              <li>The clock starts when you break the seal and keeps running if you close the tab. At 11:30 on the hall clock the sheet is collected automatically.</li>
+              <li>Scores, answers and explanations appear only after you hand in.</li>
+              <li class="examonly">Tap an option to circle it. Circles are rough work and are not scored.</li>
+              <li class="examonly">Fill a bubble to commit. You have 5 seconds to lift the pen; after that, a second bubble makes the row invalid.</li>
+            </ol>
+
+            <div class="examonly" id="seriesBlock">
+              <h2>Encode your booklet series</h2>
+              <div class="series-row">
+                <button type="button" class="bub" data-series="A" aria-label="Series A">a</button>
+                <button type="button" class="bub" data-series="B" aria-label="Series B">b</button>
+                <button type="button" class="bub" data-series="C" aria-label="Series C">c</button>
+                <button type="button" class="bub" data-series="D" aria-label="Series D">d</button>
+                <span class="help" id="seriesHelp">Your booklet is Series C. Fill the matching bubble. In the real exam, a wrong series code can void your answer sheet.</span>
+              </div>
+            </div>
+
+            <h2>Options</h2>
+            <div class="opts-row">
+              <label><input type="checkbox" id="optBell"> Hall bell at time checks (sound)</label>
+              <label><input type="checkbox" id="optFull"> Full screen while I write</label>
+            </div>
+
+            <label class="decl"><input type="checkbox" id="decl"> I have read the instructions.</label>
+            <div class="admit-acts">
+              <button type="button" class="btn-gold" id="breakSeal" disabled>Break the seal and start</button>
+              <button type="button" class="back">Back to Arena</button>
+            </div>
+
+            <div class="foot">
+              <div>This paper: Economy 34 · Environment 24 · Geography 21 · History &amp; Culture 15 · Polity 5 · General 1</div>
+              <div>About this paper: questions come from UPSC Prelims GS Paper I, 2011–2023, as recorded in Tark's PYQ bank. We left out 2020, 2024 and 2025 because those records mixed in questions UPSC never set. Our bank is thin on Polity, so this paper has fewer Polity questions than a real one.</div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════ SCORECARD ════════════════ -->
+  <section class="screen" id="screen-scorecard" data-screen="scorecard" role="tabpanel" aria-labelledby="tab-scorecard" hidden>
+    <div class="note"><span class="sample-tag">Sample result</span> Every number on this screen is illustrative and internally consistent (56 right, 27 wrong, 1 invalid, 16 blank). The cut-off values are real, taken from UPSC's official cut-off PDFs.</div>
+    <div class="app exam-hall" data-booklet="paper">
+      <nav class="rail" aria-label="App rail">
+        <div class="logo" aria-hidden="true">T</div>
+        <span class="ic on" title="Arena"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="m19 21 2-2"/></svg></span>
+        <span class="ic" title="Daily Brief"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg></span>
+        <span class="ic" title="Observatory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></span>
+        <span class="ic" title="Profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+      </nav>
+      <div class="main">
+        <div class="score">
+          <div>
+            <h1>Your answer sheet has been evaluated</h1>
+            <div class="meta">General Studies Paper I · Full paper · Series C · handed in with 4 minutes left</div>
+          </div>
+
+          <div class="hero">
+            <div class="net">93.52 <small>/ 200</small></div>
+            <div style="display:grid;gap:6px">
+              <div class="split">56 right · 27 wrong · 1 invalid · 16 blank</div>
+              <div class="chips"><span class="earn">+112.00 earned</span><span class="lost">−18.48 lost to negative marking</span></div>
+            </div>
+          </div>
+          <p class="interp">Negative marking took 18.48 marks, 17% of what you earned. The risk ledger below shows where.</p>
+
+          <div class="block">
+            <h2>Against real cut-offs</h2>
+            <svg class="chart" viewBox="0 0 900 96" width="100%" role="img" aria-label="Your score 93.52 on a 0 to 200 scale, above the General cut-offs of 2020 to 2025 and below those of 2017 to 2019.">
+              <line x1="30" y1="56" x2="870" y2="56" stroke="rgba(224,208,171,0.25)" stroke-width="1"/>
+              <g id="cutTicks"></g>
+            </svg>
+            <p class="explainer">Official UPSC Prelims cut-offs, General category, GS Paper I. Reference only: each cut-off reflects that year's paper, not this one.</p>
+            <details>
+              <summary>All categories</summary>
+              <div class="table-wrap" style="margin-top:8px">
+                <table class="data" id="cutTable"></table>
+              </div>
+            </details>
+          </div>
+
+          <div class="block">
+            <h2>Risk ledger</h2>
+            <p class="interp">Your 50:50 calls earned 0.77 marks each. Keep taking them. Pure guesses only broke even.</p>
+            <div class="table-wrap">
+              <table class="data">
+                <thead><tr><th>Confidence</th><th class="num">Attempted</th><th class="num">Right</th><th class="num">Wrong</th><th class="num">Accuracy</th><th class="num">Net marks</th><th class="num">Per answer</th><th>Verdict</th></tr></thead>
+                <tbody>
+                  <tr><td>Sure</td><td class="num">38</td><td class="num">34</td><td class="num">4</td><td class="num">89%</td><td class="num">65.36</td><td class="num">+1.72</td><td><span class="verdict good">Worth attempting</span></td></tr>
+                  <tr><td>50:50</td><td class="num">26</td><td class="num">14</td><td class="num">12</td><td class="num">54%</td><td class="num">20.08</td><td class="num">+0.77</td><td><span class="verdict good">Worth attempting</span></td></tr>
+                  <tr><td>Guess</td><td class="num">12</td><td class="num">3</td><td class="num">9</td><td class="num">25%</td><td class="num">0.06</td><td class="num">+0.01</td><td><span class="verdict even">Roughly break-even</span></td></tr>
+                  <tr><td>Not tagged</td><td class="num">8</td><td class="num">5</td><td class="num">3</td><td class="num">63%</td><td class="num">8.02</td><td class="num">+1.00</td><td><span class="verdict good">Worth attempting</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-wrap">
+              <table class="data">
+                <thead><tr><th>Options struck</th><th class="num">Attempted</th><th class="num">Right</th><th class="num">Wrong</th><th class="num">Accuracy</th><th class="num">Net marks</th><th class="num">Per answer</th><th>Verdict</th></tr></thead>
+                <tbody>
+                  <tr><td>None</td><td class="num">41</td><td class="num">30</td><td class="num">11</td><td class="num">73%</td><td class="num">52.74</td><td class="num">+1.29</td><td><span class="verdict good">Worth attempting</span></td></tr>
+                  <tr><td>One</td><td class="num">22</td><td class="num">13</td><td class="num">9</td><td class="num">59%</td><td class="num">20.06</td><td class="num">+0.91</td><td><span class="verdict good">Worth attempting</span></td></tr>
+                  <tr><td>Two</td><td class="num">17</td><td class="num">11</td><td class="num">6</td><td class="num">65%</td><td class="num">18.04</td><td class="num">+1.06</td><td><span class="verdict good">Worth attempting</span></td></tr>
+                  <tr><td>Three</td><td class="num">4</td><td class="num">2</td><td class="num">2</td><td class="num">50%</td><td class="num">2.68</td><td class="num">+0.67</td><td><span class="verdict few">Too few to judge</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="explainer">A wrong answer costs a third of a right one. With four options a blind guess roughly breaks even; every option you can rule out tips the odds your way.</p>
+          </div>
+
+          <div class="block">
+            <h2>Sheet discipline</h2>
+            <ul class="disc">
+              <li>3 answers circled in the booklet never reached your sheet. 2 of them were right; bubbling them would have added 3.34 marks.</li>
+              <li>4 answers changed while bubbling: 1 right → wrong, 3 wrong → right.</li>
+              <li>1 row double-marked (−0.66).</li>
+              <li>You left the exam tab 2 times (1m 40s).</li>
+            </ul>
+          </div>
+
+          <div class="block">
+            <h2>Pace</h2>
+            <svg class="chart" viewBox="0 0 900 230" width="100%" role="img" aria-label="Cumulative answers bubbled every five minutes. Half the paper was bubbled by 10:35; even pace reaches it at 10:30." id="paceSvg"></svg>
+            <p class="interp">You bubbled half the paper by 10:35; even pace gets there at 10:30. You handed in with 4 minutes left.</p>
+          </div>
+
+          <div class="block">
+            <h2>Subjects</h2>
+            <p class="interp">Strongest: Polity (1.07 per question). Weakest: History &amp; Culture (0.71 per question).</p>
+            <div class="table-wrap">
+              <table class="data">
+                <thead><tr><th>Subject</th><th class="num">Questions</th><th class="num">Attempted</th><th class="num">Right</th><th class="num">Wrong</th><th class="num">Net</th><th>Accuracy</th></tr></thead>
+                <tbody>
+                  <tr><td>Economy</td><td class="num">34</td><td class="num">30</td><td class="num">21</td><td class="num">9</td><td class="num">36.06</td><td><span class="accbar"><i style="width:70%"></i></span>70%</td></tr>
+                  <tr><td>Environment</td><td class="num">24</td><td class="num">20</td><td class="num">13</td><td class="num">7</td><td class="num">21.38</td><td><span class="accbar"><i style="width:65%"></i></span>65%</td></tr>
+                  <tr><td>Geography</td><td class="num">21</td><td class="num">17</td><td class="num">11</td><td class="num">6</td><td class="num">18.04</td><td><span class="accbar"><i style="width:65%"></i></span>65%</td></tr>
+                  <tr><td>History &amp; Culture</td><td class="num">15</td><td class="num">12</td><td class="num">7</td><td class="num">5</td><td class="num">10.70</td><td><span class="accbar"><i style="width:58%"></i></span>58%</td></tr>
+                  <tr><td>Polity</td><td class="num">5</td><td class="num">4</td><td class="num">3</td><td class="num">1</td><td class="num">5.34</td><td><span class="accbar"><i style="width:75%"></i></span>75%</td></tr>
+                  <tr><td>General</td><td class="num">1</td><td class="num">1</td><td class="num">1</td><td class="num">0</td><td class="num">2.00</td><td><span class="accbar"><i style="width:100%"></i></span>100%</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="block review">
+            <h2>Review your paper</h2>
+            <div class="filters" role="group" aria-label="Filter questions">
+              <button type="button" aria-pressed="false">All</button>
+              <button type="button" aria-pressed="true">Wrong</button>
+              <button type="button" aria-pressed="false">Blank</button>
+              <button type="button" aria-pressed="false">Invalid</button>
+              <button type="button" aria-pressed="false">Circled, not bubbled</button>
+              <button type="button" aria-pressed="false">Revisit</button>
+            </div>
+            <div class="booklet">
+              <div class="rv-head"><span class="v-bad">−0.66</span><span>UPSC 2018 · Geography · 1m 52s on this question</span></div>
+              <div class="q" style="padding-block:6px">
+                <div class="qn">42.</div>
+                <div class="qb">
+                  <p>Consider the following pairs:</p>
+                  <table class="pairs"><thead><tr><th></th><th>Towns sometimes mentioned in news</th><th>Country</th></tr></thead><tbody><tr><td>1.</td><td>Aleppo</td><td>Syria</td></tr><tr><td>2.</td><td>Kirkuk</td><td>Yemen</td></tr><tr><td>3.</td><td>Mosul</td><td>Palestine</td></tr><tr><td>4.</td><td>Mazar-i-sharif</td><td>Afghanistan</td></tr></tbody></table>
+                  <p>Which of the pairs given above are correctly matched?</p>
+                  <div class="opts two">
+                    <div class="opt"><span class="choose"><span class="lab">(a)</span><span class="txt">1 and 2</span></span></div>
+                    <div class="opt correct"><span class="choose"><span class="lab">(b)</span><span class="txt">1 and 4<span class="tag ok">Correct answer</span></span></span></div>
+                    <div class="opt bubbled"><span class="choose"><span class="lab">(c)</span><span class="txt">2 and 3<span class="tag no">Your answer</span></span></span></div>
+                    <div class="opt struck" style="opacity:.6"><span class="choose"><span class="lab">(d)</span><span class="txt">3 and 4</span></span></div>
+                  </div>
+                  <div class="expl">
+                    <div class="lbl">Explanation · written by Tark, not UPSC</div>
+                    <p>1. Aleppo — Syria: correct. 2. Kirkuk — Yemen: wrong, Kirkuk is in Iraq. 3. Mosul — Palestine: wrong, Mosul is in Iraq. 4. Mazar-i-sharif — Afghanistan: correct.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="block">
+            <div class="next">
+              <button type="button" class="btn-gold">Sit another full paper</button>
+              <button type="button" class="btn-ghost">Practise History &amp; Culture: 25 questions, 30 minutes</button>
+              <button type="button" class="btn-ghost" style="border:0;text-decoration:underline;text-underline-offset:3px">Back to Arena</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════ LOBBY ════════════════ -->
+  <section class="screen" id="screen-lobby" data-screen="lobby" role="tabpanel" aria-labelledby="tab-lobby" hidden>
+    <div class="note"><b>Arena lobby.</b> The Exam Hall becomes the primary entry. The existing drills move below as "Quick practice", unchanged in behaviour. The decorative 100-cell palette is removed. <span class="sample-tag">Sample history rows</span></div>
+    <div class="app">
+      <nav class="rail" aria-label="App rail">
+        <div class="logo" aria-hidden="true">T</div>
+        <span class="ic on" title="Arena"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="m13 19 6-6"/><path d="m16 16 4 4"/><path d="m19 21 2-2"/></svg></span>
+        <span class="ic" title="Daily Brief"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg></span>
+        <span class="ic" title="Observatory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></span>
+        <span class="ic" title="Profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+      </nav>
+      <div class="main">
+        <div class="lobby">
+          <div class="resume"><span>Your paper is still running · <b>1:12:40</b> left</span><button type="button" class="btn-outline">Return to the paper</button></div>
+          <section class="hall-card" aria-labelledby="hall-title">
+            <div class="eyebrow"><span class="omr-motif" aria-hidden="true"><i></i><i class="on"></i><i></i><i></i></span>UPSC CSE Prelims · GS Paper I</div>
+            <h2 id="hall-title">Sit the paper the way UPSC sets it</h2>
+            <p>One clock for the whole paper. Read in the booklet, bubble on the answer sheet, lose 0.66 for every wrong answer. Results only after you hand in.</p>
+            <div class="papers" role="radiogroup" aria-label="Choose a paper">
+              <button type="button" class="paper-opt" role="radio" aria-checked="true"><b>Full paper</b><small>100 questions · 2 hours</small></button>
+              <button type="button" class="paper-opt" role="radio" aria-checked="false"><b>Half paper</b><small>50 questions · 1 hour</small></button>
+              <div class="paper-opt" role="radio" aria-checked="false" tabindex="-1"><b>Sectional</b><small>25 questions · 30 minutes</small>
+                <label class="sr-only" for="secSubject">Sectional subject</label>
+                <select id="secSubject"><option>Mixed</option><option>Economy</option><option>Environment</option><option>Geography</option><option>History &amp; Culture</option></select>
+              </div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+              <button type="button" class="btn-gold">Go to the exam hall</button>
+              <span class="trust">Real UPSC GS-I questions, 2011–2023 · scored on our server · your sheet saves as you write</span>
+            </div>
+          </section>
+
+          <section class="yours" aria-labelledby="yours-title">
+            <h3 id="yours-title">Your papers</h3>
+            <ul>
+              <li>21 Sep · Full paper <b>93.52 / 200</b><button type="button">View</button></li>
+              <li>18 Sep · Sectional · Economy <b>31.34 / 50</b><button type="button">View</button></li>
+              <li>15 Sep · Half paper <b>44.72 / 100</b><button type="button">View</button></li>
+            </ul>
+          </section>
+
+          <section class="quick" aria-labelledby="quick-title">
+            <h3 id="quick-title">Quick practice</h3>
+            <div class="track" role="group" aria-label="Exam track"><button type="button" aria-pressed="true">UPSC CSE</button><button type="button" aria-pressed="false">SSC CGL</button></div>
+            <div class="quick-grid">
+              <button type="button" class="qcard"><b>Timed drill · ranked</b><small>25 mixed questions · 60 s each · answer shown after each question</small></button>
+              <button type="button" class="qcard"><b>Training ground</b><small>Pick subjects · 25, 35 or 50 questions · untimed</small></button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════ MOBILE ════════════════ -->
+  <section class="screen" id="screen-mobile" data-screen="mobile" role="tabpanel" aria-labelledby="tab-mobile" hidden>
+    <div class="mobile-stage">
+      <div class="phone exam-hall" data-booklet="paper" aria-label="Mobile sitting view">
+        <div class="m-head">
+          <div class="brand">Tark</div>
+          <div class="pills"><span class="on">Arena</span><span>Daily Brief</span><span>Observatory</span><span>Profile</span></div>
+        </div>
+        <div class="m-bar">
+          <div class="readout"><span class="lbl">Time left</span><span class="val">1:15:52</span></div>
+          <span class="count">46/100</span>
+          <span class="sp"></span>
+          <button type="button" class="btn-ghost">Sheet</button>
+          <button type="button" class="btn-outline">Hand in</button>
+          <button type="button" class="more" aria-label="More options"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
+        </div>
+        <div class="m-scroll">
+          <div class="booklet">
+            <div class="q active">
+              <div class="qn">47.</div>
+              <div class="qb">
+                <p>Who of the following had first deciphered the edicts of Emperor Ashoka?</p>
+                <div class="opts two">
+                  <div class="opt"><button type="button" class="choose"><span class="lab">(a)</span><span class="txt">Georg Buhler</span></button></div>
+                  <div class="opt circled"><button type="button" class="choose"><span class="lab">(b)</span><span class="txt">James Prinsep</span></button></div>
+                  <div class="opt struck"><button type="button" class="choose"><span class="lab">(c)</span><span class="txt">Max Muller</span></button></div>
+                  <div class="opt"><button type="button" class="choose"><span class="lab">(d)</span><span class="txt">William Jones</span></button></div>
+                </div>
+                <div class="tools">
+                  <div class="seg" role="radiogroup" aria-label="Confidence"><button type="button" role="radio" aria-checked="true">Sure</button><button type="button" role="radio" aria-checked="false">50:50</button><button type="button" role="radio" aria-checked="false">Guess</button></div>
+                  <span class="state pencil">Circled (b) · not on your sheet</span>
+                </div>
+                <div class="inline-row">Answer sheet
+                  <div class="bubs"><span class="bub">a</span><span class="bub">b</span><span class="bub">c</span><span class="bub">d</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="pagemark">— 11 —</div>
+          </div>
+        </div>
+        <div class="peek">Answer sheet <span>46/100 bubbled ▴</span></div>
+      </div>
+      <div class="note m-notes">
+        <b>Mobile.</b> Same rules, same data. The exam bar sits under the app's 104 px header. Each question carries an inline answer row that writes to the same sheet. The full sheet opens as a bottom sheet from the peek bar. This screen shows the calm state with more than 10 minutes left: no colour on the clock.
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="scrim" id="handInDialog" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="hi-title">
+    <h3 id="hi-title">Hand in your answer sheet?</h3>
+    <div class="stat-grid">
+      <div class="stat"><div class="k">Bubbled</div><div class="v" id="hiBub">81</div></div>
+      <div class="stat"><div class="k">Blank</div><div class="v" id="hiBlank">19</div></div>
+      <div class="stat amber"><div class="k">Circled, not bubbled</div><div class="v" id="hiCirc">3</div><div class="qchips" id="hiCircChips"></div></div>
+      <div class="stat"><div class="k">To revisit</div><div class="v" id="hiRev">5</div><div class="qchips" id="hiRevChips"></div></div>
+      <div class="stat rose"><div class="k">Invalid rows</div><div class="v">1</div></div>
+    </div>
+    <p class="line"><span class="mono" id="hiLeft">09:48</span> left on the clock. You can keep working until 11:30.</p>
+    <div class="acts">
+      <button type="button" class="btn-gold" id="hiKeep">Keep working</button>
+      <button type="button" class="btn-ghost" id="hiNow">Hand in now</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  // ── Tabs ──
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[data-tab]'));
+  var screens = Array.prototype.slice.call(document.querySelectorAll('.screen'));
+  function showTab(name) {
+    tabs.forEach(function (t) { t.setAttribute('aria-selected', String(t.dataset.tab === name)); });
+    screens.forEach(function (s) { s.hidden = s.dataset.screen !== name; });
+  }
+  tabs.forEach(function (t) { t.addEventListener('click', function () { showTab(t.dataset.tab); try { history.replaceState(null, '', '#' + t.dataset.tab); } catch (e) {} }); });
+  var initial = (location.hash || '').replace('#', '');
+  if (tabs.some(function (t) { return t.dataset.tab === initial; })) showTab(initial);
+
+  // ── Booklet theme ──
+  document.querySelectorAll('[data-theme-btn]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var v = b.dataset.themeBtn;
+      document.querySelectorAll('[data-theme-btn]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      document.querySelectorAll('.exam-hall').forEach(function (el) { el.setAttribute('data-booklet', v); });
+    });
+  });
+
+  // ── Sitting: data ──
+  var L = ['A', 'B', 'C', 'D'];
+  var questions = [
+    { n: 86, key: 'D', html: '<p>Consider the following statements:</p><ol class="stmts"><li>Most of the world’s coral reefs are in tropical waters.</li><li>More than one-third of the world’s coral reefs are located in the territories of Australia, Indonesia and Philippines.</li><li>Coral reefs host far more number of animal phyla than those hosted by tropical rainforests.</li></ol><p>Which of the statements given above is/are correct?</p>', opts: ['1 and 2 only', '3 only', '1 and 3 only', '1, 2 and 3'] },
+    { n: 87, html: '<p>Consider the following pairs:</p><table class="pairs"><thead><tr><th></th><th>Towns sometimes mentioned in news</th><th>Country</th></tr></thead><tbody><tr><td>1.</td><td>Aleppo</td><td>Syria</td></tr><tr><td>2.</td><td>Kirkuk</td><td>Yemen</td></tr><tr><td>3.</td><td>Mosul</td><td>Palestine</td></tr><tr><td>4.</td><td>Mazar-i-sharif</td><td>Afghanistan</td></tr></tbody></table><p>Which of the pairs given above are correctly matched?</p>', opts: ['1 and 2', '1 and 4', '2 and 3', '3 and 4'] },
+    { n: 88, html: '<p>With reference to Indian history, consider the following pairs:</p><table class="pairs"><thead><tr><th></th><th>Historical Person</th><th>Known as</th></tr></thead><tbody><tr><td>1.</td><td>Aryadeva</td><td>Jaina scholar</td></tr><tr><td>2.</td><td>Dignaga</td><td>Buddhist scholar</td></tr><tr><td>3.</td><td>Nathamuni</td><td>Vaishnava scholar</td></tr></tbody></table><p>How many pairs given above are correctly matched?</p>', opts: ['None of the pairs', 'Only one pair', 'Only two pairs', 'All three pairs'] },
+    { n: 89, html: '<p>Which of the following statements best describes “carbon fertilization”?</p>', opts: ['Increased plant growth due to increased concentration of carbon dioxide in the atmosphere', 'Increased temperature of Earth due to increased concentration of carbon dioxide in the atmosphere', 'Increased acidity of oceans as a result of increased concentration of carbon dioxide in the atmosphere', 'Adaptation of all living beings on Earth to the climate change brought about by the increased concentration of carbon dioxide in the atmosphere'] },
+    { n: 90, html: '<p>Banjaras during the medieval period of Indian history were generally</p>', opts: ['agriculturists', 'warriors', 'weavers', 'traders'] }
+  ];
+
+  // Sheet state (illustrative)
+  var bubbles = {}, circled = {}, struck = {}, conf = {}, flagged = {}, lastInk = {};
+  var skip = { 12: 1, 19: 1, 44: 1, 57: 1, 61: 1 };
+  for (var n = 1; n <= 86; n++) { if (!skip[n]) bubbles[n] = [L[(n * 7 + 3) % 4]]; }
+  bubbles[86] = ['D']; circled[86] = 'D';
+  bubbles[23] = ['B', 'C'];
+  circled[12] = 'A'; circled[57] = 'C'; circled[87] = 'B';
+  [7, 33, 64, 79, 90].forEach(function (q) { flagged[q] = true; });
+  struck[88] = ['A', 'D']; conf[88] = 'fifty'; conf[86] = 'sure';
+  var active = 88;
+  var popFor = null;
+
+  var flagSvg = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 21V4h11l-1.5 4L16 12H7v9z"/></svg>';
+  var strikeSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M16 4H9a3 3 0 0 0-2.83 4"/><path d="M14 12a4 4 0 0 1 0 8H6"/><line x1="4" y1="12" x2="20" y2="12"/></svg>';
+
+  function isShort(opts) { return opts.every(function (o) { return o.length <= 28; }); }
+  function stateOf(q) {
+    var b = bubbles[q] || [], c = circled[q];
+    if (b.length > 1) return { cls: 'bad', html: 'Invalid · two bubbles' };
+    if (b.length === 1) {
+      var inGrace = lastInk[q] && Date.now() - lastInk[q] < 5000;
+      return { cls: '', html: 'On your sheet: (' + b[0].toLowerCase() + ')' + (inGrace ? ' <button type="button" class="mini" data-undo="' + q + '">Undo <span class="kbd">U</span></button>' : '') };
+    }
+    if (c) return { cls: 'pencil', html: 'Circled (' + c.toLowerCase() + ') · not on your sheet <button type="button" class="mini" data-bubble-it="' + q + '">Bubble it <span class="kbd">↵</span></button>' };
+    return { cls: '', html: '' };
+  }
+
+  function renderBooklet() {
+    var el = document.getElementById('booklet');
+    var html = '';
+    questions.forEach(function (q) {
+      var s = stateOf(q.n);
+      html += '<article class="q' + (q.n === active ? ' active' : '') + '" id="q-' + q.n + '" aria-labelledby="q-' + q.n + '-label">' +
+        '<div class="qn" aria-hidden="true">' + q.n + '.</div><div class="qb"><h3 class="sr-only" id="q-' + q.n + '-label">Question ' + q.n + '</h3>' + q.html +
+        '<div class="opts' + (isShort(q.opts) ? ' two' : '') + '">';
+      q.opts.forEach(function (o, i) {
+        var k = L[i], cls = 'opt';
+        var b = bubbles[q.n] || [];
+        if (circled[q.n] === k) cls += ' circled';
+        if (b.indexOf(k) > -1) cls += ' bubbled';
+        var isStruck = (struck[q.n] || []).indexOf(k) > -1;
+        if (isStruck) cls += ' struck';
+        html += '<div class="' + cls + '"><button type="button" class="choose" data-q="' + q.n + '" data-k="' + k + '" aria-pressed="' + (circled[q.n] === k) + '"><span class="lab">(' + k.toLowerCase() + ')</span><span class="txt">' + o + '</span></button>' +
+          '<button type="button" class="strike" data-strike="' + q.n + '" data-k="' + k + '" aria-pressed="' + isStruck + '" aria-label="' + (isStruck ? 'Restore' : 'Strike out') + ' option ' + k.toLowerCase() + '">' + strikeSvg + '</button></div>';
+      });
+      html += '</div><div class="tools"><div class="seg" role="radiogroup" aria-label="Confidence for question ' + q.n + '">';
+      [['sure', 'Sure'], ['fifty', '50:50'], ['guess', 'Guess']].forEach(function (c) {
+        html += '<button type="button" role="radio" data-conf="' + q.n + '" data-v="' + c[0] + '" aria-checked="' + (conf[q.n] === c[0]) + '">' + c[1] + '</button>';
+      });
+      html += '</div><button type="button" class="flagbtn" data-flag="' + q.n + '" aria-pressed="' + !!flagged[q.n] + '">' + flagSvg + 'Revisit</button>' +
+        '<span class="state ' + s.cls + '">' + s.html + '</span></div></div></article>';
+      if (q.n % 5 === 0) html += '<div class="pagemark">— ' + (Math.ceil(q.n / 5) + 1) + ' —</div>';
+    });
+    el.innerHTML = html;
+  }
+
+  function renderSheet() {
+    var cols = document.getElementById('sheetCols');
+    var html = '';
+    [[1, 50], [51, 100]].forEach(function (range) {
+      html += '<div>';
+      for (var q = range[0]; q <= range[1]; q++) {
+        var b = bubbles[q] || [];
+        var cls = 'row' + (q % 5 === 0 ? ' g5' : '') + (q === active ? ' active' : '') + (b.length > 1 ? ' invalid' : '');
+        html += '<div class="' + cls + '" role="radiogroup" aria-label="Answer sheet, question ' + q + '"' + (b.length > 1 ? ' aria-invalid="true"' : '') + '>' +
+          '<button type="button" class="num" data-jump="' + q + '">' + q + '</button>';
+        L.forEach(function (k) {
+          var on = b.indexOf(k) > -1;
+          html += '<button type="button" class="bub' + (on ? ' on' : '') + '" role="radio" aria-checked="' + on + '" aria-label="Question ' + q + ' option ' + k.toLowerCase() + '" data-bq="' + q + '" data-k="' + k + '">' + k.toLowerCase() + '</button>';
+        });
+        html += '<span class="marks">' + (circled[q] && b.length === 0 ? '<span class="ring" title="Circled in booklet"></span>' : '') + (flagged[q] ? '<span class="fl" title="Revisit">' + flagSvg + '</span>' : '') + '</span>';
+        if (popFor && popFor.q === q) {
+          html += '<div class="popover" role="alertdialog" aria-label="Second bubble warning"><p>Row ' + q + ' already has (' + b[0].toLowerCase() + '). A second bubble makes this answer invalid and it will be marked wrong (−0.66).</p>' +
+            '<div class="acts"><button type="button" class="keep" data-keep="1">Keep (' + b[0].toLowerCase() + ')</button><button type="button" class="add" data-add="1">Add second bubble</button></div></div>';
+        }
+        html += '</div>';
+      }
+      html += '</div>';
+    });
+    cols.innerHTML = html;
+  }
+
+  function tallies() {
+    var bub = 0, circOnly = [], rev = [];
+    for (var q = 1; q <= 100; q++) {
+      var b = bubbles[q] || [];
+      if (b.length) bub++;
+      else if (circled[q]) circOnly.push(q);
+      if (flagged[q]) rev.push(q);
+    }
+    document.getElementById('tBub').textContent = bub;
+    document.getElementById('tCirc').textContent = circOnly.length;
+    document.getElementById('tRev').textContent = rev.length;
+    document.getElementById('hiBub').textContent = bub;
+    document.getElementById('hiBlank').textContent = 100 - bub;
+    document.getElementById('hiCirc').textContent = circOnly.length;
+    document.getElementById('hiRev').textContent = rev.length;
+    document.getElementById('hiCircChips').innerHTML = circOnly.map(function (q) { return '<span>Q' + q + '</span>'; }).join('');
+    document.getElementById('hiRevChips').innerHTML = rev.map(function (q) { return '<span>Q' + q + '</span>'; }).join('');
+    var ann = document.getElementById('annText');
+    if (ann) ann.textContent = '10 minutes left. Only bubbled answers are scored.' + (circOnly.length ? ' ' + circOnly.length + ' circled answer' + (circOnly.length === 1 ? ' is' : 's are') + ' not on your sheet yet.' : '');
+  }
+
+  function renderAll() { renderBooklet(); renderSheet(); tallies(); }
+
+  function hint(msg) {
+    var h = document.getElementById('sheetHint');
+    h.textContent = msg;
+    clearTimeout(hint._t);
+    hint._t = setTimeout(function () { h.textContent = ''; }, 3000);
+  }
+
+  function fill(q, k) {
+    var b = bubbles[q] || [];
+    if (b.length > 1) return;
+    if (b.length === 0) { bubbles[q] = [k]; lastInk[q] = Date.now(); popFor = null; renderAll(); popIn(q, k); scheduleGraceRefresh(); return; }
+    if (b[0] === k) { hint('Ink is permanent. Practice rules allow erasing.'); return; }
+    if (lastInk[q] && Date.now() - lastInk[q] < 5000) { bubbles[q] = [k]; lastInk[q] = Date.now(); renderAll(); popIn(q, k); return; }
+    popFor = { q: q, k: k }; renderSheet();
+    var keep = document.querySelector('.popover .keep'); if (keep) keep.focus();
+  }
+  function popIn(q, k) {
+    var el = document.querySelector('[data-bq="' + q + '"][data-k="' + k + '"]');
+    if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    el.classList.add('pop-in'); requestAnimationFrame(function () { requestAnimationFrame(function () { el.classList.remove('pop-in'); }); });
+  }
+  function scheduleGraceRefresh() { clearTimeout(scheduleGraceRefresh._t); scheduleGraceRefresh._t = setTimeout(renderBooklet, 5100); }
+
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('button');
+    if (!t) return;
+    if (t.dataset.q && t.classList.contains('choose')) {
+      var q = +t.dataset.q, k = t.dataset.k;
+      circled[q] = circled[q] === k ? undefined : k;
+      if (!circled[q]) delete circled[q];
+      active = q; renderAll(); return;
+    }
+    if (t.dataset.strike) {
+      var sq = +t.dataset.strike, sk = t.dataset.k, arr = struck[sq] || [];
+      var i = arr.indexOf(sk);
+      if (i > -1) arr.splice(i, 1); else { arr.push(sk); if (circled[sq] === sk) delete circled[sq]; }
+      struck[sq] = arr; active = sq; renderAll(); return;
+    }
+    if (t.dataset.conf) { var cq = +t.dataset.conf; conf[cq] = conf[cq] === t.dataset.v ? undefined : t.dataset.v; active = cq; renderBooklet(); return; }
+    if (t.dataset.flag) { var fq = +t.dataset.flag; flagged[fq] = !flagged[fq]; if (!flagged[fq]) delete flagged[fq]; active = fq; renderAll(); return; }
+    if (t.dataset.bubbleIt) { var bq = +t.dataset.bubbleIt; if (circled[bq]) fill(bq, circled[bq]); return; }
+    if (t.dataset.undo) { var uq = +t.dataset.undo; if (lastInk[uq] && Date.now() - lastInk[uq] < 5000) { delete bubbles[uq]; delete lastInk[uq]; renderAll(); } return; }
+    if (t.dataset.bq) { active = +t.dataset.bq; fill(+t.dataset.bq, t.dataset.k); return; }
+    if (t.dataset.keep) { popFor = null; renderSheet(); return; }
+    if (t.dataset.add) { var p = popFor; popFor = null; bubbles[p.q] = [bubbles[p.q][0], p.k].sort(); renderAll(); return; }
+    if (t.dataset.jump) {
+      var jq = +t.dataset.jump, target = document.getElementById('q-' + jq);
+      active = jq;
+      if (target) { renderAll(); document.getElementById('q-' + jq).scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' }); }
+      else { renderSheet(); hint('This mockup shows questions 86–90 only.'); }
+      return;
+    }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      if (popFor) { popFor = null; renderSheet(); }
+      var d = document.getElementById('handInDialog'); if (!d.hidden) d.hidden = true;
+    }
+  });
+
+  // Countdown (display only)
+  var left = 588, dur = 7200;
+  function pad(x) { return (x < 10 ? '0' : '') + x; }
+  function tick() {
+    var el = document.getElementById('timeLeft'), hc = document.getElementById('hallClock');
+    var m = Math.floor(left / 60), s = left % 60;
+    el.textContent = pad(m) + ':' + pad(s);
+    el.style.color = left <= 300 ? 'var(--rose)' : '';
+    var mins = 9 * 60 + 30 + Math.floor((dur - left) / 60);
+    hc.textContent = pad(Math.floor(mins / 60)) + ':' + pad(mins % 60);
+    document.getElementById('hiLeft').textContent = pad(m) + ':' + pad(s);
+    if (left > 0) left -= 1;
+  }
+  tick(); setInterval(tick, 1000);
+
+  document.getElementById('annDismiss').addEventListener('click', function () { this.parentElement.hidden = true; });
+  var dlg = document.getElementById('handInDialog');
+  document.getElementById('openHandIn').addEventListener('click', function () { dlg.hidden = false; document.getElementById('hiKeep').focus(); });
+  document.getElementById('hiKeep').addEventListener('click', function () { dlg.hidden = true; document.getElementById('openHandIn').focus(); });
+  document.getElementById('hiNow').addEventListener('click', function () { dlg.hidden = true; showTab('scorecard'); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.hidden = true; });
+
+  renderAll();
+
+  // ── Admit slip interactions ──
+  var admit = document.getElementById('screen-admit');
+  var seriesOk = false, declOk = false, examRules = true;
+  function syncSeal() { document.getElementById('breakSeal').disabled = !(declOk && (seriesOk || !examRules)); }
+  admit.querySelectorAll('[data-series]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      admit.querySelectorAll('[data-series]').forEach(function (x) { x.classList.toggle('on', x === b); });
+      seriesOk = b.dataset.series === 'C';
+      document.getElementById('seriesHelp').textContent = seriesOk ? 'Series C encoded.' : "That's not your series. Your booklet is Series C.";
+      document.getElementById('seriesHelp').style.color = seriesOk ? '' : 'var(--eh-danger)';
+      syncSeal();
+    });
+  });
+  document.getElementById('decl').addEventListener('change', function () { declOk = this.checked; syncSeal(); });
+  admit.querySelectorAll('[data-rules]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      admit.querySelectorAll('[data-rules]').forEach(function (x) { x.setAttribute('aria-checked', String(x === b)); });
+      examRules = b.dataset.rules === 'exam';
+      admit.querySelectorAll('.examonly').forEach(function (el) { el.hidden = !examRules; });
+      syncSeal();
+    });
+  });
+  document.getElementById('breakSeal').addEventListener('click', function () { showTab('sitting'); });
+
+  // ── Scorecard: cut-off band (official values) ──
+  var cut = [
+    { y: 2025, g: 92.66, ews: 89.34, obc: 92.00, sc: 84.00, st: 82.66, src: 'https://www.upsc.gov.in/sites/default/files/CSE_2025_Cut-OffMks_Eng_09032026.pdf' },
+    { y: 2024, g: 87.98, ews: 85.92, obc: 87.28, sc: 79.03, st: 74.23, src: 'https://www.upsc.gov.in/sites/default/files/CutOff-CSE-2024-Engl-220425.pdf' },
+    { y: 2023, g: 75.41, ews: 68.02, obc: 74.75, sc: 59.25, st: 47.82, src: 'https://www.upsc.gov.in/sites/default/files/CutOff-CSE-23-engl-180424.pdf' },
+    { y: 2022, g: 88.22, ews: 82.83, obc: 87.54, sc: 74.08, st: 69.35, src: 'https://www.upsc.gov.in/sites/default/files/CutOff-CSE-22-Engl-230523.pdf' },
+    { y: 2021, g: 87.54, ews: 80.14, obc: 84.85, sc: 75.41, st: 70.71, src: 'https://www.upsc.gov.in/sites/default/files/CutOff-CSE-21-engl-300522.pdf' },
+    { y: 2020, g: 92.51, ews: 77.55, obc: 89.12, sc: 74.84, st: 68.71, src: 'https://www.upsc.gov.in/sites/default/files/CutOff-CSE-20-engl-270921.pdf' },
+    { y: 2019, g: 98.00, ews: 90.00, obc: 95.34, sc: 82.00, st: 77.34, src: 'https://www.upsc.gov.in/sites/default/files/Cut_Off_Marks_CS2019_Eng.pdf' },
+    { y: 2018, g: 98.00, ews: null, obc: 96.66, sc: 84.00, st: 83.34, src: 'https://www.upsc.gov.in/sites/default/files/CutOff-CSE-2018-Engl-R.pdf' },
+    { y: 2017, g: 105.34, ews: null, obc: 102.66, sc: 88.66, st: 88.66, src: 'https://www.upsc.gov.in/sites/default/files/Cutoff-CSE-2017-Engl.pdf' }
+  ];
+  var sx = function (v) { return 30 + (v / 200) * 840; };
+  var ticks = '';
+  for (var v = 0; v <= 200; v += 25) ticks += '<line x1="' + sx(v) + '" y1="52" x2="' + sx(v) + '" y2="60" stroke="rgba(224,208,171,0.25)"/><text x="' + sx(v) + '" y="78" text-anchor="middle">' + v + '</text>';
+  var sorted = cut.slice().sort(function (a, b) { return a.g - b.g; });
+  var lastX = -99, row = 0;
+  sorted.forEach(function (c) {
+    var x = sx(c.g); row = (x - lastX < 34) ? (row + 1) % 3 : 0; lastX = x;
+    var ly = 44 - row * 12;
+    ticks += '<circle cx="' + x + '" cy="56" r="3.5" fill="#8fa2bd"/><text x="' + x + '" y="' + ly + '" text-anchor="middle">' + c.y + '</text>';
+  });
+  var me = sx(93.52);
+  ticks += '<line x1="' + me + '" y1="20" x2="' + me + '" y2="66" stroke="#e0d0ab" stroke-width="2"/><circle cx="' + me + '" cy="56" r="6" fill="#e0d0ab"/><text x="' + me + '" y="94" text-anchor="middle" style="fill:#e0d0ab;font-weight:700">You 93.52</text>';
+  document.getElementById('cutTicks').innerHTML = ticks;
+  var th = '<thead><tr><th>Year</th><th class="num">General</th><th class="num">EWS</th><th class="num">OBC</th><th class="num">SC</th><th class="num">ST</th><th>Source</th></tr></thead><tbody>';
+  cut.forEach(function (c) {
+    var f = function (x) { return x == null ? '—' : x.toFixed(2); };
+    th += '<tr><td>' + c.y + '</td><td class="num">' + f(c.g) + '</td><td class="num">' + f(c.ews) + '</td><td class="num">' + f(c.obc) + '</td><td class="num">' + f(c.sc) + '</td><td class="num">' + f(c.st) + '</td><td><a href="' + c.src + '" target="_blank" rel="noopener" style="color:var(--gold)">UPSC PDF</a></td></tr>';
+  });
+  document.getElementById('cutTable').innerHTML = th + '</tbody>';
+
+  // ── Scorecard: pace chart (sample) ──
+  var pace = [0, 6, 12, 17, 22, 27, 31, 35, 38, 42, 45, 47, 49, 52, 55, 58, 61, 64, 67, 70, 74, 78, 82, 84, 84];
+  var W = 900, H = 230, x0 = 44, x1 = 880, y0 = 196, y1 = 16;
+  var px = function (m) { return x0 + (m / 120) * (x1 - x0); };
+  var py = function (c) { return y0 - (c / 100) * (y0 - y1); };
+  var svg = '';
+  [0, 25, 50, 75, 100].forEach(function (c) { svg += '<line x1="' + x0 + '" y1="' + py(c) + '" x2="' + x1 + '" y2="' + py(c) + '" stroke="rgba(224,208,171,0.08)"/><text x="' + (x0 - 8) + '" y="' + (py(c) + 3) + '" text-anchor="end">' + c + '</text>'; });
+  ['09:30', '10:00', '10:30', '11:00', '11:30'].forEach(function (l, i) { svg += '<text x="' + px(i * 30) + '" y="' + (y0 + 20) + '" text-anchor="middle">' + l + '</text>'; });
+  svg += '<line x1="' + px(0) + '" y1="' + py(0) + '" x2="' + px(120) + '" y2="' + py(100) + '" stroke="rgba(181,193,209,0.5)" stroke-dasharray="4 5"/>';
+  var d = 'M' + px(0) + ',' + py(0);
+  pace.forEach(function (c, i) { if (i === 0) return; d += ' H' + px(i * 5) + ' V' + py(c); });
+  svg += '<path d="' + d + '" fill="none" stroke="#e0d0ab" stroke-width="2"/>';
+  svg += '<circle cx="' + px(115) + '" cy="' + py(84) + '" r="4" fill="#e0d0ab"/><text x="' + (px(115) - 8) + '" y="' + (py(84) - 10) + '" text-anchor="end" style="fill:#e0d0ab">84 bubbled</text>';
+  svg += '<text x="' + (px(120) - 4) + '" y="' + (py(100) + 16) + '" text-anchor="end">even pace</text>';
+  document.getElementById('paceSvg').innerHTML = svg;
+})();
+</script>

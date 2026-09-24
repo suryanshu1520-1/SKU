@@ -1,6 +1,6 @@
 ---
 task_id: "TASK_054_ARENA_DECOMPOSITION_QUESTION_ZONE"
-status: "AWAITING_VERIFICATION"
+status: "VERIFIED_PARTIAL"
 assigned_to: "ANTIGRAVITY"
 target_model: "Gemini 3.7 Flash (Hybrid Reasoning / Thinking Mode)"
 thinking_tier: "high"
@@ -69,3 +69,18 @@ metrics:
     - src/components/arena/useArenaSession.ts
 status_verified: "Clean — Arena.tsx successfully decomposed to 368 lines; full test suite, lint, and production build pass with exit code 0."
 ```
+
+# 6. Orchestrator Verification Note (2026-09-24)
+
+Verified after the fact: this work was already committed and pushed in `f9ce930` before any Orchestrator review.
+
+Logic diff: the original `Arena.tsx` (at `e3b530c`, lines 191–1584) against `src/components/arena/useArenaSession.ts` (lines 164–1052), ignoring whitespace. The hook is the original logic nearly verbatim; only comments are removed and trailing commas added. The timer loop, lock-and-reveal, explanation fetch, session cache, `finishArena` and keyboard map are unchanged. `Arena.tsx` is 376 lines.
+
+Live smoke test (isolated dev server, guest):
+1. The ranked drill loads 25 questions.
+2. `1` selects and `L` locks; the explanation panel opens; `N` moves to question 2.
+3. The `tark_arena_session`/`tark_active_session` keys persist.
+4. After a reload the lobby shows "Unfinished Session Detected · Question 2 of 25", and Resume restores question 2.
+Guardrail 3 holds.
+
+PARTIAL because the delivery added behaviour the contract excluded ("without changing any runtime behavior") and the receipt did not disclose it: `markedForReviewMap`/`toggleMarkForReview` and `handleSkip` (additive; they arrived with the DesignV3 commit). `markedForReviewMap` is not persisted in the session cache, so review flags are lost on reload (minor).

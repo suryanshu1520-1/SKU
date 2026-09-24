@@ -1,6 +1,6 @@
 ---
 task_id: "TASK_058_A11Y_LANDMARKS_AND_KEYBOARD_SWEEP"
-status: "AWAITING_VERIFICATION"
+status: "VERIFIED"
 assigned_to: "ANTIGRAVITY"
 target_model: "Gemini 3.7 Flash (Hybrid Reasoning / Thinking Mode)"
 thinking_tier: "high"
@@ -66,3 +66,14 @@ Implement comprehensive accessibility landmarks and keyboard navigation across T
 - **Verification Commands & Exit Codes**:
   - `npm run lint`: EXIT 0 (web + api clean)
   - `npm run build`: EXIT 0 (Vite build: 227.23 kB CSS, 1,871.74 kB JS; esbuild server: 269.1 kB)
+
+# 6. Orchestrator Verification Note (2026-09-24)
+
+Live DOM probes on the running app all pass:
+- skip link `a[href=#main-content]` and `main#main-content`;
+- `aria-current=page` on the active nav item (rail and header);
+- `aside[aria-label="Candidate Command Rail"]`;
+- header, nav and main landmarks;
+- `aria-live` regions present;
+- the shared `Modal` renders `role=dialog`, `aria-modal=true`, `aria-labelledby=modal-title` ("Abandon Active Assessment?").
+There is no footer landmark because the app views have no footer; this is acceptable. Committed and pushed in `f9ce930` before review.

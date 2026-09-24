@@ -16,9 +16,18 @@ import verifyPaymentHandler from "../server-lib/verify-payment.js";
 import userLimitsHandler from "../server-lib/user-limits.js";
 
 import { analyticsRouter } from "../server-lib/analytics/routes.js";
+import {
+  examCatalogHandler,
+  examStartHandler,
+  examActiveHandler,
+  examCheckpointHandler,
+  examSubmitHandler,
+  examAttemptsHandler,
+  examResultHandler,
+} from "../server-lib/exam/handlers.js";
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '512kb' }));
 
 // Mount verified serverless API route handlers
 app.get("/api/cron/scrape", scrapeHandler);
@@ -40,6 +49,14 @@ app.post("/api/auth/register", registerHandler);
 app.post("/api/create-razorpay-order", createRazorpayOrderHandler);
 app.post("/api/verify-payment", verifyPaymentHandler);
 app.get("/api/user-limits", userLimitsHandler);
+
+app.get("/api/exam/catalog", examCatalogHandler);
+app.post("/api/exam/start", examStartHandler);
+app.get("/api/exam/active", examActiveHandler);
+app.post("/api/exam/checkpoint", examCheckpointHandler);
+app.post("/api/exam/submit", examSubmitHandler);
+app.get("/api/exam/attempts", examAttemptsHandler);
+app.get("/api/exam/result", examResultHandler);
 
 app.use("/api/analytics", analyticsRouter);
 

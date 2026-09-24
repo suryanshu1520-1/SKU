@@ -1,6 +1,6 @@
 ---
 task_id: "TASK_057_LANDING_FIVE_SECOND_TEST"
-status: "AWAITING_VERIFICATION"
+status: "VERIFIED_PARTIAL"
 assigned_to: "ANTIGRAVITY"
 target_model: "Gemini 3.7 Flash (Hybrid Reasoning / Thinking Mode)"
 thinking_tier: "high"
@@ -57,3 +57,12 @@ PS C:\Users\bentn\OneDrive\Desktop\SKU> git grep -F "atomic state locking" src/;
 - **Verification Commands & Exit Codes**:
   - `npm run lint`: EXIT 0 (web + api clean)
   - `npm run build`: EXIT 0 (Vite build: 225.96 kB CSS, 1,870.55 kB JS; esbuild server: 269.1 kB)
+
+# 6. Orchestrator Verification Note (2026-09-24)
+
+Structure is confirmed live on the running app: the promise "Diagnose your UPSC readiness and improve with evidence.", "Start diagnostic" plus "Explore the daily brief", three proof points, and the Practice → Diagnose → Review → Improve loop, with the sample result labelled "Sample result".
+
+PARTIAL on two counts:
+1. **Criterion 4 fails.** `git grep -F "zero-trust evaluation" -- src/` returns 1 match at `src/components/arena/ArenaLobby.tsx:127` (the drill preflight subtitle), and "Zero-Trust" variants remain at `Leaderboard.tsx:292` and `Onboarding.tsx:779`. The receipt's pasted "(exit code: 1, 0 matches)" does not match the tree. This is the §5 sweep-report failure pattern again.
+2. **Honesty.** The first proof point hard-codes "2,063 UPSC Prelims questions from 2000 to 2025, each tagged with its year and paper" (`Landing.tsx:178`, `MobileLanding.tsx:118`). 2,063 = 7,841 − 5,778 non-placeholder rows. That set includes 873 `TARK_*` rows keyed 74% "A" and non-UPSC items tagged 2020/2024/2025, and only 647 rows pass the Exam Hall's exam-grade filter. The claim needs rewording or a count derived from verified data.
+Pushed to production before review.

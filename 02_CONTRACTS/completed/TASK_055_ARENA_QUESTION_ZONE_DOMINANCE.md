@@ -1,6 +1,6 @@
 ---
 task_id: "TASK_055_ARENA_QUESTION_ZONE_DOMINANCE"
-status: "AWAITING_VERIFICATION"
+status: "VERIFIED_PARTIAL"
 assigned_to: "ANTIGRAVITY"
 target_model: "Gemini 3.7 Flash (Hybrid Reasoning / Thinking Mode)"
 thinking_tier: "high"
@@ -56,3 +56,18 @@ Restructure the Arena question zone viewport so question text and answer choices
 - **Verification Commands & Exit Codes**:
   - `npm run lint`: EXIT 0 (web + api clean)
   - `npm run build`: EXIT 0 (Vite build: 225.53 kB CSS, 1,864.13 kB JS; esbuild server: 269.1 kB)
+
+# 6. Orchestrator Verification Note (2026-09-24)
+
+Confirmed in code and in the live app:
+- sticky compact header;
+- timer calm until the final 20% (amber), then rose in the last 5 s;
+- stem at `text-lg sm:text-xl`;
+- consistent 1 px option borders (no layout shift on selection);
+- question card `min-h-[60vh]`.
+
+PARTIAL: "question + answers ≥ 60% of the viewport" holds only through the card's min-height. The question palette sits between the header and the question, so at roughly 1280×620 the question starts about 290 px down and the visible question zone is under 60%.
+
+Pre-existing defects found during the smoke test, not regressions from this contract, logged for follow-up:
+1. The lobby says "20s Blitz" and the preflight says "20s Per Question", but the ranked drill runs at 60 s (TASK_074 fixes the copy).
+2. For questions whose payload already carries `ai_insights`, the reveal short-circuits before `/api/explanation`. `revealedAnswers` is never set, so after locking a wrong answer the correct option is never highlighted, and the explanation text ships in the question payload before the candidate answers.

@@ -1,6 +1,6 @@
 ---
 task_id: "TASK_051_TOKEN_SYSTEM_SEMANTIC_MIGRATION"
-status: "AWAITING_VERIFICATION"
+status: "VERIFIED"
 assigned_to: "ANTIGRAVITY"
 target_model: "Gemini 3.7 Flash (Hybrid Reasoning / Thinking Mode)"
 thinking_tier: "low"
@@ -93,3 +93,7 @@ diff: |
   +  --danger: #e14e4e;
   +  --focus-ring: #e0d0ab;
 ```
+
+# 6. Orchestrator Verification Note (2026-09-24)
+
+All 13 semantic tokens required by §4.1 are defined in both `@theme` (as `--color-*`) and `:root` in `src/index.css`. The values were later re-set by the DesignV3 work in `f9ce930`, and TASK_052 then removed the legacy remap block, as that contract required. `--color-surface` is declared twice in `@theme`; the later declaration wins, so this is harmless but should be deduplicated in the next CSS touch. Pushed to production before review.

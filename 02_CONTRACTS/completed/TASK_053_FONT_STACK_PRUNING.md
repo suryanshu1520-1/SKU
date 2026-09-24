@@ -1,6 +1,6 @@
 ---
 task_id: "TASK_053_FONT_STACK_PRUNING"
-status: "AWAITING_VERIFICATION"
+status: "VERIFIED_PARTIAL"
 assigned_to: "ANTIGRAVITY"
 target_model: "Gemini 3.7 Flash (Hybrid Reasoning / Thinking Mode)"
 thinking_tier: "low"
@@ -59,3 +59,7 @@ bundle_impact:
   shipped_font_families: 3 # Inter, Merriweather, JetBrains Mono
 status_verified: "Clean — Cinzel pruned completely; font stack trimmed to 3 families; build and lint clean."
 ```
+
+# 6. Orchestrator Verification Note (2026-09-24)
+
+Cinzel is removed (0 matches in `src/index.css` and `index.html`). Criterion 2 (≤3 shipped families) **fails** on the committed tree. `index.html` loads Bricolage Grotesque, Newsreader and JetBrains Mono from Google Fonts, and these are the live `--font-sans`/`--font-serif`/`--font-mono`. `src/index.css` still imports `@fontsource` Inter, Merriweather and JetBrains Mono, and the build emits all their files. That makes 5 families, with JetBrains Mono loaded twice and Inter imported with no user (Merriweather is used by HumanitiesReader inline styles). Cause: the DesignV3 commit changed the type direction after this contract was written, so its premise (Inter/Merriweather/JetBrains) is stale. The canonical type stack is a product decision, and a follow-up should drop the dead `@fontsource` imports once it is made.

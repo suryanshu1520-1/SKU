@@ -6,11 +6,11 @@ Single source of truth for pipeline state. **Orchestrator-exclusive file — a d
 
 | Field | Value |
 |---|---|
-| Active contract | 13 (TASK_021 — permanently ESCALATED, superseded by TASK_029, will never reach completed/; TASK_022 — ESCALATED, fast-followed by TASK_030; TASK_030 — ESCALATED on its SECOND failure, same sweep-completeness category, fast-followed by the deliberately narrow TASK_031; TASK_028 — GATE CLEARED, may now proceed; the interface-redesign batch TASK_034-041, all PENDING_EXECUTION, mutually independent; plus TASK_042, dispatched 2026-09-03, independent, naturally queued behind the still-unstarted 034-041 batch) |
-| Pending queue depth | 5 (TASK_010, TASK_011, TASK_012, TASK_013 — Cycle 1 platform-foundation batch, still queued; TASK_020 — live `pyq_prelims` corruption fix, receipt filled in by Antigravity but **not yet independently re-verified by the Orchestrator**, blocked on real Supabase project access — see 2026-08-30 finding below) |
-| Completed (session) | 24 (TASK_001 through TASK_009, TASK_014 through TASK_019, plus TASK_023, TASK_024, TASK_025, TASK_026 [VERIFIED_PARTIAL], TASK_027, TASK_029, TASK_031, TASK_032 [VERIFIED_PARTIAL], TASK_033 [VERIFIED_PARTIAL]) |
+| Active contract | TASK_074 → TASK_076 → TASK_077 (Exam Hall integration + two fast-follows, PENDING_EXECUTION; TASK_074 HARD gate cleared 2026-09-24). TASK_050–073 are all verified and in completed/. Still unverified: TASK_034–042 (active/), TASK_010–013 and TASK_020 (pending/). TASK_021, TASK_022, TASK_028 and TASK_030 remain ESCALATED. |
+| Pending queue depth | 6 (TASK_010–013 and TASK_020, all AWAITING_VERIFICATION; TASK_075_EXAM_HALL_E2E_VERIFICATION, HARD-gated on TASK_074/076/077 verification plus a human applying migration 20260924120000_mock_attempts.sql) |
+| Completed (session) | 24 (TASK_001 through TASK_009, TASK_014 through TASK_019, plus TASK_023, TASK_024, TASK_025, TASK_026 [VERIFIED_PARTIAL], TASK_027, TASK_029, TASK_031, TASK_032 [VERIFIED_PARTIAL], TASK_033 [VERIFIED_PARTIAL]) + 2026-09-24: TASK_050–073 (24 contracts; 14 VERIFIED, 10 VERIFIED_PARTIAL) |
 | Escalated | 0 (TASK_018 escalated mid-chain, resolved by user decision — see PYQ extraction closure below) |
-| Last verified contract | TASK_032_RLS_ANSWER_COLUMN_LOCKDOWN (VERIFIED_PARTIAL) |
+| Last verified contract | TASK_073_EXAM_REVIEW_BOOKLET (VERIFIED), 2026-09-24 batch pass |
 
 ## Queue
 
@@ -99,6 +99,110 @@ Given that, `TASK_042_FIRECRAWL_EXTRACTION_FALLBACK.md` was scoped honestly as a
 Dispatched to `active/` as TASK_042 (13th file in `active/`, independent of the still-unstarted TASK_034-041 batch — naturally queues behind it in ascending order, not urgent enough to jump the queue). `FIRECRAWL_API_KEY` added to local `.env` (gitignored, confirmed via `git check-ignore`) so Antigravity can actually execute and prove the fallback branch, not just reason about it. Production provisioning (Vercel env vars) intentionally left as an open Orchestrator/user decision, same boundary as the standing `apply_migration` invariant.
 
 **Process note, also worth recording**: while authoring this contract, a concurrent write landed on this exact file (`STATE.md`) mid-session — a commit ("feat: overhaul Observatory with 15-year verified PYQ engine, unify Test Arena launch CTAs, and fix reload onboarding modal") touched `STATE.md` and product code while the Orchestrator's own edit was in flight, and won the race — the Orchestrator's first attempt at this table update was silently overwritten and had to be reapplied on top of the newer content. Likely Antigravity running live with this file open in memory from before the edit, the same failure shape as the 2026-08-23 incident recorded at the top of this file, though the human user working directly cannot be ruled out from git history alone (both commit under the same local identity). Not investigated further this session; flagged to the user directly rather than assumed.
+
+## 2026-09-24 — Exam Hall batch dispatched (TASK_059–075): a real UPSC Prelims simulation, not a restyle
+
+The user asked for a major Arena rehaul that "actually simulates a UPSC exam", with the Orchestrator owning design and strategy and Antigravity executing.
+
+**Verdict after reading live code:** the Arena is a per-question quiz: a 20/60 s timer per question, lock-and-reveal after each answer, 25 questions. Its grader has two blocking defects:
+- `server-lib/submit-quiz.ts` never applies negative marking; percentile ranks raw `correctCount`.
+- It caps time at 60 s per question (`submit-quiz.ts:229`), so a 2-hour paper is impossible inside it.
+
+UPSC Prelims is structurally the opposite on every axis. The answer is therefore a new, isolated mode (`src/components/exam/`, `server-lib/exam/`, `public.mock_attempts`) launched from the Arena lobby. The drill flow, its lock-and-reveal and its localStorage keys are untouched (UX handoff guardrail 3).
+
+**Design authority:**
+- `strategy/design/exam-hall-blueprint.md` covers behaviour and exact copy.
+- `strategy/design/exam-hall-mockup.html` is the visual target, published privately as an Artifact: https://claude.ai/artifact/EGLVRurXFfM7Y5eUv8sm4K
+
+Core mechanics:
+- A booklet plus a separate OMR answer sheet.
+- "Exam-day rules": circle in the booklet, commit on the sheet. A 5 s lift-the-pen grace, then a second bubble makes the row invalid (−0.66).
+- Server-authoritative deadline, 30 s checkpoints, and idempotent submit with fallback to the last checkpoint.
+- A hall clock that starts at 09:30.
+- A scorecard with:
+  - a risk ledger (confidence × options struck → marks per answer);
+  - sheet discipline and pace;
+  - subjects;
+  - official cut-off context.
+
+**Findings made while authoring** (all verified against data, not docs):
+1. **PYQ bank provenance.** `server-lib/analytics/data/verified_pyqs_15yr.json` has three problems:
+   - its 873 `TARK_*` rows are 74% keyed "A" (placeholder keys);
+   - its 2024/2025 `db_*` rows include non-UPSC school-quiz items ("What is the name of the ion with a charge of -1?");
+   - its 2020 rows mix genuine and fabricated items ("Which set is fully correct?").
+   Spot checks of ~45 `db_*` rows from 2011–2019 and 2021–2023 matched real papers and keys. The exam pool rules (TASK_059) are `db_*`, GS-1 Prelims, 2011–2023, excluding 2020. That yields exactly 647 items, key spread A143/B188/C175/D141.
+   **No complete real paper exists in the repo.** The SQLite archive's "verified" rows are duplicated and partial. Papers are therefore composite and are labelled that way on the admit slip.
+2. **Content gap, shown to users rather than hidden.** The pool holds only 14 Polity items; real papers carry roughly 15 each. The v1 blueprint is constrained accordingly (Economy 34 / Environment 24 / Geography 21 / History 15 / Polity 5 / General 1) and says so on the admit slip. A Polity PYQ import is logged as follow-up.
+3. **Cut-offs verified at the source.** General/EWS/OBC/SC/ST Prelims cut-offs for 2017–2025 were read from UPSC's own PDFs (2025 General 92.66; 2024 87.98; 2023 75.41 …). They are written verbatim into TASK_065 with source URLs, so no number is invented.
+4. **Local dev server.** Root `server.ts` hard-codes port 3000, and another session's dev server was live in this folder, so TASK_063 adds a `PORT` override for isolated verification. Root `server.ts` also never registers `/api/submit-quiz`, so local-dev drills fall back to client-computed stats. Noted, out of scope.
+5. **Unrecorded batch.** `TASK_050`–`TASK_058` (the UX North Star batch, written 2026-09-20) sit in `active/` at `AWAITING_VERIFICATION`, uncommitted: 38 modified files plus the untracked `src/components/arena/`. They were never entered in this file. Together with `TASK_034`–`042` and `TASK_010`–`013`/`020`, that makes **23 receipts awaiting Orchestrator verification**. TASK_074 (lobby/App integration) HARD-gates on `TASK_054`/`055`/`058` reaching `completed/`.
+
+**Gates:**
+- TASK_059–073 are SOFT-chained (new files only).
+- TASK_074 is HARD on 054/055/058.
+- TASK_075 (E2E) is parked in `pending/` until TASK_059–074 are verified **and** a human applies `supabase/migrations/20260924120000_mock_attempts.sql`. No contract may apply it.
+
+Every contract carries exact, Orchestrator-precomputed expected outputs, so re-verification is mechanical rather than a trust exercise: pool counts, grading fixtures, RNG golden values, interpretation strings.
+
+## 2026-09-24 (later) — Exam Hall TASK_059–073 independently verified; TASK_054/055/058 verified after the fact; TASK_074 gate cleared
+
+Antigravity executed TASK_059–073 and correctly idled at TASK_074's HARD gate. Every receipt was re-verified by the Orchestrator, not trusted:
+- **Independent script** (`verify-exam.ts`, scratchpad): imports the delivered modules and re-asserts the contracts' precomputed expectations. **88/88 pass.** The 647-item pool is field-for-field identical to the Orchestrator's own Python build of the same rules.
+- **Gates:** `npm run test` (rebase 9/9, exam 65/65, qbank 23/23), `lint` and `build` all exit 0.
+- **Live endpoints:** catalog is exact; all six authenticated routes return 401 without a token.
+- **Client bundle scan:** no pool, ids or explanations in `dist/assets`. The pool sits in `dist/server.cjs` only.
+- **Line-by-line review of `handlers.ts`/`db.ts`:**
+  - no key or explanation leaves before submit;
+  - grading reads only the attempt's stored `question_ids`;
+  - the deadline is server-held, with a fallback to the last checkpoint;
+  - submit is idempotent;
+  - every query is scoped to the user.
+
+Deviations recorded:
+- TASK_062 migration carries one **undisclosed** extra line (`GRANT ALL … TO service_role`); benign, accepted.
+- TASK_072 scorecard files type-import from `server-lib` directly instead of via `src/components/exam/types.ts`; type-only, zero runtime impact.
+
+Latent risk: rebuilding the pool with different ids would strand in-progress attempts (POOL_MISMATCH). This must be coordinated with the qbank restoration workstream (`docs/handoffs/qbank-quality-scope-2026-09-24.md`, a separate effort that explicitly leaves the Exam Hall pool alone).
+
+**Discovered:** commit `f9ce930` ("complete DesignV3 landing & test arena overhaul and set pricing to ₹399") committed **and pushed** the whole TASK_050–058 batch while every receipt was still `AWAITING_VERIFICATION`, so unreviewed work reached production. The author identity is the shared local git user, so the actor can't be determined from git.
+
+TASK_054/055/058 were then verified after the fact:
+- **Logic diff:** the drill hook is the original Arena logic verbatim, plus undisclosed additive "Mark for review" and "Skip".
+- **Live smoke test:** select → lock → reveal → next → cache → reload → "Unfinished Session Detected" → resume all pass.
+- **a11y probes** pass.
+
+All three moved to `completed/` (054/055 `VERIFIED_PARTIAL`, 058 `VERIFIED`), which clears TASK_074's HARD gate.
+
+Pre-existing production defects surfaced by the smoke test and the landing read (not regressions, not yet contracted):
+1. The drill lobby and preflight say "20s" while ranked drills run at 60 s (TASK_074 fixes the copy).
+2. Questions whose payload carries `ai_insights` never highlight the correct option after a wrong lock, and their explanation ships before the candidate answers.
+3. The live landing hard-codes "2,063 UPSC Prelims questions from 2000 to 2025, each tagged with its year and paper" (`Landing.tsx:178`, `MobileLanding.tsx:118`). That is 7,841 − 5,778 non-placeholder rows, which include placeholder-keyed `TARK_*` rows and non-UPSC 2020/2024/2025 items. Only 647 rows are exam-grade.
+
+Still unverified: TASK_050–053, 056, 057 (live in production via `f9ce930`), TASK_034–042, TASK_010–013, and TASK_020.
+
+**Review outcome for TASK_066–071 (two line-by-line reviewers, every finding re-confirmed in code by the Orchestrator).**
+- The hook has 1 BLOCKER: the resume clock gains the time spent on the resume prompt, and after ~90 s the final sheet is graded from the last checkpoint.
+- The UI has 1 BLOCKER: full screen can't scroll.
+- There are 12 further MAJOR defects:
+  - swallowed Enter;
+  - a popover that can't be driven by keyboard, is clipped, and is cancelled by a hidden duplicate sheet instance on mobile;
+  - option labels losing their colour (~2.2:1 contrast);
+  - the UI taking its rules from prefs instead of the attempt;
+  - double-submit;
+  - retry no-op;
+  - the open away span dropped.
+
+Several root causes are **the Orchestrator's own contract text**, not the implementation:
+- TASK_066 rule 4 (offset at `beginSitting`);
+- TASK_067's "add state colour on top of base colour";
+- TASK_071's layout, which always mounted both the desktop panel and the mobile sheet;
+- TASK_068's popover anchoring.
+
+Fast-follows dispatched to `active/`: **TASK_076_EXAM_SESSION_HARDENING** (F1–F11, with new pure-helper unit tests) and **TASK_077_EXAM_UI_HARDENING** (U1–U12). TASK_075 (E2E, still in `pending/`) gains regression checks for both, including a 20 s resume-prompt wait with a ±2 s clock check. 066/067/068/071 closed `VERIFIED_PARTIAL`; 069 `VERIFIED`.
+
+**Totals this pass: 24 contracts verified and moved to `completed/`** (050–073): 14 `VERIFIED`, 10 `VERIFIED_PARTIAL`, each with an in-place §6 note.
+
+**Antigravity queue:** TASK_074 (gate cleared), then TASK_076, then TASK_077. TASK_075 waits on those three plus the migration.
 
 ## PYQ Extraction Closure (TASK_017/018/019)
 

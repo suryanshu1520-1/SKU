@@ -17,6 +17,15 @@ import explanationHandler from "./server-lib/explanation.js";
 import questionsHandler from "./server-lib/questions.js";
 import { handleGetRebase, handlePostRebaseAck } from "./server-lib/rebase.js";
 import { analyticsRouter } from "./server-lib/analytics/routes.js";
+import {
+  examCatalogHandler,
+  examStartHandler,
+  examActiveHandler,
+  examCheckpointHandler,
+  examSubmitHandler,
+  examAttemptsHandler,
+  examResultHandler,
+} from "./server-lib/exam/handlers.js";
 
 function cleanEnvValue(val: any): string {
   if (typeof val !== 'string') return '';
@@ -113,9 +122,9 @@ async function generateContentWithRetry(aiClient: any, params: any, maxRetries =
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
-  app.use(express.json());
+  app.use(express.json({ limit: '512kb' }));
 
   // Initialization of Gemini AI client
   // Wait until it's actually used to fail if there's no API key
@@ -160,6 +169,14 @@ async function startServer() {
   app.post("/api/rebase/ack", handlePostRebaseAck);
   app.use("/api/analytics", analyticsRouter);
   app.get("/api/questions", questionsHandler);
+
+  app.get("/api/exam/catalog", examCatalogHandler);
+  app.post("/api/exam/start", examStartHandler);
+  app.get("/api/exam/active", examActiveHandler);
+  app.post("/api/exam/checkpoint", examCheckpointHandler);
+  app.post("/api/exam/submit", examSubmitHandler);
+  app.get("/api/exam/attempts", examAttemptsHandler);
+  app.get("/api/exam/result", examResultHandler);
 
   app.post("/api/auth/register", registerLimiter, async (req, res) => {
     const { email, password, name } = req.body;

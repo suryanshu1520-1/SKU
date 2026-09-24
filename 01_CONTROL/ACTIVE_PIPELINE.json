@@ -1,10 +1,10 @@
 {
   "pipeline_version": "1.0.0",
-  "active_super_prompt": "INTERFACE_REDESIGN_BATCH_2026_08_31",
-  "current_stage": "INTERFACE_AUDIT_FIXES_DISPATCHED",
-  "tasks_total": 8,
-  "tasks_completed": 0,
-  "active_task_id": "TASK_034_THROUGH_TASK_041",
+  "active_super_prompt": "EXAM_HALL_2026_09_24",
+  "current_stage": "EXAM_HALL_VERIFIED_FAST_FOLLOWS_DISPATCHED",
+  "tasks_total": 19,
+  "tasks_completed": 15,
+  "active_task_id": "TASK_074_THEN_TASK_076_THEN_TASK_077",
   "note_on_stale_counters_above": "These fields track ONE super-prompt batch at a time, not the whole pipeline lifetime. Prior values (WS0_PLATFORM_FOUNDATION_BATCH, tasks_total:13, tasks_completed:9) had already drifted from STATE.md's real count of 15 completed by 2026-08-30 -- found and reconciled here rather than left stale. The WS0 batch (TASK_010-013) is still real and still queued in 02_CONTRACTS/pending/ -- see STATE.md's Queue section, not this top-level counter, for its status. This file's per-task history array below is append-only and remains the accurate long-form record regardless of which batch these summary fields point at.",
   "history": [
     {
@@ -361,6 +361,18 @@
       "event": "DISPATCHED",
       "contract": "02_CONTRACTS/active/TASK_042_FIRECRAWL_EXTRACTION_FALLBACK.md",
       "note": "2026-09-03: User asked the Orchestrator to integrate Firecrawl into the scraping infrastructure directly. Two ideas from the initial pass were checked against live code before dispatch and one was dropped: reordering pib-aggregator.ts's Lukmaan-IAS/InsightsIAS/official-PIB waterfall looked like a reliability fix but the file's own docstring shows the ordering is a deliberate UPSC-relevance curation choice, not a workaround -- untouched. The other candidate (wire-source self-drop at extract.ts's no-text gate) was live-tested via the newly-configured Firecrawl MCP plus a throwaway tsx script running the actual fetchText/extractBody code against one real current article each from The Hindu, official PIB, and Business Standard -- all three succeeded on the existing free path today, so this is dispatched honestly as a resilience addition (Firecrawl as a same-gate fallback inside extractFromUrl(), only fires when the free path already failed, cannot regress a working path), not a fix for a currently-reproducing bug. Also requires structured jsonOptions extraction rather than raw markdown, per a live-observed Hindu response mixing real article text with subscription/login boilerplate even with onlyMainContent:true. FIRECRAWL_API_KEY added to local .env (gitignored) so Antigravity can execute real proof, not just reason about it; production (Vercel) provisioning intentionally left open, same boundary as apply_migration. Independent of TASK_034-041, naturally queues behind that still-unstarted batch. Note: a concurrent write landed on STATE.md/this file mid-session from what looks like another active Orchestrator session (same documentation style, e.g. the OBSERVATORY_DEPTH_AND_ARENA_CTA_REWORK entry immediately above) -- one STATE.md edit was lost to a write race and had to be reapplied; flagged to the user directly rather than assumed to be a delegate boundary violation."
+    },
+    {
+      "task_id": "EXAM_HALL_BATCH_DISPATCHED",
+      "event": "DISPATCHED_BATCH",
+      "contract": "02_CONTRACTS/active/ (TASK_059-074) + 02_CONTRACTS/pending/TASK_075_EXAM_HALL_E2E_VERIFICATION.md",
+      "note": "2026-09-24: User asked for a major Arena rehaul that actually simulates UPSC Prelims, with the Orchestrator owning design/strategy. Verified against code: the Arena is a per-question quiz (20/60s timer per question, lock-and-reveal); submit-quiz.ts applies no negative marking and caps time at 60s/question. Built as a new isolated Exam Hall mode (src/components/exam, server-lib/exam, public.mock_attempts): booklet + OMR answer sheet with exam-day ink rules, server-authoritative deadline/checkpoints/idempotent submit, hall clock from 09:30, UPSC-native scorecard (risk ledger, sheet discipline, pace, subjects, official cut-offs verified from UPSC PDFs 2017-2025). Design authority: strategy/design/exam-hall-blueprint.md + exam-hall-mockup.html (Artifact https://claude.ai/artifact/EGLVRurXFfM7Y5eUv8sm4K). Data audit: exam pool = db_* GS-1 Prelims 2011-2023 excl. 2020 = 647 items (TARK_* rows carry placeholder 'A' keys; 2020/2024/2025 rows contaminated with non-UPSC items; only 14 Polity items, disclosed on the admit slip). Gates: 059-073 SOFT; 074 HARD on TASK_054/055/058 reaching completed/; 075 in pending/ until batch verification + a human applies migration 20260924120000_mock_attempts.sql. Also recorded: TASK_050-058 were never entered in STATE.md; 23 receipts now await verification."
+    },
+    {
+      "task_id": "EXAM_HALL_AND_UX_BATCH_VERIFICATION",
+      "event": "VERIFIED_BATCH",
+      "contract": "02_CONTRACTS/completed/ (TASK_050-073); fast-follows 02_CONTRACTS/active/TASK_076_EXAM_SESSION_HARDENING.md, TASK_077_EXAM_UI_HARDENING.md",
+      "note": "2026-09-24: Independent Orchestrator verification of 24 receipts, none trusted as written. Exam Hall 059-073: an Orchestrator script re-asserted every precomputed expectation (88/88; the pool is field-identical to the Orchestrator's Python build); test/lint/build exit 0; live catalog and 401 checks pass; the client bundle carries no pool or explanations; handlers.ts and db.ts reviewed line by line. Two reviewers covered the hook and UI, with every finding re-confirmed in code: 2 BLOCKERs (resume clock drift; full screen can't scroll) plus ~12 MAJOR defects, several caused by the Orchestrator's own contract text. These are fast-followed as TASK_076 and TASK_077. Undisclosed deviations recorded: an extra GRANT line in the TASK_062 migration; TASK_072 importing types directly from server-lib. TASK_050-058 had been committed and pushed in f9ce930 before any review. They were verified after the fact: logic diff; live drill smoke test (select/lock/reveal/next/cache/reload/resume); a11y probes; token/font/jargon greps. TASK_053 fails its <=3-families goal (5 shipped after DesignV3). TASK_057's receipt falsely claims 0 'zero-trust evaluation' matches (ArenaLobby.tsx:127). The live landing hard-codes '2,063 UPSC Prelims questions' (non-placeholder rows including non-UPSC and placeholder-key items). 14 VERIFIED, 10 VERIFIED_PARTIAL. TASK_074 HARD gate cleared."
     }
   ]
 }

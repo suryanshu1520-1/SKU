@@ -1,6 +1,6 @@
 ---
 task_id: "TASK_052_TOKEN_SYSTEM_CONSUMER_MIGRATION"
-status: "AWAITING_VERIFICATION"
+status: "VERIFIED"
 assigned_to: "ANTIGRAVITY"
 target_model: "Gemini 3.7 Flash (Hybrid Reasoning / Thinking Mode)"
 thinking_tier: "high"
@@ -53,3 +53,7 @@ raw_sweep_output:
   exit_code: 1
 status_verified: "Clean — all 32 consumer .tsx files in src/ migrated to semantic tokens; legacy zinc/neutral/stone @theme remap deleted from src/index.css; zero legacy tokens remain."
 ```
+
+# 6. Orchestrator Verification Note (2026-09-24)
+
+Raw output of `git grep -n -E "\b(zinc|neutral|stone)-[0-9]{2,3}\b" -- src/`: 0 matches. `--color-(zinc|neutral|stone)-*` in `src/index.css`: 0, so the remap block is removed. `lint` and `build` exit 0, and the live app renders with the Chamber palette (Orchestrator smoke test of landing, lobby and drill). Pixel-parity of every surface was not audited. Pushed before review.

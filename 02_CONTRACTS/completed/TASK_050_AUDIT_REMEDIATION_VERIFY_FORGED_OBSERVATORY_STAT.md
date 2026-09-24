@@ -1,6 +1,6 @@
 ---
 task_id: "TASK_050_AUDIT_REMEDIATION_VERIFY_FORGED_OBSERVATORY_STAT"
-status: "AWAITING_VERIFICATION"
+status: "VERIFIED"
 assigned_to: "ANTIGRAVITY"
 target_model: "Gemini 3.7 Flash (Hybrid Reasoning / Thinking Mode)"
 thinking_tier: "low"
@@ -54,3 +54,7 @@ powershell_verification:
   exit_code: 0
 status_verified: "Clean — zero unmeasured chi-square/p-value claims exist in src/components/Observatory.tsx."
 ```
+
+# 6. Orchestrator Verification Note (2026-09-24)
+
+Re-run by the Orchestrator on the committed tree (`f9ce930`, which was pushed before review): `git grep -n -i -E "chi.?square|p.?value|p ?<" -- src/components/Observatory.tsx` returns 0 lines, and a repo-wide grep of `src/` for `1.638`, `0.651`, `AUTHORITATIVE EMPIRICAL` and `uniformityChiSquare` returns 0 matches. The fabricated χ²/p-value claim from the 2026-08-30 audit is gone. `lint` exits 0.
