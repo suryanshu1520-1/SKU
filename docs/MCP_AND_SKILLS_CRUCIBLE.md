@@ -58,6 +58,8 @@ Below is the verified, production-grade toolset now active and configured in Tar
 | Tool / Skill | Mechanism | Why It Works |
 |---|---|---|
 | **`firecrawl`** (MCP) | Cloud/local engine with JS rendering & proxy rotation | Bypasses Cloudflare anti-bot shields, converts dynamic SPAs to clean Markdown, maps entire web domains. |
+| **`exa`** (MCP) | AI-native search & neural web crawler | Deep semantic search across academic, news, and technical domains with clean token-efficient markdown. |
+| **`deep-research`** (Skill) | Multi-source synthesis (Firecrawl + Exa) | Plans sub-questions, gathers 15-30 cited sources, cross-references claims, and blocks prompt injection from untrusted pages. |
 | **`copilot-read-pdf`** (Skill) | Local / remote PDF text & table extractor | Parses official government Gazette notifications, budget tables, and UPSC question papers without OCR lag. |
 | **`copilot-fetch-x`** (Skill) | Direct Twitter/X post scraper | Extracts breaking policy announcements and minister dispatches without requiring Twitter API v2 developer keys or visual logins. |
 | **`copilot-youtube-transcript`** (Skill) | Video caption stream parser | Ingests parliamentary debates, press conferences, and analysis lectures in seconds. |
@@ -70,6 +72,12 @@ Below is the verified, production-grade toolset now active and configured in Tar
 | Tool / Skill | Mechanism | Why It Works |
 |---|---|---|
 | **`design-craft-crucible`** (Skill) | Strict React 19 + Tailwind v4 + Chamber Void guidelines | Eliminates visual clipping seams (e.g., radial gradient clipping at `x = 0`), enforces safe Lucide icon imports, and guarantees mobile touch targets >= 44px. |
+| **`frontend-design`** (Skill) | Anthropic official design standard | Prevents generic "AI slop" templates; enforces distinctive, project-specific aesthetic worldviews, typography personality, and editorial intent. |
+| **`make-interfaces-feel-better`** (Skill) | Design-engineering micro-polish | Implements concentric radii (`R_outer = R_inner + padding`), optical alignment, `text-wrap: balance/pretty`, and eliminates `transition: all`. |
+| **`motion-patterns`** (Skill) | Framer Motion / Motion.dev best practices | Hardens exit animations (`AnimatePresence`), toast stacks, spring physics, scroll progress, and reduced-motion accessibility. |
+| **`react-performance`** (Skill) | Vercel Engineering's 70-rule performance catalog | Eliminates render waterfalls, optimizes derived state, prevents closure memory leaks, and leverages React 19 transitions. |
+| **`canvas-design`** (Skill) | Spatial visual composition & balance | Governs layout balance, negative space, visual diagrams, and museum-grade artifact craftsmanship. |
+| **`theme-factory`** (Skill) | Cohesive color & typography palette engine | 10 curated themes + custom palette generators for reportings, slides, and web views. |
 | **`impeccable`** (Skill) | Comprehensive UX & cognitive load auditing | Polishes typography hierarchy, spacing rhythm, micro-interactions, and accessibility contrast. |
 | **`framer`** (MCP) | Component export & style synchronization | Bridges Figma/Framer design specifications directly into React code. |
 | **`context7`** (MCP / CLI) | Real-time version-accurate documentation fetcher | Fetches up-to-date documentation for cutting-edge libraries (React 19, Tailwind v4 `@theme`, Vite 6) whose syntax differs from older LLM training data. |
@@ -82,6 +90,8 @@ Below is the verified, production-grade toolset now active and configured in Tar
 | Tool / Skill | Mechanism | Why It Works |
 |---|---|---|
 | **`supabase-postgres-crucible`** (Skill) | High-concurrency Postgres & RLS standards | Enforces row-level security, GIN indexing on telemetry JSONB, atomic `FOR UPDATE` seat locks, and idempotent migrations. |
+| **`postgres-patterns`** (Skill) | Supabase team's query & indexing optimization | Implements composite index ordering, covering indexes, `(SELECT auth.uid())` RLS caching, `SKIP LOCKED` queues, and table bloat detection. |
+| **`api-design`** (Skill) | Scalable REST API architecture standard | Cursor-based pagination (`id > last_id`), Zod schema validation, structured error codes, rate limiting, and deprecation headers. |
 | **Native Supabase CLI** (Shell) | Local containerized Supabase runtime | Instant schema diffing, type generation (`supabase gen types typescript`), and migration dry-runs without remote latency. |
 | **`repo-hygiene`** (Skill) | Pre-commit security & production gate | Hard rule: DB migrations, deploys, and secret rotations are strictly human-gated. Prevents unauthorized remote mutation. |
 
@@ -93,6 +103,7 @@ Below is the verified, production-grade toolset now active and configured in Tar
 | Tool / Skill | Mechanism | Why It Works |
 |---|---|---|
 | **`quality-crucible`** (Skill) | 5-Gate Deterministic Verification Pipeline | Runs `lint:web` -> `lint:api` -> `npm test` -> `test:qbank` -> `repo-hygiene`. 100% deterministic, zero token waste. |
+| **`webapp-testing`** (Skill) | Anthropic official webapp testing workflow | Server lifecycle management with `with_server.py`, Playwright DOM reconnaissance, and headless networkidle verification. |
 | **`playwright`** (MCP) | Headless accessibility-tree browser testing | Operated via `--headless` and structured accessibility snapshots rather than multi-megabyte screenshot loops. Verifies real DOM state in milliseconds without getting stuck. |
 
 ---
