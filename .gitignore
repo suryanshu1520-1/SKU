@@ -51,6 +51,7 @@ lerna-debug.log*
 # ── Diagnostics & Test Artifacts ──
 coverage/
 artifacts/
+.playwright-mcp/
 *.lcov
 test-output.md
 ts_trace.txt
