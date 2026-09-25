@@ -7,6 +7,17 @@
     "firecrawl": {
       "command": "npx",
       "args": ["-y", "firecrawl-mcp"]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest", "--headless"]
+    },
+    "context7": {
+      "serverUrl": "https://mcp.context7.com/mcp"
     }
   }
 }
