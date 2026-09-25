@@ -10,11 +10,13 @@ import {
   stemPrefix,
   validatePaperManifest,
   validateQuestionRecord,
+  validateMainsQuestionRecord,
 } from '../../server-lib/qbank/validators.js';
 import type {
   EvidenceRef,
   PaperManifest,
   QuestionRecord,
+  MainsQuestionRecord,
 } from '../../server-lib/qbank/types.js';
 
 const ev: EvidenceRef = {
@@ -277,6 +279,88 @@ test('empty source documents fails', () => {
   m.source_documents = [];
   const res = validatePaperManifest(m);
   assert.ok(res.errors.some((e) => e.field === 'source_documents'));
+});
+
+// ---------------------------------------------------------------------------
+// Mains & Essay Prompt Validation Tests
+// ---------------------------------------------------------------------------
+
+function makeMainsRecord(overrides: Partial<MainsQuestionRecord> = {}): MainsQuestionRecord {
+  return {
+    canonical_id: 'UPSC_CSE_Mains_2023_GS-M4_Q001a_en',
+    identity: {
+      exam: 'UPSC_CSE',
+      stage: 'Mains',
+      year: 2023,
+      paper: 'GS-M4',
+      language: 'en',
+      question_number: 1,
+      subpart: 'a',
+    },
+    text: {
+      prompt: 'What do you understand by moral integrity? How does it differ from statutory compliance in public administration?',
+      subpart: 'a',
+      marks_allotted: 10,
+      word_limit: 150,
+      section: 'Section A',
+    },
+    rubric: {
+      review_state: 'approved',
+      dimensions: [
+        { dimension: 'Conceptual Definition', guidelines: 'Distinguish between internal moral compass vs external legal mandate.' },
+        { dimension: 'Administrative Realism', guidelines: 'Illustrate with a public service dilemma where legal compliance was insufficient.' },
+      ],
+      expected_keywords: ['probity', 'moral agency', 'discretionary power', 'Nolan Principles'],
+    },
+    classification: { review_state: 'unreviewed' },
+    evidence: [ev],
+    status: 'complete',
+    discrepancies: [],
+    eligibility: {
+      authentic: true,
+      text_complete: true,
+      scored: false,
+      reference_only: true,
+      blocking: [],
+    },
+    version: 1,
+    created_at: '2026-09-25T00:00:00.000Z',
+    updated_at: '2026-09-25T00:00:00.000Z',
+    ...overrides,
+  };
+}
+
+test('valid mains record validates cleanly without options', () => {
+  const r = makeMainsRecord();
+  const res = validateMainsQuestionRecord(r);
+  assert.equal(res.ok, true, `Validation failed: ${JSON.stringify(res.errors)}`);
+});
+
+test('mains record with empty prompt fails validation', () => {
+  const r = makeMainsRecord({
+    text: {
+      prompt: '   ',
+      marks_allotted: 10,
+    },
+  });
+  const res = validateMainsQuestionRecord(r);
+  assert.equal(res.ok, false);
+  assert.ok(res.errors.some((e) => e.field === 'text.prompt'));
+});
+
+test('mains record with scored: true fails validation', () => {
+  const r = makeMainsRecord({
+    eligibility: {
+      authentic: true,
+      text_complete: true,
+      scored: true as any,
+      reference_only: false,
+      blocking: [],
+    },
+  });
+  const res = validateMainsQuestionRecord(r);
+  assert.equal(res.ok, false);
+  assert.ok(res.errors.some((e) => e.field === 'eligibility.scored'));
 });
 
 

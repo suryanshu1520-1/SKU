@@ -25,6 +25,7 @@ export interface AttemptRow {
   series: Series;
   seed: number;
   question_ids: string[];
+  pool_version?: number;
   duration_seconds: number;
   started_at: string;
   deadline_at: string;
@@ -50,7 +51,9 @@ export type NewAttempt = Pick<
   | 'duration_seconds'
   | 'started_at'
   | 'deadline_at'
->;
+> & {
+  pool_version?: number;
+};
 
 export interface QuestionAttemptRow {
   session_id: string;
@@ -63,7 +66,7 @@ export interface QuestionAttemptRow {
 }
 
 const ATTEMPT_COLUMNS =
-  'id, user_id, paper_code, subject, rules, series, seed, question_ids, duration_seconds, started_at, deadline_at, status, submit_mode, sheet, checkpoint_at, submitted_at, result, net_hundredths, created_at';
+  'id, user_id, paper_code, subject, rules, series, seed, question_ids, pool_version, duration_seconds, started_at, deadline_at, status, submit_mode, sheet, checkpoint_at, submitted_at, result, net_hundredths, created_at';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

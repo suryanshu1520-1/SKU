@@ -21,6 +21,7 @@ import type {
   PaperManifest,
   QuestionIdentity,
   QuestionRecord,
+  MainsQuestionRecord,
   ReasonCode,
 } from './types.js';
 
@@ -285,6 +286,43 @@ export function collectDiscrepancies(record: QuestionRecord): Discrepancy[] {
     d.push({ code: 'series_unresolved', detail: 'booklet series unresolved', question_number: qn });
 
   return d;
+}
+
+export function validateMainsQuestionRecord(record: MainsQuestionRecord): ValidationResult {
+  const errors: ValidationError[] = [];
+  const id = record.identity;
+
+  if (!record.canonical_id) errors.push(err('canonical_id', 'missing'));
+  if (id.exam !== 'UPSC_CSE') errors.push(err('identity.exam', `invalid: ${id.exam}`));
+  if (id.stage !== 'Mains') errors.push(err('identity.stage', `invalid for Mains: ${id.stage}`));
+  if (!Number.isInteger(id.year) || id.year < 1900 || id.year > 2100)
+    errors.push(err('identity.year', `invalid: ${id.year}`));
+  const MAINS_PAPERS = ['GS-M1', 'GS-M2', 'GS-M3', 'GS-M4', 'Essay'];
+  if (!MAINS_PAPERS.includes(id.paper)) errors.push(err('identity.paper', `invalid Mains paper: ${id.paper}`));
+  if (!(LANGUAGES as readonly string[]).includes(id.language)) errors.push(err('identity.language', `invalid: ${id.language}`));
+  if (!Number.isInteger(id.question_number) || id.question_number < 1)
+    errors.push(err('identity.question_number', `invalid: ${id.question_number}`));
+
+  if (typeof record.text.prompt !== 'string' || record.text.prompt.trim().length === 0)
+    errors.push(err('text.prompt', 'empty'));
+  if (typeof record.text.marks_allotted !== 'number' || record.text.marks_allotted <= 0)
+    errors.push(err('text.marks_allotted', 'must be a positive number'));
+  if (record.text.word_limit != null && (!Number.isInteger(record.text.word_limit) || record.text.word_limit <= 0))
+    errors.push(err('text.word_limit', 'must be a positive integer'));
+
+  if (record.eligibility.scored !== false)
+    errors.push(err('eligibility.scored', 'Mains questions cannot be scored as auto-MCQs'));
+
+  if (!Array.isArray(record.evidence) || record.evidence.length === 0)
+    errors.push(err('evidence', 'missing source occurrence evidence'));
+  else {
+    for (const [idx, ev] of record.evidence.entries()) {
+      if (!SHA256_RE.test(ev.sha256)) errors.push(err(`evidence[${idx}].sha256`, 'malformed'));
+      if (typeof ev.page !== 'number' || ev.page < 1) errors.push(err(`evidence[${idx}].page`, 'invalid page'));
+    }
+  }
+
+  return { ok: errors.length === 0, errors };
 }
 
 export { EMPTY_ELIGIBILITY };

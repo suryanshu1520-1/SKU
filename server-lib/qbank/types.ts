@@ -286,3 +286,57 @@ export interface PaperManifest {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Mains & Essay Non-MCQ Types
+// ---------------------------------------------------------------------------
+
+export interface MainsQuestionText {
+  /** The core analytical prompt or essay topic */
+  prompt: string;
+  /** Sub-part identifier if composite, e.g. "1(a)", "1(b)" */
+  subpart?: string | null;
+  /** Case study narrative (primarily for GS-M4 / Ethics Section B) */
+  case_study?: string | null;
+  /** Word limit explicitly specified on the paper, e.g. 150, 250, 1000-1200 */
+  word_limit?: number | null;
+  /** Marks allocated to this prompt or subpart (e.g. 10, 12.5, 15, 20, 25, 125, 250) */
+  marks_allotted: number;
+  /** Section on the paper, e.g. "Section A", "Section B" */
+  section?: string | null;
+  /** Authentic instructions printed alongside the prompt */
+  instructions?: string | null;
+}
+
+export interface MainsRubricDimension {
+  dimension: string; // e.g. "Constitutional Framework", "Empirical Arguments", "Way Forward"
+  weight_pct?: number;
+  guidelines: string;
+}
+
+export interface MainsRubricAssertion {
+  dimensions?: MainsRubricDimension[];
+  expected_keywords?: string[];
+  reference_outline?: string | null;
+  review_state: ReviewState;
+}
+
+export interface MainsQuestionRecord {
+  canonical_id: string;
+  identity: QuestionIdentity;
+  text: MainsQuestionText;
+  rubric: MainsRubricAssertion;
+  classification: ClassificationAssertion;
+  evidence: EvidenceRef[];
+  status: 'complete' | 'incomplete';
+  discrepancies: Discrepancy[];
+  eligibility: {
+    authentic: boolean;
+    text_complete: boolean;
+    scored: false; // Mains prompts are evaluation-rubric scored, not auto-MCQ scored
+    reference_only: boolean;
+    blocking: ReasonCode[];
+  };
+  version: number;
+  created_at: string;
+  updated_at: string;
+}

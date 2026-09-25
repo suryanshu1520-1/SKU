@@ -95,7 +95,7 @@ function getCandidatePaths(): string[] {
   return candidates;
 }
 
-function loadCorpus(): PYQItem[] {
+export function loadCorpus(): PYQItem[] {
   if (cachedCorpus) return cachedCorpus;
 
   try {
@@ -248,6 +248,29 @@ export function queryMasterPYQs(params: PYQQueryParams): PYQQueryResult {
   };
 }
 
+/**
+ * Exact Chi-Square upper-tail p-value for df = 3 using the regularized gamma / erf.
+ * For df = 3, P(X >= x) = 2 * (1 - normalCdf(sqrt(x))) + sqrt(2/pi) * sqrt(x) * exp(-x/2).
+ */
+function chiSquareSurvivalDf3(x: number): number {
+  if (x <= 0) return 1.0;
+  const z = Math.sqrt(x);
+  const p = 0.3275911;
+  const a1 = 0.254829592;
+  const a2 = -0.284496736;
+  const a3 = 1.421413741;
+  const a4 = -1.453152027;
+  const a5 = 1.061405429;
+  const t = 1.0 / (1.0 + p * (z / Math.SQRT2));
+  const poly = ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t;
+  const erfc = poly * Math.exp(-(z * z) / 2);
+  const oneMinusCdf = 0.5 * erfc;
+
+  const pdfTerm = Math.sqrt(2 / Math.PI) * z * Math.exp(-x / 2);
+  const pVal = 2 * oneMinusCdf + pdfTerm;
+  return Math.max(0, Math.min(1, Number(pVal.toFixed(6))));
+}
+
 let cachedCensus: CorpusCensus | null = null;
 
 export function getCorpusCensus(): CorpusCensus {
@@ -289,7 +312,7 @@ export function getCorpusCensus(): CorpusCensus {
     distribution.push({ key: k, count: O, pct, deviation: devStr, evScore: evStr });
   }
 
-  // Markov first-order sequential transitions across chronological corpus
+  // Markov first-order sequential transitions strictly within the SAME paper and exam year
   const transCounts: Record<string, Record<string, number> & { total: number }> = {
     a: { a: 0, b: 0, c: 0, d: 0, total: 0 },
     b: { a: 0, b: 0, c: 0, d: 0, total: 0 },
@@ -298,6 +321,10 @@ export function getCorpusCensus(): CorpusCensus {
   };
 
   for (let i = 0; i < corpus.length - 1; i++) {
+    // Only transition within the SAME paper and session to measure consecutive examiner decisions
+    if (corpus[i].year !== corpus[i + 1].year || corpus[i].paper !== corpus[i + 1].paper) {
+      continue;
+    }
     const curr = (corpus[i].correctKey || '').trim().toLowerCase();
     const next = (corpus[i + 1].correctKey || '').trim().toLowerCase();
     if (transCounts[curr] && transCounts[curr][next] !== undefined) {
@@ -317,12 +344,12 @@ export function getCorpusCensus(): CorpusCensus {
 
   cachedCensus = {
     totalItems: corpus.length,
-    yearsCovered: "2000–2025 (25 Years)",
+    yearsCovered: "2000–2025 (26 Years)",
     prelimsQuestions: prelimsCount,
     mainsQuestions: mainsCount,
     distribution,
     uniformityChiSquare: Number(chiSquare.toFixed(4)),
-    uniformityPValue: 0.0001, // Highly skewed: p < 0.0001
+    uniformityPValue: chiSquareSurvivalDf3(chiSquare),
     entropyBits: Number(entropy.toFixed(4)),
     markovTransitions,
   };

@@ -333,6 +333,7 @@ export async function examStartHandler(req: Request, res: Response): Promise<voi
         series,
         seed,
         question_ids: items.map((i) => i.id),
+        pool_version: 1,
         duration_seconds: duration,
         started_at: startedAt.toISOString(),
         deadline_at: deadlineAt.toISOString(),
