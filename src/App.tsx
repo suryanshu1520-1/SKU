@@ -326,8 +326,8 @@ export default function App() {
           const cachedUserId = localStorage.getItem('tark_session_user_id');
           if (cachedEmail && cachedName) {
             setUserEmail(cachedEmail);
-            setUserName(cachedName);
-            setUserId(cachedUserId || cachedEmail);
+            const isCachedUuid = Boolean(cachedUserId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cachedUserId));
+            setUserId(isCachedUuid ? cachedUserId! : '');
 
             const effectiveUid = cachedUserId || cachedEmail;
             loadStoredPreferences(effectiveUid).then((loadedPrefs) => {

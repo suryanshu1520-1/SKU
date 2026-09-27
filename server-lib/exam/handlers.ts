@@ -83,13 +83,17 @@ function resolveDuration(spec: PaperSpec): number {
 }
 
 function paperItemsFor(row: AttemptRow): PaperItem[] {
-  return row.question_ids.map((id, i) => {
+  const result: PaperItem[] = [];
+  for (let i = 0; i < row.question_ids.length; i++) {
+    const id = row.question_ids[i];
     const poolItem = getPoolItem(id);
-    if (!poolItem) {
-      throw new Error(`POOL_MISMATCH ${id}`);
+    if (poolItem) {
+      result.push(toPaperItem(poolItem, i + 1));
+    } else {
+      console.warn(`[exam] POOL_MISMATCH: question ${id} not found in pool for attempt ${row.id}`);
     }
-    return toPaperItem(poolItem, i + 1);
-  });
+  }
+  return result;
 }
 
 function compositionFor(row: AttemptRow): Record<string, number> {
@@ -177,10 +181,11 @@ async function finalize(
   const items: PoolItem[] = [];
   for (const id of row.question_ids) {
     const poolItem = getPoolItem(id);
-    if (!poolItem) {
-      throw new Error(`POOL_MISMATCH ${id}`);
+    if (poolItem) {
+      items.push(poolItem);
+    } else {
+      console.warn(`[exam] POOL_MISMATCH in finalize: question ${id} not found in pool`);
     }
-    items.push(poolItem);
   }
 
   const result = gradeSheet(items, sheet, {

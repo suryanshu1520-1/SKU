@@ -14,8 +14,8 @@ export async function fetchWithAuth(url: RequestInfo | URL, options: RequestInit
     headers,
   });
 
-  // If unauthorized and a session was active, attempt a single session refresh and retry
-  if (res.status === 401 && session) {
+  // If unauthorized, attempt a single session refresh and retry
+  if (res.status === 401) {
     try {
       const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
       if (!refreshError && refreshData.session?.access_token) {

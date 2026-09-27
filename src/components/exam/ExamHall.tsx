@@ -498,6 +498,13 @@ export default function ExamHall(props: ExamHallProps): React.ReactElement {
             )}
             <button
               type="button"
+              onClick={() => props.onStartPaper('GS1_FULL')}
+              className="px-4 py-2 rounded-md border border-[var(--gold,#e0d0ab)]/40 text-[var(--gold,#e0d0ab)] font-sans text-sm hover:bg-[var(--gold,#e0d0ab)]/10 cursor-pointer"
+            >
+              Sit a new paper
+            </button>
+            <button
+              type="button"
               onClick={props.onExit}
               className="px-4 py-2 rounded-md border border-border text-secondary font-sans text-sm hover:bg-surface-elevated cursor-pointer"
             >

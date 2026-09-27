@@ -18,7 +18,21 @@ export class ExamApiError extends Error {
   ) {
     super(message);
     this.name = 'ExamApiError';
+    Object.setPrototypeOf(this, ExamApiError.prototype);
   }
+}
+
+export function isUnauthorizedError(err: unknown): boolean {
+  if (!err || typeof err !== 'object') return false;
+  const status = (err as any).status;
+  const code = (err as any).code;
+  const msg = typeof (err as any).message === 'string' ? (err as any).message.toLowerCase() : '';
+  return (
+    status === 401 ||
+    code === 'UNAUTHORIZED' ||
+    msg.includes('sign in') ||
+    msg.includes('unauthorized')
+  );
 }
 
 async function request<T>(url: string, init?: RequestInit): Promise<T> {

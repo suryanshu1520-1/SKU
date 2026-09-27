@@ -35,7 +35,8 @@ import {
   AlertCircle,
   Eye,
   Compass,
-  ArrowRight
+  ArrowRight,
+  Menu
 } from 'lucide-react';
 
 interface ExaminerPsycheModalProps {
@@ -732,24 +733,42 @@ function NodeLinkedPyqs({
 // ── Tab Config Definition ──
 type TabId = 'trends' | 'shifts' | 'qualifiers' | 'pareto' | 'cicada' | 'csat' | 'dialectics' | 'directives';
 
-interface TabConfig {
+interface TabItem {
   id: TabId;
   label: string;
-  shortLabel: string;
   badge: string;
-  category: 'Macro Architecture' | 'Cognitive Forensics' | 'Mains & CSAT Matrix';
   icon: React.ComponentType<{ className?: string }>;
 }
 
-const TABS: TabConfig[] = [
-  { id: 'trends', label: 'Weightage & Core Slices', shortLabel: 'Distribution', badge: '1,869 Items', category: 'Macro Architecture', icon: PieChart },
-  { id: 'shifts', label: 'Format Shift Evolution', shortLabel: 'Format Shifts', badge: '4 Eras (2000–25)', category: 'Macro Architecture', icon: TrendingUp },
-  { id: 'qualifiers', label: 'Qualifier Truth vs Option Syntax', shortLabel: 'Qualifier Lab', badge: 'Myth Decoded', category: 'Cognitive Forensics', icon: Crosshair },
-  { id: 'pareto', label: 'Pareto 80/20 & Drought Radar', shortLabel: 'Pareto Radar', badge: '28 Core Nodes', category: 'Cognitive Forensics', icon: Target },
-  { id: 'cicada', label: 'Cicada Harmonic Waves', shortLabel: 'Cicada Waves', badge: '1.8y–2.5y Harmonics', category: 'Cognitive Forensics', icon: Flame },
-  { id: 'csat', label: 'CSAT Paper-2 Empirical DNA', shortLabel: 'CSAT DNA', badge: '608 Questions', category: 'Mains & CSAT Matrix', icon: BookOpen },
-  { id: 'dialectics', label: 'GS-4 & Essay Dialectical Axes', shortLabel: 'Dialectics', badge: '4 Fundamental Axes', category: 'Mains & CSAT Matrix', icon: Scale },
-  { id: 'directives', label: 'Directive Verb Scoring Pyramid', shortLabel: 'Directives', badge: '3 Cognitive Depths', category: 'Mains & CSAT Matrix', icon: Sliders },
+interface TabWing {
+  title: string;
+  items: TabItem[];
+}
+
+const TAB_WINGS: TabWing[] = [
+  {
+    title: "Macro Landscape",
+    items: [
+      { id: 'trends', label: 'Weightage & Core Slices', badge: '1,869 Items', icon: PieChart },
+      { id: 'shifts', label: 'Format Shift Evolution', badge: '4 Eras', icon: TrendingUp },
+    ]
+  },
+  {
+    title: "Cognitive Forensics",
+    items: [
+      { id: 'qualifiers', label: 'Qualifier Truth vs Syntax', badge: 'Myth Decoded', icon: Crosshair },
+      { id: 'pareto', label: 'Pareto 80/20 & Drought', badge: '28 Nodes', icon: Target },
+      { id: 'cicada', label: 'Cicada Harmonic Waves', badge: '1.8y–2.5y', icon: Flame },
+    ]
+  },
+  {
+    title: "Mains & CSAT Rubrics",
+    items: [
+      { id: 'csat', label: 'CSAT Paper-2 Empirical DNA', badge: '608 Qs', icon: BookOpen },
+      { id: 'dialectics', label: 'GS-4 & Essay Dialectical Axes', badge: '4 Axes', icon: Scale },
+      { id: 'directives', label: 'Directive Verb Scoring Pyramid', badge: '3 Depths', icon: Sliders },
+    ]
+  }
 ];
 
 export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: ExaminerPsycheModalProps) {
@@ -853,12 +872,12 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.98, y: 10 }}
         transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-6xl max-h-[92vh] bg-[#071630] border border-[#e0d0ab]/25 rounded-2xl shadow-[0_30px_70px_-15px_rgba(0,0,0,0.98),0_0_40px_rgba(224,208,171,0.08)] flex flex-col overflow-hidden text-[#f4ecd8] font-sans"
+        className="w-full max-w-7xl max-h-[92vh] h-[900px] bg-[#071630] border border-[#e0d0ab]/25 rounded-2xl shadow-[0_30px_70px_-15px_rgba(0,0,0,0.98),0_0_40px_rgba(224,208,171,0.08)] flex flex-col overflow-hidden text-[#f4ecd8] font-sans"
       >
         {/* ── Modal Header Chrome ── */}
-        <div className="px-5 sm:px-7 py-4 border-b border-[#e0d0ab]/20 bg-gradient-to-r from-[#0a2148] via-[#071630] to-[#041228] flex items-center justify-between shrink-0">
+        <div className="px-5 sm:px-7 py-3.5 border-b border-[#e0d0ab]/20 bg-gradient-to-r from-[#0a2148] via-[#071630] to-[#041228] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3.5">
-            <div className="p-2.5 rounded-xl bg-[#e0d0ab]/15 border border-[#e0d0ab]/30 text-[#e0d0ab] shadow-[0_0_20px_rgba(224,208,171,0.2)] shrink-0">
+            <div className="p-2 rounded-xl bg-[#e0d0ab]/15 border border-[#e0d0ab]/30 text-[#e0d0ab] shadow-[0_0_20px_rgba(224,208,171,0.2)] shrink-0">
               <Brain className="w-5 h-5 text-[#e0d0ab]" />
             </div>
             <div>
@@ -874,7 +893,7 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                   Zero-Null Verified
                 </span>
               </div>
-              <h2 className="text-lg sm:text-xl md:text-2xl font-serif font-bold text-[#f4ecd8] tracking-tight mt-0.5">
+              <h2 className="text-lg sm:text-xl font-serif font-bold text-[#f4ecd8] tracking-tight mt-0.5">
                 The Examiner's Psyche & Cognitive Intelligence
               </h2>
             </div>
@@ -894,797 +913,739 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
           </div>
         </div>
 
-        {/* ── High-Contrast Visual Segmented Navigation Rail ── */}
-        <div className="px-5 sm:px-7 py-2.5 bg-[#041228] border-b border-[#e0d0ab]/20 flex items-center gap-2 overflow-x-auto shrink-0 scrollbar-none">
-          {TABS.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-3.5 py-2 rounded-lg text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer select-none border ${
-                  isActive
-                    ? 'bg-[#e0d0ab] text-[#050b1a] font-bold border-[#e0d0ab] shadow-[0_0_15px_rgba(224,208,171,0.35)]'
-                    : 'bg-[#071630]/60 text-[#b5c1d1] hover:text-[#f4ecd8] hover:bg-[#0a2148] border-[#e0d0ab]/15'
-                }`}
-              >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#050b1a]' : 'text-[#e0d0ab]'}`} />
-                <span className="font-sans">{tab.label}</span>
-                <span
-                  className={`text-[10px] font-mono px-1.5 py-0.2 rounded ${
-                    isActive
-                      ? 'bg-[#050b1a]/20 text-[#050b1a] font-bold'
-                      : 'bg-[#0a2148] text-[#e0d0ab] border border-[#e0d0ab]/20'
-                  }`}
-                >
-                  {tab.badge}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* ── Scrollable Body Cockpit ── */}
-        <div className="flex-1 p-5 sm:p-7 md:p-8 overflow-y-auto space-y-6 scrollbar-thin scrollbar-thumb-[#e0d0ab]/20">
-
-          {/* ═════════════════════════════════════════════════════════════════
-              TAB 0: WEIGHTAGE & CORE SLICES (VISUAL LEARNING SUNBURST MATRIX)
-             ═════════════════════════════════════════════════════════════════ */}
-          {activeTab === 'trends' && data?.bankTrends && (
-            <div className="space-y-6">
-              {/* Macro Telemetry Cockpit */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                <div className="p-3.5 rounded-xl bg-gradient-to-br from-[#0a2148]/80 to-[#071630] border border-[#e0d0ab]/20 space-y-1 shadow-sm">
-                  <span className="text-[10px] font-mono text-[#b5c1d1] uppercase font-bold tracking-wider">Total Prelims Bank</span>
-                  <div className="text-xl font-mono font-black text-[#e0d0ab]">{data.bankTrends.census.totalPrelimsQuestions}</div>
-                  <span className="text-[9px] font-mono text-[#6e7d94] block">MCQs Ingested</span>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-gradient-to-br from-[#0a2148]/80 to-[#071630] border border-emerald-500/25 space-y-1 shadow-sm">
-                  <span className="text-[10px] font-mono text-[#b5c1d1] uppercase font-bold tracking-wider">UPSC CSE Items</span>
-                  <div className="text-xl font-mono font-black text-emerald-400">{data.bankTrends.census.upscQuestionsCount}</div>
-                  <span className="text-[9px] font-mono text-[#6e7d94] block">Dedicated Track</span>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-gradient-to-br from-[#0a2148]/80 to-[#071630] border border-blue-500/25 space-y-1 shadow-sm">
-                  <span className="text-[10px] font-mono text-[#b5c1d1] uppercase font-bold tracking-wider">SSC CGL Items</span>
-                  <div className="text-xl font-mono font-black text-blue-400">{data.bankTrends.census.sscQuestionsCount}</div>
-                  <span className="text-[9px] font-mono text-[#6e7d94] block">Segregated Track</span>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-gradient-to-br from-[#0a2148]/80 to-[#071630] border border-amber-500/25 space-y-1 shadow-sm">
-                  <span className="text-[10px] font-mono text-[#b5c1d1] uppercase font-bold tracking-wider">Mains Blueprints</span>
-                  <div className="text-xl font-mono font-black text-amber-400">{data.bankTrends.census.totalMainsQuestions}</div>
-                  <span className="text-[9px] font-mono text-[#6e7d94] block">3-Tier Rubrics</span>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-gradient-to-br from-[#0a2148]/80 to-[#071630] border border-[#e0d0ab]/20 space-y-1 shadow-sm">
-                  <span className="text-[10px] font-mono text-[#b5c1d1] uppercase font-bold tracking-wider">Syllabus Nodes</span>
-                  <div className="text-xl font-mono font-black text-[#f4ecd8]">{data.bankTrends.census.totalSyllabusNodes}</div>
-                  <span className="text-[9px] font-mono text-[#6e7d94] block">Hierarchical Graph</span>
-                </div>
-
-                <div className="p-3.5 rounded-xl bg-gradient-to-br from-[#0a2148]/80 to-[#071630] border border-emerald-500/25 space-y-1 shadow-sm">
-                  <span className="text-[10px] font-mono text-[#b5c1d1] uppercase font-bold tracking-wider">Zero Null-Key</span>
-                  <div className="text-xl font-mono font-black text-emerald-400">100%</div>
-                  <span className="text-[9px] font-mono text-[#6e7d94] block">Relational Guardrail</span>
-                </div>
-              </div>
-
-              {/* ── VISUAL LEARNING SUNBURST DONUT & PILLAR HEATMAP ── */}
-              <div className="p-5 sm:p-6 rounded-2xl bg-[#041228]/80 border border-[#e0d0ab]/20 shadow-xl space-y-5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#e0d0ab]/15 pb-4">
-                  <div>
-                    <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
-                      <PieChart className="w-4 h-4 text-[#e0d0ab]" />
-                      Interactive Syllabus Weightage & Paper Pillar Matrix (2000–2025)
-                    </h3>
-                    <p className="text-xs text-[#b5c1d1] mt-0.5">
-                      Hover over any colored sector or pillar card to dissect empirical frequency, questions count, and examiner focus.
-                    </p>
-                  </div>
-                  <span className="text-[11px] font-mono text-[#e0d0ab] bg-[#0a2148] px-3 py-1 rounded-md border border-[#e0d0ab]/25">
-                    N = 1,869 Discrete Pyqs
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                  {/* Left: SVG Interactive Donut Chart with Center Readout */}
-                  <div className="lg:col-span-5 flex flex-col items-center justify-center p-4">
-                    <div className="relative w-64 h-64 flex items-center justify-center">
-                      <svg viewBox="0 0 200 200" className="w-full h-full transform -rotate-90">
-                        <circle
-                          cx="100"
-                          cy="100"
-                          r={donutRadius}
-                          fill="transparent"
-                          stroke="#0a2148"
-                          strokeWidth="20"
-                        />
-                        {subjects.map((sub: any, idx: number) => {
-                          const strokeDash = (sub.sharePct / 100) * donutCircumference;
-                          const strokeOffset = (accumulatedShare / 100) * donutCircumference;
-                          accumulatedShare += sub.sharePct;
-                          const isHovered = hoveredSubjectIdx === idx;
-                          return (
-                            <circle
-                              key={idx}
-                              cx="100"
-                              cy="100"
-                              r={donutRadius}
-                              fill="transparent"
-                              stroke={sub.color || '#38bdf8'}
-                              strokeWidth={isHovered ? 26 : 20}
-                              strokeDasharray={`${strokeDash} ${donutCircumference}`}
-                              strokeDashoffset={-strokeOffset}
-                              className="cursor-pointer transition-all duration-200"
-                              onMouseEnter={() => setHoveredSubjectIdx(idx)}
-                              style={{
-                                filter: isHovered ? `drop-shadow(0 0 8px ${sub.color || '#38bdf8'})` : 'none',
-                                opacity: hoveredSubjectIdx === null || isHovered ? 1 : 0.45
-                              }}
-                            />
-                          );
-                        })}
-                      </svg>
-
-                      {/* Center Interactive Readout */}
-                      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center p-4">
-                        <span className="text-[10px] font-mono text-[#b5c1d1] uppercase font-bold tracking-wider">
-                          {activeSubject.pillar} Pillar
-                        </span>
-                        <div className="text-2xl font-mono font-black text-[#e0d0ab]">
-                          {activeSubject.sharePct}%
-                        </div>
-                        <span className="text-[10px] font-mono text-[#f4ecd8] line-clamp-1 max-w-[120px]">
-                          {activeSubject.count} Questions
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="text-center mt-3">
-                      <span className="text-xs font-mono text-[#b5c1d1]">
-                        Selected: <strong className="text-[#e0d0ab]">{activeSubject.subject}</strong>
-                      </span>
-                    </div>
+        {/* ── Main Split Viewport: Left Vertical Rail + Right Stage ── */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* ═══════════════════════════════════════════════════════════════
+              LEFT VERTICAL NAVIGATION RAIL (Fixed, Always Visible & Categorized)
+             ═══════════════════════════════════════════════════════════════ */}
+          <aside className="w-68 sm:w-72 shrink-0 border-r border-[#e0d0ab]/15 bg-[#041228] flex flex-col justify-between overflow-y-auto p-4 space-y-5 select-none scrollbar-thin scrollbar-thumb-[#e0d0ab]/15">
+            <div className="space-y-5">
+              {TAB_WINGS.map((wing, wIdx) => (
+                <div key={wIdx} className="space-y-1.5">
+                  <div className="px-2.5 text-[10px] font-mono uppercase tracking-widest text-[#e0d0ab]/70 font-bold flex items-center gap-1.5">
+                    <span className="w-1 h-1 rounded-full bg-[#e0d0ab]" />
+                    {wing.title}
                   </div>
 
-                  {/* Right: Interactive Pillar Breakdown Cards Grid */}
-                  <div className="lg:col-span-7 space-y-2.5 max-h-[360px] overflow-y-auto pr-1">
-                    {subjects.map((sub: any, idx: number) => {
-                      const isHovered = hoveredSubjectIdx === idx;
+                  <div className="space-y-1">
+                    {wing.items.map((tab) => {
+                      const Icon = tab.icon;
+                      const isActive = activeTab === tab.id;
                       return (
-                        <div
-                          key={idx}
-                          onMouseEnter={() => setHoveredSubjectIdx(idx)}
-                          className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
-                            isHovered
-                              ? 'bg-[#0a2148] border-[#e0d0ab] shadow-md -translate-y-0.5'
-                              : 'bg-[#071630]/70 border-[#e0d0ab]/15 hover:border-[#e0d0ab]/30'
+                        <button
+                          key={tab.id}
+                          onClick={() => setActiveTab(tab.id)}
+                          className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-all cursor-pointer text-left border ${
+                            isActive
+                              ? 'bg-[#e0d0ab] text-[#050b1a] font-bold border-[#e0d0ab] shadow-[0_0_15px_rgba(224,208,171,0.3)] translate-x-1'
+                              : 'bg-[#071630]/60 text-[#b5c1d1] hover:text-[#f4ecd8] hover:bg-[#0a2148] border-[#e0d0ab]/10 hover:border-[#e0d0ab]/25'
                           }`}
                         >
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="flex items-center gap-2.5">
-                              <span
-                                className="w-3 h-3 rounded-full shrink-0"
-                                style={{ backgroundColor: sub.color || '#38bdf8' }}
-                              />
-                              <span className="text-xs font-sans font-bold text-[#f4ecd8]">
-                                {sub.subject}
-                              </span>
-                              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#050b1a] text-[#e0d0ab] border border-[#e0d0ab]/20">
-                                {sub.pillar}
-                              </span>
-                            </div>
-
-                            <div className="flex items-center gap-3 shrink-0">
-                              <span className="text-xs font-mono font-black text-[#e0d0ab]">
-                                {sub.sharePct}%
-                              </span>
-                              <span className="text-[10px] font-mono text-[#b5c1d1]">
-                                ({sub.count} Qs)
-                              </span>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onClose();
-                                  if (onLaunchPractice) onLaunchPractice(sub.subject);
-                                }}
-                                className="px-2 py-1 rounded bg-[#071630] hover:bg-[#e0d0ab] hover:text-[#050b1a] text-[#e0d0ab] border border-[#e0d0ab]/25 text-[10px] font-mono inline-flex items-center gap-1 transition-all cursor-pointer"
-                              >
-                                <Swords className="w-3 h-3" />
-                                Drill
-                              </button>
-                            </div>
+                          <div className="flex items-center gap-2.5 min-w-0 pr-1">
+                            <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#050b1a]' : 'text-[#e0d0ab]'}`} />
+                            <span className="text-xs font-sans truncate">{tab.label}</span>
                           </div>
 
-                          <div className="mt-2 text-[11px] text-[#b5c1d1] font-sans line-clamp-1">
-                            <strong className="text-[#e0d0ab]/90 font-mono text-[10px] uppercase">Focus: </strong>
-                            {sub.highYieldFocus}
-                          </div>
-
-                          <div className="w-full h-1.5 rounded-full bg-[#050b1a] mt-2 overflow-hidden">
-                            <div
-                              className="h-full rounded-full transition-all duration-300"
-                              style={{
-                                width: `${sub.sharePct}%`,
-                                backgroundColor: sub.color || '#38bdf8'
-                              }}
-                            />
-                          </div>
-                        </div>
+                          <span
+                            className={`text-[9px] font-mono px-1.5 py-0.5 rounded shrink-0 ${
+                              isActive
+                                ? 'bg-[#050b1a]/20 text-[#050b1a] font-bold'
+                                : 'bg-[#050b1a] text-[#e0d0ab] border border-[#e0d0ab]/20'
+                            }`}
+                          >
+                            {tab.badge}
+                          </span>
+                        </button>
                       );
                     })}
                   </div>
                 </div>
-              </div>
+              ))}
+            </div>
 
-              {/* ── UPSC CSE VS SSC CGL COGNITIVE DNA COMPARISON CANVAS ── */}
-              <div className="p-5 sm:p-6 rounded-2xl bg-[#041228]/80 border border-[#0194a8]/30 space-y-4">
-                <div className="flex items-center justify-between flex-wrap gap-2 border-b border-[#0194a8]/20 pb-3">
-                  <h4 className="text-xs font-mono uppercase tracking-wider text-[#0194a8] font-bold flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-[#0194a8]" />
-                    Comparative Cognitive DNA: UPSC CSE vs SSC CGL
-                  </h4>
-                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                    Sterile Isolation Guardrail
-                  </span>
+            {/* Bottom Rail Intelligence Telemetry Card */}
+            <div className="p-3 rounded-xl bg-[#050b1a]/90 border border-[#e0d0ab]/15 space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider">
+                  Ground Truth Active
+                </span>
+              </div>
+              <p className="text-[10px] font-mono text-[#b5c1d1] leading-relaxed">
+                25 Years of UPSC Testing Forensics • 100% Zero-Null Relational Guardrail Verified
+              </p>
+            </div>
+          </aside>
+
+          {/* ═══════════════════════════════════════════════════════════════
+              RIGHT MAIN STAGE (Scrollable Interactive Content)
+             ═══════════════════════════════════════════════════════════════ */}
+          <main className="flex-1 p-5 sm:p-7 md:p-8 overflow-y-auto space-y-6 bg-[#071630] scrollbar-thin scrollbar-thumb-[#e0d0ab]/20">
+
+            {/* TAB 0: WEIGHTAGE & CORE SLICES */}
+            {activeTab === 'trends' && data?.bankTrends && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                  <div className="p-3.5 rounded-xl bg-gradient-to-br from-[#0a2148]/80 to-[#071630] border border-[#e0d0ab]/20 space-y-1 shadow-sm">
+                    <span className="text-[10px] font-mono text-[#b5c1d1] uppercase font-bold tracking-wider">Total Prelims Bank</span>
+                    <div className="text-xl font-mono font-black text-[#e0d0ab]">{data.bankTrends.census.totalPrelimsQuestions}</div>
+                    <span className="text-[9px] font-mono text-[#6e7d94] block">MCQs Ingested</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-gradient-to-br from-[#0a2148]/80 to-[#071630] border border-emerald-500/25 space-y-1 shadow-sm">
+                    <span className="text-[10px] font-mono text-[#b5c1d1] uppercase font-bold tracking-wider">UPSC CSE Items</span>
+                    <div className="text-xl font-mono font-black text-emerald-400">{data.bankTrends.census.upscQuestionsCount}</div>
+                    <span className="text-[9px] font-mono text-[#6e7d94] block">Dedicated Track</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-gradient-to-br from-[#0a2148]/80 to-[#071630] border border-blue-500/25 space-y-1 shadow-sm">
+                    <span className="text-[10px] font-mono text-[#b5c1d1] uppercase font-bold tracking-wider">SSC CGL Items</span>
+                    <div className="text-xl font-mono font-black text-blue-400">{data.bankTrends.census.sscQuestionsCount}</div>
+                    <span className="text-[9px] font-mono text-[#6e7d94] block">Segregated Track</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-gradient-to-br from-[#0a2148]/80 to-[#071630] border border-amber-500/25 space-y-1 shadow-sm">
+                    <span className="text-[10px] font-mono text-[#b5c1d1] uppercase font-bold tracking-wider">Mains Blueprints</span>
+                    <div className="text-xl font-mono font-black text-amber-400">{data.bankTrends.census.totalMainsQuestions}</div>
+                    <span className="text-[9px] font-mono text-[#6e7d94] block">3-Tier Rubrics</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-gradient-to-br from-[#0a2148]/80 to-[#071630] border border-[#e0d0ab]/20 space-y-1 shadow-sm">
+                    <span className="text-[10px] font-mono text-[#b5c1d1] uppercase font-bold tracking-wider">Syllabus Nodes</span>
+                    <div className="text-xl font-mono font-black text-[#f4ecd8]">{data.bankTrends.census.totalSyllabusNodes}</div>
+                    <span className="text-[9px] font-mono text-[#6e7d94] block">Hierarchical Graph</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-gradient-to-br from-[#0a2148]/80 to-[#071630] border border-emerald-500/25 space-y-1 shadow-sm">
+                    <span className="text-[10px] font-mono text-[#b5c1d1] uppercase font-bold tracking-wider">Zero Null-Key</span>
+                    <div className="text-xl font-mono font-black text-emerald-400">100%</div>
+                    <span className="text-[9px] font-mono text-[#6e7d94] block">Relational Guardrail</span>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {data.bankTrends.examTrackComparison.map((comp: any, idx: number) => (
-                    <div key={idx} className="p-4 rounded-xl bg-[#071630] border border-[#e0d0ab]/15 space-y-3">
-                      <h5 className="font-serif font-bold text-[#f4ecd8] text-sm flex items-center gap-2">
-                        <Target className="w-4 h-4 text-[#e0d0ab]" />
-                        {comp.feature}
-                      </h5>
-                      <div className="space-y-2 text-xs">
-                        <div className="p-3 rounded-lg bg-[#050b1a] border border-[#e0d0ab]/20 space-y-1">
-                          <span className="font-mono text-[10px] text-[#e0d0ab] font-bold uppercase block">
-                            UPSC CSE Track:
-                          </span>
-                          <p className="text-[#f4ecd8] leading-relaxed">{comp.upscCseTrack}</p>
-                        </div>
-                        <div className="p-3 rounded-lg bg-[#050b1a] border border-[#0194a8]/30 space-y-1">
-                          <span className="font-mono text-[10px] text-[#0194a8] font-bold uppercase block">
-                            SSC CGL Track:
-                          </span>
-                          <p className="text-[#f4ecd8] leading-relaxed">{comp.sscCglTrack}</p>
-                        </div>
-                      </div>
-                      <p className="text-[11px] text-[#b5c1d1] italic pt-1 border-t border-[#e0d0ab]/10">
-                        <strong className="text-[#e0d0ab] not-italic">Strategic Takeaway:</strong> {comp.strategicTakeaway}
+                <div className="p-5 sm:p-6 rounded-2xl bg-[#041228]/80 border border-[#e0d0ab]/20 shadow-xl space-y-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#e0d0ab]/15 pb-4">
+                    <div>
+                      <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
+                        <PieChart className="w-4 h-4 text-[#e0d0ab]" />
+                        Interactive Syllabus Weightage & Paper Pillar Matrix (2000–2025)
+                      </h3>
+                      <p className="text-xs text-[#b5c1d1] mt-0.5">
+                        Hover over any colored sector or pillar card to dissect empirical frequency, questions count, and examiner focus.
                       </p>
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
+                    <span className="text-[11px] font-mono text-[#e0d0ab] bg-[#0a2148] px-3 py-1 rounded-md border border-[#e0d0ab]/25">
+                      N = 1,869 Discrete Pyqs
+                    </span>
+                  </div>
 
-          {/* ═════════════════════════════════════════════════════════════════
-              TAB 1: FORMAT SHIFT CHRONOLOGY (VISUAL HISTORICAL TIMELINE)
-             ═════════════════════════════════════════════════════════════════ */}
-          {activeTab === 'shifts' && data?.formatShifts && (
-            <div className="space-y-6">
-              <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-[#0a2148]/80 via-[#071630] to-[#041228] border border-[#e0d0ab]/25 space-y-2 shadow-lg">
-                <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-[#e0d0ab]" />
-                  25-Year Format Evolution Vector (2000–2025)
-                </h3>
-                <p className="text-xs text-[#b5c1d1] leading-relaxed">
-                  Interactive historical progression showing how UPSC dismantled rote coaching shortcuts, transitioned to binary elimination, and finally rendered option tricks obsolete through pair matching.
-                </p>
-              </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <div className="lg:col-span-5 flex flex-col items-center justify-center p-4">
+                      <div className="relative w-64 h-64 flex items-center justify-center">
+                        <svg viewBox="0 0 200 200" className="w-full h-full transform -rotate-90">
+                          <circle cx="100" cy="100" r={donutRadius} fill="transparent" stroke="#0a2148" strokeWidth="20" />
+                          {subjects.map((sub: any, idx: number) => {
+                            const strokeDash = (sub.sharePct / 100) * donutCircumference;
+                            const strokeOffset = (accumulatedShare / 100) * donutCircumference;
+                            accumulatedShare += sub.sharePct;
+                            const isHovered = hoveredSubjectIdx === idx;
+                            return (
+                              <circle
+                                key={idx}
+                                cx="100"
+                                cy="100"
+                                r={donutRadius}
+                                fill="transparent"
+                                stroke={sub.color || '#38bdf8'}
+                                strokeWidth={isHovered ? 26 : 20}
+                                strokeDasharray={`${strokeDash} ${donutCircumference}`}
+                                strokeDashoffset={-strokeOffset}
+                                className="cursor-pointer transition-all duration-200"
+                                onMouseEnter={() => setHoveredSubjectIdx(idx)}
+                                style={{
+                                  filter: isHovered ? `drop-shadow(0 0 8px ${sub.color || '#38bdf8'})` : 'none',
+                                  opacity: hoveredSubjectIdx === null || isHovered ? 1 : 0.45
+                                }}
+                              />
+                            );
+                          })}
+                        </svg>
 
-              {/* Interactive Timeline Stepper Bar */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {data.formatShifts.map((shift: any, idx: number) => {
-                  const isActive = activeTimelineEra === idx;
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveTimelineEra(idx)}
-                      className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
-                        isActive
-                          ? 'bg-[#e0d0ab] text-[#050b1a] border-[#e0d0ab] shadow-lg font-bold'
-                          : 'bg-[#041228] text-[#b5c1d1] hover:text-[#f4ecd8] border-[#e0d0ab]/15'
-                      }`}
-                    >
-                      <div className="text-[10px] font-mono uppercase tracking-wider mb-1">
-                        Era {idx + 1} · {shift.yearSpan}
+                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center p-4">
+                          <span className="text-[10px] font-mono text-[#b5c1d1] uppercase font-bold tracking-wider">
+                            {activeSubject.pillar} Pillar
+                          </span>
+                          <div className="text-2xl font-mono font-black text-[#e0d0ab]">
+                            {activeSubject.sharePct}%
+                          </div>
+                          <span className="text-[10px] font-mono text-[#f4ecd8] line-clamp-1 max-w-[120px]">
+                            {activeSubject.count} Questions
+                          </span>
+                        </div>
                       </div>
-                      <div className="text-xs font-serif font-bold line-clamp-1">
-                        {shift.era}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
 
-              {/* Selected Era Deep Visual Explainer Card */}
-              {(() => {
-                const selectedEra = data.formatShifts[activeTimelineEra] || data.formatShifts[3];
-                const dist = selectedEra.prelimsFormatDistribution;
-                return (
-                  <motion.div
-                    key={activeTimelineEra}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="p-6 rounded-2xl bg-[#041228] border border-[#e0d0ab]/25 space-y-5 shadow-2xl"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#e0d0ab]/15 pb-4">
-                      <div>
-                        <span className="text-[10px] font-mono text-[#e0d0ab] uppercase font-bold tracking-widest px-2.5 py-1 rounded bg-[#e0d0ab]/15 border border-[#e0d0ab]/30">
-                          {selectedEra.yearSpan} Historical Epoch
+                      <div className="text-center mt-3">
+                        <span className="text-xs font-mono text-[#b5c1d1]">
+                          Selected: <strong className="text-[#e0d0ab]">{activeSubject.subject}</strong>
                         </span>
-                        <h4 className="text-xl font-serif font-bold text-[#f4ecd8] mt-2">
-                          {selectedEra.era}
-                        </h4>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <div className="p-3 rounded-xl bg-[#071630] border border-[#e0d0ab]/20 text-center">
-                          <span className="text-[9px] font-mono text-[#b5c1d1] uppercase block">Reading Load</span>
-                          <span className="text-lg font-mono font-black text-[#e0d0ab]">
-                            {selectedEra.avgWordsPerStem || 88} words
-                          </span>
-                          <span className="text-[9px] font-mono text-[#6e7d94] block">Avg per stem</span>
-                        </div>
                       </div>
                     </div>
 
-                    {/* Structural Pivot Description */}
-                    <div className="p-4 rounded-xl bg-[#071630] border border-[#e0d0ab]/15 space-y-1">
-                      <span className="text-[10px] font-mono text-[#e0d0ab] font-bold uppercase tracking-wider block">
-                        Structural Examination Pivot:
-                      </span>
-                      <p className="text-sm font-serif italic text-[#f4ecd8] leading-relaxed">
-                        "{selectedEra.structuralPivot}"
-                      </p>
-                    </div>
-
-                    {/* Segmented Format Proportion Bar */}
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between text-xs font-mono text-[#b5c1d1]">
-                        <span>Question Stem Format Proportions:</span>
-                        <span className="text-[#e0d0ab]">Normalized 100% Cohort</span>
-                      </div>
-
-                      <div className="h-4 w-full rounded-full bg-[#050b1a] overflow-hidden flex border border-[#e0d0ab]/20 p-0.5">
-                        {dist.singleChoicePct > 0 && (
+                    <div className="lg:col-span-7 space-y-2.5 max-h-[360px] overflow-y-auto pr-1">
+                      {subjects.map((sub: any, idx: number) => {
+                        const isHovered = hoveredSubjectIdx === idx;
+                        return (
                           <div
-                            style={{ width: `${dist.singleChoicePct}%` }}
-                            className="bg-blue-500 h-full rounded-l-full transition-all duration-500"
-                            title={`Single Choice: ${dist.singleChoicePct}%`}
-                          />
-                        )}
-                        {dist.multiStatementPct > 0 && (
-                          <div
-                            style={{ width: `${dist.multiStatementPct}%` }}
-                            className="bg-amber-500 h-full transition-all duration-500"
-                            title={`Multi-Statement: ${dist.multiStatementPct}%`}
-                          />
-                        )}
-                        {dist.pairMatchingPct > 0 && (
-                          <div
-                            style={{ width: `${dist.pairMatchingPct}%` }}
-                            className="bg-emerald-500 h-full transition-all duration-500"
-                            title={`Pair Matching: ${dist.pairMatchingPct}%`}
-                          />
-                        )}
-                        {dist.assertionReasonPct > 0 && (
-                          <div
-                            style={{ width: `${dist.assertionReasonPct}%` }}
-                            className="bg-rose-500 h-full rounded-r-full transition-all duration-500"
-                            title={`Assertion-Reason: ${dist.assertionReasonPct}%`}
-                          />
-                        )}
-                      </div>
+                            key={idx}
+                            onMouseEnter={() => setHoveredSubjectIdx(idx)}
+                            className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
+                              isHovered
+                                ? 'bg-[#0a2148] border-[#e0d0ab] shadow-md -translate-y-0.5'
+                                : 'bg-[#071630]/70 border-[#e0d0ab]/15 hover:border-[#e0d0ab]/30'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <div className="flex items-center gap-2.5">
+                                <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: sub.color || '#38bdf8' }} />
+                                <span className="text-xs font-sans font-bold text-[#f4ecd8]">{sub.subject}</span>
+                                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-[#050b1a] text-[#e0d0ab] border border-[#e0d0ab]/20">
+                                  {sub.pillar}
+                                </span>
+                              </div>
 
-                      {/* Proportion Legend Cards */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-                        <div className="p-3 rounded-xl bg-[#071630] border border-blue-500/20">
-                          <span className="text-[10px] font-mono text-blue-400 block font-bold">Single Choice</span>
-                          <span className="text-lg font-mono font-black text-blue-300">{dist.singleChoicePct}%</span>
-                        </div>
-                        <div className="p-3 rounded-xl bg-[#071630] border border-amber-500/20">
-                          <span className="text-[10px] font-mono text-amber-400 block font-bold">Multi-Statement</span>
-                          <span className="text-lg font-mono font-black text-amber-300">{dist.multiStatementPct}%</span>
-                        </div>
-                        <div className="p-3 rounded-xl bg-[#071630] border border-emerald-500/20">
-                          <span className="text-[10px] font-mono text-emerald-400 block font-bold">Pair Matching</span>
-                          <span className="text-lg font-mono font-black text-emerald-300">{dist.pairMatchingPct}%</span>
-                        </div>
-                        <div className="p-3 rounded-xl bg-[#071630] border border-rose-500/20">
-                          <span className="text-[10px] font-mono text-rose-400 block font-bold">Assertion Reason</span>
-                          <span className="text-lg font-mono font-black text-rose-300">{dist.assertionReasonPct}%</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-4 rounded-xl bg-[#050b1a] border border-[#e0d0ab]/20 space-y-1">
-                      <span className="text-[10px] font-mono text-[#e0d0ab] uppercase font-bold tracking-wider block">
-                        Pedagogical Master Takeaway:
-                      </span>
-                      <p className="text-xs text-[#f4ecd8] leading-relaxed">
-                        {selectedEra.pedagogicalTakeaway}
-                      </p>
-                    </div>
-                  </motion.div>
-                );
-              })()}
-            </div>
-          )}
-
-          {/* ═════════════════════════════════════════════════════════════════
-              TAB 2: QUALIFIER TRUTH VS OPTION SYNTAX (THE FORENSIC DISSECTION LAB)
-             ═════════════════════════════════════════════════════════════════ */}
-          {activeTab === 'qualifiers' && data?.qualifiers && (
-            <div className="space-y-6">
-              {/* Myth Busted Hero Visualizer */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                {/* Left Card: The Commercial Coaching Myth */}
-                <div className="p-6 rounded-2xl bg-red-950/25 border border-red-500/35 space-y-3.5 shadow-xl">
-                  <div className="flex items-center justify-between border-b border-red-500/25 pb-3">
-                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-red-400 flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4 text-red-400" />
-                      Commercial Tutoring Myth
-                    </span>
-                    <span className="px-2 py-0.5 rounded bg-red-500/15 text-red-300 font-mono text-[10px] font-bold uppercase border border-red-500/30">
-                      Conflated Metric
-                    </span>
-                  </div>
-                  <h4 className="font-serif font-bold text-red-100 text-lg">
-                    The "Only = 83% Falsehood Trap" Fallacy
-                  </h4>
-                  <p className="text-xs text-[#b5c1d1] leading-relaxed">
-                    Commercial coaching institutes teach candidates to eliminate any option containing the word <strong className="text-red-300 font-bold">"only"</strong> under the belief that it is an automatic examiner trap.
-                  </p>
-                  <div className="p-4 rounded-xl bg-[#050b1a]/90 border border-red-500/25 space-y-2 text-xs">
-                    <div className="flex items-center justify-between font-mono text-[11px]">
-                      <span className="text-[#b5c1d1]">Paper Questions Containing "Only":</span>
-                      <strong className="text-red-300 font-bold">42.8% of Entire Bank (799 Qs)</strong>
-                    </div>
-                    <div className="flex items-center justify-between font-mono text-[11px]">
-                      <span className="text-[#b5c1d1]">Actual Option-Syntax Occurrences:</span>
-                      <strong className="text-red-400 font-black">&gt;98.2% ('1 only', '2 only', 'Only one pair')</strong>
-                    </div>
-                    <p className="text-[11px] text-[#b5c1d1] pt-1.5 border-t border-red-500/20">
-                      Commercial tests blindly regex-matched "only" inside multiple-choice selectors, mistakenly counting standard option syntax as deceptive examiner traps!
-                    </p>
-                  </div>
-                </div>
-
-                {/* Right Card: The Empirical Ground Truth */}
-                <div className="p-6 rounded-2xl bg-emerald-950/25 border border-emerald-500/35 space-y-3.5 shadow-xl">
-                  <div className="flex items-center justify-between border-b border-emerald-500/25 pb-3">
-                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                      Empirical Ground Truth
-                    </span>
-                    <span className="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 font-mono text-[10px] font-bold uppercase border border-emerald-500/30">
-                      290 Decoded Statements
-                    </span>
-                  </div>
-                  <h4 className="font-serif font-bold text-emerald-100 text-lg">
-                    Isolated Statement Modifier Polarity
-                  </h4>
-                  <p className="text-xs text-[#b5c1d1] leading-relaxed">
-                    When qualifiers are evaluated strictly inside <strong className="text-emerald-300 font-bold">factual statement premises</strong> (excluding option labels), genuine empirical polarity emerges:
-                  </p>
-                  <div className="grid grid-cols-2 gap-3 pt-1">
-                    <div className="p-3.5 rounded-xl bg-[#050b1a]/90 border border-red-500/30 space-y-1 text-center">
-                      <span className="text-[10px] font-mono text-red-400 uppercase font-bold block">Extreme Absolutes</span>
-                      <div className="text-2xl font-mono font-black text-red-300">
-                        {data.qualifiers.overallHeuristics.extremeFalseProbability || 81.3}%
-                      </div>
-                      <span className="text-[9px] font-mono text-[#b5c1d1] block">Empirical Falsehood</span>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-[#050b1a]/90 border border-emerald-500/30 space-y-1 text-center">
-                      <span className="text-[10px] font-mono text-emerald-400 uppercase font-bold block">Contingent Modals</span>
-                      <div className="text-2xl font-mono font-black text-emerald-300">
-                        {data.qualifiers.overallHeuristics.contingentTrueProbability || 76.9}%
-                      </div>
-                      <span className="text-[9px] font-mono text-[#b5c1d1] block">Empirical Truth</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* ── INTERACTIVE STATEMENT DISSECTION WORKBENCH ── */}
-              <div className="p-6 rounded-2xl bg-[#041228] border border-[#e0d0ab]/25 space-y-4 shadow-xl">
-                <div className="flex items-center justify-between flex-wrap gap-2 border-b border-[#e0d0ab]/15 pb-3">
-                  <div>
-                    <h4 className="text-xs font-mono uppercase tracking-wider text-[#e0d0ab] font-bold flex items-center gap-2">
-                      <Eye className="w-4 h-4 text-[#e0d0ab]" />
-                      Interactive Statement Dissection Workbench
-                    </h4>
-                    <p className="text-xs text-[#b5c1d1] mt-0.5">
-                      Click any highlighted qualifier token in the authentic UPSC stem below to inspect its empirical diagnostic profile.
-                    </p>
-                  </div>
-                  <span className="text-[10px] font-mono text-[#e0d0ab] bg-[#0a2148] px-2.5 py-1 rounded border border-[#e0d0ab]/25">
-                    Live Analyzer Active
-                  </span>
-                </div>
-
-                {/* Question Stem Dissection Box */}
-                <div className="p-5 rounded-xl bg-[#071630] border border-[#e0d0ab]/20 space-y-3 font-sans">
-                  <div className="text-[10px] font-mono text-[#e0d0ab] uppercase font-bold">
-                    Official UPSC Sample Archetype (Prelims GS-1):
-                  </div>
-
-                  <p className="text-sm text-[#f4ecd8] leading-relaxed">
-                    "Consider the following statements regarding cetaceans, marine ecosystems, and statutory conservation frameworks:
-                  </p>
-
-                  <div className="space-y-2.5 pl-3 border-l-2 border-[#e0d0ab]/30 text-xs text-[#f4ecd8]">
-                    <div className="flex items-start gap-2">
-                      <span className="font-mono text-[#e0d0ab] font-bold">1.</span>
-                      <div>
-                        Cetaceans are{' '}
-                        <button
-                          onClick={() => setActiveStatementQualifier('all')}
-                          className={`px-1.5 py-0.5 rounded font-mono font-bold transition-all cursor-pointer ${
-                            activeStatementQualifier === 'all'
-                              ? 'bg-red-500 text-[#050b1a] shadow-[0_0_10px_rgba(239,68,68,0.5)]'
-                              : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                          }`}
-                        >
-                          [all / entirely]
-                        </button>{' '}
-                        restricted to marine saltwater environments.
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-2">
-                      <span className="font-mono text-[#e0d0ab] font-bold">2.</span>
-                      <div>
-                        Deep-water coral reefs{' '}
-                        <button
-                          onClick={() => setActiveStatementQualifier('can_be')}
-                          className={`px-1.5 py-0.5 rounded font-mono font-bold transition-all cursor-pointer ${
-                            activeStatementQualifier === 'can_be'
-                              ? 'bg-emerald-500 text-[#050b1a] shadow-[0_0_10px_rgba(16,185,129,0.5)]'
-                              : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                          }`}
-                        >
-                          [can be / may be]
-                        </button>{' '}
-                        found in cold waters at depths exceeding 2,000 meters without photosynthetic symbionts.
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-2">
-                      <span className="font-mono text-[#e0d0ab] font-bold">3.</span>
-                      <div>
-                        In India, river dolphin species are found{' '}
-                        <button
-                          onClick={() => setActiveStatementQualifier('only')}
-                          className={`px-1.5 py-0.5 rounded font-mono font-bold transition-all cursor-pointer ${
-                            activeStatementQualifier === 'only'
-                              ? 'bg-red-500 text-[#050b1a] shadow-[0_0_10px_rgba(239,68,68,0.5)]'
-                              : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                          }`}
-                        >
-                          [only]
-                        </button>{' '}
-                        in the national river basin."
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Dynamic Forensic Readout */}
-                <div className="p-4 rounded-xl bg-[#050b1a] border border-[#e0d0ab]/25 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#b5c1d1] font-bold">
-                      Diagnostic Forensic Profile for: <strong className="text-[#e0d0ab]">"{activeStatementQualifier}"</strong>
-                    </span>
-                    <span
-                      className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase ${
-                        activeStatementQualifier === 'can_be'
-                          ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                          : 'bg-red-500/15 text-red-400 border border-red-500/30'
-                      }`}
-                    >
-                      {activeStatementQualifier === 'can_be' ? 'High Truth Probability (76.9%)' : 'High Falsehood Risk (81.3%)'}
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-[#f4ecd8] leading-relaxed">
-                    {activeStatementQualifier === 'all' && (
-                      <span>
-                        Extreme absolutes such as "all" or "entirely" are intentionally embedded by examiners to force candidates into binary traps. In this statement, freshwater dolphins (like the Platanista gangetica) contradict the absolute assertion, rendering the statement false.
-                      </span>
-                    )}
-                    {activeStatementQualifier === 'can_be' && (
-                      <span>
-                        Permissive modal verbs ("can be", "may be", "could") reflect genuine scientific contingency. UPSC examiners deliberately use permissive phrasing when describing complex biological or planetary mechanisms that do occur under specific conditions, resulting in high empirical veracity.
-                      </span>
-                    )}
-                    {activeStatementQualifier === 'only' && (
-                      <span>
-                        When "only" appears inside factual premises (not option selectors), it narrows statutory or geographical boundaries excessively. River dolphins also inhabit the Brahmaputra and Meghna river networks, making this isolated statement premise false.
-                      </span>
-                    )}
-                  </p>
-                </div>
-              </div>
-
-              {/* Qualifier Tables Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                {/* Extreme Qualifiers */}
-                <div className="p-5 rounded-2xl bg-[#041228] border border-red-500/25 space-y-3">
-                  <div className="flex items-center justify-between border-b border-red-500/20 pb-2.5">
-                    <h5 className="text-xs font-mono uppercase tracking-wider text-red-400 font-bold flex items-center gap-2">
-                      <AlertTriangle className="w-3.5 h-3.5" />
-                      Extreme Modifiers (Falsehood Risk)
-                    </h5>
-                    <span className="text-[10px] font-mono text-[#6e7d94]">Statements Only</span>
-                  </div>
-                  <div className="space-y-2">
-                    {data.qualifiers.extremeQualifiers.map((q: any, idx: number) => (
-                      <div key={idx} className="p-3 rounded-lg bg-[#071630] border border-red-500/15 flex items-center justify-between text-xs">
-                        <span className="font-mono font-bold text-red-400">"{q.token}"</span>
-                        <div className="flex items-center gap-3">
-                          <span className="font-mono text-[#b5c1d1]">N = {q.sampleSize}</span>
-                          <span className="font-mono font-bold text-red-300">{q.falseStatementPct}% False</span>
-                          <span className="px-2 py-0.5 rounded bg-red-500/10 text-red-400 text-[10px] font-mono font-bold uppercase">
-                            {q.examinerTrapIndex.replace('_', ' ')}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Contingent Qualifiers */}
-                <div className="p-5 rounded-2xl bg-[#041228] border border-emerald-500/25 space-y-3">
-                  <div className="flex items-center justify-between border-b border-emerald-500/20 pb-2.5">
-                    <h5 className="text-xs font-mono uppercase tracking-wider text-emerald-400 font-bold flex items-center gap-2">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      Contingent Modifiers (Truth Reliability)
-                    </h5>
-                    <span className="text-[10px] font-mono text-[#6e7d94]">Statements Only</span>
-                  </div>
-                  <div className="space-y-2">
-                    {data.qualifiers.contingentQualifiers.map((q: any, idx: number) => (
-                      <div key={idx} className="p-3 rounded-lg bg-[#071630] border border-emerald-500/15 flex items-center justify-between text-xs">
-                        <span className="font-mono font-bold text-emerald-400">"{q.token}"</span>
-                        <div className="flex items-center gap-3">
-                          <span className="font-mono text-[#b5c1d1]">N = {q.sampleSize}</span>
-                          <span className="font-mono font-bold text-emerald-300">{q.trueStatementPct}% True</span>
-                          <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-mono font-bold uppercase">
-                            {q.reliabilityScore.replace('_', ' ')}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ═════════════════════════════════════════════════════════════════
-              TAB 3: PARETO 80/20 & DROUGHT RADAR
-             ═════════════════════════════════════════════════════════════════ */}
-          {activeTab === 'pareto' && data?.paretoDrought && (
-            <div className="space-y-6">
-              {/* Pareto Hero Banner */}
-              <div className="p-6 rounded-2xl bg-gradient-to-r from-[#0a2148]/90 via-[#071630] to-[#041228] border border-[#e0d0ab]/25 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
-                <div className="space-y-1.5">
-                  <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#e0d0ab]" />
-                    The 80/20 Law of UPSC Testing Weightage
-                  </h3>
-                  <p className="text-xs text-[#b5c1d1] leading-relaxed max-w-2xl">
-                    Empirical data reveals that <strong className="text-[#f4ecd8]">{data.paretoDrought.summary.core80PctNodeCount} syllabus nodes</strong> account for over 85% of total Prelims questions and Mains marks across 2000–2025.
-                  </p>
-                </div>
-                <div className="flex items-center gap-3 shrink-0">
-                  <span className="px-3.5 py-1.5 rounded-xl bg-[#071630] border border-[#e0d0ab]/25 text-[11px] font-mono text-[#f4ecd8]">
-                    Evaluated Nodes: <strong className="text-[#e0d0ab]">{data.paretoDrought.totalNodesEvaluated}</strong>
-                  </span>
-                </div>
-              </div>
-
-              {/* Search & Paper Filter Controls */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-2 overflow-x-auto">
-                  {(['ALL', 'GS1', 'GS2', 'GS3'] as const).map((paper) => (
-                    <button
-                      key={paper}
-                      onClick={() => setParetoPaperFilter(paper)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer ${
-                        paretoPaperFilter === paper
-                          ? 'bg-[#e0d0ab] text-[#050b1a] font-bold shadow-md'
-                          : 'bg-[#041228] text-[#b5c1d1] hover:text-[#f4ecd8] border border-[#e0d0ab]/15'
-                      }`}
-                    >
-                      {paper === 'ALL' ? 'All Papers' : paper}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="relative w-full sm:w-72">
-                  <Search className="w-3.5 h-3.5 text-[#6e7d94] absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    placeholder="Search node code or topic…"
-                    value={paretoSearchQuery}
-                    onChange={(e) => setParetoSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-[#041228] border border-[#e0d0ab]/20 text-xs font-sans text-[#f4ecd8] placeholder-[#6e7d94] focus:outline-none focus:border-[#e0d0ab]/60"
-                  />
-                </div>
-              </div>
-
-              {/* Core Nodes Table */}
-              <div className="space-y-3">
-                <h4 className="text-xs font-mono uppercase tracking-wider text-[#b5c1d1] font-bold flex items-center gap-2">
-                  <Target className="w-3.5 h-3.5 text-[#e0d0ab]" />
-                  High-Yield Pareto Core Syllabus Nodes ({filteredParetoNodes.length})
-                </h4>
-                <div className="overflow-x-auto border border-[#e0d0ab]/20 rounded-2xl bg-[#041228]/80 shadow-xl">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-[#071630] border-b border-[#e0d0ab]/15 font-mono text-[#b5c1d1]">
-                      <tr>
-                        <th className="p-3.5">Node ID & Scope</th>
-                        <th className="p-3.5">Paper</th>
-                        <th className="p-3.5 text-center">Prelims Qs</th>
-                        <th className="p-3.5 text-center">Mains Qs</th>
-                        <th className="p-3.5 text-center">Total Marks</th>
-                        <th className="p-3.5 text-right">Cum. Weight</th>
-                        <th className="p-3.5 text-right">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#e0d0ab]/10 font-sans">
-                      {filteredParetoNodes.map((node: any, idx: number) => (
-                        <React.Fragment key={idx}>
-                          <tr className="hover:bg-[#0a2148]/40 transition-colors">
-                            <td className="p-3.5">
-                              <div className="font-mono text-[#e0d0ab] font-bold text-[11px]">{node.nodeId}</div>
-                              <div className="text-[#b5c1d1] text-[11px] line-clamp-1 mt-0.5">{node.gloss}</div>
-                            </td>
-                            <td className="p-3.5 font-mono text-[11px] text-[#f4ecd8]">{node.paper}</td>
-                            <td className="p-3.5 text-center font-mono font-bold text-[#f4ecd8]">{node.totalPrelims}</td>
-                            <td className="p-3.5 text-center font-mono text-[#b5c1d1]">{node.totalMains}</td>
-                            <td className="p-3.5 text-center font-mono text-[#e0d0ab] font-bold">{node.totalMarks}</td>
-                            <td className="p-3.5 text-right font-mono text-emerald-400 font-bold">{node.cumulativeWeightPct}%</td>
-                            <td className="p-3.5 text-right">
-                              <div className="flex items-center justify-end gap-1.5">
+                              <div className="flex items-center gap-3 shrink-0">
+                                <span className="text-xs font-mono font-black text-[#e0d0ab]">{sub.sharePct}%</span>
+                                <span className="text-[10px] font-mono text-[#b5c1d1]">({sub.count} Qs)</span>
                                 <button
-                                  onClick={() => toggleNodeLinks(node.nodeId)}
-                                  className={`px-2.5 py-1 rounded-md border text-[10px] font-mono inline-flex items-center gap-1 transition-all cursor-pointer ${
-                                    expandedNodeId === node.nodeId
-                                      ? 'bg-[#e0d0ab] text-[#050b1a] border-[#e0d0ab] font-bold shadow-sm'
-                                      : 'bg-[#071630] hover:bg-[#0a2148] border-[#e0d0ab]/20 text-[#e0d0ab]'
-                                  }`}
-                                >
-                                  <Search className="w-3 h-3" />
-                                  Sources
-                                </button>
-                                <button
-                                  onClick={() => {
+                                  onClick={(e) => {
+                                    e.stopPropagation();
                                     onClose();
-                                    if (onLaunchPractice) onLaunchPractice(node.gloss);
+                                    if (onLaunchPractice) onLaunchPractice(sub.subject);
                                   }}
-                                  className="px-2.5 py-1 rounded-md bg-[#071630] hover:bg-[#e0d0ab] hover:text-[#050b1a] border border-[#e0d0ab]/20 text-[10px] font-mono text-[#e0d0ab] inline-flex items-center gap-1 transition-all cursor-pointer shadow-sm"
+                                  className="px-2 py-1 rounded bg-[#071630] hover:bg-[#e0d0ab] hover:text-[#050b1a] text-[#e0d0ab] border border-[#e0d0ab]/25 text-[10px] font-mono inline-flex items-center gap-1 transition-all cursor-pointer"
                                 >
                                   <Swords className="w-3 h-3" />
                                   Drill
                                 </button>
                               </div>
-                            </td>
-                          </tr>
-                          {expandedNodeId === node.nodeId && (
-                            <tr>
-                              <td colSpan={7} className="p-3.5 bg-[#050b1a]">
+                            </div>
+
+                            <div className="mt-2 text-[11px] text-[#b5c1d1] font-sans line-clamp-1">
+                              <strong className="text-[#e0d0ab]/90 font-mono text-[10px] uppercase">Focus: </strong>
+                              {sub.highYieldFocus}
+                            </div>
+
+                            <div className="w-full h-1.5 rounded-full bg-[#050b1a] mt-2 overflow-hidden">
+                              <div className="h-full rounded-full transition-all duration-300" style={{ width: `${sub.sharePct}%`, backgroundColor: sub.color || '#38bdf8' }} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-5 sm:p-6 rounded-2xl bg-[#041228]/80 border border-[#0194a8]/30 space-y-4">
+                  <div className="flex items-center justify-between flex-wrap gap-2 border-b border-[#0194a8]/20 pb-3">
+                    <h4 className="text-xs font-mono uppercase tracking-wider text-[#0194a8] font-bold flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-[#0194a8]" />
+                      Comparative Cognitive DNA: UPSC CSE vs SSC CGL
+                    </h4>
+                    <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                      Sterile Isolation Guardrail
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {data.bankTrends.examTrackComparison.map((comp: any, idx: number) => (
+                      <div key={idx} className="p-4 rounded-xl bg-[#071630] border border-[#e0d0ab]/15 space-y-3">
+                        <h5 className="font-serif font-bold text-[#f4ecd8] text-sm flex items-center gap-2">
+                          <Target className="w-4 h-4 text-[#e0d0ab]" />
+                          {comp.feature}
+                        </h5>
+                        <div className="space-y-2 text-xs">
+                          <div className="p-3 rounded-lg bg-[#050b1a] border border-[#e0d0ab]/20 space-y-1">
+                            <span className="font-mono text-[10px] text-[#e0d0ab] font-bold uppercase block">UPSC CSE Track:</span>
+                            <p className="text-[#f4ecd8] leading-relaxed">{comp.upscCseTrack}</p>
+                          </div>
+                          <div className="p-3 rounded-lg bg-[#050b1a] border border-[#0194a8]/30 space-y-1">
+                            <span className="font-mono text-[10px] text-[#0194a8] font-bold uppercase block">SSC CGL Track:</span>
+                            <p className="text-[#f4ecd8] leading-relaxed">{comp.sscCglTrack}</p>
+                          </div>
+                        </div>
+                        <p className="text-[11px] text-[#b5c1d1] italic pt-1 border-t border-[#e0d0ab]/10">
+                          <strong className="text-[#e0d0ab] not-italic">Strategic Takeaway:</strong> {comp.strategicTakeaway}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 1: FORMAT SHIFT CHRONOLOGY */}
+            {activeTab === 'shifts' && data?.formatShifts && (
+              <div className="space-y-6">
+                <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-[#0a2148]/80 via-[#071630] to-[#041228] border border-[#e0d0ab]/25 space-y-2 shadow-lg">
+                  <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-[#e0d0ab]" />
+                    25-Year Format Evolution Vector (2000–2025)
+                  </h3>
+                  <p className="text-xs text-[#b5c1d1] leading-relaxed">
+                    Interactive historical progression showing how UPSC dismantled rote coaching shortcuts, transitioned to binary elimination, and finally rendered option tricks obsolete through pair matching.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {data.formatShifts.map((shift: any, idx: number) => {
+                    const isActive = activeTimelineEra === idx;
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => setActiveTimelineEra(idx)}
+                        className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+                          isActive
+                            ? 'bg-[#e0d0ab] text-[#050b1a] border-[#e0d0ab] shadow-lg font-bold'
+                            : 'bg-[#041228] text-[#b5c1d1] hover:text-[#f4ecd8] border-[#e0d0ab]/15'
+                        }`}
+                      >
+                        <div className="text-[10px] font-mono uppercase tracking-wider mb-1">
+                          Era {idx + 1} · {shift.yearSpan}
+                        </div>
+                        <div className="text-xs font-serif font-bold line-clamp-1">{shift.era}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {(() => {
+                  const selectedEra = data.formatShifts[activeTimelineEra] || data.formatShifts[3];
+                  const dist = selectedEra.prelimsFormatDistribution;
+                  return (
+                    <motion.div
+                      key={activeTimelineEra}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="p-6 rounded-2xl bg-[#041228] border border-[#e0d0ab]/25 space-y-5 shadow-2xl"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#e0d0ab]/15 pb-4">
+                        <div>
+                          <span className="text-[10px] font-mono text-[#e0d0ab] uppercase font-bold tracking-widest px-2.5 py-1 rounded bg-[#e0d0ab]/15 border border-[#e0d0ab]/30">
+                            {selectedEra.yearSpan} Historical Epoch
+                          </span>
+                          <h4 className="text-xl font-serif font-bold text-[#f4ecd8] mt-2">{selectedEra.era}</h4>
+                        </div>
+
+                        <div className="p-3 rounded-xl bg-[#071630] border border-[#e0d0ab]/20 text-center">
+                          <span className="text-[9px] font-mono text-[#b5c1d1] uppercase block">Reading Load</span>
+                          <span className="text-lg font-mono font-black text-[#e0d0ab]">{selectedEra.avgWordsPerStem || 88} words</span>
+                          <span className="text-[9px] font-mono text-[#6e7d94] block">Avg per stem</span>
+                        </div>
+                      </div>
+
+                      <div className="p-4 rounded-xl bg-[#071630] border border-[#e0d0ab]/15 space-y-1">
+                        <span className="text-[10px] font-mono text-[#e0d0ab] font-bold uppercase tracking-wider block">
+                          Structural Examination Pivot:
+                        </span>
+                        <p className="text-sm font-serif italic text-[#f4ecd8] leading-relaxed">"{selectedEra.structuralPivot}"</p>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between text-xs font-mono text-[#b5c1d1]">
+                          <span>Question Stem Format Proportions:</span>
+                          <span className="text-[#e0d0ab]">Normalized 100% Cohort</span>
+                        </div>
+
+                        <div className="h-4 w-full rounded-full bg-[#050b1a] overflow-hidden flex border border-[#e0d0ab]/20 p-0.5">
+                          {dist.singleChoicePct > 0 && <div style={{ width: `${dist.singleChoicePct}%` }} className="bg-blue-500 h-full rounded-l-full transition-all duration-500" title={`Single Choice: ${dist.singleChoicePct}%`} />}
+                          {dist.multiStatementPct > 0 && <div style={{ width: `${dist.multiStatementPct}%` }} className="bg-amber-500 h-full transition-all duration-500" title={`Multi-Statement: ${dist.multiStatementPct}%`} />}
+                          {dist.pairMatchingPct > 0 && <div style={{ width: `${dist.pairMatchingPct}%` }} className="bg-emerald-500 h-full transition-all duration-500" title={`Pair Matching: ${dist.pairMatchingPct}%`} />}
+                          {dist.assertionReasonPct > 0 && <div style={{ width: `${dist.assertionReasonPct}%` }} className="bg-rose-500 h-full rounded-r-full transition-all duration-500" title={`Assertion-Reason: ${dist.assertionReasonPct}%`} />}
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+                          <div className="p-3 rounded-xl bg-[#071630] border border-blue-500/20">
+                            <span className="text-[10px] font-mono text-blue-400 block font-bold">Single Choice</span>
+                            <span className="text-lg font-mono font-black text-blue-300">{dist.singleChoicePct}%</span>
+                          </div>
+                          <div className="p-3 rounded-xl bg-[#071630] border border-amber-500/20">
+                            <span className="text-[10px] font-mono text-amber-400 block font-bold">Multi-Statement</span>
+                            <span className="text-lg font-mono font-black text-amber-300">{dist.multiStatementPct}%</span>
+                          </div>
+                          <div className="p-3 rounded-xl bg-[#071630] border border-emerald-500/20">
+                            <span className="text-[10px] font-mono text-emerald-400 block font-bold">Pair Matching</span>
+                            <span className="text-lg font-mono font-black text-emerald-300">{dist.pairMatchingPct}%</span>
+                          </div>
+                          <div className="p-3 rounded-xl bg-[#071630] border border-rose-500/20">
+                            <span className="text-[10px] font-mono text-rose-400 block font-bold">Assertion Reason</span>
+                            <span className="text-lg font-mono font-black text-rose-300">{dist.assertionReasonPct}%</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-4 rounded-xl bg-[#050b1a] border border-[#e0d0ab]/20 space-y-1">
+                        <span className="text-[10px] font-mono text-[#e0d0ab] uppercase font-bold tracking-wider block">
+                          Pedagogical Master Takeaway:
+                        </span>
+                        <p className="text-xs text-[#f4ecd8] leading-relaxed">{selectedEra.pedagogicalTakeaway}</p>
+                      </div>
+                    </motion.div>
+                  );
+                })()}
+              </div>
+            )}
+
+            {/* TAB 2: QUALIFIER TRUTH VS OPTION SYNTAX */}
+            {activeTab === 'qualifiers' && data?.qualifiers && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                  <div className="p-6 rounded-2xl bg-red-950/25 border border-red-500/35 space-y-3.5 shadow-xl">
+                    <div className="flex items-center justify-between border-b border-red-500/25 pb-3">
+                      <span className="text-xs font-mono font-bold uppercase tracking-wider text-red-400 flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-red-400" />
+                        Commercial Tutoring Myth
+                      </span>
+                      <span className="px-2 py-0.5 rounded bg-red-500/15 text-red-300 font-mono text-[10px] font-bold uppercase border border-red-500/30">
+                        Conflated Metric
+                      </span>
+                    </div>
+                    <h4 className="font-serif font-bold text-red-100 text-lg">
+                      The "Only = 83% Falsehood Trap" Fallacy
+                    </h4>
+                    <p className="text-xs text-[#b5c1d1] leading-relaxed">
+                      Commercial coaching institutes teach candidates to eliminate any option containing the word <strong className="text-red-300 font-bold">"only"</strong> under the belief that it is an automatic examiner trap.
+                    </p>
+                    <div className="p-4 rounded-xl bg-[#050b1a]/90 border border-red-500/25 space-y-2 text-xs">
+                      <div className="flex items-center justify-between font-mono text-[11px]">
+                        <span className="text-[#b5c1d1]">Paper Questions Containing "Only":</span>
+                        <strong className="text-red-300 font-bold">42.8% of Entire Bank (799 Qs)</strong>
+                      </div>
+                      <div className="flex items-center justify-between font-mono text-[11px]">
+                        <span className="text-[#b5c1d1]">Actual Option-Syntax Occurrences:</span>
+                        <strong className="text-red-400 font-black">&gt;98.2% ('1 only', '2 only', 'Only one pair')</strong>
+                      </div>
+                      <p className="text-[11px] text-[#b5c1d1] pt-1.5 border-t border-red-500/20">
+                        Commercial tests blindly regex-matched "only" inside multiple-choice selectors, mistakenly counting standard option syntax as deceptive examiner traps!
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-6 rounded-2xl bg-emerald-950/25 border border-emerald-500/35 space-y-3.5 shadow-xl">
+                    <div className="flex items-center justify-between border-b border-emerald-500/25 pb-3">
+                      <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        Empirical Ground Truth
+                      </span>
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 font-mono text-[10px] font-bold uppercase border border-emerald-500/30">
+                        290 Decoded Statements
+                      </span>
+                    </div>
+                    <h4 className="font-serif font-bold text-emerald-100 text-lg">
+                      Isolated Statement Modifier Polarity
+                    </h4>
+                    <p className="text-xs text-[#b5c1d1] leading-relaxed">
+                      When qualifiers are evaluated strictly inside <strong className="text-emerald-300 font-bold">factual statement premises</strong> (excluding option labels), genuine empirical polarity emerges:
+                    </p>
+                    <div className="grid grid-cols-2 gap-3 pt-1">
+                      <div className="p-3.5 rounded-xl bg-[#050b1a]/90 border border-red-500/30 space-y-1 text-center">
+                        <span className="text-[10px] font-mono text-red-400 uppercase font-bold block">Extreme Absolutes</span>
+                        <div className="text-2xl font-mono font-black text-red-300">
+                          {data.qualifiers.overallHeuristics.extremeFalseProbability || 81.3}%
+                        </div>
+                        <span className="text-[9px] font-mono text-[#b5c1d1] block">Empirical Falsehood</span>
+                      </div>
+
+                      <div className="p-3.5 rounded-xl bg-[#050b1a]/90 border border-emerald-500/30 space-y-1 text-center">
+                        <span className="text-[10px] font-mono text-emerald-400 uppercase font-bold block">Contingent Modals</span>
+                        <div className="text-2xl font-mono font-black text-emerald-300">
+                          {data.qualifiers.overallHeuristics.contingentTrueProbability || 76.9}%
+                        </div>
+                        <span className="text-[9px] font-mono text-[#b5c1d1] block">Empirical Truth</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6 rounded-2xl bg-[#041228] border border-[#e0d0ab]/25 space-y-4 shadow-xl">
+                  <div className="flex items-center justify-between flex-wrap gap-2 border-b border-[#e0d0ab]/15 pb-3">
+                    <div>
+                      <h4 className="text-xs font-mono uppercase tracking-wider text-[#e0d0ab] font-bold flex items-center gap-2">
+                        <Eye className="w-4 h-4 text-[#e0d0ab]" />
+                        Interactive Statement Dissection Workbench
+                      </h4>
+                      <p className="text-xs text-[#b5c1d1] mt-0.5">
+                        Click any highlighted qualifier token in the authentic UPSC stem below to inspect its empirical diagnostic profile.
+                      </p>
+                    </div>
+                    <span className="text-[10px] font-mono text-[#e0d0ab] bg-[#0a2148] px-2.5 py-1 rounded border border-[#e0d0ab]/25">
+                      Live Analyzer Active
+                    </span>
+                  </div>
+
+                  <div className="p-5 rounded-xl bg-[#071630] border border-[#e0d0ab]/20 space-y-3 font-sans">
+                    <div className="text-[10px] font-mono text-[#e0d0ab] uppercase font-bold">
+                      Official UPSC Sample Archetype (Prelims GS-1):
+                    </div>
+
+                    <p className="text-sm text-[#f4ecd8] leading-relaxed">
+                      "Consider the following statements regarding cetaceans, marine ecosystems, and statutory conservation frameworks:
+                    </p>
+
+                    <div className="space-y-2.5 pl-3 border-l-2 border-[#e0d0ab]/30 text-xs text-[#f4ecd8]">
+                      <div className="flex items-start gap-2">
+                        <span className="font-mono text-[#e0d0ab] font-bold">1.</span>
+                        <div>
+                          Cetaceans are{' '}
+                          <button
+                            onClick={() => setActiveStatementQualifier('all')}
+                            className={`px-1.5 py-0.5 rounded font-mono font-bold transition-all cursor-pointer ${
+                              activeStatementQualifier === 'all'
+                                ? 'bg-red-500 text-[#050b1a] shadow-[0_0_10px_rgba(239,68,68,0.5)]'
+                                : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                            }`}
+                          >
+                            [all / entirely]
+                          </button>{' '}
+                          restricted to marine saltwater environments.
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-2">
+                        <span className="font-mono text-[#e0d0ab] font-bold">2.</span>
+                        <div>
+                          Deep-water coral reefs{' '}
+                          <button
+                            onClick={() => setActiveStatementQualifier('can_be')}
+                            className={`px-1.5 py-0.5 rounded font-mono font-bold transition-all cursor-pointer ${
+                              activeStatementQualifier === 'can_be'
+                                ? 'bg-emerald-500 text-[#050b1a] shadow-[0_0_10px_rgba(16,185,129,0.5)]'
+                                : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                            }`}
+                          >
+                            [can be / may be]
+                          </button>{' '}
+                          found in cold waters at depths exceeding 2,000 meters without photosynthetic symbionts.
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-2">
+                        <span className="font-mono text-[#e0d0ab] font-bold">3.</span>
+                        <div>
+                          In India, river dolphin species are found{' '}
+                          <button
+                            onClick={() => setActiveStatementQualifier('only')}
+                            className={`px-1.5 py-0.5 rounded font-mono font-bold transition-all cursor-pointer ${
+                              activeStatementQualifier === 'only'
+                                ? 'bg-red-500 text-[#050b1a] shadow-[0_0_10px_rgba(239,68,68,0.5)]'
+                                : 'bg-red-500/20 text-red-300 border border-red-500/30'
+                            }`}
+                          >
+                            [only]
+                          </button>{' '}
+                          in the national river basin."
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-[#050b1a] border border-[#e0d0ab]/25 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#b5c1d1] font-bold">
+                        Diagnostic Forensic Profile for: <strong className="text-[#e0d0ab]">"{activeStatementQualifier}"</strong>
+                      </span>
+                      <span
+                        className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold uppercase ${
+                          activeStatementQualifier === 'can_be'
+                            ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                            : 'bg-red-500/15 text-red-400 border border-red-500/30'
+                        }`}
+                      >
+                        {activeStatementQualifier === 'can_be' ? 'High Truth Probability (76.9%)' : 'High Falsehood Risk (81.3%)'}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-[#f4ecd8] leading-relaxed">
+                      {activeStatementQualifier === 'all' && (
+                        <span>
+                          Extreme absolutes such as "all" or "entirely" are intentionally embedded by examiners to force candidates into binary traps. In this statement, freshwater dolphins (like the Platanista gangetica) contradict the absolute assertion, rendering the statement false.
+                        </span>
+                      )}
+                      {activeStatementQualifier === 'can_be' && (
+                        <span>
+                          Permissive modal verbs ("can be", "may be", "could") reflect genuine scientific contingency. UPSC examiners deliberately use permissive phrasing when describing complex biological or planetary mechanisms that do occur under specific conditions, resulting in high empirical veracity.
+                        </span>
+                      )}
+                      {activeStatementQualifier === 'only' && (
+                        <span>
+                          When "only" appears inside factual premises (not option selectors), it narrows statutory or geographical boundaries excessively. River dolphins also inhabit the Brahmaputra and Meghna river networks, making this isolated statement premise false.
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                  <div className="p-5 rounded-2xl bg-[#041228] border border-red-500/25 space-y-3">
+                    <div className="flex items-center justify-between border-b border-red-500/20 pb-2.5">
+                      <h5 className="text-xs font-mono uppercase tracking-wider text-red-400 font-bold flex items-center gap-2">
+                        <AlertTriangle className="w-3.5 h-3.5" />
+                        Extreme Modifiers (Falsehood Risk)
+                      </h5>
+                      <span className="text-[10px] font-mono text-[#6e7d94]">Statements Only</span>
+                    </div>
+                    <div className="space-y-2">
+                      {data.qualifiers.extremeQualifiers.map((q: any, idx: number) => (
+                        <div key={idx} className="p-3 rounded-lg bg-[#071630] border border-red-500/15 flex items-center justify-between text-xs">
+                          <span className="font-mono font-bold text-red-400">"{q.token}"</span>
+                          <div className="flex items-center gap-3">
+                            <span className="font-mono text-[#b5c1d1]">N = {q.sampleSize}</span>
+                            <span className="font-mono font-bold text-red-300">{q.falseStatementPct}% False</span>
+                            <span className="px-2 py-0.5 rounded bg-red-500/10 text-red-400 text-[10px] font-mono font-bold uppercase">
+                              {q.examinerTrapIndex.replace('_', ' ')}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-[#041228] border border-emerald-500/25 space-y-3">
+                    <div className="flex items-center justify-between border-b border-emerald-500/20 pb-2.5">
+                      <h5 className="text-xs font-mono uppercase tracking-wider text-emerald-400 font-bold flex items-center gap-2">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        Contingent Modifiers (Truth Reliability)
+                      </h5>
+                      <span className="text-[10px] font-mono text-[#6e7d94]">Statements Only</span>
+                    </div>
+                    <div className="space-y-2">
+                      {data.qualifiers.contingentQualifiers.map((q: any, idx: number) => (
+                        <div key={idx} className="p-3 rounded-lg bg-[#071630] border border-emerald-500/15 flex items-center justify-between text-xs">
+                          <span className="font-mono font-bold text-emerald-400">"{q.token}"</span>
+                          <div className="flex items-center gap-3">
+                            <span className="font-mono text-[#b5c1d1]">N = {q.sampleSize}</span>
+                            <span className="font-mono font-bold text-emerald-300">{q.trueStatementPct}% True</span>
+                            <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-mono font-bold uppercase">
+                              {q.reliabilityScore.replace('_', ' ')}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: PARETO 80/20 & DROUGHT RADAR */}
+            {activeTab === 'pareto' && data?.paretoDrought && (
+              <div className="space-y-6">
+                <div className="p-6 rounded-2xl bg-gradient-to-r from-[#0a2148]/90 via-[#071630] to-[#041228] border border-[#e0d0ab]/25 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
+                  <div className="space-y-1.5">
+                    <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-[#e0d0ab]" />
+                      The 80/20 Law of UPSC Testing Weightage
+                    </h3>
+                    <p className="text-xs text-[#b5c1d1] leading-relaxed max-w-2xl">
+                      Empirical data reveals that <strong className="text-[#f4ecd8]">{data.paretoDrought.summary.core80PctNodeCount} syllabus nodes</strong> account for over 85% of total Prelims questions and Mains marks across 2000–2025.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="px-3.5 py-1.5 rounded-xl bg-[#071630] border border-[#e0d0ab]/25 text-[11px] font-mono text-[#f4ecd8]">
+                      Evaluated Nodes: <strong className="text-[#e0d0ab]">{data.paretoDrought.totalNodesEvaluated}</strong>
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 overflow-x-auto">
+                    {(['ALL', 'GS1', 'GS2', 'GS3'] as const).map((paper) => (
+                      <button
+                        key={paper}
+                        onClick={() => setParetoPaperFilter(paper)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer ${
+                          paretoPaperFilter === paper
+                            ? 'bg-[#e0d0ab] text-[#050b1a] font-bold shadow-md'
+                            : 'bg-[#041228] text-[#b5c1d1] hover:text-[#f4ecd8] border border-[#e0d0ab]/15'
+                        }`}
+                      >
+                        {paper === 'ALL' ? 'All Papers' : paper}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="relative w-full sm:w-72">
+                    <Search className="w-3.5 h-3.5 text-[#6e7d94] absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      placeholder="Search node code or topic…"
+                      value={paretoSearchQuery}
+                      onChange={(e) => setParetoSearchQuery(e.target.value)}
+                      className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-[#041228] border border-[#e0d0ab]/20 text-xs font-sans text-[#f4ecd8] placeholder-[#6e7d94] focus:outline-none focus:border-[#e0d0ab]/60"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="text-xs font-mono uppercase tracking-wider text-[#b5c1d1] font-bold flex items-center gap-2">
+                    <Target className="w-3.5 h-3.5 text-[#e0d0ab]" />
+                    High-Yield Pareto Core Syllabus Nodes ({filteredParetoNodes.length})
+                  </h4>
+                  <div className="overflow-x-auto border border-[#e0d0ab]/20 rounded-2xl bg-[#041228]/80 shadow-xl">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-[#071630] border-b border-[#e0d0ab]/15 font-mono text-[#b5c1d1]">
+                        <tr>
+                          <th className="p-3.5">Node ID & Scope</th>
+                          <th className="p-3.5">Paper</th>
+                          <th className="p-3.5 text-center">Prelims Qs</th>
+                          <th className="p-3.5 text-center">Mains Qs</th>
+                          <th className="p-3.5 text-center">Total Marks</th>
+                          <th className="p-3.5 text-right">Cum. Weight</th>
+                          <th className="p-3.5 text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#e0d0ab]/10 font-sans">
+                        {filteredParetoNodes.map((node: any, idx: number) => (
+                          <React.Fragment key={idx}>
+                            <tr className="hover:bg-[#0a2148]/40 transition-colors">
+                              <td className="p-3.5">
+                                <div className="font-mono text-[#e0d0ab] font-bold text-[11px]">{node.nodeId}</div>
+                                <div className="text-[#b5c1d1] text-[11px] line-clamp-1 mt-0.5">{node.gloss}</div>
+                              </td>
+                              <td className="p-3.5 font-mono text-[11px] text-[#f4ecd8]">{node.paper}</td>
+                              <td className="p-3.5 text-center font-mono font-bold text-[#f4ecd8]">{node.totalPrelims}</td>
+                              <td className="p-3.5 text-center font-mono text-[#b5c1d1]">{node.totalMains}</td>
+                              <td className="p-3.5 text-center font-mono text-[#e0d0ab] font-bold">{node.totalMarks}</td>
+                              <td className="p-3.5 text-right font-mono text-emerald-400 font-bold">{node.cumulativeWeightPct}%</td>
+                              <td className="p-3.5 text-right">
+                                <div className="flex items-center justify-end gap-1.5">
+                                  <button
+                                    onClick={() => toggleNodeLinks(node.nodeId)}
+                                    className={`px-2.5 py-1 rounded-md border text-[10px] font-mono inline-flex items-center gap-1 transition-all cursor-pointer ${
+                                      expandedNodeId === node.nodeId
+                                        ? 'bg-[#e0d0ab] text-[#050b1a] border-[#e0d0ab] font-bold shadow-sm'
+                                        : 'bg-[#071630] hover:bg-[#0a2148] border-[#e0d0ab]/20 text-[#e0d0ab]'
+                                    }`}
+                                  >
+                                    <Search className="w-3 h-3" />
+                                    Sources
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      onClose();
+                                      if (onLaunchPractice) onLaunchPractice(node.gloss);
+                                    }}
+                                    className="px-2.5 py-1 rounded-md bg-[#071630] hover:bg-[#e0d0ab] hover:text-[#050b1a] border border-[#e0d0ab]/20 text-[10px] font-mono text-[#e0d0ab] inline-flex items-center gap-1 transition-all cursor-pointer shadow-sm"
+                                  >
+                                    <Swords className="w-3 h-3" />
+                                    Drill
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                            {expandedNodeId === node.nodeId && (
+                              <tr>
+                                <td colSpan={7} className="p-3.5 bg-[#050b1a]">
                                 <NodeLinkedPyqs
                                   nodeId={node.nodeId}
                                   nodeGloss={node.gloss}
@@ -1693,436 +1654,418 @@ export function ExaminerPsycheModal({ isOpen, onClose, onLaunchPractice }: Exami
                                   onLaunchPractice={onLaunchPractice}
                                   onClose={onClose}
                                 />
-                              </td>
-                            </tr>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </tbody>
-                  </table>
+                                </td>
+                              </tr>
+                            )}
+                          </React.Fragment>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-[#e0d0ab]/20">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <h4 className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold flex items-center gap-2">
+                      <AlertTriangle className="w-3.5 h-3.5" />
+                      Dormant Topic & Drought Radar (Surge Probability)
+                    </h4>
+                    <span className="text-[11px] font-mono text-[#b5c1d1]">
+                      {data.paretoDrought.droughtNodes.length} Dormant Nodes Detected
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {data.paretoDrought.droughtNodes.map((d: any, idx: number) => (
+                      <div key={idx} className="p-5 rounded-2xl bg-[#041228] border border-amber-500/25 space-y-3 shadow-md">
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-[11px] font-bold text-amber-400">{d.nodeId}</span>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-400/15 text-amber-300 border border-amber-400/30 font-bold">
+                            Dormant: {d.yearsDormant} Years
+                          </span>
+                        </div>
+                        <p className="text-xs text-[#f4ecd8] line-clamp-2 leading-relaxed">{d.gloss}</p>
+                        <div className="flex items-center justify-between pt-2 border-t border-[#e0d0ab]/10 text-[11px] font-mono">
+                          <span className="text-[#b5c1d1]">
+                            Surge Probability: <strong className="text-emerald-400">{d.droughtProbabilityScore}%</strong>
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => toggleNodeLinks(d.nodeId)}
+                              className="text-[#e0d0ab] hover:underline flex items-center gap-1 cursor-pointer text-[10px] font-mono"
+                            >
+                              <Search className="w-3 h-3" />
+                              {expandedNodeId === d.nodeId ? 'Hide' : 'Sources'}
+                            </button>
+                            <button
+                              onClick={() => {
+                                onClose();
+                                if (onLaunchPractice) onLaunchPractice(d.gloss);
+                              }}
+                              className="text-[#f4ecd8] hover:text-[#e0d0ab] flex items-center gap-1 cursor-pointer text-[10px] font-mono"
+                            >
+                              Practice <ChevronRight className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </div>
+                        {expandedNodeId === d.nodeId && (
+                          <div className="pt-2">
+                            <NodeLinkedPyqs
+                              nodeId={d.nodeId}
+                              nodeGloss={d.gloss}
+                              detail={nodeDetails[d.nodeId]}
+                              onLaunchPractice={onLaunchPractice}
+                              onClose={onClose}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
+            )}
 
-              {/* Drought Nodes Section */}
-              <div className="space-y-4 pt-4 border-t border-[#e0d0ab]/20">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <h4 className="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold flex items-center gap-2">
-                    <AlertTriangle className="w-3.5 h-3.5" />
-                    Dormant Topic & Drought Radar (Surge Probability)
-                  </h4>
-                  <span className="text-[11px] font-mono text-[#b5c1d1]">
-                    {data.paretoDrought.droughtNodes.length} Dormant Nodes Detected
-                  </span>
+            {/* TAB 4: CICADA HARMONIC WAVES */}
+            {activeTab === 'cicada' && data?.cicadaTopics && (
+              <div className="space-y-6">
+                <div className="p-6 rounded-2xl bg-[#041228] border border-[#e0d0ab]/25 space-y-4 shadow-xl">
+                  <div>
+                    <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
+                      <Flame className="w-4 h-4 text-amber-400" />
+                      Cicada Topics: 1.8–2.5 Year Mathematical Recurrence Waves
+                    </h3>
+                    <p className="text-xs text-[#b5c1d1] mt-1 leading-relaxed">
+                      UPSC's testing board operates on periodic cyclical rotations where specific statutory boundaries and scientific mechanisms reappear every alternate year.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-[#050b1a] border border-[#e0d0ab]/20 relative overflow-hidden">
+                    <div className="flex items-center justify-between text-[10px] font-mono text-[#b5c1d1] mb-2">
+                      <span>CYCLED FREQUENCY SPECTRUM (2-YEAR WAVELENGTH)</span>
+                      <span className="text-emerald-400 font-bold">100% Deterministic Testing Peaks</span>
+                    </div>
+                    <svg viewBox="0 0 800 100" className="w-full h-20 text-[#e0d0ab]">
+                      <path
+                        d="M 0 50 Q 100 0, 200 50 T 400 50 T 600 50 T 800 50"
+                        fill="transparent"
+                        stroke="#e0d0ab"
+                        strokeWidth="2.5"
+                        className="opacity-80"
+                      />
+                      <path
+                        d="M 0 50 Q 100 90, 200 50 T 400 50 T 600 50 T 800 50"
+                        fill="transparent"
+                        stroke="#38bdf8"
+                        strokeWidth="1.5"
+                        strokeDasharray="4 4"
+                        className="opacity-40"
+                      />
+                      {[100, 300, 500, 700].map((cx, idx) => (
+                        <g key={idx}>
+                          <circle cx={cx} cy={cx % 200 === 100 ? 25 : 75} r="5" fill="#e0d0ab" />
+                          <circle cx={cx} cy={cx % 200 === 100 ? 25 : 75} r="9" fill="transparent" stroke="#e0d0ab" strokeWidth="1" className="animate-ping" opacity="0.6" />
+                        </g>
+                      ))}
+                    </svg>
+                    <div className="flex items-center justify-between text-[9px] font-mono text-[#6e7d94] mt-1">
+                      <span>2010–2013 Base</span>
+                      <span>2015–2018 Transition</span>
+                      <span>2020–2022 Surge</span>
+                      <span>2023–2025 Current Era</span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {data.paretoDrought.droughtNodes.map((d: any, idx: number) => (
-                    <div key={idx} className="p-5 rounded-2xl bg-[#041228] border border-amber-500/25 space-y-3 shadow-md">
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono text-[11px] font-bold text-amber-400">{d.nodeId}</span>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-400/15 text-amber-300 border border-amber-400/30 font-bold">
-                          Dormant: {d.yearsDormant} Years
-                        </span>
-                      </div>
-                      <p className="text-xs text-[#f4ecd8] line-clamp-2 leading-relaxed">{d.gloss}</p>
-                      <div className="flex items-center justify-between pt-2 border-t border-[#e0d0ab]/10 text-[11px] font-mono">
-                        <span className="text-[#b5c1d1]">
-                          Surge Probability: <strong className="text-emerald-400">{d.droughtProbabilityScore}%</strong>
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => toggleNodeLinks(d.nodeId)}
-                            className="text-[#e0d0ab] hover:underline flex items-center gap-1 cursor-pointer text-[10px] font-mono"
-                          >
-                            <Search className="w-3 h-3" />
-                            {expandedNodeId === d.nodeId ? 'Hide' : 'Sources'}
-                          </button>
-                          <button
-                            onClick={() => {
-                              onClose();
-                              if (onLaunchPractice) onLaunchPractice(d.gloss);
-                            }}
-                            className="text-[#f4ecd8] hover:text-[#e0d0ab] flex items-center gap-1 cursor-pointer text-[10px] font-mono"
-                          >
-                            Practice <ChevronRight className="w-3 h-3" />
-                          </button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {data.cicadaTopics.map((c: any, idx: number) => (
+                    <div key={idx} className="p-5 rounded-2xl bg-[#041228] border border-[#e0d0ab]/20 space-y-3.5 shadow-lg">
+                      <div className="flex items-start justify-between gap-2 border-b border-[#e0d0ab]/15 pb-2.5">
+                        <div>
+                          <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-500/35">
+                            {c.pillar} • Harmonic Wave: {c.harmonicCycleYears}
+                          </span>
+                          <h4 className="font-serif font-bold text-[#f4ecd8] text-sm mt-2">{c.topic}</h4>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span className="text-sm font-mono font-black text-emerald-400">{c.recurrenceScore}%</span>
+                          <span className="text-[9px] font-mono text-[#6e7d94] block">Fidelity Score</span>
                         </div>
                       </div>
-                      {expandedNodeId === d.nodeId && (
-                        <div className="pt-2">
-                          <NodeLinkedPyqs
-                            nodeId={d.nodeId}
-                            nodeGloss={d.gloss}
-                            detail={nodeDetails[d.nodeId]}
-                            onLaunchPractice={onLaunchPractice}
-                            onClose={onClose}
-                          />
-                        </div>
-                      )}
+
+                      <p className="text-xs text-[#f4ecd8] leading-relaxed font-sans">{c.coreInsight}</p>
+
+                      <div className="pt-2 border-t border-[#e0d0ab]/10 flex items-center justify-between text-[11px] font-mono text-[#b5c1d1] flex-wrap gap-2">
+                        <span>Historical Tested Cycles:</span>
+                        <strong className="text-[#e0d0ab]">{(c.historicalTestYears || []).join(', ')}</strong>
+                      </div>
+
+                      <button
+                        onClick={() => toggleNodeLinks(c.nodeId)}
+                        className={`w-full px-3 py-2 rounded-lg border text-[10px] font-mono inline-flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                          expandedNodeId === c.nodeId
+                            ? 'bg-[#e0d0ab] text-[#050b1a] border-[#e0d0ab] font-bold shadow-md'
+                            : 'bg-[#071630] hover:bg-[#0a2148] border-[#e0d0ab]/20 text-[#e0d0ab]'
+                        }`}
+                      >
+                        <Search className="w-3 h-3" />
+                        {expandedNodeId === c.nodeId ? 'Hide base questions' : 'Show verified base questions'}
+                      </button>
+                      {expandedNodeId === c.nodeId && <NodeLinkedPyqs nodeId={c.nodeId} detail={nodeDetails[c.nodeId]} />}
                     </div>
                   ))}
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* ═════════════════════════════════════════════════════════════════
-              TAB 4: CICADA HARMONIC WAVES (VISUAL SINE WAVE RESONANCE)
-             ═════════════════════════════════════════════════════════════════ */}
-          {activeTab === 'cicada' && data?.cicadaTopics && (
-            <div className="space-y-6">
-              <div className="p-6 rounded-2xl bg-[#041228] border border-[#e0d0ab]/25 space-y-4 shadow-xl">
-                <div>
+            {/* TAB 5: CSAT PAPER-2 EMPIRICAL DNA */}
+            {activeTab === 'csat' && data?.csatAnatomy && (
+              <div className="space-y-6">
+                <div className="p-6 rounded-2xl bg-[#041228] border border-[#e0d0ab]/25 space-y-4 shadow-xl">
+                  <div>
+                    <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
+                      <BookOpen className="w-4 h-4 text-blue-400" />
+                      CSAT Paper-2: 15-Year Empirical Anatomy (2011–2025)
+                    </h3>
+                    <p className="text-xs text-[#b5c1d1] mt-1 leading-relaxed">
+                      Comprehensive breakdown of 600+ CSAT questions across Reading Comprehension, Quantitative Aptitude, and Logical Reasoning.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs font-mono text-[#b5c1d1]">
+                      <span>CSAT Cognitive Distribution Triad:</span>
+                      <span className="text-[#e0d0ab]">608 Questions Normalized</span>
+                    </div>
+                    <div className="h-4 w-full rounded-full bg-[#050b1a] overflow-hidden flex border border-[#e0d0ab]/20 p-0.5">
+                      <div style={{ width: '46.2%' }} className="bg-blue-500 h-full rounded-l-full" title="Reading Comprehension: 46.2%" />
+                      <div style={{ width: '32.4%' }} className="bg-amber-500 h-full" title="Quantitative Aptitude: 32.4%" />
+                      <div style={{ width: '21.4%' }} className="bg-emerald-500 h-full rounded-r-full" title="Logical Reasoning: 21.4%" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <div className="p-5 rounded-2xl bg-[#041228] border border-blue-500/25 space-y-3.5 shadow-lg">
+                    <div className="flex items-center justify-between border-b border-blue-500/20 pb-2">
+                      <h4 className="font-serif font-bold text-[#f4ecd8] text-sm">Reading Comprehension</h4>
+                      <span className="text-xs font-mono font-bold text-blue-400 px-2 py-0.5 rounded bg-blue-500/15 border border-blue-500/30">
+                        {data.csatAnatomy.readingComprehension.sharePct}%
+                      </span>
+                    </div>
+                    <div className="space-y-2 text-xs text-[#f4ecd8]">
+                      <p><strong className="text-[#e0d0ab]">Avg Passage:</strong> {data.csatAnatomy.readingComprehension.averagePassageWordLength} words</p>
+                      <p><strong className="text-[#e0d0ab]">Dominant Types:</strong> {data.csatAnatomy.readingComprehension.dominantQuestionType}</p>
+                      <div className="p-3 rounded-lg bg-[#050b1a] border border-red-500/20 text-red-300 text-[11px] leading-relaxed">
+                        <strong>Examiner Trap:</strong> {data.csatAnatomy.readingComprehension.examinerTrapProfile}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-[#041228] border border-amber-500/25 space-y-3.5 shadow-lg">
+                    <div className="flex items-center justify-between border-b border-amber-500/20 pb-2">
+                      <h4 className="font-serif font-bold text-[#f4ecd8] text-sm">Quantitative Aptitude</h4>
+                      <span className="text-xs font-mono font-bold text-amber-400 px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30">
+                        {data.csatAnatomy.quantitativeAptitude.sharePct}%
+                      </span>
+                    </div>
+                    <div className="space-y-2 text-xs text-[#f4ecd8]">
+                      <p><strong className="text-[#e0d0ab]">Core Focus:</strong> {data.csatAnatomy.quantitativeAptitude.coreFocusAreas}</p>
+                      <div className="p-3 rounded-lg bg-[#050b1a] border border-amber-500/20 text-amber-200 text-[11px] leading-relaxed">
+                        <strong>Pacing Profile:</strong> {data.csatAnatomy.quantitativeAptitude.pacingProfile}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-5 rounded-2xl bg-[#041228] border border-emerald-500/25 space-y-3.5 shadow-lg">
+                    <div className="flex items-center justify-between border-b border-emerald-500/20 pb-2">
+                      <h4 className="font-serif font-bold text-[#f4ecd8] text-sm">Logical Reasoning</h4>
+                      <span className="text-xs font-mono font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30">
+                        {data.csatAnatomy.logicalReasoning.sharePct}%
+                      </span>
+                    </div>
+                    <div className="space-y-2 text-xs text-[#f4ecd8]">
+                      <p><strong className="text-[#e0d0ab]">Core Focus:</strong> {data.csatAnatomy.logicalReasoning.coreFocusAreas}</p>
+                      <div className="p-3 rounded-lg bg-[#050b1a] border border-emerald-500/20 text-emerald-200 text-[11px] leading-relaxed">
+                        <strong>Pacing Profile:</strong> {data.csatAnatomy.logicalReasoning.pacingProfile}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 6: GS-4 & ESSAY DIALECTICAL AXES */}
+            {activeTab === 'dialectics' && data?.dialecticalAxes && (
+              <div className="space-y-6">
+                <div className="p-6 rounded-2xl bg-[#041228] border border-[#e0d0ab]/25 space-y-2 shadow-xl">
                   <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
-                    <Flame className="w-4 h-4 text-amber-400" />
-                    Cicada Topics: 1.8–2.5 Year Mathematical Recurrence Waves
+                    <Scale className="w-4 h-4 text-[#e0d0ab]" />
+                    The 4 Fundamental Dialectical Axes of GS-4 & Essay Papers
                   </h3>
-                  <p className="text-xs text-[#b5c1d1] mt-1 leading-relaxed">
-                    UPSC's testing board operates on periodic cyclical rotations where specific statutory boundaries and scientific mechanisms reappear every alternate year.
+                  <p className="text-xs text-[#b5c1d1] leading-relaxed">
+                    UPSC Mains GS-4 Section A and Essay prompts deliberately position candidates in the tension between competing philosophical virtues.
                   </p>
                 </div>
 
-                {/* Visual Sine Wave Harmonic Graphic */}
-                <div className="p-4 rounded-xl bg-[#050b1a] border border-[#e0d0ab]/20 relative overflow-hidden">
-                  <div className="flex items-center justify-between text-[10px] font-mono text-[#b5c1d1] mb-2">
-                    <span>CYCLED FREQUENCY SPECTRUM (2-YEAR WAVELENGTH)</span>
-                    <span className="text-emerald-400 font-bold">100% Deterministic Testing Peaks</span>
-                  </div>
-                  <svg viewBox="0 0 800 100" className="w-full h-20 text-[#e0d0ab]">
-                    {/* Sine wave path */}
-                    <path
-                      d="M 0 50 Q 100 0, 200 50 T 400 50 T 600 50 T 800 50"
-                      fill="transparent"
-                      stroke="#e0d0ab"
-                      strokeWidth="2.5"
-                      className="opacity-80"
-                    />
-                    {/* Secondary harmonic wave */}
-                    <path
-                      d="M 0 50 Q 100 90, 200 50 T 400 50 T 600 50 T 800 50"
-                      fill="transparent"
-                      stroke="#38bdf8"
-                      strokeWidth="1.5"
-                      strokeDasharray="4 4"
-                      className="opacity-40"
-                    />
-                    {/* Node points along crests */}
-                    {[100, 300, 500, 700].map((cx, idx) => (
-                      <g key={idx}>
-                        <circle cx={cx} cy={cx % 200 === 100 ? 25 : 75} r="5" fill="#e0d0ab" />
-                        <circle cx={cx} cy={cx % 200 === 100 ? 25 : 75} r="9" fill="transparent" stroke="#e0d0ab" strokeWidth="1" className="animate-ping" opacity="0.6" />
-                      </g>
-                    ))}
-                  </svg>
-                  <div className="flex items-center justify-between text-[9px] font-mono text-[#6e7d94] mt-1">
-                    <span>2010–2013 Base</span>
-                    <span>2015–2018 Transition</span>
-                    <span>2020–2022 Surge</span>
-                    <span>2023–2025 Current Era</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {data.cicadaTopics.map((c: any, idx: number) => (
-                  <div key={idx} className="p-5 rounded-2xl bg-[#041228] border border-[#e0d0ab]/20 space-y-3.5 shadow-lg">
-                    <div className="flex items-start justify-between gap-2 border-b border-[#e0d0ab]/15 pb-2.5">
-                      <div>
-                        <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-500/35">
-                          {c.pillar} • Harmonic Wave: {c.harmonicCycleYears}
-                        </span>
-                        <h4 className="font-serif font-bold text-[#f4ecd8] text-sm mt-2">{c.topic}</h4>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <span className="text-sm font-mono font-black text-emerald-400">{c.recurrenceScore}%</span>
-                        <span className="text-[9px] font-mono text-[#6e7d94] block">Fidelity Score</span>
-                      </div>
-                    </div>
-
-                    <p className="text-xs text-[#f4ecd8] leading-relaxed font-sans">{c.coreInsight}</p>
-
-                    <div className="pt-2 border-t border-[#e0d0ab]/10 flex items-center justify-between text-[11px] font-mono text-[#b5c1d1] flex-wrap gap-2">
-                      <span>Historical Tested Cycles:</span>
-                      <strong className="text-[#e0d0ab]">{(c.historicalTestYears || []).join(', ')}</strong>
-                    </div>
-
-                    <button
-                      onClick={() => toggleNodeLinks(c.nodeId)}
-                      className={`w-full px-3 py-2 rounded-lg border text-[10px] font-mono inline-flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                        expandedNodeId === c.nodeId
-                          ? 'bg-[#e0d0ab] text-[#050b1a] border-[#e0d0ab] font-bold shadow-md'
-                          : 'bg-[#071630] hover:bg-[#0a2148] border-[#e0d0ab]/20 text-[#e0d0ab]'
-                      }`}
-                    >
-                      <Search className="w-3 h-3" />
-                      {expandedNodeId === c.nodeId ? 'Hide base questions' : 'Show verified base questions'}
-                    </button>
-                    {expandedNodeId === c.nodeId && <NodeLinkedPyqs nodeId={c.nodeId} detail={nodeDetails[c.nodeId]} />}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* ═════════════════════════════════════════════════════════════════
-              TAB 5: CSAT PAPER-2 EMPIRICAL DNA (VISUAL TRIAD)
-             ═════════════════════════════════════════════════════════════════ */}
-          {activeTab === 'csat' && data?.csatAnatomy && (
-            <div className="space-y-6">
-              <div className="p-6 rounded-2xl bg-[#041228] border border-[#e0d0ab]/25 space-y-4 shadow-xl">
-                <div>
-                  <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-blue-400" />
-                    CSAT Paper-2: 15-Year Empirical Anatomy (2011–2025)
-                  </h3>
-                  <p className="text-xs text-[#b5c1d1] mt-1 leading-relaxed">
-                    Comprehensive breakdown of 600+ CSAT questions across Reading Comprehension, Quantitative Aptitude, and Logical Reasoning.
-                  </p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {data.dialecticalAxes.map((axis: any, idx: number) => {
+                    const isActive = activeDialecticIdx === idx;
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => setActiveDialecticIdx(idx)}
+                        className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+                          isActive
+                            ? 'bg-[#e0d0ab] text-[#050b1a] border-[#e0d0ab] font-bold shadow-md'
+                            : 'bg-[#041228] text-[#b5c1d1] hover:text-[#f4ecd8] border-[#e0d0ab]/15'
+                        }`}
+                      >
+                        <span className="text-[10px] font-mono block mb-1">Axis {idx + 1}</span>
+                        <span className="text-xs font-serif font-bold line-clamp-1">{axis.title}</span>
+                      </button>
+                    );
+                  })}
                 </div>
 
-                {/* Visual Proportional Triad Bar */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs font-mono text-[#b5c1d1]">
-                    <span>CSAT Cognitive Distribution Triad:</span>
-                    <span className="text-[#e0d0ab]">608 Questions Normalized</span>
-                  </div>
-                  <div className="h-4 w-full rounded-full bg-[#050b1a] overflow-hidden flex border border-[#e0d0ab]/20 p-0.5">
-                    <div style={{ width: '46.2%' }} className="bg-blue-500 h-full rounded-l-full" title="Reading Comprehension: 46.2%" />
-                    <div style={{ width: '32.4%' }} className="bg-amber-500 h-full" title="Quantitative Aptitude: 32.4%" />
-                    <div style={{ width: '21.4%' }} className="bg-emerald-500 h-full rounded-r-full" title="Logical Reasoning: 21.4%" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div className="p-5 rounded-2xl bg-[#041228] border border-blue-500/25 space-y-3.5 shadow-lg">
-                  <div className="flex items-center justify-between border-b border-blue-500/20 pb-2">
-                    <h4 className="font-serif font-bold text-[#f4ecd8] text-sm">Reading Comprehension</h4>
-                    <span className="text-xs font-mono font-bold text-blue-400 px-2 py-0.5 rounded bg-blue-500/15 border border-blue-500/30">
-                      {data.csatAnatomy.readingComprehension.sharePct}%
-                    </span>
-                  </div>
-                  <div className="space-y-2 text-xs text-[#f4ecd8]">
-                    <p><strong className="text-[#e0d0ab]">Avg Passage:</strong> {data.csatAnatomy.readingComprehension.averagePassageWordLength} words</p>
-                    <p><strong className="text-[#e0d0ab]">Dominant Types:</strong> {data.csatAnatomy.readingComprehension.dominantQuestionType}</p>
-                    <div className="p-3 rounded-lg bg-[#050b1a] border border-red-500/20 text-red-300 text-[11px] leading-relaxed">
-                      <strong>Examiner Trap:</strong> {data.csatAnatomy.readingComprehension.examinerTrapProfile}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-[#041228] border border-amber-500/25 space-y-3.5 shadow-lg">
-                  <div className="flex items-center justify-between border-b border-amber-500/20 pb-2">
-                    <h4 className="font-serif font-bold text-[#f4ecd8] text-sm">Quantitative Aptitude</h4>
-                    <span className="text-xs font-mono font-bold text-amber-400 px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30">
-                      {data.csatAnatomy.quantitativeAptitude.sharePct}%
-                    </span>
-                  </div>
-                  <div className="space-y-2 text-xs text-[#f4ecd8]">
-                    <p><strong className="text-[#e0d0ab]">Core Focus:</strong> {data.csatAnatomy.quantitativeAptitude.coreFocusAreas}</p>
-                    <div className="p-3 rounded-lg bg-[#050b1a] border border-amber-500/20 text-amber-200 text-[11px] leading-relaxed">
-                      <strong>Pacing Profile:</strong> {data.csatAnatomy.quantitativeAptitude.pacingProfile}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-[#041228] border border-emerald-500/25 space-y-3.5 shadow-lg">
-                  <div className="flex items-center justify-between border-b border-emerald-500/20 pb-2">
-                    <h4 className="font-serif font-bold text-[#f4ecd8] text-sm">Logical Reasoning</h4>
-                    <span className="text-xs font-mono font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30">
-                      {data.csatAnatomy.logicalReasoning.sharePct}%
-                    </span>
-                  </div>
-                  <div className="space-y-2 text-xs text-[#f4ecd8]">
-                    <p><strong className="text-[#e0d0ab]">Core Focus:</strong> {data.csatAnatomy.logicalReasoning.coreFocusAreas}</p>
-                    <div className="p-3 rounded-lg bg-[#050b1a] border border-emerald-500/20 text-emerald-200 text-[11px] leading-relaxed">
-                      <strong>Pacing Profile:</strong> {data.csatAnatomy.logicalReasoning.pacingProfile}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ═════════════════════════════════════════════════════════════════
-              TAB 6: GS-4 & ESSAY DIALECTICAL AXES (VISUAL TENSION BALANCE)
-             ═════════════════════════════════════════════════════════════════ */}
-          {activeTab === 'dialectics' && data?.dialecticalAxes && (
-            <div className="space-y-6">
-              <div className="p-6 rounded-2xl bg-[#041228] border border-[#e0d0ab]/25 space-y-2 shadow-xl">
-                <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
-                  <Scale className="w-4 h-4 text-[#e0d0ab]" />
-                  The 4 Fundamental Dialectical Axes of GS-4 & Essay Papers
-                </h3>
-                <p className="text-xs text-[#b5c1d1] leading-relaxed">
-                  UPSC Mains GS-4 Section A and Essay prompts deliberately position candidates in the tension between competing philosophical virtues.
-                </p>
-              </div>
-
-              {/* Axis Selector Pills */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {data.dialecticalAxes.map((axis: any, idx: number) => {
-                  const isActive = activeDialecticIdx === idx;
+                {(() => {
+                  const axis = data.dialecticalAxes[activeDialecticIdx] || data.dialecticalAxes[0];
                   return (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveDialecticIdx(idx)}
-                      className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
-                        isActive
-                          ? 'bg-[#e0d0ab] text-[#050b1a] border-[#e0d0ab] font-bold shadow-md'
-                          : 'bg-[#041228] text-[#b5c1d1] hover:text-[#f4ecd8] border-[#e0d0ab]/15'
-                      }`}
+                    <motion.div
+                      key={activeDialecticIdx}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-6 rounded-2xl bg-[#041228] border border-[#e0d0ab]/25 space-y-5 shadow-xl"
                     >
-                      <span className="text-[10px] font-mono block mb-1">Axis {idx + 1}</span>
-                      <span className="text-xs font-serif font-bold line-clamp-1">{axis.title}</span>
-                    </button>
-                  );
-                })}
-              </div>
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e0d0ab]/15 pb-3">
+                        <h4 className="font-serif font-bold text-[#f4ecd8] text-lg">{axis.title}</h4>
+                        <div className="flex gap-1.5">
+                          {axis.recurrentPapers.map((p: string, pIdx: number) => (
+                            <span key={pIdx} className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#071630] border border-[#e0d0ab]/25 text-[#e0d0ab]">
+                              {p}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
 
-              {/* Selected Dialectic Deep Visual Card */}
-              {(() => {
-                const axis = data.dialecticalAxes[activeDialecticIdx] || data.dialecticalAxes[0];
-                return (
-                  <motion.div
-                    key={activeDialecticIdx}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-6 rounded-2xl bg-[#041228] border border-[#e0d0ab]/25 space-y-5 shadow-xl"
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e0d0ab]/15 pb-3">
-                      <h4 className="font-serif font-bold text-[#f4ecd8] text-lg">{axis.title}</h4>
-                      <div className="flex gap-1.5">
-                        {axis.recurrentPapers.map((p: string, pIdx: number) => (
-                          <span key={pIdx} className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#071630] border border-[#e0d0ab]/25 text-[#e0d0ab]">
-                            {p}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed">
+                        <div className="p-4 rounded-xl bg-[#071630] border border-blue-500/25 space-y-1.5">
+                          <span className="font-mono text-[10px] font-bold text-blue-400 uppercase tracking-wider block">
+                            Thesis (Perspective A):
                           </span>
-                        ))}
+                          <p className="text-[#f4ecd8]">{axis.thesis}</p>
+                        </div>
+                        <div className="p-4 rounded-xl bg-[#071630] border border-amber-500/25 space-y-1.5">
+                          <span className="font-mono text-[10px] font-bold text-amber-400 uppercase tracking-wider block">
+                            Antithesis (Perspective B):
+                          </span>
+                          <p className="text-[#f4ecd8]">{axis.antithesis}</p>
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed">
-                      <div className="p-4 rounded-xl bg-[#071630] border border-blue-500/25 space-y-1.5">
-                        <span className="font-mono text-[10px] font-bold text-blue-400 uppercase tracking-wider block">
-                          Thesis (Perspective A):
+                      <div className="p-4.5 rounded-xl bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 space-y-1.5">
+                        <span className="font-mono text-[10px] font-bold text-[#e0d0ab] uppercase flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-[#e0d0ab]" />
+                          Examiner Expected Synthesis Framework:
                         </span>
-                        <p className="text-[#f4ecd8]">{axis.thesis}</p>
+                        <p className="text-xs text-[#f4ecd8] leading-relaxed font-sans">{axis.synthesisFramework}</p>
                       </div>
-                      <div className="p-4 rounded-xl bg-[#071630] border border-amber-500/25 space-y-1.5">
-                        <span className="font-mono text-[10px] font-bold text-amber-400 uppercase tracking-wider block">
-                          Antithesis (Perspective B):
-                        </span>
-                        <p className="text-[#f4ecd8]">{axis.antithesis}</p>
-                      </div>
-                    </div>
-
-                    <div className="p-4.5 rounded-xl bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 space-y-1.5">
-                      <span className="font-mono text-[10px] font-bold text-[#e0d0ab] uppercase flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-[#e0d0ab]" />
-                        Examiner Expected Synthesis Framework:
-                      </span>
-                      <p className="text-xs text-[#f4ecd8] leading-relaxed font-sans">{axis.synthesisFramework}</p>
-                    </div>
-                  </motion.div>
-                );
-              })()}
-            </div>
-          )}
-
-          {/* ═════════════════════════════════════════════════════════════════
-              TAB 7: DIRECTIVE VERB SCORING PYRAMID (VISUAL COGNITIVE TIERS)
-             ═════════════════════════════════════════════════════════════════ */}
-          {activeTab === 'directives' && data?.directiveRubrics && (
-            <div className="space-y-6">
-              <div className="p-6 rounded-2xl bg-[#041228] border border-[#e0d0ab]/25 space-y-2 shadow-xl">
-                <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
-                  <Sliders className="w-4 h-4 text-[#e0d0ab]" />
-                  Directive Verb Cognitive Depth Pyramid & Mark Allocation
-                </h3>
-                <p className="text-xs text-[#b5c1d1] leading-relaxed">
-                  UPSC examiners evaluate candidate responses against pre-defined cognitive depth tiers corresponding to the command directive.
-                </p>
-              </div>
-
-              {/* Directive Stepper */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {data.directiveRubrics.map((r: any, idx: number) => {
-                  const isActive = activeDirectiveIdx === idx;
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveDirectiveIdx(idx)}
-                      className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
-                        isActive
-                          ? 'bg-[#e0d0ab] text-[#050b1a] border-[#e0d0ab] font-bold shadow-md'
-                          : 'bg-[#041228] text-[#b5c1d1] hover:text-[#f4ecd8] border-[#e0d0ab]/15'
-                      }`}
-                    >
-                      <span className="text-[10px] font-mono block mb-0.5">{r.cognitiveDepth.split(' ')[0]}</span>
-                      <span className="text-xs font-serif font-bold">"{r.directive}"</span>
-                    </button>
+                    </motion.div>
                   );
-                })}
+                })()}
               </div>
+            )}
 
-              {/* Selected Directive Deep Visual Card */}
-              {(() => {
-                const directive = data.directiveRubrics[activeDirectiveIdx] || data.directiveRubrics[0];
-                return (
-                  <motion.div
-                    key={activeDirectiveIdx}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-6 rounded-2xl bg-[#041228] border border-[#e0d0ab]/25 space-y-5 shadow-xl"
-                  >
-                    <div className="flex items-center justify-between border-b border-[#e0d0ab]/15 pb-3">
-                      <span className="font-serif font-bold text-xl text-[#e0d0ab]">"{directive.directive}"</span>
-                      <span className="text-[10px] font-mono font-bold px-3 py-1 rounded bg-[#071630] border border-[#e0d0ab]/25 text-[#f4ecd8]">
-                        {directive.cognitiveDepth}
-                      </span>
-                    </div>
+            {/* TAB 7: DIRECTIVE VERB SCORING PYRAMID */}
+            {activeTab === 'directives' && data?.directiveRubrics && (
+              <div className="space-y-6">
+                <div className="p-6 rounded-2xl bg-[#041228] border border-[#e0d0ab]/25 space-y-2 shadow-xl">
+                  <h3 className="text-base font-serif font-bold text-[#e0d0ab] flex items-center gap-2">
+                    <Sliders className="w-4 h-4 text-[#e0d0ab]" />
+                    Directive Verb Cognitive Depth Pyramid & Mark Allocation
+                  </h3>
+                  <p className="text-xs text-[#b5c1d1] leading-relaxed">
+                    UPSC examiners evaluate candidate responses against pre-defined cognitive depth tiers corresponding to the command directive.
+                  </p>
+                </div>
 
-                    <p className="text-xs text-[#f4ecd8] leading-relaxed">{directive.coreIntent}</p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {data.directiveRubrics.map((r: any, idx: number) => {
+                    const isActive = activeDirectiveIdx === idx;
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => setActiveDirectiveIdx(idx)}
+                        className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+                          isActive
+                            ? 'bg-[#e0d0ab] text-[#050b1a] border-[#e0d0ab] font-bold shadow-md'
+                            : 'bg-[#041228] text-[#b5c1d1] hover:text-[#f4ecd8] border-[#e0d0ab]/15'
+                        }`}
+                      >
+                        <span className="text-[10px] font-mono block mb-0.5">{r.cognitiveDepth.split(' ')[0]}</span>
+                        <span className="text-xs font-serif font-bold">"{r.directive}"</span>
+                      </button>
+                    );
+                  })}
+                </div>
 
-                    {/* Animated Mark Allocation Blueprint Bars */}
-                    <div className="space-y-3 pt-2 border-t border-[#e0d0ab]/15">
-                      <span className="text-[10px] font-mono text-[#b5c1d1] uppercase font-bold tracking-wider">
-                        Mark Allocation Blueprint:
-                      </span>
-                      <div className="space-y-2.5">
-                        {directive.markAllocationBlueprint.map((comp: any, cIdx: number) => (
-                          <div key={cIdx} className="space-y-1">
-                            <div className="flex items-center justify-between text-xs font-mono">
-                              <span className="text-[#b5c1d1]">{comp.component}</span>
-                              <strong className="text-[#e0d0ab]">{comp.weightPct}%</strong>
-                            </div>
-                            <div className="h-2 w-full rounded-full bg-[#050b1a] overflow-hidden">
-                              <div
-                                className="h-full bg-gradient-to-r from-[#e0d0ab] to-amber-400 rounded-full transition-all duration-300"
-                                style={{ width: `${comp.weightPct}%` }}
-                              />
-                            </div>
-                          </div>
-                        ))}
+                {(() => {
+                  const directive = data.directiveRubrics[activeDirectiveIdx] || data.directiveRubrics[0];
+                  return (
+                    <motion.div
+                      key={activeDirectiveIdx}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-6 rounded-2xl bg-[#041228] border border-[#e0d0ab]/25 space-y-5 shadow-xl"
+                    >
+                      <div className="flex items-center justify-between border-b border-[#e0d0ab]/15 pb-3">
+                        <span className="font-serif font-bold text-xl text-[#e0d0ab]">"{directive.directive}"</span>
+                        <span className="text-[10px] font-mono font-bold px-3 py-1 rounded bg-[#071630] border border-[#e0d0ab]/25 text-[#f4ecd8]">
+                          {directive.cognitiveDepth}
+                        </span>
                       </div>
-                    </div>
 
-                    <div className="p-4 rounded-xl bg-red-950/25 border border-red-900/35 text-xs text-red-300 leading-relaxed">
-                      <strong className="text-red-400 font-mono text-[10px] uppercase block mb-1">
-                        Fatal Candidate Error:
-                      </strong>
-                      {directive.examinerPenaltyPitfall}
-                    </div>
-                  </motion.div>
-                );
-              })()}
-            </div>
-          )}
+                      <p className="text-xs text-[#f4ecd8] leading-relaxed">{directive.coreIntent}</p>
 
+                      <div className="space-y-3 pt-2 border-t border-[#e0d0ab]/15">
+                        <span className="text-[10px] font-mono text-[#b5c1d1] uppercase font-bold tracking-wider">
+                          Mark Allocation Blueprint:
+                        </span>
+                        <div className="space-y-2.5">
+                          {directive.markAllocationBlueprint.map((comp: any, cIdx: number) => (
+                            <div key={cIdx} className="space-y-1">
+                              <div className="flex items-center justify-between text-xs font-mono">
+                                <span className="text-[#b5c1d1]">{comp.component}</span>
+                                <strong className="text-[#e0d0ab]">{comp.weightPct}%</strong>
+                              </div>
+                              <div className="h-2 w-full rounded-full bg-[#050b1a] overflow-hidden">
+                                <div
+                                  className="h-full bg-gradient-to-r from-[#e0d0ab] to-amber-400 rounded-full transition-all duration-300"
+                                  style={{ width: `${comp.weightPct}%` }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="p-4 rounded-xl bg-red-950/25 border border-red-900/35 text-xs text-red-300 leading-relaxed">
+                        <strong className="text-red-400 font-mono text-[10px] uppercase block mb-1">
+                          Fatal Candidate Error:
+                        </strong>
+                        {directive.examinerPenaltyPitfall}
+                      </div>
+                    </motion.div>
+                  );
+                })()}
+              </div>
+            )}
+
+          </main>
         </div>
 
         {/* ── Footer Bar Chrome ── */}
-        <div className="px-5 sm:px-7 py-3.5 bg-[#041228] border-t border-[#e0d0ab]/20 flex items-center justify-between text-xs font-mono text-[#b5c1d1] shrink-0">
+        <div className="px-5 sm:px-7 py-3 bg-[#041228] border-t border-[#e0d0ab]/20 flex items-center justify-between text-xs font-mono text-[#b5c1d1] shrink-0">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>Tark Intelligence Engine • Official UPSC Historical Grounding (2000–2025)</span>

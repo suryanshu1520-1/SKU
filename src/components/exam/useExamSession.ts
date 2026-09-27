@@ -40,7 +40,12 @@ import {
   secondsElapsed,
   serverOffsetMs,
 } from './lib/clock.js';
-import { examApi, ExamApiError } from './lib/examApi.js';
+import { examApi, ExamApiError, isUnauthorizedError } from './lib/examApi.js';
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function isUuid(val: unknown): val is string {
+  return typeof val === 'string' && UUID_REGEX.test(val);
+}
 
 export type SheetCommand =
   | { type: 'CHOOSE' | 'BUBBLE' | 'STRIKE'; qid: string; key: OptionKey }
@@ -318,7 +323,7 @@ export function useExamSession({
         setPhase('scorecard');
       } catch (err) {
         if (!mountedRef.current || gen !== loadGenRef.current) return;
-        if (err instanceof ExamApiError && err.status === 401) {
+        if (isUnauthorizedError(err)) {
           setPhase('admit');
           setError('Sign in to view your exam result.');
           return;
@@ -329,7 +334,7 @@ export function useExamSession({
       return;
     }
 
-    const isGuest = !userId || userId === 'guest' || userId === 'anonymous';
+    const isGuest = !userId || userId === 'guest' || userId === 'anonymous' || !isUuid(userId);
     if (isGuest) {
       if (!mountedRef.current || gen !== loadGenRef.current) return;
       setPaperChoice(
@@ -341,6 +346,36 @@ export function useExamSession({
       return;
     }
 
+    // Direct new paper launch - resilient: active check must NEVER trap user on load-error
+    if (launch.kind === 'new') {
+      setPaperChoice({ paperCode: launch.paperCode, subject: launch.subject });
+      try {
+        const activeResp = await examApi.active();
+        if (!mountedRef.current || gen !== loadGenRef.current) return;
+        if (activeResp.active) {
+          setResumeInfo(activeResp.active);
+          setPhase('resume');
+          return;
+        }
+        if (activeResp.finalized) {
+          setSubmitResponse(activeResp.finalized);
+          setCollectedWhileAway(true);
+          clearLocalSheet(activeResp.finalized.result.attemptId);
+          setPhase('scorecard');
+          return;
+        }
+        setPhase('admit');
+      } catch (err) {
+        if (!mountedRef.current || gen !== loadGenRef.current) return;
+        setPhase('admit');
+        if (isUnauthorizedError(err)) {
+          setError('Sign in to sit a paper.');
+        }
+      }
+      return;
+    }
+
+    // Resume launch
     try {
       const activeResp = await examApi.active();
       if (!mountedRef.current || gen !== loadGenRef.current) return;
@@ -353,21 +388,13 @@ export function useExamSession({
         setResumeInfo(activeResp.active);
         setPhase('resume');
       } else {
-        setPaperChoice(
-          launch.kind === 'new'
-            ? { paperCode: launch.paperCode, subject: launch.subject }
-            : { paperCode: 'GS1_FULL' }
-        );
+        setPaperChoice({ paperCode: 'GS1_FULL' });
         setPhase('admit');
       }
     } catch (err) {
       if (!mountedRef.current || gen !== loadGenRef.current) return;
-      if (err instanceof ExamApiError && err.status === 401) {
-        setPaperChoice(
-          launch.kind === 'new'
-            ? { paperCode: launch.paperCode, subject: launch.subject }
-            : { paperCode: 'GS1_FULL' }
-        );
+      if (isUnauthorizedError(err)) {
+        setPaperChoice({ paperCode: 'GS1_FULL' });
         setPhase('admit');
         setError('Sign in to sit a paper.');
         return;
@@ -389,7 +416,8 @@ export function useExamSession({
       setError(null);
       setPhase('starting');
 
-      if (!userId || userId === 'guest' || userId === 'anonymous') {
+      const isGuest = !userId || userId === 'guest' || userId === 'anonymous' || !isUuid(userId);
+      if (isGuest) {
         setPhase('admit');
         setError('Sign in to start this paper.');
         return;
@@ -407,14 +435,22 @@ export function useExamSession({
         beginSitting(res, null, receivedAt);
       } catch (err) {
         if (!mountedRef.current) return;
-        if (err instanceof ExamApiError && err.code === 'ATTEMPT_IN_PROGRESS') {
+        if (
+          (err instanceof ExamApiError && err.code === 'ATTEMPT_IN_PROGRESS') ||
+          (err as any)?.code === 'ATTEMPT_IN_PROGRESS'
+        ) {
           await load();
           return;
         }
         setPhase('admit');
+        if (isUnauthorizedError(err)) {
+          setError('Sign in to start this paper.');
+          return;
+        }
+        const status = (err as any)?.status;
         const msg =
-          err instanceof ExamApiError && err.status >= 400 && err.status < 500
-            ? err.message
+          status >= 400 && status < 500
+            ? (err as any).message || 'Request failed.'
             : "We couldn't start the paper. Check your connection and try again.";
         setError(msg);
       }
@@ -446,7 +482,7 @@ export function useExamSession({
       }
     } catch (err) {
       if (!mountedRef.current) return;
-      if (err instanceof ExamApiError && err.status === 401) {
+      if (isUnauthorizedError(err)) {
         setPhase('admit');
         setError('Sign in to resume your paper.');
         return;
