@@ -186,20 +186,16 @@ export default function VerticalNavRail({
             className="flex items-center gap-2.5 cursor-pointer group"
             title="Tark 1.0 — Analytical Test Arena"
           >
-            <TarkSigil size={32} />
-            {isExpanded && (
+            {isExpanded ? (
               <motion.div
                 initial={{ opacity: 0, x: -6 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="flex flex-col"
+                className="flex items-center"
               >
-                <span className="font-serif font-bold text-sm text-[#e0d0ab] tracking-wider leading-none">
-                  TARK
-                </span>
-                <span className="text-[10px] font-sans uppercase tracking-widest text-[#0194a8] leading-tight">
-                  Arena 1.0
-                </span>
+                <BrandLogo size="sm" showSubtitle={true} />
               </motion.div>
+            ) : (
+              <TarkSigil size={26} />
             )}
           </div>
 

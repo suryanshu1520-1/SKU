@@ -1,218 +1,223 @@
 import React from 'react';
 
-interface BrandLogoProps {
+const TARK_SIGIL_PATH =
+  'M 107.00 54.00 L 257.00 54.00 L 273.00 70.00 L 275.00 70.00 L 287.00 83.00 L 289.00 83.00 L 291.00 85.00 L 378.00 85.00 L 375.00 88.00 L 375.00 90.00 L 365.00 99.00 L 365.00 101.00 L 363.00 103.00 L 308.00 103.00 L 308.00 104.00 L 305.00 105.00 L 305.00 206.00 L 291.00 206.00 L 291.00 114.00 L 292.00 114.00 L 293.00 109.00 L 291.00 109.00 L 291.00 110.00 L 279.00 115.00 L 278.00 117.00 L 272.00 119.00 L 271.00 121.00 L 269.00 121.00 L 266.00 124.00 L 262.00 125.00 L 261.00 127.00 L 257.00 128.00 L 256.00 130.00 L 249.00 133.00 L 248.00 135.00 L 246.00 135.00 L 245.00 137.00 L 238.00 140.00 L 237.00 142.00 L 235.00 142.00 L 234.00 144.00 L 232.00 144.00 L 231.00 146.00 L 229.00 146.00 L 227.00 148.00 L 107.00 148.00 L 107.00 139.00 L 108.00 138.00 L 228.00 138.00 L 228.00 137.00 L 234.00 135.00 L 235.00 133.00 L 238.00 133.00 L 239.00 131.00 L 242.00 131.00 L 242.00 130.00 L 244.00 130.00 L 244.00 129.00 L 246.00 129.00 L 246.00 128.00 L 248.00 128.00 L 248.00 127.00 L 260.00 122.00 L 260.00 121.00 L 263.00 121.00 L 263.00 120.00 L 265.00 120.00 L 265.00 119.00 L 267.00 119.00 L 267.00 118.00 L 269.00 118.00 L 273.00 115.00 L 276.00 115.00 L 276.00 114.00 L 278.00 114.00 L 282.00 111.00 L 287.00 110.00 L 287.00 109.00 L 283.00 109.00 L 283.00 110.00 L 280.00 110.00 L 280.00 111.00 L 275.00 111.00 L 275.00 112.00 L 272.00 112.00 L 272.00 113.00 L 268.00 113.00 L 268.00 114.00 L 264.00 114.00 L 264.00 115.00 L 260.00 115.00 L 260.00 116.00 L 248.00 118.00 L 248.00 119.00 L 244.00 119.00 L 244.00 120.00 L 237.00 121.00 L 237.00 122.00 L 234.00 122.00 L 234.00 123.00 L 230.00 123.00 L 230.00 124.00 L 107.00 124.00 L 107.00 115.00 L 234.00 115.00 L 234.00 114.00 L 240.00 114.00 L 240.00 113.00 L 246.00 113.00 L 246.00 112.00 L 252.00 112.00 L 252.00 111.00 L 272.00 109.00 L 272.00 108.00 L 277.00 108.00 L 277.00 107.00 L 286.00 107.00 L 286.00 106.00 L 292.00 106.00 L 292.00 105.00 L 299.00 105.00 L 299.00 104.00 L 107.00 104.00 L 107.00 97.00 L 250.00 97.00 L 250.00 98.00 L 258.00 98.00 L 258.00 99.00 L 270.00 99.00 L 270.00 100.00 L 289.00 101.00 L 289.00 102.00 L 300.00 103.00 L 298.00 101.00 L 292.00 100.00 L 292.00 99.00 L 289.00 99.00 L 289.00 98.00 L 284.00 97.00 L 282.00 95.00 L 279.00 95.00 L 277.00 93.00 L 274.00 93.00 L 274.00 92.00 L 272.00 92.00 L 268.00 89.00 L 265.00 89.00 L 261.00 86.00 L 258.00 86.00 L 254.00 83.00 L 107.00 83.00 L 107.00 75.00 L 256.00 75.00 L 259.00 78.00 L 263.00 79.00 L 264.00 81.00 L 270.00 83.00 L 271.00 85.00 L 273.00 85.00 L 275.00 87.00 L 277.00 87.00 L 278.00 89.00 L 280.00 89.00 L 280.00 90.00 L 286.00 92.00 L 287.00 94.00 L 295.00 97.00 L 296.00 99.00 L 298.00 99.00 L 290.00 91.00 L 288.00 91.00 L 285.00 87.00 L 283.00 87.00 L 278.00 81.00 L 276.00 81.00 L 271.00 75.00 L 269.00 75.00 L 264.00 69.00 L 262.00 69.00 L 257.00 63.00 L 255.00 63.00 L 255.00 62.00 L 107.00 62.00 L 107.00 55.00 Z M 331.00 108.00 L 358.00 108.00 L 347.00 119.00 L 347.00 121.00 L 330.00 137.00 L 330.00 139.00 L 325.00 144.00 L 330.00 149.00 L 330.00 151.00 L 335.00 155.00 L 335.00 157.00 L 339.00 160.00 L 339.00 162.00 L 344.00 166.00 L 344.00 168.00 L 349.00 172.00 L 349.00 174.00 L 353.00 177.00 L 353.00 179.00 L 357.00 182.00 L 357.00 184.00 L 361.00 187.00 L 361.00 189.00 L 365.00 192.00 L 365.00 194.00 L 370.00 198.00 L 370.00 200.00 L 377.00 205.00 L 377.00 206.00 L 349.00 206.00 L 349.00 204.00 L 347.00 203.00 L 345.00 198.00 L 343.00 197.00 L 343.00 195.00 L 341.00 194.00 L 339.00 189.00 L 337.00 188.00 L 337.00 186.00 L 335.00 185.00 L 333.00 180.00 L 331.00 179.00 L 331.00 177.00 L 329.00 176.00 L 327.00 171.00 L 324.00 169.00 L 324.00 167.00 L 322.00 166.00 L 320.00 161.00 L 317.00 159.00 L 317.00 157.00 L 315.00 156.00 L 315.00 154.00 L 311.00 150.00 L 311.00 129.00 L 331.00 109.00 Z';
+
+const TARK_WORDMARK_PATH =
+  'M 403.00 84.00 L 499.00 84.00 L 500.00 85.00 L 500.00 112.00 L 498.00 112.00 L 498.00 109.00 L 497.00 109.00 L 495.00 103.00 L 493.00 102.00 L 493.00 100.00 L 486.00 93.00 L 484.00 93.00 L 483.00 91.00 L 481.00 91.00 L 479.00 89.00 L 476.00 89.00 L 476.00 88.00 L 472.00 88.00 L 472.00 87.00 L 462.00 87.00 L 462.00 171.00 L 466.00 176.00 L 474.00 178.00 L 474.00 179.00 L 427.00 179.00 L 427.00 178.00 L 430.00 178.00 L 430.00 177.00 L 436.00 176.00 L 440.00 171.00 L 440.00 87.00 L 430.00 87.00 L 430.00 88.00 L 426.00 88.00 L 426.00 89.00 L 421.00 90.00 L 420.00 92.00 L 415.00 94.00 L 410.00 99.00 L 410.00 101.00 L 407.00 103.00 L 407.00 105.00 L 405.00 107.00 L 404.00 112.00 L 402.00 112.00 L 403.00 111.00 L 403.00 109.00 L 402.00 109.00 L 402.00 85.00 L 403.00 85.00 Z M 552.00 84.00 L 555.00 84.00 L 555.00 86.00 L 556.00 86.00 L 556.00 88.00 L 557.00 88.00 L 557.00 90.00 L 558.00 90.00 L 558.00 92.00 L 561.00 96.00 L 561.00 99.00 L 562.00 99.00 L 562.00 101.00 L 563.00 101.00 L 563.00 103.00 L 564.00 103.00 L 564.00 105.00 L 567.00 109.00 L 567.00 112.00 L 568.00 112.00 L 568.00 114.00 L 571.00 118.00 L 571.00 121.00 L 572.00 121.00 L 572.00 123.00 L 573.00 123.00 L 573.00 125.00 L 576.00 129.00 L 576.00 132.00 L 577.00 132.00 L 577.00 134.00 L 578.00 134.00 L 578.00 136.00 L 581.00 140.00 L 581.00 143.00 L 582.00 143.00 L 582.00 145.00 L 585.00 149.00 L 585.00 152.00 L 586.00 152.00 L 586.00 154.00 L 589.00 158.00 L 589.00 161.00 L 590.00 161.00 L 594.00 171.00 L 598.00 175.00 L 600.00 175.00 L 601.00 177.00 L 607.00 178.00 L 607.00 179.00 L 564.00 179.00 L 564.00 178.00 L 566.00 178.00 L 570.00 175.00 L 570.00 169.00 L 569.00 169.00 L 567.00 161.00 L 566.00 161.00 L 566.00 159.00 L 563.00 155.00 L 561.00 147.00 L 558.00 143.00 L 558.00 140.00 L 555.00 136.00 L 555.00 133.00 L 554.00 133.00 L 554.00 131.00 L 551.00 127.00 L 551.00 124.00 L 550.00 124.00 L 550.00 122.00 L 547.00 118.00 L 547.00 115.00 L 544.00 111.00 L 543.00 115.00 L 542.00 115.00 L 542.00 117.00 L 539.00 121.00 L 539.00 124.00 L 537.00 126.00 L 537.00 129.00 L 536.00 129.00 L 536.00 131.00 L 533.00 135.00 L 533.00 138.00 L 532.00 138.00 L 531.00 143.00 L 529.00 145.00 L 529.00 148.00 L 528.00 148.00 L 528.00 150.00 L 525.00 154.00 L 524.00 160.00 L 523.00 160.00 L 523.00 171.00 L 524.00 171.00 L 524.00 173.00 L 527.00 176.00 L 535.00 178.00 L 535.00 179.00 L 499.00 179.00 L 501.00 177.00 L 504.00 177.00 L 504.00 176.00 L 508.00 175.00 L 513.00 170.00 L 515.00 165.00 L 517.00 164.00 L 517.00 162.00 L 518.00 162.00 L 518.00 160.00 L 521.00 156.00 L 521.00 153.00 L 522.00 153.00 L 522.00 151.00 L 525.00 147.00 L 525.00 144.00 L 526.00 144.00 L 526.00 142.00 L 529.00 138.00 L 529.00 135.00 L 532.00 131.00 L 532.00 128.00 L 535.00 124.00 L 535.00 121.00 L 536.00 121.00 L 536.00 119.00 L 537.00 119.00 L 537.00 117.00 L 540.00 113.00 L 540.00 110.00 L 541.00 110.00 L 541.00 108.00 L 544.00 104.00 L 544.00 101.00 L 545.00 101.00 L 545.00 99.00 L 547.00 97.00 L 547.00 94.00 L 548.00 94.00 L 548.00 92.00 L 551.00 88.00 L 551.00 85.00 L 552.00 85.00 Z M 623.00 84.00 L 676.00 84.00 L 676.00 85.00 L 684.00 85.00 L 684.00 86.00 L 690.00 87.00 L 690.00 88.00 L 696.00 90.00 L 701.00 95.00 L 701.00 97.00 L 704.00 101.00 L 704.00 105.00 L 705.00 105.00 L 704.00 116.00 L 703.00 116.00 L 703.00 119.00 L 701.00 120.00 L 701.00 122.00 L 695.00 128.00 L 693.00 128.00 L 689.00 131.00 L 682.00 132.00 L 682.00 134.00 L 685.00 137.00 L 685.00 139.00 L 687.00 140.00 L 687.00 142.00 L 689.00 143.00 L 689.00 145.00 L 691.00 146.00 L 691.00 148.00 L 693.00 149.00 L 693.00 151.00 L 695.00 152.00 L 695.00 154.00 L 697.00 155.00 L 697.00 157.00 L 699.00 158.00 L 699.00 160.00 L 701.00 161.00 L 704.00 168.00 L 707.00 170.00 L 707.00 172.00 L 710.00 175.00 L 712.00 175.00 L 713.00 177.00 L 717.00 178.00 L 717.00 179.00 L 688.00 179.00 L 684.00 175.00 L 682.00 170.00 L 680.00 169.00 L 679.00 165.00 L 675.00 161.00 L 674.00 157.00 L 672.00 156.00 L 671.00 152.00 L 667.00 148.00 L 667.00 146.00 L 664.00 143.00 L 661.00 136.00 L 659.00 134.00 L 654.00 134.00 L 654.00 172.00 L 658.00 177.00 L 664.00 178.00 L 664.00 179.00 L 623.00 179.00 L 625.00 177.00 L 630.00 176.00 L 633.00 172.00 L 633.00 91.00 L 630.00 87.00 L 627.00 87.00 L 627.00 86.00 L 623.00 85.00 Z M 728.00 84.00 L 768.00 84.00 L 768.00 86.00 L 762.00 87.00 L 759.00 90.00 L 759.00 93.00 L 758.00 93.00 L 758.00 171.00 L 759.00 171.00 L 759.00 174.00 L 762.00 177.00 L 767.00 178.00 L 767.00 179.00 L 727.00 179.00 L 727.00 178.00 L 735.00 176.00 L 736.00 173.00 L 737.00 173.00 L 737.00 170.00 L 738.00 170.00 L 738.00 93.00 L 737.00 93.00 L 737.00 90.00 L 734.00 87.00 L 728.00 86.00 L 728.00 85.00 Z M 783.00 84.00 L 816.00 84.00 L 816.00 86.00 L 812.00 86.00 L 812.00 87.00 L 806.00 89.00 L 805.00 91.00 L 803.00 91.00 L 801.00 94.00 L 799.00 94.00 L 782.00 111.00 L 782.00 113.00 L 774.00 120.00 L 774.00 122.00 L 778.00 126.00 L 778.00 128.00 L 781.00 130.00 L 783.00 135.00 L 786.00 137.00 L 786.00 139.00 L 789.00 141.00 L 789.00 143.00 L 791.00 144.00 L 793.00 149.00 L 796.00 151.00 L 796.00 153.00 L 799.00 155.00 L 799.00 157.00 L 802.00 159.00 L 804.00 164.00 L 807.00 166.00 L 807.00 168.00 L 811.00 171.00 L 811.00 173.00 L 814.00 174.00 L 816.00 177.00 L 821.00 178.00 L 821.00 179.00 L 790.00 179.00 L 789.00 176.00 L 787.00 175.00 L 787.00 173.00 L 785.00 172.00 L 785.00 170.00 L 783.00 169.00 L 783.00 167.00 L 781.00 166.00 L 781.00 164.00 L 779.00 163.00 L 779.00 161.00 L 777.00 160.00 L 777.00 158.00 L 775.00 157.00 L 775.00 155.00 L 772.00 153.00 L 770.00 148.00 L 767.00 146.00 L 765.00 141.00 L 763.00 140.00 L 763.00 138.00 L 759.00 134.00 L 760.00 130.00 L 776.00 114.00 L 776.00 112.00 L 783.00 106.00 L 783.00 104.00 L 787.00 101.00 L 787.00 99.00 L 790.00 96.00 L 790.00 89.00 L 786.00 86.00 L 782.00 86.00 L 783.00 85.00 Z M 655.00 87.00 L 654.00 87.00 L 654.00 131.00 L 669.00 131.00 L 669.00 130.00 L 675.00 128.00 L 679.00 124.00 L 679.00 122.00 L 681.00 120.00 L 681.00 116.00 L 682.00 116.00 L 682.00 102.00 L 681.00 102.00 L 681.00 98.00 L 680.00 98.00 L 679.00 94.00 L 674.00 89.00 L 669.00 88.00 L 669.00 87.00 L 656.00 87.00 Z';
+
+const FULL_LOCKUP_PATH = `${TARK_SIGIL_PATH} ${TARK_WORDMARK_PATH}`;
+
+export type BrandColorMode = 'gold' | 'white' | 'dark' | string;
+
+const COLOR_MAP: Record<string, string> = {
+  gold: '#E8DCBF',
+  white: '#FFFFFF',
+  dark: '#040F21',
+};
+
+function resolveColor(c: BrandColorMode): string {
+  return COLOR_MAP[c] || c;
+}
+
+export interface TarkSigilProps {
+  size?: number;
+  color?: BrandColorMode;
+  className?: string;
+}
+
+/**
+ * Tark Master Convergence Sigil.
+ * 5 parallel analytical streams channeling directly into the geometric K junction.
+ */
+export function TarkSigil({ size = 32, color = 'gold', className = '' }: TarkSigilProps) {
+  const fillColor = resolveColor(color);
+  // Natural aspect ratio: 291 width / 172 height ≈ 1.6918
+  const width = Math.round(size * (291 / 172));
+
+  return (
+    <svg
+      width={width}
+      height={size}
+      viewBox="97.0 44.0 291.0 172.0"
+      fill={fillColor}
+      xmlns="http://www.w3.org/2000/svg"
+      className={`shrink-0 transition-transform duration-300 group-hover:scale-[1.02] ${className}`}
+      aria-label="Tark Convergence Sigil"
+    >
+      <path d={TARK_SIGIL_PATH} fillRule="evenodd" />
+    </svg>
+  );
+}
+
+/**
+ * Tark Wordmark: Chiseled Roman serif type T Λ R K with crossbarless A.
+ */
+export function TarkWordmark({
+  height = 24,
+  color = 'gold',
+  className = '',
+}: {
+  height?: number;
+  color?: BrandColorMode;
+  className?: string;
+}) {
+  const fillColor = resolveColor(color);
+  // Natural aspect ratio: 435 width / 111 height ≈ 3.9189
+  const width = Math.round(height * (435 / 111));
+
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox="394.0 76.0 435.0 111.0"
+      fill={fillColor}
+      xmlns="http://www.w3.org/2000/svg"
+      className={`shrink-0 ${className}`}
+      aria-label="TARK Wordmark"
+    >
+      <path d={TARK_WORDMARK_PATH} fillRule="evenodd" />
+    </svg>
+  );
+}
+
+/**
+ * Tark App / Favicon Squircle:
+ * Deep obsidian container with hairline champagne border and centered Convergence Sigil.
+ */
+export function TarkAppIcon({
+  size = 40,
+  className = '',
+}: {
+  size?: number;
+  className?: string;
+}) {
+  return (
+    <div
+      style={{ width: size, height: size }}
+      className={`relative shrink-0 flex items-center justify-center rounded-[22%] bg-gradient-to-br from-[#08182c] to-[#030b16] border border-[#e0d0ab]/30 shadow-[0_4px_16px_rgba(0,0,0,0.6)] ${className}`}
+    >
+      <TarkSigil size={Math.round(size * 0.46)} color="gold" />
+    </div>
+  );
+}
+
+export interface BrandLogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   isCompact?: boolean;
   showSubtitle?: boolean;
-  variant?: 'crucible' | 'monogram' | 'prism';
+  variant?: 'lockup' | 'symbol' | 'app-icon' | 'crucible' | 'monogram' | 'prism';
+  color?: BrandColorMode;
   className?: string;
   onClick?: () => void;
 }
 
 /**
- * Tark Master Sigil — The Crucible of Reason & Analytical Arena.
- * A high-precision faceted diamond prism enclosing the empirical crosshair
- * of truth and concentric syllabus orbits in gold and electric cyan.
+ * Master Tark Brand Identity Component.
+ * Supports horizontal lockup (symbol + wordmark), standalone sigil, and app icon squircle.
  */
-export function TarkSigil({ size = 32, className = '' }: { size?: number; className?: string }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 64 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={`shrink-0 transition-all duration-300 group-hover:scale-105 ${className}`}
-    >
-      <defs>
-        {/* Luxury Champagne Gold Bevel Gradient */}
-        <linearGradient id="tark-gold-sheen" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#fff8e7" />
-          <stop offset="35%" stopColor="#e8dcbf" />
-          <stop offset="70%" stopColor="#c5b084" />
-          <stop offset="100%" stopColor="#8c7343" />
-        </linearGradient>
-
-        {/* Deep Chiseled Gold Edge */}
-        <linearGradient id="tark-gold-dark" x1="100%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#d4c29a" />
-          <stop offset="50%" stopColor="#8c7343" />
-          <stop offset="100%" stopColor="#4a3b1e" />
-        </linearGradient>
-
-        {/* Electric Cyan Radial Glow */}
-        <radialGradient id="tark-cyan-core" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#0194a8" stopOpacity="0.4" />
-          <stop offset="50%" stopColor="#041d40" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="#020b18" stopOpacity="0.95" />
-        </radialGradient>
-
-        {/* Outer Glow Filter */}
-        <filter id="tark-ambient-glow" x="-30%" y="-30%" width="160%" height="160%">
-          <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#0194a8" floodOpacity="0.35" />
-          <feDropShadow dx="0" dy="2" stdDeviation="6" floodColor="#e0d0ab" floodOpacity="0.25" />
-        </filter>
-      </defs>
-
-      {/* ── Layer 1: Ambient Backdrop Diamond ── */}
-      <polygon
-        points="32,4 60,32 32,60 4,32"
-        fill="url(#tark-cyan-core)"
-        filter="url(#tark-ambient-glow)"
-      />
-
-      {/* ── Layer 2: Faceted Outer Diamond Wings (Beveled 3D Physics) ── */}
-      {/* Top-Left Facet */}
-      <polygon
-        points="32,4 4,32 32,32"
-        fill="#072042"
-        fillOpacity="0.75"
-        stroke="url(#tark-gold-sheen)"
-        strokeWidth="1.25"
-      />
-      {/* Top-Right Facet (Light Catch) */}
-      <polygon
-        points="32,4 60,32 32,32"
-        fill="#0c3568"
-        fillOpacity="0.8"
-        stroke="url(#tark-gold-sheen)"
-        strokeWidth="1.25"
-      />
-      {/* Bottom-Left Facet */}
-      <polygon
-        points="4,32 32,60 32,32"
-        fill="#04152d"
-        fillOpacity="0.85"
-        stroke="url(#tark-gold-dark)"
-        strokeWidth="1.25"
-      />
-      {/* Bottom-Right Facet */}
-      <polygon
-        points="60,32 32,60 32,32"
-        fill="#062247"
-        fillOpacity="0.8"
-        stroke="url(#tark-gold-sheen)"
-        strokeWidth="1.25"
-      />
-
-      {/* ── Layer 3: Concentric Analytical Target / Radar Orbits ── */}
-      <circle
-        cx="32"
-        cy="32"
-        r="14"
-        stroke="#0194a8"
-        strokeWidth="1"
-        strokeOpacity="0.5"
-        strokeDasharray="2 2.5"
-      />
-      <circle
-        cx="32"
-        cy="32"
-        r="8"
-        stroke="url(#tark-gold-sheen)"
-        strokeWidth="1.25"
-        strokeOpacity="0.7"
-      />
-
-      {/* ── Layer 4: Razor-Sharp Crosshair Blades (The 4 Knowledge Axes) ── */}
-      {/* North Blade */}
-      <polygon
-        points="32,6 30.5,23 32,25 33.5,23"
-        fill="url(#tark-gold-sheen)"
-      />
-      {/* South Blade */}
-      <polygon
-        points="32,58 30.5,41 32,39 33.5,41"
-        fill="url(#tark-gold-dark)"
-      />
-      {/* West Blade */}
-      <polygon
-        points="6,32 23,30.5 25,32 23,33.5"
-        fill="url(#tark-gold-sheen)"
-      />
-      {/* East Blade */}
-      <polygon
-        points="58,32 41,30.5 39,32 41,33.5"
-        fill="url(#tark-gold-sheen)"
-      />
-
-      {/* ── Layer 5: Central Core of Discernment (The Singularity) ── */}
-      <circle cx="32" cy="32" r="3.5" fill="#ffffff" filter="drop-shadow(0 0 4px #e0d0ab)" />
-      <circle cx="32" cy="32" r="1.5" fill="#041d40" />
-    </svg>
-  );
-}
-
 export default function BrandLogo({
   size = 'md',
   isCompact = false,
   showSubtitle = true,
+  variant = 'lockup',
+  color = 'gold',
   className = '',
   onClick,
 }: BrandLogoProps) {
-  const iconSize = size === 'sm' ? 26 : size === 'lg' ? 42 : size === 'xl' ? 52 : 32;
+  const resolvedColor = resolveColor(color);
 
+  // Sizing matrix for horizontal lockup (viewBox: 738 x 176 => aspect ratio ~4.193)
+  const dimensions = {
+    sm: { height: 22, width: 92, sigilSize: 22 },
+    md: { height: 30, width: 126, sigilSize: 30 },
+    lg: { height: 42, width: 176, sigilSize: 42 },
+    xl: { height: 54, width: 226, sigilSize: 54 },
+  }[size];
+
+  // If compact or requested as standalone symbol
+  if (isCompact || variant === 'symbol' || variant === 'monogram' || variant === 'prism') {
+    return (
+      <div
+        onClick={onClick}
+        className={`group inline-flex items-center justify-center select-none ${
+          onClick ? 'cursor-pointer' : ''
+        } ${className}`}
+        title="Tark | तर्क — Analytical Test Arena"
+      >
+        <TarkSigil size={dimensions.sigilSize} color={resolvedColor} />
+      </div>
+    );
+  }
+
+  // If requested as app icon squircle
+  if (variant === 'app-icon') {
+    const iconSizes = { sm: 28, md: 36, lg: 48, xl: 64 };
+    return (
+      <div
+        onClick={onClick}
+        className={`group inline-flex items-center select-none ${
+          onClick ? 'cursor-pointer' : ''
+        } ${className}`}
+        title="Tark | तर्क"
+      >
+        <TarkAppIcon size={iconSizes[size]} />
+      </div>
+    );
+  }
+
+  // Full Horizontal Lockup (Default)
   return (
     <div
       onClick={onClick}
-      className={`group flex items-center gap-3 select-none cursor-pointer ${className}`}
-      title="Tark | तर्क — The Analytical Crucible"
+      className={`group inline-flex flex-col select-none ${
+        onClick ? 'cursor-pointer' : ''
+      } ${className}`}
+      title="Tark | तर्क — Analytical Test Arena"
     >
-      {/* Bespoke Vector Sigil Emblem */}
-      <div className="relative flex items-center justify-center p-0.5">
-        <TarkSigil size={iconSize} />
+      <div className="flex items-center">
+        <svg
+          width={dimensions.width}
+          height={dimensions.height}
+          viewBox="95.0 42.0 738.0 176.0"
+          fill={resolvedColor}
+          xmlns="http://www.w3.org/2000/svg"
+          className="shrink-0 transition-opacity duration-200 group-hover:opacity-95"
+          aria-label="TARK Master Lockup"
+        >
+          <path d={FULL_LOCKUP_PATH} fillRule="evenodd" />
+        </svg>
       </div>
 
-      {/* Logotype Lockup */}
-      {!isCompact && (
-        <div className="flex flex-col min-w-0 justify-center">
-          <div className="flex items-baseline gap-2">
-            <span
-              className={`font-serif font-extrabold tracking-[0.08em] leading-none text-[#e8e0cf] group-hover:text-[#fbf7ee] transition-colors ${
-                size === 'sm'
-                  ? 'text-sm'
-                  : size === 'lg'
-                  ? 'text-2xl'
-                  : size === 'xl'
-                  ? 'text-3xl'
-                  : 'text-base'
-              }`}
-              style={{
-                textShadow: '0 2px 10px rgba(0,0,0,0.6)',
-              }}
-            >
-              TARK
-            </span>
-            <span
-              className={`font-serif font-bold text-[#0194a8] tracking-widest leading-none ${
-                size === 'sm'
-                  ? 'text-[11px]'
-                  : size === 'lg'
-                  ? 'text-base'
-                  : size === 'xl'
-                  ? 'text-lg'
-                  : 'text-[13px]'
-              }`}
-            >
-              तर्क
-            </span>
-          </div>
-
-          {showSubtitle && (
-            <span
-              className={`font-mono font-medium text-[#8fa2bd] uppercase tracking-[0.22em] mt-1 ${
-                size === 'sm'
-                  ? 'text-[8px]'
-                  : size === 'lg'
-                  ? 'text-[10.5px]'
-                  : size === 'xl'
-                  ? 'text-[12px]'
-                  : 'text-[9px]'
-              }`}
-            >
-              Crucible of Reason
-            </span>
-          )}
+      {showSubtitle && (
+        <div className="flex items-center gap-2 mt-1 px-0.5">
+          <span
+            className={`font-mono uppercase tracking-[0.24em] font-medium text-[#8fa2bd] ${
+              size === 'sm'
+                ? 'text-[7.5px]'
+                : size === 'lg'
+                ? 'text-[10px]'
+                : size === 'xl'
+                ? 'text-[11.5px]'
+                : 'text-[8.5px]'
+            }`}
+          >
+            CRUCIBLE OF REASON
+          </span>
+          <span className="text-[#136c99] text-[9px]">•</span>
+          <span
+            className={`font-serif font-bold text-[#0194a8] tracking-widest leading-none ${
+              size === 'sm'
+                ? 'text-[10px]'
+                : size === 'lg'
+                ? 'text-xs'
+                : size === 'xl'
+                ? 'text-sm'
+                : 'text-[11px]'
+            }`}
+          >
+            तर्क
+          </span>
         </div>
       )}
     </div>

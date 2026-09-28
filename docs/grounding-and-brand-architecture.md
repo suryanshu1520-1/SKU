@@ -105,7 +105,14 @@ To introduce new candidates to the Command Deck and Testing Arena without disrup
   * Green dynamic brushstroke arc on lower-right.
   * Connected Devanagari-English fusion monogram: horizontal *shirorekha* bar linking `p`, `i` (with ascending Hindi matra), and `b`.
   * Official bilingual typography: *पत्र सूचना कार्यालय* / *PRESS INFORMATION BUREAU* / *भारत सरकार*.
-* **Component**: `PibLogo` supporting `seal`, `lockup`, and `badge` variants.
+### 3.3 Tark Master Identity System (Convergence Sigil & Roman Serif Wordmark)
+* **Master Specification Manual**: Full geometric derivations, clearspace rules, and color palettes are documented in [`docs/brand/BRAND_IDENTITY.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/docs/brand/BRAND_IDENTITY.md).
+* **Asset Location**:
+  * Lockups: [`public/logos/tark-lockup-gold.svg`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/public/logos/tark-lockup-gold.svg), [`tark-lockup-white.svg`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/public/logos/tark-lockup-white.svg), [`tark-lockup-dark.svg`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/public/logos/tark-lockup-dark.svg).
+  * Sigils: [`public/logos/tark-symbol-gold.svg`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/public/logos/tark-symbol-gold.svg), [`tark-symbol-white.svg`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/public/logos/tark-symbol-white.svg), [`tark-symbol-dark.svg`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/public/logos/tark-symbol-dark.svg).
+  * Wordmarks: [`public/logos/tark-wordmark-gold.svg`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/public/logos/tark-wordmark-gold.svg), [`tark-wordmark-white.svg`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/public/logos/tark-wordmark-white.svg), [`tark-wordmark-dark.svg`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/public/logos/tark-wordmark-dark.svg).
+  * App Icon: [`public/favicon.svg`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/public/favicon.svg).
+* **Component Architecture**: [`src/components/BrandLogo.tsx`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/src/components/BrandLogo.tsx) providing `<BrandLogo />`, `<TarkSigil />`, `<TarkWordmark />`, and `<TarkAppIcon />`.
 
 ---
 

@@ -63,12 +63,21 @@
 
 | Token | Hex Value | Semantic Usage |
 |---|---|---|
-| `--color-zinc-950` | `#072e63` / `#09090b` | Deep void background |
-| `--color-zinc-900` | `#136c99` / `#18181b` | Frosted cards & elevation surfaces |
-| `--color-gold-accent` | `#e0d0ab` | Hero wordmarks, CTAs, serif titles |
+| `--color-zinc-950` | `#040F21` / `#030B16` | Deep void background |
+| `--color-zinc-900` | `#08182C` / `#136c99` | Frosted cards & elevation surfaces |
+| `--color-gold-accent` | `#E8DCBF` / `#e0d0ab` | Master Convergence Sigil, wordmark, serif titles |
 | `--color-emerald` | `#10b981` / `#34d399` | Integrity verification, +2.00 accuracy |
 | `--color-rose` | `#e14e4e` / `#ad0202` | -0.66 Negative marking penalty, incorrect options |
 | `--font-serif` | `Merriweather` / `Cinzel` | Authoritative academic headings |
 | `--font-mono` | `JetBrains Mono` | Telemetry, timers, keyboard HUD, question stats |
 | `--font-sans` | `Inter` | Body prose, question stems, explanations |
+
+---
+
+## 4. Master Brand Identity: The Convergence Sigil & Chiseled Wordmark
+
+The complete brand specification, mathematical geometry, clearspace rules, and SVG asset catalog are documented in [`docs/brand/BRAND_IDENTITY.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/docs/brand/BRAND_IDENTITY.md).
+
+- **Master Component**: [`src/components/BrandLogo.tsx`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/src/components/BrandLogo.tsx)
+- **Vector Assets**: [`public/logos/`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/public/logos) (`tark-lockup-gold.svg`, `tark-symbol-gold.svg`, `favicon.svg`)
 

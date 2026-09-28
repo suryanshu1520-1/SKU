@@ -162,11 +162,14 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
         
         {/* Top Status & Brand Lockup */}
         <div className="space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[rgba(11,61,120,0.3)] border border-[rgba(19,108,153,0.5)] rounded-xs text-[11px] font-sans text-[#e8e0cf]">
-            <span className="w-2 h-2 rounded-full bg-[#34d399] animate-pulse" />
-            <span className="text-[#8fa2bd]">Founders Induction:</span>
-            <span className="text-[#e0d0ab] font-semibold">500 Lifetime Seats</span>
-            <span className="text-[#8fa2bd] hidden sm:inline">&bull; 15-Min Lock</span>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <BrandLogo size="md" showSubtitle={false} />
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[rgba(11,61,120,0.3)] border border-[rgba(19,108,153,0.5)] rounded-xs text-[11px] font-sans text-[#e8e0cf]">
+              <span className="w-2 h-2 rounded-full bg-[#34d399] animate-pulse" />
+              <span className="text-[#8fa2bd]">Founders Induction:</span>
+              <span className="text-[#e0d0ab] font-semibold">500 Lifetime Seats</span>
+              <span className="text-[#8fa2bd] hidden sm:inline">&bull; 15-Min Lock</span>
+            </div>
           </div>
 
           <div className="space-y-2.5">
