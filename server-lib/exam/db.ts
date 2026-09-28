@@ -65,8 +65,32 @@ export interface QuestionAttemptRow {
   subject_category: string;
 }
 
-const ATTEMPT_COLUMNS =
+const ATTEMPT_BASE_COLUMNS =
+  'id, user_id, paper_code, subject, rules, series, seed, question_ids, duration_seconds, started_at, deadline_at, status, submit_mode, sheet, checkpoint_at, submitted_at, result, net_hundredths, created_at';
+
+const ATTEMPT_FULL_COLUMNS =
   'id, user_id, paper_code, subject, rules, series, seed, question_ids, pool_version, duration_seconds, started_at, deadline_at, status, submit_mode, sheet, checkpoint_at, submitted_at, result, net_hundredths, created_at';
+
+let _supportsPoolVersion: boolean | null = null;
+
+async function getAttemptColumns(supabase: SupabaseClient): Promise<string> {
+  if (_supportsPoolVersion === null) {
+    const { error } = await supabase.from('mock_attempts').select('pool_version').limit(0);
+    _supportsPoolVersion = !error;
+    if (!_supportsPoolVersion) {
+      console.warn('[exam-db] mock_attempts.pool_version column not present on remote DB; falling back to base schema.');
+    }
+  }
+  return _supportsPoolVersion ? ATTEMPT_FULL_COLUMNS : ATTEMPT_BASE_COLUMNS;
+}
+
+function normalizeAttemptRow(data: any): AttemptRow | null {
+  if (!data) return null;
+  if (data.pool_version === undefined) {
+    data.pool_version = 1;
+  }
+  return data as AttemptRow;
+}
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -119,9 +143,10 @@ export async function findInProgressAttempt(userId: string): Promise<AttemptRow 
     return null;
   }
   const supabase = getSupabaseAdmin();
+  const cols = await getAttemptColumns(supabase);
   const { data, error } = await supabase
     .from('mock_attempts')
-    .select(ATTEMPT_COLUMNS)
+    .select(cols)
     .eq('user_id', userId)
     .eq('status', 'in_progress')
     .maybeSingle();
@@ -129,15 +154,22 @@ export async function findInProgressAttempt(userId: string): Promise<AttemptRow 
   if (error) {
     throw new Error(`[exam-db] findInProgressAttempt: ${error.message}`);
   }
-  return data as AttemptRow | null;
+  return normalizeAttemptRow(data);
 }
 
 export async function insertAttempt(row: NewAttempt): Promise<AttemptRow> {
   const supabase = getSupabaseAdmin();
+  const cols = await getAttemptColumns(supabase);
+
+  const payload: any = { ...row };
+  if (!_supportsPoolVersion) {
+    delete payload.pool_version;
+  }
+
   const { data, error } = await supabase
     .from('mock_attempts')
-    .insert(row)
-    .select(ATTEMPT_COLUMNS)
+    .insert(payload)
+    .select(cols)
     .single();
 
   if (error) {
@@ -146,7 +178,7 @@ export async function insertAttempt(row: NewAttempt): Promise<AttemptRow> {
     }
     throw new Error(`[exam-db] insertAttempt: ${error.message}`);
   }
-  return data as AttemptRow;
+  return normalizeAttemptRow(data)!;
 }
 
 export async function getAttempt(attemptId: string, userId: string): Promise<AttemptRow | null> {
@@ -154,9 +186,10 @@ export async function getAttempt(attemptId: string, userId: string): Promise<Att
     return null;
   }
   const supabase = getSupabaseAdmin();
+  const cols = await getAttemptColumns(supabase);
   const { data, error } = await supabase
     .from('mock_attempts')
-    .select(ATTEMPT_COLUMNS)
+    .select(cols)
     .eq('id', attemptId)
     .eq('user_id', userId)
     .maybeSingle();
@@ -164,7 +197,7 @@ export async function getAttempt(attemptId: string, userId: string): Promise<Att
   if (error) {
     throw new Error(`[exam-db] getAttempt: ${error.message}`);
   }
-  return data as AttemptRow | null;
+  return normalizeAttemptRow(data);
 }
 
 export async function saveCheckpoint(
@@ -202,6 +235,7 @@ export async function markSubmitted(
 ): Promise<AttemptRow | null> {
   if (!isUuid(attemptId) || !isUuid(userId)) return null;
   const supabase = getSupabaseAdmin();
+  const cols = await getAttemptColumns(supabase);
   const { data, error } = await supabase
     .from('mock_attempts')
     .update({
@@ -215,13 +249,13 @@ export async function markSubmitted(
     .eq('id', attemptId)
     .eq('user_id', userId)
     .eq('status', 'in_progress')
-    .select(ATTEMPT_COLUMNS)
+    .select(cols)
     .maybeSingle();
 
   if (error) {
     throw new Error(`[exam-db] markSubmitted: ${error.message}`);
   }
-  return data as AttemptRow | null;
+  return normalizeAttemptRow(data);
 }
 
 export async function listSubmittedAttempts(userId: string, limit: number): Promise<AttemptRow[]> {
@@ -229,9 +263,10 @@ export async function listSubmittedAttempts(userId: string, limit: number): Prom
     return [];
   }
   const supabase = getSupabaseAdmin();
+  const cols = await getAttemptColumns(supabase);
   const { data, error } = await supabase
     .from('mock_attempts')
-    .select(ATTEMPT_COLUMNS)
+    .select(cols)
     .eq('user_id', userId)
     .eq('status', 'submitted')
     .order('submitted_at', { ascending: false })
@@ -240,7 +275,7 @@ export async function listSubmittedAttempts(userId: string, limit: number): Prom
   if (error) {
     throw new Error(`[exam-db] listSubmittedAttempts: ${error.message}`);
   }
-  return (data ?? []) as AttemptRow[];
+  return (data ?? []).map((row) => normalizeAttemptRow(row)!);
 }
 
 export async function getSeenQuestionIds(userId: string): Promise<Set<string>> {
