@@ -861,6 +861,10 @@ export default function App() {
             analystId={viewingAnalystId}
             currentUserId={userId}
             onClose={() => setViewingAnalystId(null)}
+            onNavigateProfile={() => {
+              setViewingAnalystId(null);
+              navigateToTab('profile');
+            }}
           />
         )}
       </AnimatePresence>

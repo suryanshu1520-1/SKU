@@ -38,6 +38,7 @@ import { EmptyState, SkeletonCard } from './shared';
 import type { CandidatePreferences } from '../types';
 import { calculateExamCountdown } from '../lib/candidatePreferences';
 import { getOptionalSubject } from '../data/optional-subjects';
+import CandidateDossierModal from './CandidateDossierModal';
 
 interface ProfileProps {
   userEmail: string;
@@ -99,6 +100,7 @@ export default function Profile({
   const [savedArticles, setSavedArticles] = useState<SavedArticle[]>([]);
   const [loadingArticles, setLoadingArticles] = useState(false);
   const [removingArticleId, setRemovingArticleId] = useState<string | null>(null);
+  const [showDossierModal, setShowDossierModal] = useState(false);
 
   const prefersReduced = useReducedMotion();
 
@@ -476,6 +478,20 @@ export default function Profile({
 
           {/* Action Pills */}
           <div className="flex items-center gap-2 flex-wrap shrink-0">
+            {/* Preview Candidate Dossier */}
+            {userId && (
+              <motion.button
+                onClick={() => setShowDossierModal(true)}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-xs font-sans font-medium transition-colors cursor-pointer bg-[rgba(224,208,171,0.12)] border-[rgba(224,208,171,0.35)] text-[#e0d0ab] hover:bg-[#e0d0ab] hover:text-[#072e63] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]"
+                title="Preview your live Candidate Dossier as seen on the leaderboard"
+              >
+                <Shield className="w-3.5 h-3.5 text-[#e0d0ab]" />
+                <span>Preview Dossier</span>
+              </motion.button>
+            )}
+
             {/* Visibility Toggle */}
             <motion.button
               onClick={handleToggleVisibility}
@@ -1086,6 +1102,17 @@ export default function Profile({
             <Sparkles className="w-3.5 h-3.5 text-[#e0d0ab]" />
             <span>{exportToast}</span>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Candidate Dossier Modal Overlay */}
+      <AnimatePresence>
+        {showDossierModal && userId && (
+          <CandidateDossierModal
+            analystId={userId}
+            currentUserId={userId}
+            onClose={() => setShowDossierModal(false)}
+          />
         )}
       </AnimatePresence>
 

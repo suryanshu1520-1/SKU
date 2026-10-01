@@ -90,6 +90,7 @@ $RECYCLE.BIN/
 # inbox (handoffs) and standalone *-handoff.md files are excluded.
 docs/handoffs/
 .agents/inbox/
+tark_pyq_handoff/
 *-handoff.md
 *.handoff.md
 

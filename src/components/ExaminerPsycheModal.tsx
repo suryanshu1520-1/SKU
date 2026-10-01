@@ -161,22 +161,17 @@ const EMPIRICAL_BASELINE_DATA = {
   },
   qualifiers: {
     extremeQualifiers: [
-      { token: "only", sampleSize: 6, falseStatementPct: 66.7, trueStatementPct: 33.3, examinerTrapIndex: "HIGH_RISK" },
-      { token: "all / entirely", sampleSize: 8, falseStatementPct: 62.5, trueStatementPct: 37.5, examinerTrapIndex: "HIGH_RISK" },
-      { token: "never / none", sampleSize: 1, falseStatementPct: 100.0, trueStatementPct: 0.0, examinerTrapIndex: "EXTREME_TRAP" },
-      { token: "drastically / exponentially", sampleSize: 5, falseStatementPct: 80.0, trueStatementPct: 20.0, examinerTrapIndex: "EXTREME_TRAP" },
-      { token: "always / solely", sampleSize: 5, falseStatementPct: 80.0, trueStatementPct: 20.0, examinerTrapIndex: "EXTREME_TRAP" }
+      { token: "absolute (only, all, never, solely)", sampleSize: 20, falseStatementPct: 55.0, trueStatementPct: 45.0, examinerTrapIndex: "MODERATE_RISK" },
+      { token: "hedged (can, may, some, largely)", sampleSize: 21, falseStatementPct: 9.5, trueStatementPct: 90.5, reliabilityScore: "HIGH_TRUTH_PROBABILITY" }
     ],
     contingentQualifiers: [
-      { token: "can be / may be", sampleSize: 10, trueStatementPct: 70.0, falseStatementPct: 30.0, reliabilityScore: "HIGH_TRUTH_PROBABILITY" },
-      { token: "some / generally", sampleSize: 3, trueStatementPct: 100.0, falseStatementPct: 0.0, reliabilityScore: "VERY_HIGH" },
-      { token: "often / largely", sampleSize: 4, trueStatementPct: 75.0, falseStatementPct: 25.0, reliabilityScore: "HIGH" },
-      { token: "might / could", sampleSize: 4, trueStatementPct: 75.0, falseStatementPct: 25.0, reliabilityScore: "HIGH" }
+      { token: "both (hedged + absolute)", sampleSize: 7, trueStatementPct: 71.4, falseStatementPct: 28.6, reliabilityScore: "LEANING_TRUE" },
+      { token: "neither (neutral)", sampleSize: 283, trueStatementPct: 64.3, falseStatementPct: 35.7, reliabilityScore: "SLIGHT_TRUE_BIAS" }
     ],
     overallHeuristics: {
-      extremeFalseProbability: 81.3,
-      contingentTrueProbability: 76.9,
-      pairMatchingImpactOnElimination: "Methodological Truth: 'only' occurs in 42.8% of UPSC questions, but over 98% of these occurrences represent option-selection syntax ('1 only', '2 only', 'Only one pair'), not factual statement premises. Within factual statements, extreme absolutes ('all', 'never', 'only') exhibit ~81.3% falsehood, while contingent verbs ('can be', 'may', 'some') have ~76.9% empirical truth. Pair-matching in 2023–2025 neutralizes binary elimination shortcuts."
+      extremeFalseProbability: 55.0,
+      contingentTrueProbability: 90.5,
+      pairMatchingImpactOnElimination: "Methodological Truth: Based on our rigorous empirical analysis of 331 statements from 110 keyed questions across the 2021-2025 GS-1 papers, absolute statements exhibit a 55% falsehood rate, while hedged/contingent statements demonstrate a massive 90.5% empirical truth rate. While pair-matching questions neutralize traditional binary elimination, the underlying probabilistic wording biases remain a powerful tool for informed guessing (+0.111 expected marks per question)."
     }
   },
   formatShifts: [
