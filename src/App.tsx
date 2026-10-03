@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'motion/react';
+import { Analytics } from '@vercel/analytics/react';
 import Login from './components/Login';
 import Landing from './components/Landing';
 import Manifesto from './components/Manifesto';
@@ -976,6 +977,9 @@ export default function App() {
           </div>
         </div>
       </Modal>
+
+      {/* Vercel Web Analytics */}
+      <Analytics />
     </div>
   );
 }
