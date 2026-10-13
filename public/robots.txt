@@ -1,5 +1,25 @@
 User-agent: *
 Allow: /
-Disallow: /api/
+Allow: /intelligence/
+Allow: /daily-edition/
+Allow: /prs/
+Allow: /arena/
+Allow: /observatory/
+Allow: /humanities/
+Allow: /leaderboard/
+Allow: /manifesto/
+Allow: /api/sitemap.xml
+Allow: /api/sitemap-news.xml
 
-Sitemap: https://tark.app/sitemap.xml
+# Protect internal mutation & transaction endpoints from crawler churn
+Disallow: /api/auth/
+Disallow: /api/cron/
+Disallow: /api/internal/
+Disallow: /api/exam/checkpoint
+Disallow: /api/exam/submit
+Disallow: /api/create-razorpay-order
+Disallow: /api/verify-payment
+Disallow: /api/rebase/
+
+Sitemap: https://tark.live/sitemap.xml
+Sitemap: https://tark.live/sitemap-news.xml

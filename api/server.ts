@@ -16,6 +16,7 @@ import verifyPaymentHandler from "../server-lib/verify-payment.js";
 import userLimitsHandler from "../server-lib/user-limits.js";
 
 import { analyticsRouter } from "../server-lib/analytics/routes.js";
+import { seoRouter } from "../server-lib/seo/routes.js";
 import {
   examCatalogHandler,
   examStartHandler,
@@ -28,6 +29,9 @@ import {
 
 const app = express();
 app.use(express.json({ limit: '512kb' }));
+
+// Mount dynamic SEO routes (sitemaps & crawler prerendering)
+app.use(seoRouter);
 
 // Mount verified serverless API route handlers
 app.get("/api/cron/scrape", scrapeHandler);

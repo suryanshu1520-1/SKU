@@ -27,6 +27,7 @@ import {
   type ContestedClaim,
 } from './TrustUI';
 import { ConceptInsightRenderer } from './shared';
+import { updateDocumentMeta } from '../lib/seo';
 
 const GOLD = '#e0d0ab';
 const MUTED_GOLD = '#c8b998';
@@ -141,6 +142,21 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
       /* ignore */
     }
   }, [readKey]);
+
+  // Synchronize Daily Edition URL and SEO meta
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const editionUrl = `/daily-edition/${today}`;
+      if (window.location.pathname !== editionUrl && !window.location.search.includes('id=')) {
+        window.history.pushState(null, '', editionUrl);
+      }
+      updateDocumentMeta({
+        title: `PIB & Daily Current Affairs Edition (${today}) | Tark Intelligence`,
+        description: `Verified daily government policy brief and PIB digests for UPSC CSE preparation. Curated on ${today}.`,
+        canonicalPath: editionUrl,
+      });
+    }
+  }, [today]);
 
   const persistRead = useCallback(
     (next: Set<string>) => {

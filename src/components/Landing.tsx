@@ -4,6 +4,7 @@ import { Swords, Globe, Layers, BookOpen, Sparkles, Trophy } from 'lucide-react'
 import { supabase } from '../lib/supabase';
 import DiagnosticPreview from './DiagnosticPreview';
 import MobileLanding from './MobileLanding';
+import InteractiveLoopSection from './InteractiveLoopSection';
 import type { CandidatePreferences } from '../types';
 
 interface LandingProps {
@@ -204,96 +205,7 @@ export default function Landing({
         {/* ═══════════════════════════════════════════════════════════════════
              SECTION 2: LOOP (What happens after you answer)
              ═══════════════════════════════════════════════════════════════════ */}
-        <section aria-labelledby="h-loop" className="px-10 lg:px-16 py-24 border-t border-[rgba(224,208,171,0.06)]">
-          <h2 id="h-loop" className="m-0 font-sans font-extrabold text-[44px] lg:text-[52px] leading-[1.04] tracking-[-0.03em] text-[#f4ecd8]">
-            What happens after you answer.
-          </h2>
-          <p className="mt-3.5 m-0 max-w-[600px] font-serif text-[18px] leading-[1.55] text-[#b5c1d1]">
-            The same four steps run after every question you answer in Tark.
-          </p>
-
-          <div className="relative mt-14">
-            {/* Horizontal progress connector line */}
-            <div aria-hidden="true" className="absolute left-1 right-0 top-1 h-[1px] bg-gradient-to-r from-[rgba(224,208,171,0.45)] to-[rgba(224,208,171,0.18)] pointer-events-none" />
-
-            <ol className="list-none m-0 p-0 grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1.75fr)_minmax(0,1fr)_minmax(0,1fr)] gap-8 relative">
-              {/* Step 1: Practice */}
-              <li>
-                <span aria-hidden="true" className="block w-[9px] h-[9px] rounded-full bg-[#050b1a] border-2 border-[#e0d0ab] box-border" />
-                <h3 className="my-4 font-sans font-bold text-[24px] tracking-[-0.02em] text-[#f4ecd8]">
-                  Practice
-                </h3>
-                <p className="m-0 font-serif text-[15px] leading-[1.55] text-[#b5c1d1]">
-                  You answer under the clock, with negative marking on.
-                </p>
-                <div className="mt-4.5 flex items-center gap-3">
-                  <span className="inline-flex items-center gap-2 px-3 py-1.5 border border-[#e0d0ab] rounded-[10px] font-serif text-[14px] text-[#f4ecd8]">
-                    <span className="font-mono text-[11px] text-[#e0d0ab]">b</span>Second
-                  </span>
-                  <span className="font-mono text-[12px] text-[#7d8ca4] tabular-nums">00:48</span>
-                </div>
-              </li>
-
-              {/* Step 2: Diagnose */}
-              <li>
-                <span aria-hidden="true" className="block w-[9px] h-[9px] rounded-full bg-[#e0d0ab] box-border" />
-                <h3 className="my-4 font-sans font-bold text-[24px] tracking-[-0.02em] text-[#f4ecd8]">
-                  Diagnose
-                </h3>
-                <div className="p-1.5 rounded-[18px] bg-gradient-to-br from-[rgba(224,208,171,0.10)] to-[rgba(224,208,171,0.02)] border border-[rgba(224,208,171,0.14)] shadow-[0_28px_70px_-30px_rgba(1,6,18,0.85)]">
-                  <div className="bg-[#071630] rounded-[12px] border border-[rgba(224,208,171,0.07)] p-5 lg:p-6">
-                    <div className="flex items-baseline justify-between mb-3.5">
-                      <span className="font-sans text-[12px] font-semibold text-[#7d8ca4]">Sample result</span>
-                      <span className="font-mono text-[11px] text-[#7d8ca4]">Prelims 2001, Q39</span>
-                    </div>
-                    <div className="flex items-baseline gap-3.5">
-                      <span className="font-sans font-extrabold text-[44px] tracking-[-0.03em] leading-none text-[#f87171] tabular-nums">−0.66</span>
-                      <span className="font-sans font-semibold text-[14px] text-[#f87171]">Incorrect</span>
-                    </div>
-                    <p className="mt-4 m-0 font-serif text-[15px] leading-[1.55] text-[#f4ecd8]">
-                      Correct answer: <strong className="font-semibold text-[#34d399]">(a) First</strong>.
-                    </p>
-                    <p className="mt-2 m-0 font-serif text-[14.5px] leading-[1.6] text-[#b5c1d1]">
-                      The First Schedule lists every State and Union Territory, so a new State means amending it. The Second Schedule sets salaries and allowances.
-                    </p>
-                  </div>
-                </div>
-              </li>
-
-              {/* Step 3: Review */}
-              <li>
-                <span aria-hidden="true" className="block w-[9px] h-[9px] rounded-full bg-[#050b1a] border-2 border-[#e0d0ab] box-border" />
-                <h3 className="my-4 font-sans font-bold text-[24px] tracking-[-0.02em] text-[#f4ecd8]">
-                  Review
-                </h3>
-                <p className="m-0 font-serif text-[15px] leading-[1.55] text-[#b5c1d1]">
-                  The miss joins your subject record, so patterns show across sessions.
-                </p>
-                <p className="mt-4.5 m-0 font-sans text-[14px] font-semibold text-[#f4ecd8]">
-                  Polity <span className="ml-2 font-mono font-normal text-[12px] text-[#7d8ca4] tabular-nums">6 of 10 this week</span>
-                </p>
-              </li>
-
-              {/* Step 4: Improve */}
-              <li>
-                <span aria-hidden="true" className="block w-[9px] h-[9px] rounded-full bg-[#050b1a] border-2 border-[#e0d0ab] box-border" />
-                <h3 className="my-4 font-sans font-bold text-[24px] tracking-[-0.02em] text-[#f4ecd8]">
-                  Improve
-                </h3>
-                <p className="m-0 font-serif text-[15px] leading-[1.55] text-[#b5c1d1]">
-                  You leave with one next set to practise, not a wall of charts.
-                </p>
-                <button
-                  type="button"
-                  onClick={onNavigateArena}
-                  className="mt-4.5 inline-block px-4 py-2 border border-[rgba(224,208,171,0.32)] hover:border-[#e0d0ab] rounded-full font-sans text-[13px] font-semibold text-[#e0d0ab] transition-colors cursor-pointer"
-                >
-                  Practise Polity
-                </button>
-              </li>
-            </ol>
-          </div>
-        </section>
+        <InteractiveLoopSection onNavigateArena={onNavigateArena} />
 
         {/* ═══════════════════════════════════════════════════════════════════
              SECTION 3: SIX ROOMS (Mirrors the Rail with Alt Hotkeys)

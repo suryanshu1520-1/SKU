@@ -44,6 +44,8 @@ export interface ArenaProps {
   onReturnToDashboard?: (originTab?: string) => void;
   onNavigateManifesto?: () => void;
   onTestStatusChange?: (isActive: boolean, kind?: 'drill' | 'exam') => void;
+  initialExamLaunch?: ExamLaunch | null;
+  onClearExamLaunch?: () => void;
 }
 
 export default function Arena({
@@ -58,6 +60,8 @@ export default function Arena({
   onReturnToDashboard,
   onNavigateManifesto,
   onTestStatusChange,
+  initialExamLaunch,
+  onClearExamLaunch,
 }: ArenaProps) {
   const session = useArenaSession({
     onComplete,
@@ -73,9 +77,16 @@ export default function Arena({
 
   const prefersReduced = useReducedMotion();
 
-  const [examLaunch, setExamLaunch] = React.useState<ExamLaunch | null>(null);
+  const [examLaunch, setExamLaunch] = React.useState<ExamLaunch | null>(initialExamLaunch ?? null);
   const [examKey, setExamKey] = React.useState(0);
   const isGuest = !userId || userId === 'guest' || userId === 'anonymous';
+
+  React.useEffect(() => {
+    if (initialExamLaunch) {
+      setExamLaunch(initialExamLaunch);
+      setExamKey((k) => k + 1);
+    }
+  }, [initialExamLaunch]);
 
   if (examLaunch) {
     return (
@@ -86,7 +97,10 @@ export default function Arena({
           userId={userId}
           candidateName={candidateName ?? null}
           onRequestLogin={onRequestLogin}
-          onExit={() => setExamLaunch(null)}
+          onExit={() => {
+            setExamLaunch(null);
+            onClearExamLaunch?.();
+          }}
           onSittingChange={(active) => onTestStatusChange?.(active, 'exam')}
           onStartPaper={(paperCode, subject) => {
             setExamLaunch({ kind: 'new', paperCode, subject });
@@ -114,7 +128,7 @@ export default function Arena({
         motivation={session.motivation}
         isGuest={isGuest}
         onOpenExam={(launch) => {
-          if (isGuest) {
+          if (isGuest && launch.kind !== 'result') {
             onRequestLogin?.();
             return;
           }

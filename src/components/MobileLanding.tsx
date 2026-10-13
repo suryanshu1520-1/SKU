@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { Swords, Globe, Layers, BookOpen, Sparkles, Trophy } from 'lucide-react';
 import DiagnosticPreview from './DiagnosticPreview';
+import InteractiveLoopSection from './InteractiveLoopSection';
 import type { CandidatePreferences } from '../types';
 
 interface MobileLandingProps {
@@ -133,72 +134,7 @@ export default function MobileLanding({
         {/* ═══════════════════════════════════════════════════════════════════
              LOOP (What happens after you answer)
              ═══════════════════════════════════════════════════════════════════ */}
-        <section aria-labelledby="m-loop" className="mt-10 px-5 pt-10 pb-4 border-t border-[rgba(224,208,171,0.06)]">
-          <h2 id="m-loop" className="m-0 font-sans font-extrabold text-[30px] leading-[1.08] tracking-[-0.03em] text-[#f4ecd8]">
-            What happens after you answer.
-          </h2>
-          <p className="mt-3 m-0 font-serif text-[15px] leading-[1.55] text-[#b5c1d1]">
-            The same four steps run after every question you answer in Tark.
-          </p>
-
-          <div className="relative mt-8 pl-6">
-            {/* Vertical timeline connector */}
-            <div aria-hidden="true" className="absolute left-1 top-2 bottom-2 w-[1px] bg-[rgba(224,208,171,0.28)]" />
-
-            <ol className="list-none m-0 p-0 flex flex-col gap-8">
-              {/* Step 1: Practice */}
-              <li className="relative">
-                <span aria-hidden="true" className="absolute -left-6 top-2 w-[9px] h-[9px] rounded-full bg-[#050b1a] border-2 border-[#e0d0ab]" />
-                <h3 className="m-0 font-sans font-bold text-[21px] tracking-[-0.02em] text-[#f4ecd8]">Practice</h3>
-                <p className="mt-1.5 m-0 font-serif text-[14.5px] leading-[1.55] text-[#b5c1d1]">
-                  You answer under the clock, with negative marking on.
-                </p>
-              </li>
-
-              {/* Step 2: Diagnose */}
-              <li className="relative">
-                <span aria-hidden="true" className="absolute -left-6 top-2 w-[9px] h-[9px] rounded-full bg-[#e0d0ab]" />
-                <h3 className="m-0 font-sans font-bold text-[21px] tracking-[-0.02em] text-[#f4ecd8]">Diagnose</h3>
-                <div className="mt-3 p-1 rounded-[16px] bg-gradient-to-br from-[rgba(224,208,171,0.10)] to-[rgba(224,208,171,0.02)] border border-[rgba(224,208,171,0.14)]">
-                  <div className="bg-[#071630] rounded-[12px] border border-[rgba(224,208,171,0.07)] p-4">
-                    <div className="flex justify-between items-baseline mb-2.5">
-                      <span className="font-sans text-[11px] font-semibold text-[#7d8ca4]">Sample result</span>
-                      <span className="font-mono text-[10.5px] text-[#7d8ca4]">Prelims 2001, Q39</span>
-                    </div>
-                    <div className="flex items-baseline gap-3">
-                      <span className="font-sans font-extrabold text-[36px] tracking-[-0.03em] leading-none text-[#f87171] tabular-nums">−0.66</span>
-                      <span className="font-sans font-semibold text-[13px] text-[#f87171]">Incorrect</span>
-                    </div>
-                    <p className="mt-3 m-0 font-serif text-[14.5px] leading-[1.5]">
-                      Correct answer: <strong className="font-semibold text-[#34d399]">(a) First</strong>.
-                    </p>
-                    <p className="mt-1.5 m-0 font-serif text-[13.5px] leading-[1.6] text-[#b5c1d1]">
-                      The First Schedule lists every State and Union Territory, so a new State means amending it. The Second Schedule sets salaries and allowances.
-                    </p>
-                  </div>
-                </div>
-              </li>
-
-              {/* Step 3: Review */}
-              <li className="relative">
-                <span aria-hidden="true" className="absolute -left-6 top-2 w-[9px] h-[9px] rounded-full bg-[#050b1a] border-2 border-[#e0d0ab]" />
-                <h3 className="m-0 font-sans font-bold text-[21px] tracking-[-0.02em] text-[#f4ecd8]">Review</h3>
-                <p className="mt-1.5 m-0 font-serif text-[14.5px] leading-[1.55] text-[#b5c1d1]">
-                  The miss joins your subject record, so patterns show across sessions.
-                </p>
-              </li>
-
-              {/* Step 4: Improve */}
-              <li className="relative">
-                <span aria-hidden="true" className="absolute -left-6 top-2 w-[9px] h-[9px] rounded-full bg-[#050b1a] border-2 border-[#e0d0ab]" />
-                <h3 className="m-0 font-sans font-bold text-[21px] tracking-[-0.02em] text-[#f4ecd8]">Improve</h3>
-                <p className="mt-1.5 m-0 font-serif text-[14.5px] leading-[1.55] text-[#b5c1d1]">
-                  You leave with one next set to practise, not a wall of charts.
-                </p>
-              </li>
-            </ol>
-          </div>
-        </section>
+        <InteractiveLoopSection onNavigateArena={onNavigateArena} />
 
         {/* ═══════════════════════════════════════════════════════════════════
              SIX ROOMS

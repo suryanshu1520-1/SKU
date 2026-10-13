@@ -20,16 +20,22 @@ import {
   Layers,
   Activity,
   BarChart3,
-  UserCheck
+  UserCheck,
+  FileText,
+  ChevronRight,
 } from 'lucide-react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import { getOptionalSubject, GS_PILLARS_CONFIG } from '../data/optional-subjects';
+import { examApi } from './exam/lib/examApi';
+import { getLocalScorecards, type StoredScorecardSummary } from './exam/lib/scorecardStorage';
+import { PAPER_SHORT_TITLES } from './exam/types';
 
 export interface CandidateDossierModalProps {
   analystId: string;
   currentUserId?: string;
   onClose: () => void;
   onNavigateProfile?: () => void;
+  onViewScorecard?: (attemptId: string) => void;
 }
 
 interface DossierData {
@@ -72,10 +78,12 @@ export default function CandidateDossierModal({
   currentUserId,
   onClose,
   onNavigateProfile,
+  onViewScorecard,
 }: CandidateDossierModalProps) {
   const [dossier, setDossier] = useState<DossierData | null>(null);
   const [loading, setLoading] = useState(true);
   const [radarData, setRadarData] = useState<RadarPoint[]>([]);
+  const [mockAttempts, setMockAttempts] = useState<StoredScorecardSummary[]>([]);
   const [isViewerPublic, setIsViewerPublic] = useState<boolean>(true);
   const [updatingViewerVisibility, setUpdatingViewerVisibility] = useState(false);
   const [viewerVisibilityToggled, setViewerVisibilityToggled] = useState(false);
@@ -273,6 +281,53 @@ export default function CandidateDossierModal({
         });
 
         setRadarData(calculatedRadar);
+
+        // 6. Fetch Evaluated Mock Papers & Scorecards
+        try {
+          const localMocks = getLocalScorecards();
+          if (isOwnProfile && currentUserId) {
+            try {
+              const srv = await examApi.attempts();
+              if (!cancelled && srv?.attempts) {
+                const serverMapped: StoredScorecardSummary[] = srv.attempts.map((a) => {
+                  const title = `GS-1 ${PAPER_SHORT_TITLES[a.paperCode] ?? a.paperCode}`;
+                  const accuracy = a.questionCount > 0 ? Math.round((a.correct / a.questionCount) * 100) : 0;
+                  return {
+                    attemptId: a.attemptId,
+                    paperCode: a.paperCode,
+                    subject: a.subject,
+                    paperTitle: title,
+                    submittedAt: a.submittedAt,
+                    durationSeconds: 0,
+                    questionCount: a.questionCount,
+                    correct: a.correct,
+                    wrong: a.wrong,
+                    blank: a.blank,
+                    netHundredths: a.netHundredths,
+                    maxHundredths: a.maxHundredths,
+                    accuracy,
+                    cpEarned: a.cpEarned,
+                    cutoffCleared: a.cutoffCleared,
+                  };
+                });
+                const map = new Map<string, StoredScorecardSummary>();
+                serverMapped.forEach((m) => map.set(m.attemptId, m));
+                localMocks.forEach((m) => {
+                  if (!map.has(m.attemptId)) map.set(m.attemptId, m);
+                });
+                if (!cancelled) setMockAttempts(Array.from(map.values()));
+              } else if (!cancelled) {
+                setMockAttempts(localMocks);
+              }
+            } catch {
+              if (!cancelled) setMockAttempts(localMocks);
+            }
+          } else if (!cancelled) {
+            setMockAttempts(localMocks);
+          }
+        } catch (err) {
+          console.warn('[CandidateDossier] Mock attempts fetch note:', err);
+        }
       } catch (err) {
         console.error('[CandidateDossier] Unexpected fetch fault:', err);
         // Fallback state so the modal never displays a blank or broken error
@@ -595,7 +650,105 @@ export default function CandidateDossierModal({
                 </div>
               </div>
 
-              {/* 4. Strategic Track & Examiner Psyche Alignment */}
+              {/* 4. Official Exam Hall Papers & Evaluated Scorecards */}
+              <div className="p-4 sm:p-5 bg-[#0a2148]/30 border border-[rgba(224,208,171,0.14)] rounded-xs space-y-3 font-sans">
+                <div className="flex items-center justify-between pb-2 border-b border-[rgba(224,208,171,0.1)]">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-[#e0d0ab]" />
+                    <span className="font-serif text-sm font-bold text-[#f4ecd8]">
+                      Official Mock Papers & Evaluation Reports
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-mono text-[#6e7d94]">
+                    {mockAttempts.length} {mockAttempts.length === 1 ? 'Paper Evaluated' : 'Papers Evaluated'}
+                  </span>
+                </div>
+
+                {mockAttempts.length === 0 ? (
+                  <div className="py-4 text-center">
+                    <p className="text-xs text-[#b5c1d1] m-0">
+                      No mock papers evaluated yet. Sit a full, half, or sectional paper in the Exam Hall to record your baseline.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2 max-h-56 overflow-y-auto pr-1 custom-scrollbar">
+                    {mockAttempts.map((item) => {
+                      let dateStr = '';
+                      try {
+                        dateStr = new Date(item.submittedAt).toLocaleDateString('en-IN', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        });
+                      } catch {
+                        dateStr = item.submittedAt;
+                      }
+
+                      const netMarksFormatted = (item.netHundredths / 100).toFixed(2);
+                      const maxMarks = (item.maxHundredths / 100).toFixed(0);
+
+                      return (
+                        <div
+                          key={item.attemptId}
+                          className="p-3 bg-[#041228]/80 border border-[rgba(224,208,171,0.12)] hover:border-[#e0d0ab]/40 rounded-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors"
+                        >
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-serif text-xs font-bold text-[#f4ecd8]">
+                                {item.paperTitle}
+                              </span>
+                              <span className="text-[10px] font-mono text-[#6e7d94]">{dateStr}</span>
+                              {item.cutoffCleared && (
+                                <span className="px-1.5 py-0.2 rounded-xs text-[9px] font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                                  Cutoff Cleared
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 text-[11px] text-[#b5c1d1] font-mono">
+                              <span className="text-emerald-400 font-bold">{item.correct} right</span>
+                              <span className="text-[#6e7d94]">&bull;</span>
+                              <span className="text-rose-400">{item.wrong} wrong</span>
+                              <span className="text-[#6e7d94]">&bull;</span>
+                              <span className="text-[#6e7d94]">{item.blank} blank</span>
+                              <span className="text-[#6e7d94]">&bull;</span>
+                              <span className="text-[#e0d0ab] font-bold">{item.accuracy}% acc</span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
+                            <div className="text-right">
+                              <span className="font-mono text-sm font-bold text-white block">
+                                {netMarksFormatted} <span className="text-[10px] text-[#6e7d94]">/ {maxMarks}</span>
+                              </span>
+                              {item.cpEarned !== undefined && item.cpEarned > 0 && (
+                                <span className="text-[9px] font-mono text-[#e0d0ab] block">
+                                  +{item.cpEarned} Weekly CP
+                                </span>
+                              )}
+                            </div>
+
+                            {onViewScorecard && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  onClose();
+                                  onViewScorecard(item.attemptId);
+                                }}
+                                className="px-2.5 py-1.5 rounded-xs bg-[#e0d0ab] hover:bg-white text-[#050b1a] text-xs font-mono font-bold transition-colors cursor-pointer flex items-center gap-1 shadow-xs"
+                              >
+                                <span>Scorecard</span>
+                                <ChevronRight className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* 5. Strategic Track & Examiner Psyche Alignment */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-sans">
                 {/* Focus Pillars & Quotas */}
                 <div className="p-3.5 bg-[#0a2148]/30 border border-[rgba(224,208,171,0.12)] rounded-xs space-y-2">

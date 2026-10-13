@@ -24,6 +24,7 @@ import {
   saveLocalSheet,
   savePrefs,
 } from './lib/localStorage.js';
+import { saveScorecardToLocal, getLocalScorecard } from './lib/scorecardStorage.js';
 import { chooseResumeSheet, keepaliveBodyFits } from './lib/sessionHelpers.js';
 import {
   emptyResponseSheet,
@@ -220,6 +221,7 @@ export function useExamSession({
         submittedRef.current = true;
         submitInFlightRef.current = false;
         clearLocalSheet(attId);
+        saveScorecardToLocal(resp);
         setSubmitResponse(resp);
         setPhase('scorecard');
         if (sittingNotifiedRef.current) {
@@ -319,10 +321,17 @@ export function useExamSession({
       try {
         const resp = await examApi.result(launch.attemptId);
         if (!mountedRef.current || gen !== loadGenRef.current) return;
+        saveScorecardToLocal(resp);
         setSubmitResponse(resp);
         setPhase('scorecard');
       } catch (err) {
         if (!mountedRef.current || gen !== loadGenRef.current) return;
+        const local = getLocalScorecard(launch.attemptId);
+        if (local) {
+          setSubmitResponse(local);
+          setPhase('scorecard');
+          return;
+        }
         if (isUnauthorizedError(err)) {
           setPhase('admit');
           setError('Sign in to view your exam result.');
@@ -358,6 +367,7 @@ export function useExamSession({
           return;
         }
         if (activeResp.finalized) {
+          saveScorecardToLocal(activeResp.finalized);
           setSubmitResponse(activeResp.finalized);
           setCollectedWhileAway(true);
           clearLocalSheet(activeResp.finalized.result.attemptId);
@@ -380,6 +390,7 @@ export function useExamSession({
       const activeResp = await examApi.active();
       if (!mountedRef.current || gen !== loadGenRef.current) return;
       if (activeResp.finalized) {
+        saveScorecardToLocal(activeResp.finalized);
         setSubmitResponse(activeResp.finalized);
         setCollectedWhileAway(true);
         clearLocalSheet(activeResp.finalized.result.attemptId);

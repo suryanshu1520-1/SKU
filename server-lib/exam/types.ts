@@ -137,6 +137,8 @@ export interface ExamResult {
   penaltyHundredths: number;
   netHundredths: number;
   maxHundredths: number;
+  cpEarned?: number;
+  cutoffCleared?: boolean;
   bySubject: Record<string, SubjectRow>;
   byConfidence: Record<Confidence | 'untagged', LedgerRow>;
   byStruckCount: Record<'0' | '1' | '2' | '3', LedgerRow>;
@@ -199,6 +201,8 @@ export interface AttemptSummary {
   blank: number;
   netHundredths: number;
   maxHundredths: number;
+  cpEarned?: number;
+  cutoffCleared?: boolean;
 }
 
 export interface CatalogResponse {

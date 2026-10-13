@@ -1,6 +1,17 @@
 {
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/server" }
+    { "source": "/sitemap.xml", "destination": "/api/server" },
+    { "source": "/sitemap-news.xml", "destination": "/api/server" },
+    { "source": "/intelligence", "destination": "/api/server" },
+    { "source": "/intelligence/(.*)", "destination": "/api/server" },
+    { "source": "/news", "destination": "/api/server" },
+    { "source": "/news/(.*)", "destination": "/api/server" },
+    { "source": "/prs", "destination": "/api/server" },
+    { "source": "/prs/(.*)", "destination": "/api/server" },
+    { "source": "/daily-edition", "destination": "/api/server" },
+    { "source": "/daily-edition/(.*)", "destination": "/api/server" },
+    { "source": "/api/(.*)", "destination": "/api/server" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "functions": {
     "api/server.ts": {

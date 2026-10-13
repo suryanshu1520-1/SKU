@@ -41,6 +41,13 @@ import prsVaultDossiers from '../data/prs-vault-dossiers.json';
 import type { CandidatePreferences } from '../types';
 import { matchOptionalRelevance } from '../lib/candidatePreferences';
 import {
+  slugify,
+  getArticleUrl,
+  getCanonicalArticleUrl,
+  updateDocumentMeta,
+  ROUTE_META_DEFAULTS,
+} from '../lib/seo';
+import {
   SourceAnchor,
   GroundingBadge,
   ContestedCard,
@@ -311,6 +318,116 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
   useEffect(() => {
     setShowVerbatimSyllabus(false);
   }, [selectedDossier?.id]);
+
+  // Deep-link inspection on mount & direct route synchronization
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const pathname = window.location.pathname;
+      const params = new URLSearchParams(window.location.search);
+      const targetId = params.get('id') || params.get('article');
+
+      if (pathname.includes('/daily-edition')) {
+        setBriefViewMode('edition');
+      } else if (pathname.includes('/prs')) {
+        setActiveCategoryTab('PRS');
+        setSelectedSource('PRS');
+      }
+
+      let resolvedId = targetId;
+      if (!resolvedId && pathname.startsWith('/prs/')) {
+        const seg = pathname.split('/')[2];
+        if (seg) resolvedId = seg;
+      }
+
+      if (resolvedId && !selectedDossier) {
+        // First check PRS Vault
+        const matchedPrs = (prsVaultDossiers as unknown as CurrentAffairsItem[]).find(
+          (p) => p.id === resolvedId || slugify(p.headline) === resolvedId || slugify(p.id || '') === resolvedId
+        );
+        if (matchedPrs) {
+          setSelectedDossier(matchedPrs);
+          return;
+        }
+
+        // Check if already in items
+        const matchedItem = items.find((it) => it.id === resolvedId);
+        if (matchedItem) {
+          setSelectedDossier(matchedItem);
+          return;
+        }
+
+        // Fetch directly from Supabase
+        (async () => {
+          try {
+            const { data, error } = await supabase
+              .from('current_affairs')
+              .select('*')
+              .eq('id', resolvedId)
+              .maybeSingle();
+
+            if (!error && data) {
+              setSelectedDossier(data as CurrentAffairsItem);
+            }
+          } catch (fetchErr) {
+            console.warn('Failed to resolve deep-link dossier:', fetchErr);
+          }
+        })();
+      }
+    } catch {
+      // ignore
+    }
+  }, [items]);
+
+  // Synchronize browser URL bar and meta tags when a dossier opens or closes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (selectedDossier) {
+      const artUrl = getArticleUrl(selectedDossier);
+      if (window.location.pathname + window.location.search !== artUrl) {
+        window.history.pushState(null, '', artUrl);
+      }
+      updateDocumentMeta({
+        title: `${selectedDossier.headline} — UPSC Policy Intelligence & Prelims Analysis | Tark`,
+        description: (selectedDossier.summary?.bullets || []).slice(0, 2).join(' ') || selectedDossier.summary?.prelims || selectedDossier.headline,
+        canonicalPath: artUrl,
+      });
+    } else {
+      const fallbackPath = activeCategoryTab === 'PRS' ? '/prs' : '/intelligence';
+      if (window.location.pathname.startsWith('/intelligence/') || window.location.pathname.startsWith('/prs/')) {
+        window.history.pushState(null, '', fallbackPath);
+      }
+      updateDocumentMeta(activeCategoryTab === 'PRS' ? ROUTE_META_DEFAULTS.prs : ROUTE_META_DEFAULTS.tracker);
+    }
+  }, [selectedDossier?.id]);
+
+  const handleShareArticle = async (item: CurrentAffairsItem, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const shareUrl = getCanonicalArticleUrl(item);
+    const shareText = `${item.headline} (${item.source} · ${item.ministry})\nRead high-yield Prelims pointers and Mains analysis on Tark:`;
+
+    if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setToastMsg('Link copied to clipboard! Share on Telegram or WhatsApp.');
+        setTimeout(() => setToastMsg(''), 4000);
+      } catch {
+        // fallback
+      }
+    }
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: item.headline,
+          text: shareText,
+          url: shareUrl,
+        });
+      } catch {
+        // ignore share cancellation
+      }
+    }
+  };
 
   // Grounding Explainer Modal State
   const [groundingExplainerData, setGroundingExplainerData] = useState<{
@@ -1475,6 +1592,15 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                     <span>Read Full Brief</span>
                     <ChevronRight className="w-3.5 h-3.5 text-[#0194a8]" />
                   </button>
+
+                  <button
+                    onClick={(e) => handleShareArticle(leadItem, e)}
+                    className="text-xs font-mono text-[#8fa2bd] hover:text-[#e0d0ab] transition-colors cursor-pointer flex items-center gap-1.5"
+                    title="Copy shareable link for Telegram / WhatsApp"
+                  >
+                    <Share2 className="w-3.5 h-3.5 text-[#e0d0ab]" />
+                    <span>Share Signal</span>
+                  </button>
                 </div>
 
                 {leadItem.url && (
@@ -1640,6 +1766,14 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                         >
                           Full Brief
                         </button>
+                        <button
+                          onClick={(e) => handleShareArticle(item, e)}
+                          className="font-mono text-[11px] text-[#8fa2bd] hover:text-[#e0d0ab] transition-colors cursor-pointer flex items-center gap-1"
+                          title="Copy shareable link"
+                        >
+                          <Share2 className="w-3 h-3 text-[#e0d0ab]" />
+                          <span>Share</span>
+                        </button>
                         {item.url && (
                           <a
                             href={item.url}
@@ -1702,12 +1836,22 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                       Policy Intelligence Dossier
                     </span>
                   </div>
-                  <button
-                    onClick={() => setSelectedDossier(null)}
-                    className="p-1.5 text-secondary hover:text-primary transition-colors bg-[rgba(11,61,120,0.3)] hover:bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.3)] rounded-xs cursor-pointer"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleShareArticle(selectedDossier)}
+                      className="px-2.5 py-1 text-xs font-mono text-[#e0d0ab] hover:text-white transition-colors bg-[rgba(11,61,120,0.3)] hover:bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.3)] hover:border-[#e0d0ab]/50 rounded-xs cursor-pointer flex items-center gap-1.5 shadow-xs"
+                      title="Copy shareable link (Telegram / WhatsApp)"
+                    >
+                      <Share2 className="w-3.5 h-3.5" />
+                      <span>Share</span>
+                    </button>
+                    <button
+                      onClick={() => setSelectedDossier(null)}
+                      className="p-1.5 text-secondary hover:text-primary transition-colors bg-[rgba(11,61,120,0.3)] hover:bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.3)] rounded-xs cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 {/* 1. Quiet Editorial Byline */}
@@ -2178,6 +2322,37 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                     <span>Practice MCQ Drill</span>
                   </button>
                 )}
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    onClick={() => handleShareArticle(selectedDossier)}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 bg-[rgba(11,61,120,0.3)] border border-[rgba(19,108,153,0.4)] hover:border-[#e0d0ab] text-[#e0d0ab] text-xs font-sans font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer shadow-xs"
+                    title="Copy Shareable Link"
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                    <span>Copy Link</span>
+                  </button>
+
+                  <a
+                    href={`https://t.me/share/url?url=${encodeURIComponent(getCanonicalArticleUrl(selectedDossier))}&text=${encodeURIComponent(selectedDossier.headline + ' — UPSC Policy Analysis on Tark')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 px-2.5 py-2 bg-[#229ED9]/15 border border-[#229ED9]/40 hover:border-[#229ED9] text-[#60cdff] text-xs font-mono rounded-sm transition-all cursor-pointer shadow-xs"
+                    title="Share to Telegram group"
+                  >
+                    <span>Telegram</span>
+                  </a>
+
+                  <a
+                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(selectedDossier.headline + '\n\n' + getCanonicalArticleUrl(selectedDossier))}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 px-2.5 py-2 bg-[#25D366]/15 border border-[#25D366]/40 hover:border-[#25D366] text-[#4ade80] text-xs font-mono rounded-sm transition-all cursor-pointer shadow-xs"
+                    title="Share to WhatsApp peer group"
+                  >
+                    <span>WhatsApp</span>
+                  </a>
+                </div>
 
                 {selectedDossier.url && (
                   <a

@@ -25,6 +25,7 @@ import type {
 } from '../exam/types';
 import { PAPER_SHORT_TITLES, SUBJECT_LABELS } from '../exam/types';
 import { examApi } from '../exam/lib/examApi';
+import { getLocalScorecards } from '../exam/lib/scorecardStorage';
 import { formatMarks, formatTimeLeft, secondsLeft, serverOffsetMs } from '../exam/lib/clock';
 
 export interface ArenaLobbyProps {
@@ -90,15 +91,43 @@ export const ArenaLobby: React.FC<ArenaLobbyProps> = ({
       }),
     ];
 
+    const localList = getLocalScorecards();
+    const mappedLocal: AttemptSummary[] = localList.map((m) => ({
+      attemptId: m.attemptId,
+      paperCode: m.paperCode,
+      subject: m.subject ?? null,
+      submittedAt: m.submittedAt,
+      submitMode: 'manual',
+      questionCount: m.questionCount,
+      correct: m.correct,
+      wrong: m.wrong,
+      blank: m.blank,
+      netHundredths: m.netHundredths,
+      maxHundredths: m.maxHundredths,
+      cpEarned: m.cpEarned,
+      cutoffCleared: m.cutoffCleared,
+    }));
+
     if (!isGuest) {
       promises.push(
         examApi.active().then((a) => {
           if (mounted) setActiveAttempt(a);
         }),
         examApi.attempts().then((res) => {
-          if (mounted) setAttempts(res.attempts);
+          if (mounted) {
+            const map = new Map<string, AttemptSummary>();
+            res.attempts.forEach((a) => map.set(a.attemptId, a));
+            mappedLocal.forEach((l) => {
+              if (!map.has(l.attemptId)) map.set(l.attemptId, l);
+            });
+            setAttempts(Array.from(map.values()));
+          }
+        }).catch(() => {
+          if (mounted) setAttempts(mappedLocal);
         })
       );
+    } else {
+      setAttempts(mappedLocal);
     }
 
     Promise.allSettled(promises);
@@ -560,7 +589,7 @@ export const ArenaLobby: React.FC<ArenaLobbyProps> = ({
           </section>
 
           {/* 3. Your Papers */}
-          {!isGuest && attempts !== null && (
+          {attempts !== null && (
             <section className="w-full text-left rounded-xl border border-[rgba(19,108,153,0.25)] bg-[#041228]/50 p-4 space-y-3" aria-labelledby="yours-title">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">

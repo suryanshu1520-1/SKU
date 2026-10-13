@@ -12,6 +12,7 @@ import {
   listSubmittedAttempts,
   markSubmitted,
   saveCheckpoint,
+  awardMockLeaderboardCp,
   AttemptInProgressError,
   type AttemptRow,
   type QuestionAttemptRow,
@@ -149,6 +150,45 @@ function buildSubmitResponse(result: ExamResult): SubmitResponse {
   };
 }
 
+export function calculateMockCp(result: ExamResult): { cpEarned: number; cutoffCleared: boolean } {
+  const netMarks = Math.max(0, result.netHundredths / 100);
+  const accuracy = result.questionCount > 0 ? result.correct / result.questionCount : 0;
+
+  // Anti-speedrun: must have spent at least 15% of allotted paper time or at least 60s
+  const minRequiredTime = Math.min(180, Math.floor(result.durationSeconds * 0.15));
+  if (result.timeUsedSeconds < minRequiredTime && result.questionCount >= 20) {
+    return { cpEarned: 0, cutoffCleared: false };
+  }
+
+  let baseCp = 0;
+  let bonusCp = 0;
+  let cutoffCleared = false;
+
+  if (result.paperCode === 'GS1_FULL') {
+    // 1.0x Net Marks (e.g. 104.66 marks = 105 CP)
+    baseCp = Math.round(netMarks);
+    // UPSC Prelims historical cutoff threshold ~88.00 marks
+    if (result.netHundredths >= 8800) {
+      bonusCp += 25;
+      cutoffCleared = true;
+    }
+  } else if (result.paperCode === 'GS1_HALF') {
+    // 0.6x Net Marks (e.g. 78.72 marks = 47 CP)
+    baseCp = Math.round(netMarks * 0.6);
+    if (accuracy >= 0.8) {
+      bonusCp += 15;
+    }
+  } else if (result.paperCode === 'GS1_SECTION') {
+    // 0.4x Net Marks (e.g. 36.00 marks = 14 CP)
+    baseCp = Math.round(netMarks * 0.4);
+    if (accuracy >= 0.85) {
+      bonusCp += 10;
+    }
+  }
+
+  return { cpEarned: baseCp + bonusCp, cutoffCleared };
+}
+
 function toAttemptRows(result: ExamResult, userId: string): QuestionAttemptRow[] {
   return result.items.map((item) => {
     let is_correct: boolean | null;
@@ -197,6 +237,18 @@ async function finalize(
     submittedAtMs,
     submitMode,
   });
+
+  const { cpEarned, cutoffCleared } = calculateMockCp(result);
+  result.cpEarned = cpEarned;
+  result.cutoffCleared = cutoffCleared;
+
+  if (cpEarned > 0 && isUuid(row.user_id)) {
+    try {
+      await awardMockLeaderboardCp(row.user_id, cpEarned);
+    } catch (err) {
+      console.warn('[exam] Failed to award mock leaderboard CP:', err);
+    }
+  }
 
   const updated = await markSubmitted(row.id, row.user_id, {
     submit_mode: submitMode,
@@ -541,6 +593,8 @@ export async function examAttemptsHandler(req: Request, res: Response): Promise<
         blank: r.result.blank,
         netHundredths: r.result.netHundredths,
         maxHundredths: r.result.maxHundredths,
+        cpEarned: r.result.cpEarned,
+        cutoffCleared: r.result.cutoffCleared,
       });
     }
 

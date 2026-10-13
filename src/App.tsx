@@ -24,12 +24,14 @@ import { Loader2, Trophy, Swords, Globe, User, House, LogIn, Layers, BookOpen, P
 import { NAV_ITEMS, PROFILE_NAV_ITEM, NavTab } from './lib/navItems';
 import AnimatedNavIcon from './components/AnimatedNavIcon';
 import type { CandidatePreferences, CandidateProfile, ArenaLaunchConfig } from './types';
+import type { ExamLaunch } from './components/exam/types';
 import {
   loadStoredPreferences,
   DEFAULT_PREFERENCES,
   calculateExamCountdown,
   formatTrackBadge
 } from './lib/candidatePreferences';
+import { updateDocumentMeta, ROUTE_META_DEFAULTS } from './lib/seo';
 
 export default function App() {
   const [userEmail, setUserEmail] = useState<string>('');
@@ -41,6 +43,7 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState<'arena' | 'tracker' | 'library' | 'humanities' | 'observatory' | 'profile' | 'leaderboard'>('arena');
   const [hoveredNavId, setHoveredNavId] = useState<string | null>(null);
+  const [examLaunchRequest, setExamLaunchRequest] = useState<ExamLaunch | null>(null);
 
   // Active Arena Test Guard
   const [isArenaQuizActive, setIsArenaQuizActive] = useState(false);
@@ -67,6 +70,125 @@ export default function App() {
     } catch {
       // ignore
     }
+  }, []);
+
+  // Deep-link & SEO URL Inspector: Initial route detection & history synchronization
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const pathname = window.location.pathname.toLowerCase();
+      const params = new URLSearchParams(window.location.search);
+      const scorecardId = params.get('scorecard') || params.get('attemptId');
+
+      if (scorecardId) {
+        localStorage.removeItem('tark_arena_results');
+        setExamLaunchRequest({ kind: 'result', attemptId: scorecardId });
+        setGameState('arena');
+        setActiveTab('arena');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.arena);
+      } else if (
+        pathname.startsWith('/intelligence') ||
+        pathname.startsWith('/news') ||
+        pathname.startsWith('/tracker') ||
+        pathname.startsWith('/brief') ||
+        pathname.startsWith('/daily-edition') ||
+        pathname.startsWith('/prs')
+      ) {
+        setGameState('arena');
+        setActiveTab('tracker');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.tracker);
+      } else if (pathname.startsWith('/arena')) {
+        setGameState('arena');
+        setActiveTab('arena');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.arena);
+      } else if (pathname.startsWith('/observatory')) {
+        setGameState('arena');
+        setActiveTab('observatory');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.observatory);
+      } else if (pathname.startsWith('/humanities') || pathname.startsWith('/thinkers')) {
+        setGameState('arena');
+        setActiveTab('humanities');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.humanities);
+      } else if (pathname.startsWith('/library') || pathname.startsWith('/pillars')) {
+        setGameState('arena');
+        setActiveTab('library');
+      } else if (pathname.startsWith('/leaderboard')) {
+        setGameState('arena');
+        setActiveTab('leaderboard');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.leaderboard);
+      } else if (pathname.startsWith('/manifesto')) {
+        setShowManifesto(true);
+        updateDocumentMeta(ROUTE_META_DEFAULTS.manifesto);
+      } else if (pathname === '/' || pathname === '') {
+        updateDocumentMeta(ROUTE_META_DEFAULTS.home);
+      }
+    } catch {
+      // ignore
+    }
+
+    const handlePopState = () => {
+      const currentPath = window.location.pathname.toLowerCase();
+      if (currentPath === '/' || currentPath === '') {
+        setTargetPillar(null);
+        setArenaConfig(null);
+        setGameState('landing');
+        setActiveTab('arena');
+        setShowManifesto(false);
+        updateDocumentMeta(ROUTE_META_DEFAULTS.home);
+      } else if (
+        currentPath.startsWith('/intelligence') ||
+        currentPath.startsWith('/news') ||
+        currentPath.startsWith('/tracker') ||
+        currentPath.startsWith('/brief') ||
+        currentPath.startsWith('/daily-edition') ||
+        currentPath.startsWith('/prs')
+      ) {
+        setTargetPillar(null);
+        setArenaConfig(null);
+        setGameState('arena');
+        setActiveTab('tracker');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.tracker);
+      } else if (currentPath.startsWith('/arena')) {
+        setTargetPillar(null);
+        setArenaConfig(null);
+        setGameState('arena');
+        setActiveTab('arena');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.arena);
+      } else if (currentPath.startsWith('/observatory')) {
+        setTargetPillar(null);
+        setArenaConfig(null);
+        setGameState('arena');
+        setActiveTab('observatory');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.observatory);
+      } else if (currentPath.startsWith('/humanities') || currentPath.startsWith('/thinkers')) {
+        setTargetPillar(null);
+        setArenaConfig(null);
+        setGameState('arena');
+        setActiveTab('humanities');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.humanities);
+      } else if (currentPath.startsWith('/library')) {
+        setTargetPillar(null);
+        setArenaConfig(null);
+        setGameState('arena');
+        setActiveTab('library');
+      } else if (currentPath.startsWith('/leaderboard')) {
+        setTargetPillar(null);
+        setArenaConfig(null);
+        setGameState('arena');
+        setActiveTab('leaderboard');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.leaderboard);
+      } else if (currentPath.startsWith('/profile')) {
+        setGameState('arena');
+        setActiveTab('profile');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.profile);
+      } else if (currentPath.startsWith('/manifesto')) {
+        setShowManifesto(true);
+        updateDocumentMeta(ROUTE_META_DEFAULTS.manifesto);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   // Manifesto modal overlay state
@@ -138,7 +260,10 @@ export default function App() {
     setShowManifesto(true);
   };
 
-  const executeTabNavigation = (tab: 'arena' | 'tracker' | 'library' | 'humanities' | 'observatory' | 'profile' | 'leaderboard') => {
+  const executeTabNavigation = (
+    tab: 'arena' | 'tracker' | 'library' | 'humanities' | 'observatory' | 'profile' | 'leaderboard',
+    pushToHistory = true
+  ) => {
     if (tab !== 'arena') {
       setTargetPillar(null);
       setArenaConfig(null);
@@ -154,6 +279,16 @@ export default function App() {
       setGameState('autopsy');
     } else if (tab === 'arena') {
       setGameState('arena');
+    }
+
+    const meta = ROUTE_META_DEFAULTS[tab] || ROUTE_META_DEFAULTS.tracker;
+    updateDocumentMeta(meta);
+
+    if (pushToHistory && typeof window !== 'undefined') {
+      const targetPath = meta.canonicalPath || '/';
+      if (window.location.pathname !== targetPath && !window.location.search.includes('id=')) {
+        window.history.pushState(null, '', targetPath);
+      }
     }
   };
 
@@ -171,17 +306,24 @@ export default function App() {
     executeTabNavigation(tab);
   };
 
-  const executeNavigateHome = () => {
+  const executeNavigateHome = (pushToHistory = true) => {
     setTargetPillar(null);
     setArenaConfig(null);
     setGameState('landing');
     setActiveTab('arena');
     setShowManifesto(false);
+    updateDocumentMeta(ROUTE_META_DEFAULTS.home);
+
+    if (pushToHistory && typeof window !== 'undefined') {
+      if (window.location.pathname !== '/') {
+        window.history.pushState(null, '', '/');
+      }
+    }
   };
 
   const handleNavigateHome = () => {
     if (activeTab === 'arena' && isArenaQuizActive) {
-      setPendingNavAction(() => executeNavigateHome);
+      setPendingNavAction(() => () => executeNavigateHome());
       setShowNavAbandonModal(true);
       return;
     }
@@ -305,6 +447,7 @@ export default function App() {
           setUserId(session.user.id);
 
           const cachedResultsRaw = localStorage.getItem('tark_arena_results');
+          const isDeepPath = typeof window !== 'undefined' && window.location.pathname !== '/' && window.location.pathname !== '';
           if (cachedResultsRaw) {
             try {
               const parsed = JSON.parse(cachedResultsRaw);
@@ -313,10 +456,12 @@ export default function App() {
               setGameState('autopsy');
               setActiveTab('arena');
             } catch {
-              setGameState('landing');
-              setActiveTab('arena');
+              if (!isDeepPath) {
+                setGameState('landing');
+                setActiveTab('arena');
+              }
             }
-          } else {
+          } else if (!isDeepPath) {
             setGameState('landing');
             setActiveTab('arena');
           }
@@ -324,6 +469,7 @@ export default function App() {
           const cachedEmail = localStorage.getItem('tark_session_email');
           const cachedName = localStorage.getItem('tark_session_name');
           const cachedUserId = localStorage.getItem('tark_session_user_id');
+          const isDeepPath = typeof window !== 'undefined' && window.location.pathname !== '/' && window.location.pathname !== '';
           if (cachedEmail && cachedName) {
             setUserEmail(cachedEmail);
             const isCachedUuid = Boolean(cachedUserId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cachedUserId));
@@ -343,22 +489,38 @@ export default function App() {
                 setGameState('autopsy');
                 setActiveTab('arena');
               } catch {
-                setGameState('landing');
-                setActiveTab('arena');
+                if (!isDeepPath) {
+                  setGameState('landing');
+                  setActiveTab('arena');
+                }
               }
-            } else {
+            } else if (!isDeepPath) {
               setGameState('landing');
               setActiveTab('arena');
             }
           } else {
-            // Cold visitor defaults to landing
+            // Cold visitor defaults to landing unless on a deep route
             loadStoredPreferences().then((loadedPrefs) => setPreferences(loadedPrefs));
-            setGameState('landing');
+            if (!isDeepPath) {
+              setGameState('landing');
+            }
           }
         }
       } catch (err) {
         console.warn("Failed to check active session:", err);
       } finally {
+        try {
+          const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+          const scorecardId = params?.get('scorecard') || params?.get('attemptId');
+          if (scorecardId) {
+            localStorage.removeItem('tark_arena_results');
+            setExamLaunchRequest({ kind: 'result', attemptId: scorecardId });
+            setGameState('arena');
+            setActiveTab('arena');
+          }
+        } catch {
+          // ignore
+        }
         setLoading(false);
       }
     }
@@ -816,6 +978,8 @@ export default function App() {
               targetPillar={targetPillar}
               arenaConfig={arenaConfig}
               candidatePreferences={preferences}
+              initialExamLaunch={examLaunchRequest}
+              onClearExamLaunch={() => setExamLaunchRequest(null)}
               onClearTargetPillar={() => {
                 setTargetPillar(null);
                 setArenaConfig(null);
@@ -864,6 +1028,12 @@ export default function App() {
             onNavigateProfile={() => {
               setViewingAnalystId(null);
               navigateToTab('profile');
+            }}
+            onViewScorecard={(attemptId) => {
+              setViewingAnalystId(null);
+              setExamLaunchRequest({ kind: 'result', attemptId });
+              setGameState('arena');
+              setActiveTab('arena');
             }}
           />
         )}

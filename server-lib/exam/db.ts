@@ -355,3 +355,34 @@ export async function insertQuestionAttemptsBestEffort(rows: QuestionAttemptRow[
     console.warn('[exam] question_attempts insert skipped:', err?.message ?? String(err));
   }
 }
+
+export async function awardMockLeaderboardCp(userId: string, cpEarned: number): Promise<void> {
+  if (!isUuid(userId) || cpEarned <= 0) return;
+  try {
+    const supabase = getSupabaseAdmin();
+    const { data: prof, error: fetchErr } = await supabase
+      .from('user_profiles')
+      .select('contender_points')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (fetchErr) {
+      console.warn('[exam-db] awardMockLeaderboardCp fetch failed:', fetchErr.message);
+      return;
+    }
+
+    if (prof) {
+      const nextCp = (prof.contender_points || 0) + cpEarned;
+      const { error: updateErr } = await supabase
+        .from('user_profiles')
+        .update({ contender_points: nextCp })
+        .eq('user_id', userId);
+      if (updateErr) {
+        console.warn('[exam-db] awardMockLeaderboardCp update failed:', updateErr.message);
+      }
+    }
+  } catch (err: any) {
+    console.warn('[exam-db] awardMockLeaderboardCp error:', err?.message ?? String(err));
+  }
+}
+

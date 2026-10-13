@@ -17,6 +17,7 @@ import explanationHandler from "./server-lib/explanation.js";
 import questionsHandler from "./server-lib/questions.js";
 import { handleGetRebase, handlePostRebaseAck } from "./server-lib/rebase.js";
 import { analyticsRouter } from "./server-lib/analytics/routes.js";
+import { seoRouter } from "./server-lib/seo/routes.js";
 import {
   examCatalogHandler,
   examStartHandler,
@@ -154,6 +155,9 @@ async function startServer() {
     standardHeaders: true,
     legacyHeaders: false,
   });
+
+  // Dynamic SEO routes (sitemaps & crawler prerendering)
+  app.use(seoRouter);
 
   // API routes FIRST
   app.get("/api/cron/scrape", scrapeHandler);
