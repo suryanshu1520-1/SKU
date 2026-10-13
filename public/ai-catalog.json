@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Tark Intelligence Bureau",
+  "description": "High-stakes analytical competitive examination testing arena and automated daily government current affairs distillation platform.",
+  "version": "1.0.0",
+  "homepage": "https://tark.live",
+  "capabilities": [
+    {
+      "name": "daily-intelligence",
+      "description": "Daily policy and governance intelligence distilled from official government notifications.",
+      "url": "https://tark.live/intelligence"
+    },
+    {
+      "name": "daily-edition",
+      "description": "Finite curated daily edition of Press Information Bureau releases.",
+      "url": "https://tark.live/daily-edition"
+    },
+    {
+      "name": "prs-vault",
+      "description": "PRS Legislative Research dossiers on parliamentary bills and acts.",
+      "url": "https://tark.live/prs"
+    },
+    {
+      "name": "exam-arena",
+      "description": "Competitive mock testing arena with negative marking.",
+      "url": "https://tark.live/arena"
+    }
+  ],
+  "llms": {
+    "txt": "https://tark.live/llms.txt",
+    "full": "https://tark.live/llms-full.txt"
+  }
+}
