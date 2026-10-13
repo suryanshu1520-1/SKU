@@ -154,9 +154,18 @@ export async function generateMainSitemap(): Promise<string> {
     }
   }
 
+  const seenLocs = new Set<string>();
+  const uniqueUrls: typeof urls = [];
+  for (const u of urls) {
+    if (!seenLocs.has(u.loc)) {
+      seenLocs.add(u.loc);
+      uniqueUrls.push(u);
+    }
+  }
+
   let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
   xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
-  for (const u of urls) {
+  for (const u of uniqueUrls) {
     xml += `  <url>\n`;
     xml += `    <loc>${escapeXml(u.loc)}</loc>\n`;
     xml += `    <lastmod>${u.lastmod}</lastmod>\n`;
@@ -208,10 +217,19 @@ export async function generateNewsSitemap(): Promise<string> {
     }
   }
 
+  const seenNews = new Set<string>();
+  const uniqueItems: typeof items = [];
+  for (const item of items) {
+    if (!seenNews.has(item.loc)) {
+      seenNews.add(item.loc);
+      uniqueItems.push(item);
+    }
+  }
+
   let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
   xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">\n`;
 
-  for (const item of items) {
+  for (const item of uniqueItems) {
     xml += `  <url>\n`;
     xml += `    <loc>${escapeXml(item.loc)}</loc>\n`;
     xml += `    <news:news>\n`;
