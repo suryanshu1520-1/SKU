@@ -23,6 +23,20 @@ export default async function handler(req: any, res: any) {
     console.log("[newsdata] Triggering unified pipeline...");
     const result = await runPolicyPipeline();
     console.log("[newsdata] Pipeline complete", result);
+
+    if (result.processed_count > 0) {
+      // Fire-and-forget notification to IndexNow (Bing & Copilot)
+      import("../seo/indexnow.js")
+        .then(({ submitToIndexNow }) => {
+          submitToIndexNow([
+            "https://tark.live/intelligence",
+            "https://tark.live/daily-edition",
+            "https://tark.live/sitemap-news.xml"
+          ]).catch(() => {});
+        })
+        .catch(() => {});
+    }
+
     return res.status(200).json(result);
   } catch (error: any) {
     console.error("[newsdata] Pipeline failed:", error);

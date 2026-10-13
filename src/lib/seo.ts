@@ -47,6 +47,26 @@ export const ROUTE_META_DEFAULTS: Record<string, RouteMetaConfig> = {
     description: 'Autonomous policy & governance intelligence distilled directly from official PIB releases, Cabinet decisions, and The Hindu for UPSC CSE and State PSC prep.',
     canonicalPath: '/intelligence',
   },
+  gs1: {
+    title: 'UPSC GS 1 Current Affairs & Static Linkages | Heritage, Geography & Society | Tark',
+    description: 'High-yield current affairs dossiers and Prelims MCQs mapped strictly to UPSC GS-1 syllabus: Indian Heritage, Modern History, Geography, and Social Demographics.',
+    canonicalPath: '/intelligence/gs-1',
+  },
+  gs2: {
+    title: 'UPSC GS 2 Current Affairs, Polity & Governance | Constitution, Bills & IR | Tark',
+    description: 'Comprehensive policy intelligence and Prelims MCQs mapped to UPSC GS-2: Indian Constitution, Parliament, Federalism, Statutory Bodies, Social Justice, and International Relations.',
+    canonicalPath: '/intelligence/gs-2',
+  },
+  gs3: {
+    title: 'UPSC GS 3 Current Affairs | Economy, Sci-Tech, Environment & Security | Tark',
+    description: 'Analytical coverage and Prelims practice MCQs mapped to UPSC GS-3: Indian Economy, Agriculture, Science & Tech, Biodiversity, Climate Policy, and Internal Security.',
+    canonicalPath: '/intelligence/gs-3',
+  },
+  gs4: {
+    title: 'UPSC GS 4 Ethics, Integrity & Aptitude Current Affairs | Case Studies | Tark',
+    description: 'Ethical analysis, administrative dilemmas, and civil service values applied to contemporary governance events for UPSC GS-4 Ethics & Case Studies.',
+    canonicalPath: '/intelligence/gs-4',
+  },
   edition: {
     title: 'Daily Curated PIB Edition | Tark Intelligence',
     description: 'Finite, verified daily briefing of high-impact government policy notifications and news for UPSC aspirants.',

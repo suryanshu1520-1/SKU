@@ -329,9 +329,33 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
 
       if (pathname.includes('/daily-edition')) {
         setBriefViewMode('edition');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.edition);
       } else if (pathname.includes('/prs')) {
         setActiveCategoryTab('PRS');
         setSelectedSource('PRS');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.prs);
+      } else if (pathname.includes('/gs-1') || pathname.includes('/gs-i')) {
+        setActiveCategoryTab('ALL');
+        setSearchQuery('GS-1');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.gs1);
+      } else if (pathname.includes('/gs-2') || pathname.includes('/gs-ii')) {
+        setActiveCategoryTab('Governance');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.gs2);
+      } else if (pathname.includes('/gs-3') || pathname.includes('/gs-iii')) {
+        setActiveCategoryTab('Economy');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.gs3);
+      } else if (pathname.includes('/gs-4') || pathname.includes('/gs-iv')) {
+        setActiveCategoryTab('ALL');
+        setSearchQuery('Ethics');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.gs4);
+      } else if (pathname.includes('/ministry/')) {
+        const mSlug = pathname.split('/ministry/')[1]?.split('?')[0];
+        if (mSlug) {
+          const rawWords = mSlug.split('-').filter(w => !['ministry', 'of', 'and', 'the', 'for'].includes(w));
+          if (rawWords[0]) {
+            setSearchQuery(rawWords[0]);
+          }
+        }
       }
 
       let resolvedId = targetId;

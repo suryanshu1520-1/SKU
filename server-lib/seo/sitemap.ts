@@ -68,6 +68,10 @@ export async function generateMainSitemap(): Promise<string> {
   const urls: { loc: string; lastmod: string; changefreq: string; priority: string }[] = [
     { loc: 'https://tark.live/', lastmod: todayStr, changefreq: 'daily', priority: '1.0' },
     { loc: 'https://tark.live/intelligence', lastmod: todayStr, changefreq: 'hourly', priority: '0.95' },
+    { loc: 'https://tark.live/intelligence/gs-1', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://tark.live/intelligence/gs-2', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://tark.live/intelligence/gs-3', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://tark.live/intelligence/gs-4', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
     { loc: 'https://tark.live/daily-edition', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
     { loc: 'https://tark.live/prs', lastmod: todayStr, changefreq: 'weekly', priority: '0.85' },
     { loc: 'https://tark.live/arena', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
@@ -106,13 +110,19 @@ export async function generateMainSitemap(): Promise<string> {
     try {
       const { data: articles, error } = await supabase
         .from('current_affairs')
-        .select('id, headline, published_at, created_at, source')
+        .select('id, headline, published_at, created_at, source, ministry')
         .neq('source', 'PIB_Digest')
         .order('created_at', { ascending: false })
         .limit(2000);
 
       if (!error && articles) {
+        const ministrySet = new Set<string>();
+
         for (const art of articles) {
+          if (art.ministry && art.ministry.trim().length > 3 && !['GENERAL', 'General Policy'].includes(art.ministry.trim())) {
+            ministrySet.add(art.ministry.trim());
+          }
+
           if (art.id && art.headline) {
             const slug = slugify(art.headline);
             const dateStr = formatDate(art.published_at || art.created_at);
@@ -121,6 +131,19 @@ export async function generateMainSitemap(): Promise<string> {
               lastmod: dateStr,
               changefreq: 'weekly',
               priority: '0.8',
+            });
+          }
+        }
+
+        // Programmatic Ministry Hubs
+        for (const min of ministrySet) {
+          const mSlug = slugify(min);
+          if (mSlug && mSlug.length > 3) {
+            urls.push({
+              loc: `https://tark.live/intelligence/ministry/${mSlug}`,
+              lastmod: todayStr,
+              changefreq: 'daily',
+              priority: '0.85',
             });
           }
         }
@@ -248,3 +271,14 @@ export async function generateNewsSitemap(): Promise<string> {
   newsSitemapCache = { xml, timestamp: now };
   return xml;
 }
+
+export async function getAllSitemapUrls(): Promise<string[]> {
+  const xml = await generateMainSitemap();
+  const matches = xml.matchAll(/<loc>(.*?)<\/loc>/g);
+  const urls: string[] = [];
+  for (const m of matches) {
+    if (m[1]) urls.push(m[1].trim());
+  }
+  return urls;
+}
+
