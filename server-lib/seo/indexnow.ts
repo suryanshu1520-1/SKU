@@ -5,7 +5,7 @@
  * Automatically notifies index engines when new intelligence or daily editions are published.
  */
 
-export const INDEXNOW_KEY = '5a812ebdf92548819d9b62615469adfe';
+export const INDEXNOW_KEY = 'e49286d54c56471291dc671e58500a13';
 export const INDEXNOW_HOST = 'tark.live';
 export const INDEXNOW_KEY_LOCATION = `https://${INDEXNOW_HOST}/${INDEXNOW_KEY}.txt`;
 const INDEXNOW_ENDPOINT = 'https://api.indexnow.org/indexnow';
