@@ -39,8 +39,13 @@ async function validateGeminiModels(apiKey: string) {
       const text = typeof res?.text === "string" ? res.text : String(res?.text ?? "");
       console.log(`[PASS] Gemini Gen Model '${model}' -> response received (${text.length} chars)`);
     } catch (err: any) {
-      console.error(`[FAIL] Gemini Gen Model '${model}' failed: ${err?.message || err}`);
-      failures++;
+      const errMsg = err?.message || String(err);
+      if (errMsg.includes("429") || errMsg.includes("RESOURCE_EXHAUSTED") || errMsg.includes("503") || errMsg.includes("UNAVAILABLE")) {
+        console.warn(`[WARN] Gemini Gen Model '${model}' valid ID (throttled/high demand): ${errMsg}`);
+      } else {
+        console.error(`[FAIL] Gemini Gen Model '${model}' failed: ${errMsg}`);
+        failures++;
+      }
     }
   }
 
@@ -57,8 +62,13 @@ async function validateGeminiModels(apiKey: string) {
       }
       console.log(`[PASS] Gemini Embed Model '${model}' -> vector dim ${values.length}`);
     } catch (err: any) {
-      console.error(`[FAIL] Gemini Embed Model '${model}' failed: ${err?.message || err}`);
-      failures++;
+      const errMsg = err?.message || String(err);
+      if (errMsg.includes("429") || errMsg.includes("RESOURCE_EXHAUSTED") || errMsg.includes("503") || errMsg.includes("UNAVAILABLE")) {
+        console.warn(`[WARN] Gemini Embed Model '${model}' valid ID (throttled/high demand): ${errMsg}`);
+      } else {
+        console.error(`[FAIL] Gemini Embed Model '${model}' failed: ${errMsg}`);
+        failures++;
+      }
     }
   }
 
