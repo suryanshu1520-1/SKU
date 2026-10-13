@@ -8,7 +8,7 @@
 export const INDEXNOW_KEY = 'e49286d54c56471291dc671e58500a13';
 export const INDEXNOW_HOST = 'tark.live';
 export const INDEXNOW_KEY_LOCATION = `https://${INDEXNOW_HOST}/${INDEXNOW_KEY}.txt`;
-const INDEXNOW_ENDPOINT = 'https://api.indexnow.org/indexnow';
+const INDEXNOW_ENDPOINT = 'https://www.bing.com/indexnow';
 
 export interface IndexNowResponse {
   ok: boolean;
