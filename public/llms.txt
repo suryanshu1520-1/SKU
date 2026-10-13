@@ -1,0 +1,20 @@
+# Tark | तर्क — Competitive Exam Testing Arena & AI Daily Intelligence
+
+> Sterile, analytical testing arena and daily UPSC Civil Services Examination (CSE) and State Public Service Commissions policy intelligence engine. Free of commercial noise, advertisements, and clickbait.
+
+Tark delivers deterministic examination simulations calibrated with strict negative marking (+2.00 / -0.66) and verified policy intelligence distilled directly from the Press Information Bureau (PIB), Union Cabinet decisions, Reserve Bank of India (RBI), and PRS Legislative Research.
+
+## Core Intelligence & Knowledge Hubs
+
+- [Daily UPSC Current Affairs & Policy Signal](https://tark.live/intelligence): Continuous autonomous distillation of high-impact government policy notifications, statutory bills, and multilateral agreements categorized by UPSC Prelims & Mains General Studies (GS 1, 2, 3, 4).
+- [Daily PIB Curated Edition](https://tark.live/daily-edition): Finite, date-wise verified digest of high-yield government policy releases with prelims key facts and mains hooks.
+- [PRS Legislative Vault](https://tark.live/prs): Statutory analysis and deep legislative breakdowns of Parliamentary Bills and Acts.
+- [25-Year UPSC Question Observatory](https://tark.live/observatory): Deep cognitive matrix of two and a half decades of UPSC Civil Services Prelims questions categorized by theme, cognitive level, and syllabus linkage.
+- [Competitive Test Arena](https://tark.live/arena): Timed examination simulator with zero-trust server-side grading and diagnostic autopsies.
+- [The Tark Manifesto](https://tark.live/manifesto): Educational philosophy, methodology on eliminating noise in competitive civil services preparation, and editorial fact-checking protocols.
+
+## Feeds & Machine Readability
+
+- [XML Sitemap](https://tark.live/sitemap.xml): Complete machine-readable index of all 1,500+ intelligence articles and dossiers.
+- [Google News Sitemap](https://tark.live/sitemap-news.xml): Fresh policy wire dispatches published within the last 48 hours.
+- [Robots Configuration](https://tark.live/robots.txt): Machine access permissions and crawler policies.

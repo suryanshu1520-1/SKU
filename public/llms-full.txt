@@ -1,0 +1,55 @@
+# Tark | तर्क — Analytical Test Arena & AI Current Affairs (Complete Knowledge Specification)
+
+> Sterile, minimalist, analytical testing arena and daily UPSC CSE / State Public Service Commission policy intelligence engine. Designed to eliminate commercial noise and empower serious civil services aspirants.
+
+## Platform Architectural Invariants
+
+- **Evaluation:** Strict deterministic grading calibrated with negative marking (+2.00 for correct answer, -0.66 for incorrect). All answer checking executes zero-trust server-side.
+- **Current Affairs:** Real-time ingestion from the Press Information Bureau (PIB), Union Cabinet decisions, Reserve Bank of India (RBI), Ministry of Finance, and PRS Legislative Research.
+- **Syllabus Categorization:** Every current affairs dispatch is distilled and classified under UPSC General Studies papers:
+  - GS Paper 1: Heritage, Geography, History, Society
+  - GS Paper 2: Governance, Constitution, Polity, Social Justice, International Relations
+  - GS Paper 3: Technology, Economic Development, Bio-diversity, Environment, Security, Disaster Management
+  - GS Paper 4: Ethics, Integrity, Aptitude
+- **Prelims High-Yield Points:** Discrete, testable factual components (statutory bodies, constitutional articles, conventions, indices).
+- **Mains Analytical Linkages:** Conceptual hooks, governance dilemmas, and statutory linkages.
+
+## Knowledge Graph & Endpoints
+
+### 1. Daily UPSC Current Affairs & Policy Signals
+- URL: https://tark.live/intelligence
+- Format: Real-time intelligence briefs distilled from official government notifications.
+- Slug Pattern: `/intelligence/:slug?id=:uuid`
+- Pre-rendered Server-Side: Yes (semantic `<article>` with Schema.org `NewsArticle` and `BreadcrumbList`).
+
+### 2. Daily PIB Curated Edition
+- URL: https://tark.live/daily-edition
+- Format: Finite daily digest of primary policy decisions.
+- Date Pattern: `/daily-edition/:date`
+
+### 3. PRS Legislative Vault
+- URL: https://tark.live/prs
+- Format: Comprehensive analytical dossiers of Parliamentary Bills, Acts, Constitutional Amendments, and Standing Committee reports.
+- Dossier Pattern: `/prs/:bill-id`
+
+### 4. 25-Year UPSC Question Observatory
+- URL: https://tark.live/observatory
+- Format: Empirical archive of UPSC Prelims questions from 1999 to present, tagged by cognitive taxonomy, subject theme, and frequency.
+
+### 5. Competitive Examination Arena
+- URL: https://tark.live/arena
+- Format: High-stakes timed simulator enforcing strict examination conditions.
+
+### 6. The Tark Manifesto
+- URL: https://tark.live/manifesto
+- Philosophy: The war on noise in competitive civil services preparation. Why infinite scroll social media and low-signal marketing harm aspirant cognition.
+
+## Editorial & Fact-Checking Standard
+
+All policy briefs published on Tark are derived strictly from official government gazettes, Press Information Bureau releases, or statutory sources. Summaries are produced through deterministic analytical extraction pipelines and cross-referenced with primary syllabus keywords.
+
+Author: Tark Intelligence Bureau
+Publisher: Tark
+Canonical Domain: https://tark.live
+Sitemap: https://tark.live/sitemap.xml
+Google News Sitemap: https://tark.live/sitemap-news.xml

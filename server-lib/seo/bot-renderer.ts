@@ -292,11 +292,19 @@ export function renderSeoHtml(article: ArticleRecord, reqUrl: string): string {
       </section>` : ''}
 
       <footer class="pt-4 border-t border-slate-800 text-xs text-slate-500 font-mono flex items-center justify-between">
-        <span>Verified by Tark Intelligence Engine</span>
+        <span>Verified by Tark Intelligence Bureau</span>
         <a href="${escapeXml(article.url || 'https://tark.live')}" rel="nofollow noopener" target="_blank" class="text-[#e0d0ab] hover:underline">
           Original Wire Source ↗
         </a>
       </footer>
+
+      <nav class="pt-4 mt-4 border-t border-slate-800/60 text-xs font-mono text-slate-400 flex flex-wrap gap-4">
+        <a href="/intelligence" class="text-[#e0d0ab] hover:underline">← All Policy Signals</a>
+        <a href="/daily-edition" class="hover:text-slate-200 hover:underline">Daily PIB Edition</a>
+        <a href="/prs" class="hover:text-slate-200 hover:underline">PRS Legislative Vault</a>
+        <a href="/arena" class="hover:text-slate-200 hover:underline">Practice Test Arena</a>
+        <a href="/observatory" class="hover:text-slate-200 hover:underline">Question Observatory</a>
+      </nav>
     </article>
   `;
 
@@ -359,7 +367,7 @@ export function renderSeoHtml(article: ArticleRecord, reqUrl: string): string {
 
   // Inject Semantic Article into #root
   modifiedHtml = modifiedHtml.replace(
-    '<div id="root"></div>',
+    /<div\s+id=["']root["']>[\s\S]*?<\/div>/i,
     `<div id="root">${semanticArticleHtml}</div>`
   );
 
@@ -464,6 +472,9 @@ export async function renderHubSeoHtml(section: 'intelligence' | 'prs' | 'daily-
     modifiedHtml = modifiedHtml.replace('</head>', `  <link rel="canonical" href="${escapeXml(canonicalUrl)}" />\n</head>`);
   }
 
-  modifiedHtml = modifiedHtml.replace('<div id="root"></div>', `<div id="root">${semanticHtml}</div>`);
+  modifiedHtml = modifiedHtml.replace(
+    /<div\s+id=["']root["']>[\s\S]*?<\/div>/i,
+    `<div id="root">${semanticHtml}</div>`
+  );
   return modifiedHtml;
 }

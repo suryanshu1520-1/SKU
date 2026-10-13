@@ -1,3 +1,5 @@
+# https://www.robotstxt.org/robotstxt.html
+
 User-agent: *
 Allow: /
 Allow: /intelligence/
@@ -8,8 +10,10 @@ Allow: /observatory/
 Allow: /humanities/
 Allow: /leaderboard/
 Allow: /manifesto/
-Allow: /api/sitemap.xml
-Allow: /api/sitemap-news.xml
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /sitemap.xml
+Allow: /sitemap-news.xml
 
 # Protect internal mutation & transaction endpoints from crawler churn
 Disallow: /api/auth/
@@ -20,6 +24,52 @@ Disallow: /api/exam/submit
 Disallow: /api/create-razorpay-order
 Disallow: /api/verify-payment
 Disallow: /api/rebase/
+
+# AI Search Crawlers (ChatGPT Search, Perplexity, Claude, Apple, Google AI)
+User-agent: GPTBot
+Allow: /
+Allow: /intelligence/
+Allow: /daily-edition/
+Allow: /prs/
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+User-agent: ChatGPT-User
+Allow: /
+Allow: /intelligence/
+Allow: /daily-edition/
+Allow: /prs/
+Allow: /llms.txt
+
+User-agent: OAI-SearchBot
+Allow: /
+Allow: /intelligence/
+Allow: /daily-edition/
+Allow: /prs/
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /intelligence/
+Allow: /daily-edition/
+Allow: /prs/
+Allow: /llms.txt
+
+User-agent: PerplexityBot
+Allow: /
+Allow: /intelligence/
+Allow: /daily-edition/
+Allow: /prs/
+Allow: /llms.txt
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Block bulk training scrape-only bots
+User-agent: CCBot
+Disallow: /
 
 Sitemap: https://tark.live/sitemap.xml
 Sitemap: https://tark.live/sitemap-news.xml

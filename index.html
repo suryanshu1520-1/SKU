@@ -22,6 +22,9 @@
     <meta property="og:title" content="Tark | The War on Noise in Civil Services Preparation" />
     <meta property="og:description" content="Timed examination arena with diagnostic autopsies and daily AI-distilled government policy intelligence for serious UPSC and State PSC aspirants." />
     <meta property="og:image" content="https://tark.live/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Tark — Analytical Test Arena & Daily Policy Signal" />
     <meta property="og:locale" content="en_IN" />
 
     <!-- Twitter -->
@@ -66,13 +69,20 @@
           }
         },
         {
-          "@type": "NewsMediaOrganization",
+          "@type": ["Organization", "NewsMediaOrganization"],
           "@id": "https://tark.live/#organization",
           "name": "Tark Intelligence Bureau",
+          "alternateName": "Tark",
           "url": "https://tark.live/",
-          "logo": "https://tark.live/favicon.svg",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://tark.live/favicon.svg",
+            "width": 512,
+            "height": 512
+          },
           "sameAs": [
-            "https://github.com/suryanshu1520-1/tark"
+            "https://github.com/suryanshu1520-1/SKU",
+            "https://x.com/tark_live"
           ]
         }
       ]
@@ -80,7 +90,20 @@
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <header style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;">
+        <h1>Tark | तर्क — Analytical Test Arena & Daily Intelligence for UPSC & State PSC</h1>
+        <p>Timed civil services mock test arena with zero-trust server grading and negative marking (+2/-0.66). Daily AI-distilled PIB releases, Cabinet decisions, and policy intelligence for UPSC & State PSC.</p>
+        <nav>
+          <a href="/intelligence">Daily Intelligence & Current Affairs</a>
+          <a href="/daily-edition">Daily PIB Edition</a>
+          <a href="/prs">PRS Legislative Vault</a>
+          <a href="/arena">Competitive Test Arena</a>
+          <a href="/observatory">25-Year UPSC Question Observatory</a>
+          <a href="/manifesto">The Tark Manifesto</a>
+        </nav>
+      </header>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
