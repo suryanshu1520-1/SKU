@@ -18,7 +18,7 @@ export function getArticleUrl(item: { id?: string; headline: string }): string {
 
 export function getCanonicalArticleUrl(item: { id?: string; headline: string }): string {
   const rel = getArticleUrl(item);
-  return `https://tark.live${rel}`;
+  return `https://www.tark.live${rel}`;
 }
 
 export function getDailyEditionUrl(date?: string): string {
@@ -38,8 +38,8 @@ export interface RouteMetaConfig {
 
 export const ROUTE_META_DEFAULTS: Record<string, RouteMetaConfig> = {
   home: {
-    title: 'Tark | तर्क — Analytical Test Arena & Daily Intelligence for UPSC & State PSC',
-    description: 'Timed civil services mock test arena with zero-trust server grading and negative marking (+2/-0.66). Daily AI-distilled PIB releases, Cabinet decisions, and policy intelligence for UPSC & State PSC.',
+    title: 'Tark | तर्क — Authentic UPSC Prelims Arena (-0.66) & Verified Daily PIB Intelligence',
+    description: 'Timed civil services mock test arena calibrated strictly to UPSC negative marking (+2.00 / -0.66) with diagnostic autopsies. Daily policy briefs from official PIB and Gazette releases. Zero hallucinations. Wire-verified evidence.',
     canonicalPath: '/',
   },
   tracker: {
@@ -135,7 +135,7 @@ export function updateDocumentMeta(config: RouteMetaConfig): void {
   if (config.canonicalPath) {
     const fullCanonical = config.canonicalPath.startsWith('http')
       ? config.canonicalPath
-      : `https://tark.live${config.canonicalPath.startsWith('/') ? config.canonicalPath : '/' + config.canonicalPath}`;
+      : `https://www.tark.live${config.canonicalPath.startsWith('/') ? config.canonicalPath : '/' + config.canonicalPath}`;
 
     let canonical = document.querySelector('link[rel="canonical"]');
     if (!canonical) {

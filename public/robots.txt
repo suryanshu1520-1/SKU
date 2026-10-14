@@ -71,5 +71,5 @@ Allow: /
 User-agent: CCBot
 Disallow: /
 
-Sitemap: https://tark.live/sitemap.xml
-Sitemap: https://tark.live/sitemap-news.xml
+Sitemap: https://www.tark.live/sitemap.xml
+Sitemap: https://www.tark.live/sitemap-news.xml

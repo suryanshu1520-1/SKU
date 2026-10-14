@@ -66,19 +66,19 @@ export async function generateMainSitemap(): Promise<string> {
 
   const todayStr = new Date().toISOString().split('T')[0];
   const urls: { loc: string; lastmod: string; changefreq: string; priority: string }[] = [
-    { loc: 'https://tark.live/', lastmod: todayStr, changefreq: 'daily', priority: '1.0' },
-    { loc: 'https://tark.live/intelligence', lastmod: todayStr, changefreq: 'hourly', priority: '0.95' },
-    { loc: 'https://tark.live/intelligence/gs-1', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
-    { loc: 'https://tark.live/intelligence/gs-2', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
-    { loc: 'https://tark.live/intelligence/gs-3', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
-    { loc: 'https://tark.live/intelligence/gs-4', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
-    { loc: 'https://tark.live/daily-edition', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
-    { loc: 'https://tark.live/prs', lastmod: todayStr, changefreq: 'weekly', priority: '0.85' },
-    { loc: 'https://tark.live/arena', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
-    { loc: 'https://tark.live/observatory', lastmod: todayStr, changefreq: 'weekly', priority: '0.8' },
-    { loc: 'https://tark.live/humanities', lastmod: todayStr, changefreq: 'monthly', priority: '0.75' },
-    { loc: 'https://tark.live/leaderboard', lastmod: todayStr, changefreq: 'hourly', priority: '0.7' },
-    { loc: 'https://tark.live/manifesto', lastmod: todayStr, changefreq: 'monthly', priority: '0.6' },
+    { loc: 'https://www.tark.live/', lastmod: todayStr, changefreq: 'daily', priority: '1.0' },
+    { loc: 'https://www.tark.live/intelligence', lastmod: todayStr, changefreq: 'hourly', priority: '0.95' },
+    { loc: 'https://www.tark.live/intelligence/gs-1', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://www.tark.live/intelligence/gs-2', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://www.tark.live/intelligence/gs-3', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://www.tark.live/intelligence/gs-4', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://www.tark.live/daily-edition', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://www.tark.live/prs', lastmod: todayStr, changefreq: 'weekly', priority: '0.85' },
+    { loc: 'https://www.tark.live/arena', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://www.tark.live/observatory', lastmod: todayStr, changefreq: 'weekly', priority: '0.8' },
+    { loc: 'https://www.tark.live/humanities', lastmod: todayStr, changefreq: 'monthly', priority: '0.75' },
+    { loc: 'https://www.tark.live/leaderboard', lastmod: todayStr, changefreq: 'hourly', priority: '0.7' },
+    { loc: 'https://www.tark.live/manifesto', lastmod: todayStr, changefreq: 'monthly', priority: '0.6' },
   ];
 
   // 1. Add PRS Vault Dossiers
@@ -91,7 +91,7 @@ export async function generateMainSitemap(): Promise<string> {
         for (const item of prsItems) {
           if (item.id) {
             urls.push({
-              loc: `https://tark.live/prs/${encodeURIComponent(item.id)}`,
+              loc: `https://www.tark.live/prs/${encodeURIComponent(item.id)}`,
               lastmod: formatDate(item.created_at),
               changefreq: 'monthly',
               priority: '0.85',
@@ -127,7 +127,7 @@ export async function generateMainSitemap(): Promise<string> {
             const slug = slugify(art.headline);
             const dateStr = formatDate(art.published_at || art.created_at);
             urls.push({
-              loc: `https://tark.live/intelligence/${slug}?id=${encodeURIComponent(art.id)}`,
+              loc: `https://www.tark.live/intelligence/${slug}?id=${encodeURIComponent(art.id)}`,
               lastmod: dateStr,
               changefreq: 'weekly',
               priority: '0.8',
@@ -140,7 +140,7 @@ export async function generateMainSitemap(): Promise<string> {
           const mSlug = slugify(min);
           if (mSlug && mSlug.length > 3) {
             urls.push({
-              loc: `https://tark.live/intelligence/ministry/${mSlug}`,
+              loc: `https://www.tark.live/intelligence/ministry/${mSlug}`,
               lastmod: todayStr,
               changefreq: 'daily',
               priority: '0.85',
@@ -164,7 +164,7 @@ export async function generateMainSitemap(): Promise<string> {
         for (const dig of digests) {
           if (dig.date) {
             urls.push({
-              loc: `https://tark.live/daily-edition/${encodeURIComponent(dig.date)}`,
+              loc: `https://www.tark.live/daily-edition/${encodeURIComponent(dig.date)}`,
               lastmod: formatDate(dig.created_at || dig.date),
               changefreq: 'monthly',
               priority: '0.75',
@@ -228,7 +228,7 @@ export async function generateNewsSitemap(): Promise<string> {
             const slug = slugify(art.headline);
             const pubDate = new Date(art.published_at || art.created_at || Date.now()).toISOString();
             items.push({
-              loc: `https://tark.live/intelligence/${slug}?id=${encodeURIComponent(art.id)}`,
+              loc: `https://www.tark.live/intelligence/${slug}?id=${encodeURIComponent(art.id)}`,
               title: art.headline,
               pubDate,
             });

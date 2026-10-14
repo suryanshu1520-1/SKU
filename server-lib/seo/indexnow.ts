@@ -6,7 +6,7 @@
  */
 
 export const INDEXNOW_KEY = 'e49286d54c56471291dc671e58500a13';
-export const INDEXNOW_HOST = 'tark.live';
+export const INDEXNOW_HOST = 'www.tark.live';
 export const INDEXNOW_KEY_LOCATION = `https://${INDEXNOW_HOST}/${INDEXNOW_KEY}.txt`;
 const INDEXNOW_ENDPOINT = 'https://www.bing.com/indexnow';
 
@@ -26,17 +26,17 @@ export async function submitToIndexNow(urls: string[]): Promise<IndexNowResponse
     return { ok: true, status: 200, message: 'No URLs provided', submittedCount: 0 };
   }
 
-  // Ensure absolute URLs on tark.live and deduplicate
+  // Ensure absolute URLs on www.tark.live and deduplicate
   const cleanUrls = Array.from(
     new Set(
       urls
-        .map((u) => u.trim())
-        .filter((u) => u.startsWith('https://tark.live') || u.startsWith('http://tark.live'))
+        .map((u) => u.trim().replace(/^https?:\/\/tark\.live\b/, 'https://www.tark.live'))
+        .filter((u) => u.startsWith('https://www.tark.live'))
     )
   );
 
   if (cleanUrls.length === 0) {
-    return { ok: false, status: 400, message: 'No valid tark.live URLs found', submittedCount: 0 };
+    return { ok: false, status: 400, message: 'No valid www.tark.live URLs found', submittedCount: 0 };
   }
 
   // IndexNow allows up to 10,000 URLs per request

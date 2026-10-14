@@ -82,7 +82,7 @@ export default function MobileLanding({
           </motion.h1>
 
           <p className="mt-3.5 m-0 font-serif text-[16px] leading-[1.5] text-[#b5c1d1]">
-            Timed Prelims questions with real negative marking, scored on our server. Every miss comes back explained.
+            Authentic Prelims pressure (+2.00 / −0.66) and wire-verified Daily PIB Intelligence. Test if you can spot the examiner's trap under a ticking timer before it costs you in the real exam.
           </p>
 
           <button
@@ -109,24 +109,24 @@ export default function MobileLanding({
             </button>
           </div>
 
-          {/* Embedded Sample Question (UPSC Prelims 2001 Question 39) */}
+          {/* Embedded Sample Question with PIB Trap Switcher */}
           <div id="mobile-diagnostic-embed" className="mt-7">
             <DiagnosticPreview onLaunchFullArena={onNavigateArena} />
           </div>
 
           {/* 3-tier Proof DL */}
-          <dl className="mt-8 pt-5 border-t border-[rgba(224,208,171,0.10)] grid grid-cols-[100px_minmax(0,1fr)] column-gap-3 row-gap-3 items-baseline">
-            <dt className="font-sans text-[15px] font-semibold text-[#e0d0ab] tabular-nums">2,063</dt>
+          <dl className="mt-8 pt-5 border-t border-[rgba(224,208,171,0.10)] grid grid-cols-[108px_minmax(0,1fr)] column-gap-3 row-gap-3 items-baseline">
+            <dt className="font-sans text-[15px] font-semibold text-[#e0d0ab] tabular-nums">+2.00 / −0.66</dt>
             <dd className="m-0 font-serif text-[14.5px] leading-[1.5] text-[#b5c1d1]">
-              UPSC Prelims questions from 2000 to 2025, each tagged with its year and paper.
+              Authentic Prelims negative marking. Every miss autopsied down to the statutory clause.
             </dd>
-            <dt className="font-sans text-[15px] font-semibold text-[#e0d0ab]">Every miss</dt>
+            <dt className="font-sans text-[15px] font-semibold text-[#e0d0ab]">50:50 Ledger</dt>
             <dd className="m-0 font-serif text-[14.5px] leading-[1.5] text-[#b5c1d1]">
-              comes back with why the right option is right.
+              Calculates whether your elimination calls gain or bleed marks when stuck between two options.
             </dd>
             <dt className="font-sans text-[15px] font-semibold text-[#e0d0ab] tabular-nums">10 a day</dt>
             <dd className="m-0 font-serif text-[14.5px] leading-[1.5] text-[#b5c1d1]">
-              Daily Brief dispatches from PIB and Cabinet releases, every sentence cited.
+              Wire-verified dispatches from PIB, Gazette, and Cabinet releases, every statement cited.
             </dd>
           </dl>
         </section>
@@ -161,7 +161,7 @@ export default function MobileLanding({
                   <h3 className="m-0 font-sans font-bold text-[22px] tracking-[-0.02em] text-[#f4ecd8]">Test Arena</h3>
                 </div>
                 <p className="mt-3 m-0 font-serif text-[14.5px] leading-[1.55] text-[#b5c1d1]">
-                  Timed Prelims practice with real negative marking, scored on our server. Skip, mark for review, and come back before you submit.
+                  Timed Prelims practice with real negative marking (+2.00 / −0.66) and mathematical 50-50 elimination risk tracking. Skip, mark for review, and autopsy your calls before you submit.
                 </p>
                 <div aria-hidden="true" className="mt-4 grid grid-cols-10 gap-1">
                   {arenaPalette.map((cell) => (

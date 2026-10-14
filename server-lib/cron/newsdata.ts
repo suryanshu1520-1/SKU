@@ -29,9 +29,9 @@ export default async function handler(req: any, res: any) {
       import("../seo/indexnow.js")
         .then(({ submitToIndexNow }) => {
           submitToIndexNow([
-            "https://tark.live/intelligence",
-            "https://tark.live/daily-edition",
-            "https://tark.live/sitemap-news.xml"
+            "https://www.tark.live/intelligence",
+            "https://www.tark.live/daily-edition",
+            "https://www.tark.live/sitemap-news.xml"
           ]).catch(() => {});
         })
         .catch(() => {});

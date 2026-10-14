@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, AlertTriangle } from 'lucide-react';
 
 interface SampleQuestion {
   id: string;
   subject: string;
   yearTag: string;
+  tabLabel: string;
+  isPibTrap?: boolean;
   question: string;
   statements?: string[];
   prompt?: string;
@@ -17,9 +19,56 @@ interface SampleQuestion {
 
 const SAMPLE_QUESTIONS: SampleQuestion[] = [
   {
+    id: 'sample-pib-green-hydrogen',
+    subject: 'Current Affairs & Policy',
+    yearTag: "Today's PIB Examiner Trap",
+    tabLabel: "PIB: Green Hydrogen",
+    isPibTrap: true,
+    question: 'With reference to the National Green Hydrogen Mission approved by the Union Cabinet, consider the following statements:',
+    statements: [
+      'The Strategic Interventions for Green Hydrogen Transition (SIGHT) programme provides direct financial incentives for domestic electrolyser manufacturing.',
+      'The Mission is administratively anchored and implemented under the Ministry of Petroleum and Natural Gas.',
+      'It imposes an immediate statutory procurement obligation of 10% green hydrogen on all domestic refineries from year one.'
+    ],
+    prompt: 'Which of the statements given above is/are correct?',
+    options: [
+      '1 only',
+      '1 and 2 only',
+      '2 and 3 only',
+      '1, 2 and 3'
+    ],
+    correctIndex: 0,
+    trap: 'The Nodal Ministry & Premature Mandate Trap. Statement 2 swaps the nodal ministry—the Mission is anchored under the Ministry of New and Renewable Energy (MNRE), not MoPNG. Statement 3 introduces an extreme qualifier; consumption mandates are phased pilot targets, not day-one statutory obligations.',
+    weakness: 'PIB Policy & Cabinet Decisions: Inter-ministerial jurisdiction confusion detected. Negative marking penalty: −0.66 marks.'
+  },
+  {
+    id: 'sample-pib-critical-minerals',
+    subject: 'Economy & Resource Policy',
+    yearTag: 'PIB Gazette Intelligence',
+    tabLabel: 'PIB: Critical Minerals',
+    isPibTrap: true,
+    question: 'With reference to the Offshore Areas Mineral (Development and Regulation) Amendment Act and recent auctions of Critical and Strategic Minerals, consider the following statements:',
+    statements: [
+      'Revenues generated from the offshore auction of critical mineral production leases are allocated entirely to the Consolidated Fund of India.',
+      'The Act establishes an absolute statutory prohibition barring private entities from mining any offshore mineral deposits.'
+    ],
+    prompt: 'Which of the statements given above is/are correct?',
+    options: [
+      '1 only',
+      '2 only',
+      'Both 1 and 2',
+      'Neither 1 nor 2'
+    ],
+    correctIndex: 0,
+    trap: 'The Extreme Absolute Qualifier Trap. Statement 2 uses "absolute statutory prohibition"; the 2023 amendment explicitly introduced competitive auction of operating rights to private corporate entities for non-atomic offshore minerals.',
+    weakness: 'Mining & Critical Minerals Regulatory Framework weakness score, 2.2 → 3.5. Overlooked recent statutory reforms (−0.66).'
+  },
+  {
     id: 'sample-prelims-2001-q39',
     subject: 'Polity',
     yearTag: 'UPSC Prelims 2001, GS Paper 1',
+    tabLabel: 'Polity: Schedules',
+    isPibTrap: false,
     question: 'If a new State of the Indian Union is to be created, which one of the following Schedules of the Constitution must be amended?',
     options: [
       'First',
@@ -35,6 +84,8 @@ const SAMPLE_QUESTIONS: SampleQuestion[] = [
     id: 'sample-delimitation',
     subject: 'Polity',
     yearTag: 'Prelims 2023, Polity',
+    tabLabel: 'Prelims 2023: Finality',
+    isPibTrap: false,
     question: 'Consider the following statements regarding the Delimitation Commission under Article 82:',
     statements: [
       'Its orders have the force of law and cannot be questioned in any court.',
@@ -55,6 +106,8 @@ const SAMPLE_QUESTIONS: SampleQuestion[] = [
     id: 'sample-anti-defection',
     subject: 'Constitutional Law',
     yearTag: 'UPSC CSE Standard',
+    tabLabel: 'Law: Anti-Defection',
+    isPibTrap: false,
     question: 'With reference to the Anti-Defection Law (Tenth Schedule of the Constitution), consider the following statements:',
     statements: [
       'The law does not specify a time-frame within which the Presiding Officer must decide a disqualification plea.',
@@ -73,13 +126,15 @@ const SAMPLE_QUESTIONS: SampleQuestion[] = [
   }
 ];
 
+const TRAP_DEFAULTS = [1, 2, 1, 2, 0];
+
 interface DiagnosticPreviewProps {
   onLaunchFullArena: () => void;
 }
 
 export default function DiagnosticPreview({ onLaunchFullArena }: DiagnosticPreviewProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedOption, setSelectedOption] = useState<number | null>(1); // Default to option B (Second) to illustrate the trap
+  const [selectedOption, setSelectedOption] = useState<number | null>(TRAP_DEFAULTS[0]); // Default to Option B to illustrate the Nodal Ministry trap
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [secondsRemaining, setSecondsRemaining] = useState(107); // 01:47
 
@@ -110,11 +165,16 @@ export default function DiagnosticPreview({ onLaunchFullArena }: DiagnosticPrevi
     setHasSubmitted(true);
   };
 
-  const handleResetOrNext = () => {
+  const handleSwitchQuestion = (idx: number) => {
+    setCurrentIndex(idx);
     setHasSubmitted(false);
-    setSelectedOption(null);
-    setCurrentIndex((prev) => (prev + 1) % SAMPLE_QUESTIONS.length);
+    setSelectedOption(TRAP_DEFAULTS[idx] ?? null);
     setSecondsRemaining(107);
+  };
+
+  const handleResetOrNext = () => {
+    const nextIdx = (currentIndex + 1) % SAMPLE_QUESTIONS.length;
+    handleSwitchQuestion(nextIdx);
   };
 
   // Keyboard shortcut listener for A, B, C, D and 1, 2, 3, 4
@@ -166,12 +226,38 @@ export default function DiagnosticPreview({ onLaunchFullArena }: DiagnosticPrevi
   return (
     <div className="w-full double-bezel-outer">
       <div className="double-bezel-inner">
+        {/* Interactive Topic / Trap Switcher */}
+        <div className="px-5 md:px-6 pt-3 pb-2.5 border-b border-[rgba(224,208,171,0.08)] bg-gradient-to-b from-[rgba(224,208,171,0.04)] to-transparent flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+          {SAMPLE_QUESTIONS.map((item, idx) => {
+            const isActive = idx === currentIndex;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => handleSwitchQuestion(idx)}
+                className={`px-2.5 py-1 rounded-full font-mono text-[10px] tracking-[0.06em] whitespace-nowrap transition-all cursor-pointer inline-flex items-center gap-1.5 ${
+                  isActive
+                    ? item.isPibTrap
+                      ? 'bg-[rgba(244,63,94,0.18)] text-[#fca5a5] border border-[rgba(244,63,94,0.45)] font-bold shadow-[0_0_12px_rgba(244,63,94,0.2)]'
+                      : 'bg-[#e0d0ab] text-[#050b1a] font-bold shadow-sm'
+                    : 'bg-[rgba(224,208,171,0.03)] text-[#7d8ca4] hover:text-[#f4ecd8] border border-[rgba(224,208,171,0.10)]'
+                }`}
+              >
+                {item.isPibTrap && (
+                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[#f87171] animate-ping' : 'bg-[#f87171]/70'}`} />
+                )}
+                <span>{item.tabLabel}</span>
+              </button>
+            );
+          })}
+        </div>
+
         {/* Tab strip */}
-        <div className="flex items-center justify-between px-5 md:px-6 py-3.5 border-b border-[rgba(224,208,171,0.10)] bg-gradient-to-b from-[rgba(224,208,171,0.03)] to-transparent">
+        <div className="flex items-center justify-between px-5 md:px-6 py-3 border-b border-[rgba(224,208,171,0.10)] bg-[rgba(5,11,26,0.3)]">
           <div className="flex items-center gap-2.5 font-mono text-[10px] text-[#6e7d94] tracking-[0.18em] uppercase">
             <span className="text-[#f4ecd8] font-medium">Live diagnostic</span>
             <span className="text-[rgba(224,208,171,0.25)]">/</span>
-            <span className="truncate max-w-[140px] sm:max-w-none">{q.yearTag}</span>
+            <span className="truncate max-w-[150px] sm:max-w-none text-[#e0d0ab]">{q.yearTag}</span>
           </div>
           <div className="flex items-center gap-3 font-mono text-[11px]">
             <span className="text-[#6e7d94]">Q</span>
@@ -195,9 +281,17 @@ export default function DiagnosticPreview({ onLaunchFullArena }: DiagnosticPrevi
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.25 }}
               >
-                {/* Marking tag */}
-                <div className="inline-block px-2.5 py-1 mb-5 bg-[rgba(52,211,153,0.10)] border border-[rgba(52,211,153,0.32)] rounded-[4px] font-mono text-[10px] text-[#34d399] font-bold tracking-[0.10em]">
-                  +2.00 / −0.66 marking on
+                {/* Marking tag with PIB Trap badge */}
+                <div className="flex items-center gap-2 mb-5">
+                  <div className="inline-block px-2.5 py-1 bg-[rgba(52,211,153,0.10)] border border-[rgba(52,211,153,0.32)] rounded-[4px] font-mono text-[10px] text-[#34d399] font-bold tracking-[0.10em]">
+                    +2.00 / −0.66 marking on
+                  </div>
+                  {q.isPibTrap && (
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[rgba(244,63,94,0.12)] border border-[rgba(244,63,94,0.30)] rounded-[4px] font-mono text-[10px] text-[#fca5a5] font-semibold tracking-[0.08em] uppercase">
+                      <AlertTriangle className="w-3 h-3 text-[#f87171]" />
+                      <span>Examiner Trap</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Question preamble */}
@@ -214,15 +308,17 @@ export default function DiagnosticPreview({ onLaunchFullArena }: DiagnosticPrevi
                   </ol>
                 )}
 
-                <p className="m-0 mb-5 font-serif text-[14px] text-[#6e7d94] italic">
-                  {q.prompt}
-                </p>
+                {q.prompt && (
+                  <p className="m-0 mb-5 font-serif text-[14px] text-[#6e7d94] italic">
+                    {q.prompt}
+                  </p>
+                )}
 
                 {/* 4 Interactive Options */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   {q.options.map((opt, idx) => {
                     const isSelected = selectedOption === idx;
-                    const letter = String.fromCharCode(97 + idx); // lowercase a, b, c, d like DesignV3
+                    const letter = String.fromCharCode(97 + idx); // lowercase a, b, c, d
 
                     return (
                       <button
@@ -297,12 +393,21 @@ export default function DiagnosticPreview({ onLaunchFullArena }: DiagnosticPrevi
                   .
                 </div>
 
-                <div className="grid grid-cols-[80px_1fr] gap-x-4 gap-y-3 pt-4 border-t border-[rgba(224,208,171,0.10)] text-[13.5px] leading-[1.55]">
+                <div className="grid grid-cols-[90px_1fr] gap-x-4 gap-y-3 pt-4 border-t border-[rgba(224,208,171,0.10)] text-[13.5px] leading-[1.55]">
                   <div className="font-mono text-[10px] text-[#6e7d94] tracking-[0.16em] uppercase pt-0.5">
                     Trap
                   </div>
                   <div className="font-serif text-[#f4ecd8]">
                     {q.trap}
+                  </div>
+
+                  <div className="font-mono text-[10px] text-[#6e7d94] tracking-[0.16em] uppercase pt-0.5">
+                    Risk Ledger
+                  </div>
+                  <div className={`font-serif ${isCorrect ? 'text-[#34d399]' : 'text-[#f87171]'}`}>
+                    {isCorrect
+                      ? 'Confident call validated (+2.00). Positive yield recorded in your risk profile.'
+                      : '50:50 instinct failed (−0.66). Risk Ledger records net mark bleed when guessing between split options.'}
                   </div>
 
                   <div className="font-mono text-[10px] text-[#6e7d94] tracking-[0.16em] uppercase pt-0.5">

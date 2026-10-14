@@ -146,7 +146,7 @@ export default function Landing({
                 transition={{ duration: 0.6, delay: 0.1, ease: [0.32, 0.72, 0, 1] }}
                 className="m-0 max-w-[440px] font-serif text-[19px] lg:text-[20px] leading-[1.55] text-[#b5c1d1]"
               >
-                Timed Prelims questions with real negative marking, scored on our server. Every miss comes back explained.
+                Authentic Prelims pressure (+2.00 / −0.66) and wire-verified Daily PIB Intelligence. Test if you can spot the examiner's trap under a ticking timer before it costs you in the real exam.
               </motion.p>
 
               <motion.div
@@ -179,23 +179,23 @@ export default function Landing({
               </motion.div>
 
               {/* 3-tier Proof DL */}
-              <dl className="m-0 mt-12 pt-6 border-t border-[rgba(224,208,171,0.10)] grid grid-cols-[112px_minmax(0,1fr)] column-gap-[18px] row-gap-[14px] items-baseline">
-                <dt className="font-sans text-[15px] font-semibold text-[#e0d0ab] tabular-nums">2,063</dt>
+              <dl className="m-0 mt-12 pt-6 border-t border-[rgba(224,208,171,0.10)] grid grid-cols-[124px_minmax(0,1fr)] column-gap-[18px] row-gap-[14px] items-baseline">
+                <dt className="font-sans text-[15px] font-semibold text-[#e0d0ab] tabular-nums">+2.00 / −0.66</dt>
                 <dd className="m-0 font-serif text-[15px] leading-[1.5] text-[#b5c1d1]">
-                  UPSC Prelims questions from 2000 to 2025, each tagged with its year and paper.
+                  Authentic Prelims negative marking. Every miss autopsied down to the statutory clause.
                 </dd>
-                <dt className="font-sans text-[15px] font-semibold text-[#e0d0ab]">Every miss</dt>
+                <dt className="font-sans text-[15px] font-semibold text-[#e0d0ab]">50:50 Ledger</dt>
                 <dd className="m-0 font-serif text-[15px] leading-[1.5] text-[#b5c1d1]">
-                  comes back with why the right option is right.
+                  Calculates whether your elimination calls gain or bleed marks when stuck between two options.
                 </dd>
                 <dt className="font-sans text-[15px] font-semibold text-[#e0d0ab] tabular-nums">10 a day</dt>
                 <dd className="m-0 font-serif text-[15px] leading-[1.5] text-[#b5c1d1]">
-                  Daily Brief dispatches from PIB and Cabinet releases, every sentence cited.
+                  Wire-verified dispatches from PIB, Gazette, and Cabinet releases, every statement cited.
                 </dd>
               </dl>
             </div>
 
-            {/* Right: Authentic Prelims 2001 Question 39 Embedded Diagnostic */}
+            {/* Right: Authentic Prelims Embedded Diagnostic */}
             <div id="diagnostic-embed" className="w-full">
               <DiagnosticPreview onLaunchFullArena={onNavigateArena} />
             </div>
@@ -247,7 +247,7 @@ export default function Landing({
 
                   <div className="mt-6 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_274px] gap-8 lg:gap-11 items-start">
                     <p className="m-0 font-serif text-[17px] leading-[1.6] text-[#b5c1d1]">
-                      Timed Prelims practice with real negative marking, scored on our server. Skip, mark for review, and come back before you submit.
+                      Timed Prelims practice with real negative marking (+2.00 / −0.66) and mathematical 50-50 elimination risk tracking. Skip, mark for review, and autopsy your calls before you submit.
                     </p>
 
                     <div>

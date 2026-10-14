@@ -54,7 +54,7 @@ function getBaseHtml(): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tark | तर्क — Analytical Test Arena & Daily Intelligence</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="canonical" href="https://tark.live/" />
+  <link rel="canonical" href="https://www.tark.live/" />
 </head>
 <body>
   <div id="root"></div>
@@ -329,7 +329,7 @@ function renderMcqHtml(mcq: McqRecord): string {
 export function renderSeoHtml(article: ArticleRecord, reqUrl: string): string {
   const baseHtml = getBaseHtml();
   const slug = slugify(article.headline);
-  const canonicalUrl = `https://tark.live/intelligence/${slug}?id=${encodeURIComponent(article.id || '')}`;
+  const canonicalUrl = `https://www.tark.live/intelligence/${slug}?id=${encodeURIComponent(article.id || '')}`;
   const pageTitle = `${article.headline} — UPSC Policy Intelligence & Prelims Analysis | Tark`;
 
   const bullets = article.summary?.bullets || [];
@@ -345,9 +345,9 @@ export function renderSeoHtml(article: ArticleRecord, reqUrl: string): string {
       '@id': `${canonicalUrl}#article`,
       'isPartOf': {
         '@type': 'WebSite',
-        '@id': 'https://tark.live/#website',
+        '@id': 'https://www.tark.live/#website',
         'name': 'Tark | तर्क',
-        'url': 'https://tark.live/'
+        'url': 'https://www.tark.live/'
       },
       'headline': article.headline,
       'description': cleanDesc,
@@ -360,15 +360,15 @@ export function renderSeoHtml(article: ArticleRecord, reqUrl: string): string {
       'author': {
         '@type': 'Organization',
         'name': 'Tark Intelligence Bureau',
-        'url': 'https://tark.live/'
+        'url': 'https://www.tark.live/'
       },
       'publisher': {
         '@type': 'Organization',
         'name': 'Tark',
-        'url': 'https://tark.live/',
+        'url': 'https://www.tark.live/',
         'logo': {
           '@type': 'ImageObject',
-          'url': 'https://tark.live/favicon.svg'
+          'url': 'https://www.tark.live/favicon.svg'
         }
       },
       'keywords': [
@@ -388,13 +388,13 @@ export function renderSeoHtml(article: ArticleRecord, reqUrl: string): string {
           '@type': 'ListItem',
           'position': 1,
           'name': 'Home',
-          'item': 'https://tark.live/'
+          'item': 'https://www.tark.live/'
         },
         {
           '@type': 'ListItem',
           'position': 2,
           'name': 'Daily Intelligence',
-          'item': 'https://tark.live/intelligence'
+          'item': 'https://www.tark.live/intelligence'
         },
         {
           '@type': 'ListItem',
@@ -474,7 +474,7 @@ export function renderSeoHtml(article: ArticleRecord, reqUrl: string): string {
 
       <footer class="pt-4 border-t border-slate-800 text-xs text-slate-500 font-mono flex items-center justify-between">
         <span>Verified by Tark Intelligence Bureau</span>
-        <a href="${escapeXml(article.url || 'https://tark.live')}" rel="nofollow noopener" target="_blank" class="text-[#e0d0ab] hover:underline">
+        <a href="${escapeXml(article.url || 'https://www.tark.live')}" rel="nofollow noopener" target="_blank" class="text-[#e0d0ab] hover:underline">
           Original Wire Source ↗
         </a>
       </footer>
@@ -641,7 +641,7 @@ export async function renderGsHubSeoHtml(rawPaper: string): Promise<string> {
   else if (normKey === '4' || normKey === 'iv') paperKey = 'gs-4';
 
   const meta = GS_PAPERS[paperKey] || GS_PAPERS['gs-1'];
-  const canonicalUrl = `https://tark.live/intelligence/${paperKey}`;
+  const canonicalUrl = `https://www.tark.live/intelligence/${paperKey}`;
 
   let articles: any[] = [];
   let mcqs: McqRecord[] = [];
@@ -710,17 +710,17 @@ export async function renderGsHubSeoHtml(rawPaper: string): Promise<string> {
       'url': canonicalUrl,
       'isPartOf': {
         '@type': 'WebSite',
-        '@id': 'https://tark.live/#website',
+        '@id': 'https://www.tark.live/#website',
         'name': 'Tark | तर्क',
-        'url': 'https://tark.live/'
+        'url': 'https://www.tark.live/'
       }
     },
     {
       '@type': 'BreadcrumbList',
       '@id': `${canonicalUrl}#breadcrumb`,
       'itemListElement': [
-        { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://tark.live/' },
-        { '@type': 'ListItem', 'position': 2, 'name': 'Daily Intelligence', 'item': 'https://tark.live/intelligence' },
+        { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://www.tark.live/' },
+        { '@type': 'ListItem', 'position': 2, 'name': 'Daily Intelligence', 'item': 'https://www.tark.live/intelligence' },
         { '@type': 'ListItem', 'position': 3, 'name': meta.roman, 'item': canonicalUrl }
       ]
     }
@@ -733,7 +733,7 @@ export async function renderGsHubSeoHtml(rawPaper: string): Promise<string> {
       'itemListElement': articles.slice(0, 15).map((art, idx) => ({
         '@type': 'ListItem',
         'position': idx + 1,
-        'url': `https://tark.live/intelligence/${slugify(art.headline)}?id=${encodeURIComponent(art.id)}`,
+        'url': `https://www.tark.live/intelligence/${slugify(art.headline)}?id=${encodeURIComponent(art.id)}`,
         'name': art.headline
       }))
     });
@@ -881,7 +881,7 @@ export async function renderMinistryHubSeoHtml(slug: string): Promise<string> {
 
   const title = `${formattedName} PIB Policy Briefs & UPSC Current Affairs | Tark`;
   const description = `Official policy releases, schemes, circulars, and Prelims practice questions from ${formattedName} distilled for UPSC Civil Services Examination.`;
-  const canonicalUrl = `https://tark.live/intelligence/ministry/${slugify(slug)}`;
+  const canonicalUrl = `https://www.tark.live/intelligence/ministry/${slugify(slug)}`;
 
   let articles: any[] = [];
   let mcqs: McqRecord[] = [];
@@ -927,17 +927,17 @@ export async function renderMinistryHubSeoHtml(slug: string): Promise<string> {
       'url': canonicalUrl,
       'isPartOf': {
         '@type': 'WebSite',
-        '@id': 'https://tark.live/#website',
+        '@id': 'https://www.tark.live/#website',
         'name': 'Tark | तर्क',
-        'url': 'https://tark.live/'
+        'url': 'https://www.tark.live/'
       }
     },
     {
       '@type': 'BreadcrumbList',
       '@id': `${canonicalUrl}#breadcrumb`,
       'itemListElement': [
-        { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://tark.live/' },
-        { '@type': 'ListItem', 'position': 2, 'name': 'Intelligence', 'item': 'https://tark.live/intelligence' },
+        { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://www.tark.live/' },
+        { '@type': 'ListItem', 'position': 2, 'name': 'Intelligence', 'item': 'https://www.tark.live/intelligence' },
         { '@type': 'ListItem', 'position': 3, 'name': formattedName, 'item': canonicalUrl }
       ]
     }
@@ -950,7 +950,7 @@ export async function renderMinistryHubSeoHtml(slug: string): Promise<string> {
       'itemListElement': articles.slice(0, 15).map((art, idx) => ({
         '@type': 'ListItem',
         'position': idx + 1,
-        'url': `https://tark.live/intelligence/${slugify(art.headline)}?id=${encodeURIComponent(art.id)}`,
+        'url': `https://www.tark.live/intelligence/${slugify(art.headline)}?id=${encodeURIComponent(art.id)}`,
         'name': art.headline
       }))
     });
@@ -1124,7 +1124,7 @@ export async function renderDailyEditionSeoHtml(dateStr?: string): Promise<strin
 
   const title = `PIB Daily Edition & UPSC Policy Digest (${targetDate || 'Today'}) | Tark`;
   const description = `Autonomous verified briefing of government policy notifications, Cabinet decisions, and high-yield Prelims MCQs for ${targetDate || 'today'}.`;
-  const canonicalUrl = targetDate ? `https://tark.live/daily-edition/${encodeURIComponent(targetDate)}` : 'https://tark.live/daily-edition';
+  const canonicalUrl = targetDate ? `https://www.tark.live/daily-edition/${encodeURIComponent(targetDate)}` : 'https://www.tark.live/daily-edition';
 
   const graphElements: any[] = [
     {
@@ -1138,15 +1138,15 @@ export async function renderDailyEditionSeoHtml(dateStr?: string): Promise<strin
       'publisher': {
         '@type': 'Organization',
         'name': 'Tark Intelligence Bureau',
-        'url': 'https://tark.live/'
+        'url': 'https://www.tark.live/'
       }
     },
     {
       '@type': 'BreadcrumbList',
       '@id': `${canonicalUrl}#breadcrumb`,
       'itemListElement': [
-        { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://tark.live/' },
-        { '@type': 'ListItem', 'position': 2, 'name': 'Daily Edition', 'item': 'https://tark.live/daily-edition' },
+        { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://www.tark.live/' },
+        { '@type': 'ListItem', 'position': 2, 'name': 'Daily Edition', 'item': 'https://www.tark.live/daily-edition' },
         ...(targetDate ? [{ '@type': 'ListItem', 'position': 3, 'name': targetDate, 'item': canonicalUrl }] : [])
       ]
     }
@@ -1261,14 +1261,14 @@ export async function renderHubSeoHtml(section: 'intelligence' | 'prs' | 'daily-
 
   let title = 'Daily UPSC Current Affairs & Policy Intelligence | Tark';
   let description = 'Autonomous policy & governance intelligence distilled directly from official PIB releases, Cabinet decisions, and The Hindu for UPSC CSE and State PSC prep.';
-  let canonicalUrl = 'https://tark.live/intelligence';
+  let canonicalUrl = 'https://www.tark.live/intelligence';
   let h1 = 'Daily Policy & Governance Intelligence';
   let itemsHtml = '';
 
   if (section === 'prs') {
     title = 'PRS Legislative Vault — Parliamentary Acts & Bills Analysis | Tark';
     description = 'Dedicated statutory and policy intelligence archive containing deep analytical breakdowns of Parliamentary Bills, Acts, and Constitutional doctrines.';
-    canonicalUrl = 'https://tark.live/prs';
+    canonicalUrl = 'https://www.tark.live/prs';
     h1 = 'PRS Legislative Research Vault';
 
     try {
