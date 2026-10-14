@@ -1,6 +1,8 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
-    { "source": "/sitemap.xml", "destination": "/api/server" },
     { "source": "/sitemap-news.xml", "destination": "/api/server" },
     { "source": "/intelligence", "destination": "/api/server" },
     { "source": "/intelligence/(.*)", "destination": "/api/server" },
@@ -14,7 +16,10 @@
     { "source": "/terms", "destination": "/api/server" },
     { "source": "/refund", "destination": "/api/server" },
     { "source": "/api/(.*)", "destination": "/api/server" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/((?!api/|assets/|favicon|robots\\.txt|sitemap\\.xml|sitemap-news\\.xml|llms\\.txt|llms-full\\.txt|ai-catalog\\.json|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|css|js|woff|woff2|ttf|json|xml|txt)$).*)",
+      "destination": "/index.html"
+    }
   ],
   "functions": {
     "api/server.ts": {
@@ -43,16 +48,46 @@
       ]
     },
     {
+      "source": "/sitemap.xml",
+      "headers": [
+        { "key": "Content-Type", "value": "application/xml; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=3600, s-maxage=3600" },
+        { "key": "X-Robots-Tag", "value": "noindex" }
+      ]
+    },
+    {
+      "source": "/sitemap-news.xml",
+      "headers": [
+        { "key": "Content-Type", "value": "application/xml; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=900, s-maxage=900" },
+        { "key": "X-Robots-Tag", "value": "noindex" }
+      ]
+    },
+    {
+      "source": "/robots.txt",
+      "headers": [
+        { "key": "Content-Type", "value": "text/plain; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=3600, s-maxage=3600" }
+      ]
+    },
+    {
       "source": "/llms.txt",
       "headers": [
-        { "key": "Content-Type", "value": "text/markdown; charset=utf-8" },
+        { "key": "Content-Type", "value": "text/plain; charset=utf-8" },
         { "key": "Cache-Control", "value": "public, max-age=3600" }
       ]
     },
     {
       "source": "/llms-full.txt",
       "headers": [
-        { "key": "Content-Type", "value": "text/markdown; charset=utf-8" },
+        { "key": "Content-Type", "value": "text/plain; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
+    },
+    {
+      "source": "/ai-catalog.json",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json; charset=utf-8" },
         { "key": "Cache-Control", "value": "public, max-age=3600" }
       ]
     },

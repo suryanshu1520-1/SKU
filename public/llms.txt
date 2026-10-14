@@ -6,22 +6,22 @@ Tark delivers deterministic examination simulations calibrated with strict negat
 
 ## Core Intelligence & Knowledge Hubs
 
-- [Daily UPSC Current Affairs & Policy Signal](https://tark.live/intelligence): Continuous autonomous distillation of high-impact government policy notifications, statutory bills, and multilateral agreements categorized by UPSC Prelims & Mains General Studies (GS 1, 2, 3, 4).
-- [Daily PIB Curated Edition](https://tark.live/daily-edition): Finite, date-wise verified digest of high-yield government policy releases with prelims key facts and mains hooks.
-- [PRS Legislative Vault](https://tark.live/prs): Statutory analysis and deep legislative breakdowns of Parliamentary Bills and Acts.
-- [25-Year UPSC Question Observatory](https://tark.live/observatory): Deep cognitive matrix of two and a half decades of UPSC Civil Services Prelims questions categorized by theme, cognitive level, and syllabus linkage.
-- [Competitive Test Arena](https://tark.live/arena): Timed examination simulator with zero-trust server-side grading and diagnostic autopsies.
-- [The Tark Manifesto](https://tark.live/manifesto): Educational philosophy, methodology on eliminating noise in competitive civil services preparation, and editorial fact-checking protocols.
+- [Daily UPSC Current Affairs & Policy Signal](https://www.tark.live/intelligence): Continuous autonomous distillation of high-impact government policy notifications, statutory bills, and multilateral agreements categorized by UPSC Prelims & Mains General Studies (GS 1, 2, 3, 4).
+- [Daily PIB Curated Edition](https://www.tark.live/daily-edition): Finite, date-wise verified digest of high-yield government policy releases with prelims key facts and mains hooks.
+- [PRS Legislative Vault](https://www.tark.live/prs): Statutory analysis and deep legislative breakdowns of Parliamentary Bills and Acts.
+- [25-Year UPSC Question Observatory](https://www.tark.live/observatory): Deep cognitive matrix of two and a half decades of UPSC Civil Services Prelims questions categorized by theme, cognitive level, and syllabus linkage.
+- [Competitive Test Arena](https://www.tark.live/arena): Timed examination simulator with zero-trust server-side grading and diagnostic autopsies.
+- [The Tark Manifesto](https://www.tark.live/manifesto): Educational philosophy, methodology on eliminating noise in competitive civil services preparation, and editorial fact-checking protocols.
 
 ## Feeds & Machine Readability
 
-- [XML Sitemap](https://tark.live/sitemap.xml): Complete machine-readable index of all 1,500+ intelligence articles and dossiers.
-- [Google News Sitemap](https://tark.live/sitemap-news.xml): Fresh policy wire dispatches published within the last 48 hours.
-- [Robots Configuration](https://tark.live/robots.txt): Machine access permissions and crawler policies.
+- [XML Sitemap](https://www.tark.live/sitemap.xml): Complete machine-readable index of all 1,500+ intelligence articles and dossiers.
+- [Google News Sitemap](https://www.tark.live/sitemap-news.xml): Fresh policy wire dispatches published within the last 48 hours.
+- [Robots Configuration](https://www.tark.live/robots.txt): Machine access permissions and crawler policies.
 
 ## Legal, Privacy & Compliance Charters
 
-- [Privacy Policy & Data Governance Charter](https://tark.live/privacy): Statutory compliance under Digital Personal Data Protection (DPDP) Act 2023, zero-tracker architecture, and strict zero-data monetization pledge.
-- [Terms of Service & Platform License Agreement](https://tark.live/terms): Institutional platform access terms, Section 52(1)(q) copyright compliance, and candidate covenant.
-- [Refund, Cancellation & Seat Allocation Policy](https://tark.live/refund): 7-day unconditional refund window, 500 lifetime seat allocation rules, and consumer protections.
+- [Privacy Policy & Data Governance Charter](https://www.tark.live/privacy): Statutory compliance under Digital Personal Data Protection (DPDP) Act 2023, zero-tracker architecture, and strict zero-data monetization pledge.
+- [Terms of Service & Platform License Agreement](https://www.tark.live/terms): Institutional platform access terms, Section 52(1)(q) copyright compliance, and candidate covenant.
+- [Refund, Cancellation & Seat Allocation Policy](https://www.tark.live/refund): 7-day unconditional refund window, 500 lifetime seat allocation rules, and consumer protections.
 

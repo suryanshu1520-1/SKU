@@ -17,31 +17,31 @@
 ## Knowledge Graph & Endpoints
 
 ### 1. Daily UPSC Current Affairs & Policy Signals
-- URL: https://tark.live/intelligence
+- URL: https://www.tark.live/intelligence
 - Format: Real-time intelligence briefs distilled from official government notifications.
 - Slug Pattern: `/intelligence/:slug?id=:uuid`
 - Pre-rendered Server-Side: Yes (semantic `<article>` with Schema.org `NewsArticle` and `BreadcrumbList`).
 
 ### 2. Daily PIB Curated Edition
-- URL: https://tark.live/daily-edition
+- URL: https://www.tark.live/daily-edition
 - Format: Finite daily digest of primary policy decisions.
 - Date Pattern: `/daily-edition/:date`
 
 ### 3. PRS Legislative Vault
-- URL: https://tark.live/prs
+- URL: https://www.tark.live/prs
 - Format: Comprehensive analytical dossiers of Parliamentary Bills, Acts, Constitutional Amendments, and Standing Committee reports.
 - Dossier Pattern: `/prs/:bill-id`
 
 ### 4. 25-Year UPSC Question Observatory
-- URL: https://tark.live/observatory
+- URL: https://www.tark.live/observatory
 - Format: Empirical archive of UPSC Prelims questions from 1999 to present, tagged by cognitive taxonomy, subject theme, and frequency.
 
 ### 5. Competitive Examination Arena
-- URL: https://tark.live/arena
+- URL: https://www.tark.live/arena
 - Format: High-stakes timed simulator enforcing strict examination conditions.
 
 ### 6. The Tark Manifesto
-- URL: https://tark.live/manifesto
+- URL: https://www.tark.live/manifesto
 - Philosophy: The war on noise in competitive civil services preparation. Why infinite scroll social media and low-signal marketing harm aspirant cognition.
 
 ## Editorial & Fact-Checking Standard
@@ -50,6 +50,6 @@ All policy briefs published on Tark are derived strictly from official governmen
 
 Author: Tark Intelligence Bureau
 Publisher: Tark
-Canonical Domain: https://tark.live
-Sitemap: https://tark.live/sitemap.xml
-Google News Sitemap: https://tark.live/sitemap-news.xml
+Canonical Domain: https://www.tark.live
+Sitemap: https://www.tark.live/sitemap.xml
+Google News Sitemap: https://www.tark.live/sitemap-news.xml
