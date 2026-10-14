@@ -1365,7 +1365,7 @@ export async function renderHubSeoHtml(section: 'intelligence' | 'prs' | 'daily-
  * Legal & Compliance Suite Pre-Renderer (/privacy, /terms, /refund)
  * Strictly synchronized with TARK-LEGAL-*-2026-V2.4 canonical charters.
  */
-export async function renderLegalSeoHtml(type: 'privacy' | 'terms' | 'refund'): Promise<string> {
+export function renderLegalSeoHtml(type: 'privacy' | 'terms' | 'refund'): string {
   const baseHtml = getBaseHtml();
 
   let title = 'Privacy Policy & Data Governance Charter | Tark';
