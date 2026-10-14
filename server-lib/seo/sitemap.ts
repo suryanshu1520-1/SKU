@@ -79,6 +79,9 @@ export async function generateMainSitemap(): Promise<string> {
     { loc: 'https://www.tark.live/humanities', lastmod: todayStr, changefreq: 'monthly', priority: '0.75' },
     { loc: 'https://www.tark.live/leaderboard', lastmod: todayStr, changefreq: 'hourly', priority: '0.7' },
     { loc: 'https://www.tark.live/manifesto', lastmod: todayStr, changefreq: 'monthly', priority: '0.6' },
+    { loc: 'https://www.tark.live/privacy', lastmod: todayStr, changefreq: 'monthly', priority: '0.6' },
+    { loc: 'https://www.tark.live/terms', lastmod: todayStr, changefreq: 'monthly', priority: '0.6' },
+    { loc: 'https://www.tark.live/refund', lastmod: todayStr, changefreq: 'monthly', priority: '0.6' },
   ];
 
   // 1. Add PRS Vault Dossiers

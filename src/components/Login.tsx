@@ -511,11 +511,11 @@ export default function Login({ onAuthenticated, onNavigateManifesto, onNavigate
           {/* Legal Links */}
           <div className="text-center mt-5 pt-4 border-t border-[rgba(19,108,153,0.3)]">
             <div className="flex items-center justify-center gap-4 text-xs font-sans text-[#8fa2bd]">
-              <button onClick={() => onNavigateLegal?.('terms')} className="hover:text-[#e0d0ab] transition-colors cursor-pointer">Terms</button>
+              <a href="/terms" onClick={(e) => { e.preventDefault(); onNavigateLegal?.('terms'); }} className="hover:text-[#e0d0ab] transition-colors cursor-pointer">Terms</a>
               <span>&bull;</span>
-              <button onClick={() => onNavigateLegal?.('privacy')} className="hover:text-[#e0d0ab] transition-colors cursor-pointer">Privacy</button>
+              <a href="/privacy" onClick={(e) => { e.preventDefault(); onNavigateLegal?.('privacy'); }} className="hover:text-[#e0d0ab] transition-colors cursor-pointer">Privacy</a>
               <span>&bull;</span>
-              <button onClick={() => onNavigateLegal?.('refund')} className="hover:text-[#e0d0ab] transition-colors cursor-pointer">Refunds</button>
+              <a href="/refund" onClick={(e) => { e.preventDefault(); onNavigateLegal?.('refund'); }} className="hover:text-[#e0d0ab] transition-colors cursor-pointer">Refunds</a>
             </div>
           </div>
 

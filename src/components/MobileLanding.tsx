@@ -381,13 +381,16 @@ export default function MobileLanding({
             >
               Start diagnostic
             </button>
-            <button
-              type="button"
-              onClick={() => onNavigateLegal?.('refund')}
+            <a
+              href="/refund"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigateLegal?.('refund');
+              }}
               className="text-link font-sans text-[14px] font-medium text-[#7d8ca4] cursor-pointer"
             >
               Refund terms
-            </button>
+            </a>
           </div>
         </section>
 
@@ -399,11 +402,10 @@ export default function MobileLanding({
             TARK
           </span>
           <nav aria-label="Footer" className="flex flex-wrap gap-x-5 gap-y-2 font-sans text-[13px] text-[#b5c1d1]">
-            <button type="button" onClick={onNavigateManifesto} className="text-link cursor-pointer">Manifesto</button>
-            <button type="button" onClick={() => onNavigateLegal?.('privacy')} className="text-link cursor-pointer">Sources</button>
-            <button type="button" onClick={() => onNavigateLegal?.('refund')} className="text-link cursor-pointer">Refund</button>
-            <button type="button" onClick={() => onNavigateLegal?.('privacy')} className="text-link cursor-pointer">Privacy</button>
-            <button type="button" onClick={() => onNavigateLegal?.('terms')} className="text-link cursor-pointer">Terms</button>
+            <a href="/manifesto" onClick={(e) => { e.preventDefault(); onNavigateManifesto?.(); }} className="text-link cursor-pointer">Manifesto</a>
+            <a href="/refund" onClick={(e) => { e.preventDefault(); onNavigateLegal?.('refund'); }} className="text-link cursor-pointer">Refund</a>
+            <a href="/privacy" onClick={(e) => { e.preventDefault(); onNavigateLegal?.('privacy'); }} className="text-link cursor-pointer">Privacy</a>
+            <a href="/terms" onClick={(e) => { e.preventDefault(); onNavigateLegal?.('terms'); }} className="text-link cursor-pointer">Terms</a>
           </nav>
           <p className="m-0 font-serif italic text-[12.5px] text-[#7d8ca4]">
             No ads. No affiliate links. No sponsored content.

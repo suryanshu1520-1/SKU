@@ -1360,3 +1360,298 @@ export async function renderHubSeoHtml(section: 'intelligence' | 'prs' | 'daily-
   );
   return modifiedHtml;
 }
+
+/**
+ * Legal & Compliance Suite Pre-Renderer (/privacy, /terms, /refund)
+ * Strictly synchronized with TARK-LEGAL-*-2026-V2.4 canonical charters.
+ */
+export async function renderLegalSeoHtml(type: 'privacy' | 'terms' | 'refund'): Promise<string> {
+  const baseHtml = getBaseHtml();
+
+  let title = 'Privacy Policy & Data Governance Charter | Tark';
+  let description = 'Digital Personal Data Protection Act (DPDP Act 2023) compliant privacy policy. Zero ads, zero tracking pixels, zero candidate data monetization.';
+  let canonicalUrl = 'https://www.tark.live/privacy';
+  let semanticHtml = '';
+
+  if (type === 'privacy') {
+    title = 'Privacy Policy & Data Governance Charter | Tark';
+    description = 'Digital Personal Data Protection Act (DPDP Act 2023) compliant privacy policy. Zero ads, zero tracking pixels, zero candidate data monetization.';
+    canonicalUrl = 'https://www.tark.live/privacy';
+
+    semanticHtml = `
+      <main class="max-w-4xl mx-auto px-4 py-12 text-neutral-100 font-sans leading-relaxed" data-ssr="true">
+        <header class="border-b border-slate-800 pb-6 mb-8">
+          <span class="inline-block px-3 py-1 bg-emerald-950/60 border border-emerald-500/40 rounded text-xs font-mono text-emerald-400 font-medium mb-3">
+            STATUTORY CHARTER // TARK-LEGAL-PP-2026-V2.4
+          </span>
+          <h1 class="text-3xl sm:text-4xl font-serif font-bold text-white tracking-tight">Privacy Policy & Data Governance Charter</h1>
+          <p class="text-xs font-mono text-slate-400 mt-2">
+            Effective: October 14, 2026 · Jurisdiction: Republic of India · DPDP Act, 2023 & IT Act Section 43A Compliant
+          </p>
+        </header>
+
+        <section class="space-y-6 text-sm text-slate-300">
+          <div>
+            <h2 class="text-xl font-serif font-bold text-[#e0d0ab] mb-2">1. Preamble & Sovereign Data Covenant</h2>
+            <p>
+              This Privacy Policy and Data Governance Charter governs the collection, processing, cryptographic storage, telemetry aggregation, and erasure of Personal Data and Usage Telemetry by <strong>Tark</strong> (<a href="https://www.tark.live" class="text-[#e0d0ab] hover:underline">https://www.tark.live</a>). Under the <strong>Digital Personal Data Protection Act, 2023 (DPDP Act)</strong>, Tark acts as a <em>Data Fiduciary</em> and you act as a <em>Data Principal</em>.
+            </p>
+            <div class="mt-4 p-4 rounded bg-slate-900/80 border border-slate-800">
+              <strong class="text-white block mb-1 font-mono text-xs uppercase tracking-wider">The Tark Zero-Ad & Zero-Brokerage Mandate:</strong>
+              <ul class="list-disc pl-5 space-y-1 text-xs">
+                <li>We do not serve third-party ads, behavioural retargeting pixels, affiliate links, or sponsored commercial content.</li>
+                <li>We never sell, rent, license, syndicate, or trade your Personal Data, test performance records, or psychometric telemetry to coaching institutes, marketing agencies, or data brokers.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-serif font-bold text-[#e0d0ab] mb-2">2. Lawful Purpose & Data Retention Matrix</h2>
+            <p class="text-xs text-slate-400 mb-3">
+              In adherence to the statutory principle of Data Minimization, we collect strictly what is necessary to grade tests on the server, preserve your longitudinal record, and verify lifetime seat ownership:
+            </p>
+            <div class="overflow-x-auto border border-slate-800 rounded">
+              <table class="w-full text-left font-sans text-xs border-collapse min-w-[620px]">
+                <thead>
+                  <tr class="border-b border-slate-800 bg-slate-900 text-[#e0d0ab] font-mono">
+                    <th class="py-2.5 px-3">Data Category</th>
+                    <th class="py-2.5 px-3">Specific Data Elements</th>
+                    <th class="py-2.5 px-3">Lawful Basis & Purpose</th>
+                    <th class="py-2.5 px-3">Retention Period</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/60 text-slate-300">
+                  <tr>
+                    <td class="py-2.5 px-3 font-semibold text-white">A. Unauthenticated Diagnostic</td>
+                    <td class="py-2.5 px-3">Ephemeral option clicks (a, b, c, d), timer ticks, landing page diagnostic payload.</td>
+                    <td class="py-2.5 px-3">User-initiated +2.00 / −0.66 evaluation without requiring mandatory registration.</td>
+                    <td class="py-2.5 px-3 font-mono text-[11px]">Purged on session close</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-3 font-semibold text-white">B. Identity & Auth</td>
+                    <td class="py-2.5 px-3">Email address, chosen handle (Leaderboard), OAuth session JWTs.</td>
+                    <td class="py-2.5 px-3">Explicit Consent (Sec. 6, DPDP Act) for account synchronization and seat binding.</td>
+                    <td class="py-2.5 px-3 font-mono text-[11px]">Active account + 30 days</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-3 font-semibold text-white">C. Psychometric Telemetry</td>
+                    <td class="py-2.5 px-3">Attempt history, +2.00 / −0.66 logs, 50:50 risk ratios, subject accuracy matrices, vulnerability tags.</td>
+                    <td class="py-2.5 px-3">Contractual performance: powering the 4-stage loop (Practice → Diagnose → Review → Improve).</td>
+                    <td class="py-2.5 px-3 font-mono text-[11px]">Account lifetime; erasable on demand</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-3 font-semibold text-white">D. Financial Metadata</td>
+                    <td class="py-2.5 px-3">Razorpay order_id, payment_id, verification signature, lifetime seat index (1–500).</td>
+                    <td class="py-2.5 px-3">Statutory tax & audit compliance (Income Tax Act, 1961 and GST rules).</td>
+                    <td class="py-2.5 px-3 font-mono text-[11px]">8 years (Statutory)</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-3 font-semibold text-white">E. Security Logs</td>
+                    <td class="py-2.5 px-3">Truncated IP, TLS handshake metadata, User-Agent, rate-limit counters.</td>
+                    <td class="py-2.5 px-3">Scraping prevention, DDoS defense, server-side grading integrity.</td>
+                    <td class="py-2.5 px-3 font-mono text-[11px]">Rolling 90-day window</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="text-xs text-slate-400 mt-2">
+              * Payment instrument exclusion: All transactions are processed exclusively via Razorpay Software Pvt. Ltd. (PCI-DSS Level 1 certified). Tark never stores or views raw credit/debit card numbers or UPI PINs.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-serif font-bold text-[#e0d0ab] mb-2">3. Sub-Processors & Technical Safeguards</h2>
+            <p>
+              Tark engages enterprise infrastructure providers: <strong>Supabase Inc.</strong> (encrypted PostgreSQL with Row Level Security), <strong>Vercel Inc.</strong> (global edge delivery & TLS 1.3 termination), and <strong>Razorpay Software Pvt. Ltd.</strong> (RBI-regulated payment gateway). All data at rest is encrypted via AES-256; data in transit is protected via TLS 1.3.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-serif font-bold text-[#e0d0ab] mb-2">4. Rights of the Data Principal (DPDP Act, 2023)</h2>
+            <p>
+              Under Sections 11–14 of the DPDP Act, you retain enforceable rights: Right to Access Information, Right to Correction & Erasure (72-hour complete purge upon request), Right to Withdraw Consent, and Right to Grievance Redressal.
+            </p>
+          </div>
+
+          <div class="p-4 rounded bg-slate-900/80 border border-slate-800">
+            <h2 class="text-lg font-serif font-bold text-white mb-1">5. Grievance Officer & Contact Information</h2>
+            <p class="text-xs text-slate-300">
+              Pursuant to Rule 5(9) of the IT (SPDI) Rules, 2011 and Section 13 of the DPDP Act, 2023:
+            </p>
+            <ul class="text-xs space-y-1 mt-2 font-mono text-slate-300">
+              <li>Designation: Data Protection & Grievance Officer — Tark</li>
+              <li>Platform: <a href="https://www.tark.live" class="text-amber-300 hover:underline">https://www.tark.live</a></li>
+              <li>Email: <a href="mailto:support@tark.live" class="text-amber-300 hover:underline">support@tark.live</a></li>
+              <li>SLA: 24-hour acknowledgement · 7-business-day resolution</li>
+            </ul>
+          </div>
+        </section>
+
+        <nav class="pt-8 mt-8 border-t border-slate-800 text-xs font-mono text-slate-400 flex flex-wrap gap-4">
+          <a href="/" class="text-amber-300 hover:underline">← Tark Arena Home</a>
+          <a href="/terms" class="hover:text-slate-200">Terms of Service</a>
+          <a href="/refund" class="hover:text-slate-200">Refund Policy</a>
+        </nav>
+      </main>
+    `;
+  } else if (type === 'terms') {
+    title = 'Terms of Service & Platform License Agreement | Tark';
+    description = 'Terms of service, platform license agreement, Section 52(1)(q) copyright provenance, and single-aspirant seat covenants for Tark.';
+    canonicalUrl = 'https://www.tark.live/terms';
+
+    semanticHtml = `
+      <main class="max-w-4xl mx-auto px-4 py-12 text-neutral-100 font-sans leading-relaxed" data-ssr="true">
+        <header class="border-b border-slate-800 pb-6 mb-8">
+          <span class="inline-block px-3 py-1 bg-amber-950/60 border border-amber-500/40 rounded text-xs font-mono text-amber-300 font-medium mb-3">
+            STATUTORY CHARTER // TARK-LEGAL-TOS-2026-V2.4
+          </span>
+          <h1 class="text-3xl sm:text-4xl font-serif font-bold text-white tracking-tight">Terms of Service & Platform License Agreement</h1>
+          <p class="text-xs font-mono text-slate-400 mt-2">
+            Effective: October 14, 2026 · Jurisdiction: Republic of India · Indian Contract Act, 1872 & IT Act, 2000
+          </p>
+        </header>
+
+        <section class="space-y-6 text-sm text-slate-300">
+          <div>
+            <h2 class="text-xl font-serif font-bold text-[#e0d0ab] mb-2">1. Binding Agreement & Service Nature</h2>
+            <p>
+              By accessing, running a diagnostic on, or purchasing a lifetime seat on Tark (<a href="https://www.tark.live" class="text-[#e0d0ab] hover:underline">https://www.tark.live</a>), you enter into a legally binding contract under the <strong>Indian Contract Act, 1872</strong>. Tark provides timed examination simulations (+2.00 / −0.66), OMR discipline tracking, the 50:50 Risk Ledger, 130-node syllabus practice sets, and primary-source daily intelligence.
+            </p>
+            <div class="mt-3 p-3.5 bg-slate-900 border border-slate-800 rounded text-xs">
+              <strong class="text-white block mb-1">Government Non-Affiliation Disclaimer:</strong>
+              Tark is an independent private technology platform. It is not affiliated with, endorsed by, or connected to the Union Public Service Commission (UPSC), any State PSC, Press Information Bureau (PIB), or any Ministry of the Government of India.
+            </div>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-serif font-bold text-[#e0d0ab] mb-2">2. 500-Seat Founding Cohort & Single-Aspirant Seat Restriction</h2>
+            <p>
+              Founding Cohort lifetime access is strictly limited to 500 seats. Each seat is licensed exclusively to <strong>one (1) natural person</strong>. Account pooling, credential sharing, or distributing session tokens across Telegram groups is a material breach resulting in immediate license revocation.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-serif font-bold text-[#e0d0ab] mb-2">3. Intellectual Property & Section 52(1)(q) Provenance</h2>
+            <ul class="list-disc pl-5 space-y-1.5 text-xs">
+              <li><strong>Historical Question Papers (2000–2025):</strong> Reproduced from public-record examinations conducted by the UPSC in strict accordance with <strong>Section 52(1)(q) of the Indian Copyright Act, 1957</strong>.</li>
+              <li><strong>Government Releases:</strong> Daily Brief statements link directly to primary government gazettes, PIB releases, and PRS Legislative briefs.</li>
+              <li><strong>Tark Proprietary Rights:</strong> The 130-node syllabus taxonomy, Examiner Trap syntheses, telemetry algorithms, 50:50 mathematical risk ledger, and source code are the copyrighted intellectual property of Tark.</li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-serif font-bold text-[#e0d0ab] mb-2">4. Acceptable Use & Anti-Scraping Covenants</h2>
+            <p>
+              You covenant not to scrape questions using automated scripts, tamper with server-side evaluation APIs (<code class="text-[#e0d0ab]">SRV_EVAL</code>), or redistribute Tark's diagnostic analyses in commercial coaching materials or competing portals.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-serif font-bold text-[#e0d0ab] mb-2">5. Limitation of Liability & Governing Law</h2>
+            <p>
+              Tark’s aggregate cumulative liability for any claim arising out of these Terms shall not exceed the amount paid by you (<strong>₹399</strong>). This Agreement is governed by the laws of the Republic of India, with jurisdiction in competent Indian courts, preserving statutory consumer protections under the Consumer Protection Act, 2019.
+            </p>
+          </div>
+        </section>
+
+        <nav class="pt-8 mt-8 border-t border-slate-800 text-xs font-mono text-slate-400 flex flex-wrap gap-4">
+          <a href="/" class="text-amber-300 hover:underline">← Tark Arena Home</a>
+          <a href="/privacy" class="hover:text-slate-200">Privacy Policy</a>
+          <a href="/refund" class="hover:text-slate-200">Refund Policy</a>
+        </nav>
+      </main>
+    `;
+  } else if (type === 'refund') {
+    title = 'Refund, Cancellation & Lifetime Seat Allocation Policy | Tark';
+    description = '7-day no-friction refund window, 24-48h Razorpay initiation, and 500-seat cohort ledger allocation terms for Tark.';
+    canonicalUrl = 'https://www.tark.live/refund';
+
+    semanticHtml = `
+      <main class="max-w-4xl mx-auto px-4 py-12 text-neutral-100 font-sans leading-relaxed" data-ssr="true">
+        <header class="border-b border-slate-800 pb-6 mb-8">
+          <span class="inline-block px-3 py-1 bg-cyan-950/60 border border-cyan-500/40 rounded text-xs font-mono text-cyan-400 font-medium mb-3">
+            STATUTORY CHARTER // TARK-LEGAL-REF-2026-V2.4
+          </span>
+          <h1 class="text-3xl sm:text-4xl font-serif font-bold text-white tracking-tight">Refund, Cancellation & Lifetime Seat Allocation Policy</h1>
+          <p class="text-xs font-mono text-slate-400 mt-2">
+            Effective: October 14, 2026 · Jurisdiction: Republic of India · Consumer Protection (E-Commerce) Rules, 2020 & RBI Directives
+          </p>
+        </header>
+
+        <section class="space-y-6 text-sm text-slate-300">
+          <div>
+            <h2 class="text-xl font-serif font-bold text-[#e0d0ab] mb-2">1. Philosophy: Try Before You Pay</h2>
+            <p>
+              Tark provides full access to the live timed +2.00 / −0.66 diagnostic on the landing page before any payment is requested. If you purchase one of the <strong>500 Lifetime Seats (₹399 one-time)</strong> and find it does not align with your study workflow, our refund policy is simple, transparent, and fair.
+            </p>
+          </div>
+
+          <div class="p-4 rounded bg-slate-900 border border-emerald-500/30">
+            <h2 class="text-lg font-serif font-bold text-emerald-400 mb-1">2. The 7-Day No-Friction Refund Window</h2>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              You are entitled to a <strong>100% full refund of your ₹399 payment</strong> within seven (7) calendar days (168 hours) of purchase. No justification or retention hoops required: email <strong class="text-white">support@tark.live</strong> with your registered email and Razorpay payment ID.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-serif font-bold text-[#e0d0ab] mb-2">3. Duplicate Payments & Technical Settlement Failures</h2>
+            <p>
+              If your bank account or UPI is debited multiple times due to a gateway timeout, Tark will immediately provision your seat or issue an <strong>unconditional 100% refund</strong> of the duplicate charge, regardless of the 7-day window.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-serif font-bold text-[#e0d0ab] mb-2">4. Effect of Refund on 500-Seat Cohort Ledger</h2>
+            <p>
+              Because the Founding Cohort is strictly capped at 500 seats: upon refund initiation, your Lifetime Seat license is revoked, and the seat is immediately released back to the open inventory pool on <code class="text-amber-300">tark.live</code> (+1 open seat).
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-serif font-bold text-[#e0d0ab] mb-2">5. Disbursement Timelines & Zero Auto-Renewal Guarantee</h2>
+            <ul class="list-disc pl-5 space-y-1.5 text-xs">
+              <li><strong>Razorpay Refund API Initiation:</strong> 24 to 48 hours from receipt of request.</li>
+              <li><strong>Bank / UPI Account Credit:</strong> 5 to 7 business days, depending on issuing bank TAT.</li>
+              <li><strong>Zero Deductions:</strong> Tark absorbs all gateway processing fees; you receive the full ₹399 back.</li>
+              <li><strong>Zero Auto-Renewal:</strong> The ₹399 Lifetime Seat is a strict one-time transaction. No recurring subscriptions or UPI autopay mandates are ever created.</li>
+            </ul>
+          </div>
+
+          <div class="p-4 rounded bg-slate-900/80 border border-slate-800">
+            <h2 class="text-lg font-serif font-bold text-white mb-1">Contact for Refund Processing</h2>
+            <p class="text-xs text-slate-300 font-mono">
+              Email: <a href="mailto:support@tark.live" class="text-amber-300 hover:underline">support@tark.live</a> · SLA: 24-hour acknowledgement
+            </p>
+          </div>
+        </section>
+
+        <nav class="pt-8 mt-8 border-t border-slate-800 text-xs font-mono text-slate-400 flex flex-wrap gap-4">
+          <a href="/" class="text-amber-300 hover:underline">← Tark Arena Home</a>
+          <a href="/privacy" class="hover:text-slate-200">Privacy Policy</a>
+          <a href="/terms" class="hover:text-slate-200">Terms of Service</a>
+        </nav>
+      </main>
+    `;
+  }
+
+  let modifiedHtml = baseHtml;
+  modifiedHtml = modifiedHtml.replace(/<title>.*?<\/title>/i, `<title>${escapeXml(title)}</title>`);
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+name=["']description["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta name="description" content="${escapeXml(description)}" />`
+  );
+  if (modifiedHtml.includes('<link rel="canonical"')) {
+    modifiedHtml = modifiedHtml.replace(
+      /<link\s+rel=["']canonical["']\s+href=["'].*?["']\s*\/?>/i,
+      `<link rel="canonical" href="${escapeXml(canonicalUrl)}" />`
+    );
+  } else {
+    modifiedHtml = modifiedHtml.replace('</head>', `  <link rel="canonical" href="${escapeXml(canonicalUrl)}" />\n</head>`);
+  }
+
+  modifiedHtml = modifiedHtml.replace(
+    /<div\s+id=["']root["']>[\s\S]*?<\/div>/i,
+    `<div id="root">${semanticHtml}</div>`
+  );
+  return modifiedHtml;
+}

@@ -564,13 +564,16 @@ export default function Landing({
               Start diagnostic
             </button>
 
-            <button
-              type="button"
-              onClick={() => onNavigateLegal?.('refund')}
+            <a
+              href="/refund"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigateLegal?.('refund');
+              }}
               className="text-link font-sans text-[15px] font-medium text-[#7d8ca4] hover:text-[#b5c1d1] cursor-pointer"
             >
               Refund terms
-            </button>
+            </a>
           </div>
         </section>
 
@@ -583,41 +586,46 @@ export default function Landing({
               TARK
             </span>
             <nav aria-label="Footer" className="flex gap-7 font-sans text-[13px] text-[#b5c1d1]">
-              <button
-                type="button"
-                onClick={onNavigateManifesto}
+              <a
+                href="/manifesto"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onNavigateManifesto?.();
+                }}
                 className="text-link cursor-pointer"
               >
                 Manifesto
-              </button>
-              <button
-                type="button"
-                onClick={() => onNavigateLegal?.('privacy')}
-                className="text-link cursor-pointer"
-              >
-                Sources
-              </button>
-              <button
-                type="button"
-                onClick={() => onNavigateLegal?.('refund')}
+              </a>
+              <a
+                href="/refund"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onNavigateLegal?.('refund');
+                }}
                 className="text-link cursor-pointer"
               >
                 Refund
-              </button>
-              <button
-                type="button"
-                onClick={() => onNavigateLegal?.('privacy')}
+              </a>
+              <a
+                href="/privacy"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onNavigateLegal?.('privacy');
+                }}
                 className="text-link cursor-pointer"
               >
                 Privacy
-              </button>
-              <button
-                type="button"
-                onClick={() => onNavigateLegal?.('terms')}
+              </a>
+              <a
+                href="/terms"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onNavigateLegal?.('terms');
+                }}
                 className="text-link cursor-pointer"
               >
                 Terms
-              </button>
+              </a>
             </nav>
           </div>
           <p className="m-0 font-serif italic text-[13px] text-[#7d8ca4]">

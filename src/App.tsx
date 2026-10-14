@@ -119,6 +119,15 @@ export default function App() {
       } else if (pathname.startsWith('/manifesto')) {
         setShowManifesto(true);
         updateDocumentMeta(ROUTE_META_DEFAULTS.manifesto);
+      } else if (pathname.startsWith('/privacy')) {
+        setLegalDocumentType('privacy');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.privacy);
+      } else if (pathname.startsWith('/terms')) {
+        setLegalDocumentType('terms');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.terms);
+      } else if (pathname.startsWith('/refund')) {
+        setLegalDocumentType('refund');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.refund);
       } else if (pathname === '/' || pathname === '') {
         updateDocumentMeta(ROUTE_META_DEFAULTS.home);
       }
@@ -134,6 +143,7 @@ export default function App() {
         setGameState('landing');
         setActiveTab('arena');
         setShowManifesto(false);
+        setLegalDocumentType(null);
         updateDocumentMeta(ROUTE_META_DEFAULTS.home);
       } else if (
         currentPath.startsWith('/intelligence') ||
@@ -184,6 +194,18 @@ export default function App() {
       } else if (currentPath.startsWith('/manifesto')) {
         setShowManifesto(true);
         updateDocumentMeta(ROUTE_META_DEFAULTS.manifesto);
+      } else if (currentPath.startsWith('/privacy')) {
+        setLegalDocumentType('privacy');
+        setShowManifesto(false);
+        updateDocumentMeta(ROUTE_META_DEFAULTS.privacy);
+      } else if (currentPath.startsWith('/terms')) {
+        setLegalDocumentType('terms');
+        setShowManifesto(false);
+        updateDocumentMeta(ROUTE_META_DEFAULTS.terms);
+      } else if (currentPath.startsWith('/refund')) {
+        setLegalDocumentType('refund');
+        setShowManifesto(false);
+        updateDocumentMeta(ROUTE_META_DEFAULTS.refund);
       }
     };
 
@@ -258,6 +280,26 @@ export default function App() {
 
   const handleNavigateManifesto = () => {
     setShowManifesto(true);
+  };
+
+  const handleNavigateLegal = (type: LegalDocumentType) => {
+    setLegalDocumentType(type);
+    if (typeof window !== 'undefined') {
+      const meta = ROUTE_META_DEFAULTS[type];
+      if (meta) updateDocumentMeta(meta);
+      window.history.pushState(null, '', `/${type}`);
+    }
+  };
+
+  const handleCloseLegalModal = () => {
+    setLegalDocumentType(null);
+    if (typeof window !== 'undefined') {
+      const currentPath = window.location.pathname.toLowerCase();
+      if (currentPath.startsWith('/privacy') || currentPath.startsWith('/terms') || currentPath.startsWith('/refund')) {
+        window.history.pushState(null, '', '/');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.home);
+      }
+    }
   };
 
   const executeTabNavigation = (
@@ -816,7 +858,7 @@ export default function App() {
         <Login
           onAuthenticated={handleAuthenticated}
           onNavigateManifesto={handleNavigateManifesto}
-          onNavigateLegal={(type) => setLegalDocumentType(type)}
+          onNavigateLegal={handleNavigateLegal}
         />
       )}
 
@@ -848,7 +890,7 @@ export default function App() {
             onNavigateObservatory={() => navigateToTab('observatory')}
             onNavigateLeaderboard={() => navigateToTab('leaderboard')}
             onNavigateManifesto={handleNavigateManifesto}
-            onNavigateLegal={(type) => setLegalDocumentType(type)}
+            onNavigateLegal={handleNavigateLegal}
             candidatePreferences={preferences}
           />
         </main>
@@ -1104,7 +1146,14 @@ export default function App() {
           >
             <LegalModal
               documentType={legalDocumentType}
-              onClose={() => setLegalDocumentType(null)}
+              onClose={handleCloseLegalModal}
+              onSelectType={(type) => {
+                setLegalDocumentType(type);
+                updateDocumentMeta(ROUTE_META_DEFAULTS[type]);
+                if (typeof window !== 'undefined') {
+                  window.history.replaceState(null, '', `/${type}`);
+                }
+              }}
             />
           </motion.div>
         )}

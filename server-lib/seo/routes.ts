@@ -7,6 +7,7 @@ import {
   renderGsHubSeoHtml,
   renderMinistryHubSeoHtml,
   renderDailyEditionSeoHtml,
+  renderLegalSeoHtml,
 } from './bot-renderer.js';
 import { INDEXNOW_KEY, submitToIndexNow } from './indexnow.js';
 
@@ -173,3 +174,19 @@ async function handlePrsRoute(req: Request, res: Response, next: NextFunction) {
 
 seoRouter.get(['/intelligence', '/intelligence/:slug', '/news', '/news/:slug', '/current-affairs'], handleIntelligenceRoute);
 seoRouter.get(['/prs', '/prs/:slug'], handlePrsRoute);
+
+// 10. Legal & Statutory Compliance Routes (Privacy Policy, Terms of Service, Refund Policy)
+seoRouter.get(
+  ['/privacy', '/terms', '/refund', '/api/privacy', '/api/terms', '/api/refund'],
+  (req: Request, res: Response) => {
+    const path = req.path.toLowerCase();
+    let type: 'privacy' | 'terms' | 'refund' = 'privacy';
+    if (path.includes('terms')) type = 'terms';
+    else if (path.includes('refund')) type = 'refund';
+
+    const html = renderLegalSeoHtml(type);
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800');
+    return res.status(200).send(html);
+  }
+);

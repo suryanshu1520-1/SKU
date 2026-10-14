@@ -107,6 +107,21 @@ export const ROUTE_META_DEFAULTS: Record<string, RouteMetaConfig> = {
     description: 'Our educational philosophy: sterile testing arenas, deterministic evaluation, and signal-rich intelligence free from commercial noise.',
     canonicalPath: '/manifesto',
   },
+  privacy: {
+    title: 'Privacy Policy & Data Governance Charter | Tark',
+    description: 'Digital Personal Data Protection Act (DPDP Act 2023) compliant privacy policy. Zero ads, zero tracking pixels, zero candidate data monetization.',
+    canonicalPath: '/privacy',
+  },
+  terms: {
+    title: 'Terms of Service & Platform License Agreement | Tark',
+    description: 'Terms of service, platform license agreement, Section 52(1)(q) copyright provenance, and single-aspirant seat covenants for Tark.',
+    canonicalPath: '/terms',
+  },
+  refund: {
+    title: 'Refund, Cancellation & Lifetime Seat Allocation Policy | Tark',
+    description: '7-day no-friction refund window, 24-48h Razorpay initiation, and 500-seat cohort ledger allocation terms for Tark.',
+    canonicalPath: '/refund',
+  },
 };
 
 export function updateDocumentMeta(config: RouteMetaConfig): void {

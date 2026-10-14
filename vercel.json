@@ -10,6 +10,9 @@
     { "source": "/prs/(.*)", "destination": "/api/server" },
     { "source": "/daily-edition", "destination": "/api/server" },
     { "source": "/daily-edition/(.*)", "destination": "/api/server" },
+    { "source": "/privacy", "destination": "/api/server" },
+    { "source": "/terms", "destination": "/api/server" },
+    { "source": "/refund", "destination": "/api/server" },
     { "source": "/api/(.*)", "destination": "/api/server" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
