@@ -19,7 +19,6 @@ import {
   SlidersHorizontal,
   Clock,
   Sparkles,
-  Shield,
   ShieldCheck,
   Layers,
   ArrowUpRight,
@@ -36,6 +35,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import DailyEdition from './DailyEdition';
+import PolicyBrief from './PolicyBrief';
 
 import prsVaultDossiers from '../data/prs-vault-dossiers.json';
 import type { CandidatePreferences } from '../types';
@@ -79,7 +79,7 @@ interface ThematicPillar {
   description: string;
 }
 
-interface CurrentAffairsItem {
+export interface CurrentAffairsItem {
   id?: string;
   source: string;
   ministry: string;
@@ -307,17 +307,6 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
 
   // Active Dossier Modal
   const [selectedDossier, setSelectedDossier] = useState<CurrentAffairsItem | null>(null);
-  const [dossierTab, setDossierTab] = useState<'exam_lens' | 'mains_depth' | 'static_links' | 'evidence'>('exam_lens');
-  const [showVerbatimSyllabus, setShowVerbatimSyllabus] = useState(false);
-
-  const parsedSyllabusTags = useMemo(() => {
-    if (!selectedDossier?.summary?.tags || selectedDossier.summary.tags.length === 0) return [];
-    return selectedDossier.summary.tags.map(parseSyllabusTag);
-  }, [selectedDossier?.summary?.tags]);
-
-  useEffect(() => {
-    setShowVerbatimSyllabus(false);
-  }, [selectedDossier?.id]);
 
   // Deep-link inspection on mount & direct route synchronization
   useEffect(() => {
@@ -425,7 +414,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
     }
   }, [selectedDossier?.id]);
 
-  const handleShareArticle = async (item: CurrentAffairsItem, e?: React.MouseEvent) => {
+  const handleShareArticle = async (item: CurrentAffairsItem, e?: React.MouseEvent, copyOnly = false) => {
     if (e) e.stopPropagation();
     const shareUrl = getCanonicalArticleUrl(item);
     const shareText = `${item.headline} (${item.source} · ${item.ministry})\nRead high-yield Prelims pointers and Mains analysis on Tark:`;
@@ -440,7 +429,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
       }
     }
 
-    if (navigator.share) {
+    if (navigator.share && !copyOnly) {
       try {
         await navigator.share({
           title: item.headline,
@@ -1833,568 +1822,33 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
       </>
       )}
 
-      {/* ── Full Brief Slide-Over (Slide-Over) ── */}
+      {/* Full brief: a continuous, navigable study note. */}
       <AnimatePresence>
         {selectedDossier && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedDossier(null)}
-            className="fixed inset-0 z-[500] bg-black/80 backdrop-blur-sm flex justify-end font-sans"
-          >
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-2xl h-full bg-[#03122a] border-l border-[rgba(19,108,153,0.4)] p-6 sm:p-8 overflow-y-auto flex flex-col justify-between shadow-2xl backdrop-blur-2xl"
-            >
-              <div className="space-y-5">
-                {/* Modal Top Bar */}
-                <div className="flex items-center justify-between pb-3.5 border-b border-[rgba(19,108,153,0.3)] font-sans">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-[10px] font-sans uppercase tracking-wider text-[#e0d0ab] font-bold">
-                      Policy Intelligence Dossier
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleShareArticle(selectedDossier)}
-                      className="px-2.5 py-1 text-xs font-mono text-[#e0d0ab] hover:text-white transition-colors bg-[rgba(11,61,120,0.3)] hover:bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.3)] hover:border-[#e0d0ab]/50 rounded-xs cursor-pointer flex items-center gap-1.5 shadow-xs"
-                      title="Copy shareable link (Telegram / WhatsApp)"
-                    >
-                      <Share2 className="w-3.5 h-3.5" />
-                      <span>Share</span>
-                    </button>
-                    <button
-                      onClick={() => setSelectedDossier(null)}
-                      className="p-1.5 text-secondary hover:text-primary transition-colors bg-[rgba(11,61,120,0.3)] hover:bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.3)] rounded-xs cursor-pointer"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* 1. Quiet Editorial Byline */}
-                <div className="flex flex-wrap items-center gap-2 text-xs font-sans text-[#8fa2bd]">
-                  {selectedDossier.source?.toUpperCase().includes('HINDU') ? (
-                    <span className="inline-flex items-center text-white" title="The Hindu — National Newspaper of Record">
-                      <TheHinduLogo height={13} color="#ffffff" animated={true} />
-                    </span>
-                  ) : selectedDossier.source?.toUpperCase().includes('PIB') ? (
-                    <span className="inline-flex items-center gap-1.5 font-mono font-bold text-[#e0d0ab]" title="Press Information Bureau">
-                      <PibLogo size={15} animated={true} />
-                      <span className="text-[11px] tracking-wider uppercase">PIB Official</span>
-                    </span>
-                  ) : (
-                    <span className="font-mono text-[11px] font-semibold text-[#e0d0ab] uppercase">
-                      {selectedDossier.source}
-                    </span>
-                  )}
-
-                  {selectedDossier.ministry && (
-                    <>
-                      <span className="text-muted select-none">&bull;</span>
-                      <span className="text-[#9fb0c8] font-medium truncate max-w-[280px]">
-                        {selectedDossier.ministry}
-                      </span>
-                    </>
-                  )}
-
-                  {selectedDossier.created_at && (
-                    <>
-                      <span className="text-muted select-none">&bull;</span>
-                      <span className="text-[#8fa2bd]/80 font-mono text-[11px]">
-                        {new Date(selectedDossier.created_at).toLocaleDateString('en-GB', {
-                          day: '2-digit',
-                          month: 'long',
-                          year: 'numeric',
-                        })}
-                      </span>
-                    </>
-                  )}
-                </div>
-
-                {/* 2. Authority Headline */}
-                <motion.h2
-                  layoutId={`dossier-headline-${selectedDossier.id}`}
-                  className="font-serif text-2xl sm:text-3xl font-bold text-[#e8e0cf] leading-tight tracking-tight"
-                >
-                  {selectedDossier.headline}
-                </motion.h2>
-
-                {/* 3. Consolidated Intelligence Telemetry Strip */}
-                <div className="p-2.5 sm:p-3 rounded-xs bg-[rgba(3,18,42,0.7)] border border-[rgba(19,108,153,0.35)] backdrop-blur-md space-y-2 font-sans shadow-sm">
-                  <div className="flex flex-wrap items-center justify-between gap-2.5">
-                    {/* Left: Truth Verification & Exam Gauge */}
-                    <div className="flex items-center gap-2.5 flex-wrap">
-                      <GroundingBadge
-                        grounding={selectedDossier.summary?.grounding}
-                        verificationMethod={selectedDossier.summary?.verification_method}
-                        headline={selectedDossier.headline}
-                        source={selectedDossier.source}
-                        claims={selectedDossier.summary?.claims}
-                        onClick={() =>
-                          setGroundingExplainerData({
-                            isOpen: true,
-                            grounding: selectedDossier.summary?.grounding,
-                            headline: selectedDossier.headline,
-                            source: selectedDossier.source,
-                            claims: selectedDossier.summary?.claims || [],
-                          })
-                        }
-                      />
-
-                      <span className="h-3.5 w-px bg-surface-elevated/60 hidden sm:inline-block" />
-
-                      {/* Compact Prelims / Mains Relevance Gauge */}
-                      <div className="inline-flex items-center gap-2 px-2 py-0.5 rounded-xs bg-[rgba(11,61,120,0.25)] border border-[rgba(19,108,153,0.3)] text-[10px] font-mono text-[#9fb0c8]">
-                        <span className="flex items-center gap-1">
-                          <span className="text-[#8fa2bd]">Prelims:</span>
-                          <span className={`font-semibold ${
-                            selectedDossier.summary?.prelims_relevance === 'HIGH' ? 'text-amber-300' :
-                            selectedDossier.summary?.prelims_relevance === 'LOW' ? 'text-secondary' : 'text-amber-200'
-                          }`}>
-                            {selectedDossier.summary?.prelims_relevance || 'MEDIUM'}
-                          </span>
-                        </span>
-                        <span className="text-muted select-none">&bull;</span>
-                        <span className="flex items-center gap-1">
-                          <span className="text-[#8fa2bd]">Mains:</span>
-                          <span className={`font-semibold ${
-                            selectedDossier.summary?.mains_relevance === 'HIGH' ? 'text-emerald-300' :
-                            selectedDossier.summary?.mains_relevance === 'LOW' ? 'text-secondary' : 'text-emerald-200'
-                          }`}>
-                            {selectedDossier.summary?.mains_relevance || 'MEDIUM'}
-                          </span>
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Right: Condensed UPSC Syllabus Chips */}
-                    {parsedSyllabusTags.length > 0 && (
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        {parsedSyllabusTags.map((tag, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => setShowVerbatimSyllabus(!showVerbatimSyllabus)}
-                            title={`${tag.full} (Click to inspect verbatim UPSC mapping)`}
-                            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-xs bg-[rgba(11,61,120,0.3)] border border-[rgba(19,108,153,0.4)] text-[10px] font-mono text-[#e0d0ab] hover:border-[#e0d0ab]/60 hover:bg-[rgba(11,61,120,0.5)] transition-all cursor-pointer shadow-xs"
-                          >
-                            <span className="font-bold text-[#e8e0cf]">{tag.paper}</span>
-                            <span className="text-muted select-none">&bull;</span>
-                            <span className="text-[#9fb0c8]">{tag.topic}</span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Verbatim Syllabus Mapping Accordion */}
-                  <AnimatePresence>
-                    {showVerbatimSyllabus && parsedSyllabusTags.length > 0 && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="overflow-hidden pt-2 border-t border-[rgba(19,108,153,0.25)] space-y-1.5"
-                      >
-                        <div className="flex items-center justify-between text-[10px] font-mono text-[#e0d0ab] uppercase tracking-wider font-bold">
-                          <span>Verbatim UPSC Syllabus Mapping</span>
-                          <button
-                            type="button"
-                            onClick={() => setShowVerbatimSyllabus(false)}
-                            className="text-muted hover:text-primary cursor-pointer font-sans"
-                          >
-                            Close &times;
-                          </button>
-                        </div>
-                        {parsedSyllabusTags.map((t, i) => (
-                          <div key={i} className="text-[11px] font-sans text-primary pl-2.5 border-l border-[#0194a8]/50 leading-relaxed">
-                            <span className="font-mono font-bold text-[#e0d0ab] mr-1">{t.paper}:</span>
-                            <span>{t.full.replace(new RegExp(`^${t.paper}[:\\s-]*`, 'i'), '') || t.full}</span>
-                          </div>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                {/* Dossier Tab Navigation Bar */}
-                <div className="flex border-b border-[rgba(19,108,153,0.3)] font-sans gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setDossierTab('exam_lens')}
-                    className={`flex items-center gap-1.5 px-3 py-2 text-xs font-sans font-bold uppercase tracking-wider transition-colors cursor-pointer border-b-2 -mb-px ${
-                      dossierTab === 'exam_lens'
-                        ? 'border-[#e0d0ab] text-[#e0d0ab] bg-[#e0d0ab]/5'
-                        : 'border-transparent text-secondary hover:text-primary'
-                    }`}
-                  >
-                    <Target className="w-3.5 h-3.5" />
-                    <span>Exam Lens</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setDossierTab('mains_depth')}
-                    className={`flex items-center gap-1.5 px-3 py-2 text-xs font-sans font-bold uppercase tracking-wider transition-colors cursor-pointer border-b-2 -mb-px ${
-                      dossierTab === 'mains_depth'
-                        ? 'border-[#e0d0ab] text-[#e0d0ab] bg-[#e0d0ab]/5'
-                        : 'border-transparent text-secondary hover:text-primary'
-                    }`}
-                  >
-                    <BookOpen className="w-3.5 h-3.5" />
-                    <span>Mains 360°</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setDossierTab('static_links')}
-                    className={`flex items-center gap-1.5 px-3 py-2 text-xs font-sans font-bold uppercase tracking-wider transition-colors cursor-pointer border-b-2 -mb-px ${
-                      dossierTab === 'static_links'
-                        ? 'border-[#e0d0ab] text-[#e0d0ab] bg-[#e0d0ab]/5'
-                        : 'border-transparent text-secondary hover:text-primary'
-                    }`}
-                  >
-                    <Layers className="w-3.5 h-3.5" />
-                    <span>Static Linkage</span>
-                    {selectedDossier.summary?.static_linkages && selectedDossier.summary.static_linkages.length > 0 && (
-                      <span className="ml-0.5 px-1.5 py-0.2 rounded-full text-[9px] font-mono bg-[#e0d0ab]/20 text-[#e0d0ab]">
-                        {selectedDossier.summary.static_linkages.length}
-                      </span>
-                    )}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setDossierTab('evidence')}
-                    className={`flex items-center gap-1.5 px-3 py-2 text-xs font-sans font-bold uppercase tracking-wider transition-colors cursor-pointer border-b-2 -mb-px ${
-                      dossierTab === 'evidence'
-                        ? 'border-[#e0d0ab] text-[#e0d0ab] bg-[#e0d0ab]/5'
-                        : 'border-transparent text-secondary hover:text-primary'
-                    }`}
-                  >
-                    <Shield className="w-3.5 h-3.5" />
-                    <span>Evidence</span>
-                  </button>
-                </div>
-
-                {/* ── TAB 1: EXAM LENS & 1-MINUTE REVISION ── */}
-                {dossierTab === 'exam_lens' && (
-                  <div className="space-y-4 font-sans pt-1">
-                    {/* 1-Minute Revision Targets */}
-                    {selectedDossier.summary?.revision_targets && (
-                      <div className="p-3.5 rounded-sm bg-[rgba(4,25,54,0.7)] border border-[rgba(224,208,171,0.25)] space-y-2.5">
-                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#e0d0ab] block">
-                          🎯 1-Minute High-Yield Targets
-                        </span>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-sans">
-                          {selectedDossier.summary.revision_targets.data_metric && (
-                            <div className="p-2 bg-surface-elevated/70 border border-border rounded-sm">
-                              <span className="text-[10px] uppercase font-mono text-amber-400 block mb-0.5">Target Data</span>
-                              <span className="text-primary font-medium">{selectedDossier.summary.revision_targets.data_metric}</span>
-                            </div>
-                          )}
-                          {selectedDossier.summary.revision_targets.nodal_body && (
-                            <div className="p-2 bg-surface-elevated/70 border border-border rounded-sm">
-                              <span className="text-[10px] uppercase font-mono text-cyan-400 block mb-0.5">Nodal Agency</span>
-                              <span className="text-primary font-medium">{selectedDossier.summary.revision_targets.nodal_body}</span>
-                            </div>
-                          )}
-                          {selectedDossier.summary.revision_targets.statutory_legal && (
-                            <div className="p-2 bg-surface-elevated/70 border border-border rounded-sm">
-                              <span className="text-[10px] uppercase font-mono text-purple-400 block mb-0.5">Statutory / Legal</span>
-                              <span className="text-primary font-medium">{selectedDossier.summary.revision_targets.statutory_legal}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Prelims Trap Radar */}
-                    {selectedDossier.summary?.prelims_trap_radar && (
-                      <div className="p-3.5 bg-amber-950/20 border border-amber-500/40 rounded-sm space-y-1">
-                        <span className="text-[10px] font-mono uppercase text-amber-400 font-bold flex items-center gap-1.5">
-                          <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
-                          🎯 Prelims Trap Radar (Examiner Pitfall)
-                        </span>
-                        <p className="text-xs text-amber-200 font-sans leading-relaxed">
-                          {selectedDossier.summary.prelims_trap_radar}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Prelims Pointer */}
-                    {selectedDossier.summary?.prelims && (
-                      <div className="p-3 bg-surface-elevated/70 border border-border rounded-sm space-y-1">
-                        <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold flex items-center gap-1">
-                          <Zap className="w-3 h-3 text-[#e0d0ab]" /> Prelims Factual Pointer
-                        </span>
-                        <p className="text-xs text-primary font-sans leading-relaxed">
-                          {selectedDossier.summary.prelims}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Executive Takeaways */}
-                    <div className="space-y-3 pt-2">
-                      <h4 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
-                        Executive Policy Highlights
-                      </h4>
-                      <div className="space-y-2.5 pl-3 border-l-2 border-[#e0d0ab]/30">
-                        {selectedDossier.summary?.bullets?.map((bullet, idx) => (
-                          <p key={idx} className="text-sm text-primary font-sans leading-relaxed">
-                            {bullet}
-                          </p>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* ── TAB 2: MAINS 360° STRATEGIC DEPTH ── */}
-                {dossierTab === 'mains_depth' && (
-                  <div className="space-y-4 font-sans pt-1">
-                    {selectedDossier.summary?.mains_analysis ? (
-                      <div className="space-y-3">
-                        {selectedDossier.summary.mains_analysis.context && (
-                          <div className="p-3.5 bg-surface-elevated/60 border border-border rounded-sm space-y-1">
-                            <span className="text-[10px] font-mono uppercase text-[#e0d0ab] font-bold block">
-                              1. Context & Historical Timeline
-                            </span>
-                            <p className="text-xs text-primary font-sans leading-relaxed">
-                              {selectedDossier.summary.mains_analysis.context}
-                            </p>
-                          </div>
-                        )}
-
-                        {selectedDossier.summary.mains_analysis.core_implications && (
-                          <div className="p-3.5 bg-surface-elevated/60 border border-border rounded-sm space-y-1">
-                            <span className="text-[10px] font-mono uppercase text-cyan-300 font-bold block">
-                              2. Core Policy Implications & Federal Dynamics
-                            </span>
-                            <p className="text-xs text-primary font-sans leading-relaxed">
-                              {selectedDossier.summary.mains_analysis.core_implications}
-                            </p>
-                          </div>
-                        )}
-
-                        {selectedDossier.summary.mains_analysis.way_forward && (
-                          <div className="p-3.5 bg-surface-elevated/60 border border-border rounded-sm space-y-1">
-                            <span className="text-[10px] font-mono uppercase text-emerald-400 font-bold block">
-                              3. Strategic Way Forward & Reform Roadmap
-                            </span>
-                            <p className="text-xs text-primary font-sans leading-relaxed">
-                              {selectedDossier.summary.mains_analysis.way_forward}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      selectedDossier.summary?.mains ? (
-                        <div className="p-4 bg-surface-elevated/60 border border-border rounded-sm space-y-2">
-                          <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold flex items-center gap-1">
-                            <ChevronRight className="w-3.5 h-3.5 text-[#e0d0ab]" /> Mains Perspective
-                          </span>
-                          <p className="text-sm text-primary font-sans leading-relaxed">
-                            {selectedDossier.summary.mains}
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="p-4 bg-surface-elevated/40 border border-border rounded-sm space-y-1">
-                          <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold">
-                            Mains Analysis Blueprint
-                          </span>
-                          <p className="text-xs text-secondary font-sans leading-relaxed">
-                            Apply this policy development to GS Paper II (Governance, Executive & Judicial Accountability) and GS Paper III (Inclusive Growth & Macroeconomic Stability). Formulate arguments focusing on implementation bottlenecks, constitutional checks, and administrative efficacy.
-                          </p>
-                        </div>
-                      )
-                    )}
-
-                    {selectedDossier.summary?.mains && selectedDossier.summary?.mains_analysis && (
-                      <div className="p-3 bg-surface-elevated/40 border border-border/80 rounded-sm">
-                        <span className="text-[10px] font-mono text-secondary uppercase block mb-1">Analytical Thesis Pointer:</span>
-                        <p className="text-xs text-primary italic font-sans">{selectedDossier.summary.mains}</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* ── TAB 3: STATIC SYLLABUS LINKAGES ── */}
-                {dossierTab === 'static_links' && (
-                  <div className="space-y-4 font-sans pt-1">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
-                        Standard Textbook & Syllabus Anchors
-                      </h4>
-                      <span className="text-[10px] font-mono text-muted">NCERT / Laxmikanth Alignment</span>
-                    </div>
-
-                    {selectedDossier.summary?.static_linkages && selectedDossier.summary.static_linkages.length > 0 ? (
-                      <div className="space-y-2.5">
-                        {selectedDossier.summary.static_linkages.map((item, idx) => (
-                          <div key={idx} className="p-3.5 bg-surface-elevated/70 border border-border rounded-sm space-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-[#e0d0ab]" />
-                              <h5 className="font-serif text-sm font-bold text-[#e0d0ab]">
-                                {item.concept}
-                              </h5>
-                            </div>
-                            <p className="text-xs text-primary font-sans leading-relaxed pl-3.5">
-                              {item.textbook_context}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="p-4 bg-surface-elevated/40 border border-border rounded-sm space-y-2 font-sans">
-                        <span className="text-[10px] font-sans uppercase text-[#e0d0ab] font-bold">
-                          Core General Studies Alignment
-                        </span>
-                        <p className="text-xs text-primary font-sans leading-relaxed">
-                          This development maps directly to {(selectedDossier.summary?.tags || ['General Studies']).join(', ')}. Review foundational constitutional provisions, statutory bodies, and standard economic metrics in your core notes.
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Thematic Pillars */}
-                    {selectedDossier.summary?.thematic_pillars && selectedDossier.summary.thematic_pillars.length > 0 && (
-                      <div className="space-y-2 pt-2">
-                        <span className="text-[10px] font-mono uppercase text-[#e0d0ab] font-bold block">
-                          Key Thematic Dimensions
-                        </span>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {selectedDossier.summary.thematic_pillars.map((pillar, idx) => (
-                            <div key={idx} className="p-2.5 bg-surface-elevated/50 border border-border rounded-sm space-y-0.5">
-                              <span className="font-serif text-xs font-bold text-primary block">{pillar.title}</span>
-                              <p className="text-[11px] text-secondary leading-snug">{pillar.description}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* ── TAB 4: EVIDENCE & GROUNDING LEDGER ── */}
-                {dossierTab === 'evidence' && (
-                  <div className="space-y-4 font-sans pt-1">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab]">
-                        Span-Anchored Evidence Ledger
-                      </h4>
-                      {typeof selectedDossier.summary?.grounding === 'number' && (
-                        <span className="text-[10px] font-mono text-emerald-400">
-                          {selectedDossier.summary.grounding}% Facts Verified
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="space-y-3 pl-3 border-l-2 border-[#e0d0ab]/30">
-                      {selectedDossier.summary?.bullets?.map((bullet, idx) => {
-                        const claim = (selectedDossier.summary?.claims || []).find((c) => c.text?.trim() === bullet?.trim()) || (selectedDossier.summary?.claims || [])[idx];
-                        return (
-                          <p key={idx} className="text-sm text-primary font-sans leading-relaxed">
-                            {bullet}
-                            {claim && <SourceAnchor claim={claim} />}
-                          </p>
-                        );
-                      })}
-                    </div>
-
-                    {/* Contested Claim Disagreement (if present) */}
-                    <ContestedCard contested={selectedDossier.summary?.contested} />
-
-                    <div className="p-3 bg-surface-elevated/40 border border-border rounded-sm text-[11px] font-mono text-secondary space-y-1">
-                      <div>Primary Source: <span className="text-primary">{selectedDossier.source}</span></div>
-                      <div>Verification Protocol: <span className="text-[#e0d0ab]">{selectedDossier.summary?.verification_method || 'live_cite_or_drop_v1'}</span></div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Modal Footer with Actions */}
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-6 mt-8 border-t border-border font-sans">
-                <button
-                  onClick={() => toggleBookmark(selectedDossier.id || '')}
-                  className={`inline-flex items-center gap-2 text-xs font-sans font-bold uppercase tracking-wider px-3.5 py-2 rounded-sm border transition-all cursor-pointer ${
-                    savedArticleIds.has(selectedDossier.id || '')
-                      ? 'border-emerald-500/60 bg-emerald-500/10 text-emerald-300'
-                      : 'border-border bg-surface-elevated text-primary hover:border-[#e0d0ab]'
-                  }`}
-                >
-                  <Bookmark className={`w-3.5 h-3.5 ${savedArticleIds.has(selectedDossier.id || '') ? 'fill-emerald-400' : ''}`} />
-                  <span>{savedArticleIds.has(selectedDossier.id || '') ? 'Saved' : 'Save Brief'}</span>
-                </button>
-
-                {onLaunchPractice && (
-                  <button
-                    onClick={() => {
-                      const tag = selectedDossier.summary?.tags?.[0] || 'CURRENT_AFFAIRS';
-                      setSelectedDossier(null);
-                      onLaunchPractice(tag);
-                    }}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#e0d0ab]/10 border border-[#e0d0ab]/50 text-[#e0d0ab] hover:bg-[#e0d0ab]/20 text-xs font-sans font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer"
-                  >
-                    <Target className="w-3.5 h-3.5" />
-                    <span>Practice MCQ Drill</span>
-                  </button>
-                )}
-
-                <div className="flex items-center gap-2 flex-wrap">
-                  <button
-                    onClick={() => handleShareArticle(selectedDossier)}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 bg-[rgba(11,61,120,0.3)] border border-[rgba(19,108,153,0.4)] hover:border-[#e0d0ab] text-[#e0d0ab] text-xs font-sans font-bold uppercase tracking-wider rounded-sm transition-all cursor-pointer shadow-xs"
-                    title="Copy Shareable Link"
-                  >
-                    <Share2 className="w-3.5 h-3.5" />
-                    <span>Copy Link</span>
-                  </button>
-
-                  <a
-                    href={`https://t.me/share/url?url=${encodeURIComponent(getCanonicalArticleUrl(selectedDossier))}&text=${encodeURIComponent(selectedDossier.headline + ' — UPSC Policy Analysis on Tark')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 px-2.5 py-2 bg-[#229ED9]/15 border border-[#229ED9]/40 hover:border-[#229ED9] text-[#60cdff] text-xs font-mono rounded-sm transition-all cursor-pointer shadow-xs"
-                    title="Share to Telegram group"
-                  >
-                    <span>Telegram</span>
-                  </a>
-
-                  <a
-                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(selectedDossier.headline + '\n\n' + getCanonicalArticleUrl(selectedDossier))}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 px-2.5 py-2 bg-[#25D366]/15 border border-[#25D366]/40 hover:border-[#25D366] text-[#4ade80] text-xs font-mono rounded-sm transition-all cursor-pointer shadow-xs"
-                    title="Share to WhatsApp peer group"
-                  >
-                    <span>WhatsApp</span>
-                  </a>
-                </div>
-
-                {selectedDossier.url && (
-                  <a
-                    href={selectedDossier.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#e0d0ab] text-surface font-sans text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-primary transition-all cursor-pointer"
-                  >
-                    <span>Primary Source</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
+          <PolicyBrief
+            key={selectedDossier.id || selectedDossier.url}
+            item={selectedDossier}
+            syllabusTags={(selectedDossier.summary?.tags || []).map(parseSyllabusTag)}
+            saved={savedArticleIds.has(selectedDossier.id || '')}
+            saving={savingArticleIds.has(selectedDossier.id || '')}
+            onClose={() => setSelectedDossier(null)}
+            onSave={() => toggleBookmark(selectedDossier.id || '')}
+            onShare={() => handleShareArticle(selectedDossier, undefined, true)}
+            onPractice={onLaunchPractice ? () => {
+              const tag = selectedDossier.summary?.tags?.[0] || 'CURRENT_AFFAIRS';
+              setSelectedDossier(null);
+              onLaunchPractice(tag);
+            } : undefined}
+            onInspectGrounding={() => setGroundingExplainerData({
+              isOpen: true,
+              grounding: selectedDossier.summary?.grounding,
+              headline: selectedDossier.headline,
+              source: selectedDossier.source,
+              claims: selectedDossier.summary?.claims || [],
+            })}
+          />
         )}
       </AnimatePresence>
-
       {/* ── PIB Digest Newspaper Modal ── */}
       <AnimatePresence>
         {showPibModal && (
@@ -2625,9 +2079,10 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[700] px-6 py-3 bg-surface-elevated border border-border/80 rounded-sm shadow-2xl"
+            role="status"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[700] w-max max-w-[calc(100vw-2rem)] px-6 py-3 bg-surface-elevated border border-border/80 rounded-sm shadow-2xl"
           >
-            <p className="text-xs text-primary font-sans whitespace-nowrap">{toastMsg}</p>
+            <p className="text-xs text-primary font-sans leading-relaxed">{toastMsg}</p>
           </motion.div>
         )}
       </AnimatePresence>
