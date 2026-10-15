@@ -17,6 +17,7 @@ interface LandingProps {
   onNavigateLeaderboard?: () => void;
   onNavigateManifesto?: () => void;
   onNavigateLegal?: (type: 'privacy' | 'terms' | 'refund') => void;
+  onLaunchConveyor?: () => void;
   candidatePreferences?: CandidatePreferences;
 }
 
@@ -36,6 +37,7 @@ export default function Landing({
   onNavigateLeaderboard,
   onNavigateManifesto,
   onNavigateLegal,
+  onLaunchConveyor,
   candidatePreferences,
 }: LandingProps) {
   const [seatData, setSeatData] = useState<SeatCountData | null>(null);
@@ -157,10 +159,10 @@ export default function Landing({
               >
                 <button
                   type="button"
-                  onClick={scrollToDiagnostic}
+                  onClick={onLaunchConveyor || scrollToDiagnostic}
                   className="cta-primary inline-flex items-center gap-3.5 py-1.5 pl-6 pr-1.5 bg-[#e0d0ab] text-[#050b1a] font-sans font-semibold text-[15px] rounded-full shadow-[0_12px_36px_-16px_rgba(224,208,171,0.5)] cursor-pointer"
                 >
-                  <span>Start diagnostic</span>
+                  <span>Enter 8-Min Conveyor Belt</span>
                   <span className="w-10 h-10 rounded-full bg-[rgba(5,11,26,0.12)] inline-flex items-center justify-center">
                     <svg className="cta-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                       <path d="M5 12h14" />
@@ -171,10 +173,10 @@ export default function Landing({
 
                 <button
                   type="button"
-                  onClick={onNavigateTracker}
+                  onClick={scrollToDiagnostic}
                   className="text-link font-sans text-[15px] font-medium text-[#b5c1d1] hover:text-[#f0dfb8] cursor-pointer"
                 >
-                  Explore the daily brief
+                  The −1.32 Mark Diagnostic
                 </button>
               </motion.div>
 
@@ -208,14 +210,17 @@ export default function Landing({
         <InteractiveLoopSection onNavigateArena={onNavigateArena} />
 
         {/* ═══════════════════════════════════════════════════════════════════
-             SECTION 3: SIX ROOMS (Mirrors the Rail with Alt Hotkeys)
+             SECTION 3: CONTRARIAN ARCHITECTURE (Fused Loop + Instant Rail)
              ═══════════════════════════════════════════════════════════════════ */}
         <section aria-labelledby="h-rooms" className="px-10 lg:px-16 py-24 border-t border-[rgba(224,208,171,0.06)]">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 font-mono text-xs font-semibold uppercase tracking-wider mb-3">
+            The Contrarian Arena Architecture
+          </div>
           <h2 id="h-rooms" className="m-0 font-sans font-extrabold text-[44px] lg:text-[52px] leading-[1.04] tracking-[-0.03em] text-[#f4ecd8]">
-            Six rooms, one keystroke each.
+            Stop room-hopping. Fused into one 8-minute loop.
           </h2>
-          <p className="mt-3.5 m-0 max-w-[620px] font-serif text-[18px] leading-[1.55] text-[#b5c1d1]">
-            Each room sits in the rail on your left, in the same order. Press Alt with its number to jump straight there.
+          <p className="mt-3.5 m-0 max-w-[680px] font-serif text-[18px] leading-[1.55] text-[#b5c1d1]">
+            EdTech workspaces fatigue aspirants with separate tabs for news, tests, and archives. In Tark, reading a PIB dispatch immediately springs an examiner trap, auto-opening the 2000–2025 PYQ twin and constitutional quote on a single screen. Or jump directly to any vault with Alt + number.
           </p>
 
           <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-5">

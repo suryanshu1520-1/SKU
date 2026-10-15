@@ -15,6 +15,10 @@ import {
   getLiveQuestionBankTrends,
   getSupabase,
   isCleanPrelimsRow,
+  getNodePsycheProfile,
+  getUserPsycheAutopsy,
+  getTargetOperatorForDailyBrief,
+  recordPsycheTelemetry,
 } from "./examiner_psyche.js";
 import { queryMasterPYQs, getCorpusCensus } from "./pyq_explorer.js";
 export const analyticsRouter = Router();
@@ -208,6 +212,77 @@ analyticsRouter.get("/examiner-psyche/node/:nodeId", async (req: Request, res: R
         mainsQuestions: mainsRes.data || [],
       }
     });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// 8. Examiner's Psyche Node Profile (TASK_080)
+analyticsRouter.get("/examiner-psyche/node-profile/:nodeId", async (req: Request, res: Response) => {
+  try {
+    const data = await getNodePsycheProfile(req.params.nodeId);
+    res.json({ success: true, data });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// 9. Examiner's Psyche User Autopsy & 50:50 Ledger (TASK_080)
+analyticsRouter.get("/examiner-psyche/user-autopsy/:userId", async (req: Request, res: Response) => {
+  try {
+    const data = await getUserPsycheAutopsy(req.params.userId);
+    res.json({ success: true, data });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// 10. Target Operator for Daily Brief (TASK_080)
+analyticsRouter.get("/examiner-psyche/target-operator/:nodeId", async (req: Request, res: Response) => {
+  try {
+    const operator = await getTargetOperatorForDailyBrief(req.params.nodeId);
+    res.json({ success: true, data: { nodeId: req.params.nodeId, targetOperator: operator } });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// 11. User Psyche Telemetry Ingestion (TASK_080)
+analyticsRouter.post("/examiner-psyche/telemetry", async (req: Request, res: Response) => {
+  try {
+    const {
+      userId,
+      questionId,
+      nodeId,
+      operatorTested,
+      selectedOption,
+      officialKey,
+      isCorrect,
+      marksDelta,
+      is5050Call,
+      eliminatedOptions,
+      responseMs,
+    } = req.body;
+
+    if (!userId || !questionId || !nodeId || !operatorTested || !selectedOption || !officialKey) {
+      return res.status(400).json({ success: false, error: "Missing required telemetry fields" });
+    }
+
+    await recordPsycheTelemetry({
+      userId,
+      questionId,
+      nodeId,
+      operatorTested,
+      selectedOption,
+      officialKey,
+      isCorrect: Boolean(isCorrect),
+      marksDelta: Number(marksDelta),
+      is5050Call: Boolean(is5050Call),
+      eliminatedOptions: Array.isArray(eliminatedOptions) ? eliminatedOptions : [],
+      responseMs: typeof responseMs === 'number' ? responseMs : undefined,
+    });
+
+    res.json({ success: true });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
   }

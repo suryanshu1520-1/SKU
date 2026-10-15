@@ -9,6 +9,10 @@ export interface Question {
   conceptual_explanation: string;
   ai_insights?: any;
   is_generated?: boolean;
+  primary_operator?: ExaminerOperatorType;
+  statement_dissection?: StatementDissectionItem[];
+  statutory_anchor?: string;
+  historical_twin_pyq_id?: string;
 }
 
 export interface ArenaSession {
@@ -136,4 +140,114 @@ export interface ArenaLaunchConfig {
   contextTag?: string;
   originTab?: 'arena' | 'tracker' | 'syllabus' | 'observatory' | 'library';
 }
+
+// ---------------------------------------------------------------------------
+// Examiner's Psyche 7-Operator Engine Types (TASK_080)
+// ---------------------------------------------------------------------------
+
+export type ExaminerOperatorType =
+  | 'PSY_01_INST_SWAP'
+  | 'PSY_02_QUAL_POLARITY'
+  | 'PSY_03_LEGAL_TIER'
+  | 'PSY_04_CAUSAL_INV'
+  | 'PSY_05_SCOPE_MUTATE'
+  | 'PSY_06_PAIR_DECOY'
+  | 'PSY_07_TRUE_NON_CAUSAL';
+
+export interface StatementDissectionItem {
+  stmt_num: number;
+  is_true: boolean;
+  operator: ExaminerOperatorType | null;
+  marked_trap?: string;
+  truth_key?: string;
+  anchor?: string;
+}
+
+export interface ExaminerOperatorMeta {
+  code: string;
+  label: string;
+  shortLabel: string;
+  description: string;
+}
+
+export const EXAMINER_OPERATORS: Record<ExaminerOperatorType, ExaminerOperatorMeta> = {
+  PSY_01_INST_SWAP: {
+    code: 'PSY_01',
+    label: 'Nodal / Authority Swap',
+    shortLabel: 'Ministry / Nodal Swap',
+    description: 'Swaps implementing Ministry, regulator, or appointing authority.',
+  },
+  PSY_02_QUAL_POLARITY: {
+    code: 'PSY_02',
+    label: 'Extreme Qualifier Trap',
+    shortLabel: 'Extreme Qualifier',
+    description: 'Injects absolute determiners (only, all, never, drastically) into conditional rules.',
+  },
+  PSY_03_LEGAL_TIER: {
+    code: 'PSY_03',
+    label: 'Legal Tier Shift',
+    shortLabel: 'Legal Tier Shift',
+    description: 'Misattributes legal origin across Constitutional, Statutory, Executive, or Judicial tiers.',
+  },
+  PSY_04_CAUSAL_INV: {
+    code: 'PSY_04',
+    label: 'Causal / Schedule Inversion',
+    shortLabel: 'Schedule / Causal Inversion',
+    description: 'Inverts schedule references, mechanisms, or proportional relationships.',
+  },
+  PSY_05_SCOPE_MUTATE: {
+    code: 'PSY_05',
+    label: 'Scope / Trend Mutation',
+    shortLabel: 'Scope / Trend Mutation',
+    description: 'Mutates numerical thresholds, tenures, eligibility bounds, or monotonic trends.',
+  },
+  PSY_06_PAIR_DECOY: {
+    code: 'PSY_06',
+    label: 'Pair-Matrix Neutralizer',
+    shortLabel: 'Pair Matrix Decoy',
+    description: 'Pair-matching structure (only one pair / two pairs) that neutralizes 50:50 elimination.',
+  },
+  PSY_07_TRUE_NON_CAUSAL: {
+    code: 'PSY_07',
+    label: 'True-Fact Non-Causal Decoy',
+    shortLabel: 'Non-Causal Decoy',
+    description: 'Both statements are factually true, but Statement-II is not the causal explanation.',
+  },
+};
+
+export interface NodePsycheProfile {
+  nodeId: string;
+  totalQuestions: number;
+  dominantOperator: ExaminerOperatorType | null;
+  operatorDistribution: Record<string, number>;
+  extremeQualifierFalseRate: number;
+  historicalTwins: Array<{
+    id: string;
+    year: number;
+    stem: string;
+    primary_operator: ExaminerOperatorType | null;
+    statutory_anchor?: string;
+  }>;
+}
+
+export interface UserPsycheAutopsy {
+  userId: string;
+  totalAttempts: number;
+  worstBleedOperator: {
+    operator: ExaminerOperatorType;
+    totalBleedMarks: number;
+    missCount: number;
+  } | null;
+  fiftyFiftyLedgerByOperator: Record<
+    ExaminerOperatorType,
+    {
+      calls: number;
+      correct: number;
+      wrong: number;
+      netMarks: number;
+      expectedValuePerQuestion: number;
+    }
+  >;
+}
+
 

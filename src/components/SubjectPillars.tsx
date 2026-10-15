@@ -617,6 +617,40 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
             </div>
           </div>
 
+          {/* Node Psyche Telemetry Header (TASK_080) */}
+          {(() => {
+            const PILLAR_PSYCHE_MAP: Record<string, { dominant: string; secondary: string; extremeFalseRate: string }> = {
+              GS1: { dominant: 'PSY_04 // CAUSAL / SCHEDULE INVERSION (38%)', secondary: 'PSY_05 // SCOPE MUTATION (29%)', extremeFalseRate: '79%' },
+              GS2: { dominant: 'PSY_03 // LEGAL TIER SHIFT (44%)', secondary: 'PSY_01 // NODAL SWAP (31%)', extremeFalseRate: '86%' },
+              GS3: { dominant: 'PSY_01 // NODAL / AUTHORITY SWAP (42%)', secondary: 'PSY_04 // CAUSAL INVERSION (29%)', extremeFalseRate: '81%' },
+              GS4: { dominant: 'PSY_07 // TRUE-FACT NON-CAUSAL DECOY (48%)', secondary: 'PSY_03 // LEGAL TIER (26%)', extremeFalseRate: '72%' },
+              CSAT: { dominant: 'PSY_02 // EXTREME QUALIFIER TRAP (52%)', secondary: 'PSY_05 // SCOPE MUTATION (34%)', extremeFalseRate: '91%' },
+              STATIC_GK: { dominant: 'PSY_05 // SCOPE / NUMERICAL MUTATION (46%)', secondary: 'PSY_01 // NODAL SWAP (32%)', extremeFalseRate: '84%' },
+            };
+            const psyche = PILLAR_PSYCHE_MAP[selectedPillar.paper] || PILLAR_PSYCHE_MAP.GS2;
+            return (
+              <div className="bg-[rgba(4,18,38,0.92)] border-b border-[rgba(224,208,171,0.14)] px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded bg-[rgba(244,63,94,0.15)] border border-[rgba(244,63,94,0.4)] text-[#fca5a5] font-bold text-[10px] uppercase">
+                    DOMINANT EXAMINER TRAP
+                  </span>
+                  <span className="text-[#f4ecd8] font-semibold">
+                    {psyche.dominant}
+                  </span>
+                </div>
+                <div className="flex items-center gap-4 text-[#9fb0c8] text-[11px]">
+                  <span>
+                    <strong className="text-[#e0d0ab]">2ND VECTOR:</strong> {psyche.secondary}
+                  </span>
+                  <span className="text-[rgba(224,208,171,0.2)]">|</span>
+                  <span>
+                    <strong className="text-[#f87171]">'ONLY/ALL' FALSE RATE:</strong> {psyche.extremeFalseRate}
+                  </span>
+                </div>
+              </div>
+            );
+          })()}
+
           {/* Dossier Navigation Pills */}
           <div className="bg-surface-elevated/70 border-b border-border px-6 py-2.5 flex items-center gap-2 overflow-x-auto">
             <button

@@ -51,6 +51,8 @@ interface SubmitPayload {
   subjectStats: SubjectStats;
   totalTimeSeconds: number;
   isRanked?: boolean;
+  fiftyFiftyCalls?: Record<string, boolean>;
+  eliminatedOptions?: Record<string, string[]>;
 }
 
 export default async function handler(req: any, res: any) {
@@ -148,7 +150,7 @@ export default async function handler(req: any, res: any) {
     if (staticQuestionIds.length > 0) {
       const { data: sData, error: dbError } = await supabase
         .from('static_questions')
-        .select('id, correct_option, subject_category')
+        .select('id, correct_option, subject_category, primary_operator')
         .in('id', staticQuestionIds);
 
       if (dbError) {
@@ -172,12 +174,13 @@ export default async function handler(req: any, res: any) {
       caQuestions = cData || [];
     }
 
-    const questionMap = new Map<string, { correct_option: string; subject_category: string }>();
+    const questionMap = new Map<string, { correct_option: string; subject_category: string; primary_operator?: string }>();
 
     for (const q of dbQuestions) {
       questionMap.set(String(q.id), {
         correct_option: q.correct_option?.trim() || '',
-        subject_category: q.subject_category || 'CORE'
+        subject_category: q.subject_category || 'CORE',
+        primary_operator: q.primary_operator || undefined,
       });
     }
 
@@ -361,6 +364,49 @@ export default async function handler(req: any, res: any) {
       if (rpcError) {
         console.error("Failed to increment vanguard limit, but saving quiz anyway:", rpcError);
       }
+    }
+
+    // 4.6 Record Examiner Psyche Telemetry & 50:50 calls into user_psyche_telemetry
+    try {
+      const psycheRows: any[] = [];
+      for (const q of payload.questions) {
+        const qId = String(q.id);
+        const dbQ = questionMap.get(qId);
+        const selected = payload.answers[q.id] || payload.answers[String(q.id)] || null;
+        if (!selected || !dbQ?.primary_operator) continue;
+
+        const correctOpt = dbQ.correct_option?.trim() || '';
+        const isCorrect = selected.toUpperCase() === correctOpt.toUpperCase();
+        const marksDelta = isCorrect ? 2.0 : -0.66;
+        const eliminated = payload.eliminatedOptions?.[qId] || payload.eliminatedOptions?.[String(q.id)] || [];
+        const is5050 = !!payload.fiftyFiftyCalls?.[qId] || eliminated.length === 2;
+        const timeSpent = Math.min(60, Math.max(0, payload.timeSpentMap[q.id] || payload.timeSpentMap[String(q.id)] || 0));
+
+        psycheRows.push({
+          user_id: payload.userId,
+          question_id: qId,
+          node_id: 'NODE-GS2-001',
+          operator_tested: dbQ.primary_operator,
+          selected_option: selected.toLowerCase(),
+          official_key: correctOpt.toLowerCase() || 'a',
+          is_correct: isCorrect,
+          marks_delta: marksDelta,
+          is_50_50_call: is5050,
+          eliminated_options: eliminated,
+          response_ms: timeSpent * 1000,
+        });
+      }
+
+      if (psycheRows.length > 0) {
+        const { error: psycheError } = await supabase
+          .from('user_psyche_telemetry')
+          .insert(psycheRows);
+        if (psycheError) {
+          console.warn('Non-fatal: Failed to record user psyche telemetry:', psycheError);
+        }
+      }
+    } catch (psycheCatch) {
+      console.warn('Non-fatal exception recording psyche telemetry:', psycheCatch);
     }
 
     // 5. Return success

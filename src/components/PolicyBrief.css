@@ -184,3 +184,12 @@
 @media (prefers-reduced-motion: reduce) {
   .policy-brief *, .policy-brief *::before, .policy-brief *::after { transition: none !important; }
 }
+
+.vulnerability-warning-ministry {
+  background: rgba(245, 158, 11, 0.14);
+  border-bottom: 2px dashed #f59e0b;
+  padding: 1px 4px;
+  border-radius: 2px;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+}
+

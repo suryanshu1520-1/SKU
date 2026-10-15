@@ -228,58 +228,95 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
         </motion.div>
 
         {/* Manifesto Content */}
-        <div className="space-y-10">
+        <div className="space-y-8">
           
+          {/* Act 1: The Bleed */}
           <motion.section
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-surface-elevated/20 border border-border/60 p-6 md:p-8 rounded-sm"
+            className="bg-surface-elevated/30 border border-rose-500/30 p-6 md:p-8 rounded-sm relative overflow-hidden"
           >
-            <p className="text-sm md:text-base text-primary leading-relaxed font-sans">
-              Your time is your most finite resource. Traditional EdTech is engineered to maximize your screen time through addictive gamification, intrusive ads, and endless video lecture playlists. We reject this entirely. Tark is built exclusively to maximize your <span className="text-[#e0d0ab] font-semibold">return on time</span>.
+            <div className="flex items-center gap-2 text-rose-400 font-mono text-[11px] font-bold uppercase tracking-wider mb-2">
+              <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+              ACT I: THE BLEED // THE 1.32-MARK AUTOPSY
+            </div>
+            <h2 className="font-serif text-xl md:text-2xl font-bold text-[#f4ecd8] mb-3 leading-snug">
+              "I lost Prelims by 1.32 marks because I read the PIB release on Green Hydrogen—and still fell for the nodal ministry swap."
+            </h2>
+            <p className="text-sm md:text-base text-secondary leading-relaxed font-sans mb-3">
+              Like every serious repeater, I spent two hours every morning highlighting 120-page monthly compilation PDFs. I knew the SIGHT programme inside out. I knew the financial outlays.
+            </p>
+            <p className="text-sm md:text-base text-secondary leading-relaxed font-sans">
+              Yet in the exam hall, two 50:50 guesses flipped negative (<span className="text-rose-400 font-bold font-mono">−1.32 marks</span>). The examiner quietly swapped the Ministry of New and Renewable Energy (MNRE) with the Ministry of Petroleum and Natural Gas (MoPNG) and slipped in an absolute statutory mandate. Two clicks on an OMR sheet, and another year was gone.
             </p>
           </motion.section>
 
+          {/* Act 2: The Realization */}
           <motion.section
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
+            className="p-6 md:p-8 bg-surface-elevated/20 border border-border/70 rounded-sm"
           >
-            <h2 className="font-serif text-lg md:text-xl font-bold text-[#e0d0ab] mb-3 tracking-wide flex items-center gap-2">
-              <Shield className="w-4 h-4 text-emerald-400" />
-              1. The Intelligence Advantage
+            <div className="flex items-center gap-2 text-[#e0d0ab] font-mono text-[11px] font-bold uppercase tracking-wider mb-2">
+              <Sparkles className="w-3.5 h-3.5 text-[#e0d0ab]" />
+              ACT II: THE REALIZATION // TWO DIFFERENT COGNITIVE SKILLS
+            </div>
+            <h2 className="font-serif text-xl font-bold text-[#e0d0ab] mb-3">
+              Reading current affairs and surviving an examiner trap have nothing in common.
             </h2>
+            <p className="text-sm text-secondary leading-relaxed font-sans mb-3">
+              EdTech companies profit by selling you passive reading materials. They give you 100-page booklets that give the illusion of progress. But when we digitized and autopsied 25 years of UPSC Prelims papers (2000–2025), the data was brutal:
+            </p>
+            <ul className="text-sm text-primary space-y-2 font-mono list-disc list-inside bg-black/20 p-4 rounded border border-white/5 mb-3">
+              <li><strong className="text-[#e0d0ab]">70% of magazine bloat</strong> never maps to the 130 testable syllabus nodes.</li>
+              <li><strong className="text-rose-400">78.4% of extreme absolute qualifiers</strong> ('only', 'all', 'never', 'solely') are intentional examiner traps.</li>
+              <li><strong className="text-amber-300">64% of candidate mark bleed</strong> happens on inter-ministerial jurisdiction swaps and unverified statutory thresholds.</li>
+            </ul>
             <p className="text-sm text-secondary leading-relaxed font-sans">
-              Instead of spending 3 hours deciphering bureaucratic jargon and political press releases, our ingestion engine distills 40+ daily government dispatches into ultra-focused, 4-minute analytical briefs. You bypass the noise and retain the exact factual baseline tested in the examination.
+              You do not lose marks because you didn't read enough. You lose marks because you were never trained under adversarial pressure.
             </p>
           </motion.section>
 
+          {/* Act 3: The Weapon */}
           <motion.section
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
+            className="p-6 md:p-8 bg-surface-elevated/20 border border-emerald-500/30 rounded-sm"
           >
-            <h2 className="font-serif text-lg md:text-xl font-bold text-[#e0d0ab] mb-3 tracking-wide flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#e0d0ab]" />
-              2. An Ad-Free, Noise-Free Sanctuary
+            <div className="flex items-center gap-2 text-emerald-400 font-mono text-[11px] font-bold uppercase tracking-wider mb-2">
+              <Shield className="w-3.5 h-3.5 text-emerald-400" />
+              ACT III: THE WEAPON // THE ADVERSARIAL CONVEYOR BELT
+            </div>
+            <h2 className="font-serif text-xl font-bold text-[#f4ecd8] mb-3">
+              Turning mark-bleed telemetry into structural immunity.
             </h2>
+            <p className="text-sm text-secondary leading-relaxed font-sans mb-3">
+              Tark is built as an adversarial sparring partner. Instead of letting you passively browse six different rooms, our <span className="text-[#e0d0ab] font-semibold">Adversarial Conveyor Belt</span> fuses your daily routine into a single 8-minute crucible:
+            </p>
             <p className="text-sm text-secondary leading-relaxed font-sans">
-              Tark is engineered for deep focus. You will never see an advertisement, a third-party affiliate link, or a cartoon mascot demanding your attention. We provide a pristine analytical environment so 100% of your cognitive capacity is deployed on retention and reasoning.
+              Reading a wire-verified PIB dispatch immediately triggers an authentic timed <span className="text-emerald-400 font-mono font-bold">+2.00 / −0.66</span> trap question. If you fall for it, our engine instantly auto-opens the exact historical PYQ twin from 2000–2025 and a primary constitutional quote from Ambedkar or Kant on the same screen. You never bleed marks to the same structural trick twice.
             </p>
           </motion.section>
 
+          {/* Act 4: The Sanctuary & Scarcity Guarantee */}
           <motion.section
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
+            className="p-6 md:p-8 bg-surface-elevated/20 border border-border/70 rounded-sm"
           >
-            <h2 className="font-serif text-lg md:text-xl font-bold text-[#e0d0ab] mb-3 tracking-wide flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              3. The Provable Scarcity Guarantee
+            <div className="flex items-center gap-2 text-cyan-400 font-mono text-[11px] font-bold uppercase tracking-wider mb-2">
+              <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
+              ACT IV: THE COVENANT // STRICT SCARCITY & ZERO NOISE
+            </div>
+            <h2 className="font-serif text-xl font-bold text-[#e0d0ab] mb-3">
+              No ads. No video playlists. Strictly capped at 500 members.
             </h2>
             <p className="text-sm text-secondary leading-relaxed font-sans">
-              Because we refuse to monetize attention or sell candidate data, Tark is funded purely by its members. To maintain low server latencies, immediate AI diagnostic generations, and direct support, Founders Club memberships are hard-capped at 500 members. No recurring subscriptions. One price, lifetime access.
+              Because we refuse to monetize attention or sell candidate data, Tark is funded purely by its members. To guarantee zero server latencies, immediate AI diagnostic generations, and direct support, Founders Club memberships are hard-capped at 500 members. No recurring subscriptions. One payment, lifetime access.
             </p>
           </motion.section>
 
@@ -287,10 +324,10 @@ export default function Manifesto({ onNavigateArena, onNavigateSignup, onClose, 
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
-            className="bg-surface-elevated/30 border border-border/80 p-6 rounded-sm text-center"
+            className="bg-surface-elevated/40 border border-[#e0d0ab]/30 p-6 rounded-sm text-center"
           >
             <p className="font-serif text-lg sm:text-xl text-[#e0d0ab] font-bold tracking-wide">
-              Enter the arena. Do the work. Exit.
+              Enter the crucible. Defuse the traps. Never bleed to the same trick twice.
             </p>
           </motion.section>
 

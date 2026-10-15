@@ -29,13 +29,19 @@ import {
   AlertCircle,
   Zap,
   Scale,
-  Target
+  Target,
+  ShieldAlert,
+  AlertTriangle,
+  Crosshair,
+  ChevronDown
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import DailyEdition from './DailyEdition';
 import PolicyBrief from './PolicyBrief';
+import { getStoredVulnerabilityIndex } from '../lib/vulnerabilityIndex';
+import { EXAMINER_OPERATORS, type ExaminerOperatorType, type UserPsycheAutopsy } from '../types';
 
 import prsVaultDossiers from '../data/prs-vault-dossiers.json';
 import type { CandidatePreferences } from '../types';
@@ -85,6 +91,15 @@ export interface CurrentAffairsItem {
   ministry: string;
   headline: string;
   url: string;
+  primary_operator?: ExaminerOperatorType;
+  node_id?: string;
+  historical_twin?: {
+    id: string;
+    year: number;
+    stem: string;
+    primary_operator: ExaminerOperatorType;
+    statutory_anchor?: string;
+  };
   summary: {
     bullets: string[];
     significance?: number;
@@ -110,6 +125,69 @@ export interface CurrentAffairsItem {
   created_at?: string;
 }
 
+export function getDispatchOperator(item: CurrentAffairsItem): ExaminerOperatorType {
+  if (item.primary_operator) return item.primary_operator;
+  const text = `${item.ministry} ${item.headline} ${item.summary?.bullets?.join(' ') || ''}`.toLowerCase();
+  if (/ministry|department|board|commission|rbi|sebi|npci|niti aayog|cag|authority/i.test(text)) {
+    return 'PSY_01_INST_SWAP';
+  }
+  if (/only|all|every|never|strictly|exclusively|prohibition|mandatory|immediate/i.test(text)) {
+    return 'PSY_02_QUAL_POLARITY';
+  }
+  if (/constitution|act|statutory|parliament|bill|ordinance|treaty|court|schedule/i.test(text)) {
+    return 'PSY_03_LEGAL_TIER';
+  }
+  if (/crore|percent|increased|decreased|growth|tenure|target|threshold|\d{2,}/i.test(text)) {
+    return 'PSY_05_SCOPE_MUTATE';
+  }
+  return 'PSY_04_CAUSAL_INV';
+}
+
+export const HISTORICAL_TWIN_VAULT: Record<ExaminerOperatorType, { year: number; stem: string; anchor: string; takeaway: string }> = {
+  PSY_01_INST_SWAP: {
+    year: 2021,
+    stem: 'Consider the following statements regarding the "National Clean Air Programme (NCAP)": 1. It is implemented by the Ministry of Environment, Forest and Climate Change. 2. Central Pollution Control Board acts as the sole regulatory executive body.',
+    anchor: 'Cabinet Allocation of Business Rules & NCAP Framework',
+    takeaway: 'UPSC swapped Central Pollution Control Board role with State Pollution Control Boards for state-level monitoring.',
+  },
+  PSY_02_QUAL_POLARITY: {
+    year: 2023,
+    stem: 'Consider the following statements: 1. All corporate donations to political parties require compulsory disclosure under the Companies Act without any upper limit.',
+    anchor: 'Companies Act 2013, Section 182 read with Electoral Bonds Judgment',
+    takeaway: '"All corporate donations" ignored statutory exceptions and board approval criteria.',
+  },
+  PSY_03_LEGAL_TIER: {
+    year: 2022,
+    stem: 'With reference to the National Green Tribunal (NGT), consider the following statements: 1. NGT was established under a constitutional amendment to uphold Article 21.',
+    anchor: 'National Green Tribunal Act, 2010 (Statutory, not Constitutional body)',
+    takeaway: 'Classic tier shift: presenting a statutory body created by an Act of Parliament as a constitutional organ.',
+  },
+  PSY_04_CAUSAL_INV: {
+    year: 2022,
+    stem: 'If inflation is too high, Reserve Bank of India (RBI) is likely to buy government securities in the open market.',
+    anchor: 'RBI Monetary Policy Framework read with Liquidity Adjustment Facility',
+    takeaway: 'Inverted the directional mechanism: RBI sells securities to absorb liquidity during high inflation.',
+  },
+  PSY_05_SCOPE_MUTATE: {
+    year: 2020,
+    stem: 'In India, the term "Public Finance Management System (PFMS)" is used for tracking multi-year monotonicity of welfare expenditure.',
+    anchor: 'Ministry of Finance Expenditure Department Guidelines',
+    takeaway: 'Mutated the operational scope of direct benefit transfers into macro-fiscal forecasting.',
+  },
+  PSY_06_PAIR_DECOY: {
+    year: 2023,
+    stem: 'Consider the following pairs of historic locations and their states: Renuka - Himachal Pradesh, Bhoj - Madhya Pradesh. How many pairs are correctly matched?',
+    anchor: 'Ramsar Sites Directory & MoEFCC Gazette',
+    takeaway: 'Employs "Only one / Only two" structure to completely neutralize 50:50 elimination.',
+  },
+  PSY_07_TRUE_NON_CAUSAL: {
+    year: 2024,
+    stem: 'Statement-I: The Reserve Bank of India manages government debt. Statement-II: Inflation targeting is anchored to the Consumer Price Index (CPI).',
+    anchor: 'RBI Act 1934, Section 45ZB & Government Securities Act',
+    takeaway: 'Both statements are 100% factual, but Statement-II does not causally explain Statement-I.',
+  },
+};
+
 interface PibDigestItem {
   id: string;
   title: string;
@@ -119,10 +197,12 @@ interface PibDigestItem {
   created_at: string;
 }
 
+
 interface CurrentAffairsProps {
   userId: string;
   candidatePreferences?: CandidatePreferences;
   onLaunchPractice?: (pillarOrSubject: string) => void;
+  onLaunchConveyor?: () => void;
 }
 
 // Slide-and-fade variants for the PIB edition carousel, keyed by swipe/nav direction.
@@ -230,8 +310,9 @@ export function parseSyllabusTag(rawTag: string): ParsedSyllabusTag {
   return { paper: 'UPSC', topic: formatted, full: clean };
 }
 
-export default function CurrentAffairs({ userId, candidatePreferences, onLaunchPractice }: CurrentAffairsProps) {
+export default function CurrentAffairs({ userId, candidatePreferences, onLaunchPractice, onLaunchConveyor }: CurrentAffairsProps) {
   const [items, setItems] = useState<CurrentAffairsItem[]>([]);
+  const vulnerabilityIndex = useMemo(() => getStoredVulnerabilityIndex(), []);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [syncSuccess, setSyncSuccess] = useState<boolean | null>(null);
@@ -253,6 +334,22 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
   const [trustFilter, setTrustFilter] = useState<'ALL' | 'HIGH_GROUNDING' | 'CONTESTED'>('ALL');
   const [ministrySearch, setMinistrySearch] = useState<string>('');
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [expandedTwinId, setExpandedTwinId] = useState<string | null>(null);
+  const [worstBleedOperator, setWorstBleedOperator] = useState<ExaminerOperatorType | null>('PSY_01_INST_SWAP');
+
+  // Load candidate psyche autopsy for personal trap radar
+  useEffect(() => {
+    if (userId && userId !== '00000000-0000-0000-0000-000000000000') {
+      fetchWithAuth(`/api/analytics/examiner-psyche/user-autopsy/${userId}`)
+        .then((res) => res.json())
+        .then((json) => {
+          if (json.success && json.data?.worstBleedOperator) {
+            setWorstBleedOperator(json.data.worstBleedOperator.operator);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [userId]);
 
   // View Mode: 'signals' (Signal Deck) vs 'edition' (Daily Edition)
   type BriefViewMode = 'signals' | 'edition';
@@ -963,6 +1060,50 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
           </div>
         </div>
 
+        {/* ── Adversarial Crucible & Live Trap Vulnerability Index Banner ── */}
+        <div className="mt-5 p-4 rounded-md bg-[#091530] border border-[rgba(224,208,171,0.22)] shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#e0d0ab]">
+                Personal Trap Vulnerability Index (PTVI)
+              </span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-300">
+                {vulnerabilityIndex.isColdStart ? 'Empirical UPSC Benchmark' : 'Candidate Autopsy Active'}
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs font-mono text-slate-300">
+              <span>
+                50:50 EV:{' '}
+                <strong className={vulnerabilityIndex.fiftyFiftyEV >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+                  {vulnerabilityIndex.fiftyFiftyEV >= 0 ? `+${vulnerabilityIndex.fiftyFiftyEV}` : vulnerabilityIndex.fiftyFiftyEV} marks/call
+                </strong>
+              </span>
+              <span>
+                Qualifier Vulnerability:{' '}
+                <strong className="text-amber-300">{vulnerabilityIndex.qualifierVulnerabilityRate}%</strong>
+              </span>
+              <span>
+                Ministry Blind Spot:{' '}
+                <strong className={vulnerabilityIndex.ministrySwapBlindSpot ? 'text-amber-400' : 'text-emerald-400'}>
+                  {vulnerabilityIndex.ministrySwapBlindSpot ? 'ACTIVE (Nodal Bodies Highlighted)' : 'RESOLVED'}
+                </strong>
+              </span>
+            </div>
+          </div>
+
+          {onLaunchConveyor && (
+            <button
+              type="button"
+              onClick={onLaunchConveyor}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#e0d0ab] hover:bg-[#ebd9b4] text-[#050b1a] rounded-full text-xs font-sans font-bold uppercase tracking-wider transition-all shadow-md shrink-0 cursor-pointer"
+            >
+              <ShieldAlert className="w-4 h-4" />
+              <span>Enter Adversarial Conveyor Belt (8 Min)</span>
+            </button>
+          )}
+        </div>
+
         {/* ── Verified Wire Streams Showcase (PIB, The Hindu, RBI, PRS) ── */}
         <div className="mt-4 pt-3.5 border-t border-border/80 flex flex-wrap items-center justify-between gap-3 text-xs font-sans">
           <div className="flex items-center gap-2.5 flex-wrap">
@@ -1525,6 +1666,29 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                     }
                     return null;
                   })()}
+
+                  {/* Examiner Psyche Trap Vector Badge */}
+                  {(() => {
+                    const op = getDispatchOperator(leadItem);
+                    const opMeta = EXAMINER_OPERATORS[op];
+                    const isBlindSpot = worstBleedOperator === op;
+                    return (
+                      <span
+                        className={`px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider rounded-xs border flex items-center gap-1.5 shadow-xs ${
+                          isBlindSpot
+                            ? 'bg-amber-950/70 text-amber-300 border-amber-500/60 animate-pulse'
+                            : 'bg-[rgba(1,148,168,0.15)] text-[#5fe3f5] border-[rgba(1,148,168,0.4)]'
+                        }`}
+                        title={opMeta?.description}
+                      >
+                        <Crosshair className={`w-3 h-3 ${isBlindSpot ? 'text-amber-400' : 'text-[#0194a8]'}`} />
+                        <span>
+                          TRAP VECTOR: {opMeta?.code || op} // {opMeta?.shortLabel || 'DISTORTION'}
+                          {isBlindSpot && ' [YOUR −0.66 BLIND SPOT]'}
+                        </span>
+                      </span>
+                    );
+                  })()}
                 </div>
 
                 {leadItem.created_at && (
@@ -1568,6 +1732,54 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
 
               {/* Contested claim comparison */}
               <ContestedCard contested={leadItem.summary?.contested} />
+
+              {/* Historical UPSC Twin (Alt + 6) Collapsible Drawer */}
+              {(() => {
+                const op = getDispatchOperator(leadItem);
+                const twin = leadItem.historical_twin || HISTORICAL_TWIN_VAULT[op];
+                if (!twin) return null;
+                const isOpen = expandedTwinId === (leadItem.id || 'lead');
+                return (
+                  <div className="mt-4 pt-3 border-t border-[rgba(19,108,153,0.3)]">
+                    <button
+                      onClick={() => setExpandedTwinId(isOpen ? null : (leadItem.id || 'lead'))}
+                      className="w-full flex items-center justify-between text-xs font-mono text-[#e0d0ab] hover:text-white py-1 transition-colors cursor-pointer"
+                    >
+                      <span className="flex items-center gap-2">
+                        <ShieldAlert className="w-3.5 h-3.5 text-[#0194a8]" />
+                        <span className="font-semibold uppercase tracking-wider">Historical UPSC Twin (Alt + 6)</span>
+                        <span className="text-[10px] px-1.5 py-0.2 bg-[rgba(11,61,120,0.5)] rounded text-[#8fa2bd]">Prelims {twin.year}</span>
+                      </span>
+                      <span className="flex items-center gap-1 text-[10px] text-[#8fa2bd]">
+                        <span>{isOpen ? 'Fold Twin' : 'Inspect Twin Trap'}</span>
+                        <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                      </span>
+                    </button>
+                    <AnimatePresence>
+                      {isOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="overflow-hidden mt-2 p-3.5 bg-[rgba(2,15,35,0.75)] border border-[rgba(19,108,153,0.4)] rounded-xs space-y-2 text-xs"
+                        >
+                          <div className="font-serif text-[#d6e2f0] leading-relaxed italic">
+                            "{twin.stem}"
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2 pt-1 font-mono text-[10px] text-[#8fa2bd]">
+                            <span className="text-[#e0d0ab] font-bold">STATUTORY ANCHOR:</span>
+                            <span className="text-[#9fb0c8]">{(twin as any).statutory_anchor || (twin as any).anchor}</span>
+                          </div>
+                          <div className="text-[11px] font-mono text-amber-300/90 bg-amber-950/30 p-2 rounded border border-amber-900/40">
+                            <span className="font-bold uppercase tracking-wider text-amber-400">Examiner Trap Takeaway: </span>
+                            {(twin as any).takeaway || 'UPSC systematically exploits this structural polarity to trip speed-reading aspirants.'}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })()}
 
               {/* Footer Actions */}
               <div className="flex items-center justify-between pt-4 border-t border-[rgba(19,108,153,0.35)] font-sans">
@@ -1707,6 +1919,26 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                             }
                             return null;
                           })()}
+
+                          {/* Examiner Trap Vector Badge */}
+                          {(() => {
+                            const op = getDispatchOperator(item);
+                            const opMeta = EXAMINER_OPERATORS[op];
+                            const isBlindSpot = worstBleedOperator === op;
+                            return (
+                              <span
+                                className={`px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider rounded-xs border flex items-center gap-1 shrink-0 ${
+                                  isBlindSpot
+                                    ? 'bg-amber-950/70 text-amber-300 border-amber-500/60'
+                                    : 'bg-[rgba(1,148,168,0.12)] text-[#5fe3f5] border-[rgba(1,148,168,0.35)]'
+                                }`}
+                                title={opMeta?.description}
+                              >
+                                <Crosshair className={`w-2.5 h-2.5 ${isBlindSpot ? 'text-amber-400' : 'text-[#0194a8]'}`} />
+                                <span>{opMeta?.code || op}{isBlindSpot ? ' • BLIND SPOT' : ''}</span>
+                              </span>
+                            );
+                          })()}
                         </div>
                         {item.created_at && (
                           <span className="text-xs font-sans text-[#8fa2bd]">
@@ -1748,6 +1980,49 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
 
                       {/* Contested claim comparison */}
                       <ContestedCard contested={item.summary?.contested} />
+
+                      {/* Collapsible Historical UPSC Twin */}
+                      {(() => {
+                        const op = getDispatchOperator(item);
+                        const twin = item.historical_twin || HISTORICAL_TWIN_VAULT[op];
+                        if (!twin) return null;
+                        const isOpen = expandedTwinId === articleId;
+                        return (
+                          <div className="mt-2.5 pt-2 border-t border-[rgba(19,108,153,0.25)]">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExpandedTwinId(isOpen ? null : articleId);
+                              }}
+                              className="w-full flex items-center justify-between text-[10px] font-mono text-[#8fa2bd] hover:text-[#e0d0ab] transition-colors cursor-pointer"
+                            >
+                              <span className="flex items-center gap-1">
+                                <ShieldAlert className="w-3 h-3 text-[#0194a8]" />
+                                <span>Historical Twin ({twin.year})</span>
+                              </span>
+                              <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                            </button>
+                            <AnimatePresence>
+                              {isOpen && (
+                                <motion.div
+                                  initial={{ opacity: 0, height: 0 }}
+                                  animate={{ opacity: 1, height: 'auto' }}
+                                  exit={{ opacity: 0, height: 0 }}
+                                  className="overflow-hidden mt-1.5 p-2 bg-[rgba(2,15,35,0.7)] border border-[rgba(19,108,153,0.3)] rounded-xs space-y-1.5 text-[11px]"
+                                >
+                                  <div className="font-serif text-[#d6e2f0] italic leading-tight">
+                                    "{twin.stem}"
+                                  </div>
+                                  <div className="text-[10px] font-mono text-amber-300/90 bg-amber-950/20 p-1.5 rounded border border-amber-900/30">
+                                    <span className="font-semibold text-amber-400">Takeaway: </span>
+                                    {(twin as any).takeaway || 'UPSC structural trap vector.'}
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        );
+                      })()}
                     </div>
 
                     {/* Action Bar */}
@@ -1838,6 +2113,10 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
               const tag = selectedDossier.summary?.tags?.[0] || 'CURRENT_AFFAIRS';
               setSelectedDossier(null);
               onLaunchPractice(tag);
+            } : undefined}
+            onLaunchConveyor={onLaunchConveyor ? () => {
+              setSelectedDossier(null);
+              onLaunchConveyor();
             } : undefined}
             onInspectGrounding={() => setGroundingExplainerData({
               isOpen: true,

@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, useReducedMotion } from 'motion/react';
-import { AlertCircle, Bookmark, BookOpen, ExternalLink, Share2, Target, X } from 'lucide-react';
-import type { CurrentAffairsItem, ParsedSyllabusTag } from './CurrentAffairs';
+import { AlertCircle, Bookmark, BookOpen, ExternalLink, Share2, Target, X, AlertTriangle, ShieldAlert, Crosshair } from 'lucide-react';
+import { getDispatchOperator, HISTORICAL_TWIN_VAULT, type CurrentAffairsItem, type ParsedSyllabusTag } from './CurrentAffairs';
+import { EXAMINER_OPERATORS } from '../types';
 import { ContestedCard, GroundingBadge, SourceAnchor } from './TrustUI';
 import { TheHinduLogo, PibLogo } from './SourceLogos';
 import { getCanonicalArticleUrl } from '../lib/seo';
+import { getStoredVulnerabilityIndex } from '../lib/vulnerabilityIndex';
 import './PolicyBrief.css';
 
 interface PolicyBriefProps {
@@ -17,6 +19,7 @@ interface PolicyBriefProps {
   onSave: () => void;
   onShare: () => void;
   onPractice?: () => void;
+  onLaunchConveyor?: () => void;
   onInspectGrounding: () => void;
 }
 
@@ -41,8 +44,9 @@ function Note({ title, children }: { title: string; children: ReactNode }) {
   return <div className="brief-note"><h4>{title}</h4>{children}</div>;
 }
 
-export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose, onSave, onShare, onPractice, onInspectGrounding }: PolicyBriefProps) {
+export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose, onSave, onShare, onPractice, onLaunchConveyor, onInspectGrounding }: PolicyBriefProps) {
   const summary = item.summary;
+  const vulnerabilityIndex = getStoredVulnerabilityIndex();
   const reducedMotion = useReducedMotion();
   const dialogRef = useRef<HTMLDivElement>(null);
   const readerRef = useRef<HTMLDivElement>(null);
@@ -158,11 +162,48 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
               })}</time>}
             </div>
             <h2 id="brief-title">{item.headline}</h2>
-            {item.ministry && <p className="brief-ministry">{item.ministry}</p>}
+            {item.ministry && (
+              <div className="brief-ministry-container" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', margin: '4px 0 12px' }}>
+                <p className={`brief-ministry ${vulnerabilityIndex.ministrySwapBlindSpot ? 'vulnerability-warning-ministry' : ''}`} style={{ margin: 0 }}>
+                  {item.ministry}
+                </p>
+                {vulnerabilityIndex.ministrySwapBlindSpot && (
+                  <span
+                    className="vulnerability-badge"
+                    title="Your historical ledger indicates vulnerability to nodal ministry swaps. Verify whether this agency or department is the authentic statutory anchor."
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontSize: '11px',
+                      fontFamily: 'var(--font-mono)',
+                      fontWeight: 600,
+                      color: '#f59e0b',
+                      background: 'rgba(245, 158, 11, 0.12)',
+                      border: '1px solid rgba(245, 158, 11, 0.35)',
+                      padding: '2px 6px',
+                      borderRadius: '3px',
+                    }}
+                  >
+                    <AlertTriangle size={12} /> Nodal Swap Trap Risk
+                  </span>
+                )}
+              </div>
+            )}
 
             <div className="brief-relevance" aria-label="Exam relevance">
               <span>Prelims <strong>{(summary?.prelims_relevance || 'MEDIUM').toLowerCase()}</strong></span>
               <span>Mains <strong>{(summary?.mains_relevance || 'MEDIUM').toLowerCase()}</strong></span>
+              {(() => {
+                const op = getDispatchOperator(item);
+                const opMeta = EXAMINER_OPERATORS[op];
+                return (
+                  <span className="font-mono text-[11px] font-bold text-[#5fe3f5] bg-[rgba(1,148,168,0.15)] px-2 py-0.5 rounded border border-[rgba(1,148,168,0.3)] inline-flex items-center gap-1">
+                    <Crosshair size={12} className="text-[#0194a8]" />
+                    <span>TRAP: {opMeta?.code || op} ({opMeta?.shortLabel || 'DISTORTION'})</span>
+                  </span>
+                );
+              })()}
               <GroundingBadge grounding={summary?.grounding} verificationMethod={summary?.verification_method}
                 headline={item.headline} source={item.source} claims={summary?.claims} onClick={onInspectGrounding} />
             </div>
@@ -196,15 +237,49 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
                 ) : <p className="brief-secondary">No policy highlights are available for this brief yet. Refer to the primary source below.</p>}
               </Note>
               {targets.length > 0 && <Note title="Remember in one minute">
-                <dl className="brief-facts">{targets.map(target => <div key={target.label}>
-                  <dt>{target.label}</dt><dd>{target.value}</dd>
-                </div>)}</dl>
+                <dl className="brief-facts">{targets.map(target => {
+                  const isNodal = target.label === 'Nodal agency';
+                  const isVulnerable = isNodal && vulnerabilityIndex.ministrySwapBlindSpot;
+                  return (
+                    <div key={target.label}>
+                      <dt style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        {target.label}
+                        {isVulnerable && (
+                          <span title="Candidate Blind Spot" style={{ display: 'inline-flex' }}>
+                            <AlertTriangle size={12} color="#f59e0b" />
+                          </span>
+                        )}
+                      </dt>
+                      <dd className={isVulnerable ? 'vulnerability-warning-ministry' : ''}>
+                        {target.value}
+                      </dd>
+                    </div>
+                  );
+                })}</dl>
               </Note>}
               {summary?.prelims && <Note title="Prelims factual pointer"><p>{summary.prelims}</p></Note>}
-              {summary?.prelims_trap_radar && <aside className="brief-pitfall" aria-labelledby="brief-pitfall-title">
-                <h4 id="brief-pitfall-title"><AlertCircle size={17} aria-hidden="true" />Watch the exam trap</h4>
-                <p>{summary.prelims_trap_radar}</p>
-              </aside>}
+              {(() => {
+                const op = getDispatchOperator(item);
+                const twin = item.historical_twin || HISTORICAL_TWIN_VAULT[op];
+                return (
+                  <aside className="brief-pitfall" aria-labelledby="brief-pitfall-title">
+                    <h4 id="brief-pitfall-title" className="flex items-center gap-2">
+                      <ShieldAlert size={17} aria-hidden="true" />
+                      <span>Examiner Vector: {EXAMINER_OPERATORS[op]?.label || op}</span>
+                    </h4>
+                    {summary?.prelims_trap_radar && <p className="mb-2">{summary.prelims_trap_radar}</p>}
+                    {twin && (
+                      <div className="mt-2 pt-2 border-t border-[rgba(224,208,171,0.2)] text-xs font-mono">
+                        <span className="text-[#e0d0ab] font-bold">Historical UPSC Twin ({twin.year}): </span>
+                        <span className="italic font-serif text-[#d6e2f0]">"{twin.stem}"</span>
+                        <div className="mt-1 text-[11px] text-amber-300">
+                          <strong>Anchor:</strong> {(twin as any).statutory_anchor || (twin as any).anchor}
+                        </div>
+                      </div>
+                    )}
+                  </aside>
+                );
+              })()}
             </NoteSection>
 
             <NoteSection id="analysis" title="Mains analysis">
@@ -260,9 +335,14 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
             <Bookmark size={17} fill={saved ? 'currentColor' : 'none'} aria-hidden="true" />
             {saving ? 'Saving…' : saved ? 'Brief saved' : 'Save brief'}
           </button>
-          {onPractice && <button type="button" className="brief-practice" onClick={onPractice}>
-            <Target size={17} aria-hidden="true" />Practice MCQ drill
-          </button>}
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            {onPractice && <button type="button" className="brief-practice" onClick={onPractice}>
+              <Target size={17} aria-hidden="true" />Practice MCQ drill
+            </button>}
+            {onLaunchConveyor && <button type="button" className="brief-practice" style={{ background: '#e0d0ab', color: '#050b1a' }} onClick={onLaunchConveyor}>
+              <ShieldAlert size={17} aria-hidden="true" />Face Examiner Trap (+2 / −0.66)
+            </button>}
+          </div>
         </footer>
       </motion.div>
     </motion.div>,

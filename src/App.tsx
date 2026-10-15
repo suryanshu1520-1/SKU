@@ -18,6 +18,7 @@ import VerticalNavRail, { ContextActionItem } from './components/VerticalNavRail
 import { WebsiteTour } from './components/WebsiteTour';
 import Onboarding from './components/Onboarding';
 import BrandLogo from './components/BrandLogo';
+import { AdversarialConveyorBelt } from './components/conveyor/AdversarialConveyorBelt';
 import { Modal } from './components/shared';
 import { supabase } from './lib/supabase';
 import { Loader2, Trophy, Swords, Globe, User, House, LogIn, Layers, BookOpen, PanelLeftOpen, LayoutTemplate, Radio, Clock, Compass } from 'lucide-react';
@@ -57,6 +58,8 @@ export default function App() {
 
   // Website Tour State & First-Time Visitor Auto-Launch
   const [isTourOpen, setIsTourOpen] = useState(false);
+  // Adversarial Conveyor Belt state
+  const [isConveyorActive, setIsConveyorActive] = useState(false);
 
   useEffect(() => {
     try {
@@ -891,6 +894,7 @@ export default function App() {
             onNavigateLeaderboard={() => navigateToTab('leaderboard')}
             onNavigateManifesto={handleNavigateManifesto}
             onNavigateLegal={handleNavigateLegal}
+            onLaunchConveyor={() => setIsConveyorActive(true)}
             candidatePreferences={preferences}
           />
         </main>
@@ -942,6 +946,7 @@ export default function App() {
                 setGameState('arena');
                 setActiveTab('arena');
               }}
+              onLaunchConveyor={() => setIsConveyorActive(true)}
             />
           ) : activeTab === 'observatory' ? (
             <Observatory
@@ -1113,6 +1118,16 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Adversarial Conveyor Belt Overlay */}
+      {isConveyorActive && (
+        <AdversarialConveyorBelt
+          onExit={() => setIsConveyorActive(false)}
+          onComplete={() => {
+            // refresh any state if needed
+          }}
+        />
+      )}
 
       {/* Onboarding Crucible Modal */}
       {showOnboarding && (

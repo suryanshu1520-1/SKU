@@ -902,3 +902,305 @@ export async function getExaminerPsycheOverview() {
   };
 }
 
+// ---------------------------------------------------------------------------
+// 9. Deterministic Examiner's Psyche 7-Operator Analytics Engine (TASK_080)
+// ---------------------------------------------------------------------------
+
+export type ExaminerOperatorType =
+  | 'PSY_01_INST_SWAP'
+  | 'PSY_02_QUAL_POLARITY'
+  | 'PSY_03_LEGAL_TIER'
+  | 'PSY_04_CAUSAL_INV'
+  | 'PSY_05_SCOPE_MUTATE'
+  | 'PSY_06_PAIR_DECOY'
+  | 'PSY_07_TRUE_NON_CAUSAL';
+
+export interface StatementDissectionItem {
+  stmt_num: number;
+  is_true: boolean;
+  operator: ExaminerOperatorType | null;
+  marked_trap?: string;
+  truth_key?: string;
+  anchor?: string;
+}
+
+export interface NodePsycheProfile {
+  nodeId: string;
+  totalQuestions: number;
+  dominantOperator: ExaminerOperatorType | null;
+  operatorDistribution: Record<string, number>;
+  extremeQualifierFalseRate: number;
+  historicalTwins: Array<{
+    id: string;
+    year: number;
+    stem: string;
+    primary_operator: ExaminerOperatorType | null;
+    statutory_anchor?: string;
+  }>;
+}
+
+export interface UserPsycheAutopsy {
+  userId: string;
+  totalAttempts: number;
+  worstBleedOperator: {
+    operator: ExaminerOperatorType;
+    totalBleedMarks: number;
+    missCount: number;
+  } | null;
+  fiftyFiftyLedgerByOperator: Record<
+    ExaminerOperatorType,
+    {
+      calls: number;
+      correct: number;
+      wrong: number;
+      netMarks: number;
+      expectedValuePerQuestion: number;
+    }
+  >;
+}
+
+export const CANONICAL_OPERATORS: readonly ExaminerOperatorType[] = [
+  'PSY_01_INST_SWAP',
+  'PSY_02_QUAL_POLARITY',
+  'PSY_03_LEGAL_TIER',
+  'PSY_04_CAUSAL_INV',
+  'PSY_05_SCOPE_MUTATE',
+  'PSY_06_PAIR_DECOY',
+  'PSY_07_TRUE_NON_CAUSAL',
+];
+
+/**
+ * 1. getNodePsycheProfile(nodeId: string)
+ * Returns empirical base rates and historical twin PYQs for a given syllabus node.
+ */
+export async function getNodePsycheProfile(nodeId: string): Promise<NodePsycheProfile> {
+  const supabase: any = getSupabase();
+
+  let dominantOperator: ExaminerOperatorType | null = null;
+  let operatorDistribution: Record<string, number> = {
+    PSY_01_INST_SWAP: 0.35,
+    PSY_02_QUAL_POLARITY: 0.25,
+    PSY_03_LEGAL_TIER: 0.20,
+    PSY_04_CAUSAL_INV: 0.10,
+    PSY_05_SCOPE_MUTATE: 0.10,
+  };
+  let extremeQualifierFalseRate = 0.78;
+
+  try {
+    const { data: nodeAnalytics } = await supabase
+      .from('pyq_node_analytics')
+      .select('operator_distribution, dominant_operator, extreme_qualifier_false_rate')
+      .eq('node_id', nodeId)
+      .maybeSingle();
+
+    if (nodeAnalytics) {
+      if (nodeAnalytics.dominant_operator) {
+        dominantOperator = nodeAnalytics.dominant_operator as ExaminerOperatorType;
+      }
+      if (nodeAnalytics.operator_distribution && typeof nodeAnalytics.operator_distribution === 'object') {
+        operatorDistribution = nodeAnalytics.operator_distribution;
+      }
+      if (typeof nodeAnalytics.extreme_qualifier_false_rate === 'number') {
+        extremeQualifierFalseRate = nodeAnalytics.extreme_qualifier_false_rate;
+      }
+    }
+  } catch (err) {
+    console.warn('[examiner_psyche] getNodePsycheProfile analytics fetch failed:', err);
+  }
+
+  // Fetch top 2 most recent PYQs for this node
+  let historicalTwins: Array<{
+    id: string;
+    year: number;
+    stem: string;
+    primary_operator: ExaminerOperatorType | null;
+    statutory_anchor?: string;
+  }> = [];
+  let totalQuestions = 0;
+
+  try {
+    const { data: twins, count } = await supabase
+      .from('pyq_prelims')
+      .select('id, year, stem, primary_operator, statutory_anchor', { count: 'exact' })
+      .eq('node_id', nodeId)
+      .order('year', { ascending: false })
+      .limit(2);
+
+    totalQuestions = count ?? (twins?.length || 0);
+    if (twins && twins.length > 0) {
+      historicalTwins = twins.map((t: any) => ({
+        id: String(t.id),
+        year: Number(t.year) || 2024,
+        stem: String(t.stem || ''),
+        primary_operator: (t.primary_operator as ExaminerOperatorType) || null,
+        statutory_anchor: t.statutory_anchor ? String(t.statutory_anchor) : undefined,
+      }));
+    }
+  } catch (err) {
+    console.warn('[examiner_psyche] getNodePsycheProfile twins fetch failed:', err);
+  }
+
+  return {
+    nodeId,
+    totalQuestions,
+    dominantOperator: dominantOperator || 'PSY_01_INST_SWAP',
+    operatorDistribution,
+    extremeQualifierFalseRate,
+    historicalTwins,
+  };
+}
+
+/**
+ * 2. getUserPsycheAutopsy(userId: string)
+ * Computes candidate cognitive blind spots and 50:50 Ledger Expected Value across all 7 operators.
+ */
+export async function getUserPsycheAutopsy(userId: string): Promise<UserPsycheAutopsy> {
+  const supabase: any = getSupabase();
+
+  const fiftyFiftyMap: Record<
+    ExaminerOperatorType,
+    { calls: number; correct: number; wrong: number; netMarks: number; expectedValuePerQuestion: number }
+  > = {
+    PSY_01_INST_SWAP: { calls: 0, correct: 0, wrong: 0, netMarks: 0, expectedValuePerQuestion: 0 },
+    PSY_02_QUAL_POLARITY: { calls: 0, correct: 0, wrong: 0, netMarks: 0, expectedValuePerQuestion: 0 },
+    PSY_03_LEGAL_TIER: { calls: 0, correct: 0, wrong: 0, netMarks: 0, expectedValuePerQuestion: 0 },
+    PSY_04_CAUSAL_INV: { calls: 0, correct: 0, wrong: 0, netMarks: 0, expectedValuePerQuestion: 0 },
+    PSY_05_SCOPE_MUTATE: { calls: 0, correct: 0, wrong: 0, netMarks: 0, expectedValuePerQuestion: 0 },
+    PSY_06_PAIR_DECOY: { calls: 0, correct: 0, wrong: 0, netMarks: 0, expectedValuePerQuestion: 0 },
+    PSY_07_TRUE_NON_CAUSAL: { calls: 0, correct: 0, wrong: 0, netMarks: 0, expectedValuePerQuestion: 0 },
+  };
+
+  const bleedMap: Record<ExaminerOperatorType, { totalBleedMarks: number; missCount: number }> = {
+    PSY_01_INST_SWAP: { totalBleedMarks: 0, missCount: 0 },
+    PSY_02_QUAL_POLARITY: { totalBleedMarks: 0, missCount: 0 },
+    PSY_03_LEGAL_TIER: { totalBleedMarks: 0, missCount: 0 },
+    PSY_04_CAUSAL_INV: { totalBleedMarks: 0, missCount: 0 },
+    PSY_05_SCOPE_MUTATE: { totalBleedMarks: 0, missCount: 0 },
+    PSY_06_PAIR_DECOY: { totalBleedMarks: 0, missCount: 0 },
+    PSY_07_TRUE_NON_CAUSAL: { totalBleedMarks: 0, missCount: 0 },
+  };
+
+  let totalAttempts = 0;
+
+  try {
+    const { data: telemetry, error } = await supabase
+      .from('user_psyche_telemetry')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (!error && telemetry && telemetry.length > 0) {
+      totalAttempts = telemetry.length;
+      for (const row of telemetry) {
+        const op = row.operator_tested as ExaminerOperatorType;
+        if (!fiftyFiftyMap[op]) continue;
+
+        const marks = Number(row.marks_delta);
+        const isMiss = !row.is_correct;
+
+        if (isMiss) {
+          bleedMap[op].totalBleedMarks += Math.abs(marks);
+          bleedMap[op].missCount += 1;
+        }
+
+        if (row.is_50_50_call) {
+          fiftyFiftyMap[op].calls += 1;
+          if (row.is_correct) {
+            fiftyFiftyMap[op].correct += 1;
+          } else {
+            fiftyFiftyMap[op].wrong += 1;
+          }
+          fiftyFiftyMap[op].netMarks += marks;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[examiner_psyche] getUserPsycheAutopsy query failed:', err);
+  }
+
+  // Calculate EV per question for 50:50 calls
+  for (const op of CANONICAL_OPERATORS) {
+    const entry = fiftyFiftyMap[op];
+    entry.expectedValuePerQuestion = entry.calls > 0 ? Number((entry.netMarks / entry.calls).toFixed(2)) : 0;
+  }
+
+  // Determine worst bleed operator (the one with the largest totalBleedMarks > 0)
+  let worstBleed: { operator: ExaminerOperatorType; totalBleedMarks: number; missCount: number } | null = null;
+  let maxBleed = 0;
+  for (const op of CANONICAL_OPERATORS) {
+    if (bleedMap[op].totalBleedMarks > maxBleed && bleedMap[op].missCount > 0) {
+      maxBleed = bleedMap[op].totalBleedMarks;
+      worstBleed = {
+        operator: op,
+        totalBleedMarks: Number(bleedMap[op].totalBleedMarks.toFixed(2)),
+        missCount: bleedMap[op].missCount,
+      };
+    }
+  }
+
+  return {
+    userId,
+    totalAttempts,
+    worstBleedOperator: worstBleed,
+    fiftyFiftyLedgerByOperator: fiftyFiftyMap,
+  };
+}
+
+/**
+ * 3. getTargetOperatorForDailyBrief(nodeId: string)
+ * Used by the daily PIB synthesis pipeline to ground generated trap MCQs into UPSC's historical operator pattern.
+ */
+export async function getTargetOperatorForDailyBrief(nodeId: string): Promise<ExaminerOperatorType> {
+  const supabase: any = getSupabase();
+  try {
+    const { data } = await supabase
+      .from('pyq_node_analytics')
+      .select('dominant_operator')
+      .eq('node_id', nodeId)
+      .maybeSingle();
+
+    if (data?.dominant_operator) {
+      return data.dominant_operator as ExaminerOperatorType;
+    }
+  } catch (err) {
+    console.warn('[examiner_psyche] getTargetOperatorForDailyBrief failed for', nodeId, err);
+  }
+  return 'PSY_01_INST_SWAP';
+}
+
+/**
+ * 4. recordPsycheTelemetry
+ * Records an attempt in user_psyche_telemetry table.
+ */
+export async function recordPsycheTelemetry(entry: {
+  userId: string;
+  questionId: string;
+  nodeId: string;
+  operatorTested: ExaminerOperatorType;
+  selectedOption: string;
+  officialKey: string;
+  isCorrect: boolean;
+  marksDelta: number;
+  is5050Call?: boolean;
+  eliminatedOptions?: string[];
+  responseMs?: number;
+}): Promise<void> {
+  try {
+    const supabase: any = getSupabase();
+    await supabase.from('user_psyche_telemetry').insert({
+      user_id: entry.userId,
+      question_id: entry.questionId,
+      node_id: entry.nodeId,
+      operator_tested: entry.operatorTested,
+      selected_option: entry.selectedOption.toLowerCase(),
+      official_key: entry.officialKey.toLowerCase(),
+      is_correct: entry.isCorrect,
+      marks_delta: entry.marksDelta,
+      is_50_50_call: !!entry.is5050Call,
+      eliminated_options: entry.eliminatedOptions || [],
+      response_ms: entry.responseMs ?? null,
+    });
+  } catch (err) {
+    console.warn('[examiner_psyche] recordPsycheTelemetry failed:', err);
+  }
+}
+

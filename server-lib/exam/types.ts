@@ -18,6 +18,24 @@ export type Series = 'A' | 'B' | 'C' | 'D';
 export type Confidence = 'sure' | 'fifty' | 'guess';
 export type SubmitMode = 'manual' | 'timeout' | 'recovered';
 
+export type ExaminerOperatorType =
+  | 'PSY_01_INST_SWAP'
+  | 'PSY_02_QUAL_POLARITY'
+  | 'PSY_03_LEGAL_TIER'
+  | 'PSY_04_CAUSAL_INV'
+  | 'PSY_05_SCOPE_MUTATE'
+  | 'PSY_06_PAIR_DECOY'
+  | 'PSY_07_TRUE_NON_CAUSAL';
+
+export interface StatementDissectionItem {
+  stmt_num: number;
+  is_true: boolean;
+  operator: ExaminerOperatorType | null;
+  marked_trap?: string;
+  truth_key?: string;
+  anchor?: string;
+}
+
 /** Server-only. Holds the key. Never serialise to a client before submission. */
 export interface PoolItem {
   id: string;
@@ -28,6 +46,10 @@ export interface PoolItem {
   options: [string, string, string, string];
   key: OptionKey;
   explanation: string;
+  node_id?: string;
+  primary_operator?: ExaminerOperatorType | null;
+  statement_dissection?: StatementDissectionItem[];
+  statutory_anchor?: string;
 }
 
 /** Sent to the client during a sitting: no key, explanation, year or subject. */

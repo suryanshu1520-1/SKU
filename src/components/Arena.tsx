@@ -6,9 +6,10 @@ import {
   AlertTriangle,
   Bookmark,
   BookmarkCheck,
+  Crosshair,
 } from 'lucide-react';
 import { Modal, ConceptInsightRenderer } from './shared';
-import type { CandidatePreferences, ArenaLaunchConfig } from '../types';
+import { EXAMINER_OPERATORS, type CandidatePreferences, type ArenaLaunchConfig } from '../types';
 import { useArenaSession } from './arena/useArenaSession';
 import { ArenaLobby } from './arena/ArenaLobby';
 import { TrainingSetup } from './arena/TrainingSetup';
@@ -305,7 +306,9 @@ export default function Arena({
                     isSelected={isSelected}
                     isQuestionLocked={isQuestionLocked}
                     isOptionCorrect={isOptionCorrect}
+                    isStruck={(session.eliminatedOptionsMap[currentQId] || []).includes(key)}
                     onSelect={session.handleSelect}
+                    onToggleStrike={session.handleToggleStrike}
                   />
                 );
               })}
@@ -348,6 +351,21 @@ export default function Arena({
                     <span>{isBookmarked ? 'Saved' : 'Save'}</span>
                   </button>
                 </div>
+
+                {/* Examiner's Psyche Distortion Badge */}
+                {currentQ.primary_operator && (
+                  <div className="p-3 bg-[rgba(1,148,168,0.1)] border border-[rgba(1,148,168,0.35)] rounded-xs flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <span className="font-mono text-[#5fe3f5] font-bold flex items-center gap-1.5">
+                      <Crosshair className="w-3.5 h-3.5 text-[#0194a8]" />
+                      <span>OPERATOR: {EXAMINER_OPERATORS[currentQ.primary_operator]?.code || currentQ.primary_operator} // {EXAMINER_OPERATORS[currentQ.primary_operator]?.shortLabel || 'DISTORTION'}</span>
+                    </span>
+                    {currentQ.statutory_anchor && (
+                      <span className="font-mono text-[11px] text-[#e0d0ab]">
+                        ANCHOR: {currentQ.statutory_anchor}
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 {isLoadingExplanation && !currentExplanation && !currentQ.conceptual_explanation ? (
                   <div className="p-4 bg-surface/60 border border-border rounded-sm flex items-center gap-2 text-xs font-sans text-secondary">

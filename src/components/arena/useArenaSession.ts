@@ -194,6 +194,7 @@ export function useArenaSession({
   const [pendingAnswersMap, setPendingAnswersMap] = useState<Record<string, string>>({});
   const [lockedMap, setLockedMap] = useState<Record<string, boolean>>({});
   const [markedForReviewMap, setMarkedForReviewMap] = useState<Record<string, boolean>>({});
+  const [eliminatedOptionsMap, setEliminatedOptionsMap] = useState<Record<string, string[]>>({});
 
   // Explanation cache states
   const [explanationCache, setExplanationCache] = useState<Record<string, any>>({});
@@ -746,6 +747,24 @@ export function useArenaSession({
     });
   };
 
+  const handleToggleStrike = (optionKey: string) => {
+    if (!currentQuestionId) return;
+    const isCurrentlyLocked = !!lockedMap[currentQuestionId] || !!timeouts[currentQuestionId] || quizSubmitted;
+    if (isCurrentlyLocked) return;
+
+    setEliminatedOptionsMap((prev) => {
+      const currentList = prev[currentQuestionId] || [];
+      const isAlreadyStruck = currentList.includes(optionKey);
+      const nextList = isAlreadyStruck
+        ? currentList.filter((k) => k !== optionKey)
+        : [...currentList, optionKey];
+      return {
+        ...prev,
+        [currentQuestionId]: nextList,
+      };
+    });
+  };
+
   const handlePrevious = () => {
     if (currentQuestionIndex <= 0) return;
     setCurrentQuestionIndex((prev) => prev - 1);
@@ -906,6 +925,13 @@ export function useArenaSession({
       totalTime += timeSpentMap[q.id] || 0;
     });
 
+    const fiftyFiftyCalls: Record<string, boolean> = {};
+    Object.entries(eliminatedOptionsMap).forEach(([qId, list]) => {
+      if (list.length === 2) {
+        fiftyFiftyCalls[qId] = true;
+      }
+    });
+
     try {
       const response = await fetchWithAuth('/api/submit-quiz', {
         method: 'POST',
@@ -922,6 +948,8 @@ export function useArenaSession({
           subjectStats: finalSubjectStats,
           totalTimeSeconds: totalTime,
           isRanked,
+          eliminatedOptions: eliminatedOptionsMap,
+          fiftyFiftyCalls,
         }),
       });
 
@@ -1004,6 +1032,26 @@ export function useArenaSession({
 
       const key = e.key.toUpperCase();
       const code = e.code;
+
+      if (e.shiftKey) {
+        if (code === 'KeyA' || key === 'A') {
+          e.preventDefault();
+          handleToggleStrike('A');
+          return;
+        } else if (code === 'KeyB' || key === 'B') {
+          e.preventDefault();
+          handleToggleStrike('B');
+          return;
+        } else if (code === 'KeyC' || key === 'C') {
+          e.preventDefault();
+          handleToggleStrike('C');
+          return;
+        } else if (code === 'KeyD' || key === 'D') {
+          e.preventDefault();
+          handleToggleStrike('D');
+          return;
+        }
+      }
 
       if (key === 'A' || code === 'KeyA' || key === '1' || code === 'Digit1' || code === 'Numpad1') {
         e.preventDefault();
@@ -1115,5 +1163,7 @@ export function useArenaSession({
     toggleMarkForReview,
     handleConfirmAbandon,
     toggleBookmark,
+    eliminatedOptionsMap,
+    handleToggleStrike,
   };
 }

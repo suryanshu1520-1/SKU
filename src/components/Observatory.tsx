@@ -992,6 +992,41 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                 </div>
               </div>
 
+              {/* Node Psyche Telemetry Header (TASK_080) */}
+              {(() => {
+                const SUBJECT_PSYCHE_MAP: Record<string, { dominant: string; secondary: string; extremeFalseRate: string }> = {
+                  Polity: { dominant: 'PSY_03 // LEGAL TIER SHIFT (44%)', secondary: 'PSY_01 // NODAL SWAP (31%)', extremeFalseRate: '86%' },
+                  Economy: { dominant: 'PSY_01 // NODAL / AUTHORITY SWAP (42%)', secondary: 'PSY_04 // CAUSAL INVERSION (29%)', extremeFalseRate: '81%' },
+                  Environment: { dominant: 'PSY_02 // EXTREME QUALIFIER TRAP (46%)', secondary: 'PSY_05 // SCOPE MUTATION (28%)', extremeFalseRate: '88%' },
+                  History: { dominant: 'PSY_04 // CAUSAL / SCHEDULE INVERSION (41%)', secondary: 'PSY_05 // SCOPE MUTATION (32%)', extremeFalseRate: '76%' },
+                  Geography: { dominant: 'PSY_04 // CAUSAL / DIRECTIONAL INVERSION (39%)', secondary: 'PSY_01 // NODAL SWAP (26%)', extremeFalseRate: '74%' },
+                  'Science & Tech': { dominant: 'PSY_05 // SCOPE / APPLICATION MUTATION (43%)', secondary: 'PSY_02 // EXTREME QUALIFIER (31%)', extremeFalseRate: '83%' },
+                  All: { dominant: 'PSY_01 // NODAL MINISTRY SWAP (36%)', secondary: 'PSY_02 // EXTREME QUALIFIER TRAP (27%)', extremeFalseRate: '82%' },
+                };
+                const psyche = SUBJECT_PSYCHE_MAP[selectedPyqSubject] || SUBJECT_PSYCHE_MAP.All;
+                return (
+                  <div className="p-3 rounded-sm bg-gradient-to-r from-[rgba(4,25,54,0.95)] to-[rgba(7,46,99,0.8)] border border-[rgba(224,208,171,0.20)] flex flex-wrap items-center justify-between gap-3 text-xs font-mono shadow-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded bg-[rgba(244,63,94,0.18)] border border-[rgba(244,63,94,0.45)] text-[#fca5a5] font-bold text-[10px] uppercase">
+                        DOMINANT EXAMINER TRAP
+                      </span>
+                      <span className="text-[#f4ecd8] font-bold">
+                        {psyche.dominant}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4 text-[#9fb0c8] text-[11px]">
+                      <span>
+                        <strong className="text-[#e0d0ab]">2ND VECTOR:</strong> {psyche.secondary}
+                      </span>
+                      <span className="text-[rgba(224,208,171,0.2)]">|</span>
+                      <span>
+                        <strong className="text-[#f87171]">'ONLY/ALL' FALSE RATE ON THIS NODE:</strong> {psyche.extremeFalseRate}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* Telemetry & Candidate Self-Check Score Bar */}
               <div className="p-3 rounded-sm bg-[rgba(3,16,38,0.6)] border border-[rgba(19,108,153,0.25)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs">
                 <div className="flex items-center gap-2 text-[#8fa2bd]">
