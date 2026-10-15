@@ -4,30 +4,19 @@ import { fetchWithAuth } from '../lib/api';
 import { motion, AnimatePresence, LayoutGroup, useReducedMotion, useMotionValue, useTransform, animate, type PanInfo } from 'motion/react';
 import {
   ExternalLink,
-  Filter,
-  RotateCcw,
-  BookOpen,
   Inbox,
   RefreshCw,
-  Calendar,
   Bookmark,
   X,
   Share2,
   Sun,
   Moon,
-  Search,
-  SlidersHorizontal,
   Clock,
-  Sparkles,
-  ShieldCheck,
   Layers,
   ArrowUpRight,
   ChevronRight,
   ChevronLeft,
-  FileText,
-  CheckCircle2,
   AlertCircle,
-  Zap,
   Scale,
   Target,
   ShieldAlert,
@@ -40,6 +29,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import DailyEdition from './DailyEdition';
 import PolicyBrief from './PolicyBrief';
+import DailyBriefHeader, { DailyBriefFilters } from './DailyBriefHeader';
 import { getStoredVulnerabilityIndex } from '../lib/vulnerabilityIndex';
 import { EXAMINER_OPERATORS, type ExaminerOperatorType, type UserPsycheAutopsy } from '../types';
 
@@ -60,7 +50,7 @@ import {
   type VerifiedClaim,
   type ContestedClaim,
 } from './TrustUI';
-import { TheHinduLogo, PibLogo, SourceBadge } from './SourceLogos';
+import { TheHinduLogo, PibLogo } from './SourceLogos';
 import { GroundingExplainerModal } from './GroundingExplainerModal';
 
 interface RevisionTargets {
@@ -332,7 +322,6 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
   const [endDate, setEndDate] = useState<string>('');
   const [timePreset, setTimePreset] = useState<'ALL' | 'TODAY' | 'WEEK' | 'MONTH' | 'CUSTOM'>('ALL');
   const [trustFilter, setTrustFilter] = useState<'ALL' | 'HIGH_GROUNDING' | 'CONTESTED'>('ALL');
-  const [ministrySearch, setMinistrySearch] = useState<string>('');
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [expandedTwinId, setExpandedTwinId] = useState<string | null>(null);
   const [worstBleedOperator, setWorstBleedOperator] = useState<ExaminerOperatorType | null>('PSY_01_INST_SWAP');
@@ -955,14 +944,6 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
     return [CATEGORY_TABS[0], trackTab, ...CATEGORY_TABS.slice(1)];
   }, [candidatePreferences]);
 
-  const activeFilterCount =
-    (selectedMinistry !== 'ALL' ? 1 : 0) +
-    (selectedSource !== 'ALL' ? 1 : 0) +
-    (timePreset !== 'ALL' ? 1 : 0) +
-    (trustFilter !== 'ALL' ? 1 : 0) +
-    (activeCategoryTab !== 'ALL' ? 1 : 0) +
-    (searchQuery ? 1 : 0);
-
   const resetAllFilters = () => {
     setSelectedMinistry('ALL');
     setSelectedSource('ALL');
@@ -972,7 +953,6 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
     setEndDate('');
     setActiveCategoryTab('ALL');
     setSearchQuery('');
-    setMinistrySearch('');
     setPage(0);
   };
 
@@ -1002,6 +982,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
           /* ignore */
         }
       } else if (action === 'filters') {
+        setBriefViewMode('signals');
         setIsFilterDrawerOpen((prev) => !prev);
       } else if (action === 'saved') {
         setBriefViewMode('signals');
@@ -1014,146 +995,21 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
   }, []);
 
   return (
-    <div className="w-full min-h-screen text-primary font-sans pb-24">
+    <div className="w-full min-h-screen text-primary font-sans pb-24 md:pl-6">
       
-      {/* ── Editorial Masthead Header ── */}
-      <div className="border-b border-border/80 pb-5 mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[10px] font-sans uppercase tracking-wider text-[#e0d0ab] font-medium">
-                Autonomous Policy &amp; Governance Intelligence
-              </span>
-            </div>
-            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">
-              The Daily Brief <span className="font-serif font-normal text-[#e0d0ab] text-2xl sm:text-3xl">| दैनिक नीति संकेत</span>
-            </h1>
-            <p className="text-secondary text-xs sm:text-sm font-sans mt-2 max-w-2xl leading-relaxed">
-              Every press release, cabinet decision, and policy notification that matters, distilled into a few honest minutes for UPSC and State PSC prep.
-            </p>
-          </div>
-
-          {/* Indexed status badge & Grounding Explainer CTA */}
-          <div className="flex items-center gap-2.5 shrink-0 font-sans">
-            <button
-              data-tour="grounding-info"
-              onClick={() =>
-                setGroundingExplainerData({
-                  isOpen: true,
-                  grounding: leadItem?.summary?.grounding || 0.67,
-                  headline: leadItem?.headline || 'Government Policy Gazette',
-                  source: leadItem?.source || 'Official Wire',
-                  claims: leadItem?.summary?.claims || [],
-                })
-              }
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(1,148,168,0.12)] border border-[rgba(1,148,168,0.35)] hover:border-[#e0d0ab] hover:bg-[rgba(1,148,168,0.25)] rounded-xs text-xs font-mono text-[#0194a8] hover:text-[#e0d0ab] transition-all cursor-pointer shadow-xs"
-              title="Inspect Tark's Zero-Hallucination Grounding Protocol"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>How Grounding Works</span>
-            </button>
-
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(3,18,42,0.8)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-mono text-[#8fa2bd]">
-              <span className="text-[#e0d0ab] font-bold">{items.length}</span> dispatches indexed
-            </span>
-          </div>
-        </div>
-
-        {/* ── Adversarial Crucible & Live Trap Vulnerability Index Banner ── */}
-        <div className="mt-5 p-4 rounded-md bg-[#091530] border border-[rgba(224,208,171,0.22)] shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#e0d0ab]">
-                Personal Trap Vulnerability Index (PTVI)
-              </span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-300">
-                {vulnerabilityIndex.isColdStart ? 'Empirical UPSC Benchmark' : 'Candidate Autopsy Active'}
-              </span>
-            </div>
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs font-mono text-slate-300">
-              <span>
-                50:50 EV:{' '}
-                <strong className={vulnerabilityIndex.fiftyFiftyEV >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
-                  {vulnerabilityIndex.fiftyFiftyEV >= 0 ? `+${vulnerabilityIndex.fiftyFiftyEV}` : vulnerabilityIndex.fiftyFiftyEV} marks/call
-                </strong>
-              </span>
-              <span>
-                Qualifier Vulnerability:{' '}
-                <strong className="text-amber-300">{vulnerabilityIndex.qualifierVulnerabilityRate}%</strong>
-              </span>
-              <span>
-                Ministry Blind Spot:{' '}
-                <strong className={vulnerabilityIndex.ministrySwapBlindSpot ? 'text-amber-400' : 'text-emerald-400'}>
-                  {vulnerabilityIndex.ministrySwapBlindSpot ? 'ACTIVE (Nodal Bodies Highlighted)' : 'RESOLVED'}
-                </strong>
-              </span>
-            </div>
-          </div>
-
-          {onLaunchConveyor && (
-            <button
-              type="button"
-              onClick={onLaunchConveyor}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#e0d0ab] hover:bg-[#ebd9b4] text-[#050b1a] rounded-full text-xs font-sans font-bold uppercase tracking-wider transition-all shadow-md shrink-0 cursor-pointer"
-            >
-              <ShieldAlert className="w-4 h-4" />
-              <span>Enter Adversarial Conveyor Belt (8 Min)</span>
-            </button>
-          )}
-        </div>
-
-        {/* ── Verified Wire Streams Showcase (PIB, The Hindu, RBI, PRS) ── */}
-        <div className="mt-4 pt-3.5 border-t border-border/80 flex flex-wrap items-center justify-between gap-3 text-xs font-sans">
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-secondary font-bold flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#e0d0ab]" />
-              Official Wire Streams:
-            </span>
-            <div className="flex items-center gap-2 flex-wrap">
-              <SourceBadge
-                source="PIB"
-                active={selectedSource === 'PIB'}
-                onClick={() => setSelectedSource(selectedSource === 'PIB' ? 'ALL' : 'PIB')}
-              />
-              <SourceBadge
-                source="THE HINDU"
-                active={selectedSource === 'THE HINDU'}
-                onClick={() => setSelectedSource(selectedSource === 'THE HINDU' ? 'ALL' : 'THE HINDU')}
-              />
-              <SourceBadge
-                source="RBI"
-                active={selectedSource === 'RBI'}
-                onClick={() => setSelectedSource(selectedSource === 'RBI' ? 'ALL' : 'RBI')}
-              />
-              <SourceBadge
-                source="PRS"
-                active={selectedSource === 'PRS'}
-                onClick={() => {
-                  if (selectedSource === 'PRS') {
-                    setSelectedSource('ALL');
-                  } else {
-                    setSelectedSource('PRS');
-                    setActiveCategoryTab('PRS');
-                  }
-                }}
-              />
-            </div>
-          </div>
-
-          {selectedSource !== 'ALL' && (
-            <button
-              onClick={() => setSelectedSource('ALL')}
-              className="text-[11px] font-mono text-[#e0d0ab] hover:underline cursor-pointer flex items-center gap-1.5"
-            >
-              <RotateCcw className="w-3 h-3" />
-              <span>Reset Filter ({selectedSource})</span>
-            </button>
-          )}
-        </div>
-      </div>
-
+      <DailyBriefHeader
+        count={items.length}
+        metrics={vulnerabilityIndex}
+        onInspectGrounding={() => setGroundingExplainerData({
+          isOpen: true,
+          grounding: leadItem?.summary?.grounding || 0.67,
+          headline: leadItem?.headline || 'Government Policy Gazette',
+          source: leadItem?.source || 'Official Wire',
+          claims: leadItem?.summary?.claims || [],
+        })}
+        onLaunchPractice={onLaunchPractice ? () => onLaunchPractice('CURRENT_AFFAIRS') : undefined}
+        onLaunchConveyor={onLaunchConveyor}
+      />
       {/* ── Error Banner ── */}
       {errorMsg && (
         <div className="mb-6 p-4 bg-rose-950/20 border border-rose-800/40 text-rose-300 text-xs rounded-sm flex items-start gap-3 font-sans">
@@ -1179,352 +1035,37 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
       {/* ── MODE 2: SIGNAL DECK & POLICY EXPLORER ── */}
       {briefViewMode === 'signals' && (
         <>
-          <div className="pt-2 mb-4 font-sans">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div>
-                <h3 className="font-serif text-base font-bold text-[#e8e0cf] flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-[#0194a8]" />
-                  <span>Policy Dispatches &amp; Signal Explorer</span>
-                </h3>
-                <p className="text-xs text-[#8fa2bd] font-sans m-0">
-                  Search policy dispatches, filter by ministry, or browse verified intelligence.
-                </p>
-              </div>
-              {onLaunchPractice && (
-                <motion.button
-                  onClick={() => onLaunchPractice('CURRENT_AFFAIRS')}
-                  whileHover={{ scale: 1.02, y: -1 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#e0d0ab] text-[#072e63] font-sans font-bold text-xs uppercase tracking-wider rounded-md hover:bg-white transition-colors cursor-pointer shadow-sm self-start sm:self-auto shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]"
-                >
-                  <Zap className="w-3.5 h-3.5 text-[#072e63]" />
-                  <span>Today's Arena Battle</span>
-                </motion.button>
-              )}
-            </div>
-          </div>
-
-      {/* ── Search & Horizontal Category Filter Tabs ── */}
-      <div className="space-y-4 mb-8 font-sans">
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
-          
-          {/* Category Tabs */}
-          <LayoutGroup id="ca-category-tabs">
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-2 lg:pb-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              {categoryTabs.map((tab) => {
-                const isActive = activeCategoryTab === tab.id;
-                return (
-                  <motion.button
-                    key={tab.id}
-                    onClick={() => setActiveCategoryTab(tab.id)}
-                    whileTap={{ scale: 0.97 }}
-                    className={`relative px-3.5 py-1.5 rounded-md text-xs font-sans font-medium whitespace-nowrap transition-colors cursor-pointer border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab] ${
-                      isActive
-                        ? 'border-transparent text-[#072e63] font-bold'
-                        : 'bg-[rgba(3,18,42,0.55)] border-[rgba(19,108,153,0.3)] text-[#8fa2bd] hover:text-[#e8e0cf] hover:border-[#e0d0ab]/40'
-                    }`}
-                  >
-                    {isActive && (
-                      <motion.span
-                        layoutId="ca-category-active-pill"
-                        className="absolute inset-0 bg-[#e0d0ab] rounded-md shadow-xs"
-                        transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', bounce: 0.15, duration: 0.45 }}
-                      />
-                    )}
-                    <span className="relative z-10">
-                      {tab.label}
-                    </span>
-                  </motion.button>
-                );
-              })}
-            </div>
-          </LayoutGroup>
-
-          {/* Search Input & Deep Filter Toggle */}
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1 lg:w-72">
-              <Search className="w-3.5 h-3.5 text-[#0194a8] absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search policy briefs, ministries, keywords..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 bg-[rgba(3,18,42,0.85)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-primary placeholder-[#8fa2bd]/60 focus:outline-none focus:border-[#e0d0ab] focus:ring-1 focus:ring-[#e0d0ab]/30"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#8fa2bd] hover:text-primary cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-
-            <button
-              onClick={() => setIsFilterDrawerOpen(!isFilterDrawerOpen)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xs border text-xs font-mono font-medium transition-all cursor-pointer ${
-                activeFilterCount > 0 || isFilterDrawerOpen
-                  ? 'bg-[rgba(11,61,120,0.4)] border-[#e0d0ab] text-[#e0d0ab]'
-                  : 'bg-[rgba(3,18,42,0.6)] border-[rgba(19,108,153,0.35)] text-[#8fa2bd] hover:border-[rgba(19,108,153,0.6)] hover:text-primary'
-              }`}
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5 text-[#0194a8]" />
-              <span>Filters</span>
-              {activeFilterCount > 0 && (
-                <span className="w-4 h-4 rounded-full bg-[#e0d0ab] text-[#072e63] font-bold text-[9px] flex items-center justify-center ml-0.5">
-                  {activeFilterCount}
-                </span>
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Expandable Refined Filter Tray (Intuitive Command Center) */}
-        <AnimatePresence>
-          {isFilterDrawerOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden bg-[rgba(3,18,42,0.95)] border border-[rgba(19,108,153,0.45)] rounded-xs p-5 backdrop-blur-xl font-sans space-y-5 shadow-2xl"
-            >
-              {/* Row 1: Time Horizon & Verification Controls */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {/* 1. Time Horizon Presets */}
-                <div>
-                  <label className="block text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mb-2">
-                    Time Horizon
-                  </label>
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {[
-                      { id: 'ALL', label: 'All Time' },
-                      { id: 'TODAY', label: "Today's Briefing" },
-                      { id: 'WEEK', label: 'Past 7 Days' },
-                      { id: 'MONTH', label: 'This Month' },
-                      { id: 'CUSTOM', label: 'Custom Range' },
-                    ].map((preset) => (
-                      <button
-                        key={preset.id}
-                        onClick={() => applyTimePreset(preset.id as any)}
-                        className={`px-3 py-1.5 rounded-xs text-xs font-mono transition-colors cursor-pointer border ${
-                          timePreset === preset.id
-                            ? 'bg-[#e0d0ab] text-[#072e63] border-[#e0d0ab] font-bold shadow-sm'
-                            : 'bg-[rgba(4,25,54,0.8)] border-[rgba(19,108,153,0.4)] text-[#9fb0c8] hover:border-[#e0d0ab] hover:text-[#e0d0ab]'
-                        }`}
-                      >
-                        {preset.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Custom Date Inputs if Custom selected */}
-                  {timePreset === 'CUSTOM' && (
-                    <div className="flex items-center gap-2 mt-2.5">
-                      <input
-                        type="date"
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                        className="px-2.5 py-1.5 bg-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-primary [color-scheme:dark]"
-                      />
-                      <span className="text-xs text-[#8fa2bd] font-mono">to</span>
-                      <input
-                        type="date"
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                        className="px-2.5 py-1.5 bg-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.4)] rounded-xs text-xs font-sans text-primary [color-scheme:dark]"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {/* 2. Verification & Grounding Filter */}
-                <div>
-                  <label className="block text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mb-2">
-                    Evidence & Grounding
-                  </label>
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {[
-                      { id: 'ALL', label: 'All Dispatches' },
-                      { id: 'HIGH_GROUNDING', label: '🛡️ High Grounding (≥90%)' },
-                      { id: 'CONTESTED', label: '⚠️ Contested Claims' },
-                    ].map((trust) => (
-                      <button
-                        key={trust.id}
-                        onClick={() => setTrustFilter(trust.id as any)}
-                        className={`px-3 py-1.5 rounded-xs text-xs font-mono transition-colors cursor-pointer border ${
-                          trustFilter === trust.id
-                            ? 'bg-[#e0d0ab] text-[#072e63] border-[#e0d0ab] font-bold shadow-sm'
-                            : 'bg-[rgba(4,25,54,0.8)] border-[rgba(19,108,153,0.4)] text-[#9fb0c8] hover:border-[#e0d0ab] hover:text-[#e0d0ab]'
-                        }`}
-                      >
-                        {trust.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Row 2: Primary Source Filter */}
-              <div>
-                <label className="block text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mb-2">
-                  Verified Intelligence Source
-                </label>
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  {[
-                    { id: 'ALL', label: 'All Sources' },
-                    { id: 'PIB', label: 'PIB Official', isPib: true },
-                    { id: 'THE HINDU', label: 'The Hindu', isHindu: true },
-                    { id: 'RBI', label: '📈 RBI Notifications' },
-                    { id: 'PRS', label: '⚖️ PRS Legislative Research' },
-                  ].map((src) => (
-                    <button
-                      key={src.id}
-                      onClick={() => {
-                        setSelectedSource(src.id);
-                        if (src.id === 'PRS') setActiveCategoryTab('PRS');
-                      }}
-                      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xs text-xs font-mono transition-colors cursor-pointer border ${
-                        selectedSource === src.id
-                          ? 'bg-[#e0d0ab] text-[#072e63] border-[#e0d0ab] font-bold shadow-sm'
-                          : 'bg-[rgba(4,25,54,0.8)] border-[rgba(19,108,153,0.4)] text-[#9fb0c8] hover:border-[#e0d0ab] hover:text-[#e0d0ab]'
-                      }`}
-                    >
-                      {src.isPib && <PibLogo size={16} animated={false} />}
-                      {src.isHindu && <TheHinduLogo height={12} color={selectedSource === src.id ? '#072e63' : '#ffffff'} />}
-                      {!src.isHindu && <span>{src.label}</span>}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Row 3: High-Yield Ministries (Interactive Chips & Search) */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold">
-                    High-Yield Ministries & Departments
-                  </label>
-                  {selectedMinistry !== 'ALL' && (
-                    <button
-                      onClick={() => setSelectedMinistry('ALL')}
-                      className="text-[10px] font-mono text-[#0194a8] hover:text-[#e0d0ab] cursor-pointer"
-                    >
-                      Show All Ministries
-                    </button>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <button
-                    onClick={() => setSelectedMinistry('ALL')}
-                    className={`px-2.5 py-1 rounded-xs text-xs font-sans transition-colors cursor-pointer border ${
-                      selectedMinistry === 'ALL'
-                        ? 'bg-[#e0d0ab] text-[#072e63] border-[#e0d0ab] font-bold shadow-sm'
-                        : 'bg-[rgba(4,25,54,0.7)] border-[rgba(19,108,153,0.35)] text-[#8fa2bd] hover:text-primary'
-                    }`}
-                  >
-                    All Ministries ({items.length})
-                  </button>
-                  {TOP_MINISTRIES.map((min) => {
-                    const count = items.filter((it) => it.ministry === min).length;
-                    const isSelected = selectedMinistry === min;
-                    const shortName = min.replace('Ministry of ', '').replace('and ', '& ');
-                    return (
-                      <button
-                        key={min}
-                        onClick={() => setSelectedMinistry(isSelected ? 'ALL' : min)}
-                        className={`px-2.5 py-1 rounded-xs text-xs font-sans transition-colors cursor-pointer border ${
-                          isSelected
-                            ? 'bg-[#e0d0ab] text-[#072e63] border-[#e0d0ab] font-bold shadow-sm'
-                            : 'bg-[rgba(4,25,54,0.7)] border-[rgba(19,108,153,0.35)] text-[#8fa2bd] hover:border-[#e0d0ab] hover:text-[#e0d0ab]'
-                        }`}
-                      >
-                        <span>{shortName}</span>
-                        {count > 0 && <span className="ml-1 text-[10px] opacity-75">({count})</span>}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Bottom Actions Bar */}
-              <div className="flex items-center justify-between pt-3 border-t border-[rgba(19,108,153,0.3)]">
-                <span className="text-xs font-mono text-[#8fa2bd]">
-                  Showing <span className="text-[#e0d0ab] font-bold">{displayedItems.length}</span> dispatches matching filters
-                </span>
-                {activeFilterCount > 0 && (
-                  <button
-                    onClick={resetAllFilters}
-                    className="px-3.5 py-1.5 bg-[rgba(11,61,120,0.5)] hover:bg-[rgba(11,61,120,0.8)] border border-[#e0d0ab] text-[#e0d0ab] rounded-xs text-xs font-mono flex items-center gap-1.5 cursor-pointer shadow-sm"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Reset All Filters</span>
-                  </button>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ── Active Filter Badges Bar (Quick 1-Click Clear) ── */}
-        {activeFilterCount > 0 && (
-          <div className="flex items-center gap-2 flex-wrap pt-1">
-            <span className="font-mono text-[9px] uppercase tracking-wider text-[#8fa2bd]">
-              Active Filters:
-            </span>
-
-            {activeCategoryTab !== 'ALL' && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-xs bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.5)] text-[#e0d0ab] text-[11px] font-mono">
-                <span>{CATEGORY_TABS.find((t) => t.id === activeCategoryTab)?.label || activeCategoryTab}</span>
-                <button onClick={() => setActiveCategoryTab('ALL')} className="hover:text-white cursor-pointer ml-1">×</button>
-              </span>
-            )}
-
-            {selectedSource !== 'ALL' && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-xs bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.5)] text-[#e0d0ab] text-[11px] font-mono">
-                <span>Source: {selectedSource}</span>
-                <button onClick={() => setSelectedSource('ALL')} className="hover:text-white cursor-pointer ml-1">×</button>
-              </span>
-            )}
-
-            {selectedMinistry !== 'ALL' && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-xs bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.5)] text-[#e0d0ab] text-[11px] font-mono">
-                <span>{selectedMinistry.replace('Ministry of ', '')}</span>
-                <button onClick={() => setSelectedMinistry('ALL')} className="hover:text-white cursor-pointer ml-1">×</button>
-              </span>
-            )}
-
-            {timePreset !== 'ALL' && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-xs bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.5)] text-[#e0d0ab] text-[11px] font-mono">
-                <span>Time: {timePreset === 'TODAY' ? 'Today' : timePreset === 'WEEK' ? 'Past 7 Days' : timePreset === 'MONTH' ? 'Past 30 Days' : 'Custom'}</span>
-                <button onClick={() => applyTimePreset('ALL')} className="hover:text-white cursor-pointer ml-1">×</button>
-              </span>
-            )}
-
-            {trustFilter !== 'ALL' && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-xs bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.5)] text-[#e0d0ab] text-[11px] font-mono">
-                <span>{trustFilter === 'HIGH_GROUNDING' ? 'Grounding ≥90%' : 'Contested'}</span>
-                <button onClick={() => setTrustFilter('ALL')} className="hover:text-white cursor-pointer ml-1">×</button>
-              </span>
-            )}
-
-            {searchQuery && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-xs bg-[rgba(11,61,120,0.5)] border border-[rgba(19,108,153,0.5)] text-[#e0d0ab] text-[11px] font-mono">
-                <span>"{searchQuery}"</span>
-                <button onClick={() => setSearchQuery('')} className="hover:text-white cursor-pointer ml-1">×</button>
-              </span>
-            )}
-
-            <button
-              onClick={resetAllFilters}
-              className="text-[10px] font-mono text-[#8fa2bd] hover:text-[#e0d0ab] underline cursor-pointer ml-1"
-            >
-              Clear all
-            </button>
-          </div>
-        )}
-      </div>
-
+          <DailyBriefFilters
+            categories={categoryTabs}
+            ministries={[...TOP_MINISTRIES, ...ministries]}
+            ministryCounts={items.reduce<Record<string, number>>((counts, item) => {
+              counts[item.ministry] = (counts[item.ministry] || 0) + 1;
+              return counts;
+            }, {})}
+            indexedCount={items.length}
+            sources={sources}
+            category={activeCategoryTab}
+            source={selectedSource}
+            ministry={selectedMinistry}
+            time={timePreset}
+            trust={trustFilter}
+            startDate={startDate}
+            endDate={endDate}
+            search={searchQuery}
+            open={isFilterDrawerOpen}
+            resultCount={displayedItems.length}
+            loading={loading}
+            onCategory={(value) => { setActiveCategoryTab(value); setPage(0); }}
+            onSource={(value) => { setSelectedSource(value); setPage(0); }}
+            onMinistry={(value) => { setSelectedMinistry(value); setPage(0); }}
+            onTime={(value) => { applyTimePreset(value); setPage(0); }}
+            onTrust={setTrustFilter}
+            onStartDate={(value) => { setStartDate(value); setPage(0); }}
+            onEndDate={(value) => { setEndDate(value); setPage(0); }}
+            onSearch={setSearchQuery}
+            onToggle={() => setIsFilterDrawerOpen(!isFilterDrawerOpen)}
+            onReset={resetAllFilters}
+          />
       {/* ── Loading Skeleton ── */}
       {loading ? (
         <div className="space-y-6">
@@ -1553,16 +1094,18 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
         <div className="flex flex-col items-center justify-center p-16 border border-dashed border-border rounded-sm bg-surface-elevated/10 text-center font-sans">
           <Inbox className="w-10 h-10 text-muted mb-3" />
           <h3 className="font-serif text-sm font-bold tracking-tight text-primary mb-1">
-            No Dispatches Ingested For Selected Parameters
+            {activeCategoryTab === 'SAVED' ? 'No saved briefs yet' : 'No briefs match these filters'}
           </h3>
-          <p className="text-muted text-xs max-w-md mx-auto mb-4">
-            Try adjusting your search keywords, switching category tabs, or clearing your date filters.
+          <p className="text-secondary text-sm max-w-md mx-auto mb-4">
+            {activeCategoryTab === 'SAVED'
+              ? 'Save a brief while reading to keep it in your reading list.'
+              : 'Try another search, choose a different topic in Filters, or reset your date range.'}
           </p>
           <button
             onClick={resetAllFilters}
             className="px-4 py-2 bg-surface-elevated border border-border text-[#e0d0ab] text-xs font-sans rounded-sm hover:border-[#e0d0ab] transition-all cursor-pointer"
           >
-            Clear All Filters
+            {activeCategoryTab === 'SAVED' ? 'Browse latest briefs' : 'Reset all filters'}
           </button>
         </div>
       ) : (
