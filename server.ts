@@ -18,6 +18,7 @@ import questionsHandler from "./server-lib/questions.js";
 import { handleGetRebase, handlePostRebaseAck } from "./server-lib/rebase.js";
 import { analyticsRouter } from "./server-lib/analytics/routes.js";
 import { seoRouter } from "./server-lib/seo/routes.js";
+import { policyRadarHandler } from "./server-lib/policy-radar.js";
 import {
   examCatalogHandler,
   examStartHandler,
@@ -173,6 +174,7 @@ async function startServer() {
   app.post("/api/rebase/ack", handlePostRebaseAck);
   app.use("/api/analytics", analyticsRouter);
   app.get("/api/questions", questionsHandler);
+  app.get("/api/policy-radar", policyRadarHandler);
 
   app.get("/api/exam/catalog", examCatalogHandler);
   app.post("/api/exam/start", examStartHandler);

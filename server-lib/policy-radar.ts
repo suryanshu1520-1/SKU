@@ -23,7 +23,7 @@ function getFallbackSnapshot() {
   return { chains: [], entities: [] };
 }
 
-export default async function policyRadarHandler(req: Request, res: Response) {
+export async function policyRadarHandler(req: Request, res: Response) {
   // Set Vercel Edge caching headers: 1 hour edge cache, 24 hours stale-while-revalidate
   res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
   res.setHeader('Content-Type', 'application/json');
@@ -95,3 +95,5 @@ export default async function policyRadarHandler(req: Request, res: Response) {
     return res.status(200).json(getFallbackSnapshot());
   }
 }
+
+export default policyRadarHandler;
