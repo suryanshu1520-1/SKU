@@ -30,6 +30,17 @@ import {
 } from 'lucide-react';
 import { InlineMath, BlockMath } from './MathView';
 import PolicyRippleRadar, { CANONICAL_RIPPLE_CHAINS } from './observatory/PolicyRippleRadar';
+import './observatory/PolicyRippleRadar.css';
+
+function SonarIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="6" />
+      <circle cx="12" cy="12" r="2" />
+    </svg>
+  );
+}
 
 // ============================================================================
 // VERIFIED HIGH-YIELD TOPICS & PYQ BASELINE
@@ -770,12 +781,12 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
   }, [readingWpm]);
 
   const TABS = [
-    { id: 'vault' as const, label: 'Question Vault', icon: Search, badge: '1,500+ PYQs' },
-    { id: 'calculator' as const, label: '50:50 & Cutoff Calculator', icon: Calculator, badge: '+0.67 EV' },
-    { id: 'matrix' as const, label: 'High-Yield Topics', icon: Flame, badge: 'Top 75%' },
-    { id: 'traps' as const, label: 'Examiner Traps', icon: Crosshair, badge: '4 Patterns' },
-    { id: 'pacing' as const, label: 'Pacing & Mains Rubric', icon: Clock, badge: 'Directives' },
-    { id: 'ripple' as const, label: 'Policy Ripple Radar', icon: GitFork, badge: `${CANONICAL_RIPPLE_CHAINS.length} Chains` },
+    { id: 'vault' as const, label: 'Vault', icon: Search, badge: '1,500+' },
+    { id: 'calculator' as const, label: '50:50 & Cutoff', icon: Calculator, badge: '+0.67 EV' },
+    { id: 'matrix' as const, label: 'High-yield', icon: Flame, badge: 'Top 75%' },
+    { id: 'traps' as const, label: 'Traps', icon: Crosshair, badge: '4' },
+    { id: 'pacing' as const, label: 'Pacing & Rubric', icon: Clock, badge: null },
+    { id: 'ripple' as const, label: 'Ripple Radar', icon: SonarIcon, badge: `${CANONICAL_RIPPLE_CHAINS.length} chains` },
   ];
 
   return (
@@ -787,22 +798,23 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
         {/* ══════════════════════════════════════════════════════════════════
             HEADER & QUICK LAUNCH
             ══════════════════════════════════════════════════════════════════ */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 border-b border-[rgba(19,108,153,0.3)] pb-5">
-          <div className="space-y-1.5 max-w-2xl">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-sm bg-[#e0d0ab]/10 text-[#e0d0ab] border border-[#e0d0ab]/30 text-[11px] font-mono font-semibold uppercase tracking-wider">
-                Intelligence Engine
-              </span>
-              <span className="text-xs text-[#8fa2bd] flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                Last 15 Years (2011–2025)
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-12 pt-5 pb-2">
+          <div className="flex flex-col gap-3.5 max-w-2xl min-w-0">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3.5 font-mono text-[11px] uppercase tracking-[0.14em] text-[#e0d0ab]">
+              <span>Intelligence engine</span>
+              <span aria-hidden="true" className="w-7 h-px bg-[#e0d0ab]/30" />
+              <span className="inline-flex items-center gap-2 text-[#8fa2bd] tracking-normal normal-case">
+                <i aria-hidden="true" className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_0_3px_rgba(52,211,153,0.15)]" />
+                2011–2025 · 15 exam cycles
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#e8e0cf] tracking-tight">
-              The Observatory
+
+            <h1 className="font-serif text-4xl sm:text-[52px] font-normal leading-none tracking-tight text-[#f4ecd8]">
+              The <em className="italic text-[#e0d0ab]">Observatory</em>
             </h1>
-            <p className="text-xs sm:text-sm text-[#9fb0c8] leading-relaxed">
-              Explore 1,500+ verified UPSC Prelims questions from the modern 15-year testing era (2011–2025), calculate optimal 50:50 attempt strategies, and master the recurring traps examiners set every year.
+
+            <p className="text-sm sm:text-[15px] leading-relaxed text-[#9fb0c8] max-w-[56ch]">
+              1,500+ verified UPSC Prelims questions from the modern testing era. Calculate 50:50 attempt strategies and learn the traps examiners repeat every year.
             </p>
 
             {/* Quick Feature Launch Banner */}
@@ -810,72 +822,79 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
               <button
                 type="button"
                 onClick={() => handleTabChange('ripple')}
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm bg-gradient-to-r from-[rgba(1,148,168,0.2)] to-[rgba(224,208,171,0.15)] hover:from-[rgba(1,148,168,0.3)] hover:to-[rgba(224,208,171,0.25)] border border-[#0194a8]/50 text-[#e0d0ab] text-xs font-mono font-medium transition-all cursor-pointer shadow-xs group"
+                aria-label={`New: Policy Ripple Radar — ${CANONICAL_RIPPLE_CHAINS.length} chains, 5 legal tiers`}
+                className="inline-flex items-center gap-3 py-1.5 px-3.5 pl-1.5 rounded bg-[rgba(4,18,40,0.55)] hover:bg-[rgba(4,18,40,0.9)] border border-[rgba(224,208,171,0.16)] hover:border-[rgba(224,208,171,0.42)] text-[#f4ecd8] text-[13px] transition-all cursor-pointer group shadow-sm"
               >
-                <GitFork className="w-3.5 h-3.5 text-[#0194a8] group-hover:rotate-45 transition-transform" />
-                <span className="font-bold text-white">NEW:</span>
-                <span>Policy Ripple Radar & 5 Legal Tiers ({CANONICAL_RIPPLE_CHAINS.length} Policy Chains)</span>
-                <ArrowRight className="w-3 h-3 text-[#e0d0ab] group-hover:translate-x-0.5 transition-transform" />
+                <span aria-hidden="true" className="relative shrink-0 w-[26px] h-[26px] rounded-full border border-[rgba(224,208,171,0.35)] overflow-hidden bg-[#041228]">
+                  <span className="absolute inset-[6px] rounded-full border border-[rgba(224,208,171,0.18)]" />
+                  <span className="absolute inset-0 rounded-full radar-mini-spinning bg-[conic-gradient(from_0deg,rgba(224,208,171,0)_0deg_280deg,rgba(224,208,171,0.38)_359deg,rgba(224,208,171,0)_360deg)]" />
+                  <span className="absolute left-1/2 top-1/2 w-[3px] h-[3px] -ml-[1.5px] -mt-[1.5px] rounded-full bg-[#e0d0ab]" />
+                  <span className="absolute left-4 top-1 w-1 h-1 rounded-full bg-[#e0d0ab] radar-mini-blipping" />
+                </span>
+                <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-[#e0d0ab] font-medium">New</span>
+                <span aria-hidden="true" className="w-px h-3.5 bg-[rgba(224,208,171,0.2)]" />
+                <span className="font-serif text-[15px] text-[#f4ecd8]">Policy Ripple Radar</span>
+                <span className="text-xs text-[#8fa2bd]">{CANONICAL_RIPPLE_CHAINS.length} chains · 5 legal tiers</span>
+                <ArrowRight className="w-3.5 h-3.5 text-[#e0d0ab] group-hover:translate-x-0.5 transition-transform" />
               </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="shrink-0 pt-2 md:pt-0">
             <button
+              type="button"
               onClick={() => onNavigateArena && onNavigateArena()}
-              className="px-4 py-2.5 rounded-sm bg-[#e0d0ab] hover:bg-white text-[#072e63] font-sans font-bold text-xs uppercase tracking-wider transition-all duration-150 shadow-md hover:shadow-[#e0d0ab]/20 active:scale-[0.98] flex items-center gap-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e0d0ab]"
+              className="flex items-center gap-2.5 min-h-[46px] px-5 rounded bg-[#e0d0ab] hover:bg-[#f4ecd8] text-[#072e63] text-[13px] font-semibold tracking-normal transition-all duration-150 shadow-md hover:shadow-[#e0d0ab]/20 active:scale-[0.98] cursor-pointer"
             >
               <Zap className="w-4 h-4 fill-current" />
-              Launch Test Arena
+              <span>Launch test arena</span>
             </button>
           </div>
-        </div>
+        </header>
 
         {/* ══════════════════════════════════════════════════════════════════
             TAB NAVIGATION (6 HIGH-UTILITY MODES)
             ══════════════════════════════════════════════════════════════════ */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none border-b border-[rgba(19,108,153,0.35)]">
+        <nav
+          aria-label="Observatory sections"
+          className="relative flex items-center overflow-x-auto scrollbar-none border-t border-b border-[rgba(224,208,171,0.12)] gap-1"
+        >
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
+                type="button"
                 onClick={() => handleTabChange(tab.id)}
-                className={`relative px-3.5 py-2.5 rounded-sm font-sans text-xs font-medium transition-all duration-150 flex items-center gap-2 cursor-pointer shrink-0 ${
-                  isActive
-                    ? 'bg-[rgba(224,208,171,0.14)] text-[#e0d0ab] border border-[rgba(224,208,171,0.35)] shadow-xs'
-                    : tab.id === 'ripple'
-                    ? 'text-emerald-300 hover:text-white hover:bg-[rgba(16,185,129,0.15)] border border-emerald-500/30'
-                    : 'text-[#8fa2bd] hover:text-[#e8e0cf] hover:bg-[rgba(11,61,120,0.3)]'
+                className={`relative flex items-center gap-2 shrink-0 min-h-[48px] px-3.5 text-[13px] whitespace-nowrap transition-colors cursor-pointer ${
+                  isActive ? 'text-[#f4ecd8] font-medium' : 'text-[#8fa2bd] hover:text-[#f4ecd8]'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#e0d0ab]' : tab.id === 'ripple' ? 'text-emerald-400' : 'text-[#8fa2bd]'}`} />
-                <span>{tab.label}</span>
-                <span
-                  className={`text-[9px] font-mono px-1.5 py-0.2 rounded ${
-                    tab.id === 'ripple'
-                      ? isActive
-                        ? 'bg-emerald-500 text-neutral-950 font-bold'
-                        : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                      : isActive
-                      ? 'bg-[#072e63] text-[#e0d0ab]'
-                      : 'bg-[rgba(11,61,120,0.5)] text-[#8fa2bd]'
-                  }`}
-                >
-                  {tab.badge}
+                <span className={`flex items-center ${isActive ? 'text-[#e0d0ab]' : 'text-current'}`}>
+                  <Icon className="w-4 h-4" />
                 </span>
+                <span>{tab.label}</span>
+                {tab.badge && (
+                  <span
+                    className={`font-mono text-[10px] tracking-[0.02em] tabular-nums ${
+                      isActive ? 'text-[#e0d0ab]' : 'text-[#8fa2bd]'
+                    }`}
+                  >
+                    {tab.badge}
+                  </span>
+                )}
                 {isActive && (
                   <motion.div
                     layoutId="observatory-tab-edge"
-                    className="absolute -bottom-px left-2 right-2 h-0.5 bg-[#e0d0ab]"
-                    transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
+                    className="absolute bottom-[-1px] left-0 right-0 h-[2px] bg-[#e0d0ab]"
+                    transition={{ type: 'spring', bounce: 0.15, duration: 0.38 }}
                   />
                 )}
               </button>
             );
           })}
-        </div>
+        </nav>
 
         {/* ══════════════════════════════════════════════════════════════════
             TAB 1: QUESTION VAULT (SEARCH & TEST BANK)
