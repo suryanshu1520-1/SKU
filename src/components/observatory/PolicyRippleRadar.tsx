@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import SNAPSHOT from '../../data/policy-radar-snapshot.json';
 import {
   CHAINS,
   ENTITIES,
@@ -11,8 +12,21 @@ import './PolicyRippleRadar.css';
 
 export { CANONICAL_RIPPLE_CHAINS };
 
+export const RING_META: Record<number, { label: string; desc: string }> = {
+  0: { label: 'R0 · Sovereign Origin', desc: 'Cabinet, CCEA, Parliament, or Apex Court trigger' },
+  1: { label: 'R1 · Statutory Architecture', desc: 'Statutory rules, Master Directions, Gazette notifications' },
+  2: { label: 'R2 · Inter-Ministerial Execution', desc: 'Executing SPVs, Special Missions, Ministry MoUs' },
+  3: { label: 'R3 · Grassroots / Federal Rollout', desc: 'State adoption, terminal enforcement, citizen impact' },
+};
+
 export default function PolicyRippleRadar() {
   const [view, setView] = useState<'ripple' | 'entities'>('ripple');
+  const [chains, setChains] = useState<RippleChain[]>(
+    ((SNAPSHOT?.chains as unknown) as RippleChain[]) || CHAINS
+  );
+  const [entities, setEntities] = useState<EntityRecord[]>(
+    ((SNAPSHOT?.entities as unknown) as EntityRecord[]) || ENTITIES
+  );
   const [chainIndex, setChainIndex] = useState<number>(0);
   const [activeStep, setActiveStep] = useState<number>(0);
   const [tracing, setTracing] = useState<boolean>(false);
@@ -21,21 +35,57 @@ export default function PolicyRippleRadar() {
   const [refsOpen, setRefsOpen] = useState<boolean>(false);
   const [entitySearch, setEntitySearch] = useState<string>('');
   const [tierFilter, setTierFilter] = useState<string>('all');
-  const [entityAuthority, setEntityAuthority] = useState<string>(ENTITIES[0]?.authority || '');
+  const [entityAuthority, setEntityAuthority] = useState<string>(
+    SNAPSHOT?.entities?.[0]?.authority || ENTITIES[0]?.authority || ''
+  );
+
+  // Background Edge Hydration: updates with fresh live dispatches if online
+  useEffect(() => {
+    let isMounted = true;
+    async function hydrateLiveRadar() {
+      try {
+        const res = await fetch('/api/policy-radar');
+        if (res.ok) {
+          const liveData = await res.json();
+          if (isMounted && liveData?.chains?.length > 0) {
+            setChains(liveData.chains);
+            if (liveData?.entities?.length > 0) {
+              setEntities(liveData.entities);
+            }
+          }
+        }
+      } catch {
+        // Silently preserve prebaked snapshot fallback
+      }
+    }
+    hydrateLiveRadar();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const traceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const TRACE_MS = 1800;
 
-  const currentChain: RippleChain = CHAINS[chainIndex] || CHAINS[0];
+  const currentChain: RippleChain = chains[chainIndex] || chains[0] || CHAINS[0];
   const steps = currentChain.nodes_flow;
   const n = steps.length;
   const currentStepIndex = Math.min(activeStep, n - 1);
   const currentStep = steps[currentStepIndex];
 
-  // Radar polar coordinate geometry
+  // 4-Ring Deterministic Radar Polar Coordinate Geometry (r0..r3)
   const geometry = useMemo(() => {
-    const points = steps.map((_, i) => {
-      const radius = i === 0 ? 0 : 112 + ((i - 1) * 136) / Math.max(1, n - 2);
+    const points = steps.map((node, i) => {
+      const ringDepth = node.ring_depth;
+      const radius =
+        typeof ringDepth === 'number'
+          ? ringDepth === 0
+            ? 0
+            : 75 + ringDepth * 65 // r1: 140, r2: 205, r3: 270
+          : i === 0
+          ? 0
+          : 112 + ((i - 1) * 136) / Math.max(1, n - 2);
+
       const spread = Math.min(320, (n - 2) * 100);
       const angle = -90 + ((i - 1) * spread) / Math.max(1, n - 2);
       const t = (angle * Math.PI) / 180;
@@ -114,25 +164,26 @@ export default function PolicyRippleRadar() {
   // Filtered authorities list
   const filteredEntities = useMemo(() => {
     const q = entitySearch.trim().toLowerCase();
-    return ENTITIES.filter((e) => {
+    return entities.filter((e) => {
       const matchSearch =
         !q ||
-        `${e.authority} ${e.tier_description} ${e.neutralized_trap}`
+        `${e.authority} ${e.tier_description} ${e.neutralized_trap} ${e.parent_ministry || ''} ${e.entity_slug || ''}`
           .toLowerCase()
           .includes(q);
       const matchTier =
         tierFilter === 'all' || e.tier_number === Number(tierFilter);
       return matchSearch && matchTier;
     });
-  }, [entitySearch, tierFilter]);
+  }, [entities, entitySearch, tierFilter]);
 
   const selectedEntity: EntityRecord = useMemo(() => {
     return (
       filteredEntities.find((e) => e.authority === entityAuthority) ||
       filteredEntities[0] ||
+      entities[0] ||
       ENTITIES[0]
     );
-  }, [filteredEntities, entityAuthority]);
+  }, [entities, filteredEntities, entityAuthority]);
 
   const handleSelectChain = (idx: number) => {
     setTracing(false);
@@ -171,7 +222,7 @@ export default function PolicyRippleRadar() {
               Sovereign Knowledge Web
             </span>
             <span className="text-xs text-[#8fa2bd] font-mono">
-              {CHAINS.length} Chains · 5 Legal Tiers
+              {chains.length} Chains · 5 Legal Tiers
             </span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#e0d0ab] tracking-tight">
@@ -241,7 +292,7 @@ export default function PolicyRippleRadar() {
                 onChange={(e) => handleSelectChain(Number(e.target.value))}
                 className="w-full max-w-xl py-2 px-3 rounded-sm bg-[#071630] border border-[rgba(224,208,171,0.2)] text-xs sm:text-sm text-[#f4ecd8] focus:outline-none focus:border-[#e0d0ab] cursor-pointer"
               >
-                {CHAINS.map((c, i) => (
+                {chains.map((c, i) => (
                   <option key={c.chain_id} value={i} className="bg-[#041228] text-[#f4ecd8]">
                     {String(i + 1).padStart(2, '0')} · {c.title}
                   </option>
@@ -263,7 +314,7 @@ export default function PolicyRippleRadar() {
               </button>
               <button
                 type="button"
-                disabled={chainIndex === CHAINS.length - 1}
+                disabled={chainIndex === chains.length - 1}
                 onClick={() => handleSelectChain(chainIndex + 1)}
                 className="p-2 rounded-sm bg-[#071630] border border-[rgba(224,208,171,0.2)] text-[#e0d0ab] hover:bg-[#e0d0ab] hover:text-[#072e63] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
                 title="Next Policy Chain"
@@ -275,17 +326,33 @@ export default function PolicyRippleRadar() {
             </div>
           </div>
 
-          {/* Active Chain Title & Pillar */}
+          {/* Active Chain Title & Badges */}
           <div className="space-y-1">
             <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#f4ecd8]">
               {currentChain.title}
             </h3>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="px-2 py-0.5 rounded-sm bg-[rgba(1,148,168,0.15)] text-[#0194a8] border border-[rgba(1,148,168,0.3)] text-[10px] font-mono uppercase font-bold">
                 {currentChain.primary_pillar}
               </span>
+              {currentChain.node_id && (
+                <span className="px-2 py-0.5 rounded-sm bg-[#e0d0ab]/10 text-[#e0d0ab] border border-[#e0d0ab]/30 text-[10px] font-mono font-semibold" title="Master Syllabus Link">
+                  Syllabus: {currentChain.node_id}
+                </span>
+              )}
+              {currentChain.has_sync_debt && (
+                <span className="px-2 py-0.5 rounded-sm bg-amber-500/15 text-amber-300 border border-amber-500/40 text-[10px] font-mono uppercase font-bold flex items-center gap-1" title="Downstream fact mutation / Sync debt detected">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                  Sync Debt Active
+                </span>
+              )}
+              {currentChain.historical_twin_pyq_id && (
+                <span className="px-2 py-0.5 rounded-sm bg-purple-500/15 text-purple-300 border border-purple-500/30 text-[10px] font-mono">
+                  Twin PYQ: {currentChain.historical_twin_pyq_id}
+                </span>
+              )}
               <span className="text-xs text-[#8fa2bd]">
-                {steps.length} sequential ministerial checkpoints
+                {steps.length} sequential checkpoints
               </span>
             </div>
           </div>
@@ -343,22 +410,23 @@ export default function PolicyRippleRadar() {
                     <line key={i} x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} stroke="rgba(224,208,171,0.22)" strokeWidth={t.w} />
                   ))}
 
-                  {/* Concentric Step Radii Rings */}
-                  {geometry.points.slice(1).map((p, i) => {
-                    const idx = i + 1;
-                    const isSelected = currentStepIndex === idx;
-                    const isHovered = hoverStep === idx && !isSelected;
-                    const isPassed = idx < currentStepIndex;
+                  {/* Concentric 4-Ring Taxonomy Boundary Rings (r1: 140px, r2: 205px, r3: 270px) */}
+                  {[
+                    { r: 140, depth: 1 },
+                    { r: 205, depth: 2 },
+                    { r: 270, depth: 3 },
+                  ].map(({ r, depth }) => {
+                    const isRingActive = currentStep.ring_depth === depth;
                     return (
                       <circle
-                        key={`ring-${idx}`}
+                        key={`ring-depth-${depth}`}
                         cx="320"
                         cy="320"
-                        r={p.radius}
+                        r={r}
                         fill="none"
-                        stroke={isSelected || isHovered ? '#e0d0ab' : isPassed ? 'rgba(224,208,171,0.28)' : 'rgba(224,208,171,0.14)'}
-                        strokeOpacity={isSelected ? 0.75 : isHovered ? 0.45 : 1}
-                        strokeDasharray={isHovered ? '3 5' : 'none'}
+                        stroke={isRingActive ? '#e0d0ab' : 'rgba(224,208,171,0.18)'}
+                        strokeWidth={isRingActive ? 1.5 : 1}
+                        strokeDasharray={isRingActive ? 'none' : '2 5'}
                         className="transition-all duration-300"
                       />
                     );
@@ -510,7 +578,7 @@ export default function PolicyRippleRadar() {
 
               {/* Sub-radar explanatory footer */}
               <div className="flex justify-between items-center text-[10px] text-[#8fa2bd] pt-2 border-t border-[rgba(224,208,171,0.08)]">
-                <span>Concentric rings indicate sequential ministerial order</span>
+                <span>4 concentric rings: Hub (R0 Sovereign) → Inner (R1 Regulatory) → Middle (R2 Inter-Ministerial) → Outer (R3 Rollout)</span>
                 <span className="font-mono">Tark 2026 Executive Intelligence</span>
               </div>
             </div>
@@ -551,15 +619,33 @@ export default function PolicyRippleRadar() {
 
                 {/* Active Ministry & Action Card */}
                 <div className="p-4 rounded-sm bg-[#041228] border border-[rgba(224,208,171,0.18)] space-y-2.5">
-                  <span className="text-[10px] uppercase font-mono text-[#0194a8] font-bold block">
-                    Executing Authority / Ministry
-                  </span>
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <span className="text-[10px] uppercase font-mono text-[#0194a8] font-bold block">
+                      Executing Authority / Ministry
+                    </span>
+                    {typeof currentStep.ring_depth === 'number' && (
+                      <span className="px-1.5 py-0.5 rounded bg-[#e0d0ab]/10 border border-[#e0d0ab]/25 text-[10px] font-mono text-[#e0d0ab] font-bold">
+                        {RING_META[currentStep.ring_depth]?.label || `Ring ${currentStep.ring_depth}`}
+                      </span>
+                    )}
+                  </div>
                   <h4 className="text-lg sm:text-xl font-serif font-bold text-[#f4ecd8] leading-snug">
                     {currentStep.ministry}
                   </h4>
                   <p className="text-xs sm:text-sm text-[#b5c1d1] leading-relaxed pt-1 border-t border-[rgba(224,208,171,0.1)]">
                     {currentStep.action}
                   </p>
+                  {currentStep.mutates_prior_fact && (
+                    <div className="p-2 rounded bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-200 flex items-center gap-1.5">
+                      <span className="text-amber-400 font-bold">⚠️ Sync Debt:</span>
+                      <span>This step mutates an earlier baseline fact or target in the chain.</span>
+                    </div>
+                  )}
+                  {currentStep.examiner_operator && (
+                    <div className="text-[10px] font-mono text-[#8fa2bd] pt-1">
+                      Examiner Trap: <span className="text-[#e0d0ab]">{currentStep.examiner_operator}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Step Navigation Controls */}
@@ -907,6 +993,24 @@ export default function PolicyRippleRadar() {
                   </div>
                 </div>
 
+                {/* Administrative Parentage & Statutory Grounding */}
+                {(selectedEntity.parent_ministry || selectedEntity.parent_statute_or_article) && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    {selectedEntity.parent_ministry && (
+                      <div className="p-2.5 rounded-sm bg-[#071630] border border-[rgba(224,208,171,0.1)]">
+                        <span className="text-[10px] font-mono uppercase text-[#8fa2bd] block">Nodal Ministry</span>
+                        <span className="text-[#f4ecd8] font-medium">{selectedEntity.parent_ministry}</span>
+                      </div>
+                    )}
+                    {selectedEntity.parent_statute_or_article && (
+                      <div className="p-2.5 rounded-sm bg-[#071630] border border-[rgba(224,208,171,0.1)]">
+                        <span className="text-[10px] font-mono uppercase text-[#8fa2bd] block">Parent Statute / Article</span>
+                        <span className="text-[#e0d0ab] font-mono font-semibold">{selectedEntity.parent_statute_or_article}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Legal Origin & Mandate */}
                 <div className="space-y-1.5">
                   <h4 className="text-xs font-mono uppercase tracking-wider text-[#e0d0ab] font-bold">
@@ -918,13 +1022,18 @@ export default function PolicyRippleRadar() {
                 </div>
 
                 {/* Neutralized UPSC Trap */}
-                <div className="p-3.5 rounded-sm bg-red-950/20 border border-red-500/35 space-y-1 text-xs">
+                <div className="p-3.5 rounded-sm bg-red-950/20 border border-red-500/35 space-y-1.5 text-xs">
                   <span className="text-red-400 font-bold block text-[11px] font-mono uppercase">
                     Examiner Trap Neutralized:
                   </span>
-                  <p className="text-red-200 text-xs leading-relaxed">
+                  <p className="text-red-200 text-xs leading-relaxed font-semibold">
                     {selectedEntity.neutralized_trap}
                   </p>
+                  {selectedEntity.trap_explanation && (
+                    <p className="text-red-300/80 text-[11px] leading-relaxed pt-1.5 border-t border-red-500/20">
+                      {selectedEntity.trap_explanation}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
