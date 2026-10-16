@@ -1,0 +1,54 @@
+/* Policy Ripple Radar Animations & Scoped Styles */
+
+@keyframes radar-sweep-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes radar-blip-pulse {
+  0%, 10% {
+    opacity: 0.25;
+    transform: scale(1);
+  }
+  13% {
+    opacity: 1;
+    transform: scale(1.6);
+  }
+  60%, 100% {
+    opacity: 0.25;
+    transform: scale(1);
+  }
+}
+
+@keyframes radar-ping-expand {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.radar-sweep-spinning {
+  animation: radar-sweep-spin 3.6s linear infinite;
+  transform-origin: center center;
+}
+
+.radar-mini-spinning {
+  animation: radar-sweep-spin 3.2s linear infinite;
+  transform-origin: center center;
+}
+
+.radar-mini-blipping {
+  animation: radar-blip-pulse 3.2s infinite;
+}
+
+.radar-node-ping {
+  animation: radar-ping-expand 1.8s cubic-bezier(0.2, 0.7, 0.3, 1) infinite;
+}

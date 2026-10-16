@@ -112,8 +112,11 @@ scripts/data/simulations/pib_categorized_*.json
 *.dryrun.*
 cluster-test.ts
 tsconfig.verify*.json
-Design*.html
-Design*.htm
+# ── HTML files (except root index.html) ──
+*.html
+!index.html
+Policy*.html
+unpacked*.html
 
 # ── Raw Source Archive (Local OCR & raw data — NEVER pushed to git) ──
 _raw_source_archive/

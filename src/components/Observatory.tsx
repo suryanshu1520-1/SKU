@@ -29,7 +29,7 @@ import {
   GitFork,
 } from 'lucide-react';
 import { InlineMath, BlockMath } from './MathView';
-import PolicyRippleRadar from './observatory/PolicyRippleRadar';
+import PolicyRippleRadar, { CANONICAL_RIPPLE_CHAINS } from './observatory/PolicyRippleRadar';
 
 // ============================================================================
 // VERIFIED HIGH-YIELD TOPICS & PYQ BASELINE
@@ -775,7 +775,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
     { id: 'matrix' as const, label: 'High-Yield Topics', icon: Flame, badge: 'Top 75%' },
     { id: 'traps' as const, label: 'Examiner Traps', icon: Crosshair, badge: '4 Patterns' },
     { id: 'pacing' as const, label: 'Pacing & Mains Rubric', icon: Clock, badge: 'Directives' },
-    { id: 'ripple' as const, label: 'Policy Ripple Radar', icon: GitFork, badge: '15 Chains' },
+    { id: 'ripple' as const, label: 'Policy Ripple Radar', icon: GitFork, badge: `${CANONICAL_RIPPLE_CHAINS.length} Chains` },
   ];
 
   return (
@@ -814,7 +814,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
               >
                 <GitFork className="w-3.5 h-3.5 text-[#0194a8] group-hover:rotate-45 transition-transform" />
                 <span className="font-bold text-white">NEW:</span>
-                <span>Policy Ripple Radar & 5 Legal Tiers Web (15 Macro Chains)</span>
+                <span>Policy Ripple Radar & 5 Legal Tiers ({CANONICAL_RIPPLE_CHAINS.length} Policy Chains)</span>
                 <ArrowRight className="w-3 h-3 text-[#e0d0ab] group-hover:translate-x-0.5 transition-transform" />
               </button>
             </div>

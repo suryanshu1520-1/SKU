@@ -1,567 +1,934 @@
-import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
-  Share2,
-  ArrowRight,
-  ShieldCheck,
-  Scale,
-  Zap,
-  AlertTriangle,
-  Search,
-  FileText,
-  CheckCircle2,
-  Building2,
-  ScrollText,
-  GitFork,
-  ExternalLink,
-  Layers,
-  Sparkles,
-  ChevronRight
-} from 'lucide-react';
+  CHAINS,
+  ENTITIES,
+  TIERS,
+  CANONICAL_RIPPLE_CHAINS,
+  RippleChain,
+  EntityRecord,
+} from './policy-ripple-data';
+import './PolicyRippleRadar.css';
 
-export interface RippleStep {
-  ministry: string;
-  action: string;
-}
-
-export interface RippleChain {
-  chain_id: string;
-  title: string;
-  primary_pillar: string;
-  lead_driver: string;
-  nodes_flow: RippleStep[];
-  linked_dispatches: string[];
-}
-
-export interface EntityTierInfo {
-  authority: string;
-  appearances_count: number;
-  tier_number: number;
-  tier_name: string;
-  tier_description: string;
-  neutralized_trap: string;
-}
-
-// 15 Canonical 2026 Macro Policy Ripple Chains
-export const CANONICAL_RIPPLE_CHAINS: RippleChain[] = [
-  {
-    chain_id: 'CHAIN_01_SEMICON_NEXUS',
-    title: 'The Semiconductor Ecosystem & Critical Materials Nexus',
-    primary_pillar: 'GS3 Science & Economy',
-    lead_driver: 'Cabinet approval of Semicon 2.0 with ₹1.27 Lakh Crore outlay and domestic component localization.',
-    nodes_flow: [
-      { ministry: 'Cabinet / PMO', action: 'Announced Semicon 2.0 guidelines and national AI computing infrastructure mission.' },
-      { ministry: 'Ministry of Power', action: 'Notified 552 GW non-fossil capacity target and ultra-reliable industrial grid standards for fabs.' },
-      { ministry: 'Ministry of Mines', action: 'Auctioned offshore critical minerals (Lithium, Rare Earths, Silicon) for chip substrate inputs.' },
-      { ministry: 'Ministry of Steel', action: 'Implemented green steel ship-recycling circulars to supply low-carbon structural housing.' },
-      { ministry: 'MeitY / ISM', action: 'Operationalized 5 approved semiconductor units and notified the ₹40,000 Cr ECMS scheme.' },
-      { ministry: 'Ministry of Commerce', action: 'Negotiated duty-free reciprocal access in New Zealand & Tajikistan FTAs for electronics.' },
-      { ministry: 'Reserve Bank of India', action: 'Calibrated overnight VRRR auctions to absorb massive foreign direct capex inflows.' },
-    ],
-    linked_dispatches: ['Dispatch #001 (BHAVYA 51:49 Clusters)', 'Dispatch #018 (Power for AI Engagements)', 'Dispatch #021 (Semiconductor CEO Roundtable)', 'Dispatch #022 (ECMS Component Scheme)', 'Dispatch #024 (India-NZ Free Trade Agreement)', 'Dispatch #229 (Semicon India 2026 Conclave)'],
-  },
-  {
-    chain_id: 'CHAIN_02_CIRCULAR_EWASTE',
-    title: 'Circular Economy & Industrial Effluent Compliance Cascades',
-    primary_pillar: 'GS3 Environment & GS2 Governance',
-    lead_driver: 'Special Campaign 6.0 and nationwide enforcement of E-Waste (Management) Rules, 2022.',
-    nodes_flow: [
-      { ministry: 'MoEFCC / CPCB', action: 'Notified strict extended producer responsibility (EPR) recycling targets.' },
-      { ministry: 'Ministry of Steel', action: 'Mandated institutional segregation and electronic disposal across all public steel plants.' },
-      { ministry: 'MeitY', action: 'Directed electronics manufacturers and GeM vendors to supply certified recyclable devices.' },
-      { ministry: 'Ministry of Law & Justice', action: 'Conducted judicial and legislative record disposal workshops at Kartavya Bhawan.' },
-    ],
-    linked_dispatches: ['Dispatch #019 (Steel E-Waste)', 'Dispatch #039 (ECL Sustainability)', 'Dispatch #457 (Namami Gange Pollution)', 'Dispatch #493 (E-Waste Kartavya Bhawan)'],
-  },
-  {
-    chain_id: 'CHAIN_03_DEFENSE_EXPORT_SURGE',
-    title: 'Defense Indigenization & Private Sector Export Explosion',
-    primary_pillar: 'GS3 Security & Economy',
-    lead_driver: 'Defense exports reaching all-time high of ₹38,424 Crore in FY 2025-26 under DAP indigenization lists.',
-    nodes_flow: [
-      { ministry: 'Cabinet Secretariat', action: 'Approved higher capital acquisition budget allocation for domestic vendors.' },
-      { ministry: 'Ministry of Defence', action: 'Presented SIDM Champion Awards 2026 to incentivize private defense R&D.' },
-      { ministry: 'DRDO & Ordnance', action: 'Transferred missile propulsion and radar technology packages to private consortia.' },
-      { ministry: 'Indian Navy', action: 'Showcased indigenous stealth assets (INS Sahyadri, INS Kulish) at AIME-2026 in Philippines.' },
-      { ministry: 'Ministry of Commerce / DGFT', action: 'Streamlined military export authorizations toward ₹50,000 Crore 2029 target.' },
-    ],
-    linked_dispatches: ['Dispatch #241 (Surya Kiran Aerobatics)', 'Dispatch #361 (INS Sahyadri & Kulish at AIME-26)', 'Dispatch #421 (SIDM Champion Awards 2026)', 'Dispatch #433 (Ex-Servicemen Special Campaign)'],
-  },
-  {
-    chain_id: 'CHAIN_04_AGRI_MSP_COOP',
-    title: 'Agrarian Price Stabilization & Primary Cooperative Modernization',
-    primary_pillar: 'GS3 Agriculture & GS2 Cooperation',
-    lead_driver: 'Kharif price fixings, PM-KISAN biometric saturation, and PACS computerization.',
-    nodes_flow: [
-      { ministry: 'Cabinet Committee on Economic Affairs', action: 'Approved Kharif Minimum Support Prices guaranteeing 1.5x production cost.' },
-      { ministry: 'Ministry of Agriculture & FW', action: 'Disbursed PM-KISAN direct transfers and expanded digital crop insurance monitoring.' },
-      { ministry: 'Ministry of Cooperation', action: 'Connected Primary Agricultural Credit Societies (PACS) to common cloud accounting.' },
-      { ministry: 'Department of Fertilizers', action: 'Subsidized nano-urea and rationalized nutrient-based subsidies (NBS) for soil health.' },
-    ],
-    linked_dispatches: ['Dispatch #008 (NAFED Welfare Suite)', 'Dispatch #020 (Agri Development)', 'Dispatch #349 (India-Netherlands Agri Pact)'],
-  },
-  {
-    chain_id: 'CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR',
-    title: 'Monetary Liquidity Corridor & Sovereign Balance Sheet Calibrations',
-    primary_pillar: 'GS3 Economy & Monetary Policy',
-    lead_driver: 'RBI Variable Rate Reverse Repo (VRRR) liquidity absorption and corporate reporting rigor.',
-    nodes_flow: [
-      { ministry: 'Ministry of Finance', action: 'Tracked direct tax buoyant collections and maintained fiscal deficit trajectory.' },
-      { ministry: 'Reserve Bank of India (MPC)', action: 'Operated VRRR auctions at 5.49% to anchor short-term rates to policy repo.' },
-      { ministry: 'National Financial Reporting Authority (NFRA)', action: 'Enforced audit quality and technology assurance across corporate books.' },
-      { ministry: 'Ministry of Corporate Affairs', action: 'Expanded learner registrations for corporate governance and insolvency norms.' },
-    ],
-    linked_dispatches: ['Dispatch #003 (DigiDukaan Platform)', 'Dispatch #045 (NFRA Audit Quality)', 'Dispatch #046 (MCA Registrations)'],
-  },
-  {
-    chain_id: 'CHAIN_06_GREEN_HYDROGEN_SIGHT',
-    title: 'National Green Hydrogen Mission & Electrolyser Supply Chain',
-    primary_pillar: 'GS3 Environment & Energy',
-    lead_driver: 'Strategic Interventions for Green Hydrogen Transition (SIGHT) tenders under MNRE.',
-    nodes_flow: [
-      { ministry: 'MNRE', action: 'Allocated electrolyser manufacturing capacity under Component I of SIGHT mission.' },
-      { ministry: 'Ministry of Petroleum & NG', action: 'Mandated green hydrogen blending in public sector refinery operations.' },
-      { ministry: 'Ministry of Power', action: 'Granted open-access green energy transmission waivers for hydrogen production.' },
-    ],
-    linked_dispatches: ['Dispatch #038 (Geothermal Energy Policy)', 'Dispatch #253 (Telecom Manufacturing Investments)'],
-  },
-  {
-    chain_id: 'CHAIN_07_GATISHAKTI_LOGISTICS',
-    title: 'PM GatiShakti Multimodal Logistics & Transit De-bottlenecking',
-    primary_pillar: 'GS3 Infrastructure',
-    lead_driver: 'Network Planning Group (NPG) integrated clearances across transport ministries.',
-    nodes_flow: [
-      { ministry: 'DPIIT / PM GatiShakti', action: 'Synchronized infrastructure corridors using GIS multi-layer mapping.' },
-      { ministry: 'Ministry of Railways', action: 'Expanded Kavach 4.0 train collision avoidance rollout and freight corridors.' },
-      { ministry: 'Ministry of Road Transport & Highways', action: 'Monetized highway stretches and expedited economic corridor tunnels.' },
-      { ministry: 'Ministry of Ports & Shipping', action: 'Commissioned zero-emission green port tugs and coastal shipping nodes.' },
-    ],
-    linked_dispatches: ['Dispatch #029 (Zero Emission Green Shipping)', 'Dispatch #051 (CRRI Urban Pavement Tech)'],
-  },
-  {
-    chain_id: 'CHAIN_08_AYUSH_UNIVERSAL_HEALTH',
-    title: 'Universal Senior Healthcare & Traditional Medicine Integration',
-    primary_pillar: 'GS2 Social Justice & Health',
-    lead_driver: 'Expansion of Ayushman Bharat to senior citizens aged 70+ and 11th Ayurveda Day.',
-    nodes_flow: [
-      { ministry: 'Cabinet / MoHFW', action: 'Approved universal health coverage for all citizens 70+ regardless of income.' },
-      { ministry: 'Ministry of Ayush', action: 'Organized 11th Ayurveda Day globally and standardized CCRAS pharmacopoeia.' },
-      { ministry: 'National Health Authority', action: 'Digitized electronic health records under the Ayushman Bharat Digital Mission.' },
-    ],
-    linked_dispatches: ['Dispatch #032 (Health Infrastructure Updates)', 'Dispatch #047 (CCRAS Internal Finance)', 'Dispatch #265 (11th Ayurveda Day Mandate)'],
-  },
-];
-
-// Sample Entity Disambiguation Entries
-export const SAMPLE_ENTITY_TIERS: EntityTierInfo[] = [
-  {
-    authority: 'Election Commission of India (ECI)',
-    appearances_count: 12,
-    tier_number: 1,
-    tier_name: 'Constitutional Body',
-    tier_description: 'Article 324 of the Constitution. Autonomous, permanent constitutional organ.',
-    neutralized_trap: 'PSY_03_LEGAL_TIER (Examiners misclaiming ECI is created under Representation of the People Act 1951)',
-  },
-  {
-    authority: 'National Commission for Scheduled Castes (NCSC)',
-    appearances_count: 8,
-    tier_number: 1,
-    tier_name: 'Constitutional Body',
-    tier_description: 'Article 338 of the Constitution. Direct constitutional grievance redressal powers.',
-    neutralized_trap: 'PSY_03_LEGAL_TIER (Confusing constitutional origin with statutory commission acts)',
-  },
-  {
-    authority: 'Reserve Bank of India (RBI)',
-    appearances_count: 103,
-    tier_number: 2,
-    tier_name: 'Statutory Apex Regulator',
-    tier_description: 'Reserve Bank of India Act, 1934. Statutory central bank and monetary regulator.',
-    neutralized_trap: 'PSY_01_INST_SWAP (Swapping RBI with SEBI, NPCI, or Ministry of Finance)',
-  },
-  {
-    authority: 'National Financial Reporting Authority (NFRA)',
-    appearances_count: 9,
-    tier_number: 2,
-    tier_name: 'Statutory Apex Regulator',
-    tier_description: 'Section 132 of the Companies Act, 2013. Quasi-judicial corporate auditor regulator.',
-    neutralized_trap: 'PSY_01_INST_SWAP (Confusing NFRA with ICAI professional body or MCA internal division)',
-  },
-  {
-    authority: 'India Semiconductor Mission (ISM)',
-    appearances_count: 34,
-    tier_number: 3,
-    tier_name: 'Executive Business Division',
-    tier_description: 'Business Division under Digital India Corporation (MeitY). No separate Act of Parliament.',
-    neutralized_trap: 'PSY_03_LEGAL_TIER (Examiners asserting ISM was established via a parliamentary statute)',
-  },
-  {
-    authority: 'PM GatiShakti Network Planning Group (NPG)',
-    appearances_count: 18,
-    tier_number: 3,
-    tier_name: 'Executive Business Division',
-    tier_description: 'Inter-ministerial coordination group under DPIIT / Ministry of Commerce & Industry.',
-    neutralized_trap: 'PSY_01_INST_SWAP (Claiming NPG has independent statutory veto powers)',
-  },
-  {
-    authority: 'Society of Indian Defence Manufacturers (SIDM)',
-    appearances_count: 14,
-    tier_number: 4,
-    tier_name: 'Registered Industry Society',
-    tier_description: 'Apex non-profit industry body (established 2017) representing public and private defense players.',
-    neutralized_trap: 'PSY_01_INST_SWAP (Misattributing SIDM as a direct Department of Ministry of Defence)',
-  },
-  {
-    authority: 'Uranium Corporation of India Limited (UCIL)',
-    appearances_count: 6,
-    tier_number: 5,
-    tier_name: 'Public Sector Undertaking (PSU)',
-    tier_description: 'Public Sector Enterprise under Department of Atomic Energy (DAE).',
-    neutralized_trap: 'PSY_01_INST_SWAP (Confusing UCIL commercial mining with AERB nuclear safety regulator)',
-  },
-];
+export { CANONICAL_RIPPLE_CHAINS };
 
 export default function PolicyRippleRadar() {
-  const [selectedChainId, setSelectedChainId] = useState<string>(CANONICAL_RIPPLE_CHAINS[0].chain_id);
-  const [activeStepIdx, setActiveStepIdx] = useState<number>(0);
+  const [view, setView] = useState<'ripple' | 'entities'>('ripple');
+  const [chainIndex, setChainIndex] = useState<number>(0);
+  const [activeStep, setActiveStep] = useState<number>(0);
+  const [tracing, setTracing] = useState<boolean>(false);
+  const [hoverStep, setHoverStep] = useState<number>(-1);
+  const [pathOpen, setPathOpen] = useState<boolean>(false);
+  const [refsOpen, setRefsOpen] = useState<boolean>(false);
   const [entitySearch, setEntitySearch] = useState<string>('');
-  const [tierFilter, setTierFilter] = useState<number | 'all'>('all');
-  const [viewMode, setViewMode] = useState<'ripple' | 'entities'>('ripple');
+  const [tierFilter, setTierFilter] = useState<string>('all');
+  const [entityAuthority, setEntityAuthority] = useState<string>(ENTITIES[0]?.authority || '');
 
-  const selectedChain = useMemo(() => {
-    return CANONICAL_RIPPLE_CHAINS.find((c) => c.chain_id === selectedChainId) || CANONICAL_RIPPLE_CHAINS[0];
-  }, [selectedChainId]);
+  const traceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const TRACE_MS = 1800;
 
+  const currentChain: RippleChain = CHAINS[chainIndex] || CHAINS[0];
+  const steps = currentChain.nodes_flow;
+  const n = steps.length;
+  const currentStepIndex = Math.min(activeStep, n - 1);
+  const currentStep = steps[currentStepIndex];
+
+  // Radar polar coordinate geometry
+  const geometry = useMemo(() => {
+    const points = steps.map((_, i) => {
+      const radius = i === 0 ? 0 : 112 + ((i - 1) * 136) / Math.max(1, n - 2);
+      const spread = Math.min(320, (n - 2) * 100);
+      const angle = -90 + ((i - 1) * spread) / Math.max(1, n - 2);
+      const t = (angle * Math.PI) / 180;
+      return {
+        x: 320 + Math.cos(t) * radius,
+        y: 320 + Math.sin(t) * radius,
+        radius,
+        angle,
+      };
+    });
+
+    const links = points.slice(1).map((p, i) => {
+      const q = points[i];
+      const L = Math.hypot(p.x - q.x, p.y - q.y);
+      const dx = (p.x - q.x) / L;
+      const dy = (p.y - q.y) / L;
+      const inset = i === 0 ? 48 : 24;
+      const x1 = q.x + dx * inset;
+      const y1 = q.y + dy * inset;
+      const x2 = p.x - dx * 24;
+      const y2 = p.y - dy * 24;
+      return {
+        x1,
+        y1,
+        x2,
+        y2,
+        len: Math.hypot(x2 - x1, y2 - y1),
+        deg: (Math.atan2(dy, dx) * 180) / Math.PI,
+      };
+    });
+
+    return { points, links };
+  }, [steps, n]);
+
+  // 360-degree ticks
+  const ticks = useMemo(() => {
+    const arr = [];
+    for (let d = 0; d < 360; d += 10) {
+      const t = (d * Math.PI) / 180;
+      const major = d % 30 === 0;
+      const r1 = 280;
+      const r2 = major ? 270 : 275;
+      arr.push({
+        x1: 320 + Math.cos(t) * r1,
+        y1: 320 + Math.sin(t) * r1,
+        x2: 320 + Math.cos(t) * r2,
+        y2: 320 + Math.sin(t) * r2,
+        w: major ? 1.25 : 1,
+      });
+    }
+    return arr;
+  }, []);
+
+  // Tracing auto-advance schedule
+  useEffect(() => {
+    if (!tracing || view !== 'ripple') {
+      if (traceTimerRef.current) clearInterval(traceTimerRef.current);
+      return;
+    }
+
+    traceTimerRef.current = setTimeout(() => {
+      setActiveStep((prev) => {
+        if (prev >= n - 1) {
+          setTracing(false);
+          return prev;
+        }
+        return prev + 1;
+      });
+    }, TRACE_MS);
+
+    return () => {
+      if (traceTimerRef.current) clearTimeout(traceTimerRef.current);
+    };
+  }, [tracing, activeStep, n, view]);
+
+  // Filtered authorities list
   const filteredEntities = useMemo(() => {
-    return SAMPLE_ENTITY_TIERS.filter((e) => {
+    const q = entitySearch.trim().toLowerCase();
+    return ENTITIES.filter((e) => {
       const matchSearch =
-        !entitySearch ||
-        e.authority.toLowerCase().includes(entitySearch.toLowerCase()) ||
-        e.tier_description.toLowerCase().includes(entitySearch.toLowerCase()) ||
-        e.neutralized_trap.toLowerCase().includes(entitySearch.toLowerCase());
-      const matchTier = tierFilter === 'all' || e.tier_number === tierFilter;
+        !q ||
+        `${e.authority} ${e.tier_description} ${e.neutralized_trap}`
+          .toLowerCase()
+          .includes(q);
+      const matchTier =
+        tierFilter === 'all' || e.tier_number === Number(tierFilter);
       return matchSearch && matchTier;
     });
   }, [entitySearch, tierFilter]);
 
+  const selectedEntity: EntityRecord = useMemo(() => {
+    return (
+      filteredEntities.find((e) => e.authority === entityAuthority) ||
+      filteredEntities[0] ||
+      ENTITIES[0]
+    );
+  }, [filteredEntities, entityAuthority]);
+
+  const handleSelectChain = (idx: number) => {
+    setTracing(false);
+    setActiveStep(0);
+    setChainIndex(idx);
+    setPathOpen(false);
+    setRefsOpen(false);
+    setHoverStep(-1);
+  };
+
+  const handleSelectStep = (stepIdx: number) => {
+    setTracing(false);
+    setActiveStep(stepIdx);
+  };
+
+  const toggleTrace = () => {
+    if (tracing) {
+      setTracing(false);
+    } else {
+      if (activeStep >= n - 1) setActiveStep(0);
+      setTracing(true);
+    }
+  };
+
+  const activePoint = geometry.points[currentStepIndex] || { x: 320, y: 320, angle: -90 };
+
   return (
-    <div className="space-y-6">
-      {/* ── Sub-Nav Switcher ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-sm bg-[rgba(4,25,54,0.7)] border border-[rgba(19,108,153,0.35)] backdrop-blur-md">
-        <div>
+    <div className="w-full text-[#f4ecd8] font-sans space-y-6">
+      {/* ══════════════════════════════════════════════════════════════════
+          HERO & SUB-NAV: RADAR VS LEGAL TIERS
+          ══════════════════════════════════════════════════════════════════ */}
+      <div className="flex flex-wrap justify-between items-start gap-4 pb-5 border-b border-[rgba(224,208,171,0.14)]">
+        <div className="space-y-1.5 max-w-2xl">
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded-sm bg-[#e0d0ab]/10 text-[#e0d0ab] border border-[#e0d0ab]/30 text-[10px] font-mono uppercase tracking-wider">
-              Tark Sovereign Web
+            <span className="px-2 py-0.5 rounded-sm bg-[#e0d0ab]/10 text-[#e0d0ab] border border-[#e0d0ab]/30 text-[10px] font-mono uppercase tracking-wider font-semibold">
+              Sovereign Knowledge Web
             </span>
-            <span className="text-xs text-[#8fa2bd] flex items-center gap-1 font-mono">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              499 Dossiers Linked
+            <span className="text-xs text-[#8fa2bd] font-mono">
+              {CHAINS.length} Chains · 5 Legal Tiers
             </span>
           </div>
-          <h2 className="text-lg font-serif font-bold text-[#e8e0cf] mt-1">
-            Policy Ripple Radar & Sovereign Knowledge Web
+          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#e0d0ab] tracking-tight">
+            Policy Ripple Radar
           </h2>
-          <p className="text-xs text-[#9fb0c8]">
-            Trace inter-ministerial policy cascades, systemic supply-chain ripples, and deterministic entity tiers across the 2026 executive record.
+          <p className="text-xs sm:text-sm text-[#b5c1d1] leading-relaxed max-w-2xl">
+            Trace how a single Union policy trigger cascades across collaborating ministries, and verify the exact constitutional parentage of every authority behind the action.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        {/* View Switcher: Radar vs Legal Tiers */}
+        <div className="flex items-center gap-1.5 bg-[#041228] p-1 rounded-sm border border-[rgba(224,208,171,0.16)] shrink-0">
           <button
-            onClick={() => setViewMode('ripple')}
-            className={`px-3 py-1.5 rounded-sm font-sans text-xs font-medium transition-all duration-150 flex items-center gap-1.5 cursor-pointer ${
-              viewMode === 'ripple'
-                ? 'bg-[rgba(224,208,171,0.18)] text-[#e0d0ab] border border-[#e0d0ab]/40 shadow-xs'
-                : 'text-[#8fa2bd] hover:text-[#e8e0cf] hover:bg-[rgba(11,61,120,0.3)]'
+            type="button"
+            onClick={() => setView('ripple')}
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-sm text-xs font-semibold cursor-pointer transition-all duration-150 ${
+              view === 'ripple'
+                ? 'bg-[#e0d0ab] text-[#072e63] shadow-sm'
+                : 'text-[#8fa2bd] hover:text-[#f4ecd8]'
             }`}
           >
-            <GitFork className="w-3.5 h-3.5" />
-            <span>Ripple Chains</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <circle cx="12" cy="12" r="6" />
+              <circle cx="12" cy="12" r="2" />
+            </svg>
+            <span>Ripple Radar</span>
           </button>
           <button
-            onClick={() => setViewMode('entities')}
-            className={`px-3 py-1.5 rounded-sm font-sans text-xs font-medium transition-all duration-150 flex items-center gap-1.5 cursor-pointer ${
-              viewMode === 'entities'
-                ? 'bg-[rgba(224,208,171,0.18)] text-[#e0d0ab] border border-[#e0d0ab]/40 shadow-xs'
-                : 'text-[#8fa2bd] hover:text-[#e8e0cf] hover:bg-[rgba(11,61,120,0.3)]'
+            type="button"
+            onClick={() => {
+              setTracing(false);
+              setView('entities');
+            }}
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-sm text-xs font-semibold cursor-pointer transition-all duration-150 ${
+              view === 'entities'
+                ? 'bg-[#e0d0ab] text-[#072e63] shadow-sm'
+                : 'text-[#8fa2bd] hover:text-[#f4ecd8]'
             }`}
           >
-            <Scale className="w-3.5 h-3.5" />
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+              <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+              <path d="M7 21h10" />
+              <path d="M12 3v18" />
+              <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" />
+            </svg>
             <span>5 Legal Tiers</span>
           </button>
         </div>
       </div>
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          VIEW 1: INTER-MINISTERIAL POLICY RIPPLE CHAINS
-          ══════════════════════════════════════════════════════════════════════ */}
-      {viewMode === 'ripple' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          {/* Left: Ripple Chain Selector */}
-          <div className="lg:col-span-4 space-y-2">
-            <div className="px-3 py-2 rounded-sm bg-[rgba(11,61,120,0.3)] border border-[rgba(19,108,153,0.3)] flex items-center justify-between">
-              <span className="text-[11px] font-mono font-semibold text-[#e0d0ab] uppercase tracking-wider flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5" />
-                Select Policy Cascade
-              </span>
-              <span className="text-[10px] font-mono text-[#8fa2bd]">15 Chains</span>
+      {/* ══════════════════════════════════════════════════════════════════
+          VIEW 1: RADAR RIPPLE SIMULATOR
+          ══════════════════════════════════════════════════════════════════ */}
+      {view === 'ripple' && (
+        <div className="space-y-6">
+          {/* Chain Selection Ribbon */}
+          <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-sm bg-[#041228] border border-[rgba(224,208,171,0.14)]">
+            <div className="flex items-center gap-3 flex-1 min-w-[240px]">
+              <label htmlFor="chain-selector" className="text-xs font-mono uppercase tracking-wider text-[#e0d0ab] font-bold shrink-0">
+                Policy Chain:
+              </label>
+              <select
+                id="chain-selector"
+                value={chainIndex}
+                onChange={(e) => handleSelectChain(Number(e.target.value))}
+                className="w-full max-w-xl py-2 px-3 rounded-sm bg-[#071630] border border-[rgba(224,208,171,0.2)] text-xs sm:text-sm text-[#f4ecd8] focus:outline-none focus:border-[#e0d0ab] cursor-pointer"
+              >
+                {CHAINS.map((c, i) => (
+                  <option key={c.chain_id} value={i} className="bg-[#041228] text-[#f4ecd8]">
+                    {String(i + 1).padStart(2, '0')} · {c.title}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <div className="space-y-1.5 max-h-[580px] overflow-y-auto pr-1 scrollbar-thin">
-              {CANONICAL_RIPPLE_CHAINS.map((chain, idx) => {
-                const isSelected = chain.chain_id === selectedChainId;
-                return (
-                  <button
-                    key={chain.chain_id}
-                    onClick={() => {
-                      setSelectedChainId(chain.chain_id);
-                      setActiveStepIdx(0);
-                    }}
-                    className={`w-full text-left p-3 rounded-sm transition-all duration-150 border cursor-pointer relative ${
-                      isSelected
-                        ? 'bg-[rgba(224,208,171,0.12)] border-[#e0d0ab]/50 shadow-sm'
-                        : 'bg-[rgba(4,25,54,0.6)] border-[rgba(19,108,153,0.25)] hover:border-[rgba(19,108,153,0.5)] hover:bg-[rgba(11,61,120,0.25)]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-[10px] font-mono font-bold text-[#e0d0ab]">
-                        CHAIN #{idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
-                      </span>
-                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[rgba(11,61,120,0.5)] text-[#8fa2bd]">
-                        {chain.nodes_flow.length} Steps
-                      </span>
-                    </div>
-                    <div className="text-xs font-serif font-bold text-[#e8e0cf] mt-1 leading-snug line-clamp-2">
-                      {chain.title}
-                    </div>
-                    <div className="text-[10px] text-[#8fa2bd] mt-1 flex items-center gap-1">
-                      <span className="text-emerald-400 font-mono">Pillar:</span> {chain.primary_pillar}
-                    </div>
-                    {isSelected && (
-                      <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#e0d0ab]">
-                        <ChevronRight className="w-4 h-4" />
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <button
+                type="button"
+                disabled={chainIndex === 0}
+                onClick={() => handleSelectChain(chainIndex - 1)}
+                className="p-2 rounded-sm bg-[#071630] border border-[rgba(224,208,171,0.2)] text-[#e0d0ab] hover:bg-[#e0d0ab] hover:text-[#072e63] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                title="Previous Policy Chain"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                disabled={chainIndex === CHAINS.length - 1}
+                onClick={() => handleSelectChain(chainIndex + 1)}
+                className="p-2 rounded-sm bg-[#071630] border border-[rgba(224,208,171,0.2)] text-[#e0d0ab] hover:bg-[#e0d0ab] hover:text-[#072e63] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                title="Next Policy Chain"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </button>
             </div>
           </div>
 
-          {/* Right: Active Ripple Flow & Interactive Visual DAG */}
-          <div className="lg:col-span-8 space-y-4">
-            {/* Chain Banner */}
-            <div className="p-4 sm:p-5 rounded-sm bg-[rgba(4,25,54,0.8)] border border-[rgba(19,108,153,0.35)] space-y-3">
-              <div className="flex items-center justify-between gap-3">
-                <span className="px-2 py-0.5 rounded-sm bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono font-semibold uppercase tracking-wider">
-                  Active Ripple Vector
-                </span>
-                <span className="text-xs text-[#8fa2bd] font-mono">{selectedChain.primary_pillar}</span>
-              </div>
-              <h3 className="text-base sm:text-lg font-serif font-bold text-[#e8e0cf] leading-snug">
-                {selectedChain.title}
-              </h3>
-              <p className="text-xs text-[#9fb0c8] leading-relaxed bg-[rgba(11,61,120,0.25)] p-2.5 rounded border border-[rgba(19,108,153,0.2)]">
-                <strong className="text-[#e0d0ab]">Lead Sovereign Driver:</strong> {selectedChain.lead_driver}
-              </p>
+          {/* Active Chain Title & Pillar */}
+          <div className="space-y-1">
+            <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#f4ecd8]">
+              {currentChain.title}
+            </h3>
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded-sm bg-[rgba(1,148,168,0.15)] text-[#0194a8] border border-[rgba(1,148,168,0.3)] text-[10px] font-mono uppercase font-bold">
+                {currentChain.primary_pillar}
+              </span>
+              <span className="text-xs text-[#8fa2bd]">
+                {steps.length} sequential ministerial checkpoints
+              </span>
             </div>
+          </div>
 
-            {/* Sequential Ripple Flow Steps */}
-            <div className="p-4 sm:p-5 rounded-sm bg-[rgba(4,25,54,0.8)] border border-[rgba(19,108,153,0.35)] space-y-4">
-              <div className="flex items-center justify-between">
-                <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[#e0d0ab] flex items-center gap-1.5">
-                  <GitFork className="w-3.5 h-3.5" />
-                  Inter-Ministerial Propagation Path
-                </h4>
-                <span className="text-[10px] font-mono text-[#8fa2bd]">Click any node to inspect action</span>
+          {/* Radar Main Console: Left Radar Display + Right Inspector */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 bg-[#041228] border border-[rgba(224,208,171,0.14)] rounded-sm overflow-hidden shadow-sm">
+            {/* LEFT COLUMN: SONAR RADAR CANVAS (Cols 1-7) */}
+            <div className="lg:col-span-7 flex flex-col justify-between p-4 sm:p-6 border-b lg:border-b-0 lg:border-r border-[rgba(224,208,171,0.14)] relative">
+              {/* Radar status telemetry header */}
+              <div className="flex items-center justify-between gap-3 text-xs text-[#b5c1d1] pb-2 border-b border-[rgba(224,208,171,0.08)]">
+                <div className="flex items-center gap-4 flex-wrap text-[11px]">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#e0d0ab]" />
+                    <span>Origin Trigger</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#b5c1d1]" />
+                    <span>Propagation Vector</span>
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 font-mono text-[11px] text-[#e0d0ab]">
+                  <span
+                    className={`w-2 h-2 rounded-full ${
+                      tracing ? 'bg-emerald-400 animate-ping' : 'bg-[#e0d0ab]'
+                    }`}
+                  />
+                  <span>
+                    {tracing ? 'Tracing Active' : `${n - 1} Downstream Ripples`}
+                  </span>
+                </div>
               </div>
 
-              <div className="space-y-3 relative before:absolute before:top-4 before:bottom-4 before:left-4 before:w-0.5 before:bg-[rgba(19,108,153,0.35)]">
-                {selectedChain.nodes_flow.map((step, sIdx) => {
-                  const isActive = activeStepIdx === sIdx;
-                  const isLast = sIdx === selectedChain.nodes_flow.length - 1;
-                  return (
-                    <motion.div
-                      key={sIdx}
-                      onClick={() => setActiveStepIdx(sIdx)}
-                      className={`relative pl-10 cursor-pointer transition-all duration-150 ${
-                        isActive ? 'scale-[1.01]' : 'opacity-85 hover:opacity-100'
-                      }`}
-                    >
-                      {/* Step Circle Indicator */}
-                      <div
-                        className={`absolute left-2.5 top-3 -translate-x-1/2 w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${
-                          isActive
-                            ? 'bg-[#e0d0ab] border-white ring-4 ring-[#e0d0ab]/20'
-                            : isLast
-                            ? 'bg-emerald-500 border-emerald-400'
-                            : 'bg-[#072e63] border-[#136c99]'
-                        }`}
-                      >
-                        <span className="text-[8px] font-mono font-bold text-[#041936]">{sIdx + 1}</span>
-                      </div>
+              {/* The Interactive SVG Radar Viewport */}
+              <div className="relative w-full max-w-[560px] mx-auto aspect-square my-4 select-none">
+                <svg
+                  viewBox="0 0 640 640"
+                  className="absolute inset-0 w-full h-full overflow-visible pointer-events-none"
+                >
+                  <defs>
+                    <radialGradient id="ripple-sector-fill" cx="320" cy="320" r="270" gradientUnits="userSpaceOnUse">
+                      <stop offset="0.15" stopColor="#e0d0ab" stopOpacity="0" />
+                      <stop offset="1" stopColor="#e0d0ab" stopOpacity="0.12" />
+                    </radialGradient>
+                  </defs>
 
-                      <div
-                        className={`p-3.5 rounded-sm border transition-all ${
-                          isActive
-                            ? 'bg-[rgba(224,208,171,0.14)] border-[#e0d0ab]/60 shadow-sm'
-                            : 'bg-[rgba(11,61,120,0.25)] border-[rgba(19,108,153,0.25)] hover:bg-[rgba(11,61,120,0.4)]'
+                  {/* Center Crosshairs */}
+                  <line x1="320" y1="40" x2="320" y2="600" stroke="rgba(224,208,171,0.16)" strokeDasharray="3 7" />
+                  <line x1="40" y1="320" x2="600" y2="320" stroke="rgba(224,208,171,0.16)" strokeDasharray="3 7" />
+
+                  {/* Outer Sonar Boundary Ring */}
+                  <circle cx="320" cy="320" r="280" fill="none" stroke="rgba(224,208,171,0.16)" />
+
+                  {/* 360-degree ticks */}
+                  {ticks.map((t, i) => (
+                    <line key={i} x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} stroke="rgba(224,208,171,0.22)" strokeWidth={t.w} />
+                  ))}
+
+                  {/* Concentric Step Radii Rings */}
+                  {geometry.points.slice(1).map((p, i) => {
+                    const idx = i + 1;
+                    const isSelected = currentStepIndex === idx;
+                    const isHovered = hoverStep === idx && !isSelected;
+                    const isPassed = idx < currentStepIndex;
+                    return (
+                      <circle
+                        key={`ring-${idx}`}
+                        cx="320"
+                        cy="320"
+                        r={p.radius}
+                        fill="none"
+                        stroke={isSelected || isHovered ? '#e0d0ab' : isPassed ? 'rgba(224,208,171,0.28)' : 'rgba(224,208,171,0.14)'}
+                        strokeOpacity={isSelected ? 0.75 : isHovered ? 0.45 : 1}
+                        strokeDasharray={isHovered ? '3 5' : 'none'}
+                        className="transition-all duration-300"
+                      />
+                    );
+                  })}
+
+                  {/* Active Sector Wedge pointing towards selected contact */}
+                  {currentStepIndex > 0 && (
+                    <path
+                      d="M 320 320 L 585.9 273.1 A 270 270 0 0 1 585.9 366.9 Z"
+                      fill="url(#ripple-sector-fill)"
+                      style={{
+                        transformOrigin: '320px 320px',
+                        transform: `rotate(${activePoint.angle}deg)`,
+                        transition: 'transform 450ms cubic-bezier(.3,.7,.2,1)',
+                      }}
+                    />
+                  )}
+
+                  {/* Propagation Vector Lines & Arrowheads */}
+                  {geometry.links.map((l, i) => {
+                    const isTraced = i < currentStepIndex;
+                    return (
+                      <g key={`link-${i}`}>
+                        {/* Background guide dotted line */}
+                        <line
+                          x1={l.x1}
+                          y1={l.y1}
+                          x2={l.x2}
+                          y2={l.y2}
+                          stroke="#b5c1d1"
+                          strokeOpacity="0.35"
+                          strokeWidth="1.25"
+                          strokeDasharray="4 5"
+                        />
+                        {/* Active glowing connection line */}
+                        {isTraced && (
+                          <line
+                            x1={l.x1}
+                            y1={l.y1}
+                            x2={l.x2}
+                            y2={l.y2}
+                            stroke="#e0d0ab"
+                            strokeOpacity="0.9"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                          />
+                        )}
+                        {/* Directional arrowhead */}
+                        <path
+                          d="M -6 -3.5 L 1 0 L -6 3.5 Z"
+                          fill={isTraced ? '#e0d0ab' : '#b5c1d1'}
+                          fillOpacity={isTraced ? 1 : 0.4}
+                          transform={`translate(${l.x2} ${l.y2}) rotate(${l.deg})`}
+                        />
+                      </g>
+                    );
+                  })}
+
+                  {/* Origin Central Hub Circle */}
+                  <circle cx="320" cy="320" r="44" fill="#071630" stroke="#e0d0ab" strokeWidth="1.5" />
+                </svg>
+
+                {/* Rotating Sonar Conic Gradient Sweep Line */}
+                {tracing && (
+                  <div
+                    className="absolute inset-[6.25%] w-[87.5%] h-[87.5%] rounded-full pointer-events-none radar-sweep-spinning"
+                    style={{
+                      background:
+                        'conic-gradient(from 0deg, rgba(224,208,171,0) 0deg 290deg, rgba(224,208,171,0.08) 352deg, rgba(224,208,171,0.3) 359.4deg, rgba(224,208,171,0) 360deg)',
+                    }}
+                  />
+                )}
+
+                {/* Interactive Contact Buttons Layer */}
+                {steps.map((st, i) => {
+                  const p = geometry.points[i];
+                  const isOrigin = i === 0;
+                  const isActive = i === currentStepIndex;
+                  const isTraced = i < currentStepIndex;
+                  const isHov = hoverStep === i;
+                  const isLit = isActive || (isHov && !isOrigin);
+                  const align = p.x < 130 ? 'start' : p.x > 510 ? 'end' : 'center';
+
+                  return (
+                    <button
+                      key={`contact-${i}`}
+                      type="button"
+                      onClick={() => handleSelectStep(i)}
+                      onMouseEnter={() => setHoverStep(i)}
+                      onMouseLeave={() => setHoverStep(-1)}
+                      className="absolute flex items-center justify-center cursor-pointer -translate-x-1/2 -translate-y-1/2 group"
+                      style={{
+                        left: `${(p.x / 640) * 100}%`,
+                        top: `${(p.y / 640) * 100}%`,
+                        width: isOrigin ? 60 : 44,
+                        height: isOrigin ? 60 : 44,
+                        zIndex: isHov || isActive ? 20 : 10,
+                      }}
+                      title={`${isOrigin ? 'Trigger' : `Step ${i}`}: ${st.ministry}`}
+                    >
+                      {/* Active Contact Target Ping */}
+                      {isActive && (
+                        <span className="absolute inset-0 rounded-full border border-[#e0d0ab] radar-node-ping pointer-events-none" />
+                      )}
+
+                      {/* Blip Circle */}
+                      <span
+                        className={`rounded-full flex items-center justify-center font-mono font-bold transition-all duration-200 text-xs ${
+                          isOrigin
+                            ? 'w-11 h-11 bg-[#071630] text-[#e0d0ab] border-2 border-[#e0d0ab]'
+                            : isLit
+                            ? 'w-8 h-8 bg-[#e0d0ab] text-[#072e63] border border-[#e0d0ab] scale-110 shadow-md'
+                            : isTraced
+                            ? 'w-7 h-7 bg-[#041228] text-[#e0d0ab] border border-[#e0d0ab]'
+                            : 'w-7 h-7 bg-[#041228] text-[#8fa2bd] border border-[#8fa2bd]/40 group-hover:border-[#e0d0ab]'
                         }`}
                       >
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs font-serif font-bold text-[#e8e0cf] flex items-center gap-1.5">
-                            <Building2 className="w-3.5 h-3.5 text-[#e0d0ab]" />
-                            {step.ministry}
-                          </span>
-                          <span
-                            className={`text-[9px] font-mono px-1.5 py-0.2 rounded uppercase ${
-                              sIdx === 0
-                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                                : isLast
-                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                                : 'bg-[rgba(11,61,120,0.6)] text-[#8fa2bd]'
-                            }`}
-                          >
-                            {sIdx === 0 ? 'Trigger' : isLast ? 'Sovereign Result' : `Ripple Step ${sIdx + 1}`}
-                          </span>
-                        </div>
-                        <p className="text-xs text-[#9fb0c8] mt-1.5 leading-relaxed">{step.action}</p>
-                      </div>
-                    </motion.div>
+                        {isOrigin ? (
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <circle cx="12" cy="12" r="6" />
+                            <circle cx="12" cy="12" r="2" />
+                          </svg>
+                        ) : (
+                          String(i).padStart(2, '0')
+                        )}
+                      </span>
+
+                      {/* Ministry Floating Label */}
+                      <span
+                        className={`absolute top-full mt-1 w-32 text-[11px] leading-tight font-medium bg-[#041228]/95 px-1.5 py-0.5 rounded border border-[rgba(224,208,171,0.18)] pointer-events-none transition-colors duration-150 ${
+                          align === 'start'
+                            ? 'left-0 text-left'
+                            : align === 'end'
+                            ? 'right-0 text-right'
+                            : 'left-1/2 -translate-x-1/2 text-center'
+                        } ${
+                          isActive || isHov
+                            ? 'text-[#e0d0ab] border-[#e0d0ab]/50'
+                            : 'text-[#8fa2bd]'
+                        }`}
+                      >
+                        {st.ministry}
+                      </span>
+                    </button>
                   );
                 })}
               </div>
+
+              {/* Sub-radar explanatory footer */}
+              <div className="flex justify-between items-center text-[10px] text-[#8fa2bd] pt-2 border-t border-[rgba(224,208,171,0.08)]">
+                <span>Concentric rings indicate sequential ministerial order</span>
+                <span className="font-mono">Tark 2026 Executive Intelligence</span>
+              </div>
             </div>
 
-            {/* Linked Primary Dossiers */}
-            <div className="p-4 rounded-sm bg-[rgba(4,25,54,0.7)] border border-[rgba(19,108,153,0.3)] space-y-2.5">
-              <span className="text-[11px] font-mono font-semibold text-[#e0d0ab] uppercase tracking-wider flex items-center gap-1.5">
-                <ScrollText className="w-3.5 h-3.5" />
-                Linked Primary Dossiers in Broadsheet Compendium
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {selectedChain.linked_dispatches.map((disp, dIdx) => (
-                  <div
-                    key={dIdx}
-                    className="p-2.5 rounded bg-[rgba(11,61,120,0.25)] border border-[rgba(19,108,153,0.2)] text-[11px] text-[#9fb0c8] flex items-start gap-2"
+            {/* RIGHT COLUMN: INSPECTION SIDEBAR (Cols 8-12) */}
+            <div className="lg:col-span-5 p-5 sm:p-6 bg-[#071630] flex flex-col justify-between space-y-5">
+              <div className="space-y-4">
+                {/* Current Position & Counter */}
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-mono font-bold uppercase tracking-wider text-[#e0d0ab]">
+                    {currentStepIndex === 0
+                      ? 'Policy Trigger Point'
+                      : currentStepIndex === n - 1
+                      ? 'Terminal Executive Step'
+                      : `Downstream Ripple ${currentStepIndex}`}
+                  </span>
+                  <span className="font-mono text-[#8fa2bd]">
+                    Step {currentStepIndex + 1} of {n}
+                  </span>
+                </div>
+
+                {/* Horizontal Segment Progress Bar */}
+                <div className="flex items-center gap-1">
+                  {steps.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => handleSelectStep(i)}
+                      className={`h-1.5 flex-1 rounded-sm transition-all cursor-pointer ${
+                        i <= currentStepIndex
+                          ? 'bg-[#e0d0ab]'
+                          : 'bg-[rgba(224,208,171,0.15)] hover:bg-[rgba(224,208,171,0.3)]'
+                      }`}
+                      title={`Jump to step ${i + 1}`}
+                    />
+                  ))}
+                </div>
+
+                {/* Active Ministry & Action Card */}
+                <div className="p-4 rounded-sm bg-[#041228] border border-[rgba(224,208,171,0.18)] space-y-2.5">
+                  <span className="text-[10px] uppercase font-mono text-[#0194a8] font-bold block">
+                    Executing Authority / Ministry
+                  </span>
+                  <h4 className="text-lg sm:text-xl font-serif font-bold text-[#f4ecd8] leading-snug">
+                    {currentStep.ministry}
+                  </h4>
+                  <p className="text-xs sm:text-sm text-[#b5c1d1] leading-relaxed pt-1 border-t border-[rgba(224,208,171,0.1)]">
+                    {currentStep.action}
+                  </p>
+                </div>
+
+                {/* Step Navigation Controls */}
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <button
+                    type="button"
+                    disabled={currentStepIndex === 0}
+                    onClick={() => handleSelectStep(currentStepIndex - 1)}
+                    className="p-2.5 rounded-sm bg-[#041228] border border-[rgba(224,208,171,0.18)] text-left hover:border-[#e0d0ab] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-all"
                   >
-                    <FileText className="w-3.5 h-3.5 text-[#e0d0ab] shrink-0 mt-0.5" />
-                    <span className="line-clamp-2">{disp}</span>
+                    <span className="block text-[10px] text-[#8fa2bd] font-mono">← Previous</span>
+                    <strong className="block text-xs text-[#e0d0ab] truncate">
+                      {currentStepIndex > 0 ? steps[currentStepIndex - 1].ministry : 'Origin'}
+                    </strong>
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={currentStepIndex === n - 1}
+                    onClick={() => handleSelectStep(currentStepIndex + 1)}
+                    className="p-2.5 rounded-sm bg-[#041228] border border-[rgba(224,208,171,0.18)] text-right hover:border-[#e0d0ab] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-all"
+                  >
+                    <span className="block text-[10px] text-[#8fa2bd] font-mono">Next Ripple →</span>
+                    <strong className="block text-xs text-[#e0d0ab] truncate">
+                      {currentStepIndex < n - 1 ? steps[currentStepIndex + 1].ministry : 'Terminal'}
+                    </strong>
+                  </button>
+                </div>
+
+                {/* Trace Automated Player Buttons */}
+                <div className="flex items-center gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={toggleTrace}
+                    className="flex-1 py-2.5 px-4 rounded-sm bg-[#e0d0ab] hover:bg-white text-[#072e63] font-sans font-bold text-xs uppercase tracking-wider transition-all duration-150 shadow-md flex items-center justify-center gap-2 cursor-pointer relative overflow-hidden"
+                  >
+                    {tracing ? (
+                      <>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                          <rect x="6" y="4" width="4" height="16" />
+                          <rect x="14" y="4" width="4" height="16" />
+                        </svg>
+                        <span>Pause Trace</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                          <polygon points="5 3 19 12 5 21 5 3" />
+                        </svg>
+                        <span>
+                          {currentStepIndex === n - 1 ? 'Replay Chain' : 'Trace Chain'}
+                        </span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSelectStep(0)}
+                    disabled={currentStepIndex === 0 && !tracing}
+                    className="p-2.5 rounded-sm bg-[#041228] border border-[rgba(224,208,171,0.2)] text-[#e0d0ab] hover:border-[#e0d0ab] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                    title="Reset to Policy Trigger (Step 0)"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                      <path d="M3 3v5h5" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* Lead Policy Catalyst Callout */}
+              <div className="p-3.5 rounded-sm bg-[#041228]/80 border border-[rgba(224,208,171,0.15)] space-y-1 text-xs">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold block">
+                  Lead Policy Catalyst:
+                </span>
+                <p className="text-[#b5c1d1] text-xs leading-relaxed">
+                  {currentChain.lead_driver}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Collapsible Section 1: Full Propagation Path Timeline */}
+          <div className="rounded-sm bg-[#041228] border border-[rgba(224,208,171,0.14)] overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setPathOpen(!pathOpen)}
+              className="w-full p-4 flex items-center justify-between text-left text-xs sm:text-sm font-semibold text-[#e0d0ab] hover:bg-[#071630] cursor-pointer transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                <span>View Full Chronological Propagation Vector</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#e0d0ab]/10 text-[#e0d0ab] border border-[#e0d0ab]/20">
+                  {steps.length} Steps
+                </span>
+              </span>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`transition-transform duration-200 ${pathOpen ? 'rotate-180' : ''}`}
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+
+            {pathOpen && (
+              <div className="p-4 pt-1 space-y-2 border-t border-[rgba(224,208,171,0.1)]">
+                {steps.map((st, i) => (
+                  <div
+                    key={i}
+                    onClick={() => handleSelectStep(i)}
+                    className={`p-3 rounded-sm flex items-start gap-3 cursor-pointer transition-colors ${
+                      i === currentStepIndex
+                        ? 'bg-[#e0d0ab]/15 border border-[#e0d0ab]/50'
+                        : 'bg-[#071630]/60 hover:bg-[#071630] border border-transparent'
+                    }`}
+                  >
+                    <span className="font-mono text-xs font-bold text-[#e0d0ab] shrink-0 w-6 pt-0.5">
+                      {i === 0 ? 'TRG' : String(i).padStart(2, '0')}
+                    </span>
+                    <div className="space-y-0.5 text-xs">
+                      <strong className={`block ${i === currentStepIndex ? 'text-[#e0d0ab]' : 'text-[#f4ecd8]'}`}>
+                        {st.ministry}
+                      </strong>
+                      <p className="text-[#b5c1d1] leading-relaxed">
+                        {st.action}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
-            </div>
+            )}
+          </div>
+
+          {/* Collapsible Section 2: Compendium References */}
+          <div className="rounded-sm bg-[#041228] border border-[rgba(224,208,171,0.14)] overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setRefsOpen(!refsOpen)}
+              className="w-full p-4 flex items-center justify-between text-left text-xs sm:text-sm font-semibold text-[#e0d0ab] hover:bg-[#071630] cursor-pointer transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                <span>Associated PIB Compendium Dossiers</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[rgba(1,148,168,0.15)] text-[#0194a8] border border-[rgba(1,148,168,0.3)]">
+                  {currentChain.linked_dispatches.length} Sources
+                </span>
+              </span>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className={`transition-transform duration-200 ${refsOpen ? 'rotate-180' : ''}`}
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+
+            {refsOpen && (
+              <div className="p-4 pt-1 space-y-2 border-t border-[rgba(224,208,171,0.1)] text-xs">
+                <p className="text-[#8fa2bd] text-[11px] pb-1">
+                  Primary source releases filed in the 2026 Master Chronicle grounding this ripple chain:
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {currentChain.linked_dispatches.map((ref, i) => (
+                    <div
+                      key={i}
+                      className="p-2.5 rounded-sm bg-[#071630] border border-[rgba(224,208,171,0.12)] text-[#e8e0cf] font-mono text-[11px]"
+                    >
+                      {ref}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════════════
-          VIEW 2: DETERMINISTIC ENTITY DISAMBIGUATION (5 LEGAL TIERS)
-          ══════════════════════════════════════════════════════════════════════ */}
-      {viewMode === 'entities' && (
-        <div className="space-y-4">
-          {/* Search & Filter Bar */}
-          <div className="p-4 sm:p-5 rounded-sm bg-[rgba(4,25,54,0.7)] border border-[rgba(19,108,153,0.35)] space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <h3 className="text-sm font-serif font-bold text-[#e8e0cf] flex items-center gap-2">
-                  <Scale className="w-4 h-4 text-[#e0d0ab]" />
-                  Deterministic Entity Disambiguation Grid
-                </h3>
-                <p className="text-xs text-[#8fa2bd]">
-                  Neutralize PSY_01 (Authority Swaps) and PSY_03 (Legal Tier Shifts) by anchoring each body to its exact origin.
-                </p>
-              </div>
+      {/* ══════════════════════════════════════════════════════════════════
+          VIEW 2: 5 LEGAL TIERS ENTITY DISAMBIGUATION MATRIX
+          ══════════════════════════════════════════════════════════════════ */}
+      {view === 'entities' && (
+        <div className="space-y-6">
+          {/* Header intro */}
+          <div className="space-y-1">
+            <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#f4ecd8]">
+              Know the Authority Behind the Action
+            </h3>
+            <p className="text-xs sm:text-sm text-[#b5c1d1] leading-relaxed max-w-3xl">
+              UPSC Prelims repeatedly tests whether an entity is a <strong>Constitutional organ</strong>, a <strong>Statutory regulator</strong>, an <strong>Executive division</strong>, or a <strong>Registered society</strong>. Use this matrix to instantly eliminate institutional swap traps.
+            </p>
+          </div>
 
-              {/* Tier Filter Pills */}
-              <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none">
-                <button
-                  onClick={() => setTierFilter('all')}
-                  className={`px-2.5 py-1 rounded text-[10px] font-mono cursor-pointer transition-all ${
-                    tierFilter === 'all'
-                      ? 'bg-[#e0d0ab] text-[#041936] font-bold'
-                      : 'bg-[rgba(11,61,120,0.4)] text-[#8fa2bd] hover:text-white'
-                  }`}
-                >
-                  All Tiers
-                </button>
-                {[1, 2, 3, 4, 5].map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setTierFilter(t)}
-                    className={`px-2.5 py-1 rounded text-[10px] font-mono cursor-pointer transition-all ${
-                      tierFilter === t
-                        ? 'bg-[#e0d0ab] text-[#041936] font-bold'
-                        : 'bg-[rgba(11,61,120,0.4)] text-[#8fa2bd] hover:text-white'
-                    }`}
-                  >
-                    Tier {t}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Search Input */}
-            <div className="relative">
-              <Search className="w-4 h-4 text-[#8fa2bd] absolute left-3.5 top-1/2 -translate-y-1/2" />
+          {/* Search & Tier Filter Bar */}
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 p-4 rounded-sm bg-[#041228] border border-[rgba(224,208,171,0.14)]">
+            <div className="sm:col-span-8 relative">
               <input
-                type="text"
+                type="search"
                 value={entitySearch}
                 onChange={(e) => setEntitySearch(e.target.value)}
-                placeholder="Search authority, statute, or trap (e.g. 'ECI', 'ISM', 'NFRA', 'SIDM', 'Article 324')..."
-                className="w-full pl-9 pr-4 py-2 rounded-sm bg-[rgba(11,61,120,0.3)] border border-[rgba(19,108,153,0.35)] text-xs text-[#e8e0cf] placeholder-[#8fa2bd]/60 focus:outline-none focus:border-[#e0d0ab]"
+                placeholder="Search authority name, parent Act, or trap keyword (e.g. 'Article 324', 'SEBI', 'ISM')..."
+                className="w-full py-2.5 px-3 rounded-sm bg-[#071630] border border-[rgba(224,208,171,0.2)] text-xs sm:text-sm text-[#f4ecd8] focus:outline-none focus:border-[#e0d0ab]"
               />
+            </div>
+
+            <div className="sm:col-span-4">
+              <select
+                value={tierFilter}
+                onChange={(e) => setTierFilter(e.target.value)}
+                className="w-full py-2.5 px-3 rounded-sm bg-[#071630] border border-[rgba(224,208,171,0.2)] text-xs sm:text-sm text-[#f4ecd8] focus:outline-none focus:border-[#e0d0ab] cursor-pointer"
+              >
+                <option value="all">All 5 Legal Tiers</option>
+                {TIERS.map((t, i) => (
+                  <option key={i} value={String(i + 1)}>
+                    Tier {i + 1} · {t}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
-          {/* Entity Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-            {filteredEntities.map((ent, eIdx) => {
-              const tierBadgeColors: Record<number, string> = {
-                1: 'bg-purple-500/20 text-purple-300 border-purple-500/40',
-                2: 'bg-blue-500/20 text-blue-300 border-blue-500/40',
-                3: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
-                4: 'bg-rose-500/20 text-rose-300 border-rose-500/40',
-                5: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
-              };
-
-              return (
-                <div
-                  key={eIdx}
-                  className="p-4 rounded-sm bg-[rgba(4,25,54,0.7)] border border-[rgba(19,108,153,0.3)] space-y-2.5 hover:border-[rgba(19,108,153,0.5)] transition-all"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h4 className="text-xs font-serif font-bold text-[#e8e0cf] leading-snug">
-                        {ent.authority}
-                      </h4>
-                      <span className="text-[10px] font-mono text-[#8fa2bd]">
-                        {ent.appearances_count} Dossiers Cited
-                      </span>
-                    </div>
-
-                    <span
-                      className={`text-[9px] font-mono px-2 py-0.5 rounded border uppercase shrink-0 font-bold ${
-                        tierBadgeColors[ent.tier_number] || 'bg-gray-500/20 text-gray-300'
+          {/* Entity Grid: Left List + Right Detail with 5-Tier Ladder */}
+          {filteredEntities.length === 0 ? (
+            <div className="p-10 rounded-sm bg-[#041228] border border-[rgba(224,208,171,0.14)] text-center space-y-3">
+              <p className="text-sm text-[#b5c1d1]">No authorities match your query.</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setEntitySearch('');
+                  setTierFilter('all');
+                }}
+                className="text-xs text-[#0194a8] hover:text-[#e0d0ab] underline cursor-pointer font-medium"
+              >
+                Reset Search Filters
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left Column: Authority Selector List (Cols 1-5) */}
+              <div className="lg:col-span-5 space-y-2 max-h-[580px] overflow-y-auto pr-1">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-[#8fa2bd] block pb-1">
+                  Showing {filteredEntities.length} Authorities
+                </span>
+                {filteredEntities.map((ent) => {
+                  const isSelected = selectedEntity.authority === ent.authority;
+                  return (
+                    <button
+                      key={ent.authority}
+                      type="button"
+                      onClick={() => setEntityAuthority(ent.authority)}
+                      className={`w-full p-3.5 rounded-sm text-left transition-all cursor-pointer border ${
+                        isSelected
+                          ? 'bg-[#071630] border-[#e0d0ab] shadow-sm'
+                          : 'bg-[#041228] border-[rgba(224,208,171,0.12)] hover:border-[rgba(224,208,171,0.3)]'
                       }`}
                     >
-                      Tier {ent.tier_number}: {ent.tier_name}
+                      <div className="flex items-center justify-between gap-2">
+                        <strong className={`text-xs sm:text-sm font-semibold truncate ${isSelected ? 'text-[#e0d0ab]' : 'text-[#f4ecd8]'}`}>
+                          {ent.authority}
+                        </strong>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[rgba(11,61,120,0.5)] text-[#e0d0ab] shrink-0 font-bold">
+                          Tier {ent.tier_number}
+                        </span>
+                      </div>
+                      <span className="text-[11px] text-[#8fa2bd] block pt-1">
+                        {ent.tier_name}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Right Column: Authority Dossier & 5-Tier Ladder (Cols 6-12) */}
+              <div className="lg:col-span-7 p-6 rounded-sm bg-[#041228] border border-[rgba(224,208,171,0.18)] space-y-5">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-sm bg-[#e0d0ab]/10 text-[#e0d0ab] border border-[#e0d0ab]/30 text-[10px] font-mono uppercase font-bold">
+                      Tier {selectedEntity.tier_number} · {selectedEntity.tier_name}
+                    </span>
+                    <span className="text-[11px] font-mono text-[#8fa2bd]">
+                      {selectedEntity.appearances_count} Compendium Mentions
                     </span>
                   </div>
+                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#f4ecd8] pt-1">
+                    {selectedEntity.authority}
+                  </h3>
+                </div>
 
-                  <p className="text-xs text-[#9fb0c8] leading-relaxed bg-[rgba(11,61,120,0.2)] p-2 rounded border border-[rgba(19,108,153,0.15)]">
-                    {ent.tier_description}
-                  </p>
-
-                  <div className="pt-1 border-t border-[rgba(19,108,153,0.2)] flex items-start gap-1.5 text-[11px] text-amber-300/90 font-mono">
-                    <ShieldCheck className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
-                    <span>
-                      <strong className="text-[#e0d0ab]">Trap Neutralized:</strong> {ent.neutralized_trap}
-                    </span>
+                {/* THE 5-TIER VERTICAL LADDER (Interactive visual ladder) */}
+                <div className="p-4 rounded-sm bg-[#071630] border border-[rgba(224,208,171,0.14)] space-y-2">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-[#0194a8] font-bold block pb-1">
+                    Constitutional & Legal Hierarchy
+                  </span>
+                  <div className="space-y-2">
+                    {TIERS.map((tName, idx) => {
+                      const tNum = idx + 1;
+                      const isCurrentTier = selectedEntity.tier_number === tNum;
+                      return (
+                        <div
+                          key={tNum}
+                          className={`flex items-center gap-3 p-2 rounded-sm transition-all ${
+                            isCurrentTier
+                              ? 'bg-[#e0d0ab]/15 border-l-2 border-[#e0d0ab]'
+                              : 'opacity-50'
+                          }`}
+                        >
+                          <span
+                            className={`font-mono text-xs font-bold w-6 ${
+                              isCurrentTier ? 'text-[#e0d0ab]' : 'text-[#8fa2bd]'
+                            }`}
+                          >
+                            T{tNum}
+                          </span>
+                          <span
+                            className={`h-1.5 rounded-sm transition-all ${
+                              isCurrentTier ? 'w-10 bg-[#e0d0ab]' : 'w-4 bg-[rgba(224,208,171,0.2)]'
+                            }`}
+                          />
+                          <span
+                            className={`text-xs ${
+                              isCurrentTier ? 'font-bold text-[#f4ecd8]' : 'text-[#8fa2bd]'
+                            }`}
+                          >
+                            {tName}
+                          </span>
+                          {isCurrentTier && (
+                            <span className="ml-auto text-[10px] font-mono text-[#e0d0ab] font-bold">
+                              ← ACTIVE
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              );
-            })}
-          </div>
+
+                {/* Legal Origin & Mandate */}
+                <div className="space-y-1.5">
+                  <h4 className="text-xs font-mono uppercase tracking-wider text-[#e0d0ab] font-bold">
+                    Legal Origin & Constitutional Grounding
+                  </h4>
+                  <p className="text-xs sm:text-sm text-[#b5c1d1] leading-relaxed p-3.5 rounded-sm bg-[#071630] border border-[rgba(224,208,171,0.1)]">
+                    {selectedEntity.tier_description}
+                  </p>
+                </div>
+
+                {/* Neutralized UPSC Trap */}
+                <div className="p-3.5 rounded-sm bg-red-950/20 border border-red-500/35 space-y-1 text-xs">
+                  <span className="text-red-400 font-bold block text-[11px] font-mono uppercase">
+                    Examiner Trap Neutralized:
+                  </span>
+                  <p className="text-red-200 text-xs leading-relaxed">
+                    {selectedEntity.neutralized_trap}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
