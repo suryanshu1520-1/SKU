@@ -471,7 +471,24 @@ interface ObservatoryProps {
 type ObservatoryTab = 'vault' | 'calculator' | 'matrix' | 'traps' | 'pacing' | 'ripple';
 
 export default function Observatory({ onNavigateArena, onLaunchPractice }: ObservatoryProps) {
-  const [activeTab, setActiveTab] = useState<ObservatoryTab>('vault');
+  const [activeTab, setActiveTab] = useState<ObservatoryTab>(() => {
+    if (typeof window !== 'undefined') {
+      const urlTab = new URLSearchParams(window.location.search).get('tab') as ObservatoryTab;
+      if (urlTab && ['vault', 'calculator', 'matrix', 'traps', 'pacing', 'ripple'].includes(urlTab)) {
+        return urlTab;
+      }
+    }
+    return 'vault';
+  });
+
+  const handleTabChange = (newTab: ObservatoryTab) => {
+    setActiveTab(newTab);
+    if (typeof window !== 'undefined' && window.history) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('tab', newTab);
+      window.history.replaceState({}, '', url.toString());
+    }
+  };
 
   // --------------------------------------------------------------------------
   // Tab 1: Question Vault (Search & Practice Bank)
@@ -787,6 +804,20 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
             <p className="text-xs sm:text-sm text-[#9fb0c8] leading-relaxed">
               Explore 1,500+ verified UPSC Prelims questions from the modern 15-year testing era (2011–2025), calculate optimal 50:50 attempt strategies, and master the recurring traps examiners set every year.
             </p>
+
+            {/* Quick Feature Launch Banner */}
+            <div className="pt-1">
+              <button
+                type="button"
+                onClick={() => handleTabChange('ripple')}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm bg-gradient-to-r from-[rgba(1,148,168,0.2)] to-[rgba(224,208,171,0.15)] hover:from-[rgba(1,148,168,0.3)] hover:to-[rgba(224,208,171,0.25)] border border-[#0194a8]/50 text-[#e0d0ab] text-xs font-mono font-medium transition-all cursor-pointer shadow-xs group"
+              >
+                <GitFork className="w-3.5 h-3.5 text-[#0194a8] group-hover:rotate-45 transition-transform" />
+                <span className="font-bold text-white">NEW:</span>
+                <span>Policy Ripple Radar & 5 Legal Tiers Web (15 Macro Chains)</span>
+                <ArrowRight className="w-3 h-3 text-[#e0d0ab] group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
@@ -801,7 +832,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
         </div>
 
         {/* ══════════════════════════════════════════════════════════════════
-            TAB NAVIGATION (5 HIGH-UTILITY MODES)
+            TAB NAVIGATION (6 HIGH-UTILITY MODES)
             ══════════════════════════════════════════════════════════════════ */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none border-b border-[rgba(19,108,153,0.35)]">
           {TABS.map((tab) => {
@@ -810,18 +841,26 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 className={`relative px-3.5 py-2.5 rounded-sm font-sans text-xs font-medium transition-all duration-150 flex items-center gap-2 cursor-pointer shrink-0 ${
                   isActive
                     ? 'bg-[rgba(224,208,171,0.14)] text-[#e0d0ab] border border-[rgba(224,208,171,0.35)] shadow-xs'
+                    : tab.id === 'ripple'
+                    ? 'text-emerald-300 hover:text-white hover:bg-[rgba(16,185,129,0.15)] border border-emerald-500/30'
                     : 'text-[#8fa2bd] hover:text-[#e8e0cf] hover:bg-[rgba(11,61,120,0.3)]'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#e0d0ab]' : 'text-[#8fa2bd]'}`} />
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#e0d0ab]' : tab.id === 'ripple' ? 'text-emerald-400' : 'text-[#8fa2bd]'}`} />
                 <span>{tab.label}</span>
                 <span
                   className={`text-[9px] font-mono px-1.5 py-0.2 rounded ${
-                    isActive ? 'bg-[#072e63] text-[#e0d0ab]' : 'bg-[rgba(11,61,120,0.5)] text-[#8fa2bd]'
+                    tab.id === 'ripple'
+                      ? isActive
+                        ? 'bg-emerald-500 text-neutral-950 font-bold'
+                        : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                      : isActive
+                      ? 'bg-[#072e63] text-[#e0d0ab]'
+                      : 'bg-[rgba(11,61,120,0.5)] text-[#8fa2bd]'
                   }`}
                 >
                   {tab.badge}
