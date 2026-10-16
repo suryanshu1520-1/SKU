@@ -1,0 +1,2962 @@
+{
+  "Government of India": {
+    "authority": "Government of India",
+    "appearances_count": 22,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Vice President of India (Shri C. P. Radhakrishnan)": {
+    "authority": "Vice President of India (Shri C. P. Radhakrishnan)",
+    "appearances_count": 1,
+    "tier_number": 1,
+    "tier_name": "Constitutional Body",
+    "tier_description": "Established directly by the Constitution of India; independent constitutional mandate.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Reserve Bank of India (RBI)** / **Ministry of Finance": {
+    "authority": "Reserve Bank of India (RBI)** / **Ministry of Finance",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Commerce and Industry** (India) & **Ministry of Industry and Trade** (Morocco)": {
+    "authority": "Ministry of Commerce and Industry** (India) & **Ministry of Industry and Trade** (Morocco)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "26th SCO Heads of State Summit, Bishkek, Kyrgyz Republic (Chaired by President **Sadyr Zhaparov**)": {
+    "authority": "26th SCO Heads of State Summit, Bishkek, Kyrgyz Republic (Chaired by President **Sadyr Zhaparov**)",
+    "appearances_count": 1,
+    "tier_number": 1,
+    "tier_name": "Constitutional Body",
+    "tier_description": "Established directly by the Constitution of India; independent constitutional mandate.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Election Commission of India (ECI)": {
+    "authority": "Election Commission of India (ECI)",
+    "appearances_count": 5,
+    "tier_number": 1,
+    "tier_name": "Constitutional Body",
+    "tier_description": "Established directly by the Constitution of India; independent constitutional mandate.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Government e-Marketplace (GeM), Ministry of Commerce & Industry and Textile Committee, Ministry of Textiles": {
+    "authority": "Government e-Marketplace (GeM), Ministry of Commerce & Industry and Textile Committee, Ministry of Textiles",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Business Division / Special Unit",
+    "tier_description": "Created by executive notification under an administrative department; no independent statutory act.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Central Adoption Resource Authority (CARA)": {
+    "authority": "Central Adoption Resource Authority (CARA)",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Ports, Shipping and Waterways": {
+    "authority": "Ministry of Ports, Shipping and Waterways",
+    "appearances_count": 3,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Social Justice and Empowerment": {
+    "authority": "Ministry of Social Justice and Empowerment",
+    "appearances_count": 14,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Steel / Joint Plant Committee (JPC)": {
+    "authority": "Ministry of Steel / Joint Plant Committee (JPC)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Health and Family Welfare (MoHFW)": {
+    "authority": "Ministry of Health and Family Welfare (MoHFW)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Indian Space Research Organisation (ISRO), Department of Space": {
+    "authority": "Indian Space Research Organisation (ISRO), Department of Space",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Commerce and Industry": {
+    "authority": "Ministry of Commerce and Industry",
+    "appearances_count": 6,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Commission for Protection of Child Rights (NCPCR) / Ministry of Women and Child Development": {
+    "authority": "National Commission for Protection of Child Rights (NCPCR) / Ministry of Women and Child Development",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Social Justice and Empowerment (MoSJE)": {
+    "authority": "Ministry of Social Justice and Empowerment (MoSJE)",
+    "appearances_count": 3,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Tribal Affairs (MoTA)": {
+    "authority": "Ministry of Tribal Affairs (MoTA)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of New and Renewable Energy (MNRE)": {
+    "authority": "Ministry of New and Renewable Energy (MNRE)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Administrative Reforms and Public Grievances (DARPG)": {
+    "authority": "Department of Administrative Reforms and Public Grievances (DARPG)",
+    "appearances_count": 4,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Indian Space Research Organisation (ISRO) and National Centre for Space Studies (CNES), France.": {
+    "authority": "Indian Space Research Organisation (ISRO) and National Centre for Space Studies (CNES), France.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Earth Sciences (MoES)": {
+    "authority": "Ministry of Earth Sciences (MoES)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Youth Affairs and Sports": {
+    "authority": "Ministry of Youth Affairs and Sports",
+    "appearances_count": 9,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Vice President's Secretariat": {
+    "authority": "Vice President's Secretariat",
+    "appearances_count": 1,
+    "tier_number": 1,
+    "tier_name": "Constitutional Body",
+    "tier_description": "Established directly by the Constitution of India; independent constitutional mandate.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Ministry of External Affairs** (India) & **Federal Public Service Foreign Affairs** (Belgium)": {
+    "authority": "Ministry of External Affairs** (India) & **Federal Public Service Foreign Affairs** (Belgium)",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "National Financial Reporting Authority (NFRA)": {
+    "authority": "National Financial Reporting Authority (NFRA)",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Corporate Affairs (MCA)": {
+    "authority": "Ministry of Corporate Affairs (MCA)",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Central Council for Research in Ayurvedic Sciences (CCRAS) under the Ministry of Ayush": {
+    "authority": "Central Council for Research in Ayurvedic Sciences (CCRAS) under the Ministry of Ayush",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "National Credit Guarantee Trustee Company (NCGTC), Department of Financial Services, Ministry of Finance.": {
+    "authority": "National Credit Guarantee Trustee Company (NCGTC), Department of Financial Services, Ministry of Finance.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Collaborative medical institutions and cardiac societies in India.": {
+    "authority": "Collaborative medical institutions and cardiac societies in India.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "CSIR-Central Road Research Institute (CSIR-CRRI), Ministry of Science & Technology, and Delhi Public Works Department (PWD).": {
+    "authority": "CSIR-Central Road Research Institute (CSIR-CRRI), Ministry of Science & Technology, and Delhi Public Works Department (PWD).",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Department of Scientific and Industrial Research (DSIR), Ministry of Science and Technology": {
+    "authority": "Department of Scientific and Industrial Research (DSIR), Ministry of Science and Technology",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Coal / Coal India Limited (CIL)": {
+    "authority": "Ministry of Coal / Coal India Limited (CIL)",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Inter-State Council Secretariat, Ministry of Home Affairs.": {
+    "authority": "Inter-State Council Secretariat, Ministry of Home Affairs.",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "National Commission for Scheduled Castes (NCSC)": {
+    "authority": "National Commission for Scheduled Castes (NCSC)",
+    "appearances_count": 2,
+    "tier_number": 1,
+    "tier_name": "Constitutional Body",
+    "tier_description": "Established directly by the Constitution of India; independent constitutional mandate.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "National Biodiversity Authority (NBA)": {
+    "authority": "National Biodiversity Authority (NBA)",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Home Affairs": {
+    "authority": "Ministry of Home Affairs",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Posts, Ministry of Communications": {
+    "authority": "Department of Posts, Ministry of Communications",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Narco Coordination Centre (NCORD) / Ministry of Home Affairs (MHA)": {
+    "authority": "Narco Coordination Centre (NCORD) / Ministry of Home Affairs (MHA)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Defence, Ministry of External Affairs": {
+    "authority": "Ministry of Defence, Ministry of External Affairs",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Coal, Government of India, along with Coal India Limited (CIL) and Punjab State Power Corporation Limited (PSPCL).": {
+    "authority": "Ministry of Coal, Government of India, along with Coal India Limited (CIL) and Punjab State Power Corporation Limited (PSPCL).",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Ministry of Development of North Eastern Region (MDoNER) / Department of Higher Education, Ministry of Education": {
+    "authority": "Ministry of Development of North Eastern Region (MDoNER) / Department of Higher Education, Ministry of Education",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Biodiversity Authority (NBA) under the Ministry of Environment, Forest and Climate Change (MoEFCC).": {
+    "authority": "National Biodiversity Authority (NBA) under the Ministry of Environment, Forest and Climate Change (MoEFCC).",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Commission for Safai Karamcharis (NCSK)": {
+    "authority": "National Commission for Safai Karamcharis (NCSK)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Commerce & Industry": {
+    "authority": "Ministry of Commerce & Industry",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of External Affairs (MEA)": {
+    "authority": "Ministry of External Affairs (MEA)",
+    "appearances_count": 4,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Zoological Park (NZP), Ministry of Environment, Forest and Climate Change (MoEFCC)": {
+    "authority": "National Zoological Park (NZP), Ministry of Environment, Forest and Climate Change (MoEFCC)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Business Division / Special Unit",
+    "tier_description": "Created by executive notification under an administrative department; no independent statutory act.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Home Affairs (MHA), Goa Police, Indian Coast Guard": {
+    "authority": "Ministry of Home Affairs (MHA), Goa Police, Indian Coast Guard",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Council of Scientific and Industrial Research (CSIR), Ministry of Science and Technology": {
+    "authority": "Council of Scientific and Industrial Research (CSIR), Ministry of Science and Technology",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Directorate General of Foreign Trade (DGFT)**, Ministry of Commerce & Industry": {
+    "authority": "Directorate General of Foreign Trade (DGFT)**, Ministry of Commerce & Industry",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "CSIR-Central Road Research Institute (CSIR-CRRI) & Geosynthetics Society (GS)": {
+    "authority": "CSIR-Central Road Research Institute (CSIR-CRRI) & Geosynthetics Society (GS)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Financial Services, Ministry of Finance": {
+    "authority": "Department of Financial Services, Ministry of Finance",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Social Justice and Empowerment, Ministry of Social Justice and Empowerment": {
+    "authority": "Department of Social Justice and Empowerment, Ministry of Social Justice and Empowerment",
+    "appearances_count": 4,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Sainik Schools Society, Ministry of Defence": {
+    "authority": "Sainik Schools Society, Ministry of Defence",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Prime Minister's Office": {
+    "authority": "Prime Minister's Office",
+    "appearances_count": 1,
+    "tier_number": 1,
+    "tier_name": "Constitutional Body",
+    "tier_description": "Established directly by the Constitution of India; independent constitutional mandate.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Ministry of Micro, Small and Medium Enterprises (MSME)": {
+    "authority": "Ministry of Micro, Small and Medium Enterprises (MSME)",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "International Advanced Research Centre for Powder Metallurgy and New Materials (ARCI)": {
+    "authority": "International Advanced Research Centre for Powder Metallurgy and New Materials (ARCI)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Telecommunications (DoT), Ministry of Communications": {
+    "authority": "Department of Telecommunications (DoT), Ministry of Communications",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Atomic Energy (DAE) and Tata Memorial Centre (TMC)": {
+    "authority": "Department of Atomic Energy (DAE) and Tata Memorial Centre (TMC)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Payments Corporation of India (NPCI) / Reserve Bank of India (RBI)": {
+    "authority": "National Payments Corporation of India (NPCI) / Reserve Bank of India (RBI)",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Central Registrar of Cooperative Societies (CRCS), Ministry of Cooperation, Government of India.": {
+    "authority": "Central Registrar of Cooperative Societies (CRCS), Ministry of Cooperation, Government of India.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Youth Affairs and Sports, Indian Olympic Association (IOA)": {
+    "authority": "Ministry of Youth Affairs and Sports, Indian Olympic Association (IOA)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Commission for Scheduled Castes (NCSC), Ministry of Social Justice and Empowerment": {
+    "authority": "National Commission for Scheduled Castes (NCSC), Ministry of Social Justice and Empowerment",
+    "appearances_count": 1,
+    "tier_number": 1,
+    "tier_name": "Constitutional Body",
+    "tier_description": "Established directly by the Constitution of India; independent constitutional mandate.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Ministry of Coal and Coal India Limited (CIL)": {
+    "authority": "Ministry of Coal and Coal India Limited (CIL)",
+    "appearances_count": 2,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Ministry of Law and Justice": {
+    "authority": "Ministry of Law and Justice",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Parliamentary Affairs": {
+    "authority": "Ministry of Parliamentary Affairs",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Donyi-Polo Mission and Department of Social Justice & Empowerment and Tribal Affairs, Arunachal Pradesh.": {
+    "authority": "Donyi-Polo Mission and Department of Social Justice & Empowerment and Tribal Affairs, Arunachal Pradesh.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Unique Identification Authority of India (UIDAI), Ministry of Electronics and Information Technology (MeitY).": {
+    "authority": "Unique Identification Authority of India (UIDAI), Ministry of Electronics and Information Technology (MeitY).",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "ICAR-National Research Centre on Mithun (ICAR-NRC on Mithun)**, Medziphema, Nagaland": {
+    "authority": "ICAR-National Research Centre on Mithun (ICAR-NRC on Mithun)**, Medziphema, Nagaland",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Commerce and Industry / India-Thailand Joint Trade Committee (JTC)": {
+    "authority": "Ministry of Commerce and Industry / India-Thailand Joint Trade Committee (JTC)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of External Affairs (MEA), Government of India": {
+    "authority": "Ministry of External Affairs (MEA), Government of India",
+    "appearances_count": 3,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Fisheries, Ministry of Fisheries, Animal Husbandry and Dairying": {
+    "authority": "Department of Fisheries, Ministry of Fisheries, Animal Husbandry and Dairying",
+    "appearances_count": 5,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Social Justice and Empowerment (\u0938\u093e\u092e\u093e\u091c\u093f\u0915 \u0928\u094d\u200d\u092f\u093e\u092f \u090f\u0935\u0902 \u0905\u0927\u093f\u0915\u093e\u0930\u093f\u0924\u093e \u092e\u0902\u0924\u094d\u0930\u093e\u0932\u092f)": {
+    "authority": "Ministry of Social Justice and Empowerment (\u0938\u093e\u092e\u093e\u091c\u093f\u0915 \u0928\u094d\u200d\u092f\u093e\u092f \u090f\u0935\u0902 \u0905\u0927\u093f\u0915\u093e\u0930\u093f\u0924\u093e \u092e\u0902\u0924\u094d\u0930\u093e\u0932\u092f)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Empowerment of Persons with Disabilities (DEPwD), Ministry of Social Justice and Empowerment, in collaboration with ALIMCO and EkStep Foundation.": {
+    "authority": "Department of Empowerment of Persons with Disabilities (DEPwD), Ministry of Social Justice and Empowerment, in collaboration with ALIMCO and EkStep Foundation.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Consumer Affairs, Ministry of Consumer Affairs, Food and Public Distribution": {
+    "authority": "Department of Consumer Affairs, Ministry of Consumer Affairs, Food and Public Distribution",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Department of Land Resources (DoLR), Ministry of Rural Development.": {
+    "authority": "Department of Land Resources (DoLR), Ministry of Rural Development.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Cooperation and Ministry of Home Affairs": {
+    "authority": "Ministry of Cooperation and Ministry of Home Affairs",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Central Adoption Resource Authority (CARA), Ministry of Women and Child Development.": {
+    "authority": "Central Adoption Resource Authority (CARA), Ministry of Women and Child Development.",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Indian Council of Agricultural Research (ICAR) & International Crops Research Institute for the Semi-Arid Tropics (ICRISAT)": {
+    "authority": "Indian Council of Agricultural Research (ICAR) & International Crops Research Institute for the Semi-Arid Tropics (ICRISAT)",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Ministry of External Affairs (MEA) and Ministry of Commerce and Industry": {
+    "authority": "Ministry of External Affairs (MEA) and Ministry of Commerce and Industry",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Finance": {
+    "authority": "Ministry of Finance",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Indian Pharmacopoeia Commission (IPC), Ministry of Health and Family Welfare.": {
+    "authority": "Indian Pharmacopoeia Commission (IPC), Ministry of Health and Family Welfare.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Land Resources (DoLR), Ministry of Rural Development": {
+    "authority": "Department of Land Resources (DoLR), Ministry of Rural Development",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Health and Family Welfare, Government of India": {
+    "authority": "Ministry of Health and Family Welfare, Government of India",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Agricultural Research and Education (DARE)** / **Indian Council of Agricultural Research (ICAR)": {
+    "authority": "Department of Agricultural Research and Education (DARE)** / **Indian Council of Agricultural Research (ICAR)",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "United Nations (UN) and Ministry of External Affairs (MEA), Government of India": {
+    "authority": "United Nations (UN) and Ministry of External Affairs (MEA), Government of India",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Labour and Employment": {
+    "authority": "Ministry of Labour and Employment",
+    "appearances_count": 3,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Administration of Dadra and Nagar Haveli and Daman and Diu": {
+    "authority": "Administration of Dadra and Nagar Haveli and Daman and Diu",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Confederation of Indian Industry (CII)": {
+    "authority": "Confederation of Indian Industry (CII)",
+    "appearances_count": 1,
+    "tier_number": 4,
+    "tier_name": "Registered Society / Industry Body",
+    "tier_description": "Autonomous society or apex industrial/trade body facilitating public-private partnerships.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Agriculture & Farmers Welfare (National Bamboo Mission) and NECTAR (Autonomous body under DST).": {
+    "authority": "Ministry of Agriculture & Farmers Welfare (National Bamboo Mission) and NECTAR (Autonomous body under DST).",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Housing and Urban Affairs (MoHUA)": {
+    "authority": "Ministry of Housing and Urban Affairs (MoHUA)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Indian Council of Agricultural Research (ICAR) & ICRISAT": {
+    "authority": "Indian Council of Agricultural Research (ICAR) & ICRISAT",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Central Council for Research in Ayurvedic Sciences (CCRAS), Ministry of Ayush.": {
+    "authority": "Central Council for Research in Ayurvedic Sciences (CCRAS), Ministry of Ayush.",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Ministry of Rural Development": {
+    "authority": "Ministry of Rural Development",
+    "appearances_count": 4,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Textiles and Central Cottage Industries Corporation (CCIC)": {
+    "authority": "Ministry of Textiles and Central Cottage Industries Corporation (CCIC)",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "CSIR-Central Road Research Institute (CSIR-CRRI)": {
+    "authority": "CSIR-Central Road Research Institute (CSIR-CRRI)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Labour and Employment (MoLE)": {
+    "authority": "Ministry of Labour and Employment (MoLE)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Coal / South Eastern Coalfields Limited (SECL)": {
+    "authority": "Ministry of Coal / South Eastern Coalfields Limited (SECL)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Health and Family Welfare": {
+    "authority": "Ministry of Health and Family Welfare",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "BRICS / Ministry of External Affairs": {
+    "authority": "BRICS / Ministry of External Affairs",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "DARE / ICAR in collaboration with ICRISAT": {
+    "authority": "DARE / ICAR in collaboration with ICRISAT",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Institute of Teaching and Research in Ayurveda (ITRA), Jamnagar, Ministry of Ayush.": {
+    "authority": "Institute of Teaching and Research in Ayurveda (ITRA), Jamnagar, Ministry of Ayush.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Commerce and Industry / Ministry of Finance": {
+    "authority": "Ministry of Commerce and Industry / Ministry of Finance",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Animal Husbandry and Dairying (DAHD), Ministry of Fisheries, Animal Husbandry and Dairying.": {
+    "authority": "Department of Animal Husbandry and Dairying (DAHD), Ministry of Fisheries, Animal Husbandry and Dairying.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Headquarters Integrated Defence Staff (HQ IDS)": {
+    "authority": "Headquarters Integrated Defence Staff (HQ IDS)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "ICAR-National Dairy Research Institute (NDRI)**, Karnal & **GBPUAT**, Pantnagar": {
+    "authority": "ICAR-National Dairy Research Institute (NDRI)**, Karnal & **GBPUAT**, Pantnagar",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of External Affairs (MEA) and Ministry of Environment, Forest and Climate Change (MoEFCC).": {
+    "authority": "Ministry of External Affairs (MEA) and Ministry of Environment, Forest and Climate Change (MoEFCC).",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Environment, Forest and Climate Change (MoEFCC)": {
+    "authority": "Ministry of Environment, Forest and Climate Change (MoEFCC)",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Animal Husbandry and Dairying (DAHD), Ministry of Fisheries, Animal Husbandry and Dairying": {
+    "authority": "Department of Animal Husbandry and Dairying (DAHD), Ministry of Fisheries, Animal Husbandry and Dairying",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Defence / Indian Navy": {
+    "authority": "Ministry of Defence / Indian Navy",
+    "appearances_count": 4,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Home Affairs / Asiatic Society of Mumbai / National Manuscript Mission": {
+    "authority": "Ministry of Home Affairs / Asiatic Society of Mumbai / National Manuscript Mission",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Electronics and Information Technology (MeitY)": {
+    "authority": "Ministry of Electronics and Information Technology (MeitY)",
+    "appearances_count": 5,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Coal, Government of India": {
+    "authority": "Ministry of Coal, Government of India",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Official Language, Ministry of Home Affairs": {
+    "authority": "Department of Official Language, Ministry of Home Affairs",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Indian Air Force, Ministry of Defence": {
+    "authority": "Indian Air Force, Ministry of Defence",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Human Rights Commission (NHRC)": {
+    "authority": "National Human Rights Commission (NHRC)",
+    "appearances_count": 5,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Women and Child Development": {
+    "authority": "Ministry of Women and Child Development",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Social Justice and Empowerment, Ministry of Social Justice and Empowerment.": {
+    "authority": "Department of Social Justice and Empowerment, Ministry of Social Justice and Empowerment.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Jawaharlal Nehru Centre for Advanced Scientific Research (JNCASR), Bengaluru (an autonomous institute under the Department of Science and Technology)": {
+    "authority": "Jawaharlal Nehru Centre for Advanced Scientific Research (JNCASR), Bengaluru (an autonomous institute under the Department of Science and Technology)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Official Language, Ministry of Home Affairs.": {
+    "authority": "Department of Official Language, Ministry of Home Affairs.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Official Language, Ministry of Home Affairs (coordinating body for Hindi Salahkar Samitis across ministries)": {
+    "authority": "Department of Official Language, Ministry of Home Affairs (coordinating body for Hindi Salahkar Samitis across ministries)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Higher Education, Ministry of Education": {
+    "authority": "Department of Higher Education, Ministry of Education",
+    "appearances_count": 3,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Archaeological Survey of India (ASI), Ministry of Culture": {
+    "authority": "Archaeological Survey of India (ASI), Ministry of Culture",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Commerce & Industry**, Government of India": {
+    "authority": "Ministry of Commerce & Industry**, Government of India",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Jal Shakti": {
+    "authority": "Ministry of Jal Shakti",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Railways": {
+    "authority": "Ministry of Railways",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Skill Development and Entrepreneurship (MSDE)": {
+    "authority": "Ministry of Skill Development and Entrepreneurship (MSDE)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Dam Safety Authority (NDSA), Ministry of Jal Shakti": {
+    "authority": "National Dam Safety Authority (NDSA), Ministry of Jal Shakti",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Finance / National Payments Corporation of India (NPCI) / UPI Steering Committee": {
+    "authority": "Ministry of Finance / National Payments Corporation of India (NPCI) / UPI Steering Committee",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Justice, Ministry of Law and Justice": {
+    "authority": "Department of Justice, Ministry of Law and Justice",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Scheduled Tribes Finance and Development Corporation (NSTFDC), Ministry of Tribal Affairs": {
+    "authority": "National Scheduled Tribes Finance and Development Corporation (NSTFDC), Ministry of Tribal Affairs",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Controller General of Defence Accounts (CGDA) under the Ministry of Defence.": {
+    "authority": "Controller General of Defence Accounts (CGDA) under the Ministry of Defence.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Power": {
+    "authority": "Ministry of Power",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Cadet Corps (NCC), Ministry of Defence": {
+    "authority": "National Cadet Corps (NCC), Ministry of Defence",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Micro, Small and Medium Enterprises (Ministry of MSME) in collaboration with MSDE and Ministry of Finance.": {
+    "authority": "Ministry of Micro, Small and Medium Enterprises (Ministry of MSME) in collaboration with MSDE and Ministry of Finance.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Steel": {
+    "authority": "Ministry of Steel",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Defence, Indian Army": {
+    "authority": "Ministry of Defence, Indian Army",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Central Board of Indirect Taxes and Customs (CBIC), Ministry of Finance.": {
+    "authority": "Central Board of Indirect Taxes and Customs (CBIC), Ministry of Finance.",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Home Affairs (MHA)": {
+    "authority": "Ministry of Home Affairs (MHA)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Agriculture and Farmers Welfare, Ministry of Rural Development, and National Disaster Management Authority (NDMA).": {
+    "authority": "Ministry of Agriculture and Farmers Welfare, Ministry of Rural Development, and National Disaster Management Authority (NDMA).",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Environment, Forest and Climate Change (MoEFCC), Central Pollution Control Board (CPCB), and SITRA.": {
+    "authority": "Ministry of Environment, Forest and Climate Change (MoEFCC), Central Pollution Control Board (CPCB), and SITRA.",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Bureau of Pharma PSUs of India (BPPI) / Pharmaceuticals and Medical Devices Bureau of India (PMBI)": {
+    "authority": "Bureau of Pharma PSUs of India (BPPI) / Pharmaceuticals and Medical Devices Bureau of India (PMBI)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Council of Scientific and Industrial Research (CSIR), CSIR-CLRI, and CSIR-CRRI": {
+    "authority": "Council of Scientific and Industrial Research (CSIR), CSIR-CLRI, and CSIR-CRRI",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Department of Drinking Water and Sanitation (DDWS) & Department of Urban Development (DOUD)": {
+    "authority": "Department of Drinking Water and Sanitation (DDWS) & Department of Urban Development (DOUD)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Ports, Shipping and Waterways and Ministry of Steel": {
+    "authority": "Ministry of Ports, Shipping and Waterways and Ministry of Steel",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Prime Minister's Office / Ministry of Electronics and Information Technology": {
+    "authority": "Prime Minister's Office / Ministry of Electronics and Information Technology",
+    "appearances_count": 1,
+    "tier_number": 1,
+    "tier_name": "Constitutional Body",
+    "tier_description": "Established directly by the Constitution of India; independent constitutional mandate.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Commission for Air Quality Management (CAQM)": {
+    "authority": "Commission for Air Quality Management (CAQM)",
+    "appearances_count": 4,
+    "tier_number": 3,
+    "tier_name": "Executive Business Division / Special Unit",
+    "tier_description": "Created by executive notification under an administrative department; no independent statutory act.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Public Enterprises (DPE), Ministry of Finance": {
+    "authority": "Department of Public Enterprises (DPE), Ministry of Finance",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Ministry of Civil Aviation (under the overarching guidelines of the Department of Administrative Reforms and Public Grievances - DARPG).": {
+    "authority": "Ministry of Civil Aviation (under the overarching guidelines of the Department of Administrative Reforms and Public Grievances - DARPG).",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Ministry of Power (MoP)": {
+    "authority": "Ministry of Power (MoP)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Ayush and All India Institute of Ayurveda (AIIA), Goa": {
+    "authority": "Ministry of Ayush and All India Institute of Ayurveda (AIIA), Goa",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Skill Development and Entrepreneurship (MSDE) / Directorate General of Training (DGT)": {
+    "authority": "Ministry of Skill Development and Entrepreneurship (MSDE) / Directorate General of Training (DGT)",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Land Monetization Corporation (NLMC), Ministry of Finance": {
+    "authority": "National Land Monetization Corporation (NLMC), Ministry of Finance",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Land Resources, Ministry of Rural Development": {
+    "authority": "Department of Land Resources, Ministry of Rural Development",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Indian Coast Guard (ICG)": {
+    "authority": "Indian Coast Guard (ICG)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Sports Authority of India (SAI)": {
+    "authority": "Sports Authority of India (SAI)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Agriculture and Farmers Welfare": {
+    "authority": "Ministry of Agriculture and Farmers Welfare",
+    "appearances_count": 5,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Science and Technology (DST)": {
+    "authority": "Department of Science and Technology (DST)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Ayush**, Government of India": {
+    "authority": "Ministry of Ayush**, Government of India",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Headquarters Integrated Defence Staff (HQ IDS) / Centre for Joint Warfare Studies (CENJOWS)": {
+    "authority": "Headquarters Integrated Defence Staff (HQ IDS) / Centre for Joint Warfare Studies (CENJOWS)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Kalakshetra Foundation, Chennai (Ministry of Culture)": {
+    "authority": "Kalakshetra Foundation, Chennai (Ministry of Culture)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Health and Family Welfare / Government of Madhya Pradesh": {
+    "authority": "Ministry of Health and Family Welfare / Government of Madhya Pradesh",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Human Rights Commission (NHRC), India, in collaboration with the Ministry of External Affairs (MEA)": {
+    "authority": "National Human Rights Commission (NHRC), India, in collaboration with the Ministry of External Affairs (MEA)",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Hindustan Aeronautics Limited (HAL)": {
+    "authority": "Hindustan Aeronautics Limited (HAL)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Northern Coalfields Limited (NCL)": {
+    "authority": "Northern Coalfields Limited (NCL)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Youth Affairs and Sports / My Bharat-National Service Scheme (NSS)": {
+    "authority": "Ministry of Youth Affairs and Sports / My Bharat-National Service Scheme (NSS)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Culture, Government of India": {
+    "authority": "Ministry of Culture, Government of India",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Defence / Indian Navy / Cochin Shipyard Limited (CSL)": {
+    "authority": "Ministry of Defence / Indian Navy / Cochin Shipyard Limited (CSL)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Electronics and Information Technology (MeitY) / India Semiconductor Mission (ISM)": {
+    "authority": "Ministry of Electronics and Information Technology (MeitY) / India Semiconductor Mission (ISM)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Business Division / Special Unit",
+    "tier_description": "Created by executive notification under an administrative department; no independent statutory act.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Cooperation": {
+    "authority": "Ministry of Cooperation",
+    "appearances_count": 3,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Ayush, Digital India Bhashini Division": {
+    "authority": "Ministry of Ayush, Digital India Bhashini Division",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Communications": {
+    "authority": "Ministry of Communications",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Prime Minister's Office / Ministry of Textiles": {
+    "authority": "Prime Minister's Office / Ministry of Textiles",
+    "appearances_count": 1,
+    "tier_number": 1,
+    "tier_name": "Constitutional Body",
+    "tier_description": "Established directly by the Constitution of India; independent constitutional mandate.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "India\u2013Nepal Inter-Governmental Sub-Committee (IGSC)": {
+    "authority": "India\u2013Nepal Inter-Governmental Sub-Committee (IGSC)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "\u0915\u0947\u0902\u0926\u094d\u0930\u0940\u092f \u0915\u0943\u0937\u093f \u090f\u0935\u0902 \u0915\u093f\u0938\u093e\u0928 \u0915\u0932\u094d\u092f\u093e\u0923 \u092e\u0902\u0924\u094d\u0930\u093e\u0932\u092f": {
+    "authority": "\u0915\u0947\u0902\u0926\u094d\u0930\u0940\u092f \u0915\u0943\u0937\u093f \u090f\u0935\u0902 \u0915\u093f\u0938\u093e\u0928 \u0915\u0932\u094d\u092f\u093e\u0923 \u092e\u0902\u0924\u094d\u0930\u093e\u0932\u092f",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Information and Broadcasting / Department of Expenditure": {
+    "authority": "Ministry of Information and Broadcasting / Department of Expenditure",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "NLC India Limited (NLCIL) under Ministry of Coal": {
+    "authority": "NLC India Limited (NLCIL) under Ministry of Coal",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Indian Navy / Ministry of Defence": {
+    "authority": "Indian Navy / Ministry of Defence",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Scheduled Castes Finance and Development Corporation (NSFDC), Ministry of Social Justice and Empowerment.": {
+    "authority": "National Scheduled Castes Finance and Development Corporation (NSFDC), Ministry of Social Justice and Empowerment.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Drinking Water and Sanitation, Ministry of Jal Shakti.": {
+    "authority": "Department of Drinking Water and Sanitation, Ministry of Jal Shakti.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "India Semiconductor Mission (ISM), Ministry of Electronics and Information Technology (MeitY).": {
+    "authority": "India Semiconductor Mission (ISM), Ministry of Electronics and Information Technology (MeitY).",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Business Division / Special Unit",
+    "tier_description": "Created by executive notification under an administrative department; no independent statutory act.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Highways Authority of India (NHAI), Ministry of Road Transport and Highways": {
+    "authority": "National Highways Authority of India (NHAI), Ministry of Road Transport and Highways",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Ministry of Petroleum and Natural Gas (MoPNG) and Public Sector Oil Marketing Companies (OMCs).": {
+    "authority": "Ministry of Petroleum and Natural Gas (MoPNG) and Public Sector Oil Marketing Companies (OMCs).",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "National Green Tribunal (NGT) / Ministry of Environment, Forest and Climate Change (MoEFCC)": {
+    "authority": "National Green Tribunal (NGT) / Ministry of Environment, Forest and Climate Change (MoEFCC)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Central Silk Board (CSB), Ministry of Textiles": {
+    "authority": "Central Silk Board (CSB), Ministry of Textiles",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Indian Air Force (Ministry of Defence)": {
+    "authority": "Indian Air Force (Ministry of Defence)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Green Tribunal (NGT)": {
+    "authority": "National Green Tribunal (NGT)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Telecommunications (DoT)": {
+    "authority": "Department of Telecommunications (DoT)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Personnel, Public Grievances and Pensions (Department of Personnel and Training)": {
+    "authority": "Ministry of Personnel, Public Grievances and Pensions (Department of Personnel and Training)",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Narcotics Control Bureau (NCB), Ministry of Home Affairs": {
+    "authority": "Narcotics Control Bureau (NCB), Ministry of Home Affairs",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Defence (Indian Navy)": {
+    "authority": "Ministry of Defence (Indian Navy)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Telecommunications (DoT) and Government of Madhya Pradesh": {
+    "authority": "Department of Telecommunications (DoT) and Government of Madhya Pradesh",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Directorate of Revenue Intelligence (DRI), Ministry of Finance": {
+    "authority": "Directorate of Revenue Intelligence (DRI), Ministry of Finance",
+    "appearances_count": 3,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Mines": {
+    "authority": "Ministry of Mines",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Culture / National Gallery of Modern Art (NGMA)": {
+    "authority": "Ministry of Culture / National Gallery of Modern Art (NGMA)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Vision **MAHASAGAR** & **Neighbourhood First Policy": {
+    "authority": "Vision **MAHASAGAR** & **Neighbourhood First Policy",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Ministry of Ayush and Ministry of Health and Family Welfare": {
+    "authority": "Ministry of Ayush and Ministry of Health and Family Welfare",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Civil Aviation / Airports Authority of India (AAI)": {
+    "authority": "Ministry of Civil Aviation / Airports Authority of India (AAI)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Narcotics Control Bureau (NCB) / Anti-Narcotics Task Force (ANTF)": {
+    "authority": "Narcotics Control Bureau (NCB) / Anti-Narcotics Task Force (ANTF)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "President Secretariat / Directorate of Film Festivals": {
+    "authority": "President Secretariat / Directorate of Film Festivals",
+    "appearances_count": 1,
+    "tier_number": 1,
+    "tier_name": "Constitutional Body",
+    "tier_description": "Established directly by the Constitution of India; independent constitutional mandate.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Mahanadi Coalfields Limited (MCL)": {
+    "authority": "Mahanadi Coalfields Limited (MCL)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Heavy Industries and Ministry of Steel": {
+    "authority": "Ministry of Heavy Industries and Ministry of Steel",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Ayush; CCRAS (Central Council for Research in Ayurvedic Sciences); RIS (Research and Information System for Developing Countries)": {
+    "authority": "Ministry of Ayush; CCRAS (Central Council for Research in Ayurvedic Sciences); RIS (Research and Information System for Developing Countries)",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "National Gallery of Modern Art (NGMA), Ministry of Culture": {
+    "authority": "National Gallery of Modern Art (NGMA), Ministry of Culture",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Fertilizers, Ministry of Chemicals and Fertilizers": {
+    "authority": "Department of Fertilizers, Ministry of Chemicals and Fertilizers",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "India Semiconductor Mission (ISM), Ministry of Electronics and Information Technology (MeitY)": {
+    "authority": "India Semiconductor Mission (ISM), Ministry of Electronics and Information Technology (MeitY)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Business Division / Special Unit",
+    "tier_description": "Created by executive notification under an administrative department; no independent statutory act.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Brahma Kumaris Institution / Ministry of Culture (Protocol context)": {
+    "authority": "Brahma Kumaris Institution / Ministry of Culture (Protocol context)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "All India Institute of Ayurveda (AIIA)": {
+    "authority": "All India Institute of Ayurveda (AIIA)",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Directorate of Revenue Intelligence (DRI)": {
+    "authority": "Directorate of Revenue Intelligence (DRI)",
+    "appearances_count": 3,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department for Promotion of Industry and Internal Trade (DPIIT)": {
+    "authority": "Department for Promotion of Industry and Internal Trade (DPIIT)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Railways / South East Central Railway": {
+    "authority": "Ministry of Railways / South East Central Railway",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Rural Development, Government of India": {
+    "authority": "Ministry of Rural Development, Government of India",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Prasar Bharati, Ministry of Information and Broadcasting (MIB)": {
+    "authority": "Prasar Bharati, Ministry of Information and Broadcasting (MIB)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Drinking Water and Sanitation (DDWS), Ministry of Jal Shakti": {
+    "authority": "Department of Drinking Water and Sanitation (DDWS), Ministry of Jal Shakti",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Competition Commission of India (CCI), Ministry of Corporate Affairs.": {
+    "authority": "Competition Commission of India (CCI), Ministry of Corporate Affairs.",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Culture": {
+    "authority": "Ministry of Culture",
+    "appearances_count": 4,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Steel Authority of India Limited (SAIL), Ministry of Steel": {
+    "authority": "Steel Authority of India Limited (SAIL), Ministry of Steel",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Commerce and Industry (Department of Commerce)": {
+    "authority": "Ministry of Commerce and Industry (Department of Commerce)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Backward Classes Finance and Development Corporation (NBCFDC)": {
+    "authority": "National Backward Classes Finance and Development Corporation (NBCFDC)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Food Safety and Standards Authority of India (FSSAI)": {
+    "authority": "Food Safety and Standards Authority of India (FSSAI)",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "DRDO / Technology Development Fund (TDF) / Solid State Physics Laboratory": {
+    "authority": "DRDO / Technology Development Fund (TDF) / Solid State Physics Laboratory",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Safai Karamcharis Finance and Development Corporation": {
+    "authority": "National Safai Karamcharis Finance and Development Corporation",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Central Water Commission (CWC)": {
+    "authority": "Central Water Commission (CWC)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of AYUSH and the Central Council for Research in Ayurvedic Sciences (CCRAS).": {
+    "authority": "Ministry of AYUSH and the Central Council for Research in Ayurvedic Sciences (CCRAS).",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Legislative Department (Ministry of Law and Justice), Ministry of Housing and Urban Affairs, Department of Drinking Water and Sanitation": {
+    "authority": "Legislative Department (Ministry of Law and Justice), Ministry of Housing and Urban Affairs, Department of Drinking Water and Sanitation",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Finance and Reserve Bank of India (RBI)": {
+    "authority": "Ministry of Finance and Reserve Bank of India (RBI)",
+    "appearances_count": 2,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Home Affairs / Ministry of Commerce and Industry": {
+    "authority": "Ministry of Home Affairs / Ministry of Commerce and Industry",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Social Justice and Empowerment / Brahmakumaris": {
+    "authority": "Department of Social Justice and Empowerment / Brahmakumaris",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Indian Coast Guard": {
+    "authority": "Indian Coast Guard",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Cooperation & 'Tribhuvana' Cooperative University (TSU)": {
+    "authority": "Ministry of Cooperation & 'Tribhuvana' Cooperative University (TSU)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Zoological Park (NZP)**, New Delhi (**MoEF&CC**)": {
+    "authority": "National Zoological Park (NZP)**, New Delhi (**MoEF&CC**)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Business Division / Special Unit",
+    "tier_description": "Created by executive notification under an administrative department; no independent statutory act.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Administrative Reforms and Public Grievances (DARPG), Ministry of Personnel, Public Grievances and Pensions.": {
+    "authority": "Department of Administrative Reforms and Public Grievances (DARPG), Ministry of Personnel, Public Grievances and Pensions.",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Ministry of Minority Affairs (along with NMDFC, IISc-FSID, IIT Madras-CUBE, and IIM Bengaluru)": {
+    "authority": "Ministry of Minority Affairs (along with NMDFC, IISc-FSID, IIT Madras-CUBE, and IIM Bengaluru)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Armed Forces Medical Services (AFMS), Ministry of Defence": {
+    "authority": "Armed Forces Medical Services (AFMS), Ministry of Defence",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Chemicals and Petrochemicals (DCPC), Ministry of Chemicals and Fertilizers.": {
+    "authority": "Department of Chemicals and Petrochemicals (DCPC), Ministry of Chemicals and Fertilizers.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Health and Family Welfare (MoHFW) and World Health Organization (WHO)": {
+    "authority": "Ministry of Health and Family Welfare (MoHFW) and World Health Organization (WHO)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Tourism": {
+    "authority": "Ministry of Tourism",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Business Division / Special Unit",
+    "tier_description": "Created by executive notification under an administrative department; no independent statutory act.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Cooperation, NAFED, Central Bureau (Kendriya Bhandar), Amul": {
+    "authority": "Ministry of Cooperation, NAFED, Central Bureau (Kendriya Bhandar), Amul",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Indian Council of Agricultural Research (ICAR), Ministry of Agriculture and Farmers Welfare": {
+    "authority": "Indian Council of Agricultural Research (ICAR), Ministry of Agriculture and Farmers Welfare",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Ministry of Railways / South Coast Railway": {
+    "authority": "Ministry of Railways / South Coast Railway",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "CSIR-NIScPR (CSIR-National Institute of Science Communication and Policy Research)": {
+    "authority": "CSIR-NIScPR (CSIR-National Institute of Science Communication and Policy Research)",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Central Bureau of Narcotics (CBN), Ministry of Finance": {
+    "authority": "Central Bureau of Narcotics (CBN), Ministry of Finance",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Ports, Shipping and Waterways (Deendayal Port Authority and Assam Petro-chemicals Limited)": {
+    "authority": "Ministry of Ports, Shipping and Waterways (Deendayal Port Authority and Assam Petro-chemicals Limited)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Lalit Kala Akademi, Ministry of Culture": {
+    "authority": "Lalit Kala Akademi, Ministry of Culture",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Mata Amritanandamayi Math (MAM)** (**ECOSOC** Consultative Status)": {
+    "authority": "Mata Amritanandamayi Math (MAM)** (**ECOSOC** Consultative Status)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "NMDC Limited (under the Ministry of Steel)": {
+    "authority": "NMDC Limited (under the Ministry of Steel)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Finance, Government of India / Asian Infrastructure Investment Bank (AIIB)": {
+    "authority": "Ministry of Finance, Government of India / Asian Infrastructure Investment Bank (AIIB)",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Zoological Park (NZP), New Delhi": {
+    "authority": "National Zoological Park (NZP), New Delhi",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Business Division / Special Unit",
+    "tier_description": "Created by executive notification under an administrative department; no independent statutory act.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Petroleum and Natural Gas (MoPNG)": {
+    "authority": "Ministry of Petroleum and Natural Gas (MoPNG)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Textiles": {
+    "authority": "Ministry of Textiles",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Central Information Commission (CIC) / Ministry of Personnel, Public Grievances and Pensions": {
+    "authority": "Central Information Commission (CIC) / Ministry of Personnel, Public Grievances and Pensions",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Armed Forces Medical Services (AFMS)": {
+    "authority": "Armed Forces Medical Services (AFMS)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Pharmaceuticals": {
+    "authority": "Department of Pharmaceuticals",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Union Public Service Commission (UPSC)": {
+    "authority": "Union Public Service Commission (UPSC)",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Technology Development Board (TDB), Department of Science and Technology (DST), Ministry of Science & Technology.": {
+    "authority": "Technology Development Board (TDB), Department of Science and Technology (DST), Ministry of Science & Technology.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Consumer Affairs, Food and Public Distribution": {
+    "authority": "Ministry of Consumer Affairs, Food and Public Distribution",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Ministry of Defence and Indian Air Force (IAF)": {
+    "authority": "Ministry of Defence and Indian Air Force (IAF)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Social Justice and Empowerment / ALIMCO": {
+    "authority": "Ministry of Social Justice and Empowerment / ALIMCO",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Survey of India (Department of Science and Technology) in consultation with Ministry of Home Affairs and UT Administration of Ladakh": {
+    "authority": "Survey of India (Department of Science and Technology) in consultation with Ministry of Home Affairs and UT Administration of Ladakh",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Commerce and Industry, World Trade Organization (WTO), International Labour Organization (ILO).": {
+    "authority": "Ministry of Commerce and Industry, World Trade Organization (WTO), International Labour Organization (ILO).",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Education (for Mid-Day Meal / PM POSHAN history)": {
+    "authority": "Ministry of Education (for Mid-Day Meal / PM POSHAN history)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Pharmaceuticals (\u0914\u0937\u0927 \u0935\u093f\u092d\u093e\u0917)": {
+    "authority": "Department of Pharmaceuticals (\u0914\u0937\u0927 \u0935\u093f\u092d\u093e\u0917)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Agricultural and Processed Food Products Export Development Authority (APEDA), Ministry of Commerce and Industry": {
+    "authority": "Agricultural and Processed Food Products Export Development Authority (APEDA), Ministry of Commerce and Industry",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Institute of Economic Growth (IEG)** & **Ministry of Finance": {
+    "authority": "Institute of Economic Growth (IEG)** & **Ministry of Finance",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Cooperation, KRIBHCO, MP State Biodiversity Board": {
+    "authority": "Ministry of Cooperation, KRIBHCO, MP State Biodiversity Board",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Higher Education, Ministry of Education (Nodal Institute for MP-Karnataka: School of Planning and Architecture, Bhopal)": {
+    "authority": "Department of Higher Education, Ministry of Education (Nodal Institute for MP-Karnataka: School of Planning and Architecture, Bhopal)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Digital India Bhashini Division (DIBD), Digital India Corporation (DIC), Ministry of Electronics and Information Technology (MeitY)": {
+    "authority": "Digital India Bhashini Division (DIBD), Digital India Corporation (DIC), Ministry of Electronics and Information Technology (MeitY)",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Business Division / Special Unit",
+    "tier_description": "Created by executive notification under an administrative department; no independent statutory act.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Home Affairs (MHA) and Central Bureau of Investigation (CBI)": {
+    "authority": "Ministry of Home Affairs (MHA) and Central Bureau of Investigation (CBI)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Directorate of Revenue Intelligence (DRI) & Wildlife Crime Control Bureau (WCCB)": {
+    "authority": "Directorate of Revenue Intelligence (DRI) & Wildlife Crime Control Bureau (WCCB)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Ports, Shipping and Waterways / Mumbai Port Authority": {
+    "authority": "Ministry of Ports, Shipping and Waterways / Mumbai Port Authority",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Ports, Shipping and Waterways (MoPSW)": {
+    "authority": "Ministry of Ports, Shipping and Waterways (MoPSW)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Social Justice and Empowerment (MoSJE), Government of India.": {
+    "authority": "Ministry of Social Justice and Empowerment (MoSJE), Government of India.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Telecommunications (DoT), Ministry of Communications.": {
+    "authority": "Department of Telecommunications (DoT), Ministry of Communications.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Drinking Water and Sanitation, Ministry of Jal Shakti": {
+    "authority": "Department of Drinking Water and Sanitation, Ministry of Jal Shakti",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Bhaskaracharya National Institute for Space Applications and Geo-informatics (BISAG-N) under MeitY": {
+    "authority": "Bhaskaracharya National Institute for Space Applications and Geo-informatics (BISAG-N) under MeitY",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Wildlife Institute of India (WII)": {
+    "authority": "Wildlife Institute of India (WII)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Agricultural Research and Education (DARE) and Indian Council of Agricultural Research (ICAR)": {
+    "authority": "Department of Agricultural Research and Education (DARE) and Indian Council of Agricultural Research (ICAR)",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Ministry of Environment, Forest and Climate Change (MoEFCC) in collaboration with Rajasthan Forest Department and Wildlife Institute of India (WII).": {
+    "authority": "Ministry of Environment, Forest and Climate Change (MoEFCC) in collaboration with Rajasthan Forest Department and Wildlife Institute of India (WII).",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "NITI Aayog": {
+    "authority": "NITI Aayog",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Jointly steered by the Department of Science and Technology (DST) and Ministry of Electronics and Information Technology (MeitY); implemented by C-DAC, Pune and IISc, Bengaluru.": {
+    "authority": "Jointly steered by the Department of Science and Technology (DST) and Ministry of Electronics and Information Technology (MeitY); implemented by C-DAC, Pune and IISc, Bengaluru.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Textiles / Cotton Corporation of India (CCI) / Central Silk Board (CSB)": {
+    "authority": "Ministry of Textiles / Cotton Corporation of India (CCI) / Central Silk Board (CSB)",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Inter-Parliamentary Union (IPU)** (Established **1889**; HQ: **Geneva, Switzerland**)": {
+    "authority": "Inter-Parliamentary Union (IPU)** (Established **1889**; HQ: **Geneva, Switzerland**)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Bhagwan Mahavir Memorial Samiti and Jain Mahasabha Delhi": {
+    "authority": "Bhagwan Mahavir Memorial Samiti and Jain Mahasabha Delhi",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Inland Waterways Authority of India (IWAI)": {
+    "authority": "Inland Waterways Authority of India (IWAI)",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Directorate of Revenue Intelligence (DRI) in coordination with Central Narcotics Bureau (CBN).": {
+    "authority": "Directorate of Revenue Intelligence (DRI) in coordination with Central Narcotics Bureau (CBN).",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Commerce and Industry and Ministry of External Affairs": {
+    "authority": "Ministry of Commerce and Industry and Ministry of External Affairs",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Road Transport and Highways (MoRTH) and Ministry of Railways": {
+    "authority": "Ministry of Road Transport and Highways (MoRTH) and Ministry of Railways",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Technology Development Board (TDB), Department of Science and Technology (DST)": {
+    "authority": "Technology Development Board (TDB), Department of Science and Technology (DST)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Atomic Energy (DAE), Government of India.": {
+    "authority": "Department of Atomic Energy (DAE), Government of India.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Youth Affairs and Sports (Mera Yuva Bharat / MY Bharat)": {
+    "authority": "Ministry of Youth Affairs and Sports (Mera Yuva Bharat / MY Bharat)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Rural Development (MoRD)": {
+    "authority": "Ministry of Rural Development (MoRD)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Commission for Air Quality Management (CAQM) in NCR and Adjoining Areas, in coordination with Central Pollution Control Board (CPCB)": {
+    "authority": "Commission for Air Quality Management (CAQM) in NCR and Adjoining Areas, in coordination with Central Pollution Control Board (CPCB)",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Environment, Forest and Climate Change (MoEFCC), Government of India, and Embassy of Japan in India.": {
+    "authority": "Ministry of Environment, Forest and Climate Change (MoEFCC), Government of India, and Embassy of Japan in India.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Defence (MoD)": {
+    "authority": "Ministry of Defence (MoD)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Parliament of India": {
+    "authority": "Parliament of India",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Steel / Steel Industry Safety Council (SISC)": {
+    "authority": "Ministry of Steel / Steel Industry Safety Council (SISC)",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Ministry of Health and Family Welfare and C-DAC Mohali": {
+    "authority": "Ministry of Health and Family Welfare and C-DAC Mohali",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Lok Sabha Secretariat / State Legislatures": {
+    "authority": "Lok Sabha Secretariat / State Legislatures",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Global System for Mobile Communications Association (GSMA)": {
+    "authority": "Global System for Mobile Communications Association (GSMA)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Safai Karamcharis Finance and Development Corporation (NSKFDC), Ministry of Social Justice and Empowerment": {
+    "authority": "National Safai Karamcharis Finance and Development Corporation (NSKFDC), Ministry of Social Justice and Empowerment",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Telecommunications (DoT) and Madhya Pradesh Government": {
+    "authority": "Department of Telecommunications (DoT) and Madhya Pradesh Government",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Telecommunications (DoT), Ministry of Communications & Cellular Operators Association of India (COAI)": {
+    "authority": "Department of Telecommunications (DoT), Ministry of Communications & Cellular Operators Association of India (COAI)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Institute of Naturopathy (NIN), Pune / Ministry of Ayush": {
+    "authority": "National Institute of Naturopathy (NIN), Pune / Ministry of Ayush",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Competition Commission of India (CCI)": {
+    "authority": "Competition Commission of India (CCI)",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Central Zoo Authority (CZA) and Indian Institute of Forest Management (IIFM)": {
+    "authority": "Central Zoo Authority (CZA) and Indian Institute of Forest Management (IIFM)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Business Division / Special Unit",
+    "tier_description": "Created by executive notification under an administrative department; no independent statutory act.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Commission for Scheduled Castes (NCSC) and Department of Financial Services (DFS), Ministry of Finance": {
+    "authority": "National Commission for Scheduled Castes (NCSC) and Department of Financial Services (DFS), Ministry of Finance",
+    "appearances_count": 1,
+    "tier_number": 1,
+    "tier_name": "Constitutional Body",
+    "tier_description": "Established directly by the Constitution of India; independent constitutional mandate.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "National Scheduled Castes Finance and Development Corporation (NSFDC), Ministry of Social Justice and Empowerment": {
+    "authority": "National Scheduled Castes Finance and Development Corporation (NSFDC), Ministry of Social Justice and Empowerment",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Small Industries Corporation (NSIC), Ministry of Micro, Small and Medium Enterprises (MoMSME).": {
+    "authority": "National Small Industries Corporation (NSIC), Ministry of Micro, Small and Medium Enterprises (MoMSME).",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Parliament of India (Rajya Sabha Secretariat) and the Ministry of External Affairs.": {
+    "authority": "Parliament of India (Rajya Sabha Secretariat) and the Ministry of External Affairs.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Telecom Regulatory Authority of India (TRAI), Ministry of Communications": {
+    "authority": "Telecom Regulatory Authority of India (TRAI), Ministry of Communications",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Commerce, Ministry of Commerce and Industry, India.": {
+    "authority": "Department of Commerce, Ministry of Commerce and Industry, India.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Drugs Technical Advisory Board (DTAB), Ministry of Health and Family Welfare": {
+    "authority": "Drugs Technical Advisory Board (DTAB), Ministry of Health and Family Welfare",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Women and Child Development (MoWCD)": {
+    "authority": "Ministry of Women and Child Development (MoWCD)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Bharat 6G Alliance (B6GA) and Department of Telecommunications (DoT)": {
+    "authority": "Bharat 6G Alliance (B6GA) and Department of Telecommunications (DoT)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Defence / Society of Indian Defence Manufacturers (SIDM)": {
+    "authority": "Ministry of Defence / Society of Indian Defence Manufacturers (SIDM)",
+    "appearances_count": 1,
+    "tier_number": 4,
+    "tier_name": "Registered Society / Industry Body",
+    "tier_description": "Autonomous society or apex industrial/trade body facilitating public-private partnerships.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Cochin Shipyard Limited (CSL)": {
+    "authority": "Cochin Shipyard Limited (CSL)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Education (Department of Higher Education)": {
+    "authority": "Ministry of Education (Department of Higher Education)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Indian Navy, Ministry of Defence": {
+    "authority": "Indian Navy, Ministry of Defence",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Telecommunication Engineering Centre (TEC), Department of Telecommunications (DoT), Ministry of Communications, and Indian Council of Agricultural Research (ICAR).": {
+    "authority": "Telecommunication Engineering Centre (TEC), Department of Telecommunications (DoT), Ministry of Communications, and Indian Council of Agricultural Research (ICAR).",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Commission for Air Quality Management in National Capital Region and Adjoining Areas (CAQM), Ministry of Environment, Forest and Climate Change.": {
+    "authority": "Commission for Air Quality Management in National Capital Region and Adjoining Areas (CAQM), Ministry of Environment, Forest and Climate Change.",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Business Division / Special Unit",
+    "tier_description": "Created by executive notification under an administrative department; no independent statutory act.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Youth Affairs and Sports (My Bharat-NSS)": {
+    "authority": "Ministry of Youth Affairs and Sports (My Bharat-NSS)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Indian Institute of Corporate Affairs (IICA) under the Ministry of Corporate Affairs": {
+    "authority": "Indian Institute of Corporate Affairs (IICA) under the Ministry of Corporate Affairs",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Agriculture and Farmers Welfare / PIB Delhi": {
+    "authority": "Ministry of Agriculture and Farmers Welfare / PIB Delhi",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Biodiversity Authority (NBA), Ministry of Environment, Forest and Climate Change (MoEFCC).": {
+    "authority": "National Biodiversity Authority (NBA), Ministry of Environment, Forest and Climate Change (MoEFCC).",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Indian Institute of Corporate Affairs (IICA), Ministry of Corporate Affairs": {
+    "authority": "Indian Institute of Corporate Affairs (IICA), Ministry of Corporate Affairs",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Science and Technology / PHDCCI": {
+    "authority": "Ministry of Science and Technology / PHDCCI",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Finance and Institute of Economic Growth (IEG)": {
+    "authority": "Ministry of Finance and Institute of Economic Growth (IEG)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Office of the Principal Scientific Adviser (Office of PSA)": {
+    "authority": "Office of the Principal Scientific Adviser (Office of PSA)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Development of North Eastern Region (DoNER)": {
+    "authority": "Ministry of Development of North Eastern Region (DoNER)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Ex-Servicemen Welfare (DESW), Ministry of Defence": {
+    "authority": "Department of Ex-Servicemen Welfare (DESW), Ministry of Defence",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Indian Institute of Tropical Meteorology (IITM), Pune / Ministry of Earth Sciences": {
+    "authority": "Indian Institute of Tropical Meteorology (IITM), Pune / Ministry of Earth Sciences",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "NCCF and NAFED": {
+    "authority": "NCCF and NAFED",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Hemvanti Nandan Bahuguna Garhwal University (Uttarakhand nodal institution) and IIT Kharagpur (host institution)": {
+    "authority": "Hemvanti Nandan Bahuguna Garhwal University (Uttarakhand nodal institution) and IIT Kharagpur (host institution)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Indian Navy and Royal Navy (UK)": {
+    "authority": "Indian Navy and Royal Navy (UK)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Railways / Railway Recruitment Boards (RRB)": {
+    "authority": "Ministry of Railways / Railway Recruitment Boards (RRB)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Social Justice and Empowerment (along with NSFDC, NBCFDC, and NSKFDC)": {
+    "authority": "Ministry of Social Justice and Empowerment (along with NSFDC, NBCFDC, and NSKFDC)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Rashtrapati Bhavan (Secretariat of the President of India)": {
+    "authority": "Rashtrapati Bhavan (Secretariat of the President of India)",
+    "appearances_count": 1,
+    "tier_number": 1,
+    "tier_name": "Constitutional Body",
+    "tier_description": "Established directly by the Constitution of India; independent constitutional mandate.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Ministry of Agriculture and Farmers Welfare and Ministry of Consumer Affairs, Food and Public Distribution": {
+    "authority": "Ministry of Agriculture and Farmers Welfare and Ministry of Consumer Affairs, Food and Public Distribution",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Indian Navy / Ministry of Defence / Cochin Shipyard Limited": {
+    "authority": "Indian Navy / Ministry of Defence / Cochin Shipyard Limited",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Commission for Air Quality Management (CAQM) and Municipal Corporation of Delhi (MCD)": {
+    "authority": "Commission for Air Quality Management (CAQM) and Municipal Corporation of Delhi (MCD)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Business Division / Special Unit",
+    "tier_description": "Created by executive notification under an administrative department; no independent statutory act.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Power, Government of India": {
+    "authority": "Ministry of Power, Government of India",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "National Human Rights Commission (NHRC), Ministry of Jal Shakti (National Mission for Clean Ganga & Department of Drinking Water and Sanitation), and NITI Aayog.": {
+    "authority": "National Human Rights Commission (NHRC), Ministry of Jal Shakti (National Mission for Clean Ganga & Department of Drinking Water and Sanitation), and NITI Aayog.",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Central Pollution Control Board (CPCB) / National Mission for Clean Ganga (NMCG)": {
+    "authority": "Central Pollution Control Board (CPCB) / National Mission for Clean Ganga (NMCG)",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Khadi and Village Industries Commission (KVIC)": {
+    "authority": "Khadi and Village Industries Commission (KVIC)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Development of North Eastern Region (MDoNER)": {
+    "authority": "Ministry of Development of North Eastern Region (MDoNER)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Fisheries, Animal Husbandry and Dairying": {
+    "authority": "Ministry of Fisheries, Animal Husbandry and Dairying",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Commerce and Industry / Central Government": {
+    "authority": "Ministry of Commerce and Industry / Central Government",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Coir Board / Ministry of MSME": {
+    "authority": "Coir Board / Ministry of MSME",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Legislative Department, Ministry of Law and Justice": {
+    "authority": "Legislative Department, Ministry of Law and Justice",
+    "appearances_count": 2,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Bureau of Indian Standards (BIS) under the Ministry of Consumer Affairs, Food and Public Distribution": {
+    "authority": "Bureau of Indian Standards (BIS) under the Ministry of Consumer Affairs, Food and Public Distribution",
+    "appearances_count": 1,
+    "tier_number": 2,
+    "tier_name": "Statutory Regulator / Apex Body",
+    "tier_description": "Created by an Act of Parliament with legally binding rulemaking and adjudication powers.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Defence Accounts Department (Controller General of Defence Accounts)": {
+    "authority": "Defence Accounts Department (Controller General of Defence Accounts)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of External Affairs, Government of India": {
+    "authority": "Ministry of External Affairs, Government of India",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Cabinet Committee on Economic Affairs (CCEA)": {
+    "authority": "Cabinet Committee on Economic Affairs (CCEA)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Consumer Affairs, Food and Public Distribution (Department of Food and Public Distribution)": {
+    "authority": "Ministry of Consumer Affairs, Food and Public Distribution (Department of Food and Public Distribution)",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Ministry of Health and Family Welfare / Government of India": {
+    "authority": "Ministry of Health and Family Welfare / Government of India",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Assam Police / Ministry of Home Affairs": {
+    "authority": "Assam Police / Ministry of Home Affairs",
+    "appearances_count": 1,
+    "tier_number": 5,
+    "tier_name": "Public Sector Undertaking / Statutory Corporation",
+    "tier_description": "State-owned commercial corporate enterprise or statutory commercial entity.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "All India Institute of Ayurveda (AIIA), New Delhi / Ministry of Ayush": {
+    "authority": "All India Institute of Ayurveda (AIIA), New Delhi / Ministry of Ayush",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Commerce, Ministry of Commerce and Industry": {
+    "authority": "Department of Commerce, Ministry of Commerce and Industry",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Department of Agriculture and Farmers Welfare": {
+    "authority": "Department of Agriculture and Farmers Welfare",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Technology Development Board (TDB) / Department of Science and Technology": {
+    "authority": "Technology Development Board (TDB) / Department of Science and Technology",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Defence / National Cadet Corps (NCC) Directorate General": {
+    "authority": "Ministry of Defence / National Cadet Corps (NCC) Directorate General",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Science and Technology / Department of Science and Technology (IIT Kanpur)": {
+    "authority": "Ministry of Science and Technology / Department of Science and Technology (IIT Kanpur)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Road Transport and Highways": {
+    "authority": "Ministry of Road Transport and Highways",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Environment, Forest and Climate Change": {
+    "authority": "Ministry of Environment, Forest and Climate Change",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Indian Coast Guard (ICG) and Korea Coast Guard (KCG)": {
+    "authority": "Indian Coast Guard (ICG) and Korea Coast Guard (KCG)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Social Justice and Empowerment (NSFDC, NBCFDC, NSKFDC)": {
+    "authority": "Ministry of Social Justice and Empowerment (NSFDC, NBCFDC, NSKFDC)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "New Customs House Air Cargo Complex (ACC Import), SIIB Branch": {
+    "authority": "New Customs House Air Cargo Complex (ACC Import), SIIB Branch",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Central Bureau of Narcotics (CBN)": {
+    "authority": "Central Bureau of Narcotics (CBN)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Ministry of Finance / World Bank Group": {
+    "authority": "Ministry of Finance / World Bank Group",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  },
+  "Cabinet Secretariat / President's Secretariat": {
+    "authority": "Cabinet Secretariat / President's Secretariat",
+    "appearances_count": 1,
+    "tier_number": 1,
+    "tier_name": "Constitutional Body",
+    "tier_description": "Established directly by the Constitution of India; independent constitutional mandate.",
+    "neutralized_trap": "PSY_03_LEGAL_TIER"
+  },
+  "Directorate of Revenue Intelligence (DRI) and Central Bureau of Narcotics (CBN)": {
+    "authority": "Directorate of Revenue Intelligence (DRI) and Central Bureau of Narcotics (CBN)",
+    "appearances_count": 1,
+    "tier_number": 3,
+    "tier_name": "Executive Department",
+    "tier_description": "Administrative Central Ministry or Department operating under Government of India Transaction of Business Rules.",
+    "neutralized_trap": "PSY_01_INST_SWAP"
+  }
+}

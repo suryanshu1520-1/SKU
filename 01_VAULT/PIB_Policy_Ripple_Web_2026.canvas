@@ -1,0 +1,1168 @@
+{
+  "nodes": [
+    {
+      "id": "hub-central-union",
+      "x": 0,
+      "y": 0,
+      "width": 500,
+      "height": 260,
+      "type": "text",
+      "text": "## \ud83c\udfdb\ufe0f GOVERNMENT OF INDIA // EXECUTIVE APPARATUS\n### Sovereign Policy Ripple Nexus (June\u2013October 2026)\n\n*Central Coordinating Architecture:*\n- **Cabinet Secretariat** \u00b7 PMO \u00b7 NITI Aayog\n- **PM GatiShakti NPG** (Multimodal Connectivity)\n- **National Quantum & Semiconductor Missions**\n- **Fiscal Deficit & Liquidity Anchors (MoF / RBI)**\n\n*499 Verified Primary Dossiers Synthesized*",
+      "color": "6"
+    },
+    {
+      "id": "card-CHAIN_01_SEMICON_NEXUS",
+      "x": 800,
+      "y": -1800,
+      "width": 420,
+      "height": 240,
+      "type": "text",
+      "text": "### \u26a1 Chain #01: The Semiconductor Ecosystem & Critical Materials Nexus\n**Pillar:** `GS3 Science & Economy`\n\n> **Core Driver:** Cabinet approval of Semicon 2.0 with \u20b91.27 Lakh Crore outlay and domestic component localization.\n\n*Total Linked Dispatches:* 6",
+      "color": "2"
+    },
+    {
+      "id": "step-CHAIN_01_SEMICON_NEXUS-0",
+      "x": 1350,
+      "y": -1800,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 1: Cabinet / PMO**\n\nAnnounced Semicon 2.0 and AI computing mission guidelines.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_01_SEMICON_NEXUS-1",
+      "x": 1730,
+      "y": -1800,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 2: Ministry of Power**\n\nNotified 552 GW non-fossil capacity and ultra-reliable industrial grid standards for fabs.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_01_SEMICON_NEXUS-2",
+      "x": 2110,
+      "y": -1800,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 3: Ministry of Mines**\n\nAuctioned offshore critical minerals (Lithium, Rare Earths, Silicon) for chip substrate inputs.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_01_SEMICON_NEXUS-3",
+      "x": 2490,
+      "y": -1800,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 4: Ministry of Steel**\n\nImplemented green steel ship-recycling circulars to supply low-carbon structural housing.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_01_SEMICON_NEXUS-4",
+      "x": 2870,
+      "y": -1800,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 5: MeitY / ISM**\n\nOperationalized 5 approved semiconductor units and notified the \u20b940,000 Cr ECMS scheme.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_01_SEMICON_NEXUS-5",
+      "x": 3250,
+      "y": -1800,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 6: Ministry of Commerce**\n\nNegotiated duty-free reciprocal access in New Zealand & Tajikistan FTAs for electronics.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_01_SEMICON_NEXUS-6",
+      "x": 3630,
+      "y": -1800,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 7: Reserve Bank of India**\n\nCalibrated overnight VRRR auctions to absorb massive foreign direct capex inflows.",
+      "color": "4"
+    },
+    {
+      "id": "card-CHAIN_02_CIRCULAR_EWASTE",
+      "x": 800,
+      "y": -1420,
+      "width": 420,
+      "height": 240,
+      "type": "text",
+      "text": "### \u26a1 Chain #02: Circular Economy & Industrial Effluent Compliance Cascades\n**Pillar:** `GS3 Environment & GS2 Governance`\n\n> **Core Driver:** Special Campaign 6.0 and nationwide enforcement of E-Waste (Management) Rules, 2022.\n\n*Total Linked Dispatches:* 5",
+      "color": "5"
+    },
+    {
+      "id": "step-CHAIN_02_CIRCULAR_EWASTE-0",
+      "x": 1350,
+      "y": -1420,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 1: MoEFCC / CPCB**\n\nNotified strict extended producer responsibility (EPR) recycling targets.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_02_CIRCULAR_EWASTE-1",
+      "x": 1730,
+      "y": -1420,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 2: Ministry of Steel**\n\nMandated institutional segregation and electronic disposal across all public steel plants.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_02_CIRCULAR_EWASTE-2",
+      "x": 2110,
+      "y": -1420,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 3: MeitY**\n\nDirected electronics manufacturers and GeM vendors to supply certified recyclable devices.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_02_CIRCULAR_EWASTE-3",
+      "x": 2490,
+      "y": -1420,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 4: Ministry of Law & Justice**\n\nConducted judicial and legislative record disposal workshops at Kartavya Bhawan.",
+      "color": "4"
+    },
+    {
+      "id": "card-CHAIN_03_DEFENSE_EXPORT_SURGE",
+      "x": 800,
+      "y": -1040,
+      "width": 420,
+      "height": 240,
+      "type": "text",
+      "text": "### \u26a1 Chain #03: Defense Indigenization & Private Sector Export Explosion\n**Pillar:** `GS3 Security & Economy`\n\n> **Core Driver:** Defense exports reaching all-time high of \u20b938,424 Crore in FY 2025-26 under DAP indigenization lists.\n\n*Total Linked Dispatches:* 4",
+      "color": "2"
+    },
+    {
+      "id": "step-CHAIN_03_DEFENSE_EXPORT_SURGE-0",
+      "x": 1350,
+      "y": -1040,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 1: Cabinet Secretariat**\n\nApproved higher capital acquisition budget allocation for domestic vendors.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_03_DEFENSE_EXPORT_SURGE-1",
+      "x": 1730,
+      "y": -1040,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 2: Ministry of Defence**\n\nPresented SIDM Champion Awards 2026 to incentivize private defense R&D.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_03_DEFENSE_EXPORT_SURGE-2",
+      "x": 2110,
+      "y": -1040,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 3: DRDO & Ordnance**\n\nTransferred missile propulsion and radar technology packages to private consortia.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_03_DEFENSE_EXPORT_SURGE-3",
+      "x": 2490,
+      "y": -1040,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 4: Indian Navy**\n\nShowcased indigenous stealth assets (INS Sahyadri, INS Kulish) at AIME-2026 in Philippines.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_03_DEFENSE_EXPORT_SURGE-4",
+      "x": 2870,
+      "y": -1040,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 5: Ministry of Commerce / DGFT**\n\nStreamlined military export authorizations toward \u20b950,000 Crore 2029 target.",
+      "color": "4"
+    },
+    {
+      "id": "card-CHAIN_04_AGRI_MSP_COOP",
+      "x": 800,
+      "y": -660,
+      "width": 420,
+      "height": 240,
+      "type": "text",
+      "text": "### \u26a1 Chain #04: Agrarian Price Stabilization & Primary Cooperative Modernization\n**Pillar:** `GS3 Agriculture & GS2 Cooperation`\n\n> **Core Driver:** Kharif price fixings, PM-KISAN biometric saturation, and PACS computerization.\n\n*Total Linked Dispatches:* 3",
+      "color": "5"
+    },
+    {
+      "id": "step-CHAIN_04_AGRI_MSP_COOP-0",
+      "x": 1350,
+      "y": -660,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 1: Cabinet Committee on Economic Affairs**\n\nApproved Kharif Minimum Support Prices guaranteeing 1.5x production cost.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_04_AGRI_MSP_COOP-1",
+      "x": 1730,
+      "y": -660,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 2: Ministry of Agriculture & FW**\n\nDisbursed PM-KISAN direct transfers and expanded digital crop insurance monitoring.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_04_AGRI_MSP_COOP-2",
+      "x": 2110,
+      "y": -660,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 3: Ministry of Cooperation**\n\nConnected Primary Agricultural Credit Societies (PACS) to common cloud accounting.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_04_AGRI_MSP_COOP-3",
+      "x": 2490,
+      "y": -660,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 4: Department of Fertilizers**\n\nSubsidized nano-urea and rationalized nutrient-based subsidies (NBS) for soil health.",
+      "color": "4"
+    },
+    {
+      "id": "card-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR",
+      "x": 800,
+      "y": -280,
+      "width": 420,
+      "height": 240,
+      "type": "text",
+      "text": "### \u26a1 Chain #05: Monetary Liquidity Corridor & Sovereign Balance Sheet Calibrations\n**Pillar:** `GS3 Economy & Monetary Policy`\n\n> **Core Driver:** RBI Variable Rate Reverse Repo (VRRR) liquidity absorption and corporate reporting rigor.\n\n*Total Linked Dispatches:* 4",
+      "color": "2"
+    },
+    {
+      "id": "step-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-0",
+      "x": 1350,
+      "y": -280,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 1: Ministry of Finance**\n\nTracked direct tax buoyant collections and maintained fiscal deficit trajectory.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-1",
+      "x": 1730,
+      "y": -280,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 2: Reserve Bank of India (MPC)**\n\nOperated VRRR auctions at 5.49% to anchor short-term rates to policy repo.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-2",
+      "x": 2110,
+      "y": -280,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 3: National Financial Reporting Authority (NFRA)**\n\nEnforced audit quality and technology assurance across corporate books.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-3",
+      "x": 2490,
+      "y": -280,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 4: Ministry of Corporate Affairs**\n\nExpanded learner registrations for corporate governance and insolvency norms.",
+      "color": "4"
+    },
+    {
+      "id": "card-CHAIN_06_GREEN_HYDROGEN_SIGHT",
+      "x": 800,
+      "y": 100,
+      "width": 420,
+      "height": 240,
+      "type": "text",
+      "text": "### \u26a1 Chain #06: National Green Hydrogen Mission & Electrolyser Supply Chain\n**Pillar:** `GS3 Environment & Energy`\n\n> **Core Driver:** Strategic Interventions for Green Hydrogen Transition (SIGHT) tenders under MNRE.\n\n*Total Linked Dispatches:* 2",
+      "color": "5"
+    },
+    {
+      "id": "step-CHAIN_06_GREEN_HYDROGEN_SIGHT-0",
+      "x": 1350,
+      "y": 100,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 1: MNRE**\n\nAllocated electrolyser manufacturing capacity under Component I of SIGHT mission.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_06_GREEN_HYDROGEN_SIGHT-1",
+      "x": 1730,
+      "y": 100,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 2: Ministry of Petroleum & NG**\n\nMandated green hydrogen blending in public sector refinery operations.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_06_GREEN_HYDROGEN_SIGHT-2",
+      "x": 2110,
+      "y": 100,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 3: Ministry of Power**\n\nGranted open-access green energy transmission waivers for hydrogen production.",
+      "color": "4"
+    },
+    {
+      "id": "card-CHAIN_07_GATISHAKTI_LOGISTICS",
+      "x": 800,
+      "y": 480,
+      "width": 420,
+      "height": 240,
+      "type": "text",
+      "text": "### \u26a1 Chain #07: PM GatiShakti Multimodal Logistics & Transit De-bottlenecking\n**Pillar:** `GS3 Infrastructure`\n\n> **Core Driver:** Network Planning Group (NPG) integrated clearances across transport ministries.\n\n*Total Linked Dispatches:* 2",
+      "color": "2"
+    },
+    {
+      "id": "step-CHAIN_07_GATISHAKTI_LOGISTICS-0",
+      "x": 1350,
+      "y": 480,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 1: DPIIT / PM GatiShakti**\n\nSynchronized infrastructure corridors using GIS multi-layer mapping.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_07_GATISHAKTI_LOGISTICS-1",
+      "x": 1730,
+      "y": 480,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 2: Ministry of Railways**\n\nExpanded Kavach 4.0 train collision avoidance rollout and freight corridors.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_07_GATISHAKTI_LOGISTICS-2",
+      "x": 2110,
+      "y": 480,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 3: Ministry of Road Transport & Highways**\n\nMonetized highway stretches and expedited economic corridor tunnels.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_07_GATISHAKTI_LOGISTICS-3",
+      "x": 2490,
+      "y": 480,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 4: Ministry of Ports & Shipping**\n\nCommissioned zero-emission green port tugs and coastal shipping nodes.",
+      "color": "4"
+    },
+    {
+      "id": "card-CHAIN_08_AYUSH_UNIVERSAL_HEALTH",
+      "x": 800,
+      "y": 860,
+      "width": 420,
+      "height": 240,
+      "type": "text",
+      "text": "### \u26a1 Chain #08: Universal Senior Healthcare & Traditional Medicine Integration\n**Pillar:** `GS2 Social Justice & Health`\n\n> **Core Driver:** Expansion of Ayushman Bharat to senior citizens aged 70+ and 11th Ayurveda Day.\n\n*Total Linked Dispatches:* 3",
+      "color": "5"
+    },
+    {
+      "id": "step-CHAIN_08_AYUSH_UNIVERSAL_HEALTH-0",
+      "x": 1350,
+      "y": 860,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 1: Cabinet / MoHFW**\n\nApproved universal health coverage for all citizens 70+ regardless of income.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_08_AYUSH_UNIVERSAL_HEALTH-1",
+      "x": 1730,
+      "y": 860,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 2: Ministry of Ayush**\n\nOrganized 11th Ayurveda Day globally and standardized CCRAS pharmacopoeia.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_08_AYUSH_UNIVERSAL_HEALTH-2",
+      "x": 2110,
+      "y": 860,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 3: National Health Authority**\n\nDigitized electronic health records under the Ayushman Bharat Digital Mission.",
+      "color": "4"
+    },
+    {
+      "id": "card-CHAIN_09_BORDER_SECURITY_INFRA",
+      "x": 800,
+      "y": 1240,
+      "width": 420,
+      "height": 240,
+      "type": "text",
+      "text": "### \u26a1 Chain #09: Strategic Border Infrastructure & High-Altitude Defense Logistics\n**Pillar:** `GS3 Security & Border Management`\n\n> **Core Driver:** Border Roads Organisation (BRO) year-round strategic tunnel completions.\n\n*Total Linked Dispatches:* 2",
+      "color": "2"
+    },
+    {
+      "id": "step-CHAIN_09_BORDER_SECURITY_INFRA-0",
+      "x": 1350,
+      "y": 1240,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 1: Ministry of Defence**\n\nFunded all-weather border bypasses and heavy armor bridges along LAC and LoC.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_09_BORDER_SECURITY_INFRA-1",
+      "x": 1730,
+      "y": 1240,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 2: Ministry of Home Affairs**\n\nExpanded Vibrant Villages Programme to prevent border demographic depletion.",
+      "color": "4"
+    },
+    {
+      "id": "card-CHAIN_10_NUCLEAR_SOVEREIGNTY",
+      "x": 800,
+      "y": 1620,
+      "width": 420,
+      "height": 240,
+      "type": "text",
+      "text": "### \u26a1 Chain #10: Nuclear Fuel Cycle Sovereignty & Fast Breeder Commercialization\n**Pillar:** `GS3 Science & Atomic Energy`\n\n> **Core Driver:** Uranium Corporation of India Limited (UCIL) Diamond Jubilee and PFBR fuel loading.\n\n*Total Linked Dispatches:* 1",
+      "color": "5"
+    },
+    {
+      "id": "step-CHAIN_10_NUCLEAR_SOVEREIGNTY-0",
+      "x": 1350,
+      "y": 1620,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 1: Department of Atomic Energy**\n\nExpanded domestic uranium mining and yellowcake refining at Jaduguda.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_10_NUCLEAR_SOVEREIGNTY-1",
+      "x": 1730,
+      "y": 1620,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 2: Nuclear Power Corporation (NPCIL)**\n\nSynchronized 700 MWe Pressurised Heavy Water Reactors at Kakrapar.",
+      "color": "4"
+    },
+    {
+      "id": "card-CHAIN_11_WATER_SECURITY_JAL_JEEVAN",
+      "x": 800,
+      "y": 2000,
+      "width": 420,
+      "height": 240,
+      "type": "text",
+      "text": "### \u26a1 Chain #11: Water Security, Industrial Effluent Zero-Discharge & River Basins\n**Pillar:** `GS3 Environment & GS2 Governance`\n\n> **Core Driver:** Jal Jeevan Mission 2.0 regional state reviews and Namami Gange industrial audits.\n\n*Total Linked Dispatches:* 2",
+      "color": "2"
+    },
+    {
+      "id": "step-CHAIN_11_WATER_SECURITY_JAL_JEEVAN-0",
+      "x": 1350,
+      "y": 2000,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 1: Ministry of Jal Shakti / DDWS**\n\nConvened regional states at IIM Bangalore for functional tap water sustainability.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_11_WATER_SECURITY_JAL_JEEVAN-1",
+      "x": 1730,
+      "y": 2000,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 2: National Mission for Clean Ganga (NMCG)**\n\nEnforced zero liquid discharge (ZLD) regulations on tanneries and paper mills.",
+      "color": "4"
+    },
+    {
+      "id": "card-CHAIN_12_SPECIAL_CAMPAIGN_GOVERNANCE",
+      "x": 800,
+      "y": 2380,
+      "width": 420,
+      "height": 240,
+      "type": "text",
+      "text": "### \u26a1 Chain #12: Special Campaign 6.0: De-cluttering & Administrative Space Monetization\n**Pillar:** `GS2 Administrative Reforms`\n\n> **Core Driver:** National administrative disposal drive from October 2 to October 31, 2026.\n\n*Total Linked Dispatches:* 4",
+      "color": "5"
+    },
+    {
+      "id": "step-CHAIN_12_SPECIAL_CAMPAIGN_GOVERNANCE-0",
+      "x": 1350,
+      "y": 2380,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 1: DARPG**\n\nCoordinated pan-ministerial targets for disposing public grievances and parliamentary assurances.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_12_SPECIAL_CAMPAIGN_GOVERNANCE-1",
+      "x": 1730,
+      "y": 2380,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 2: All Line Ministries**\n\nFreed office spaces, monetized scrap materials, and digitized archival records.",
+      "color": "4"
+    },
+    {
+      "id": "card-CHAIN_13_BILATERAL_TRADE_ENERGY",
+      "x": 800,
+      "y": 2760,
+      "width": 420,
+      "height": 240,
+      "type": "text",
+      "text": "### \u26a1 Chain #13: Bilateral Trade Alliances & Strategic Energy Corridor Access\n**Pillar:** `GS2 International Relations`\n\n> **Core Driver:** Union Finance Minister official visit to Qatar and New Zealand Free Trade Agreement.\n\n*Total Linked Dispatches:* 2",
+      "color": "2"
+    },
+    {
+      "id": "step-CHAIN_13_BILATERAL_TRADE_ENERGY-0",
+      "x": 1350,
+      "y": 2760,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 1: Ministry of Finance**\n\nHeld bilateral investment facilitation talks with Qatar Investment Authority.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_13_BILATERAL_TRADE_ENERGY-1",
+      "x": 1730,
+      "y": 2760,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 2: Ministry of Commerce**\n\nSecured zero-duty market access for Indian textiles and pharmaceuticals in New Zealand.",
+      "color": "4"
+    },
+    {
+      "id": "card-CHAIN_14_TRIBAL_PVTG_SATURATION",
+      "x": 800,
+      "y": 3140,
+      "width": 420,
+      "height": 240,
+      "type": "text",
+      "text": "### \u26a1 Chain #14: PM-JANMAN & Particularly Vulnerable Tribal Group (PVTG) Saturation\n**Pillar:** `GS2 Social Justice & Tribal Welfare`\n\n> **Core Driver:** Direct saturation of 11 critical interventions across 75 PVTG communities.\n\n*Total Linked Dispatches:* 1",
+      "color": "5"
+    },
+    {
+      "id": "step-CHAIN_14_TRIBAL_PVTG_SATURATION-0",
+      "x": 1350,
+      "y": 3140,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 1: Ministry of Tribal Affairs**\n\nDisbursed housing, clean water, and solar home lighting grants under Article 275(1).",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_14_TRIBAL_PVTG_SATURATION-1",
+      "x": 1730,
+      "y": 3140,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 2: Ministry of Rural Development**\n\nConstructed all-weather connecting roads to remote tribal habitations.",
+      "color": "4"
+    },
+    {
+      "id": "card-CHAIN_15_DIGITAL_GOVERNANCE_DATA",
+      "x": 800,
+      "y": 3520,
+      "width": 420,
+      "height": 240,
+      "type": "text",
+      "text": "### \u26a1 Chain #15: Digital Public Infrastructure, Open Networks & Data Protection Rules\n**Pillar:** `GS3 Science & GS2 Governance`\n\n> **Core Driver:** Notification of Digital Personal Data Protection (DPDP) Act subordinate rules.\n\n*Total Linked Dispatches:* 2",
+      "color": "2"
+    },
+    {
+      "id": "step-CHAIN_15_DIGITAL_GOVERNANCE_DATA-0",
+      "x": 1350,
+      "y": 3520,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 1: MeitY**\n\nFormulated Data Protection Board operating procedures and open network DigiDukaan rails.",
+      "color": "3"
+    },
+    {
+      "id": "step-CHAIN_15_DIGITAL_GOVERNANCE_DATA-1",
+      "x": 1730,
+      "y": 3520,
+      "width": 320,
+      "height": 220,
+      "type": "text",
+      "text": "**Step 2: Ministry of Law & Justice**\n\nVetted statutory compliance for cross-border data transfer safeguards.",
+      "color": "4"
+    },
+    {
+      "id": "pillar-legal-tiers",
+      "x": -800,
+      "y": -900,
+      "width": 550,
+      "height": 600,
+      "type": "text",
+      "text": "## \u2696\ufe0f THE 5 INSTITUTIONAL LEGAL TIERS\n### Deterministic Entity Disambiguation (TASK_080)\n\n### Tier 1: Constitutional Bodies (Art. 75, 324, 338)\n- ECI \u00b7 NCSC \u00b7 Union Council of Ministers\n- *Neutralizes PSY_03 Legal Tier Shifts*\n\n### Tier 2: Statutory Regulators (Acts of Parliament)\n- RBI \u00b7 SEBI \u00b7 NFRA \u00b7 CARA \u00b7 NBA \u00b7 BIS \u00b7 CPCB\n- *Neutralizes PSY_01 Authority Swaps*\n\n### Tier 3: Executive Business Divisions\n- India Semiconductor Mission (ISM / MeitY)\n- PM GatiShakti NPG \u00b7 GeM \u00b7 DigiDukaan\n\n### Tier 4: Apex Industry Societies\n- Society of Indian Defence Manufacturers (SIDM)\n\n### Tier 5: Commercial PSUs\n- Uranium Corp (UCIL) \u00b7 Coal India (CIL)",
+      "color": "1"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-hub-CHAIN_01_SEMICON_NEXUS",
+      "fromNode": "hub-central-union",
+      "fromSide": "right",
+      "toNode": "card-CHAIN_01_SEMICON_NEXUS",
+      "toSide": "left",
+      "label": "Mandate #1"
+    },
+    {
+      "id": "edge-card-CHAIN_01_SEMICON_NEXUS-step-CHAIN_01_SEMICON_NEXUS-0",
+      "fromNode": "card-CHAIN_01_SEMICON_NEXUS",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_01_SEMICON_NEXUS-0",
+      "toSide": "left",
+      "label": "triggers"
+    },
+    {
+      "id": "edge-step-CHAIN_01_SEMICON_NEXUS-0-step-CHAIN_01_SEMICON_NEXUS-1",
+      "fromNode": "step-CHAIN_01_SEMICON_NEXUS-0",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_01_SEMICON_NEXUS-1",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-step-CHAIN_01_SEMICON_NEXUS-1-step-CHAIN_01_SEMICON_NEXUS-2",
+      "fromNode": "step-CHAIN_01_SEMICON_NEXUS-1",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_01_SEMICON_NEXUS-2",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-step-CHAIN_01_SEMICON_NEXUS-2-step-CHAIN_01_SEMICON_NEXUS-3",
+      "fromNode": "step-CHAIN_01_SEMICON_NEXUS-2",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_01_SEMICON_NEXUS-3",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-step-CHAIN_01_SEMICON_NEXUS-3-step-CHAIN_01_SEMICON_NEXUS-4",
+      "fromNode": "step-CHAIN_01_SEMICON_NEXUS-3",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_01_SEMICON_NEXUS-4",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-step-CHAIN_01_SEMICON_NEXUS-4-step-CHAIN_01_SEMICON_NEXUS-5",
+      "fromNode": "step-CHAIN_01_SEMICON_NEXUS-4",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_01_SEMICON_NEXUS-5",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-step-CHAIN_01_SEMICON_NEXUS-5-step-CHAIN_01_SEMICON_NEXUS-6",
+      "fromNode": "step-CHAIN_01_SEMICON_NEXUS-5",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_01_SEMICON_NEXUS-6",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-hub-CHAIN_02_CIRCULAR_EWASTE",
+      "fromNode": "hub-central-union",
+      "fromSide": "right",
+      "toNode": "card-CHAIN_02_CIRCULAR_EWASTE",
+      "toSide": "left",
+      "label": "Mandate #2"
+    },
+    {
+      "id": "edge-card-CHAIN_02_CIRCULAR_EWASTE-step-CHAIN_02_CIRCULAR_EWASTE-0",
+      "fromNode": "card-CHAIN_02_CIRCULAR_EWASTE",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_02_CIRCULAR_EWASTE-0",
+      "toSide": "left",
+      "label": "triggers"
+    },
+    {
+      "id": "edge-step-CHAIN_02_CIRCULAR_EWASTE-0-step-CHAIN_02_CIRCULAR_EWASTE-1",
+      "fromNode": "step-CHAIN_02_CIRCULAR_EWASTE-0",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_02_CIRCULAR_EWASTE-1",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-step-CHAIN_02_CIRCULAR_EWASTE-1-step-CHAIN_02_CIRCULAR_EWASTE-2",
+      "fromNode": "step-CHAIN_02_CIRCULAR_EWASTE-1",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_02_CIRCULAR_EWASTE-2",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-step-CHAIN_02_CIRCULAR_EWASTE-2-step-CHAIN_02_CIRCULAR_EWASTE-3",
+      "fromNode": "step-CHAIN_02_CIRCULAR_EWASTE-2",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_02_CIRCULAR_EWASTE-3",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-hub-CHAIN_03_DEFENSE_EXPORT_SURGE",
+      "fromNode": "hub-central-union",
+      "fromSide": "right",
+      "toNode": "card-CHAIN_03_DEFENSE_EXPORT_SURGE",
+      "toSide": "left",
+      "label": "Mandate #3"
+    },
+    {
+      "id": "edge-card-CHAIN_03_DEFENSE_EXPORT_SURGE-step-CHAIN_03_DEFENSE_EXPORT_SURGE-0",
+      "fromNode": "card-CHAIN_03_DEFENSE_EXPORT_SURGE",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_03_DEFENSE_EXPORT_SURGE-0",
+      "toSide": "left",
+      "label": "triggers"
+    },
+    {
+      "id": "edge-step-CHAIN_03_DEFENSE_EXPORT_SURGE-0-step-CHAIN_03_DEFENSE_EXPORT_SURGE-1",
+      "fromNode": "step-CHAIN_03_DEFENSE_EXPORT_SURGE-0",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_03_DEFENSE_EXPORT_SURGE-1",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-step-CHAIN_03_DEFENSE_EXPORT_SURGE-1-step-CHAIN_03_DEFENSE_EXPORT_SURGE-2",
+      "fromNode": "step-CHAIN_03_DEFENSE_EXPORT_SURGE-1",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_03_DEFENSE_EXPORT_SURGE-2",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-step-CHAIN_03_DEFENSE_EXPORT_SURGE-2-step-CHAIN_03_DEFENSE_EXPORT_SURGE-3",
+      "fromNode": "step-CHAIN_03_DEFENSE_EXPORT_SURGE-2",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_03_DEFENSE_EXPORT_SURGE-3",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-step-CHAIN_03_DEFENSE_EXPORT_SURGE-3-step-CHAIN_03_DEFENSE_EXPORT_SURGE-4",
+      "fromNode": "step-CHAIN_03_DEFENSE_EXPORT_SURGE-3",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_03_DEFENSE_EXPORT_SURGE-4",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-hub-CHAIN_04_AGRI_MSP_COOP",
+      "fromNode": "hub-central-union",
+      "fromSide": "right",
+      "toNode": "card-CHAIN_04_AGRI_MSP_COOP",
+      "toSide": "left",
+      "label": "Mandate #4"
+    },
+    {
+      "id": "edge-card-CHAIN_04_AGRI_MSP_COOP-step-CHAIN_04_AGRI_MSP_COOP-0",
+      "fromNode": "card-CHAIN_04_AGRI_MSP_COOP",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_04_AGRI_MSP_COOP-0",
+      "toSide": "left",
+      "label": "triggers"
+    },
+    {
+      "id": "edge-step-CHAIN_04_AGRI_MSP_COOP-0-step-CHAIN_04_AGRI_MSP_COOP-1",
+      "fromNode": "step-CHAIN_04_AGRI_MSP_COOP-0",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_04_AGRI_MSP_COOP-1",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-step-CHAIN_04_AGRI_MSP_COOP-1-step-CHAIN_04_AGRI_MSP_COOP-2",
+      "fromNode": "step-CHAIN_04_AGRI_MSP_COOP-1",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_04_AGRI_MSP_COOP-2",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-step-CHAIN_04_AGRI_MSP_COOP-2-step-CHAIN_04_AGRI_MSP_COOP-3",
+      "fromNode": "step-CHAIN_04_AGRI_MSP_COOP-2",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_04_AGRI_MSP_COOP-3",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-hub-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR",
+      "fromNode": "hub-central-union",
+      "fromSide": "right",
+      "toNode": "card-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR",
+      "toSide": "left",
+      "label": "Mandate #5"
+    },
+    {
+      "id": "edge-card-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-step-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-0",
+      "fromNode": "card-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-0",
+      "toSide": "left",
+      "label": "triggers"
+    },
+    {
+      "id": "edge-step-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-0-step-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-1",
+      "fromNode": "step-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-0",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-1",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-step-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-1-step-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-2",
+      "fromNode": "step-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-1",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-2",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-step-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-2-step-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-3",
+      "fromNode": "step-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-2",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR-3",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-hub-CHAIN_06_GREEN_HYDROGEN_SIGHT",
+      "fromNode": "hub-central-union",
+      "fromSide": "right",
+      "toNode": "card-CHAIN_06_GREEN_HYDROGEN_SIGHT",
+      "toSide": "left",
+      "label": "Mandate #6"
+    },
+    {
+      "id": "edge-card-CHAIN_06_GREEN_HYDROGEN_SIGHT-step-CHAIN_06_GREEN_HYDROGEN_SIGHT-0",
+      "fromNode": "card-CHAIN_06_GREEN_HYDROGEN_SIGHT",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_06_GREEN_HYDROGEN_SIGHT-0",
+      "toSide": "left",
+      "label": "triggers"
+    },
+    {
+      "id": "edge-step-CHAIN_06_GREEN_HYDROGEN_SIGHT-0-step-CHAIN_06_GREEN_HYDROGEN_SIGHT-1",
+      "fromNode": "step-CHAIN_06_GREEN_HYDROGEN_SIGHT-0",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_06_GREEN_HYDROGEN_SIGHT-1",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-step-CHAIN_06_GREEN_HYDROGEN_SIGHT-1-step-CHAIN_06_GREEN_HYDROGEN_SIGHT-2",
+      "fromNode": "step-CHAIN_06_GREEN_HYDROGEN_SIGHT-1",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_06_GREEN_HYDROGEN_SIGHT-2",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-hub-CHAIN_07_GATISHAKTI_LOGISTICS",
+      "fromNode": "hub-central-union",
+      "fromSide": "right",
+      "toNode": "card-CHAIN_07_GATISHAKTI_LOGISTICS",
+      "toSide": "left",
+      "label": "Mandate #7"
+    },
+    {
+      "id": "edge-card-CHAIN_07_GATISHAKTI_LOGISTICS-step-CHAIN_07_GATISHAKTI_LOGISTICS-0",
+      "fromNode": "card-CHAIN_07_GATISHAKTI_LOGISTICS",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_07_GATISHAKTI_LOGISTICS-0",
+      "toSide": "left",
+      "label": "triggers"
+    },
+    {
+      "id": "edge-step-CHAIN_07_GATISHAKTI_LOGISTICS-0-step-CHAIN_07_GATISHAKTI_LOGISTICS-1",
+      "fromNode": "step-CHAIN_07_GATISHAKTI_LOGISTICS-0",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_07_GATISHAKTI_LOGISTICS-1",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-step-CHAIN_07_GATISHAKTI_LOGISTICS-1-step-CHAIN_07_GATISHAKTI_LOGISTICS-2",
+      "fromNode": "step-CHAIN_07_GATISHAKTI_LOGISTICS-1",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_07_GATISHAKTI_LOGISTICS-2",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-step-CHAIN_07_GATISHAKTI_LOGISTICS-2-step-CHAIN_07_GATISHAKTI_LOGISTICS-3",
+      "fromNode": "step-CHAIN_07_GATISHAKTI_LOGISTICS-2",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_07_GATISHAKTI_LOGISTICS-3",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-hub-CHAIN_08_AYUSH_UNIVERSAL_HEALTH",
+      "fromNode": "hub-central-union",
+      "fromSide": "right",
+      "toNode": "card-CHAIN_08_AYUSH_UNIVERSAL_HEALTH",
+      "toSide": "left",
+      "label": "Mandate #8"
+    },
+    {
+      "id": "edge-card-CHAIN_08_AYUSH_UNIVERSAL_HEALTH-step-CHAIN_08_AYUSH_UNIVERSAL_HEALTH-0",
+      "fromNode": "card-CHAIN_08_AYUSH_UNIVERSAL_HEALTH",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_08_AYUSH_UNIVERSAL_HEALTH-0",
+      "toSide": "left",
+      "label": "triggers"
+    },
+    {
+      "id": "edge-step-CHAIN_08_AYUSH_UNIVERSAL_HEALTH-0-step-CHAIN_08_AYUSH_UNIVERSAL_HEALTH-1",
+      "fromNode": "step-CHAIN_08_AYUSH_UNIVERSAL_HEALTH-0",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_08_AYUSH_UNIVERSAL_HEALTH-1",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-step-CHAIN_08_AYUSH_UNIVERSAL_HEALTH-1-step-CHAIN_08_AYUSH_UNIVERSAL_HEALTH-2",
+      "fromNode": "step-CHAIN_08_AYUSH_UNIVERSAL_HEALTH-1",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_08_AYUSH_UNIVERSAL_HEALTH-2",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-hub-CHAIN_09_BORDER_SECURITY_INFRA",
+      "fromNode": "hub-central-union",
+      "fromSide": "right",
+      "toNode": "card-CHAIN_09_BORDER_SECURITY_INFRA",
+      "toSide": "left",
+      "label": "Mandate #9"
+    },
+    {
+      "id": "edge-card-CHAIN_09_BORDER_SECURITY_INFRA-step-CHAIN_09_BORDER_SECURITY_INFRA-0",
+      "fromNode": "card-CHAIN_09_BORDER_SECURITY_INFRA",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_09_BORDER_SECURITY_INFRA-0",
+      "toSide": "left",
+      "label": "triggers"
+    },
+    {
+      "id": "edge-step-CHAIN_09_BORDER_SECURITY_INFRA-0-step-CHAIN_09_BORDER_SECURITY_INFRA-1",
+      "fromNode": "step-CHAIN_09_BORDER_SECURITY_INFRA-0",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_09_BORDER_SECURITY_INFRA-1",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-hub-CHAIN_10_NUCLEAR_SOVEREIGNTY",
+      "fromNode": "hub-central-union",
+      "fromSide": "right",
+      "toNode": "card-CHAIN_10_NUCLEAR_SOVEREIGNTY",
+      "toSide": "left",
+      "label": "Mandate #10"
+    },
+    {
+      "id": "edge-card-CHAIN_10_NUCLEAR_SOVEREIGNTY-step-CHAIN_10_NUCLEAR_SOVEREIGNTY-0",
+      "fromNode": "card-CHAIN_10_NUCLEAR_SOVEREIGNTY",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_10_NUCLEAR_SOVEREIGNTY-0",
+      "toSide": "left",
+      "label": "triggers"
+    },
+    {
+      "id": "edge-step-CHAIN_10_NUCLEAR_SOVEREIGNTY-0-step-CHAIN_10_NUCLEAR_SOVEREIGNTY-1",
+      "fromNode": "step-CHAIN_10_NUCLEAR_SOVEREIGNTY-0",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_10_NUCLEAR_SOVEREIGNTY-1",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-hub-CHAIN_11_WATER_SECURITY_JAL_JEEVAN",
+      "fromNode": "hub-central-union",
+      "fromSide": "right",
+      "toNode": "card-CHAIN_11_WATER_SECURITY_JAL_JEEVAN",
+      "toSide": "left",
+      "label": "Mandate #11"
+    },
+    {
+      "id": "edge-card-CHAIN_11_WATER_SECURITY_JAL_JEEVAN-step-CHAIN_11_WATER_SECURITY_JAL_JEEVAN-0",
+      "fromNode": "card-CHAIN_11_WATER_SECURITY_JAL_JEEVAN",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_11_WATER_SECURITY_JAL_JEEVAN-0",
+      "toSide": "left",
+      "label": "triggers"
+    },
+    {
+      "id": "edge-step-CHAIN_11_WATER_SECURITY_JAL_JEEVAN-0-step-CHAIN_11_WATER_SECURITY_JAL_JEEVAN-1",
+      "fromNode": "step-CHAIN_11_WATER_SECURITY_JAL_JEEVAN-0",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_11_WATER_SECURITY_JAL_JEEVAN-1",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-hub-CHAIN_12_SPECIAL_CAMPAIGN_GOVERNANCE",
+      "fromNode": "hub-central-union",
+      "fromSide": "right",
+      "toNode": "card-CHAIN_12_SPECIAL_CAMPAIGN_GOVERNANCE",
+      "toSide": "left",
+      "label": "Mandate #12"
+    },
+    {
+      "id": "edge-card-CHAIN_12_SPECIAL_CAMPAIGN_GOVERNANCE-step-CHAIN_12_SPECIAL_CAMPAIGN_GOVERNANCE-0",
+      "fromNode": "card-CHAIN_12_SPECIAL_CAMPAIGN_GOVERNANCE",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_12_SPECIAL_CAMPAIGN_GOVERNANCE-0",
+      "toSide": "left",
+      "label": "triggers"
+    },
+    {
+      "id": "edge-step-CHAIN_12_SPECIAL_CAMPAIGN_GOVERNANCE-0-step-CHAIN_12_SPECIAL_CAMPAIGN_GOVERNANCE-1",
+      "fromNode": "step-CHAIN_12_SPECIAL_CAMPAIGN_GOVERNANCE-0",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_12_SPECIAL_CAMPAIGN_GOVERNANCE-1",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-hub-CHAIN_13_BILATERAL_TRADE_ENERGY",
+      "fromNode": "hub-central-union",
+      "fromSide": "right",
+      "toNode": "card-CHAIN_13_BILATERAL_TRADE_ENERGY",
+      "toSide": "left",
+      "label": "Mandate #13"
+    },
+    {
+      "id": "edge-card-CHAIN_13_BILATERAL_TRADE_ENERGY-step-CHAIN_13_BILATERAL_TRADE_ENERGY-0",
+      "fromNode": "card-CHAIN_13_BILATERAL_TRADE_ENERGY",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_13_BILATERAL_TRADE_ENERGY-0",
+      "toSide": "left",
+      "label": "triggers"
+    },
+    {
+      "id": "edge-step-CHAIN_13_BILATERAL_TRADE_ENERGY-0-step-CHAIN_13_BILATERAL_TRADE_ENERGY-1",
+      "fromNode": "step-CHAIN_13_BILATERAL_TRADE_ENERGY-0",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_13_BILATERAL_TRADE_ENERGY-1",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-hub-CHAIN_14_TRIBAL_PVTG_SATURATION",
+      "fromNode": "hub-central-union",
+      "fromSide": "right",
+      "toNode": "card-CHAIN_14_TRIBAL_PVTG_SATURATION",
+      "toSide": "left",
+      "label": "Mandate #14"
+    },
+    {
+      "id": "edge-card-CHAIN_14_TRIBAL_PVTG_SATURATION-step-CHAIN_14_TRIBAL_PVTG_SATURATION-0",
+      "fromNode": "card-CHAIN_14_TRIBAL_PVTG_SATURATION",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_14_TRIBAL_PVTG_SATURATION-0",
+      "toSide": "left",
+      "label": "triggers"
+    },
+    {
+      "id": "edge-step-CHAIN_14_TRIBAL_PVTG_SATURATION-0-step-CHAIN_14_TRIBAL_PVTG_SATURATION-1",
+      "fromNode": "step-CHAIN_14_TRIBAL_PVTG_SATURATION-0",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_14_TRIBAL_PVTG_SATURATION-1",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-hub-CHAIN_15_DIGITAL_GOVERNANCE_DATA",
+      "fromNode": "hub-central-union",
+      "fromSide": "right",
+      "toNode": "card-CHAIN_15_DIGITAL_GOVERNANCE_DATA",
+      "toSide": "left",
+      "label": "Mandate #15"
+    },
+    {
+      "id": "edge-card-CHAIN_15_DIGITAL_GOVERNANCE_DATA-step-CHAIN_15_DIGITAL_GOVERNANCE_DATA-0",
+      "fromNode": "card-CHAIN_15_DIGITAL_GOVERNANCE_DATA",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_15_DIGITAL_GOVERNANCE_DATA-0",
+      "toSide": "left",
+      "label": "triggers"
+    },
+    {
+      "id": "edge-step-CHAIN_15_DIGITAL_GOVERNANCE_DATA-0-step-CHAIN_15_DIGITAL_GOVERNANCE_DATA-1",
+      "fromNode": "step-CHAIN_15_DIGITAL_GOVERNANCE_DATA-0",
+      "fromSide": "right",
+      "toNode": "step-CHAIN_15_DIGITAL_GOVERNANCE_DATA-1",
+      "toSide": "left",
+      "label": "causes"
+    },
+    {
+      "id": "edge-tiers-to-hub",
+      "fromNode": "pillar-legal-tiers",
+      "fromSide": "right",
+      "toNode": "hub-central-union",
+      "toSide": "left",
+      "label": "constitutional validity"
+    }
+  ]
+}

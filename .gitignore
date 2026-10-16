@@ -100,6 +100,10 @@ docs/research/
 
 # ── Scratch & verification throwaways (probes, dry-runs, temp tsconfigs) ──
 _scratch/
+output/
+scripts/data/simulations/db_snapshot.json
+scripts/data/simulations/all_pib_digests_*.json
+scripts/data/simulations/pib_categorized_*.json
 *.probe.mjs
 *-probe.mjs
 *-probe.ts

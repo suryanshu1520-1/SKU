@@ -1,0 +1,900 @@
+{
+  "generated_at": "2026-10-15T13:50:24.703337Z",
+  "simulation_suite_version": "1.0.0-PROD",
+  "database_census": {
+    "current_affairs_count": 1598,
+    "pib_digests_count": 476,
+    "mcqs_count": 740,
+    "pyq_count": 2890,
+    "nodes_count": 137,
+    "attempts_count": 805,
+    "runs_count": 226,
+    "decisions_count": 1328
+  },
+  "engine_1_paper_setter_monte_carlo": {
+    "committees_simulated": 1000,
+    "questions_simulated": 100000,
+    "subject_forecast": {
+      "Economy & Monetary Policy": {
+        "mean": 17.75,
+        "std": 3.7,
+        "ci_95": [
+          11,
+          25
+        ],
+        "min": 8,
+        "max": 31
+      },
+      "Environment, Biodiversity & Agri": {
+        "mean": 18.94,
+        "std": 3.81,
+        "ci_95": [
+          13,
+          27
+        ],
+        "min": 7,
+        "max": 31
+      },
+      "Polity & Constitutional Governance": {
+        "mean": 16.05,
+        "std": 3.7,
+        "ci_95": [
+          10,
+          24
+        ],
+        "min": 7,
+        "max": 31
+      },
+      "History, Art & Culture": {
+        "mean": 14.99,
+        "std": 3.55,
+        "ci_95": [
+          9,
+          23
+        ],
+        "min": 5,
+        "max": 28
+      },
+      "Physical & Indian Geography": {
+        "mean": 12.2,
+        "std": 3.31,
+        "ci_95": [
+          6,
+          19
+        ],
+        "min": 5,
+        "max": 24
+      },
+      "Science & Technology": {
+        "mean": 11.93,
+        "std": 3.19,
+        "ci_95": [
+          6,
+          19
+        ],
+        "min": 4,
+        "max": 25
+      },
+      "International Relations & Security": {
+        "mean": 8.14,
+        "std": 2.7,
+        "ci_95": [
+          4,
+          14
+        ],
+        "min": 2,
+        "max": 20
+      }
+    },
+    "top_predicted_nodes": [
+      {
+        "node_id": "GS3.ECO.MONETARY",
+        "paper": "GS3",
+        "gloss": "Reserve Bank of India Monetary Policy Committee (MPC), policy repo rate, CPI inflation targeting (4% +/- 2%), open market operations, and liquidity management.",
+        "expected_questions_per_paper": 13.659,
+        "pyq_historical_count": 100,
+        "recent_news_surge": 383
+      },
+      {
+        "node_id": "GS2.POL.CONSTITUTION",
+        "paper": "GS2",
+        "gloss": "Constituent Assembly debates, Preamble values, salient features of the Constitution, constitutional amendment procedure (Article 368), and the Basic Structure Doctrine.",
+        "expected_questions_per_paper": 13.454,
+        "pyq_historical_count": 1754,
+        "recent_news_surge": 124
+      },
+      {
+        "node_id": "GS1.GEO.AGRI_GEO",
+        "paper": "GS1",
+        "gloss": "Major soil types of India (Alluvial, Black, Red, Laterite), soil degradation and conservation, agro-climatic zones, and regional cropping patterns.",
+        "expected_questions_per_paper": 9.496,
+        "pyq_historical_count": 131,
+        "recent_news_surge": 5
+      },
+      {
+        "node_id": "GS1.CUL.ARCH",
+        "paper": "GS1",
+        "gloss": "Rock-cut cave architecture, Stupas, Nagara, Dravida, and Vesara temple styles, Indo-Islamic monuments, colonial architecture, and Buddhist-Jain art schools.",
+        "expected_questions_per_paper": 6.716,
+        "pyq_historical_count": 49,
+        "recent_news_surge": 41
+      },
+      {
+        "node_id": "GS1.GEO.IND_PHYS",
+        "paper": "GS1",
+        "gloss": "Physiographic divisions of India: Himalayas, Northern Plains, Peninsular Plateau, Coastal Plains, Islands; drainage systems of Himalayan and Peninsular rivers.",
+        "expected_questions_per_paper": 6.422,
+        "pyq_historical_count": 102,
+        "recent_news_surge": 5
+      },
+      {
+        "node_id": "GS1.GEO.CLIMATE",
+        "paper": "GS1",
+        "gloss": "Atmospheric layers, heat budget, planetary wind systems, Indian monsoon mechanism, tropical and temperate cyclones, Western Disturbances, El Ni\u00f1o, La Ni\u00f1a, and IOD.",
+        "expected_questions_per_paper": 5.149,
+        "pyq_historical_count": 72,
+        "recent_news_surge": 8
+      },
+      {
+        "node_id": "GS3.ENV.BIODIVERSITY",
+        "paper": "GS3",
+        "gloss": "Wildlife Protection Act 1972, National Parks, Wildlife Sanctuaries, Biosphere Reserves, Tiger Reserves, Project Tiger/Elephant, IUCN Red List categories, and CITES convention.",
+        "expected_questions_per_paper": 4.896,
+        "pyq_historical_count": 65,
+        "recent_news_surge": 6
+      },
+      {
+        "node_id": "GS3.SCI.NUCLEAR",
+        "paper": "GS3",
+        "gloss": "India's three-stage nuclear power programme, Fast Breeder Reactors (PFBR), Pressurised Heavy Water Reactors, ITER fusion project, civilian nuclear safety, and atomic minerals.",
+        "expected_questions_per_paper": 4.802,
+        "pyq_historical_count": 29,
+        "recent_news_surge": 5
+      },
+      {
+        "node_id": "GS1.HIS.FREEDOM",
+        "paper": "GS1",
+        "gloss": "The Revolt of 1857, Indian National Congress foundation, Moderate and Extremist phases, Swadeshi movement, Home Rule, Gandhian mass movements, revolutionary activities, and partition.",
+        "expected_questions_per_paper": 3.063,
+        "pyq_historical_count": 41,
+        "recent_news_surge": 3
+      },
+      {
+        "node_id": "GS1.HIS.ANCIENT",
+        "paper": "GS1",
+        "gloss": "Prehistoric cultures, Indus Valley Civilization, Vedic period, Mahajanapadas, Mauryan Empire, Gupta period, Harshavardhana, Sangam literature, and early state formation.",
+        "expected_questions_per_paper": 2.862,
+        "pyq_historical_count": 55,
+        "recent_news_surge": 1
+      },
+      {
+        "node_id": "GS3.ECO.GROWTH",
+        "paper": "GS3",
+        "gloss": "GDP growth trends, inclusive growth, formalization of economy, labour force participation, gig and platform economy, and demographic dividend utilization.",
+        "expected_questions_per_paper": 2.139,
+        "pyq_historical_count": 29,
+        "recent_news_surge": 57
+      },
+      {
+        "node_id": "GS3.SCI.SPACE",
+        "paper": "GS3",
+        "gloss": "ISRO satellite programmes, launch vehicles (PSLV, GSLV Mk III/LVM3, SSLV), Chandrayaan, Aditya-L1, Gaganyaan manned mission, NavIC satellite navigation, and IN-SPACe space privatization.",
+        "expected_questions_per_paper": 2.022,
+        "pyq_historical_count": 21,
+        "recent_news_surge": 3
+      },
+      {
+        "node_id": "PRE.SCI.PHYS",
+        "paper": "PRELIMS",
+        "gloss": "Principles of light and optics (refraction, total internal reflection), electromagnetism, sound waves, mechanics, thermodynamics, and planetary motion basics.",
+        "expected_questions_per_paper": 1.603,
+        "pyq_historical_count": 10,
+        "recent_news_surge": 18
+      },
+      {
+        "node_id": "GS3.ENV.CLIMATE",
+        "paper": "GS3",
+        "gloss": "UNFCCC COP negotiations, Paris Agreement Nationally Determined Contributions (NDCs), net-zero by 2070 target, Carbon Border Adjustment Mechanism (CBAM), and Loss & Damage Fund.",
+        "expected_questions_per_paper": 1.134,
+        "pyq_historical_count": 6,
+        "recent_news_surge": 42
+      },
+      {
+        "node_id": "GS2.IR.WEST_ASIA",
+        "paper": "GS2",
+        "gloss": "Look West and Act East policies, relations with Gulf Cooperation Council (GCC), Israel, Iran (Chabahar port), Central Asian republics, and ASEAN.",
+        "expected_questions_per_paper": 1.051,
+        "pyq_historical_count": 1,
+        "recent_news_surge": 53
+      },
+      {
+        "node_id": "GS3.SCI.BIOTECH",
+        "paper": "GS3",
+        "gloss": "Recombinant DNA technology, CRISPR-Cas9 genome editing, Genome India Project, DNA profiling, stem cell therapy, mRNA vaccine platforms, and biosafety protocols.",
+        "expected_questions_per_paper": 0.995,
+        "pyq_historical_count": 9,
+        "recent_news_surge": 4
+      },
+      {
+        "node_id": "GS3.ENV.WETLANDS",
+        "paper": "GS3",
+        "gloss": "Ramsar Convention on Wetlands, Montreux Record, Coastal Regulation Zone (CRZ) rules, mangrove conservation (MISHTI scheme), and coral reef conservation.",
+        "expected_questions_per_paper": 0.97,
+        "pyq_historical_count": 22,
+        "recent_news_surge": 3
+      },
+      {
+        "node_id": "GS2.POL.PARLIAMENT",
+        "paper": "GS2",
+        "gloss": "Structure, functioning, parliamentary proceedings, financial committees (PAC, Estimates, COPU), parliamentary privileges, and decline in parliamentary sittings.",
+        "expected_questions_per_paper": 0.926,
+        "pyq_historical_count": 137,
+        "recent_news_surge": 54
+      },
+      {
+        "node_id": "GS3.SEC.CYBER",
+        "paper": "GS3",
+        "gloss": "Cyber threats, critical information infrastructure protection (NCIIPC), CERT-In incident reporting mandates, darknet investigations, malware/ransomware attacks, and National Cyber Security Strategy.",
+        "expected_questions_per_paper": 0.876,
+        "pyq_historical_count": 1,
+        "recent_news_surge": 60
+      },
+      {
+        "node_id": "GS3.SEC.INTERNAL",
+        "paper": "GS3",
+        "gloss": "Left-Wing Extremism (Naxalism) security and development response (SAMBHAV), Northeast insurgent groups, peace accords, Armed Forces Special Powers Act (AFSPA) withdrawal dynamics.",
+        "expected_questions_per_paper": 0.725,
+        "pyq_historical_count": 1,
+        "recent_news_surge": 60
+      },
+      {
+        "node_id": "GS2.IR.NEIGHBOURHOOD",
+        "paper": "GS2",
+        "gloss": "Neighbourhood First policy, bilateral relations and border issues with Pakistan, China (LAC), Nepal, Bhutan, Bangladesh, Sri Lanka, Maldives, and Myanmar.",
+        "expected_questions_per_paper": 0.565,
+        "pyq_historical_count": 0,
+        "recent_news_surge": 53
+      },
+      {
+        "node_id": "GS3.SEC.TERROR",
+        "paper": "GS3",
+        "gloss": "Transnational terrorism, terror financing networks, Financial Action Task Force (FATF) grey/black lists, Prevention of Money Laundering Act (PMLA), and organized crime syndicates (drugs-arms nexus).",
+        "expected_questions_per_paper": 0.559,
+        "pyq_historical_count": 0,
+        "recent_news_surge": 61
+      },
+      {
+        "node_id": "GS2.IR.BILATERAL",
+        "paper": "GS2",
+        "gloss": "India's strategic partnerships with the United States, Russia, European Union, Japan, France, United Kingdom, Australia, and key emerging economies.",
+        "expected_questions_per_paper": 0.552,
+        "pyq_historical_count": 0,
+        "recent_news_surge": 89
+      },
+      {
+        "node_id": "GS3.SEC",
+        "paper": "GS3",
+        "gloss": "Linkages between development and spread of extremism, role of external state and non-state actors, cyber security, money laundering, and border management.",
+        "expected_questions_per_paper": 0.541,
+        "pyq_historical_count": 0,
+        "recent_news_surge": 60
+      },
+      {
+        "node_id": "GS1.HIS.MEDIEVAL",
+        "paper": "GS1",
+        "gloss": "Delhi Sultanate, Vijayanagara Empire, Bahmani Sultanate, Mughal Empire, Maratha administration, Bhakti and Sufi movements.",
+        "expected_questions_per_paper": 0.54,
+        "pyq_historical_count": 14,
+        "recent_news_surge": 1
+      }
+    ],
+    "operator_forecast": {
+      "PSY_01_INST_SWAP": {
+        "mean_questions_per_paper": 24.06,
+        "std": 4.09,
+        "ci_95": [
+          16,
+          32
+        ]
+      },
+      "PSY_02_QUAL_POLARITY": {
+        "mean_questions_per_paper": 21.71,
+        "std": 4.15,
+        "ci_95": [
+          14,
+          30
+        ]
+      },
+      "PSY_03_LEGAL_TIER": {
+        "mean_questions_per_paper": 16.28,
+        "std": 3.7,
+        "ci_95": [
+          9,
+          23
+        ]
+      },
+      "PSY_04_CAUSAL_INV": {
+        "mean_questions_per_paper": 14.04,
+        "std": 3.4,
+        "ci_95": [
+          8,
+          21
+        ]
+      },
+      "PSY_05_SCOPE_MUTATE": {
+        "mean_questions_per_paper": 12.05,
+        "std": 3.37,
+        "ci_95": [
+          6,
+          19
+        ]
+      },
+      "PSY_06_PAIR_DECOY": {
+        "mean_questions_per_paper": 7.98,
+        "std": 2.79,
+        "ci_95": [
+          3,
+          14
+        ]
+      },
+      "PSY_07_TRUE_NON_CAUSAL": {
+        "mean_questions_per_paper": 3.88,
+        "std": 1.92,
+        "ci_95": [
+          1,
+          8
+        ]
+      }
+    }
+  },
+  "engine_2_aspirant_monte_carlo": {
+    "total_candidates": 100000,
+    "prelims_cutoff_score": 73.62,
+    "overall_score_distribution": {
+      "mean": 35.98,
+      "median": 26.42,
+      "std": 31.4,
+      "min": -26.8,
+      "max": 188.68,
+      "percentiles": {
+        "p05": 1.02,
+        "p10": 5.56,
+        "p25": 13.76,
+        "p50": 26.42,
+        "p75": 50.24,
+        "p90": 82.26,
+        "p95": 102.7,
+        "p99": 134.7
+      }
+    },
+    "archetype_breakdown": {
+      "Aggressive Gambler": {
+        "candidate_count": 29909,
+        "qualifying_count": 4728,
+        "qualifying_rate_pct": 15.81,
+        "mean_score": 40.62,
+        "std_score": 33.67,
+        "p10_score": 7.76,
+        "p50_score": 31.04,
+        "p90_score": 90.88,
+        "mean_attempts": 94.0,
+        "mean_50_50_net_ev": 8.16
+      },
+      "Balanced Scalper": {
+        "candidate_count": 35052,
+        "qualifying_count": 4845,
+        "qualifying_rate_pct": 13.82,
+        "mean_score": 37.54,
+        "std_score": 30.92,
+        "p10_score": 7.0,
+        "p50_score": 28.2,
+        "p90_score": 84.1,
+        "mean_attempts": 82.0,
+        "mean_50_50_net_ev": 5.59
+      },
+      "Conservative Specialist": {
+        "candidate_count": 15076,
+        "qualifying_count": 1170,
+        "qualifying_rate_pct": 7.76,
+        "mean_score": 27.75,
+        "std_score": 25.92,
+        "p10_score": 2.88,
+        "p50_score": 19.42,
+        "p90_score": 66.7,
+        "mean_attempts": 67.0,
+        "mean_50_50_net_ev": 0.67
+      },
+      "Impulsive Memorizer": {
+        "candidate_count": 19963,
+        "qualifying_count": 2269,
+        "qualifying_rate_pct": 11.37,
+        "mean_score": 32.5,
+        "std_score": 30.89,
+        "p10_score": 3.08,
+        "p50_score": 23.02,
+        "p90_score": 78.22,
+        "mean_attempts": 89.0,
+        "mean_50_50_net_ev": 3.75
+      }
+    },
+    "fifty_fifty_ev_curve": [
+      {
+        "p_trap_attraction": 0.2,
+        "p_correct": 0.8,
+        "expected_value_per_call": 1.468,
+        "net_ev_over_15_calls": 22.02,
+        "is_positive_ev": true
+      },
+      {
+        "p_trap_attraction": 0.25,
+        "p_correct": 0.75,
+        "expected_value_per_call": 1.335,
+        "net_ev_over_15_calls": 20.02,
+        "is_positive_ev": true
+      },
+      {
+        "p_trap_attraction": 0.3,
+        "p_correct": 0.7,
+        "expected_value_per_call": 1.202,
+        "net_ev_over_15_calls": 18.03,
+        "is_positive_ev": true
+      },
+      {
+        "p_trap_attraction": 0.35,
+        "p_correct": 0.65,
+        "expected_value_per_call": 1.069,
+        "net_ev_over_15_calls": 16.04,
+        "is_positive_ev": true
+      },
+      {
+        "p_trap_attraction": 0.4,
+        "p_correct": 0.6,
+        "expected_value_per_call": 0.936,
+        "net_ev_over_15_calls": 14.04,
+        "is_positive_ev": true
+      },
+      {
+        "p_trap_attraction": 0.45,
+        "p_correct": 0.55,
+        "expected_value_per_call": 0.803,
+        "net_ev_over_15_calls": 12.05,
+        "is_positive_ev": true
+      },
+      {
+        "p_trap_attraction": 0.5,
+        "p_correct": 0.5,
+        "expected_value_per_call": 0.67,
+        "net_ev_over_15_calls": 10.05,
+        "is_positive_ev": true
+      },
+      {
+        "p_trap_attraction": 0.55,
+        "p_correct": 0.45,
+        "expected_value_per_call": 0.537,
+        "net_ev_over_15_calls": 8.05,
+        "is_positive_ev": true
+      },
+      {
+        "p_trap_attraction": 0.6,
+        "p_correct": 0.4,
+        "expected_value_per_call": 0.404,
+        "net_ev_over_15_calls": 6.06,
+        "is_positive_ev": true
+      },
+      {
+        "p_trap_attraction": 0.65,
+        "p_correct": 0.35,
+        "expected_value_per_call": 0.271,
+        "net_ev_over_15_calls": 4.07,
+        "is_positive_ev": true
+      },
+      {
+        "p_trap_attraction": 0.7,
+        "p_correct": 0.3,
+        "expected_value_per_call": 0.138,
+        "net_ev_over_15_calls": 2.07,
+        "is_positive_ev": true
+      }
+    ]
+  },
+  "engine_3_temporal_fact_drift": {
+    "total_claims_audited": 1672,
+    "fact_durability_half_lives": [
+      {
+        "claim_type": "numeric",
+        "decay_rate_lambda": 0.015,
+        "half_life_days": 46.2,
+        "survival_prob_6_months": 6.7,
+        "survival_prob_10_months": 1.1,
+        "vulnerability_level": "CRITICAL"
+      },
+      {
+        "claim_type": "economic_target",
+        "decay_rate_lambda": 0.011,
+        "half_life_days": 63.0,
+        "survival_prob_6_months": 13.8,
+        "survival_prob_10_months": 3.7,
+        "vulnerability_level": "CRITICAL"
+      },
+      {
+        "claim_type": "scheme_outlay",
+        "decay_rate_lambda": 0.007,
+        "half_life_days": 99.0,
+        "survival_prob_6_months": 28.4,
+        "survival_prob_10_months": 12.2,
+        "vulnerability_level": "HIGH"
+      },
+      {
+        "claim_type": "nodal_body",
+        "decay_rate_lambda": 0.003,
+        "half_life_days": 231.0,
+        "survival_prob_6_months": 58.3,
+        "survival_prob_10_months": 40.7,
+        "vulnerability_level": "DURABLE"
+      },
+      {
+        "claim_type": "statutory_tier",
+        "decay_rate_lambda": 0.0008,
+        "half_life_days": 866.4,
+        "survival_prob_6_months": 86.6,
+        "survival_prob_10_months": 78.7,
+        "vulnerability_level": "DURABLE"
+      }
+    ],
+    "subject_obsolescence_10_month_simulation": {
+      "Polity & Governance": {
+        "total_mcqs": 157,
+        "estimated_10m_obsolete_pct": 6.0,
+        "expected_vulnerable_mcqs": 9.4
+      },
+      "Economy": {
+        "total_mcqs": 263,
+        "estimated_10m_obsolete_pct": 42.5,
+        "expected_vulnerable_mcqs": 111.8
+      },
+      "Science & Technology": {
+        "total_mcqs": 51,
+        "estimated_10m_obsolete_pct": 15.0,
+        "expected_vulnerable_mcqs": 7.6
+      },
+      "Environment & Ecology": {
+        "total_mcqs": 44,
+        "estimated_10m_obsolete_pct": 18.0,
+        "expected_vulnerable_mcqs": 7.9
+      },
+      "Social Justice & Schemes": {
+        "total_mcqs": 163,
+        "estimated_10m_obsolete_pct": 28.0,
+        "expected_vulnerable_mcqs": 45.6
+      },
+      "International Relations": {
+        "total_mcqs": 55,
+        "estimated_10m_obsolete_pct": 12.0,
+        "expected_vulnerable_mcqs": 6.6
+      },
+      "Geography & Disaster Management": {
+        "total_mcqs": 7,
+        "estimated_10m_obsolete_pct": 12.0,
+        "expected_vulnerable_mcqs": 0.8
+      }
+    },
+    "safe_question_principles": [
+      "Avoid exact rupee outlays or single-quarter GDP estimates; test directionality rather than point metrics.",
+      "Statutory origins and constitutional schedules have >800 days half-life; anchor trap questions to legal tiers.",
+      "Nodal agency mandates remain stable over 7-8 months; ideal for PSY_01_INST_SWAP testing."
+    ]
+  },
+  "engine_4_volcano_nodes": {
+    "total_nodes_scanned": 137,
+    "erupting_nodes_count": 85,
+    "heating_nodes_count": 22,
+    "top_15_volcano_nodes": [
+      {
+        "node_id": "GS3.ECO.EXTERNAL",
+        "paper": "GS3",
+        "gloss": "Balance of Payments, Current Account Deficit (CAD), Foreign Direct Investment (FDI) policy, Foreign Portfolio Investment (FPI), and forex reserves management.",
+        "last_tested_year": 2013,
+        "years_dormant": 13,
+        "avg_recurrence_interval": 2.0,
+        "historical_prelims_count": 1,
+        "news_articles_2026": 51,
+        "volcano_index": 30.126,
+        "status": "ERUPTING"
+      },
+      {
+        "node_id": "GS2.IR.BILATERAL",
+        "paper": "GS2",
+        "gloss": "India's strategic partnerships with the United States, Russia, European Union, Japan, France, United Kingdom, Australia, and key emerging economies.",
+        "last_tested_year": 2015,
+        "years_dormant": 11,
+        "avg_recurrence_interval": 2.0,
+        "historical_prelims_count": 0,
+        "news_articles_2026": 89,
+        "volcano_index": 28.531,
+        "status": "ERUPTING"
+      },
+      {
+        "node_id": "PRE.STAT",
+        "paper": "PRELIMS",
+        "gloss": "High-yield factual minutiae: geographical mapping passes, world chokepoints, international reports/indices, and scheme eligibility.",
+        "last_tested_year": 2019,
+        "years_dormant": 7,
+        "avg_recurrence_interval": 1.19,
+        "historical_prelims_count": 17,
+        "news_articles_2026": 48,
+        "volcano_index": 26.91,
+        "status": "ERUPTING"
+      },
+      {
+        "node_id": "GS3.SEC.BORDER",
+        "paper": "GS3",
+        "gloss": "Land border management (Line of Control, Line of Actual Control, Indo-Pak, Indo-Bangla borders), Comprehensive Integrated Border Management System (CIBMS), and multi-tier coastal security.",
+        "last_tested_year": 2015,
+        "years_dormant": 11,
+        "avg_recurrence_interval": 2.0,
+        "historical_prelims_count": 0,
+        "news_articles_2026": 64,
+        "volcano_index": 26.729,
+        "status": "ERUPTING"
+      },
+      {
+        "node_id": "GS1.CUL.PAINT_CRAFT",
+        "paper": "GS1",
+        "gloss": "Mural paintings, miniature painting traditions (Mughal, Rajasthani, Pahari, Deccan), folk art forms, traditional textiles, and Geographical Indication handicrafts.",
+        "last_tested_year": 2013,
+        "years_dormant": 13,
+        "avg_recurrence_interval": 2.0,
+        "historical_prelims_count": 1,
+        "news_articles_2026": 30,
+        "volcano_index": 26.721,
+        "status": "ERUPTING"
+      },
+      {
+        "node_id": "GS3.ECO.TRADE",
+        "paper": "GS3",
+        "gloss": "Foreign Trade Policy, export promotion schemes (RoDTEP), Special Economic Zones (SEZs), Free Trade Agreements (FTAs), and WTO tariff disputes.",
+        "last_tested_year": 2015,
+        "years_dormant": 11,
+        "avg_recurrence_interval": 2.0,
+        "historical_prelims_count": 0,
+        "news_articles_2026": 61,
+        "volcano_index": 26.467,
+        "status": "ERUPTING"
+      },
+      {
+        "node_id": "GS3.SEC.TERROR",
+        "paper": "GS3",
+        "gloss": "Transnational terrorism, terror financing networks, Financial Action Task Force (FATF) grey/black lists, Prevention of Money Laundering Act (PMLA), and organized crime syndicates (drugs-arms nexus).",
+        "last_tested_year": 2015,
+        "years_dormant": 11,
+        "avg_recurrence_interval": 2.0,
+        "historical_prelims_count": 0,
+        "news_articles_2026": 61,
+        "volcano_index": 26.467,
+        "status": "ERUPTING"
+      },
+      {
+        "node_id": "GS3.SEC",
+        "paper": "GS3",
+        "gloss": "Linkages between development and spread of extremism, role of external state and non-state actors, cyber security, money laundering, and border management.",
+        "last_tested_year": 2015,
+        "years_dormant": 11,
+        "avg_recurrence_interval": 2.0,
+        "historical_prelims_count": 0,
+        "news_articles_2026": 60,
+        "volcano_index": 26.377,
+        "status": "ERUPTING"
+      },
+      {
+        "node_id": "GS3.SEC.FORCES",
+        "paper": "GS3",
+        "gloss": "Chief of Defence Staff (CDS) role, Theaterisation of Armed Forces, Central Armed Police Forces (BSF, CRPF, CISF, ITBP, SSB, Assam Rifles) roles and operational mandates.",
+        "last_tested_year": 2015,
+        "years_dormant": 11,
+        "avg_recurrence_interval": 2.0,
+        "historical_prelims_count": 0,
+        "news_articles_2026": 60,
+        "volcano_index": 26.377,
+        "status": "ERUPTING"
+      },
+      {
+        "node_id": "GS2.IR.MARITIME",
+        "paper": "GS2",
+        "gloss": "SAGAR initiative (Security and Growth for All in the Region), Indo-Pacific Oceans Initiative, maritime chokepoints (Malacca, Hormuz, Bab-el-Mandeb), and anti-piracy.",
+        "last_tested_year": 2015,
+        "years_dormant": 11,
+        "avg_recurrence_interval": 2.0,
+        "historical_prelims_count": 0,
+        "news_articles_2026": 57,
+        "volcano_index": 26.097,
+        "status": "ERUPTING"
+      },
+      {
+        "node_id": "GS3.ECO.BANKING",
+        "paper": "GS3",
+        "gloss": "Public Sector Banks health, Non-Performing Assets (NPAs), Insolvency and Bankruptcy Code (IBC), Prompt Corrective Action (PCA), NBFC regulation, and bad bank (NARCL).",
+        "last_tested_year": 2015,
+        "years_dormant": 11,
+        "avg_recurrence_interval": 2.0,
+        "historical_prelims_count": 0,
+        "news_articles_2026": 57,
+        "volcano_index": 26.097,
+        "status": "ERUPTING"
+      },
+      {
+        "node_id": "GS2.POL.NON_CONST",
+        "paper": "GS2",
+        "gloss": "National Human Rights Commission (NHRC), Central Vigilance Commission (CVC), Central Information Commission (CIC), Lokpal and Lokayuktas, Competition Commission, and NGT.",
+        "last_tested_year": 2015,
+        "years_dormant": 11,
+        "avg_recurrence_interval": 2.0,
+        "historical_prelims_count": 0,
+        "news_articles_2026": 54,
+        "volcano_index": 25.802,
+        "status": "ERUPTING"
+      },
+      {
+        "node_id": "GS3.DIS.FRAMEWORK",
+        "paper": "GS3",
+        "gloss": "Disaster Management Act 2005, National Disaster Management Authority (NDMA), NDRF operations, State/District disaster plans, and Sendai Framework for Disaster Risk Reduction (2015\u20132030).",
+        "last_tested_year": 2015,
+        "years_dormant": 11,
+        "avg_recurrence_interval": 2.0,
+        "historical_prelims_count": 0,
+        "news_articles_2026": 54,
+        "volcano_index": 25.802,
+        "status": "ERUPTING"
+      },
+      {
+        "node_id": "GS2.IR",
+        "paper": "GS2",
+        "gloss": "India and its bilateral, regional and global groupings, agreements affecting India's interests, and Indian diaspora.",
+        "last_tested_year": 2015,
+        "years_dormant": 11,
+        "avg_recurrence_interval": 2.0,
+        "historical_prelims_count": 0,
+        "news_articles_2026": 53,
+        "volcano_index": 25.701,
+        "status": "ERUPTING"
+      },
+      {
+        "node_id": "GS2.IR.NEIGHBOURHOOD",
+        "paper": "GS2",
+        "gloss": "Neighbourhood First policy, bilateral relations and border issues with Pakistan, China (LAC), Nepal, Bhutan, Bangladesh, Sri Lanka, Maldives, and Myanmar.",
+        "last_tested_year": 2015,
+        "years_dormant": 11,
+        "avg_recurrence_interval": 2.0,
+        "historical_prelims_count": 0,
+        "news_articles_2026": 53,
+        "volcano_index": 25.701,
+        "status": "ERUPTING"
+      }
+    ]
+  },
+  "engine_5_cross_source_asymmetry": {
+    "sources_evaluated": 8,
+    "source_metrics_table": [
+      {
+        "source": "PIB",
+        "article_count": 604,
+        "market_share_pct": 37.8,
+        "avg_summary_words": 472.3,
+        "avg_significance": 58.1,
+        "prelims_trap_radar_pct": 74.5,
+        "revision_targets_pct": 74.5,
+        "verified_claims_pct": 65.6,
+        "static_linkages_pct": 67.9,
+        "statutory_anchor_pct": 95.4,
+        "numerical_metrics_pct": 33.6
+      },
+      {
+        "source": "THE HINDU",
+        "article_count": 569,
+        "market_share_pct": 35.6,
+        "avg_summary_words": 96.2,
+        "avg_significance": 39.3,
+        "prelims_trap_radar_pct": 0.4,
+        "revision_targets_pct": 0.4,
+        "verified_claims_pct": 3.3,
+        "static_linkages_pct": 0.4,
+        "statutory_anchor_pct": 44.6,
+        "numerical_metrics_pct": 33.7
+      },
+      {
+        "source": "LIVEMINT",
+        "article_count": 175,
+        "market_share_pct": 11.0,
+        "avg_summary_words": 129.8,
+        "avg_significance": 40.0,
+        "prelims_trap_radar_pct": 5.1,
+        "revision_targets_pct": 5.1,
+        "verified_claims_pct": 10.9,
+        "static_linkages_pct": 3.4,
+        "statutory_anchor_pct": 54.9,
+        "numerical_metrics_pct": 63.4
+      },
+      {
+        "source": "RBI",
+        "article_count": 103,
+        "market_share_pct": 6.4,
+        "avg_summary_words": 441.7,
+        "avg_significance": 78.2,
+        "prelims_trap_radar_pct": 79.6,
+        "revision_targets_pct": 80.6,
+        "verified_claims_pct": 61.2,
+        "static_linkages_pct": 75.7,
+        "statutory_anchor_pct": 99.0,
+        "numerical_metrics_pct": 58.3
+      },
+      {
+        "source": "PRS",
+        "article_count": 74,
+        "market_share_pct": 4.6,
+        "avg_summary_words": 537.0,
+        "avg_significance": 76.4,
+        "prelims_trap_radar_pct": 68.9,
+        "revision_targets_pct": 68.9,
+        "verified_claims_pct": 82.4,
+        "static_linkages_pct": 58.1,
+        "statutory_anchor_pct": 97.3,
+        "numerical_metrics_pct": 60.8
+      },
+      {
+        "source": "BUSINESS STANDARD",
+        "article_count": 38,
+        "market_share_pct": 2.4,
+        "avg_summary_words": 396.0,
+        "avg_significance": 39.9,
+        "prelims_trap_radar_pct": 52.6,
+        "revision_targets_pct": 52.6,
+        "verified_claims_pct": 50.0,
+        "static_linkages_pct": 50.0,
+        "statutory_anchor_pct": 81.6,
+        "numerical_metrics_pct": 76.3
+      },
+      {
+        "source": "INDIAN EXPRESS",
+        "article_count": 34,
+        "market_share_pct": 2.1,
+        "avg_summary_words": 111.4,
+        "avg_significance": 43.0,
+        "prelims_trap_radar_pct": 0.0,
+        "revision_targets_pct": 0.0,
+        "verified_claims_pct": 2.9,
+        "static_linkages_pct": 0.0,
+        "statutory_anchor_pct": 55.9,
+        "numerical_metrics_pct": 70.6
+      },
+      {
+        "source": "PIB_Digest",
+        "article_count": 1,
+        "market_share_pct": 0.1,
+        "avg_summary_words": 308.0,
+        "avg_significance": 50.0,
+        "prelims_trap_radar_pct": 0.0,
+        "revision_targets_pct": 0.0,
+        "verified_claims_pct": 0.0,
+        "static_linkages_pct": 0.0,
+        "statutory_anchor_pct": 100.0,
+        "numerical_metrics_pct": 100.0
+      }
+    ],
+    "institutional_asymmetry": {
+      "government_primary_sources": {
+        "total_articles": 782,
+        "statutory_citation_rate_pct": 96.0,
+        "prelims_trap_density_pct": 74.6,
+        "mean_significance": 62.5,
+        "core_utility": "Highest authority for nodal implementing ministries, scheme rules, and legal definitions."
+      },
+      "independent_press": {
+        "total_articles": 816,
+        "statutory_citation_rate_pct": 49.0,
+        "prelims_trap_density_pct": 3.8,
+        "mean_significance": 39.9,
+        "core_utility": "Superior critical context, multi-pillar policy implications, and Mains argument synthesis."
+      },
+      "divergence_index": 117.77
+    }
+  }
+}

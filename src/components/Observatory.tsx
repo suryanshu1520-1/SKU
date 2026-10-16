@@ -26,8 +26,10 @@ import {
   TrendingUp,
   RefreshCw,
   ExternalLink,
+  GitFork,
 } from 'lucide-react';
 import { InlineMath, BlockMath } from './MathView';
+import PolicyRippleRadar from './observatory/PolicyRippleRadar';
 
 // ============================================================================
 // VERIFIED HIGH-YIELD TOPICS & PYQ BASELINE
@@ -466,7 +468,7 @@ interface ObservatoryProps {
   onLaunchPractice?: (subjectCategory: string) => void;
 }
 
-type ObservatoryTab = 'vault' | 'calculator' | 'matrix' | 'traps' | 'pacing';
+type ObservatoryTab = 'vault' | 'calculator' | 'matrix' | 'traps' | 'pacing' | 'ripple';
 
 export default function Observatory({ onNavigateArena, onLaunchPractice }: ObservatoryProps) {
   const [activeTab, setActiveTab] = useState<ObservatoryTab>('vault');
@@ -756,6 +758,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
     { id: 'matrix' as const, label: 'High-Yield Topics', icon: Flame, badge: 'Top 75%' },
     { id: 'traps' as const, label: 'Examiner Traps', icon: Crosshair, badge: '4 Patterns' },
     { id: 'pacing' as const, label: 'Pacing & Mains Rubric', icon: Clock, badge: 'Directives' },
+    { id: 'ripple' as const, label: 'Policy Ripple Radar', icon: GitFork, badge: '15 Chains' },
   ];
 
   return (
@@ -1847,6 +1850,15 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                 );
               })()}
             </div>
+          </motion.div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════════════════
+            TAB 6: POLICY RIPPLE RADAR & ENTITY DISAMBIGUATION WEB
+            ══════════════════════════════════════════════════════════════════ */}
+        {activeTab === 'ripple' && (
+          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+            <PolicyRippleRadar />
           </motion.div>
         )}
       </div>
