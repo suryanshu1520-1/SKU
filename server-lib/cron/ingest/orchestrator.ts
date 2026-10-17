@@ -32,6 +32,7 @@ import { upsertMcq } from "./mcq-db.js";
 import { upsertCurrentAffairs, upsertPibDigest } from "../db.js";
 import { callUpdateSourceReputation } from "../../internal/reputation.js";
 import { llmAvailable } from "../../llm.js";
+import { processDispatchIntoPolicyGraph, runPolicyGraphWorker } from "../policy-graph-worker.js";
 import {
   startIngestRun,
   finishIngestRun,
@@ -569,6 +570,20 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
           }
         }
 
+        // Non-blocking Policy Ripple Radar extraction
+        try {
+          await processDispatchIntoPolicyGraph({
+            id: lead.url,
+            headline: lead.headline,
+            ministry,
+            summary,
+            url: lead.url,
+            published_at: new Date().toISOString(),
+          });
+        } catch (graphErr) {
+          console.warn(`[ingest] Policy graph extraction hiccup:`, graphErr);
+        }
+
         if (runId) {
           void recordIngestDecision({
             ingestRunId: runId,
@@ -616,6 +631,13 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
         status: result.status === "degraded" ? "degraded" : result.errors > 0 && result.processed === 0 ? "failed" : "success",
         resultData: result,
       });
+    }
+
+    // Trigger Policy Ripple Radar worker batch update
+    try {
+      await runPolicyGraphWorker({ maxDispatches: 10 });
+    } catch (graphCycleErr) {
+      console.warn("[ingest] Policy graph worker cycle hiccup:", graphCycleErr);
     }
   }
 

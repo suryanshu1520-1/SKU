@@ -86,6 +86,10 @@ export const EPHEMERAL_TRIVIA_PATTERNS = [
   /\bSpecial Campaign\s+\d+\b.*\b(workshop|record management|cleanliness|scrap disposal)\b/i,
   /\bremoval of (dust|silt|construction debris) from roads\b/i,
   /\b(courtesy call|pays floral tributes|condoles the passing)\b/i,
+  /\b(Auction of State Government Securities|State Government Securities\s*-\s*Full Auction Result)\b/i,
+  /\bConversion\/Switch (auction )?of Government of India Securities\b/i,
+  /\bPremature redemption under Sovereign Gold Bond \(SGB\) Scheme\b/i,
+  /\bCPGRAMS Monthly Report\b/i,
 ];
 
 /** True if item matches routine money-market liquidity or ministerial cleanliness trivia. */

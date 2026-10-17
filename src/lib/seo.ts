@@ -1,9 +1,8 @@
 export function toCleanSlug(title: string, maxLen = 72): string {
   const raw = (title || '')
     .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-');
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
   if (raw.length <= maxLen) return raw;
   return raw.slice(0, maxLen).replace(/-[^-]*$/, '');
 }

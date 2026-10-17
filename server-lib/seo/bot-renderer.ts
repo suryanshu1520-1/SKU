@@ -1287,9 +1287,22 @@ export async function renderDailyEditionSeoHtml(dateStr?: string): Promise<strin
 }
 
 /**
- * Generic Hub Pre-Renderer (/intelligence, /prs, /daily-edition)
+ * Generic Hub Pre-Renderer (/intelligence, /prs, /daily-edition, /observatory, /syllabus, /arena, /thinkers, /humanities, /manifesto, /sources, /leaderboard)
  */
-export async function renderHubSeoHtml(section: 'intelligence' | 'prs' | 'daily-edition'): Promise<string> {
+export type HubSectionType =
+  | 'intelligence'
+  | 'prs'
+  | 'daily-edition'
+  | 'observatory'
+  | 'syllabus'
+  | 'arena'
+  | 'thinkers'
+  | 'humanities'
+  | 'manifesto'
+  | 'sources'
+  | 'leaderboard';
+
+export async function renderHubSeoHtml(section: HubSectionType): Promise<string> {
   if (section === 'daily-edition') {
     return renderDailyEditionSeoHtml();
   }
@@ -1299,9 +1312,9 @@ export async function renderHubSeoHtml(section: 'intelligence' | 'prs' | 'daily-
 
   let title = 'Daily UPSC Current Affairs & Policy Intelligence | Tark';
   let description = 'Autonomous policy & governance intelligence distilled directly from official PIB releases, Cabinet decisions, and The Hindu for UPSC CSE and State PSC prep.';
-  let canonicalUrl = 'https://www.tark.live/intelligence';
+  let canonicalUrl = `https://www.tark.live/${section}`;
   let h1 = 'Daily Policy & Governance Intelligence';
-  let itemsHtml = '';
+  let semanticBody = '';
 
   if (section === 'prs') {
     title = 'PRS Legislative Vault — Parliamentary Acts & Bills Analysis | Tark';
@@ -1309,6 +1322,7 @@ export async function renderHubSeoHtml(section: 'intelligence' | 'prs' | 'daily-
     canonicalUrl = 'https://www.tark.live/prs';
     h1 = 'PRS Legislative Research Vault';
 
+    let itemsHtml = '';
     try {
       const prsPath = path.resolve(process.cwd(), 'src/data/prs-vault-dossiers.json');
       if (fs.existsSync(prsPath)) {
@@ -1327,53 +1341,335 @@ export async function renderHubSeoHtml(section: 'intelligence' | 'prs' | 'daily-
     } catch {
       // ignore
     }
-  }
 
-  if (!itemsHtml && supabase) {
+    semanticBody = `
+      <section>
+        <ul class="space-y-3">
+          ${itemsHtml || '<li class="text-slate-400 text-sm">No legislative dossiers found.</li>'}
+        </ul>
+      </section>
+    `;
+  } else if (section === 'observatory') {
+    title = '25-Year UPSC Question Observatory & High-Yield Matrix | Tark';
+    description = 'Explore two and a half decades of UPSC Civil Services Prelims questions categorized by subject, theme, and examiner cognitive depth.';
+    canonicalUrl = 'https://www.tark.live/observatory';
+    h1 = '25-Year UPSC Civil Services Question Observatory';
+
+    semanticBody = `
+      <section class="space-y-6 text-sm text-slate-300">
+        <p class="leading-relaxed">
+          The Tark Question Observatory indexes 25 years of UPSC Civil Services Examination Prelims questions (1995–2025), categorized across four foundational General Studies pillars and mapped to examiner trap patterns.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 bg-slate-900/80 border border-slate-800 rounded-lg">
+            <h2 class="font-mono text-xs uppercase tracking-wider text-amber-300 font-bold mb-1">GS Paper 1 // Heritage, History & Geography</h2>
+            <p class="text-xs text-slate-300 mb-3">Ancient, Medieval, Modern History, Art & Culture, Physical & Indian Geography, Demographics.</p>
+            <a href="/intelligence/gs-1" class="text-xs font-mono text-[#e0d0ab] hover:underline">Explore GS-1 Questions & Dossiers →</a>
+          </div>
+          <div class="p-4 bg-slate-900/80 border border-slate-800 rounded-lg">
+            <h2 class="font-mono text-xs uppercase tracking-wider text-cyan-300 font-bold mb-1">GS Paper 2 // Polity, Governance & IR</h2>
+            <p class="text-xs text-slate-300 mb-3">Indian Constitution, Federal Architecture, Parliamentary Procedures, Statutory Bodies, Bilateral Treaties.</p>
+            <a href="/intelligence/gs-2" class="text-xs font-mono text-[#e0d0ab] hover:underline">Explore GS-2 Questions & Dossiers →</a>
+          </div>
+          <div class="p-4 bg-slate-900/80 border border-slate-800 rounded-lg">
+            <h2 class="font-mono text-xs uppercase tracking-wider text-purple-300 font-bold mb-1">GS Paper 3 // Economy, Sci-Tech & Environment</h2>
+            <p class="text-xs text-slate-300 mb-3">Macroeconomics, RBI Regulatory Circulars, Agriculture & MSP, Space, Defence, Ecology & COP Treaties.</p>
+            <a href="/intelligence/gs-3" class="text-xs font-mono text-[#e0d0ab] hover:underline">Explore GS-3 Questions & Dossiers →</a>
+          </div>
+          <div class="p-4 bg-slate-900/80 border border-slate-800 rounded-lg">
+            <h2 class="font-mono text-xs uppercase tracking-wider text-emerald-300 font-bold mb-1">GS Paper 4 // Ethics, Integrity & Aptitude</h2>
+            <p class="text-xs text-slate-300 mb-3">Moral Philosophers, Probity in Governance, Emotional Intelligence, Civil Service Dilemmas.</p>
+            <a href="/intelligence/gs-4" class="text-xs font-mono text-[#e0d0ab] hover:underline">Explore GS-4 Questions & Dossiers →</a>
+          </div>
+        </div>
+      </section>
+    `;
+  } else if (section === 'syllabus') {
+    title = 'UPSC Civil Services Complete Syllabus Matrix & High-Yield Hierarchy | Tark';
+    description = 'Interactive UPSC Civil Services GS Papers 1 to 4 and CSAT syllabus matrix with micro-topic classification and past question distributions.';
+    canonicalUrl = 'https://www.tark.live/syllabus';
+    h1 = 'UPSC Civil Services Examination Master Syllabus Matrix';
+
+    semanticBody = `
+      <section class="space-y-6 text-sm text-slate-300">
+        <p class="leading-relaxed">
+          Comprehensive civil services examination blueprint detailing the four General Studies mains papers, preliminary examination curriculum, and micro-topic classification.
+        </p>
+        <div class="space-y-4">
+          <div class="p-4 bg-slate-900/70 border border-slate-800 rounded">
+            <h2 class="font-serif font-bold text-base text-white mb-1">GS-I: Indian Heritage and Culture, History and Geography of the World and Society</h2>
+            <p class="text-xs text-slate-300">Salient aspects of Art Forms, Literature and Architecture from ancient to modern times; Modern Indian history; The Freedom Struggle; Post-independence consolidation; World history; Salient features of Indian Society; Diversity of India; Role of women; Urbanization; Globalization; Social empowerment; Physical geography; Distribution of key natural resources.</p>
+            <div class="mt-2 text-xs font-mono"><a href="/intelligence/gs-1" class="text-amber-300 hover:underline">Access GS-1 Intelligence Hub →</a></div>
+          </div>
+          <div class="p-4 bg-slate-900/70 border border-slate-800 rounded">
+            <h2 class="font-serif font-bold text-base text-white mb-1">GS-II: Governance, Constitution, Polity, Social Justice and International Relations</h2>
+            <p class="text-xs text-slate-300">Indian Constitution—historical underpinnings, evolution, features, amendments, significant provisions and basic structure; Functions and responsibilities of the Union and the States; Separation of powers; Parliament and State legislatures; Executive and Judiciary; Representation of People's Act; Statutory, regulatory and quasi-judicial bodies; Welfare schemes; Health, Education, Human Resources; Bilateral, regional and global groupings.</p>
+            <div class="mt-2 text-xs font-mono"><a href="/intelligence/gs-2" class="text-amber-300 hover:underline">Access GS-2 Intelligence Hub →</a></div>
+          </div>
+          <div class="p-4 bg-slate-900/70 border border-slate-800 rounded">
+            <h2 class="font-serif font-bold text-base text-white mb-1">GS-III: Technology, Economic Development, Bio-diversity, Environment, Security and Disaster Management</h2>
+            <p class="text-xs text-slate-300">Indian Economy and issues relating to planning, mobilization of resources, growth, development and employment; Inclusive growth; Government Budgeting; Major crops, cropping patterns, irrigation, MSP, PDS, buffer stocks; Technology missions; Food processing; Land reforms; Science and Technology; Indigenization of technology; Conservation, environmental pollution and degradation; Disaster management; Internal security challenges.</p>
+            <div class="mt-2 text-xs font-mono"><a href="/intelligence/gs-3" class="text-amber-300 hover:underline">Access GS-3 Intelligence Hub →</a></div>
+          </div>
+          <div class="p-4 bg-slate-900/70 border border-slate-800 rounded">
+            <h2 class="font-serif font-bold text-base text-white mb-1">GS-IV: Ethics, Integrity and Aptitude</h2>
+            <p class="text-xs text-slate-300">Ethics and Human Interface; Human Values—lessons from the lives and teachings of great leaders, reformers and administrators; Attitude; Aptitude and foundational values for Civil Service; Emotional intelligence; Contributions of moral thinkers and philosophers from India and world; Public/Civil service values and Ethics in Public administration; Probity in Governance; Case Studies.</p>
+            <div class="mt-2 text-xs font-mono"><a href="/intelligence/gs-4" class="text-amber-300 hover:underline">Access GS-4 Intelligence Hub →</a></div>
+          </div>
+        </div>
+      </section>
+    `;
+  } else if (section === 'arena') {
+    title = 'Competitive Test Arena & Prelims Simulator | Tark';
+    description = 'Timed high-stakes examination simulator calibrated with authentic negative marking (+2.00 / -0.66) and server-side autopsies.';
+    canonicalUrl = 'https://www.tark.live/arena';
+    h1 = 'Tark Competitive Test Arena & Examination Simulator';
+
+    semanticBody = `
+      <section class="space-y-6 text-sm text-slate-300">
+        <p class="leading-relaxed">
+          The Tark Test Arena delivers authentic civil services preliminary examination drills with strict negative marking (+2.00 for correct, -0.66 for incorrect). Every question is anchored to verified primary policy releases or official UPSC past years questions with forensic autopsies.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="p-4 bg-slate-900/80 border border-slate-800 rounded">
+            <h2 class="font-mono text-xs uppercase text-amber-300 font-bold mb-2">⚡ Negative Marking Calibrated</h2>
+            <p class="text-xs text-slate-300">True UPSC scoring penalizes guessing (-0.66). Practice disciplined risk calibration.</p>
+          </div>
+          <div class="p-4 bg-slate-900/80 border border-slate-800 rounded">
+            <h2 class="font-mono text-xs uppercase text-cyan-300 font-bold mb-2">🔬 Examiner Traps Decoded</h2>
+            <p class="text-xs text-slate-300">Identifies Institutional Swaps, Polarity Inversions, and Temporal Scope shifts in real-time.</p>
+          </div>
+          <div class="p-4 bg-slate-900/80 border border-slate-800 rounded">
+            <h2 class="font-mono text-xs uppercase text-emerald-300 font-bold mb-2">📜 Wire-Verified Provenance</h2>
+            <p class="text-xs text-slate-300">Questions derived directly from PIB, Gazette notifications, and Parliamentary Acts.</p>
+          </div>
+        </div>
+        <div class="pt-4 border-t border-slate-800 text-xs font-mono flex flex-wrap gap-4">
+          <a href="/observatory" class="text-amber-300 hover:underline">View 25-Year PYQ Observatory →</a>
+          <a href="/daily-edition" class="text-amber-300 hover:underline">Practice Today's PIB Edition →</a>
+          <a href="/prs" class="text-amber-300 hover:underline">Explore Legislative Vault →</a>
+        </div>
+      </section>
+    `;
+  } else if (section === 'thinkers' || section === 'humanities') {
+    const isThinkers = section === 'thinkers';
+    title = isThinkers
+      ? 'Canonical Thinkers & Philosophical Passages | Tark'
+      : 'Primary Thinkers & Humanities Deep Reader | Tark';
+    description = isThinkers
+      ? 'Verbatim philosophical texts and thinkers mapped to UPSC GS Paper 4 Ethics and Essay: Ambedkar, Gandhi, Kant, Mill, and Aristotle.'
+      : 'Unfiltered primary philosophy, political theory, and historical texts for deep analytical foundations in UPSC Mains.';
+    canonicalUrl = `https://www.tark.live/${section}`;
+    h1 = isThinkers
+      ? 'Canonical Moral Thinkers & Philosophical Passages'
+      : 'Primary Humanities Reader & Moral Thinkers Deep Archive';
+
+    let thinkersListHtml = '';
     try {
-      const { data } = await supabase
-        .from('current_affairs')
-        .select('id, headline, source, ministry, created_at, published_at')
-        .neq('source', 'PIB_Digest')
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      if (data && data.length > 0) {
-        itemsHtml = data.map((item: any) => {
-          const slug = slugify(item.headline);
-          const url = `/intelligence/${slug}?id=${encodeURIComponent(item.id)}`;
-          return `
-            <li class="p-3.5 bg-slate-900/60 border border-slate-800 rounded">
-              <span class="text-xs uppercase font-mono text-[#e0d0ab]">${escapeXml(item.source)} · ${escapeXml(item.ministry || 'Policy')}</span>
-              <h2 class="text-base font-serif font-bold text-white mt-1">
-                <a href="${url}" class="hover:underline">${escapeXml(item.headline)}</a>
-              </h2>
-            </li>
-          `;
-        }).join('');
+      const canonPath = path.resolve(process.cwd(), 'src/data/humanities-canon.json');
+      if (fs.existsSync(canonPath)) {
+        const canonData = JSON.parse(fs.readFileSync(canonPath, 'utf-8'));
+        if (Array.isArray(canonData.thinkers)) {
+          thinkersListHtml = canonData.thinkers.map((t: any) => {
+            const passages = Array.isArray(t.passages) ? t.passages : [];
+            const samplePassage = passages[0]?.text || '';
+            const pyqs = passages[0]?.pyqCitations || [];
+            return `
+              <article class="p-5 bg-slate-900/70 border border-slate-800 rounded-lg">
+                <div class="flex items-center justify-between mb-2">
+                  <h2 class="text-lg font-serif font-bold text-white">${escapeXml(t.name)}</h2>
+                  <span class="text-xs font-mono text-[#e0d0ab]">${escapeXml(t.workTitle || '')} (${t.year || ''})</span>
+                </div>
+                <p class="text-xs font-mono text-slate-400 mb-3">${escapeXml(t.publicDomainBasis || 'Public Domain')}</p>
+                ${samplePassage ? `
+                  <blockquote class="text-xs sm:text-sm text-slate-200 italic border-l-2 border-amber-400/80 pl-3 my-3 leading-relaxed">
+                    "${escapeXml(samplePassage.slice(0, 360))}..."
+                  </blockquote>
+                ` : ''}
+                ${pyqs.length > 0 ? `
+                  <div class="mt-3 pt-2 border-t border-slate-800/80 text-[11px] font-mono text-cyan-300">
+                    <span>🏛️ UPSC Examination Nexus:</span> ${escapeXml(pyqs.map((p: any) => `${p.paper} (${p.year}) - ${p.note}`).join(' · '))}
+                  </div>
+                ` : ''}
+              </article>
+            `;
+          }).join('\n');
+        }
       }
     } catch {
       // ignore
     }
+
+    semanticBody = `
+      <section class="space-y-6 text-sm text-slate-300">
+        <p class="leading-relaxed">
+          Unfiltered canonical philosophy and political thought directly excerpted for civil services examination aspirants tackling GS-IV Ethics, Integrity and Aptitude, and Essay papers.
+        </p>
+        <div class="space-y-4">
+          ${thinkersListHtml || '<p class="text-slate-400">Loading thinkers archive...</p>'}
+        </div>
+      </section>
+    `;
+  } else if (section === 'manifesto') {
+    title = 'The Tark Manifesto — The War on Noise in Civil Services Preparation | Tark';
+    description = 'Our educational philosophy: sterile testing arenas, deterministic evaluation, and signal-rich intelligence free from commercial noise.';
+    canonicalUrl = 'https://www.tark.live/manifesto';
+    h1 = 'The Tark Manifesto: The War on Noise in Civil Services Preparation';
+
+    semanticBody = `
+      <section class="space-y-6 text-sm text-slate-300 leading-relaxed">
+        <div>
+          <h2 class="text-lg font-serif font-bold text-white mb-2">I. The War on Noise</h2>
+          <p>
+            Civil services aspirants in India are subjected to hundreds of pages of unverified coaching digests, sensationalized YouTube current affairs roundups, and speculative test series with random subjective scoring. Tark was engineered as an antidote: a sterile, distraction-free analytical arena focused purely on authentic government primary sources and mathematical evaluation.
+          </p>
+        </div>
+        <div>
+          <h2 class="text-lg font-serif font-bold text-white mb-2">II. Strict Primary Source Grounding</h2>
+          <p>
+            Every single intelligence brief and current affairs card on Tark is grounded in official government releases: Press Information Bureau (PIB), The Gazette of India, Parliamentary Acts (PRS India), and Reserve Bank of India statutory circulars. Zero coaching opinions. Zero commercial speculation.
+          </p>
+        </div>
+        <div>
+          <h2 class="text-lg font-serif font-bold text-white mb-2">III. The Sovereign Data & Privacy Charter</h2>
+          <p>
+            Zero advertisements. Zero tracking cookies. Zero selling of candidate telephone numbers or test performance metrics to coaching cartels. Tark is fully compliant with the Digital Personal Data Protection Act, 2023 (DPDP Act).
+          </p>
+        </div>
+      </section>
+    `;
+  } else if (section === 'sources') {
+    title = 'Primary Sources & Evidence-Span Directory | Tark';
+    description = 'Verified government sources directory: PIB releases, Gazette notifications, PRS India legislative briefs, and RBI monetary policy bulletins.';
+    canonicalUrl = 'https://www.tark.live/sources';
+    h1 = 'Verified Sovereign & Primary Sources Directory';
+
+    semanticBody = `
+      <section class="space-y-6 text-sm text-slate-300">
+        <p class="leading-relaxed">
+          Tark enforces an uncompromising cite-or-drop protocol. If an administrative fact or statistic cannot be verified against an official primary source, it is omitted. Below is our canonical source directory.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-4 bg-slate-900/80 border border-slate-800 rounded">
+            <h2 class="font-mono text-xs uppercase text-amber-300 font-bold mb-1">Press Information Bureau (PIB)</h2>
+            <p class="text-xs text-slate-300 mb-2">Official nodal agency of the Government of India for disseminating information on policy decisions and development programmes.</p>
+            <a href="https://pib.gov.in" target="_blank" rel="noopener" class="text-xs font-mono text-[#e0d0ab] hover:underline">pib.gov.in ↗</a>
+          </div>
+          <div class="p-4 bg-slate-900/80 border border-slate-800 rounded">
+            <h2 class="font-mono text-xs uppercase text-cyan-300 font-bold mb-1">The Gazette of India (eGazette)</h2>
+            <p class="text-xs text-slate-300 mb-2">Official sovereign legal publication containing statutory notifications, appointments, and President of India orders.</p>
+            <a href="https://egazette.gov.in" target="_blank" rel="noopener" class="text-xs font-mono text-[#e0d0ab] hover:underline">egazette.gov.in ↗</a>
+          </div>
+          <div class="p-4 bg-slate-900/80 border border-slate-800 rounded">
+            <h2 class="font-mono text-xs uppercase text-purple-300 font-bold mb-1">PRS Legislative Research</h2>
+            <p class="text-xs text-slate-300 mb-2">Non-partisan research body tracking Parliamentary legislation, committee reports, and state assembly laws.</p>
+            <a href="/prs" class="text-xs font-mono text-[#e0d0ab] hover:underline">Tark PRS Vault Archive →</a>
+          </div>
+          <div class="p-4 bg-slate-900/80 border border-slate-800 rounded">
+            <h2 class="font-mono text-xs uppercase text-emerald-300 font-bold mb-1">Reserve Bank of India (RBI)</h2>
+            <p class="text-xs text-slate-300 mb-2">Central banking authority regulatory releases, Monetary Policy Committee (MPC) resolutions, and financial stability reports.</p>
+            <a href="https://rbi.org.in" target="_blank" rel="noopener" class="text-xs font-mono text-[#e0d0ab] hover:underline">rbi.org.in ↗</a>
+          </div>
+        </div>
+      </section>
+    `;
+  } else if (section === 'leaderboard') {
+    title = 'Live Candidate Leaderboard & Rankings | Tark';
+    description = 'Real-time percentile rankings, daily streaks, and analytical scores across competitive examination aspirants.';
+    canonicalUrl = 'https://www.tark.live/leaderboard';
+    h1 = 'Live Candidate Arena Leaderboard & Percentile Matrix';
+
+    semanticBody = `
+      <section class="space-y-6 text-sm text-slate-300">
+        <p class="leading-relaxed">
+          Percentile rankings computed across all simulated test arena sessions. Scores strictly follow UPSC negative marking (+2.00 / -0.66) and evaluate question elimination speed and accuracy under time pressure.
+        </p>
+        <div class="p-4 bg-slate-900/80 border border-slate-800 rounded-lg">
+          <h2 class="font-mono text-xs uppercase text-amber-300 font-bold mb-2">Evaluation Architecture</h2>
+          <ul class="text-xs space-y-2 list-disc list-inside text-slate-300">
+            <li>Strict server-side validation prevents tamper or client-side scoring manipulations.</li>
+            <li>Cohort percentiles calculated against all candidate attempts in the current examination cycle.</li>
+            <li>Diagnostic autopsies break down performance by Subject Pillar and Examiner Trap sensitivity.</li>
+          </ul>
+        </div>
+      </section>
+    `;
+  } else {
+    // intelligence default
+    canonicalUrl = 'https://www.tark.live/intelligence';
+    h1 = 'Daily Policy & Governance Intelligence';
+
+    let itemsHtml = '';
+    if (supabase) {
+      try {
+        const { data } = await supabase
+          .from('current_affairs')
+          .select('id, headline, source, ministry, created_at, published_at')
+          .neq('source', 'PIB_Digest')
+          .order('created_at', { ascending: false })
+          .limit(20);
+
+        if (data && data.length > 0) {
+          itemsHtml = data.map((item: any) => {
+            const slug = slugify(item.headline);
+            const url = `/intelligence/${slug}?id=${encodeURIComponent(item.id)}`;
+            return `
+              <li class="p-3.5 bg-slate-900/60 border border-slate-800 rounded">
+                <span class="text-xs uppercase font-mono text-[#e0d0ab]">${escapeXml(item.source)} · ${escapeXml(item.ministry || 'Policy')}</span>
+                <h2 class="text-base font-serif font-bold text-white mt-1">
+                  <a href="${url}" class="hover:underline">${escapeXml(item.headline)}</a>
+                </h2>
+              </li>
+            `;
+          }).join('');
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    semanticBody = `
+      <div class="flex flex-wrap gap-2 mb-6 text-xs font-mono">
+        <a href="/intelligence/gs-1" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-amber-300 hover:border-amber-400">GS-1 Hub</a>
+        <a href="/intelligence/gs-2" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-amber-300 hover:border-amber-400">GS-2 Hub</a>
+        <a href="/intelligence/gs-3" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-amber-300 hover:border-amber-400">GS-3 Hub</a>
+        <a href="/intelligence/gs-4" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-amber-300 hover:border-amber-400">GS-4 Hub</a>
+      </div>
+      <section>
+        <ul class="space-y-3">
+          ${itemsHtml || '<li class="text-slate-400 text-sm">No recent policy items available.</li>'}
+        </ul>
+      </section>
+    `;
   }
 
   const semanticHtml = `
     <main class="max-w-4xl mx-auto px-4 py-8 text-neutral-100 font-sans" data-ssr="true">
       <header class="border-b border-slate-800 pb-5 mb-6">
+        <nav class="text-xs font-mono uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-2">
+          <a href="/" class="hover:text-slate-200">Home</a>
+          <span>/</span>
+          <span class="text-[#e0d0ab] font-bold">${escapeXml(section)}</span>
+        </nav>
         <h1 class="text-3xl font-serif font-bold text-white">${escapeXml(h1)}</h1>
         <p class="text-sm text-slate-300 mt-2">${escapeXml(description)}</p>
-        <div class="flex flex-wrap gap-2 mt-4 text-xs font-mono">
-          <a href="/intelligence/gs-1" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-amber-300 hover:border-amber-400">GS-1 Hub</a>
-          <a href="/intelligence/gs-2" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-amber-300 hover:border-amber-400">GS-2 Hub</a>
-          <a href="/intelligence/gs-3" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-amber-300 hover:border-amber-400">GS-3 Hub</a>
-          <a href="/intelligence/gs-4" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-amber-300 hover:border-amber-400">GS-4 Hub</a>
-        </div>
       </header>
-      <section>
-        <ul class="space-y-3">
-          ${itemsHtml}
-        </ul>
-      </section>
+      ${semanticBody}
+      <footer class="pt-8 mt-8 border-t border-slate-800 text-xs font-mono text-slate-400 flex flex-wrap gap-4">
+        <a href="/" class="hover:text-slate-200">Home</a>
+        <a href="/intelligence" class="hover:text-slate-200">Daily Intelligence</a>
+        <a href="/daily-edition" class="hover:text-slate-200">Daily PIB Edition</a>
+        <a href="/prs" class="hover:text-slate-200">PRS Vault</a>
+        <a href="/arena" class="hover:text-slate-200">Practice Arena</a>
+        <a href="/observatory" class="hover:text-slate-200">PYQ Observatory</a>
+        <a href="/syllabus" class="hover:text-slate-200">Syllabus</a>
+        <a href="/thinkers" class="hover:text-slate-200">Thinkers</a>
+        <a href="/manifesto" class="hover:text-slate-200">Manifesto</a>
+        <a href="/sources" class="hover:text-slate-200">Sources</a>
+        <a href="/privacy" class="hover:text-slate-200">Privacy</a>
+        <a href="/terms" class="hover:text-slate-200">Terms</a>
+        <a href="/refund" class="hover:text-slate-200">Refund</a>
+      </footer>
     </main>
   `;
 
@@ -1383,6 +1679,7 @@ export async function renderHubSeoHtml(section: 'intelligence' | 'prs' | 'daily-
     /<meta\s+name=["']description["']\s+content=["'].*?["']\s*\/?>/i,
     `<meta name="description" content="${escapeXml(description)}" />`
   );
+
   if (modifiedHtml.includes('<link rel="canonical"')) {
     modifiedHtml = modifiedHtml.replace(
       /<link\s+rel=["']canonical["']\s+href=["'].*?["']\s*\/?>/i,
@@ -1391,6 +1688,51 @@ export async function renderHubSeoHtml(section: 'intelligence' | 'prs' | 'daily-
   } else {
     modifiedHtml = modifiedHtml.replace('</head>', `  <link rel="canonical" href="${escapeXml(canonicalUrl)}" />\n</head>`);
   }
+
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+property=["']og:title["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta property="og:title" content="${escapeXml(title)}" />`
+  );
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+property=["']og:description["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta property="og:description" content="${escapeXml(description)}" />`
+  );
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+property=["']og:url["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta property="og:url" content="${escapeXml(canonicalUrl)}" />`
+  );
+
+  const extraHead = `
+    <script type="application/ld+json">
+      ${JSON.stringify({
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'WebPage',
+            '@id': `${canonicalUrl}#webpage`,
+            'name': title,
+            'description': description,
+            'url': canonicalUrl,
+            'isPartOf': {
+              '@type': 'WebSite',
+              '@id': 'https://www.tark.live/#website',
+              'name': 'Tark | तर्क',
+              'url': 'https://www.tark.live/'
+            }
+          },
+          {
+            '@type': 'BreadcrumbList',
+            '@id': `${canonicalUrl}#breadcrumb`,
+            'itemListElement': [
+              { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://www.tark.live/' },
+              { '@type': 'ListItem', 'position': 2, 'name': section.toUpperCase(), 'item': canonicalUrl }
+            ]
+          }
+        ]
+      })}
+    </script>
+  `;
+  modifiedHtml = modifiedHtml.replace('</head>', `${extraHead}\n</head>`);
 
   modifiedHtml = modifiedHtml.replace(
     /<div\s+id=["']root["']>[\s\S]*?<\/div>/i,

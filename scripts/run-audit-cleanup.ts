@@ -11,6 +11,7 @@
 
 import "../server-lib/load-env.js";
 import { createClient } from "@supabase/supabase-js";
+import { isEphemeralTrivia } from "../server-lib/cron/ingest/classify.js";
 
 async function runAuditCleanup() {
   const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
@@ -82,15 +83,16 @@ async function runAuditCleanup() {
       console.log(`[audit-cleanup] Corrected BHAVYA typo in ${bhavyaItems.length} rows.`);
     }
 
-    // 4. Purge existing ephemeral trivia
+    // 4. Purge existing ephemeral trivia (VRRR, T-Bills, SGS auctions, Switch auctions, SGB redemptions, CPGRAMS)
     const { data: triviaItems } = await supabase
-      .from("current_affairs")
-      .select("id, headline");
+       .from("current_affairs")
+       .select("id, headline, summary");
 
     if (triviaItems) {
       const triviaIds = triviaItems
         .filter((it) =>
-          /(Variable Rate Reverse Repo|Treasury Bills.*auction|Workshop on Record Management under Special Campaign|Removal of dust\/silt from roads)/i.test(
+          isEphemeralTrivia(it.headline, JSON.stringify(it.summary || {})) ||
+          /(Variable Rate Reverse Repo|Treasury Bills.*auction|Workshop on Record Management under Special Campaign|Removal of dust\/silt from roads|Auction of State Government Securities|Conversion\/Switch.*Securities|Premature redemption under Sovereign Gold Bond|CPGRAMS Monthly Report)/i.test(
             it.headline
           )
         )

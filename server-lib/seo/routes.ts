@@ -190,3 +190,29 @@ seoRouter.get(
     return res.status(200).send(html);
   }
 );
+
+// 11. Core Platform Hub Routes (Self-Referencing Canonical Hubs)
+const HUB_ROUTES: Record<string, Parameters<typeof renderHubSeoHtml>[0]> = {
+  '/observatory': 'observatory',
+  '/syllabus': 'syllabus',
+  '/arena': 'arena',
+  '/thinkers': 'thinkers',
+  '/humanities': 'humanities',
+  '/manifesto': 'manifesto',
+  '/sources': 'sources',
+  '/leaderboard': 'leaderboard',
+};
+
+for (const [routePath, section] of Object.entries(HUB_ROUTES)) {
+  seoRouter.get([routePath, `${routePath}/:sub*`], async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      const html = await renderHubSeoHtml(section);
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
+      return res.status(200).send(html);
+    } catch (err) {
+      console.warn(`[seo-router] Error rendering hub ${section}:`, err);
+      return next();
+    }
+  });
+}
