@@ -205,7 +205,8 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
                 );
               })()}
               <GroundingBadge grounding={summary?.grounding} verificationMethod={summary?.verification_method}
-                headline={item.headline} source={item.source} claims={summary?.claims} onClick={onInspectGrounding} />
+                headline={item.headline} source={item.source} sourceUrl={item.url} claims={summary?.claims} onClick={onInspectGrounding} />
+
             </div>
 
             {syllabusTags.length > 0 && (

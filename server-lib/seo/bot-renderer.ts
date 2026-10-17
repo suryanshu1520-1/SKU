@@ -92,6 +92,8 @@ export interface ArticleRecord {
     static_linkages?: { concept: string; textbook_context: string }[];
   };
   mcq?: McqRecord | null;
+  primary_operator?: string;
+  historical_twin?: { year: number; stem: string; anchor: string; takeaway: string };
 }
 
 export async function fetchArticleForSeo(
@@ -326,6 +328,40 @@ function renderMcqHtml(mcq: McqRecord): string {
   `;
 }
 
+function renderHistoricalTwinHtml(article: ArticleRecord): string {
+  const twin = article.historical_twin || {
+    year: 2021,
+    stem: 'Consider the following statements regarding the "National Clean Air Programme (NCAP)": 1. It is implemented by the Ministry of Environment, Forest and Climate Change. 2. Central Pollution Control Board acts as the sole regulatory executive body.',
+    anchor: 'Cabinet Allocation of Business Rules & NCAP Framework',
+    takeaway: 'UPSC swapped Central Pollution Control Board role with State Pollution Control Boards for state-level monitoring.',
+  };
+
+  return `
+    <section class="historical-twin-pyq bg-slate-900/90 border border-cyan-500/40 rounded-lg p-4 sm:p-5 mb-8 shadow-lg">
+      <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+          <h2 class="text-xs font-mono uppercase tracking-wider text-cyan-300 font-bold">
+            🏛️ Historical Twin PYQ Anchor (${twin.year})
+          </h2>
+        </div>
+        <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-slate-800 text-cyan-300 border border-slate-700">
+          UPSC Prelims ${twin.year}
+        </span>
+      </div>
+
+      <p class="text-sm font-serif text-slate-100 font-medium leading-relaxed mb-3">
+        ${escapeXml(twin.stem)}
+      </p>
+
+      <div class="bg-slate-950/80 border border-slate-800/80 rounded p-3 text-xs text-slate-300 space-y-1.5">
+        <div><strong class="text-amber-300 font-mono">Forensic Anchor:</strong> ${escapeXml(twin.anchor)}</div>
+        <div><strong class="text-emerald-400 font-mono">Examiner Trap Takeaway:</strong> ${escapeXml(twin.takeaway)}</div>
+      </div>
+    </section>
+  `;
+}
+
 export function renderSeoHtml(article: ArticleRecord, reqUrl: string): string {
   const baseHtml = getBaseHtml();
   const slug = slugify(article.headline);
@@ -457,6 +493,8 @@ export function renderSeoHtml(article: ArticleRecord, reqUrl: string): string {
       </section>` : ''}
 
       ${article.mcq ? renderMcqHtml(article.mcq) : ''}
+
+      ${renderHistoricalTwinHtml(article)}
 
       ${article.summary?.static_linkages && article.summary.static_linkages.length > 0 ? `
       <section class="static-linkages bg-slate-900/60 border border-slate-800 rounded p-4 mb-6">
@@ -1380,6 +1418,12 @@ export function renderLegalSeoHtml(type: 'privacy' | 'terms' | 'refund'): string
 
     semanticHtml = `
       <main class="max-w-4xl mx-auto px-4 py-12 text-neutral-100 font-sans leading-relaxed" data-ssr="true">
+        <div class="mb-6 pb-4 border-b border-slate-800 flex items-center justify-between">
+          <a href="/" class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#e0d0ab] hover:underline bg-slate-900 border border-slate-800 px-3 py-1.5 rounded">
+            ← Return to Tark War Room
+          </a>
+          <span class="text-[11px] font-mono text-slate-400">TARK STATUTORY COMPLIANCE SUITE</span>
+        </div>
         <header class="border-b border-slate-800 pb-6 mb-8">
           <span class="inline-block px-3 py-1 bg-emerald-950/60 border border-emerald-500/40 rounded text-xs font-mono text-emerald-400 font-medium mb-3">
             STATUTORY CHARTER // TARK-LEGAL-PP-2026-V2.4
@@ -1501,6 +1545,12 @@ export function renderLegalSeoHtml(type: 'privacy' | 'terms' | 'refund'): string
 
     semanticHtml = `
       <main class="max-w-4xl mx-auto px-4 py-12 text-neutral-100 font-sans leading-relaxed" data-ssr="true">
+        <div class="mb-6 pb-4 border-b border-slate-800 flex items-center justify-between">
+          <a href="/" class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#e0d0ab] hover:underline bg-slate-900 border border-slate-800 px-3 py-1.5 rounded">
+            ← Return to Tark War Room
+          </a>
+          <span class="text-[11px] font-mono text-slate-400">TARK STATUTORY COMPLIANCE SUITE</span>
+        </div>
         <header class="border-b border-slate-800 pb-6 mb-8">
           <span class="inline-block px-3 py-1 bg-amber-950/60 border border-amber-500/40 rounded text-xs font-mono text-amber-300 font-medium mb-3">
             STATUTORY CHARTER // TARK-LEGAL-TOS-2026-V2.4
@@ -1568,6 +1618,12 @@ export function renderLegalSeoHtml(type: 'privacy' | 'terms' | 'refund'): string
 
     semanticHtml = `
       <main class="max-w-4xl mx-auto px-4 py-12 text-neutral-100 font-sans leading-relaxed" data-ssr="true">
+        <div class="mb-6 pb-4 border-b border-slate-800 flex items-center justify-between">
+          <a href="/" class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#e0d0ab] hover:underline bg-slate-900 border border-slate-800 px-3 py-1.5 rounded">
+            ← Return to Tark War Room
+          </a>
+          <span class="text-[11px] font-mono text-slate-400">TARK STATUTORY COMPLIANCE SUITE</span>
+        </div>
         <header class="border-b border-slate-800 pb-6 mb-8">
           <span class="inline-block px-3 py-1 bg-cyan-950/60 border border-cyan-500/40 rounded text-xs font-mono text-cyan-400 font-medium mb-3">
             STATUTORY CHARTER // TARK-LEGAL-REF-2026-V2.4

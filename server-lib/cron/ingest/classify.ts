@@ -78,6 +78,23 @@ export function deriveMinistry(text: string, fallback = "Government of India"): 
 }
 
 // ------------------------------------------------------------
+// Ephemeral Trivia Filter (24-Hour Trivia / 0% Prelims Yield)
+// ------------------------------------------------------------
+export const EPHEMERAL_TRIVIA_PATTERNS = [
+  /\b(VRRR|Variable Rate Repo|Variable Rate Reverse Repo)\s+auction\b/i,
+  /\b(91-day|182-day|364-day)\s+Treasury Bills?\s+\(T-Bills?\)\s+auction/i,
+  /\bSpecial Campaign\s+\d+\b.*\b(workshop|record management|cleanliness|scrap disposal)\b/i,
+  /\bremoval of (dust|silt|construction debris) from roads\b/i,
+  /\b(courtesy call|pays floral tributes|condoles the passing)\b/i,
+];
+
+/** True if item matches routine money-market liquidity or ministerial cleanliness trivia. */
+export function isEphemeralTrivia(title: string, body = ""): boolean {
+  const hay = `${title} ${body}`;
+  return EPHEMERAL_TRIVIA_PATTERNS.some((pat) => pat.test(hay));
+}
+
+// ------------------------------------------------------------
 // Hard exclusion filter (zero-cost pre-filter)
 // ------------------------------------------------------------
 const EXCLUDE_KEYWORDS = [
@@ -98,6 +115,7 @@ const EXCLUDE_KEYWORDS = [
 
 /** True if the item is obvious noise and should be dropped pre-LLM. */
 export function isExcluded(title: string, body = ""): boolean {
+  if (isEphemeralTrivia(title, body)) return true;
   const hay = `${title} ${body}`.toUpperCase();
   return EXCLUDE_KEYWORDS.some((kw) => hay.includes(kw));
 }

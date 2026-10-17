@@ -137,6 +137,14 @@ const PRS: SourceAdapter = {
           if (title.length < 20) return;
           const url = href.startsWith("http") ? href : "https://prsindia.org" + href;
           if (seen.has(url)) return;
+
+          // PRS Scraper Date Guard (TASK_083 Workstream 2):
+          // Reject historical archives (< 2025) so they never surface as breaking news
+          const pastYearMatch = (title + " " + url).match(/\b(201\d|202[0-4])\b/);
+          if (pastYearMatch && parseInt(pastYearMatch[1], 10) < 2025) {
+            return;
+          }
+
           seen.add(url);
           refs.push({ url, title, ministryHint: "Parliamentary Affairs" });
         });
@@ -148,6 +156,28 @@ const PRS: SourceAdapter = {
     return refs;
   },
   extract: async (ref) => {
+    // PRS Scraper Date Guard (TASK_083 Workstream 2):
+    const pastYearMatch = (ref.title + " " + ref.url).match(/\b(201\d|202[0-4])\b/);
+    if (pastYearMatch && parseInt(pastYearMatch[1], 10) < 2025) {
+      return null;
+    }
+
+    const html = await fetchText(ref.url);
+    if (html) {
+      const $ = cheerio.load(html);
+      const metaDate =
+        $('meta[property="article:published_time"]').attr('content') ||
+        $('meta[name="publication_date"]').attr('content') ||
+        $('.date').first().text().trim() ||
+        $('time').attr('datetime');
+      if (metaDate) {
+        const parsedYear = new Date(metaDate).getFullYear();
+        if (parsedYear && parsedYear < 2025) {
+          return null; // Skip historical PRS dispatches (< 2025)
+        }
+      }
+    }
+
     const body = await extractFromUrl(ref.url, [
       ".top_content",
       ".field--name-body",

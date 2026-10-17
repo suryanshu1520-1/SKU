@@ -61,19 +61,6 @@ export default function App() {
   // Adversarial Conveyor Belt state
   const [isConveyorActive, setIsConveyorActive] = useState(false);
 
-  useEffect(() => {
-    try {
-      const tourCompleted = localStorage.getItem('tark_website_tour_completed');
-      if (!tourCompleted) {
-        const timer = setTimeout(() => {
-          setIsTourOpen(true);
-        }, 1200);
-        return () => clearTimeout(timer);
-      }
-    } catch {
-      // ignore
-    }
-  }, []);
 
   // Deep-link & SEO URL Inspector: Initial route detection & history synchronization
   useEffect(() => {
@@ -669,7 +656,7 @@ export default function App() {
       </a>
 
       {/* ── Mode 1: Left Vertical Command Rail (Desktop) ── */}
-      {gameState !== 'login' && navOrientation === 'vertical' && (
+      {gameState !== 'login' && !legalDocumentType && navOrientation === 'vertical' && (
         <div className="hidden md:block">
           <VerticalNavRail
             activeTab={activeTab}
@@ -689,7 +676,7 @@ export default function App() {
       )}
 
       {/* ── Mode 2: Top Horizontal Header (Mobile or when Horizontal is chosen) ── */}
-      {gameState !== 'login' && (
+      {gameState !== 'login' && !legalDocumentType && (
         <header
           className={`fixed top-0 left-0 w-full z-40 bg-[rgba(4,25,54,0.75)] backdrop-blur-md border-b border-[rgba(19,108,153,0.5)] ${
             navOrientation === 'vertical' ? 'md:hidden' : ''
@@ -857,13 +844,44 @@ export default function App() {
       )}
 
       {/* Screen Routing */}
-      {gameState === 'login' && (
-        <Login
-          onAuthenticated={handleAuthenticated}
-          onNavigateManifesto={handleNavigateManifesto}
-          onNavigateLegal={handleNavigateLegal}
-        />
-      )}
+      {legalDocumentType ? (
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="min-h-screen bg-[#050b1a] text-[#f4ecd8] pt-6 pb-16 px-4 sm:px-6 md:px-8 outline-none"
+        >
+          <div className="max-w-4xl mx-auto mb-6 flex items-center justify-between border-b border-[rgba(224,208,171,0.15)] pb-4">
+            <button
+              onClick={handleCloseLegalModal}
+              className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[#e0d0ab] hover:text-white transition-colors cursor-pointer bg-[#071630] border border-[rgba(224,208,171,0.2)] px-3.5 py-1.5 rounded-sm shadow-xs"
+            >
+              ← Return to Tark War Room
+            </button>
+            <div className="text-[11px] font-mono text-[#7d8ca4]">
+              TARK STATUTORY COMPLIANCE SUITE
+            </div>
+          </div>
+          <LegalModal
+            documentType={legalDocumentType}
+            onClose={handleCloseLegalModal}
+            onSelectType={(type) => {
+              setLegalDocumentType(type);
+              updateDocumentMeta(ROUTE_META_DEFAULTS[type]);
+              if (typeof window !== 'undefined') {
+                window.history.replaceState(null, '', `/${type}`);
+              }
+            }}
+          />
+        </main>
+      ) : (
+        <>
+          {gameState === 'login' && (
+            <Login
+              onAuthenticated={handleAuthenticated}
+              onNavigateManifesto={handleNavigateManifesto}
+              onNavigateLegal={handleNavigateLegal}
+            />
+          )}
 
       {gameState === 'landing' && (
         <main
@@ -1064,6 +1082,8 @@ export default function App() {
           )}
         </main>
       )}
+        </>
+      )}
 
       {/* Analyst Dossier Overlay */}
       <AnimatePresence>
@@ -1149,30 +1169,6 @@ export default function App() {
         />
       )}
 
-      {/* Legal Modal Overlay */}
-      <AnimatePresence>
-        {legalDocumentType && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 overflow-y-auto bg-surface/90 backdrop-blur-sm flex justify-center items-start pt-4 md:pt-12"
-          >
-            <LegalModal
-              documentType={legalDocumentType}
-              onClose={handleCloseLegalModal}
-              onSelectType={(type) => {
-                setLegalDocumentType(type);
-                updateDocumentMeta(ROUTE_META_DEFAULTS[type]);
-                if (typeof window !== 'undefined') {
-                  window.history.replaceState(null, '', `/${type}`);
-                }
-              }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* ── First-Time Visitor Guided Website Tour ── */}
       <WebsiteTour

@@ -21,14 +21,18 @@ function getSupabaseClient() {
   return createClient(cleanEnvValue(url), cleanEnvValue(key));
 }
 
-export function slugify(text: string): string {
-  return (text || '')
+export function toCleanSlug(title: string, maxLen = 72): string {
+  const raw = (title || "")
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
+    .replace(/[^a-z0-9\s-]/g, "")
     .trim()
-    .replace(/[\s_-]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 80);
+    .replace(/\s+/g, "-");
+  if (raw.length <= maxLen) return raw;
+  return raw.slice(0, maxLen).replace(/-[^-]*$/, "");
+}
+
+export function slugify(text: string): string {
+  return toCleanSlug(text, 72);
 }
 
 export function escapeXml(unsafe: string): string {
@@ -68,21 +72,25 @@ export async function generateMainSitemap(): Promise<string> {
   const urls: { loc: string; lastmod: string; changefreq: string; priority: string }[] = [
     { loc: 'https://www.tark.live/', lastmod: todayStr, changefreq: 'daily', priority: '1.0' },
     { loc: 'https://www.tark.live/intelligence', lastmod: todayStr, changefreq: 'hourly', priority: '0.95' },
+    { loc: 'https://www.tark.live/daily-edition', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://www.tark.live/prs', lastmod: todayStr, changefreq: 'weekly', priority: '0.85' },
+    { loc: 'https://www.tark.live/arena', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://www.tark.live/syllabus', lastmod: todayStr, changefreq: 'weekly', priority: '0.85' },
+    { loc: 'https://www.tark.live/thinkers', lastmod: todayStr, changefreq: 'monthly', priority: '0.8' },
+    { loc: 'https://www.tark.live/observatory', lastmod: todayStr, changefreq: 'weekly', priority: '0.8' },
+    { loc: 'https://www.tark.live/manifesto', lastmod: todayStr, changefreq: 'monthly', priority: '0.6' },
+    { loc: 'https://www.tark.live/sources', lastmod: todayStr, changefreq: 'monthly', priority: '0.7' },
+    { loc: 'https://www.tark.live/privacy', lastmod: todayStr, changefreq: 'monthly', priority: '0.6' },
+    { loc: 'https://www.tark.live/terms', lastmod: todayStr, changefreq: 'monthly', priority: '0.6' },
+    { loc: 'https://www.tark.live/refund', lastmod: todayStr, changefreq: 'monthly', priority: '0.6' },
     { loc: 'https://www.tark.live/intelligence/gs-1', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
     { loc: 'https://www.tark.live/intelligence/gs-2', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
     { loc: 'https://www.tark.live/intelligence/gs-3', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
     { loc: 'https://www.tark.live/intelligence/gs-4', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
-    { loc: 'https://www.tark.live/daily-edition', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
-    { loc: 'https://www.tark.live/prs', lastmod: todayStr, changefreq: 'weekly', priority: '0.85' },
-    { loc: 'https://www.tark.live/arena', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
-    { loc: 'https://www.tark.live/observatory', lastmod: todayStr, changefreq: 'weekly', priority: '0.8' },
     { loc: 'https://www.tark.live/humanities', lastmod: todayStr, changefreq: 'monthly', priority: '0.75' },
     { loc: 'https://www.tark.live/leaderboard', lastmod: todayStr, changefreq: 'hourly', priority: '0.7' },
-    { loc: 'https://www.tark.live/manifesto', lastmod: todayStr, changefreq: 'monthly', priority: '0.6' },
-    { loc: 'https://www.tark.live/privacy', lastmod: todayStr, changefreq: 'monthly', priority: '0.6' },
-    { loc: 'https://www.tark.live/terms', lastmod: todayStr, changefreq: 'monthly', priority: '0.6' },
-    { loc: 'https://www.tark.live/refund', lastmod: todayStr, changefreq: 'monthly', priority: '0.6' },
   ];
+
 
   // 1. Add PRS Vault Dossiers
   try {

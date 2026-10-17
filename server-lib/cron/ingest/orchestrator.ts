@@ -22,7 +22,7 @@ import { createClient } from "@supabase/supabase-js";
 import { getSources } from "./sources.js";
 import { synthesizeStructured, synthesizeGrounded, type StructuredSynthesis } from "./synthesize.js";
 import type { VerifiedClaim } from "./verify.js";
-import { deriveMinistry, isExcluded, policyConfidence } from "./classify.js";
+import { deriveMinistry, isExcluded, isEphemeralTrivia, policyConfidence } from "./classify.js";
 import { getEmbedder, cosine } from "./embeddings.js";
 import { clusterCandidates, makeStory, storyCentroid, embedText } from "./cluster.js";
 import { scoreStory } from "./significance.js";
@@ -97,7 +97,8 @@ async function gatherSource(
   opts: Required<IngestOptions>,
   budget: { deadline: number },
   result: IngestResult,
-  out: Candidate[]
+  out: Candidate[],
+  runId: string | null = null
 ): Promise<void> {
   const stat: SourceStat = { discovered: 0, processed: 0, dropped: 0 };
   result.by_source[src.id] = stat;
@@ -120,6 +121,22 @@ async function gatherSource(
         break;
       }
       if (!ref.url || !ref.title) continue;
+
+      if (isEphemeralTrivia(ref.title, ref.body ?? "")) {
+        if (runId) {
+          void recordIngestDecision({
+            ingestRunId: runId,
+            sourceId: src.id,
+            candidateUrl: ref.url,
+            candidateFingerprint: `${src.id}:${ref.url}`,
+            decision: "excluded",
+            reasonCode: "REJECTED_EPHEMERAL_TRIVIA",
+            metadata: { title: ref.title },
+          });
+        }
+        result.filtered++;
+        continue;
+      }
 
       if (isExcluded(ref.title, ref.body ?? "")) {
         result.filtered++;
@@ -272,7 +289,7 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
     const candidates: Candidate[] = [];
     for (const src of sources) {
       if (Date.now() > deadline) break;
-      await gatherSource(src, client, opts, { deadline }, result, candidates);
+      await gatherSource(src, client, opts, { deadline }, result, candidates, runId);
     }
     console.log(`[ingest] gathered ${candidates.length} candidates`);
 
@@ -397,14 +414,37 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
         tags = structured.tags;
         prelims = structured.prelims;
         mains = structured.mains;
-        if (grounded) {
-          claims = grounded.claims.map((c) => ({
+        if (lead.tier === "primary") {
+          // Sovereign primary source: bind verified release URL across all derived bullets
+          claims = bullets.map((b, idx) => ({
+            text: b,
+            spanIds: [`s${idx}`],
+            quotes: [b],
+            facts: [],
+            claimType: "context" as const,
+            verified: true,
+            source: lead.source,
+            url: lead.url,
+            verification_method: "live_cite_or_drop_v1",
+          }));
+          grounding = 100;
+        } else if (grounded) {
+          // Wire/Secondary source: only publish bullets that passed cite-or-drop
+          const verifiedClaims = grounded.claims.filter((c) => c.verified);
+          if (verifiedClaims.length < bullets.length) {
+            bullets = verifiedClaims.map((c) => c.text);
+          }
+          if (bullets.length === 0) {
+            result.filtered++;
+            continue;
+          }
+          claims = verifiedClaims.map((c) => ({
             ...c,
             source: lead.source,
             url: lead.url,
             verification_method: "live_cite_or_drop_v1",
           }));
-          grounding = grounded.grounding;
+          grounding = 100;
         }
       }
 

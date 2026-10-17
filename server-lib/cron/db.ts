@@ -9,8 +9,10 @@ export async function upsertCurrentAffairs(params: {
   url: string;
   ministry: string;
   summary: { bullets: string[]; prelims?: string; mains?: string; [k: string]: unknown };
+  published_at?: string;
+  primary_operator?: string;
 }): Promise<{ ok: boolean; errorMessage?: string }> {
-  let { source, headline, url, ministry, summary } = params;
+  let { source, headline, url, ministry, summary, published_at, primary_operator } = params;
 
   // Auto-translate Hindi headlines into rich contextual English
   if (headline && DEVANAGARI_REGEX.test(headline)) {
@@ -44,15 +46,18 @@ Output ONLY the clean translated English headline string without quotes or prefi
 
   const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
-  const row = {
+  const row: Record<string, any> = {
     source,
     headline,
     summary, // { bullets: string[] } — matches frontend contract
     url,
     ministry,
-    published_at: new Date().toISOString(),
+    published_at: published_at || new Date().toISOString(),
     created_at: new Date().toISOString(),
   };
+  if (primary_operator) {
+    row.primary_operator = primary_operator;
+  }
 
   try {
     const { error } = await supabase

@@ -117,19 +117,28 @@ export interface CurrentAffairsItem {
 
 export function getDispatchOperator(item: CurrentAffairsItem): ExaminerOperatorType {
   if (item.primary_operator) return item.primary_operator;
-  const text = `${item.ministry} ${item.headline} ${item.summary?.bullets?.join(' ') || ''}`.toLowerCase();
-  if (/ministry|department|board|commission|rbi|sebi|npci|niti aayog|cag|authority/i.test(text)) {
-    return 'PSY_01_INST_SWAP';
-  }
-  if (/only|all|every|never|strictly|exclusively|prohibition|mandatory|immediate/i.test(text)) {
-    return 'PSY_02_QUAL_POLARITY';
-  }
-  if (/constitution|act|statutory|parliament|bill|ordinance|treaty|court|schedule/i.test(text)) {
-    return 'PSY_03_LEGAL_TIER';
-  }
-  if (/crore|percent|increased|decreased|growth|tenure|target|threshold|\d{2,}/i.test(text)) {
+  const text = `${item.headline} ${item.summary?.bullets?.join(' ') || ''}`.toLowerCase();
+
+  // 1. PSY_05_SCOPE_MUTATE: Outlays, multi-year timelines (FY27-32), percentages, targets, numbers
+  if (/\b(\d+|crore|percent|percentage|fy\s*\d{2}|\d{4}[-–]\d{2,4}|target|outlay|allocation|threshold|increased|decreased|growth|tenure)\b/i.test(text)) {
     return 'PSY_05_SCOPE_MUTATE';
   }
+
+  // 2. PSY_03_LEGAL_TIER: Constitutional, Statutory, Executive Resolution, or Section-8 Society status
+  if (/\b(constitution|constitutional|statutory|act|bill|ordinance|resolution|section[- ]?8|cabinet resolution|treaty|court|schedule|tribunal)\b/i.test(text)) {
+    return 'PSY_03_LEGAL_TIER';
+  }
+
+  // 3. PSY_02_QUAL_POLARITY: Restrictive determiners (only, all, every, never, strictly, mandatory)
+  if (/\b(only|all|every|never|strictly|exclusively|prohibition|mandatory|immediate mandatory|immediate|none)\b/i.test(text)) {
+    return 'PSY_02_QUAL_POLARITY';
+  }
+
+  // 4. PSY_01_INST_SWAP: Reserve strictly for dispatches with non-obvious nodal agencies, inter-ministerial SPVs, or regulatory overlaps
+  if (/\b(nodal agency|implementing agency|spv|special purpose vehicle|birac|npci|nfra|dri|cbn|ism|india semiconductor mission|sebi vs rbi|cci|cag|regulatory overlap)\b/i.test(text)) {
+    return 'PSY_01_INST_SWAP';
+  }
+
   return 'PSY_04_CAUSAL_INV';
 }
 
@@ -324,7 +333,12 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
   const [trustFilter, setTrustFilter] = useState<'ALL' | 'HIGH_GROUNDING' | 'CONTESTED'>('ALL');
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [expandedTwinId, setExpandedTwinId] = useState<string | null>(null);
-  const [worstBleedOperator, setWorstBleedOperator] = useState<ExaminerOperatorType | null>('PSY_01_INST_SWAP');
+  interface UserTelemetrySummary {
+    totalAttempts: number;
+    worstOperatorBleed: number;
+    worstBleedOperator: ExaminerOperatorType | null;
+  }
+  const [userTelemetry, setUserTelemetry] = useState<UserTelemetrySummary | null>(null);
 
   // Load candidate psyche autopsy for personal trap radar
   useEffect(() => {
@@ -332,13 +346,28 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
       fetchWithAuth(`/api/analytics/examiner-psyche/user-autopsy/${userId}`)
         .then((res) => res.json())
         .then((json) => {
-          if (json.success && json.data?.worstBleedOperator) {
-            setWorstBleedOperator(json.data.worstBleedOperator.operator);
+          if (json.success && json.data) {
+            const wb = json.data.worstBleedOperator;
+            setUserTelemetry({
+              totalAttempts: json.data.totalAttempts || 0,
+              worstOperatorBleed: wb ? -Math.abs(wb.totalBleedMarks) : 0,
+              worstBleedOperator: wb?.operator || null,
+            });
           }
         })
         .catch(() => {});
     }
   }, [userId]);
+
+  const hasSufficientTelemetry =
+    Boolean(userTelemetry) &&
+    (userTelemetry?.totalAttempts ?? 0) >= 3 &&
+    (userTelemetry?.worstOperatorBleed ?? 0) < 0;
+
+  const isPersonalBlindSpot = (operator?: ExaminerOperatorType | null) =>
+    hasSufficientTelemetry &&
+    Boolean(operator) &&
+    userTelemetry?.worstBleedOperator === operator;
 
   // View Mode: 'signals' (Signal Deck) vs 'edition' (Daily Edition)
   type BriefViewMode = 'signals' | 'edition';
@@ -534,6 +563,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
     grounding?: number;
     headline?: string;
     source?: string;
+    sourceUrl?: string;
     claims?: VerifiedClaim[];
   }>({
     isOpen: false,
@@ -1108,7 +1138,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
             {activeCategoryTab === 'SAVED' ? 'Browse latest briefs' : 'Reset all filters'}
           </button>
         </div>
-      ) : (
+      ) : !selectedDossier ? (
         /* ── Editorial Content Stream ── */
         <div className="space-y-8">
           {/* PRS Legislative Research Vault Banner */}
@@ -1184,6 +1214,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                     verificationMethod={leadItem.summary?.verification_method}
                     headline={leadItem.headline}
                     source={leadItem.source}
+                    sourceUrl={leadItem.url}
                     claims={leadItem.summary?.claims}
                     onClick={() =>
                       setGroundingExplainerData({
@@ -1191,6 +1222,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                         grounding: leadItem.summary?.grounding,
                         headline: leadItem.headline,
                         source: leadItem.source,
+                        sourceUrl: leadItem.url,
                         claims: leadItem.summary?.claims || [],
                       })
                     }
@@ -1214,7 +1246,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                   {(() => {
                     const op = getDispatchOperator(leadItem);
                     const opMeta = EXAMINER_OPERATORS[op];
-                    const isBlindSpot = worstBleedOperator === op;
+                    const isBlindSpot = isPersonalBlindSpot(op);
                     return (
                       <span
                         className={`px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider rounded-xs border flex items-center gap-1.5 shadow-xs ${
@@ -1226,7 +1258,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                       >
                         <Crosshair className={`w-3 h-3 ${isBlindSpot ? 'text-amber-400' : 'text-[#0194a8]'}`} />
                         <span>
-                          TRAP VECTOR: {opMeta?.code || op} // {opMeta?.shortLabel || 'DISTORTION'}
+                          TRAP VECTOR: {opMeta?.code || op} // {opMeta?.shortLabel || 'NODAL SWAP'}
                           {isBlindSpot && ' [YOUR −0.66 BLIND SPOT]'}
                         </span>
                       </span>
@@ -1439,6 +1471,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                             verificationMethod={item.summary?.verification_method}
                             headline={item.headline}
                             source={item.source}
+                            sourceUrl={item.url}
                             claims={item.summary?.claims}
                             onClick={() =>
                               setGroundingExplainerData({
@@ -1446,6 +1479,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                                 grounding: item.summary?.grounding,
                                 headline: item.headline,
                                 source: item.source,
+                                sourceUrl: item.url,
                                 claims: item.summary?.claims || [],
                               })
                             }
@@ -1467,7 +1501,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                           {(() => {
                             const op = getDispatchOperator(item);
                             const opMeta = EXAMINER_OPERATORS[op];
-                            const isBlindSpot = worstBleedOperator === op;
+                            const isBlindSpot = isPersonalBlindSpot(op);
                             return (
                               <span
                                 className={`px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider rounded-xs border flex items-center gap-1 shrink-0 ${
@@ -1636,7 +1670,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
             </div>
           )}
         </div>
-      )}
+      ) : null}
       </>
       )}
 
@@ -1649,7 +1683,11 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
             syllabusTags={(selectedDossier.summary?.tags || []).map(parseSyllabusTag)}
             saved={savedArticleIds.has(selectedDossier.id || '')}
             saving={savingArticleIds.has(selectedDossier.id || '')}
-            onClose={() => setSelectedDossier(null)}
+            onClose={() => {
+              setSelectedDossier(null);
+              const cleanPath = typeof window !== 'undefined' && window.location.pathname.startsWith('/prs') ? '/prs' : '/intelligence';
+              window.history.pushState({}, '', cleanPath);
+            }}
             onSave={() => toggleBookmark(selectedDossier.id || '')}
             onShare={() => handleShareArticle(selectedDossier, undefined, true)}
             onPractice={onLaunchPractice ? () => {

@@ -1,12 +1,17 @@
-export function slugify(text: string): string {
-  return (text || '')
+export function toCleanSlug(title: string, maxLen = 72): string {
+  const raw = (title || '')
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
     .trim()
-    .replace(/[\s_-]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 80);
+    .replace(/\s+/g, '-');
+  if (raw.length <= maxLen) return raw;
+  return raw.slice(0, maxLen).replace(/-[^-]*$/, '');
 }
+
+export function slugify(text: string): string {
+  return toCleanSlug(text, 72);
+}
+
 
 export function getArticleUrl(item: { id?: string; headline: string }): string {
   const slug = slugify(item.headline);

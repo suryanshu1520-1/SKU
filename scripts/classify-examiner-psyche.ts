@@ -239,23 +239,21 @@ export function heuristicClassify(question: {
 
   const text = [question.stem || '', ...(question.statements || [])].join(' ');
 
-  // Institutional Swap detection
-  if (/\b(ministry|department|board|commission|rbi|sebi|npci|niti aayog|cag|drdo|isro)\b/i.test(text)) {
+  // 1. PSY_05_SCOPE_MUTATE: Numerical outlays, multi-year timelines (e.g. FY27-32), percentage targets, rankings
+  if (/\b(\d+|years|months|crore|percent|percentage|fy\s*\d{2}|\d{4}[-–]\d{2,4}|target|outlay|allocation|threshold|increased|decreased|steadily)\b/i.test(text)) {
     return {
-      primary_operator: 'PSY_01_INST_SWAP',
-      statutory_anchor: 'Executive Allocation of Business Rules & Gazette Notification',
+      primary_operator: 'PSY_05_SCOPE_MUTATE',
+      statutory_anchor: 'Economic Survey / Statutory Qualification Parameters',
       statement_dissection: (question.statements || []).map((stmt, idx) => ({
         stmt_num: idx + 1,
         is_true: idx === 0,
-        operator: idx === 0 ? null : 'PSY_01_INST_SWAP',
-        marked_trap: 'Authority swap',
-        truth_key: 'Official designated nodal agency',
+        operator: idx === 0 ? null : 'PSY_05_SCOPE_MUTATE',
       })),
     };
   }
 
-  // Legal Tier detection
-  if (/\b(constitution|statutory|parliament|ordinance|presidential|article \d+|schedule)\b/i.test(text)) {
+  // 2. PSY_03_LEGAL_TIER: Constitutional, Statutory, Executive Resolution, or Section-8 Society status
+  if (/\b(constitution|constitutional|statutory|parliament|ordinance|presidential|article \d+|schedule|resolution|section[- ]?8|tribunal)\b/i.test(text)) {
     return {
       primary_operator: 'PSY_03_LEGAL_TIER',
       statutory_anchor: 'Constitutional Articles & Statutory Mandates',
@@ -267,8 +265,8 @@ export function heuristicClassify(question: {
     };
   }
 
-  // Extreme Qualifier detection
-  if (pre.extremeQualifiers.length > 0) {
+  // 3. PSY_02_QUAL_POLARITY: Restrictive determiners (only, all, immediate mandatory obligation)
+  if (pre.extremeQualifiers.length > 0 || /\b(only|all|every|never|strictly|exclusively|prohibition|mandatory|immediate mandatory)\b/i.test(text)) {
     return {
       primary_operator: 'PSY_02_QUAL_POLARITY',
       statutory_anchor: 'Statutory Exceptions and Discretionary Scope',
@@ -276,20 +274,22 @@ export function heuristicClassify(question: {
         stmt_num: idx + 1,
         is_true: idx === 0,
         operator: idx === 0 ? null : 'PSY_02_QUAL_POLARITY',
-        marked_trap: pre.extremeQualifiers.join(', '),
+        marked_trap: pre.extremeQualifiers.join(', ') || 'Restrictive qualifier',
       })),
     };
   }
 
-  // Numerical / Scope Mutation
-  if (/\b(\d+|years|months|crore|percent|increased|decreased|steadily)\b/i.test(text)) {
+  // 4. PSY_01_INST_SWAP: Reserve strictly for dispatches with non-obvious nodal agencies, inter-ministerial SPVs, or regulatory overlaps
+  if (/\b(nodal agency|implementing agency|spv|special purpose vehicle|birac|npci|nfra|dri|cbn|ism|india semiconductor mission|sebi vs rbi|cci|cag|regulatory overlap)\b/i.test(text)) {
     return {
-      primary_operator: 'PSY_05_SCOPE_MUTATE',
-      statutory_anchor: 'Economic Survey / Statutory Qualification Parameters',
+      primary_operator: 'PSY_01_INST_SWAP',
+      statutory_anchor: 'Executive Allocation of Business Rules & Gazette Notification',
       statement_dissection: (question.statements || []).map((stmt, idx) => ({
         stmt_num: idx + 1,
         is_true: idx === 0,
-        operator: idx === 0 ? null : 'PSY_05_SCOPE_MUTATE',
+        operator: idx === 0 ? null : 'PSY_01_INST_SWAP',
+        marked_trap: 'Authority swap',
+        truth_key: 'Official designated nodal agency',
       })),
     };
   }
@@ -333,12 +333,12 @@ export async function dissectQuestionWithLlm(question: {
 
   const system = `You are a senior UPSC Prelims forensic analyst. Given a question stem, statements, options, and the official answer key:
 1. Determine which statements are TRUE and which are FALSE based strictly on the official_key.
-2. For each FALSE statement, identify the exact distortion operator the paper-setter used from this strict enum:
-   - PSY_01_INST_SWAP (Swapped ministry, regulatory body, commission, or appointing authority)
-   - PSY_02_QUAL_POLARITY (Injected extreme qualifier like 'only', 'all', 'immediate', 'never')
-   - PSY_03_LEGAL_TIER (Confused Constitutional vs Statutory vs Executive vs Judicial status)
-   - PSY_04_CAUSAL_INV (Inverted cause-effect, proportionality, or Constitutional Schedule/Article number)
-   - PSY_05_SCOPE_MUTATE (Altered numerical threshold, tenure, geographical bound, or 'steadily increased' trend)
+2. For each FALSE statement, identify the exact distortion operator the paper-setter used from this strict enum (enforce diversity across PSY_01 to PSY_07):
+   - PSY_05_SCOPE_MUTATE (Mutates financial outlays, multi-year timelines e.g. FY27–32, percentage targets, or numerical rankings)
+   - PSY_03_LEGAL_TIER (Centers on a body's Constitutional, Statutory, Executive Resolution, or Section-8 Society status)
+   - PSY_02_QUAL_POLARITY (Hinges on restrictive determiners: 'only', 'all', 'immediate mandatory obligation', 'never')
+   - PSY_01_INST_SWAP (Reserve strictly for dispatches with non-obvious nodal agencies, inter-ministerial SPVs, or regulatory overlaps e.g. ISM, BIRAC, NPCI, NFRA, DRI vs. CBN)
+   - PSY_04_CAUSAL_INV (Inverted cause-effect, directionality, or Constitutional Schedule/Article number)
    - PSY_06_PAIR_DECOY (Pair-counting neutralization trap)
    - PSY_07_TRUE_NON_CAUSAL (Statement I and II both true, but II does not explain I)
 3. Extract the exact marked_trap phrase (the false words in the statement), the truth_key (the real fact), and the statutory_anchor (the exact Act, Article, Schedule, or PIB/Ministry document).

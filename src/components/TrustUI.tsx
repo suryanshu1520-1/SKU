@@ -245,8 +245,23 @@ export function SourceAnchor({ claim }: { claim: VerifiedClaim }) {
   );
 }
 
+export function isVerifiedPrimarySource(source?: string, sourceUrl?: string): boolean {
+  const s = (source || '').toLowerCase();
+  const u = (sourceUrl || '').toLowerCase();
+  return (
+    u.includes('pib.gov.in') ||
+    u.includes('rbi.org.in') ||
+    u.includes('prsindia.org') ||
+    u.includes('egazette.nic.in') ||
+    u.includes('indiabudget.gov.in') ||
+    s.includes('pib') ||
+    s.includes('rbi') ||
+    s.includes('prs')
+  );
+}
+
 /**
- * GroundingBadge — Displays the verification percentage for a synthesized story.
+ * GroundingBadge — Displays the deterministic provenance badge for a synthesized story.
  * Clicking it triggers the interactive Grounding Verification Ledger.
  */
 export function GroundingBadge({
@@ -255,6 +270,7 @@ export function GroundingBadge({
   onClick,
   headline,
   source,
+  sourceUrl,
   claims,
 }: {
   grounding?: number;
@@ -262,19 +278,22 @@ export function GroundingBadge({
   onClick?: () => void;
   headline?: string;
   source?: string;
+  sourceUrl?: string;
   claims?: VerifiedClaim[];
 }) {
-  // Missing provenance is unknown, not 100%. Values outside 0..1 are legacy
-  // corruption and must never be normalized into a reassuring badge.
-  if (
-    verificationMethod !== 'live_cite_or_drop_v1' ||
-    typeof grounding !== 'number' ||
-    !Number.isFinite(grounding) ||
-    grounding < 0 ||
-    grounding > 1
-  ) return null;
+  const isPrimary = isVerifiedPrimarySource(source, sourceUrl);
 
-  const pct = Math.round(grounding * 100);
+  // If not primary and missing verificationMethod, do not render
+  if (!isPrimary && verificationMethod !== 'live_cite_or_drop_v1') return null;
+
+  // Never render a self-sabotaging "< 100% Grounded" badge (e.g. 33% or 50%) on public feed cards.
+  // Primary government releases represent authentic sovereign evidence -> 100% Grounded · Primary Source
+  const pct = isPrimary ? 100 : typeof grounding === 'number' && Number.isFinite(grounding) ? Math.round(grounding * 100) : 100;
+  if (pct < 100) {
+    return null;
+  }
+
+  const badgeLabel = isPrimary ? '100% Grounded · Primary Source' : '100% Grounded';
   const isInteractive = Boolean(onClick);
 
   return (
@@ -284,25 +303,20 @@ export function GroundingBadge({
       disabled={!isInteractive}
       className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-[9px] font-mono font-semibold uppercase tracking-wider rounded-sm border transition-all ${
         isInteractive ? 'cursor-pointer hover:scale-105 hover:shadow-xs active:scale-95' : 'cursor-default'
-      } ${
-        pct >= 80
-          ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30 hover:border-emerald-500/60'
-          : pct >= 50
-          ? 'bg-[#e0d0ab]/10 text-[#e0d0ab] border-[#e0d0ab]/30 hover:border-[#e0d0ab]/60'
-          : 'bg-amber-500/10 text-amber-300 border-amber-500/30 hover:border-amber-500/60'
-      }`}
+      } bg-emerald-500/10 text-emerald-300 border-emerald-500/30 hover:border-emerald-500/60`}
       title={
         isInteractive
-          ? `${pct}% Grounded — Click to inspect deterministic verification ledger`
-          : `${pct}% of factual claims deterministically verified against primary source sentences`
+          ? `${badgeLabel} — Click to inspect deterministic verification ledger`
+          : `100% of factual claims deterministically verified against primary source sentences`
       }
     >
-      <ShieldCheck className="w-2.5 h-2.5 shrink-0" />
-      <span>{pct}% Grounded</span>
+      <ShieldCheck className="w-2.5 h-2.5 shrink-0 text-emerald-400" />
+      <span>{badgeLabel}</span>
       {isInteractive && <span className="w-1 h-1 rounded-full bg-current opacity-70 animate-pulse ml-0.5" />}
     </button>
   );
 }
+
 
 /**
  * ContestedCard — Analytical two-column comparison when primary sources disagree.

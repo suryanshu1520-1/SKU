@@ -374,7 +374,7 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
                         <Layers className="w-2.5 h-2.5" />+{corroboration} src
                       </span>
                     )}
-                    <GroundingBadge grounding={s.grounding} verificationMethod={s.verification_method} />
+                    <GroundingBadge grounding={s.grounding} verificationMethod={s.verification_method} source={item.source} sourceUrl={item.url} />
                   </div>
 
                   {/* Syllabus tag chips */}

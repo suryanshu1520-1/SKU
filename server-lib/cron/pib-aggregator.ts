@@ -18,6 +18,7 @@ import { llmGenerate } from "../llm.js";
 import { createClient } from "@supabase/supabase-js";
 import WebSocket from "ws";
 import dotenv from "dotenv";
+import { isEphemeralTrivia } from "./ingest/classify.js";
 
 dotenv.config();
 
@@ -515,9 +516,13 @@ export async function runPibAggregatorPipeline(): Promise<{ processed: number; s
     return { processed: 0, success: false };
   }
 
-  // Step 4: Idempotency Filter
+  // Step 4: Idempotency & Ephemeral Trivia Filter
   const unprocessedArticles: { title: string; url: string }[] = [];
   for (const item of articleLinks) {
+    if (isEphemeralTrivia(item.title)) {
+      console.log(`[pib-aggregator] Dropping 24-hour ephemeral trivia: "${item.title}"`);
+      continue;
+    }
     const alreadyDone = await isArticleProcessed(item.url);
     if (!alreadyDone) {
       unprocessedArticles.push(item);
