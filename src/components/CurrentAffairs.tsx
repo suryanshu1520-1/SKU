@@ -428,6 +428,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
 
   // Active Dossier Modal
   const [selectedDossier, setSelectedDossier] = useState<CurrentAffairsItem | null>(null);
+  const hasInitialMounted = useRef(false);
 
   // Deep-link inspection on mount & direct route synchronization
   useEffect(() => {
@@ -472,6 +473,11 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
       if (!resolvedId && pathname.startsWith('/prs/')) {
         const seg = pathname.split('/')[2];
         if (seg) resolvedId = seg;
+      } else if (!resolvedId && (pathname.startsWith('/intelligence/') || pathname.startsWith('/news/'))) {
+        const seg = pathname.split('/')[2]?.split('?')[0];
+        if (seg && !seg.startsWith('gs-') && seg !== 'ministry') {
+          resolvedId = seg;
+        }
       }
 
       if (resolvedId && !selectedDossier) {
@@ -485,7 +491,9 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
         }
 
         // Check if already in items
-        const matchedItem = items.find((it) => it.id === resolvedId);
+        const matchedItem = items.find(
+          (it) => it.id === resolvedId || slugify(it.headline) === resolvedId || slugify(it.id || '') === resolvedId
+        );
         if (matchedItem) {
           setSelectedDossier(matchedItem);
           return;
@@ -494,14 +502,29 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
         // Fetch directly from Supabase
         (async () => {
           try {
-            const { data, error } = await supabase
-              .from('current_affairs')
-              .select('*')
-              .eq('id', resolvedId)
-              .maybeSingle();
-
-            if (!error && data) {
-              setSelectedDossier(data as CurrentAffairsItem);
+            const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(resolvedId);
+            let matchedData: CurrentAffairsItem | null = null;
+            if (isUuid) {
+              const { data, error } = await supabase
+                .from('current_affairs')
+                .select('*')
+                .eq('id', resolvedId)
+                .maybeSingle();
+              if (!error && data) matchedData = data as CurrentAffairsItem;
+            }
+            if (!matchedData) {
+              const { data, error } = await supabase
+                .from('current_affairs')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(200);
+              if (!error && data) {
+                const found = data.find((d: any) => slugify(d.headline) === resolvedId || d.id === resolvedId);
+                if (found) matchedData = found as CurrentAffairsItem;
+              }
+            }
+            if (matchedData) {
+              setSelectedDossier(matchedData);
             }
           } catch (fetchErr) {
             console.warn('Failed to resolve deep-link dossier:', fetchErr);
@@ -517,6 +540,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (selectedDossier) {
+      hasInitialMounted.current = true;
       const artUrl = getArticleUrl(selectedDossier);
       if (window.location.pathname + window.location.search !== artUrl) {
         window.history.pushState(null, '', artUrl);
@@ -527,6 +551,16 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
         canonicalPath: artUrl,
       });
     } else {
+      // Only rewrite URL if the user previously had a dossier open and closed it
+      if (!hasInitialMounted.current) {
+        hasInitialMounted.current = true;
+        return;
+      }
+      const isSubRoute = window.location.pathname.startsWith('/intelligence/gs-') || 
+                         window.location.pathname.startsWith('/intelligence/ministry/') ||
+                         window.location.pathname.startsWith('/daily-edition');
+      if (isSubRoute) return;
+
       const fallbackPath = activeCategoryTab === 'PRS' ? '/prs' : '/intelligence';
       if (window.location.pathname.startsWith('/intelligence/') || window.location.pathname.startsWith('/prs/')) {
         window.history.pushState(null, '', fallbackPath);

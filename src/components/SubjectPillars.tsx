@@ -280,8 +280,8 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
     if (volcanoFilter !== 'all') {
       list = list.filter((c) => {
         const v = getVolcanoTelemetryForNode(c.syllabusTag, c.title);
-        if (volcanoFilter === 'erupting') return v.volcano_status === 'ERUPTING';
-        if (volcanoFilter === 'heating') return v.volcano_status === 'HEATING';
+        if (volcanoFilter === 'erupting') return v?.volcano_status === 'ERUPTING';
+        if (volcanoFilter === 'heating') return v?.volcano_status === 'HEATING';
         return true;
       });
     }
@@ -781,7 +781,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                             </span>
                             {(() => {
                               const v = getVolcanoTelemetryForNode(concept.syllabusTag, concept.title);
-                              if (v.volcano_index <= 0) return null;
+                              if (!v || v.volcano_index <= 0) return null;
                               return (
                                 <span
                                   className={`text-[9.5px] font-mono px-2 py-0.5 rounded border flex items-center gap-1 font-bold ${
@@ -996,7 +996,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                           <div className="flex items-center gap-2">
                             {(() => {
                               const v = getVolcanoTelemetryForNode(selectedPillar.paper, ev.theme);
-                              if (v.volcano_index <= 0) return null;
+                              if (!v || v.volcano_index <= 0) return null;
                               return (
                                 <span
                                   className={`text-[9.5px] font-mono px-2 py-0.5 rounded border flex items-center gap-1 font-bold ${

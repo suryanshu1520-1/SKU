@@ -321,7 +321,17 @@ export function getVolcanoTelemetryForNode(
     return CANONICAL_VOLCANO_BASELINES['GS3.DEF.MODERN'];
   }
 
-  return null;
+  return {
+    node_id: nodeId || 'GENERAL',
+    title: headline || 'General Syllabus Node',
+    paper: 'GS',
+    last_tested_year: 2024,
+    years_dormant: 2,
+    recurrence_interval_avg: 2.5,
+    news_count_2026: 0,
+    volcano_index: 0,
+    volcano_status: 'STABLE',
+  };
 }
 
 /**
