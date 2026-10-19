@@ -15,7 +15,12 @@
 
 import { llmGenerate } from "../../llm.js";
 import type { SourceLang } from "./types.js";
-import { segmentSpans, verifyClaim, groundingScore, type VerifiedClaim } from "./verify.js";
+import { segmentSpans, verifyClaim, groundingScore, type VerifiedClaim, type EvidenceSpan } from "./verify.js";
+import {
+  validateArticleExamInsights,
+  computeSourceFingerprint,
+  type ArticleExamInsights,
+} from "../../../src/lib/article-exam-insights.js";
 
 const EN_SYSTEM = [
   "You are a policy summarizer for UPSC/civil-services aspirants.",
@@ -61,10 +66,15 @@ const EN_STRUCTURED_SYSTEM = [
   '  ],',
   '  "prelims_trap_radar": string, // Subtle distinction UPSC examiners use to set traps (e.g. Centrally Sponsored vs Central Sector, Statutory vs Executive body, Mandatory vs Advisory, Upper house vs Lower house).',
   '  "prelims_relevance": "HIGH" | "MEDIUM" | "LOW",',
-  '  "mains_relevance": "HIGH" | "MEDIUM" | "LOW"',
+  '  "mains_relevance": "HIGH" | "MEDIUM" | "LOW",',
+  '  "exam_insights": {',
+  '    "facts": [{ "kind": "mechanism" | "institution" | "scope" | "metric" | "legal" | "other", "label": string, "statement": string, "spans": number[] }], // 1-3 concise testable facts with exact source sentence numbers',
+  '    "distinction": { "statement": string, "spans": number[], "operator": "PSY_01_INST_SWAP" | "PSY_02_QUAL_POLARITY" | "PSY_03_LEGAL_TIER" | "PSY_04_CAUSAL_INV" | "PSY_05_SCOPE_MUTATE" } // optional distinction explicitly supported by source',
+  '  }',
   "}",
   "Guidelines:",
   "- Strictly factual; zero extrapolation or fabricated metrics.",
+  "- Facts in exam_insights must be directly derived from cited source sentences. Zero supported insights is preferred over padded output.",
   "- If not UPSC-relevant or if no syllabus tag applies, respond with exactly: {\"relevance\": \"NULL\"} or NULL.",
 ].join("\n");
 
@@ -96,10 +106,15 @@ const HI_STRUCTURED_SYSTEM = [
   '  ],',
   '  "prelims_trap_radar": string, // Subtle distinction (e.g. 100% Central funding vs 60:40 Centre-State sharing, Statutory vs Executive body).',
   '  "prelims_relevance": "HIGH" | "MEDIUM" | "LOW",',
-  '  "mains_relevance": "HIGH" | "MEDIUM" | "LOW"',
+  '  "mains_relevance": "HIGH" | "MEDIUM" | "LOW",',
+  '  "exam_insights": {',
+  '    "facts": [{ "kind": "mechanism" | "institution" | "scope" | "metric" | "legal" | "other", "label": string, "statement": string, "spans": number[] }],',
+  '    "distinction": { "statement": string, "spans": number[], "operator": "PSY_01_INST_SWAP" | "PSY_02_QUAL_POLARITY" | "PSY_03_LEGAL_TIER" | "PSY_04_CAUSAL_INV" | "PSY_05_SCOPE_MUTATE" }',
+  '  }',
   "}",
   "Guidelines:",
   "- Translate accurately from Hindi; do not hallucinate non-existent ministries or numbers.",
+  "- Facts in exam_insights must be grounded in source sentences; zero supported insights is better than padded output.",
   "- If purely ceremonial or non-exam-relevant, respond with: {\"relevance\": \"NULL\"} or NULL.",
 ].join("\n");
 
@@ -118,9 +133,13 @@ const EN_GROUNDED_SYSTEM = [
   '  "static_linkages": [{ "concept": string, "textbook_context": string }],',
   '  "prelims_trap_radar": string,',
   '  "prelims_relevance": "HIGH" | "MEDIUM" | "LOW",',
-  '  "mains_relevance": "HIGH" | "MEDIUM" | "LOW"',
+  '  "mains_relevance": "HIGH" | "MEDIUM" | "LOW",',
+  '  "exam_insights": {',
+  '    "facts": [{ "kind": "mechanism" | "institution" | "scope" | "metric" | "legal" | "other", "label": string, "statement": string, "spans": number[] }],',
+  '    "distinction": { "statement": string, "spans": number[], "operator": "PSY_01_INST_SWAP" | "PSY_02_QUAL_POLARITY" | "PSY_03_LEGAL_TIER" | "PSY_04_CAUSAL_INV" | "PSY_05_SCOPE_MUTATE" }',
+  '  }',
   "}",
-  "HARD GROUNDING RULE: every figure, percentage, currency amount, date/year and acronym in a bullet MUST appear in its cited source sentences. If you cannot ground a fact in a specific numbered sentence, omit that fact or that bullet. Never introduce facts absent from the cited sentences.",
+  "HARD GROUNDING RULE: every figure, percentage, currency amount, date/year and acronym in a bullet MUST appear in its cited source sentences. If you cannot ground a fact in a specific numbered sentence, omit that fact or that bullet. Never introduce facts absent from the cited sentences. If no exam insights can be verified from the source text, omit exam_insights.",
   "If not UPSC-relevant, respond with exactly: NULL.",
 ].join("\n");
 
@@ -140,7 +159,11 @@ const HI_GROUNDED_SYSTEM = [
   '  "static_linkages": [{ "concept": string, "textbook_context": string }],',
   '  "prelims_trap_radar": string,',
   '  "prelims_relevance": "HIGH" | "MEDIUM" | "LOW",',
-  '  "mains_relevance": "HIGH" | "MEDIUM" | "LOW"',
+  '  "mains_relevance": "HIGH" | "MEDIUM" | "LOW",',
+  '  "exam_insights": {',
+  '    "facts": [{ "kind": "mechanism" | "institution" | "scope" | "metric" | "legal" | "other", "label": string, "statement": string, "spans": number[] }],',
+  '    "distinction": { "statement": string, "spans": number[], "operator": "PSY_01_INST_SWAP" | "PSY_02_QUAL_POLARITY" | "PSY_03_LEGAL_TIER" | "PSY_04_CAUSAL_INV" | "PSY_05_SCOPE_MUTATE" }',
+  '  }',
   "}",
   "HARD GROUNDING RULE: preserve scheme names, figures, dates and acronyms exactly; every such fact in a bullet MUST appear in its cited source sentences. Omit any fact you cannot ground. Never invent details.",
   "If not exam-relevant or purely ceremonial, respond with exactly: NULL.",
@@ -180,6 +203,7 @@ export type StructuredSynthesis = {
   prelims_trap_radar?: string;
   prelims_relevance?: "HIGH" | "MEDIUM" | "LOW";
   mains_relevance?: "HIGH" | "MEDIUM" | "LOW";
+  exam_insights?: ArticleExamInsights;
 };
 
 /** StructuredSynthesis + span-anchored, cite-or-drop verified claims (the ledger). */
@@ -358,7 +382,11 @@ export async function synthesizeStructured(params: {
           ? parsed.mains.trim()
           : "";
 
-        const rich = extractRichFields(parsed);
+        const spans = segmentSpans(clamp(body, 6000));
+        const rich = extractRichFields(parsed, {
+          spans,
+          sourceFingerprint: computeSourceFingerprint(body),
+        });
 
         console.log(`[ingest][llm] structured distillation (${tags.join(", ")}) via ${result.provider}/${result.model}`);
         return { bullets, tags, prelims, mains, ...rich };
@@ -452,7 +480,10 @@ export async function synthesizeGrounded(params: {
       ? parsed.mains.trim()
       : "";
 
-  const rich = extractRichFields(parsed);
+  const rich = extractRichFields(parsed, {
+    spans,
+    sourceFingerprint: computeSourceFingerprint(body),
+  });
 
   // grounding = kept/total across ALL produced bullets (honest drop-rate gauge).
   const grounding = groundingScore(claims);
@@ -465,7 +496,14 @@ export async function synthesizeGrounded(params: {
 /**
  * Safely extracts high-density 6-layer intelligence fields from parsed JSON.
  */
-function extractRichFields(parsed: any) {
+function extractRichFields(
+  parsed: any,
+  options?: {
+    spans?: EvidenceSpan[];
+    sourceUrl?: string;
+    sourceFingerprint?: string;
+  }
+) {
   const revision_targets: RevisionTargets | undefined =
     parsed.revision_targets && typeof parsed.revision_targets === "object"
       ? {
@@ -531,6 +569,91 @@ function extractRichFields(parsed: any) {
     ? (rawMainsRel as "HIGH" | "MEDIUM" | "LOW")
     : undefined;
 
+  let exam_insights: ArticleExamInsights | undefined = undefined;
+  if (parsed.exam_insights && typeof parsed.exam_insights === "object") {
+    const rawInsights = parsed.exam_insights;
+    const rawFacts = Array.isArray(rawInsights.facts) ? rawInsights.facts : [];
+    const spans = options?.spans || [];
+    const sourceFp = options?.sourceFingerprint || "00000000000000";
+    const sourceUrl = options?.sourceUrl || "";
+
+    const candidateFacts = rawFacts.map((f: any, idx: number) => {
+      const spanNums = Array.isArray(f?.spans) ? f.spans : [];
+      const evidence = spanNums
+        .map((num: any) => {
+          const span = spans.find((s) => s.id === `s${Number(num)}`);
+          if (!span) return null;
+          return {
+            source_url: sourceUrl,
+            source_fingerprint: sourceFp,
+            span_id: span.id,
+            quote: span.text,
+          };
+        })
+        .filter(Boolean);
+
+      return {
+        id: `f_${idx}`,
+        kind: f?.kind || "other",
+        label: typeof f?.label === "string" ? f.label.trim() : undefined,
+        statement:
+          typeof f?.statement === "string"
+            ? f.statement.trim()
+            : typeof f?.text === "string"
+            ? f.text.trim()
+            : "",
+        evidence,
+      };
+    });
+
+    let candidateDistinction = undefined;
+    if (rawInsights.distinction && typeof rawInsights.distinction === "object") {
+      const d = rawInsights.distinction;
+      const distSpans = Array.isArray(d.spans) ? d.spans : [];
+      const distEvidence = distSpans
+        .map((num: any) => {
+          const span = spans.find((s) => s.id === `s${Number(num)}`);
+          if (!span) return null;
+          return {
+            source_url: sourceUrl,
+            source_fingerprint: sourceFp,
+            span_id: span.id,
+            quote: span.text,
+          };
+        })
+        .filter(Boolean);
+
+      if (typeof d.statement === "string" && d.statement.trim() && distEvidence.length > 0) {
+        candidateDistinction = {
+          statement: d.statement.trim(),
+          fact_ids: [],
+          evidence: distEvidence,
+          operator: d.operator,
+        };
+      }
+    }
+
+    const candidatePayload = {
+      schema_version: 1,
+      generator_version: "tark_insight_v1",
+      source_fingerprint: sourceFp,
+      generated_at: new Date().toISOString(),
+      status: candidateFacts.length > 0 ? "ready" : "insufficient_evidence",
+      facts: candidateFacts,
+      distinction: candidateDistinction,
+    };
+
+    const validated = validateArticleExamInsights(candidatePayload, {
+      sourceUrl,
+      sourceFingerprint: sourceFp,
+      spans,
+    });
+
+    if (validated) {
+      exam_insights = validated;
+    }
+  }
+
   return {
     ...(revision_targets ? { revision_targets } : {}),
     ...(thematic_pillars && thematic_pillars.length ? { thematic_pillars } : {}),
@@ -539,5 +662,6 @@ function extractRichFields(parsed: any) {
     ...(prelims_trap_radar ? { prelims_trap_radar } : {}),
     ...(prelims_relevance ? { prelims_relevance } : {}),
     ...(mains_relevance ? { mains_relevance } : {}),
+    ...(exam_insights ? { exam_insights } : {}),
   };
 }

@@ -415,22 +415,8 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
         tags = structured.tags;
         prelims = structured.prelims;
         mains = structured.mains;
-        if (lead.tier === "primary") {
-          // Sovereign primary source: bind verified release URL across all derived bullets
-          claims = bullets.map((b, idx) => ({
-            text: b,
-            spanIds: [`s${idx}`],
-            quotes: [b],
-            facts: [],
-            claimType: "context" as const,
-            verified: true,
-            source: lead.source,
-            url: lead.url,
-            verification_method: "live_cite_or_drop_v1",
-          }));
-          grounding = 100;
-        } else if (grounded) {
-          // Wire/Secondary source: only publish bullets that passed cite-or-drop
+        if (grounded) {
+          // Source passed cite-or-drop: only publish bullets that passed verification
           const verifiedClaims = grounded.claims.filter((c) => c.verified);
           if (verifiedClaims.length < bullets.length) {
             bullets = verifiedClaims.map((c) => c.text);
@@ -446,6 +432,10 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
             verification_method: "live_cite_or_drop_v1",
           }));
           grounding = 100;
+        } else {
+          // Grounding failed or ungrounded fallback: DO NOT manufacture fake self-quoting claims
+          claims = [];
+          grounding = 0;
         }
       }
 
@@ -509,6 +499,7 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
         ...(structuredData?.prelims_trap_radar ? { prelims_trap_radar: structuredData.prelims_trap_radar } : {}),
         ...(structuredData?.prelims_relevance ? { prelims_relevance: structuredData.prelims_relevance } : {}),
         ...(structuredData?.mains_relevance ? { mains_relevance: structuredData.mains_relevance } : {}),
+        ...(structuredData?.exam_insights ? { exam_insights: structuredData.exam_insights } : {}),
         // Evidence-span ledger: span-anchored, cite-or-drop claims +
         // the per-brief grounding gauge. Present only when grounding succeeded.
         ...(claims.length ? { claims, verification_method: "live_cite_or_drop_v1" } : {}),
