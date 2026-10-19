@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { BookOpen, ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
-import type { TrapVulnerabilityMetrics } from '../lib/vulnerabilityIndex';
+import { hasPersonalMinistrySwapRisk, type TrapVulnerabilityMetrics } from '../lib/vulnerabilityIndex';
 import './DailyBriefHeader.css';
 
 interface DailyBriefHeaderProps {
@@ -13,6 +13,8 @@ interface DailyBriefHeaderProps {
 
 export default function DailyBriefHeader({ count, metrics, onInspectGrounding, onLaunchPractice, onLaunchConveyor }: DailyBriefHeaderProps) {
   const [toolsOpen, setToolsOpen] = useState(false);
+  const hasAgencyHistory = !metrics.isColdStart && (metrics.ministryEvidenceCount || 0) >= 3;
+  const agencyReviewRecommended = hasPersonalMinistrySwapRisk(metrics);
   return (
     <header className="daily-brief-header">
       <div className="daily-brief-masthead">
@@ -37,7 +39,7 @@ export default function DailyBriefHeader({ count, metrics, onInspectGrounding, o
         <dl className="daily-brief-metrics">
           <div><dt>50:50 expected value</dt><dd className={metrics.fiftyFiftyEV >= 0 ? 'is-positive' : 'is-negative'}>{metrics.fiftyFiftyEV >= 0 ? '+' : ''}{metrics.fiftyFiftyEV} <span>marks/call</span></dd></div>
           <div><dt>Qualifier vulnerability</dt><dd>{metrics.qualifierVulnerabilityRate}%</dd></div>
-          <div><dt>Ministry blind spot</dt><dd>{metrics.ministrySwapBlindSpot ? 'Active' : 'Resolved'}</dd>{metrics.ministrySwapBlindSpot && <p>Nodal bodies highlighted in your briefs.</p>}</div>
+          <div><dt>Agency responsibilities</dt><dd>{!hasAgencyHistory ? 'Not enough evidence' : agencyReviewRecommended ? 'Review recommended' : 'No current review signal'}</dd>{hasAgencyHistory && <p>Based on {metrics.ministryEvidenceCount} relevant attempts.</p>}</div>
         </dl>
         {(onLaunchPractice || onLaunchConveyor) && <div className="daily-brief-practice-options">
           {onLaunchPractice && <button type="button" onClick={onLaunchPractice}>Practice current affairs <span>Today’s arena battle</span></button>}

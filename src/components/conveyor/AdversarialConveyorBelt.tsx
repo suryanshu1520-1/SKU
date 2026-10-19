@@ -16,7 +16,7 @@ import {
   Flame,
   ArrowRight
 } from 'lucide-react';
-import { getStoredVulnerabilityIndex, type TrapVulnerabilityMetrics } from '../../lib/vulnerabilityIndex';
+import { getStoredVulnerabilityIndex, hasPersonalMinistrySwapRisk, type TrapVulnerabilityMetrics } from '../../lib/vulnerabilityIndex';
 
 export interface ConveyorItem {
   id: string;
@@ -347,13 +347,13 @@ export const AdversarialConveyorBelt: React.FC<AdversarialConveyorBeltProps> = (
                   {currentItem.dispatchHeadline}
                 </h2>
 
-                {/* Blind spot warning alert if ministry swap is active */}
-                {vulnerabilityIndex.ministrySwapBlindSpot && currentItem.nodalAgency && (
+                {/* An advisory requires actual negative agency-role attempt history. */}
+                {hasPersonalMinistrySwapRisk(vulnerabilityIndex) && currentItem.nodalAgency && (
                   <div className="mb-4 p-3 rounded bg-amber-500/10 border border-amber-500/30 flex items-start gap-2 text-xs text-amber-200">
                     <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                     <div>
-                      <strong className="font-semibold">Candidate Blind Spot Alert:</strong> You have
-                      previously lost marks on inter-ministerial swaps. Verify the nodal agency anchor:
+                      <strong className="font-semibold">Review agency responsibilities:</strong> Your recent
+                      agency-role attempts have a negative net score. Check this agency against the source:
                       <span className="block mt-1 font-mono text-amber-300 font-semibold underline">
                         {currentItem.nodalAgency}
                       </span>

@@ -49,13 +49,28 @@
 ### E. Policy Intelligence Dossier (`CurrentAffairs.tsx`)
 - **Location**: [`src/components/CurrentAffairs.tsx`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/src/components/CurrentAffairs.tsx)
 - **Hierarchy**:
-  - **Editorial Byline**: Quiet, unboxed metadata breadcrumb (`Source • Ministry • Date`) using authentic agency marks (`PibLogo`, `TheHinduLogo`) and muted typography (`#8fa2bd`).
-  - **Headline Prominence**: Elevates the authoritative serif headline immediately under the byline, eliminating badge-soup displacement.
-  - **Consolidated Telemetry Strip**: High-density glass bar (`bg-[rgba(3,18,42,0.7)] border border-[rgba(19,108,153,0.35)]`) uniting:
-    1. Deterministic Grounding audit ledger trigger (`<GroundingBadge />`).
-    2. Compact Prelims/Mains relevance indicator (`Prelims: MED • Mains: MED`).
-    3. Intelligent syllabus chips (`parseSyllabusTag`) condensing verbose 80-character strings into clean identifiers (`GS-II • Health & Social Sector`).
-  - **Verbatim Syllabus Drawer**: Interactive accordion that reveals exact, untruncated UPSC syllabus mapping on demand without visual clutter.
+  - **Editorial Byline**: Authentic source mark and date, followed by a full Newsreader headline at weight 500 and plain ministry attribution.
+  - **Reading Metadata**: Display actual Prelims/Mains relevance only when supplied. A quiet “Sources & verification” action opens the evidence ledger without claiming verification in the header.
+  - **Syllabus Mapping**: A native disclosure summarizes the topic count and papers, then reveals the full supplied mapping.
+  - **Study Connections**: A separate native disclosure groups exam focus, policy-chain navigation, and topic resurgence into labeled rows with consistent Lucide icons. Inferred focus is marked as a suggestion; resurgence is identified as a model signal.
+  - **Agency Advisory**: No ministry-wide warning or generic Government of India risk label. A source-check advisory can appear beside a specific nodal fact only with at least three evidenced agency-role attempts and a negative net score, plus relevant article content.
+  - **Historical Examples**: Show an article's supplied historical twin only; never substitute a generic example selected from a heuristic operator.
+
+#### Reading-first news feed (`NewsSignalCard.tsx`)
+
+This scoped pattern governs the current-affairs feed cards and lead story; the full dossier reader remains a separate reading surface.
+
+- **Implementation**: `src/components/NewsSignalCard.tsx` and `NewsSignalCard.css`, composed by `CurrentAffairs.tsx`.
+- **Surface**: Flat navy (`#071630`, lead `#041936`), cream headlines (`#e8e0cf`), restrained gold (`#e0d0ab`) and cyan (`#0194a8`), with thin borders and no card shadows or tilt.
+- **Light mode**: Warm cream surfaces (`#f9f5ee`, `#f1ebdf`), navy headings, dark gold actions and cyan details retain the same hierarchy.
+- **Byline**: Quiet linked source and valid article date (`created_at`), with a separate bookmark control exposing saved and saving states.
+- **Headline**: Full, untruncated serif text; the lead uses a larger `h2`, standard cards use `h3`, and each headline is a keyboard-operable button.
+- **Preview**: Up to two summary bullets on the lead and one on standard cards; inline evidence anchors and contested warnings stay visible.
+- **Primary action**: “Read brief” opens the full brief; “Exam context” discloses the supporting study detail.
+- **Disclosure**: Holds ministry, grounding inspection, exam focus, matching optional-subject relevance, volcano activity, an article's supplied historical twin, policy-chain link and sharing when available. Cards open independently; inferred focus is labeled as a suggestion.
+- **Feed layout**: The first displayed item leads. Remaining briefs use an auto-fit grid with a `22rem` minimum, contracting to one column. A ResizeObserver measures intrinsic card heights and updates grid row spans, packing subsequent cards below available space with approximately 20px gaps. Expanded cards never stretch their neighbours. DOM and keyboard order remain chronological; browsers without ResizeObserver retain a normal grid with natural card heights.
+- **Access and motion**: Card actions have at least 44px targets, visible gold focus outlines, `aria-expanded`/`aria-controls` on the disclosure and reduced-motion transition suppression.
+- **Narrow screens**: At 639px and below, padding becomes 20px horizontally and exam facts stack into one column; headlines and actions wrap naturally.
 
 ---
 

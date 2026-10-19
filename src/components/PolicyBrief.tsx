@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, useReducedMotion } from 'motion/react';
-import { AlertCircle, Bookmark, BookOpen, ExternalLink, Share2, Target, X, AlertTriangle, ShieldAlert, Crosshair, Flame, GitFork } from 'lucide-react';
-import { getDispatchOperator, HISTORICAL_TWIN_VAULT, type CurrentAffairsItem, type ParsedSyllabusTag } from './CurrentAffairs';
+import { ArrowUpRight, Bookmark, BookOpen, ChevronDown, ExternalLink, Share2, ShieldCheck, Target, X, ShieldAlert, Flame, GitFork } from 'lucide-react';
+import { getDispatchOperator, type CurrentAffairsItem, type ParsedSyllabusTag } from './CurrentAffairs';
 import { matchDispatchToPolicyChain, getVolcanoTelemetryForNode } from '../lib/policy-ripple-radar-shared';
-import { EXAMINER_OPERATORS } from '../types';
-import { ContestedCard, GroundingBadge, SourceAnchor } from './TrustUI';
+import { EXAMINER_OPERATORS, type ExaminerOperatorType } from '../types';
+import { ContestedCard, SourceAnchor } from './TrustUI';
 import { TheHinduLogo, PibLogo } from './SourceLogos';
 import { getCanonicalArticleUrl } from '../lib/seo';
-import { getStoredVulnerabilityIndex } from '../lib/vulnerabilityIndex';
+import { getArticleNodalSwapRisk, getStoredVulnerabilityIndex } from '../lib/vulnerabilityIndex';
 import './PolicyBrief.css';
 
 interface PolicyBriefProps {
@@ -32,6 +32,16 @@ const sections = [
 ] as const;
 type SectionId = typeof sections[number]['id'];
 
+const examFocusLabels: Record<ExaminerOperatorType, string> = {
+  PSY_01_INST_SWAP: 'Institutions & responsibilities',
+  PSY_02_QUAL_POLARITY: 'Conditions & qualifiers',
+  PSY_03_LEGAL_TIER: 'Legal status',
+  PSY_04_CAUSAL_INV: 'Cause, effect & sequence',
+  PSY_05_SCOPE_MUTATE: 'Numbers, scope & trends',
+  PSY_06_PAIR_DECOY: 'Matched pairs',
+  PSY_07_TRUE_NON_CAUSAL: 'Assertion & explanation',
+};
+
 function NoteSection({ id, title, children }: { id: SectionId; title: string; children: ReactNode }) {
   return (
     <section id={`brief-${id}`} className="brief-section" aria-labelledby={`brief-${id}-heading`}>
@@ -47,7 +57,6 @@ function Note({ title, children }: { title: string; children: ReactNode }) {
 
 export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose, onSave, onShare, onPractice, onLaunchConveyor, onInspectGrounding }: PolicyBriefProps) {
   const summary = item.summary;
-  const vulnerabilityIndex = getStoredVulnerabilityIndex();
   const reducedMotion = useReducedMotion();
   const dialogRef = useRef<HTMLDivElement>(null);
   const readerRef = useRef<HTMLDivElement>(null);
@@ -57,6 +66,21 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
   closeCallback.current = onClose;
   const [activeSection, setActiveSection] = useState<SectionId>('revision');
   const canonicalUrl = getCanonicalArticleUrl(item);
+  const operator = getDispatchOperator(item);
+  const operatorMeta = EXAMINER_OPERATORS[operator];
+  const examFocus = examFocusLabels[operator];
+  const historicalTwin = item.historical_twin;
+  const nodalRisk = getArticleNodalSwapRisk(item, getStoredVulnerabilityIndex());
+  const policyChain = matchDispatchToPolicyChain(item.headline, item.ministry, summary?.bullets?.join(' '), item.chain_id);
+  const volcano = getVolcanoTelemetryForNode(item.node_id, item.headline, item.ministry);
+  const resurgingTopic = volcano?.volcano_status === 'ERUPTING' ? volcano : null;
+  const syllabusPapers = Array.from(new Set(syllabusTags.map(tag => tag.paper)));
+  const singleSyllabusTopic = syllabusTags.length === 1 ? `${syllabusTags[0].paper} · ${syllabusTags[0].topic}` : '';
+  const syllabusOverview = singleSyllabusTopic && singleSyllabusTopic.length <= 48
+    ? singleSyllabusTopic
+    : `${syllabusTags.length} ${syllabusTags.length === 1 ? 'topic' : 'topics'} · ${syllabusPapers.join(', ')}`;
+  const articleDate = item.created_at ? new Date(item.created_at) : null;
+  const validDate = articleDate && Number.isFinite(articleDate.getTime()) ? articleDate : null;
   const targets = [
     { label: 'Key data', value: summary?.revision_targets?.data_metric },
     { label: 'Nodal agency', value: summary?.revision_targets?.nodal_body },
@@ -158,108 +182,79 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
               ) : item.source?.toUpperCase().includes('PIB') ? (
                 <span className="brief-source"><PibLogo size={18} /> PIB Official</span>
               ) : <span className="brief-source">{item.source}</span>}
-              {item.created_at && <time dateTime={item.created_at}>{new Date(item.created_at).toLocaleDateString('en-GB', {
-                day: '2-digit', month: 'long', year: 'numeric', timeZone: 'Asia/Kolkata',
+              {validDate && <time dateTime={validDate.toISOString()}>{validDate.toLocaleDateString('en-GB', {
+                day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata',
               })}</time>}
             </div>
             <h2 id="brief-title">{item.headline}</h2>
-            {item.ministry && (
-              <div className="brief-ministry-container" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', margin: '4px 0 12px' }}>
-                <p className={`brief-ministry ${vulnerabilityIndex.ministrySwapBlindSpot ? 'vulnerability-warning-ministry' : ''}`} style={{ margin: 0 }}>
-                  {item.ministry}
-                </p>
-                {vulnerabilityIndex.ministrySwapBlindSpot && (
-                  <span
-                    className="vulnerability-badge"
-                    title="Your historical ledger indicates vulnerability to nodal ministry swaps. Verify whether this agency or department is the authentic statutory anchor."
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontSize: '11px',
-                      fontFamily: 'var(--font-mono)',
-                      fontWeight: 600,
-                      color: '#f59e0b',
-                      background: 'rgba(245, 158, 11, 0.12)',
-                      border: '1px solid rgba(245, 158, 11, 0.35)',
-                      padding: '2px 6px',
-                      borderRadius: '3px',
-                    }}
-                  >
-                    <AlertTriangle size={12} /> Nodal Swap Trap Risk
-                  </span>
-                )}
-              </div>
-            )}
+            {item.ministry && <p className="brief-ministry">{item.ministry}</p>}
 
-            <div className="brief-relevance" aria-label="Exam relevance">
-              <span>Prelims <strong>{(summary?.prelims_relevance || 'MEDIUM').toLowerCase()}</strong></span>
-              <span>Mains <strong>{(summary?.mains_relevance || 'MEDIUM').toLowerCase()}</strong></span>
-              {(() => {
-                const op = getDispatchOperator(item);
-                const opMeta = EXAMINER_OPERATORS[op];
-                return (
-                  <span className="font-mono text-[11px] font-bold text-[#5fe3f5] bg-[rgba(1,148,168,0.15)] px-2 py-0.5 rounded border border-[rgba(1,148,168,0.3)] inline-flex items-center gap-1">
-                    <Crosshair size={12} className="text-[#0194a8]" />
-                    <span>TRAP: {opMeta?.code || op} ({opMeta?.shortLabel || 'DISTORTION'})</span>
-                  </span>
-                );
-              })()}
-
-              {/* Volcano Telemetry Badge */}
-              {(() => {
-                const v = getVolcanoTelemetryForNode(item.node_id, item.headline, item.ministry);
-                if (!v || v.volcano_status !== 'ERUPTING') return null;
-                return (
-                  <span
-                    className="font-mono text-[11px] font-bold text-rose-300 bg-rose-950/70 px-2 py-0.5 rounded border border-rose-500/50 inline-flex items-center gap-1 shadow-xs"
-                    title={`Volcano Node ${v.node_id}: ${v.years_dormant} years since last tested, high 2026 news velocity`}
-                  >
-                    <Flame size={12} className="text-rose-400 animate-pulse" />
-                    <span>VOLCANO V_j: {v.volcano_index.toFixed(1)} // {v.years_dormant}-YR REBOUND</span>
-                  </span>
-                );
-              })()}
-
-              {/* Clickable Policy Ripple Pill */}
-              {(() => {
-                const chain = matchDispatchToPolicyChain(item.headline, item.ministry, item.summary?.bullets?.join(' '), item.chain_id);
-                if (!chain) return null;
-                return (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const targetUrl = `/observatory?tab=ripple&chain=${chain.chain_id}`;
-                      window.history.pushState(null, '', targetUrl);
-                      window.dispatchEvent(new PopStateEvent('popstate'));
-                    }}
-                    className="font-mono text-[11px] font-bold text-[#5fe3f5] bg-[rgba(1,148,168,0.2)] hover:bg-[rgba(1,148,168,0.35)] px-2 py-0.5 rounded border border-[rgba(1,148,168,0.5)] inline-flex items-center gap-1 transition-colors cursor-pointer"
-                    title={`Deep-link to Policy Ripple Radar: ${chain.title}`}
-                  >
-                    <GitFork size={12} className="text-[#0194a8]" />
-                    <span>[RIPPLE r{item.ring_depth ?? 2} // {chain.title.toUpperCase()} → VIEW CHAIN]</span>
-                  </button>
-                );
-              })()}
-
-              <GroundingBadge grounding={summary?.grounding} verificationMethod={summary?.verification_method}
-                headline={item.headline} source={item.source} sourceUrl={item.url} claims={summary?.claims} onClick={onInspectGrounding} />
-
+            <div className="brief-study-meta">
+              {(summary?.prelims_relevance || summary?.mains_relevance) && <dl className="brief-relevance" aria-label="Exam relevance">
+                {summary.prelims_relevance && <div><dt>Prelims</dt><dd>{summary.prelims_relevance.toLowerCase()}</dd></div>}
+                {summary.mains_relevance && <div><dt>Mains</dt><dd>{summary.mains_relevance.toLowerCase()}</dd></div>}
+              </dl>}
+              <button type="button" className="brief-evidence-access" onClick={onInspectGrounding}>
+                <ShieldCheck size={15} strokeWidth={1.6} aria-hidden="true" />
+                <span>Sources & verification</span>
+                <ArrowUpRight size={14} strokeWidth={1.6} aria-hidden="true" />
+              </button>
             </div>
 
             {syllabusTags.length > 0 && (
-              <details className="brief-syllabus">
+              <details className="brief-disclosure brief-syllabus">
                 <summary>
-                  <span className="brief-syllabus-label">Syllabus</span>
-                  <span className="brief-syllabus-topics">{syllabusTags.map(tag => `${tag.paper} · ${tag.topic}`).join(' / ')}</span>
-                  <span className="brief-syllabus-toggle">View mapping</span>
+                  <span className="brief-disclosure-label">Syllabus</span>
+                  <span className="brief-disclosure-preview">{syllabusOverview}</span>
+                  <ChevronDown size={16} strokeWidth={1.6} aria-hidden="true" />
                 </summary>
                 <div className="brief-syllabus-full">
-                  <h4>Verbatim UPSC syllabus mapping</h4>
+                  <h4>UPSC syllabus mapping</h4>
                   <ul>{syllabusTags.map((tag, index) => <li key={index}>{tag.full}</li>)}</ul>
                 </div>
               </details>
             )}
+
+            <details className="brief-disclosure brief-study-connections">
+              <summary>
+                <span className="brief-disclosure-label">Study connections</span>
+                <span className="brief-disclosure-preview">{policyChain ? 'Exam focus & policy chain' : 'Exam focus'}</span>
+                <ChevronDown size={16} strokeWidth={1.6} aria-hidden="true" />
+              </summary>
+              <dl className="brief-connection-list">
+                <div>
+                  <dt><Target size={16} strokeWidth={1.6} aria-hidden="true" />Exam focus</dt>
+                  <dd>
+                    <strong>{examFocus}</strong>
+                    <p>{operatorMeta.description}</p>
+                    {!item.primary_operator && <span className="brief-connection-note">Suggested by article text</span>}
+                  </dd>
+                </div>
+                {policyChain && <div>
+                  <dt><GitFork size={16} strokeWidth={1.6} aria-hidden="true" />Policy chain</dt>
+                  <dd>
+                    <strong>{policyChain.title}</strong>
+                    {item.ring_depth !== undefined && <p>Connection depth: {item.ring_depth}</p>}
+                    <a href={`/observatory?tab=ripple&chain=${encodeURIComponent(policyChain.chain_id)}`}
+                      onClick={event => {
+                        if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+                        event.preventDefault();
+                        window.history.pushState(null, '', event.currentTarget.getAttribute('href'));
+                        window.dispatchEvent(new PopStateEvent('popstate'));
+                      }}
+                      className="brief-connection-link">Explore policy chain <ArrowUpRight size={15} aria-hidden="true" /></a>
+                  </dd>
+                </div>}
+                {resurgingTopic && <div>
+                  <dt><Flame size={16} strokeWidth={1.6} aria-hidden="true" />Topic resurgence</dt>
+                  <dd>
+                    <strong>{resurgingTopic.years_dormant} years since last tested</strong>
+                    <p>Volcano index {resurgingTopic.volcano_index.toFixed(1)} · {resurgingTopic.node_id}</p>
+                    <span className="brief-connection-note">Historical model signal</span>
+                  </dd>
+                </div>}
+              </dl>
+            </details>
           </header>
 
           <nav ref={navRef} className="brief-navigation" aria-label="Jump to brief section">
@@ -276,49 +271,31 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
                 ) : <p className="brief-secondary">No policy highlights are available for this brief yet. Refer to the primary source below.</p>}
               </Note>
               {targets.length > 0 && <Note title="Remember in one minute">
-                <dl className="brief-facts">{targets.map(target => {
-                  const isNodal = target.label === 'Nodal agency';
-                  const isVulnerable = isNodal && vulnerabilityIndex.ministrySwapBlindSpot;
-                  return (
-                    <div key={target.label}>
-                      <dt style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        {target.label}
-                        {isVulnerable && (
-                          <span title="Candidate Blind Spot" style={{ display: 'inline-flex' }}>
-                            <AlertTriangle size={12} color="#f59e0b" />
-                          </span>
-                        )}
-                      </dt>
-                      <dd className={isVulnerable ? 'vulnerability-warning-ministry' : ''}>
-                        {target.value}
-                      </dd>
-                    </div>
-                  );
-                })}</dl>
+                <dl className="brief-facts">{targets.map(target => <div key={target.label}>
+                  <dt>{target.label}</dt>
+                  <dd>
+                    {target.value}
+                    {target.label === 'Nodal agency' && nodalRisk && target.value?.trim().toLowerCase() === nodalRisk.agency.trim().toLowerCase() && <span className="brief-agency-check">
+                      <strong>Review agency responsibilities</strong>
+                      Based on {nodalRisk.attemptedCount} agency-role attempts (net {nodalRisk.netMarks.toFixed(2)} marks).
+                      <button type="button" className="brief-fact-source" onClick={() => jumpTo('evidence')}>Check source evidence <ArrowUpRight size={14} aria-hidden="true" /></button>
+                    </span>}
+                  </dd>
+                </div>)}</dl>
               </Note>}
               {summary?.prelims && <Note title="Prelims factual pointer"><p>{summary.prelims}</p></Note>}
-              {(() => {
-                const op = getDispatchOperator(item);
-                const twin = item.historical_twin || HISTORICAL_TWIN_VAULT[op];
-                return (
-                  <aside className="brief-pitfall" aria-labelledby="brief-pitfall-title">
-                    <h4 id="brief-pitfall-title" className="flex items-center gap-2">
-                      <ShieldAlert size={17} aria-hidden="true" />
-                      <span>Examiner Vector: {EXAMINER_OPERATORS[op]?.label || op}</span>
-                    </h4>
-                    {summary?.prelims_trap_radar && <p className="mb-2">{summary.prelims_trap_radar}</p>}
-                    {twin && (
-                      <div className="mt-2 pt-2 border-t border-[rgba(224,208,171,0.2)] text-xs font-mono">
-                        <span className="text-[#e0d0ab] font-bold">Historical UPSC Twin ({twin.year}): </span>
-                        <span className="italic font-serif text-[#d6e2f0]">"{twin.stem}"</span>
-                        <div className="mt-1 text-[11px] text-amber-300">
-                          <strong>Anchor:</strong> {(twin as any).statutory_anchor || (twin as any).anchor}
-                        </div>
-                      </div>
-                    )}
-                  </aside>
-                );
-              })()}
+              {(summary?.prelims_trap_radar || historicalTwin) && <aside className="brief-pitfall" aria-labelledby="brief-pitfall-title">
+                <h4 id="brief-pitfall-title">
+                  <ShieldAlert size={17} strokeWidth={1.6} aria-hidden="true" />
+                  <span>Exam focus: {examFocus}</span>
+                </h4>
+                {summary?.prelims_trap_radar && <p>{summary.prelims_trap_radar}</p>}
+                {historicalTwin && <div className="brief-historical-example">
+                  <h5>Historical comparison · {historicalTwin.year}</h5>
+                  <blockquote>{historicalTwin.stem}</blockquote>
+                  {historicalTwin.statutory_anchor && <p className="brief-historical-anchor"><strong>Anchor:</strong> {historicalTwin.statutory_anchor}</p>}
+                </div>}
+              </aside>}
             </NoteSection>
 
             <NoteSection id="analysis" title="Mains analysis">
@@ -374,12 +351,12 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
             <Bookmark size={17} fill={saved ? 'currentColor' : 'none'} aria-hidden="true" />
             {saving ? 'Saving…' : saved ? 'Brief saved' : 'Save brief'}
           </button>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            {onPractice && <button type="button" className="brief-practice" onClick={onPractice}>
-              <Target size={17} aria-hidden="true" />Practice MCQ drill
+          <div className="brief-practice-actions">
+            {onPractice && <button type="button" className={`brief-practice${onLaunchConveyor ? ' brief-practice--secondary' : ''}`} onClick={onPractice}>
+              <Target size={17} strokeWidth={1.6} aria-hidden="true" />Practice MCQs
             </button>}
-            {onLaunchConveyor && <button type="button" className="brief-practice" style={{ background: '#e0d0ab', color: '#050b1a' }} onClick={onLaunchConveyor}>
-              <ShieldAlert size={17} aria-hidden="true" />Face Examiner Trap (+2 / −0.66)
+            {onLaunchConveyor && <button type="button" className="brief-practice" title="Correct answer: +2 marks. Incorrect answer: −0.66 marks." onClick={onLaunchConveyor}>
+              <ShieldAlert size={17} strokeWidth={1.6} aria-hidden="true" />Try examiner drill
             </button>}
           </div>
         </footer>

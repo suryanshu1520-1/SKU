@@ -3,28 +3,16 @@ import { supabase } from '../lib/supabase';
 import { fetchWithAuth } from '../lib/api';
 import { motion, AnimatePresence, LayoutGroup, useReducedMotion, useMotionValue, useTransform, animate, type PanInfo } from 'motion/react';
 import {
-  ExternalLink,
   Inbox,
   RefreshCw,
-  Bookmark,
   X,
-  Share2,
   Sun,
   Moon,
   Clock,
-  Layers,
-  ArrowUpRight,
   ChevronRight,
   ChevronLeft,
   AlertCircle,
   Scale,
-  Target,
-  ShieldAlert,
-  AlertTriangle,
-  Crosshair,
-  ChevronDown,
-  Flame,
-  GitFork
 } from 'lucide-react';
 import { matchDispatchToPolicyChain, getVolcanoTelemetryForNode } from '../lib/policy-ripple-radar-shared';
 import ReactMarkdown from 'react-markdown';
@@ -32,9 +20,11 @@ import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
 import DailyEdition from './DailyEdition';
 import PolicyBrief from './PolicyBrief';
+import NewsSignalCard from './NewsSignalCard';
+import NewsSignalGrid from './NewsSignalGrid';
 import DailyBriefHeader, { DailyBriefFilters } from './DailyBriefHeader';
 import { getStoredVulnerabilityIndex } from '../lib/vulnerabilityIndex';
-import { EXAMINER_OPERATORS, type ExaminerOperatorType, type UserPsycheAutopsy } from '../types';
+import { EXAMINER_OPERATORS, type ExaminerOperatorType } from '../types';
 
 import prsVaultDossiers from '../data/prs-vault-dossiers.json';
 import type { CandidatePreferences } from '../types';
@@ -47,13 +37,10 @@ import {
   ROUTE_META_DEFAULTS,
 } from '../lib/seo';
 import {
-  SourceAnchor,
-  GroundingBadge,
-  ContestedCard,
   type VerifiedClaim,
   type ContestedClaim,
 } from './TrustUI';
-import { TheHinduLogo, PibLogo } from './SourceLogos';
+import { PibLogo } from './SourceLogos';
 import { GroundingExplainerModal } from './GroundingExplainerModal';
 
 interface RevisionTargets {
@@ -147,51 +134,6 @@ export function getDispatchOperator(item: CurrentAffairsItem): ExaminerOperatorT
 
   return 'PSY_04_CAUSAL_INV';
 }
-
-export const HISTORICAL_TWIN_VAULT: Record<ExaminerOperatorType, { year: number; stem: string; anchor: string; takeaway: string }> = {
-  PSY_01_INST_SWAP: {
-    year: 2021,
-    stem: 'Consider the following statements regarding the "National Clean Air Programme (NCAP)": 1. It is implemented by the Ministry of Environment, Forest and Climate Change. 2. Central Pollution Control Board acts as the sole regulatory executive body.',
-    anchor: 'Cabinet Allocation of Business Rules & NCAP Framework',
-    takeaway: 'UPSC swapped Central Pollution Control Board role with State Pollution Control Boards for state-level monitoring.',
-  },
-  PSY_02_QUAL_POLARITY: {
-    year: 2023,
-    stem: 'Consider the following statements: 1. All corporate donations to political parties require compulsory disclosure under the Companies Act without any upper limit.',
-    anchor: 'Companies Act 2013, Section 182 read with Electoral Bonds Judgment',
-    takeaway: '"All corporate donations" ignored statutory exceptions and board approval criteria.',
-  },
-  PSY_03_LEGAL_TIER: {
-    year: 2022,
-    stem: 'With reference to the National Green Tribunal (NGT), consider the following statements: 1. NGT was established under a constitutional amendment to uphold Article 21.',
-    anchor: 'National Green Tribunal Act, 2010 (Statutory, not Constitutional body)',
-    takeaway: 'Classic tier shift: presenting a statutory body created by an Act of Parliament as a constitutional organ.',
-  },
-  PSY_04_CAUSAL_INV: {
-    year: 2022,
-    stem: 'If inflation is too high, Reserve Bank of India (RBI) is likely to buy government securities in the open market.',
-    anchor: 'RBI Monetary Policy Framework read with Liquidity Adjustment Facility',
-    takeaway: 'Inverted the directional mechanism: RBI sells securities to absorb liquidity during high inflation.',
-  },
-  PSY_05_SCOPE_MUTATE: {
-    year: 2020,
-    stem: 'In India, the term "Public Finance Management System (PFMS)" is used for tracking multi-year monotonicity of welfare expenditure.',
-    anchor: 'Ministry of Finance Expenditure Department Guidelines',
-    takeaway: 'Mutated the operational scope of direct benefit transfers into macro-fiscal forecasting.',
-  },
-  PSY_06_PAIR_DECOY: {
-    year: 2023,
-    stem: 'Consider the following pairs of historic locations and their states: Renuka - Himachal Pradesh, Bhoj - Madhya Pradesh. How many pairs are correctly matched?',
-    anchor: 'Ramsar Sites Directory & MoEFCC Gazette',
-    takeaway: 'Employs "Only one / Only two" structure to completely neutralize 50:50 elimination.',
-  },
-  PSY_07_TRUE_NON_CAUSAL: {
-    year: 2024,
-    stem: 'Statement-I: The Reserve Bank of India manages government debt. Statement-II: Inflation targeting is anchored to the Consumer Price Index (CPI).',
-    anchor: 'RBI Act 1934, Section 45ZB & Government Securities Act',
-    takeaway: 'Both statements are 100% factual, but Statement-II does not causally explain Statement-I.',
-  },
-};
 
 interface PibDigestItem {
   id: string;
@@ -338,7 +280,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
   const [timePreset, setTimePreset] = useState<'ALL' | 'TODAY' | 'WEEK' | 'MONTH' | 'CUSTOM'>('ALL');
   const [trustFilter, setTrustFilter] = useState<'ALL' | 'HIGH_GROUNDING' | 'CONTESTED'>('ALL');
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
-  const [expandedTwinId, setExpandedTwinId] = useState<string | null>(null);
+  const [expandedContextIds, setExpandedContextIds] = useState<Set<string>>(() => new Set());
   interface UserTelemetrySummary {
     totalAttempts: number;
     worstOperatorBleed: number;
@@ -1064,6 +1006,89 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
     return () => window.removeEventListener('tark:brief-action', handleBriefAction);
   }, []);
 
+  const renderSignalCard = (item: CurrentAffairsItem, articleId: string, lead = false) => {
+    const operator = getDispatchOperator(item);
+    const operatorMeta = EXAMINER_OPERATORS[operator];
+    const twin = item.historical_twin;
+    const statutoryAnchor = twin?.statutory_anchor;
+    const volcano = getVolcanoTelemetryForNode(item.node_id, item.headline, item.ministry);
+    const chain = matchDispatchToPolicyChain(item.headline, item.ministry, item.summary?.bullets?.join(' '), item.chain_id);
+    const optional = candidatePreferences
+      ? matchOptionalRelevance(item.headline, item.summary?.bullets, candidatePreferences.optionalSubject)
+      : null;
+
+    return (
+      <NewsSignalCard
+        key={articleId}
+        item={item}
+        articleId={articleId}
+        lead={lead}
+        saved={savedArticleIds.has(item.id || '')}
+        saving={savingArticleIds.has(item.id || '')}
+        contextOpen={expandedContextIds.has(articleId)}
+        onToggleContext={() => setExpandedContextIds((current) => {
+          const next = new Set(current);
+          if (next.has(articleId)) next.delete(articleId);
+          else next.add(articleId);
+          return next;
+        })}
+        onOpen={() => setSelectedDossier(item)}
+        onSave={() => { void toggleBookmark(item.id || ''); }}
+        onShare={(event) => { void handleShareArticle(item, event); }}
+        onGrounding={() => setGroundingExplainerData({
+          isOpen: true,
+          grounding: item.summary?.grounding,
+          headline: item.headline,
+          source: item.source,
+          sourceUrl: item.url,
+          claims: item.summary?.claims || [],
+        })}
+        examContext={(
+          <div className="news-signal__exam-details">
+            <dl className="news-signal__facts">
+              <div>
+                <dt>{item.primary_operator ? 'Exam focus' : 'Suggested focus'}</dt>
+                <dd>
+                  {operatorMeta.label}{isPersonalBlindSpot(operator) && <strong> · Your blind spot</strong>}
+                  <p>{operatorMeta.description}</p>
+                  {!item.primary_operator && <p>Suggested from the article text; this is not a confirmed examiner trap.</p>}
+                </dd>
+              </div>
+              {optional?.matches && <div><dt>Optional subject</dt><dd>{optional.optionalName} · Paper 2 anchor</dd></div>}
+              {volcano?.volcano_status === 'ERUPTING' && (
+                <div>
+                  <dt>Topic activity</dt>
+                  <dd>{volcano.title} · {volcano.years_dormant}-year rebound <span>(Volcano index {volcano.volcano_index.toFixed(1)})</span></dd>
+                </div>
+              )}
+            </dl>
+            {chain && (
+              <a
+                href={`/observatory?tab=ripple&chain=${encodeURIComponent(chain.chain_id)}`}
+                className="news-signal__context-link"
+                onClick={(event) => {
+                  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                  event.preventDefault();
+                  window.history.pushState(null, '', event.currentTarget.href);
+                  window.dispatchEvent(new PopStateEvent('popstate'));
+                }}
+              >
+                Explore policy chain: {chain.title} (ring {item.ring_depth ?? 2})
+              </a>
+            )}
+            {twin && (
+              <section className="news-signal__historical">
+                <h4>Historical twin · Prelims {twin.year}</h4>
+                <blockquote>{twin.stem}</blockquote>
+                {statutoryAnchor && <p><strong>Anchor:</strong> {statutoryAnchor}</p>}
+              </section>
+            )}
+          </div>
+        )}
+      />
+    );
+  };
+
   return (
     <div className="w-full min-h-screen text-primary font-sans pb-24 md:pl-6">
       
@@ -1180,7 +1205,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
         </div>
       ) : !selectedDossier ? (
         /* ── Editorial Content Stream ── */
-        <div className="space-y-8">
+        <div className="news-signal-stream">
           {/* PRS Legislative Research Vault Banner */}
           {(activeCategoryTab === 'PRS' || selectedSource === 'PRS') && (
             <motion.div
@@ -1218,559 +1243,21 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
             </motion.div>
           )}
 
-          {/* 1. LEAD STORY (HERO DISPATCH) */}
-          {leadItem && (
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={prefersReducedMotion ? undefined : { y: -3 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-              className="bg-gradient-to-br from-[rgba(4,25,54,0.85)] via-[rgba(7,46,99,0.55)] to-[rgba(4,25,54,0.9)] border border-[rgba(19,108,153,0.5)] hover:border-[#e0d0ab]/70 rounded-xs p-6 sm:p-8 relative overflow-hidden shadow-[0_16px_50px_rgba(0,0,0,0.6)] backdrop-blur-xl group font-sans"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-                <div className="flex items-center gap-2 flex-wrap font-sans">
-                  <span className="px-2.5 py-0.5 bg-[#e0d0ab] text-[#072e63] text-[10px] font-mono font-bold uppercase tracking-wider rounded-xs shadow-sm">
-                    LEAD SIGNAL
-                  </span>
-                  <span className="px-2.5 py-0.5 bg-[rgba(11,61,120,0.35)] text-[#e0d0ab] text-[10px] font-mono uppercase tracking-wider rounded-xs border border-[rgba(19,108,153,0.4)]">
-                    {leadItem.ministry}
-                  </span>
-                  {leadItem.source?.toUpperCase().includes('HINDU') ? (
-                    <span className="inline-flex items-center px-2.5 py-1 bg-surface-elevated/90 border border-border rounded-sm shadow-xs" title="The Hindu — National Newspaper of Record">
-                      <TheHinduLogo height={13} color="#ffffff" animated={true} />
-                    </span>
-                  ) : leadItem.source?.toUpperCase().includes('PIB') ? (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-surface-elevated/90 border border-border rounded-sm text-[#e0d0ab] shadow-xs" title="Press Information Bureau">
-                      <PibLogo size={16} animated={true} />
-                      <span className="text-[10px] font-mono font-bold tracking-wider">PIB OFFICIAL</span>
-                    </span>
-                  ) : (
-                    <span className="text-[#8fa2bd] text-xs font-sans font-medium uppercase">
-                      {leadItem.source}
-                    </span>
-                  )}
-                  <GroundingBadge
-                    grounding={leadItem.summary?.grounding}
-                    verificationMethod={leadItem.summary?.verification_method}
-                    headline={leadItem.headline}
-                    source={leadItem.source}
-                    sourceUrl={leadItem.url}
-                    claims={leadItem.summary?.claims}
-                    onClick={() =>
-                      setGroundingExplainerData({
-                        isOpen: true,
-                        grounding: leadItem.summary?.grounding,
-                        headline: leadItem.headline,
-                        source: leadItem.source,
-                        sourceUrl: leadItem.url,
-                        claims: leadItem.summary?.claims || [],
-                      })
-                    }
-                  />
+          {leadItem && renderSignalCard(leadItem, leadItem.id || leadItem.url || 'lead', true)}
 
-                  {/* Candidate Optional Subject Cross-Over Anchor */}
-                  {candidatePreferences && (() => {
-                    const syn = matchOptionalRelevance(leadItem.headline, leadItem.summary?.bullets, candidatePreferences.optionalSubject);
-                    if (syn.matches) {
-                      return (
-                        <span className="px-2.5 py-0.5 bg-[rgba(224,208,171,0.15)] text-[#e0d0ab] border border-[rgba(224,208,171,0.35)] text-xs font-sans font-semibold rounded-md flex items-center gap-1.5 shadow-xs">
-                          <Target className="w-3 h-3 text-[#34d399]" />
-                          <span>{syn.optionalName} Paper 2 Anchor</span>
-                        </span>
-                      );
-                    }
-                    return null;
-                  })()}
-
-                  {/* Examiner Psyche Trap Vector Badge */}
-                  {(() => {
-                    const op = getDispatchOperator(leadItem);
-                    const opMeta = EXAMINER_OPERATORS[op];
-                    const isBlindSpot = isPersonalBlindSpot(op);
-                    return (
-                      <span
-                        className={`px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider rounded-xs border flex items-center gap-1.5 shadow-xs ${
-                          isBlindSpot
-                            ? 'bg-amber-950/70 text-amber-300 border-amber-500/60 animate-pulse'
-                            : 'bg-[rgba(1,148,168,0.15)] text-[#5fe3f5] border-[rgba(1,148,168,0.4)]'
-                        }`}
-                        title={opMeta?.description}
-                      >
-                        <Crosshair className={`w-3 h-3 ${isBlindSpot ? 'text-amber-400' : 'text-[#0194a8]'}`} />
-                        <span>
-                          TRAP VECTOR: {opMeta?.code || op} // {opMeta?.shortLabel || 'NODAL SWAP'}
-                          {isBlindSpot && ' [YOUR −0.66 BLIND SPOT]'}
-                        </span>
-                      </span>
-                    );
-                  })()}
-
-                  {/* Volcano Node Telemetry Badge */}
-                  {(() => {
-                    const v = getVolcanoTelemetryForNode(leadItem.node_id, leadItem.headline, leadItem.ministry);
-                    if (!v || v.volcano_status !== 'ERUPTING') return null;
-                    return (
-                      <span
-                        className="px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider rounded-xs border flex items-center gap-1.5 bg-rose-950/70 text-rose-300 border-rose-500/60 shadow-xs"
-                        title={`Volcano Node: ${v.title} (${v.years_dormant}-yr drought rebound)`}
-                      >
-                        <Flame className="w-3 h-3 text-rose-400 animate-pulse" />
-                        <span>VOLCANO V_j: {v.volcano_index.toFixed(1)} // {v.years_dormant}-YR REBOUND</span>
-                      </span>
-                    );
-                  })()}
-
-                  {/* Clickable Policy Ripple Pill */}
-                  {(() => {
-                    const chain = matchDispatchToPolicyChain(leadItem.headline, leadItem.ministry, leadItem.summary?.bullets?.join(' '), leadItem.chain_id);
-                    if (!chain) return null;
-                    return (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const targetUrl = `/observatory?tab=ripple&chain=${chain.chain_id}`;
-                          window.history.pushState(null, '', targetUrl);
-                          window.dispatchEvent(new PopStateEvent('popstate'));
-                        }}
-                        className="px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider rounded-xs border flex items-center gap-1.5 bg-[rgba(1,148,168,0.2)] text-[#5fe3f5] hover:bg-[rgba(1,148,168,0.35)] hover:text-white border-[rgba(1,148,168,0.5)] transition-colors cursor-pointer shadow-xs"
-                        title={`Deep-link to Policy Ripple Radar: ${chain.title}`}
-                      >
-                        <GitFork className="w-3 h-3 text-[#0194a8]" />
-                        <span>[RIPPLE r{leadItem.ring_depth ?? 2} // {chain.title.toUpperCase()} → VIEW CHAIN]</span>
-                      </button>
-                    );
-                  })()}
-                </div>
-
-                {leadItem.created_at && (
-                  <span className="text-[11px] font-mono text-[#8fa2bd] flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-[#0194a8]" />
-                    {new Date(leadItem.created_at).toLocaleDateString('en-GB', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric',
-                    })}
-                  </span>
-                )}
+          {standardItems.length > 0 && (
+            <section aria-labelledby="latest-briefs-heading">
+              <div className="news-signal-feed-heading">
+                <h2 id="latest-briefs-heading">More briefs <span>({standardItems.length})</span></h2>
+                <span>Latest first</span>
               </div>
-
-              {/* Lead Headline */}
-              <motion.h2
-                layoutId={`dossier-headline-${leadItem.id}`}
-                onClick={() => setSelectedDossier(leadItem)}
-                className="font-serif text-xl sm:text-2xl md:text-2xl lg:text-3xl font-bold text-[#e8e0cf] group-hover:text-[#e0d0ab] transition-colors leading-tight mb-4 cursor-pointer"
-              >
-                {leadItem.headline}
-              </motion.h2>
-
-              {/* Curated Bullets */}
-              {leadItem.summary?.bullets && leadItem.summary.bullets.length > 0 && (
-                <div className="space-y-2 mb-4 max-w-4xl">
-                  {leadItem.summary.bullets.slice(0, 3).map((bullet, idx) => {
-                    const claim = (leadItem.summary?.claims || []).find((c) => c.text?.trim() === bullet?.trim()) || (leadItem.summary?.claims || [])[idx];
-                    return (
-                      <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#9fb0c8] font-sans leading-relaxed">
-                        <span className="text-[#0194a8] font-bold mt-0.5 select-none text-[11px]">&bull;</span>
-                        <div className="flex-1 min-w-0">
-                          <span>{bullet}</span>
-                          {claim && <span className="inline-block ml-1.5 align-middle"><SourceAnchor claim={claim} /></span>}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Contested claim comparison */}
-              <ContestedCard contested={leadItem.summary?.contested} />
-
-              {/* Historical UPSC Twin (Alt + 6) Collapsible Drawer */}
-              {(() => {
-                const op = getDispatchOperator(leadItem);
-                const twin = leadItem.historical_twin || HISTORICAL_TWIN_VAULT[op];
-                if (!twin) return null;
-                const isOpen = expandedTwinId === (leadItem.id || 'lead');
-                return (
-                  <div className="mt-4 pt-3 border-t border-[rgba(19,108,153,0.3)]">
-                    <button
-                      onClick={() => setExpandedTwinId(isOpen ? null : (leadItem.id || 'lead'))}
-                      className="w-full flex items-center justify-between text-xs font-mono text-[#e0d0ab] hover:text-white py-1 transition-colors cursor-pointer"
-                    >
-                      <span className="flex items-center gap-2">
-                        <ShieldAlert className="w-3.5 h-3.5 text-[#0194a8]" />
-                        <span className="font-semibold uppercase tracking-wider">Historical UPSC Twin (Alt + 6)</span>
-                        <span className="text-[10px] px-1.5 py-0.2 bg-[rgba(11,61,120,0.5)] rounded text-[#8fa2bd]">Prelims {twin.year}</span>
-                      </span>
-                      <span className="flex items-center gap-1 text-[10px] text-[#8fa2bd]">
-                        <span>{isOpen ? 'Fold Twin' : 'Inspect Twin Trap'}</span>
-                        <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-                      </span>
-                    </button>
-                    <AnimatePresence>
-                      {isOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          className="overflow-hidden mt-2 p-3.5 bg-[rgba(2,15,35,0.75)] border border-[rgba(19,108,153,0.4)] rounded-xs space-y-2 text-xs"
-                        >
-                          <div className="font-serif text-[#d6e2f0] leading-relaxed italic">
-                            "{twin.stem}"
-                          </div>
-                          <div className="flex flex-wrap items-center gap-2 pt-1 font-mono text-[10px] text-[#8fa2bd]">
-                            <span className="text-[#e0d0ab] font-bold">STATUTORY ANCHOR:</span>
-                            <span className="text-[#9fb0c8]">{(twin as any).statutory_anchor || (twin as any).anchor}</span>
-                          </div>
-                          <div className="text-[11px] font-mono text-amber-300/90 bg-amber-950/30 p-2 rounded border border-amber-900/40">
-                            <span className="font-bold uppercase tracking-wider text-amber-400">Examiner Trap Takeaway: </span>
-                            {(twin as any).takeaway || 'UPSC systematically exploits this structural polarity to trip speed-reading aspirants.'}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                );
-              })()}
-
-              {/* Footer Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-[rgba(19,108,153,0.35)] font-sans">
-                <div className="flex items-center gap-4">
-                  <motion.button
-                    onClick={() => toggleBookmark(leadItem.id || '')}
-                    disabled={savingArticleIds.has(leadItem.id || '')}
-                    whileTap={prefersReducedMotion ? undefined : { scale: 0.8 }}
-                    className={`inline-flex items-center gap-1.5 text-xs font-mono font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
-                      savedArticleIds.has(leadItem.id || '')
-                        ? 'text-emerald-400 hover:text-emerald-300'
-                        : 'text-[#8fa2bd] hover:text-[#e0d0ab]'
-                    }`}
-                  >
-                    <motion.span
-                      key={savedArticleIds.has(leadItem.id || '') ? 'on' : 'off'}
-                      initial={prefersReducedMotion ? undefined : { scale: 0.6 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: 'spring', stiffness: 500, damping: 15 }}
-                      className="inline-flex"
-                    >
-                      <Bookmark
-                        className={`w-4 h-4 ${
-                          savedArticleIds.has(leadItem.id || '') ? 'fill-emerald-400 text-emerald-400' : 'text-current'
-                        }`}
-                      />
-                    </motion.span>
-                    <span>{savedArticleIds.has(leadItem.id || '') ? 'Saved to Ledger' : 'Save Brief'}</span>
-                  </motion.button>
-
-                  <button
-                    onClick={() => setSelectedDossier(leadItem)}
-                    className="text-xs font-mono text-[#8fa2bd] hover:text-white transition-colors cursor-pointer flex items-center gap-1"
-                  >
-                    <span>Read Full Brief</span>
-                    <ChevronRight className="w-3.5 h-3.5 text-[#0194a8]" />
-                  </button>
-
-                  <button
-                    onClick={(e) => handleShareArticle(leadItem, e)}
-                    className="text-xs font-mono text-[#8fa2bd] hover:text-[#e0d0ab] transition-colors cursor-pointer flex items-center gap-1.5"
-                    title="Copy shareable link for Telegram / WhatsApp"
-                  >
-                    <Share2 className="w-3.5 h-3.5 text-[#e0d0ab]" />
-                    <span>Share Signal</span>
-                  </button>
-                </div>
-
-                {leadItem.url && (
-                  <a
-                    href={leadItem.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-mono text-[#e0d0ab] hover:underline cursor-pointer"
-                  >
-                    <span>Gov Source</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </a>
+              <NewsSignalGrid>
+                {standardItems.map((item, index) =>
+                  renderSignalCard(item, item.id || item.url || `item-${index}`)
                 )}
-              </div>
-            </motion.div>
+              </NewsSignalGrid>
+            </section>
           )}
-
-          {/* 2. CHRONOLOGICAL GAZETTE FEED */}
-          <div>
-            <div className="flex items-center justify-between border-b border-[rgba(19,108,153,0.35)] pb-3 mb-6 font-sans">
-              <h3 className="font-serif text-sm font-bold tracking-tight text-[#e0d0ab] flex items-center gap-2">
-                <Layers className="w-3.5 h-3.5 text-[#0194a8]" />
-                <span>Latest Briefs <span className="font-mono">({displayedItems.length})</span></span>
-              </h3>
-              <span className="text-[10px] font-mono text-[#8fa2bd]">
-                Page <span className="font-mono">{page + 1}</span> &bull; Sorted by Recency
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 font-sans">
-              {standardItems.map((item, idx) => {
-                const articleId = item.id || `item-${idx}`;
-                const isSaved = savedArticleIds.has(articleId);
-
-                return (
-                  <motion.div
-                    key={articleId}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    whileHover={prefersReducedMotion ? undefined : { y: -4, scale: 1.012 }}
-                    whileTap={prefersReducedMotion ? undefined : { scale: 0.985 }}
-                    transition={{ delay: Math.min(idx * 0.03, 0.3), type: 'spring', stiffness: 340, damping: 30 }}
-                    className="bg-[rgba(4,25,54,0.7)] hover:bg-[rgba(7,36,75,0.8)] border border-[rgba(19,108,153,0.35)] hover:border-[#e0d0ab]/50 p-5 rounded-xs flex flex-col justify-between transition-all duration-200 group backdrop-blur-xl shadow-md"
-                  >
-                    <div>
-                      {/* Meta Tags */}
-                      <div className="flex items-center justify-between gap-2 mb-3 font-sans">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="px-2.5 py-0.5 bg-[rgba(11,61,120,0.3)] text-[#e0d0ab] text-xs font-sans rounded-md border border-[rgba(19,108,153,0.35)] truncate max-w-[180px]">
-                            {item.ministry}
-                          </span>
-                          {item.source?.toUpperCase().includes('HINDU') ? (
-                            <span className="inline-flex items-center px-2 py-0.5 bg-surface-elevated/90 border border-border rounded-sm text-primary" title="The Hindu — National Newspaper of Record">
-                              <TheHinduLogo height={10} color="#ffffff" />
-                            </span>
-                          ) : item.source?.toUpperCase().includes('PIB') ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-surface-elevated/90 border border-border rounded-sm text-[#e0d0ab]" title="Press Information Bureau">
-                              <PibLogo size={13} />
-                              <span className="text-[9px] font-mono font-bold">PIB</span>
-                            </span>
-                          ) : (
-                            <span className="px-2 py-0.5 bg-surface-elevated/80 text-secondary text-[10px] font-mono rounded-sm border border-border">
-                              {item.source}
-                            </span>
-                          )}
-                          <GroundingBadge
-                            grounding={item.summary?.grounding}
-                            verificationMethod={item.summary?.verification_method}
-                            headline={item.headline}
-                            source={item.source}
-                            sourceUrl={item.url}
-                            claims={item.summary?.claims}
-                            onClick={() =>
-                              setGroundingExplainerData({
-                                isOpen: true,
-                                grounding: item.summary?.grounding,
-                                headline: item.headline,
-                                source: item.source,
-                                sourceUrl: item.url,
-                                claims: item.summary?.claims || [],
-                              })
-                            }
-                          />
-                          {candidatePreferences && (() => {
-                            const syn = matchOptionalRelevance(item.headline, item.summary?.bullets, candidatePreferences.optionalSubject);
-                            if (syn.matches) {
-                              return (
-                                <span className="px-2 py-0.5 bg-[rgba(224,208,171,0.15)] text-[#e0d0ab] border border-[rgba(224,208,171,0.35)] text-xs font-sans font-semibold rounded-md flex items-center gap-1 shrink-0 shadow-xs">
-                                  <Target className="w-3 h-3 text-[#34d399]" />
-                                  <span>{syn.optionalName} Anchor</span>
-                                </span>
-                              );
-                            }
-                            return null;
-                          })()}
-
-                          {/* Examiner Trap Vector Badge */}
-                          {(() => {
-                            const op = getDispatchOperator(item);
-                            const opMeta = EXAMINER_OPERATORS[op];
-                            const isBlindSpot = isPersonalBlindSpot(op);
-                            return (
-                              <span
-                                className={`px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider rounded-xs border flex items-center gap-1 shrink-0 ${
-                                  isBlindSpot
-                                    ? 'bg-amber-950/70 text-amber-300 border-amber-500/60'
-                                    : 'bg-[rgba(1,148,168,0.12)] text-[#5fe3f5] border-[rgba(1,148,168,0.35)]'
-                                }`}
-                                title={opMeta?.description}
-                              >
-                                <Crosshair className={`w-2.5 h-2.5 ${isBlindSpot ? 'text-amber-400' : 'text-[#0194a8]'}`} />
-                                <span>{opMeta?.code || op}{isBlindSpot ? ' • BLIND SPOT' : ''}</span>
-                              </span>
-                            );
-                          })()}
-
-                          {/* Volcano Telemetry Badge */}
-                          {(() => {
-                            const v = getVolcanoTelemetryForNode(item.node_id, item.headline, item.ministry);
-                            if (!v || v.volcano_status !== 'ERUPTING') return null;
-                            return (
-                              <span
-                                className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider rounded-xs border flex items-center gap-1 bg-rose-950/70 text-rose-300 border-rose-500/60 shrink-0"
-                                title={`Volcano Node: ${v.title} (${v.years_dormant}-yr drought rebound)`}
-                              >
-                                <Flame className="w-2.5 h-2.5 text-rose-400 animate-pulse" />
-                                <span>VOLCANO V_j: {v.volcano_index.toFixed(1)}</span>
-                              </span>
-                            );
-                          })()}
-
-                          {/* Clickable Policy Ripple Pill */}
-                          {(() => {
-                            const chain = matchDispatchToPolicyChain(item.headline, item.ministry, item.summary?.bullets?.join(' '), item.chain_id);
-                            if (!chain) return null;
-                            return (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const targetUrl = `/observatory?tab=ripple&chain=${chain.chain_id}`;
-                                  window.history.pushState(null, '', targetUrl);
-                                  window.dispatchEvent(new PopStateEvent('popstate'));
-                                }}
-                                className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider rounded-xs border flex items-center gap-1 bg-[rgba(1,148,168,0.2)] text-[#5fe3f5] hover:bg-[rgba(1,148,168,0.35)] hover:text-white border-[rgba(1,148,168,0.5)] transition-colors cursor-pointer shrink-0"
-                                title={`Deep-link to Policy Ripple Radar: ${chain.title}`}
-                              >
-                                <GitFork className="w-2.5 h-2.5 text-[#0194a8]" />
-                                <span>[RIPPLE r{item.ring_depth ?? 2} // {chain.title.toUpperCase()}]</span>
-                              </button>
-                            );
-                          })()}
-                        </div>
-                        {item.created_at && (
-                          <span className="text-xs font-sans text-[#8fa2bd]">
-                            {new Date(item.created_at).toLocaleDateString('en-GB', {
-                              day: '2-digit',
-                              month: 'short',
-                              year: 'numeric',
-                            })}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Headline */}
-                      <motion.h4
-                        layoutId={`dossier-headline-${articleId}`}
-                        onClick={() => setSelectedDossier(item)}
-                        className="font-serif text-sm font-bold text-[#e8e0cf] group-hover:text-[#e0d0ab] transition-colors leading-snug mb-3 cursor-pointer"
-                      >
-                        {item.headline}
-                      </motion.h4>
-
-                      {/* Summary bullets */}
-                      {item.summary?.bullets && item.summary.bullets.length > 0 && (
-                        <ul className="space-y-1.5 mb-3">
-                          {item.summary.bullets.slice(0, 2).map((b, bIdx) => {
-                            const claim = (item.summary?.claims || []).find((c) => c.text?.trim() === b?.trim()) || (item.summary?.claims || [])[bIdx];
-                            return (
-                              <li key={bIdx} className="text-xs text-[#9fb0c8] font-sans leading-relaxed flex items-start gap-2">
-                                <span className="text-[#0194a8] font-bold mt-0.5 select-none text-[10px]">•</span>
-                                <div className="flex-1 min-w-0">
-                                  <span className="line-clamp-2 inline">{b}</span>
-                                  {claim && <span className="inline-block ml-1.5 align-middle"><SourceAnchor claim={claim} /></span>}
-                                </div>
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      )}
-
-                      {/* Contested claim comparison */}
-                      <ContestedCard contested={item.summary?.contested} />
-
-                      {/* Collapsible Historical UPSC Twin */}
-                      {(() => {
-                        const op = getDispatchOperator(item);
-                        const twin = item.historical_twin || HISTORICAL_TWIN_VAULT[op];
-                        if (!twin) return null;
-                        const isOpen = expandedTwinId === articleId;
-                        return (
-                          <div className="mt-2.5 pt-2 border-t border-[rgba(19,108,153,0.25)]">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setExpandedTwinId(isOpen ? null : articleId);
-                              }}
-                              className="w-full flex items-center justify-between text-[10px] font-mono text-[#8fa2bd] hover:text-[#e0d0ab] transition-colors cursor-pointer"
-                            >
-                              <span className="flex items-center gap-1">
-                                <ShieldAlert className="w-3 h-3 text-[#0194a8]" />
-                                <span>Historical Twin ({twin.year})</span>
-                              </span>
-                              <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-                            </button>
-                            <AnimatePresence>
-                              {isOpen && (
-                                <motion.div
-                                  initial={{ opacity: 0, height: 0 }}
-                                  animate={{ opacity: 1, height: 'auto' }}
-                                  exit={{ opacity: 0, height: 0 }}
-                                  className="overflow-hidden mt-1.5 p-2 bg-[rgba(2,15,35,0.7)] border border-[rgba(19,108,153,0.3)] rounded-xs space-y-1.5 text-[11px]"
-                                >
-                                  <div className="font-serif text-[#d6e2f0] italic leading-tight">
-                                    "{twin.stem}"
-                                  </div>
-                                  <div className="text-[10px] font-mono text-amber-300/90 bg-amber-950/20 p-1.5 rounded border border-amber-900/30">
-                                    <span className="font-semibold text-amber-400">Takeaway: </span>
-                                    {(twin as any).takeaway || 'UPSC structural trap vector.'}
-                                  </div>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        );
-                      })()}
-                    </div>
-
-                    {/* Action Bar */}
-                    <div className="flex items-center justify-between pt-3 border-t border-[rgba(19,108,153,0.3)] text-xs font-sans">
-                      <motion.button
-                        onClick={() => toggleBookmark(articleId)}
-                        disabled={savingArticleIds.has(articleId)}
-                        whileTap={prefersReducedMotion ? undefined : { scale: 0.8 }}
-                        className={`inline-flex items-center gap-1 font-mono text-[11px] font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
-                          isSaved ? 'text-emerald-400' : 'text-[#8fa2bd] hover:text-[#e0d0ab]'
-                        }`}
-                      >
-                        <motion.span
-                          key={isSaved ? 'on' : 'off'}
-                          initial={prefersReducedMotion ? undefined : { scale: 0.6 }}
-                          animate={{ scale: 1 }}
-                          transition={{ type: 'spring', stiffness: 500, damping: 15 }}
-                          className="inline-flex"
-                        >
-                          <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-emerald-400' : ''}`} />
-                        </motion.span>
-                        <span>{isSaved ? 'Saved' : 'Save'}</span>
-                      </motion.button>
-
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => setSelectedDossier(item)}
-                          className="font-mono text-[11px] text-[#8fa2bd] hover:text-white transition-colors cursor-pointer"
-                        >
-                          Full Brief
-                        </button>
-                        <button
-                          onClick={(e) => handleShareArticle(item, e)}
-                          className="font-mono text-[11px] text-[#8fa2bd] hover:text-[#e0d0ab] transition-colors cursor-pointer flex items-center gap-1"
-                          title="Copy shareable link"
-                        >
-                          <Share2 className="w-3 h-3 text-[#e0d0ab]" />
-                          <span>Share</span>
-                        </button>
-                        {item.url && (
-                          <a
-                            href={item.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="font-mono text-[11px] text-[#e0d0ab] hover:underline flex items-center gap-0.5 cursor-pointer"
-                          >
-                            <span>Source</span>
-                            <ArrowUpRight className="w-3 h-3" />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
 
           {/* ── Pagination ── */}
           {hasMore && (
