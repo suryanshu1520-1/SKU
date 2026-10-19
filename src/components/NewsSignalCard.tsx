@@ -5,6 +5,8 @@ import type { CurrentAffairsItem } from './CurrentAffairs';
 import { ContestedCard, GroundingBadge, SourceAnchor } from './TrustUI';
 import './NewsSignalCard.css';
 
+const DISCLOSURE_DURATION = { open: 320, close: 260 };
+
 export interface NewsSignalCardProps {
   item: CurrentAffairsItem;
   articleId: string;
@@ -73,6 +75,7 @@ export default function NewsSignalCard({
       const previous = animationsRef.current;
       const shouldAnimate = mountedRef.current && !reducedMotion
         && typeof frame.animate === 'function' && Math.abs(fromHeight - targetHeight) > 0.5;
+      const duration = contextOpen ? DISCLOSURE_DURATION.open : DISCLOSURE_DURATION.close;
 
       if (!contextOpen && frame.contains(document.activeElement)) toggleRef.current?.focus({ preventScroll: true });
 
@@ -82,7 +85,7 @@ export default function NewsSignalCard({
       if (shouldAnimate) {
         card.dispatchEvent(new CustomEvent('news-signal-resize', {
           bubbles: true,
-          detail: { height: baseHeight + targetHeight, duration: contextOpen ? 220 : 180 },
+          detail: { height: baseHeight + targetHeight, duration },
         }));
       }
       if (previous) {
@@ -96,7 +99,6 @@ export default function NewsSignalCard({
         return;
       }
 
-      const duration = contextOpen ? 220 : 180;
       const easing = 'cubic-bezier(0.16, 1, 0.3, 1)';
       frame.style.height = `${targetHeight}px`;
       const height = frame.animate([
@@ -104,7 +106,7 @@ export default function NewsSignalCard({
       ], { duration, easing });
       const opacity = content.animate([
         { opacity: fromHeight < 1 ? 0 : fromOpacity }, { opacity: contextOpen ? 1 : 0 },
-      ], { duration: contextOpen ? 140 : 120, easing, fill: 'forwards' });
+      ], { duration: contextOpen ? 200 : 160, easing, fill: 'forwards' });
       animationsRef.current = { height, opacity };
       height.onfinish = () => {
         if (animationsRef.current?.height !== height) return;

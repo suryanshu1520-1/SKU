@@ -147,7 +147,7 @@ export default function NewsSignalGrid({ children }: { children: ReactNode }) {
       const detail = (event as CustomEvent<SignalResizeDetail>).detail;
       if (!card || !detail || !Number.isFinite(detail.height) || detail.height <= 0) return;
       targetHeights.set(card, detail.height);
-      pack(Number.isFinite(detail.duration) ? Math.max(0, Math.min(detail.duration, 1000)) : 220);
+      pack(Number.isFinite(detail.duration) ? Math.max(0, Math.min(detail.duration, 1000)) : 320);
     };
 
     const onResizeEnd = (event: Event) => {
