@@ -5,6 +5,8 @@ universe: live
 ---
 
 > **Correction (2026-08-19, post-P2):** The "four parallel `current_affairs` paths" described in §3 are **superseded** — P2 consolidated them into ONE module, [`server-lib/cron/ingest/`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/server-lib/cron/ingest) (`runIngest()`, three tiers: gather → cluster → synthesize). Relevance/testability now lives in the new [[syllabus-testability-graph]] subsystem. Read §3 below as historical, not current.
+>
+> **Update (2026-10-19):** Article-specific exam insights (`summary.exam_insights`, schema_version 1) integrated across `synthesize.ts` and `orchestrator.ts`. The synthetic primary-source shortcut (`quotes: [b]`) is eliminated; all claims require genuine span verification against source sentences. Consumed via shared display resolver [`src/lib/article-exam-insights.ts`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/src/lib/article-exam-insights.ts).
 
 # Object: Ingestion Pipeline (`current_affairs`, `pib_digests`, RSS Scrapers, LLM Distillation)
 

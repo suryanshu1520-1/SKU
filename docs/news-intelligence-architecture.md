@@ -193,3 +193,23 @@ Matches the design system exactly (accent `#e0d0ab`, serif headlines / sans body
 2. ✅ Ingestion backend implemented in `server-lib/cron/ingest/` (`significance.ts`, `synthesize.ts`, `mcq.ts`, `mcq-db.ts`, `orchestrator.ts`).
 3. ✅ Full contract support for `summary.significance`, `summary.tags`, `summary.prelims`, `summary.mains`, `summary.sources`, `summary.cluster_size`, `summary.edition_date`, and `summary.has_quiz`.
 4. ✅ Typecheck verified cleanly with `npm run lint`.
+
+---
+
+## Article-Specific Exam Insights (`summary.exam_insights`) — Implemented (2026-10-19)
+
+Replaced generic examiner operator descriptions (`EXAMINER_OPERATORS[operator].description`) with genuine, article-specific testable facts ("What to remember") and conditions ("Read carefully").
+
+1. **Shared Contract (`src/lib/article-exam-insights.ts`)**:
+   - `ArticleExamInsights` (schema_version 1): 1–3 non-redundant facts (`mechanism`, `institution`, `scope`, `metric`, `legal`) with exact evidence references (`source_url`, `source_fingerprint`, `span_id`, verbatim `quote`).
+   - Pure display resolver `resolveArticleExamInsights(item)`: consumes `summary.exam_insights`. Fails closed to `{ status: 'empty' }` if unsupported, never fabricating classifier descriptions.
+2. **Provenance Hardening**:
+   - Eliminated synthetic self-quotation (`quotes: [b]`) in `server-lib/cron/ingest/orchestrator.ts`. Sovereign primary sources and wires alike must pass cite-or-drop against real sentence spans (`verify.ts`).
+3. **Ingestion Threading**:
+   - `synthesize.ts` requests `exam_insights` within existing $0 bounded prompts; validates spans and figures before assembly.
+   - `orchestrator.ts` persists `summary.exam_insights`.
+4. **Surfaces**:
+   - `NewsSignalCard.tsx`: Expanded card disclosure renders "What to remember" + "Read carefully" distinction, preserving 320ms/260ms masonry resizing.
+   - `PolicyBrief.tsx`: "Study connections" and "Mains analysis" consume the shared resolver, completely eliminating canned blueprint boilerplate.
+5. **Legacy Enrichment & Rollback**:
+   - `scripts/enrich-exam-insights.ts` provides dry-run by default, idempotent execution, and non-destructive JSONB patching preserving creation timestamps, publication dates, and bookmarks.
