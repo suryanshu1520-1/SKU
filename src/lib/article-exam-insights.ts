@@ -87,7 +87,7 @@ const VALID_OPERATORS = new Set<string>([
 ]);
 
 function normalizeQuote(s: string): string {
-  return s.trim().toLowerCase().replace(/\s+/g, ' ');
+  return s.trim().toLowerCase().replace(/[.!?।॥,;:"'“”‘’]/g, '').replace(/\s+/g, ' ');
 }
 
 export interface ValidationContext {
@@ -269,7 +269,7 @@ export function validateArticleExamInsights(
     generated_at: String(raw.generated_at),
     status: 'ready',
     facts: validatedFacts,
-    distinction: validatedDistinction,
+    ...(validatedDistinction ? { distinction: validatedDistinction } : {}),
   };
 }
 

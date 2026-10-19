@@ -17,7 +17,7 @@
     "lint:web": "tsc --noEmit",
     "lint:api": "tsc -p api/tsconfig.json --noEmit",
     "lint": "npm run lint:web && npm run lint:api",
-    "test": "tsx --test scripts/test-rebase-contract.ts src/lib/vulnerabilityIndex.test.ts scripts/tests/examiner_psyche.test.ts && npm run test:exam && npm run test:qbank",
+    "test": "tsx --test scripts/test-rebase-contract.ts src/lib/vulnerabilityIndex.test.ts scripts/tests/examiner_psyche.test.ts scripts/tests/article-exam-insights.test.ts && npm run test:exam && npm run test:qbank",
     "test:exam": "tsx --test scripts/exam-tests/grading.test.ts scripts/exam-tests/assemble.test.ts scripts/exam-tests/sanitize.test.ts scripts/exam-tests/clock.test.ts scripts/exam-tests/sheetReducer.test.ts scripts/exam-tests/itemLayout.test.ts scripts/exam-tests/interpret.test.ts scripts/exam-tests/sessionHelpers.test.ts",
     "test:qbank": "tsx --test scripts/qbank-tests/validators.test.ts"
   },
