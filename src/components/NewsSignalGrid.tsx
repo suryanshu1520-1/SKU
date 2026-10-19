@@ -116,6 +116,8 @@ export default function NewsSignalGrid({ children }: { children: ReactNode }) {
     });
 
     const reconcileCards = () => {
+      // Filtering/pagination can move otherwise unchanged cards outside a resize transaction.
+      cancelAnimations();
       const nextCards = Array.from(grid.children).filter((child): child is HTMLElement => child instanceof HTMLElement);
       cards.forEach(card => {
         if (nextCards.includes(card)) return;
