@@ -216,34 +216,34 @@ export default function NewsSignalCard({
       </div>
 
       <div ref={frameRef} className="news-signal__disclosure" id={contextId} aria-hidden={!contextOpen} inert={!contextOpen}>
-      <div ref={contentRef} className="news-signal__context">
-        <div className="news-signal__provenance">
-          {item.ministry && <p className="news-signal__ministry">{item.ministry}</p>}
-          <div className="news-signal__grounding">
-            <GroundingBadge
-              grounding={item.summary?.grounding}
-              verificationMethod={item.summary?.verification_method}
-              headline={item.headline}
-              source={item.source}
-              sourceUrl={item.url}
-              claims={item.summary?.claims}
-              onClick={onGrounding}
-            />
+        <div ref={contentRef} className="news-signal__context">
+          <div className="news-signal__provenance">
+            {item.ministry && <p className="news-signal__ministry">{item.ministry}</p>}
+            <div className="news-signal__grounding">
+              <GroundingBadge
+                grounding={item.summary?.grounding}
+                verificationMethod={item.summary?.verification_method}
+                headline={item.headline}
+                source={item.source}
+                sourceUrl={item.url}
+                claims={item.summary?.claims}
+                onClick={onGrounding}
+              />
+            </div>
+          </div>
+          <div className="news-signal__exam-content">{examContext}</div>
+          <div className="news-signal__context-actions">
+            {saved && (
+              <span className="news-signal__saved-note">
+                <Check size={14} aria-hidden="true" /> Saved for revision
+              </span>
+            )}
+            <button className="news-signal__share" type="button" onClick={onShare}>
+              <Share2 size={15} strokeWidth={1.6} aria-hidden="true" />
+              Share article
+            </button>
           </div>
         </div>
-        <div className="news-signal__exam-content">{examContext}</div>
-        <div className="news-signal__context-actions">
-          {saved && (
-            <span className="news-signal__saved-note">
-              <Check size={14} aria-hidden="true" /> Saved for revision
-            </span>
-          )}
-          <button className="news-signal__share" type="button" onClick={onShare}>
-            <Share2 size={15} strokeWidth={1.6} aria-hidden="true" />
-            Share article
-          </button>
-        </div>
-      </div>
       </div>
     </article>
   );
