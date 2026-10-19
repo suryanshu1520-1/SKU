@@ -1,4 +1,5 @@
-import React, { useId } from 'react';
+import React, { useId, useLayoutEffect, useRef } from 'react';
+import { useReducedMotion } from 'motion/react';
 import { ArrowUpRight, Bookmark, Check, ChevronDown, Share2 } from 'lucide-react';
 import type { CurrentAffairsItem } from './CurrentAffairs';
 import { ContestedCard, GroundingBadge, SourceAnchor } from './TrustUI';
@@ -35,6 +36,13 @@ export default function NewsSignalCard({
   examContext,
 }: NewsSignalCardProps) {
   const instanceId = useId();
+  const cardRef = useRef<HTMLElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const mountedRef = useRef(false);
+  const animationsRef = useRef<{ height: Animation; opacity: Animation } | null>(null);
+  const reducedMotion = useReducedMotion();
   const contextId = `news-context-${instanceId}`;
   const headlineId = `news-headline-${instanceId}`;
   const Heading = lead ? 'h2' : 'h3';
@@ -42,8 +50,91 @@ export default function NewsSignalCard({
   const validDate = date && Number.isFinite(date.getTime()) ? date : null;
   const bullets = item.summary?.bullets?.slice(0, lead ? 2 : 1) || [];
 
+  useLayoutEffect(() => {
+    const card = cardRef.current;
+    const frame = frameRef.current;
+    const content = contentRef.current;
+    if (!card || !frame || !content) return;
+    let targetHeight = 0;
+
+    const settle = () => {
+      frame.style.height = contextOpen ? 'auto' : '0px';
+      frame.hidden = !contextOpen;
+      content.style.opacity = '1';
+      card.dispatchEvent(new CustomEvent('news-signal-resize-end', { bubbles: true }));
+    };
+
+    const resize = () => {
+      const fromHeight = frame.hidden ? 0 : frame.getBoundingClientRect().height;
+      const fromOpacity = Number.parseFloat(getComputedStyle(content).opacity);
+      frame.hidden = false;
+      targetHeight = contextOpen ? content.getBoundingClientRect().height : 0;
+      const baseHeight = card.getBoundingClientRect().height - fromHeight;
+      const previous = animationsRef.current;
+      const shouldAnimate = mountedRef.current && !reducedMotion
+        && typeof frame.animate === 'function' && Math.abs(fromHeight - targetHeight) > 0.5;
+
+      if (!contextOpen && frame.contains(document.activeElement)) toggleRef.current?.focus({ preventScroll: true });
+
+      // Reserve the final masonry space once. Neighbours can then move on the compositor
+      // while only this disclosure's clipped height changes during the reveal.
+      frame.style.height = `${fromHeight}px`;
+      if (shouldAnimate) {
+        card.dispatchEvent(new CustomEvent('news-signal-resize', {
+          bubbles: true,
+          detail: { height: baseHeight + targetHeight, duration: contextOpen ? 220 : 180 },
+        }));
+      }
+      if (previous) {
+        previous.height.onfinish = null;
+        previous.height.cancel();
+        previous.opacity.cancel();
+        animationsRef.current = null;
+      }
+      if (!shouldAnimate) {
+        settle();
+        return;
+      }
+
+      const duration = contextOpen ? 220 : 180;
+      const easing = 'cubic-bezier(0.16, 1, 0.3, 1)';
+      frame.style.height = `${targetHeight}px`;
+      const height = frame.animate([
+        { height: `${fromHeight}px` }, { height: `${targetHeight}px` },
+      ], { duration, easing });
+      const opacity = content.animate([
+        { opacity: fromHeight < 1 ? 0 : fromOpacity }, { opacity: contextOpen ? 1 : 0 },
+      ], { duration: contextOpen ? 140 : 120, easing, fill: 'forwards' });
+      animationsRef.current = { height, opacity };
+      height.onfinish = () => {
+        if (animationsRef.current?.height !== height) return;
+        animationsRef.current = null;
+        opacity.cancel();
+        settle();
+      };
+    };
+
+    resize();
+    mountedRef.current = true;
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(() => {
+      if (contextOpen && Math.abs(content.getBoundingClientRect().height - targetHeight) > 0.5) resize();
+    });
+    observer?.observe(content);
+    return () => observer?.disconnect();
+  }, [contextOpen, reducedMotion]);
+
+  useLayoutEffect(() => () => {
+    const current = animationsRef.current;
+    if (current) {
+      current.height.onfinish = null;
+      current.height.cancel();
+      current.opacity.cancel();
+    }
+  }, []);
+
   return (
     <article
+      ref={cardRef}
       className={`news-signal${lead ? ' news-signal--lead' : ''}`}
       aria-labelledby={headlineId}
       data-article-id={articleId}
@@ -112,6 +203,7 @@ export default function NewsSignalCard({
           <ArrowUpRight size={17} strokeWidth={1.6} aria-hidden="true" />
         </button>
         <button
+          ref={toggleRef}
           className="news-signal__context-toggle"
           type="button"
           aria-expanded={contextOpen}
@@ -123,7 +215,8 @@ export default function NewsSignalCard({
         </button>
       </div>
 
-      <div className="news-signal__context" id={contextId} hidden={!contextOpen}>
+      <div ref={frameRef} className="news-signal__disclosure" id={contextId} aria-hidden={!contextOpen} inert={!contextOpen}>
+      <div ref={contentRef} className="news-signal__context">
         <div className="news-signal__provenance">
           {item.ministry && <p className="news-signal__ministry">{item.ministry}</p>}
           <div className="news-signal__grounding">
@@ -150,6 +243,7 @@ export default function NewsSignalCard({
             Share article
           </button>
         </div>
+      </div>
       </div>
     </article>
   );
