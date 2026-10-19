@@ -404,6 +404,47 @@
   margin: 4px 0 0;
 }
 
+.news-signal__insights-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.news-signal__insight-item {
+  position: relative;
+  line-height: 1.55;
+  color: var(--signal-body);
+}
+
+.news-signal__insight-label {
+  color: var(--signal-heading);
+  font-weight: 500;
+}
+
+.news-signal__evidence-tag {
+  display: inline-block;
+  margin-left: 6px;
+  color: var(--signal-muted);
+  font-size: 11px;
+  cursor: help;
+}
+
+.news-signal__insight-distinction {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-left: 2px solid var(--signal-accent);
+  background: rgba(224, 208, 171, 0.05);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--signal-body);
+}
+
+.news-signal__insight-distinction strong {
+  color: var(--signal-accent);
+}
+
 .news-signal__context-link {
   display: inline-flex;
   align-items: center;
