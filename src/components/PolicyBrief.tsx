@@ -2,9 +2,10 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowUpRight, Bookmark, BookOpen, ChevronDown, ExternalLink, Share2, ShieldCheck, Target, X, ShieldAlert, Flame, GitFork } from 'lucide-react';
-import { getDispatchOperator, type CurrentAffairsItem, type ParsedSyllabusTag } from './CurrentAffairs';
+import { type CurrentAffairsItem, type ParsedSyllabusTag } from './CurrentAffairs';
 import { matchDispatchToPolicyChain, getVolcanoTelemetryForNode } from '../lib/policy-ripple-radar-shared';
-import { EXAMINER_OPERATORS, type ExaminerOperatorType } from '../types';
+import { EXAMINER_OPERATORS } from '../types';
+import { resolveArticleExamInsights } from '../lib/article-exam-insights';
 import { ContestedCard, SourceAnchor } from './TrustUI';
 import { TheHinduLogo, PibLogo } from './SourceLogos';
 import { getCanonicalArticleUrl } from '../lib/seo';
@@ -32,16 +33,6 @@ const sections = [
 ] as const;
 type SectionId = typeof sections[number]['id'];
 
-const examFocusLabels: Record<ExaminerOperatorType, string> = {
-  PSY_01_INST_SWAP: 'Institutions & responsibilities',
-  PSY_02_QUAL_POLARITY: 'Conditions & qualifiers',
-  PSY_03_LEGAL_TIER: 'Legal status',
-  PSY_04_CAUSAL_INV: 'Cause, effect & sequence',
-  PSY_05_SCOPE_MUTATE: 'Numbers, scope & trends',
-  PSY_06_PAIR_DECOY: 'Matched pairs',
-  PSY_07_TRUE_NON_CAUSAL: 'Assertion & explanation',
-};
-
 function NoteSection({ id, title, children }: { id: SectionId; title: string; children: ReactNode }) {
   return (
     <section id={`brief-${id}`} className="brief-section" aria-labelledby={`brief-${id}-heading`}>
@@ -66,9 +57,7 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
   closeCallback.current = onClose;
   const [activeSection, setActiveSection] = useState<SectionId>('revision');
   const canonicalUrl = getCanonicalArticleUrl(item);
-  const operator = getDispatchOperator(item);
-  const operatorMeta = EXAMINER_OPERATORS[operator];
-  const examFocus = examFocusLabels[operator];
+  const examInsights = resolveArticleExamInsights(item);
   const historicalTwin = item.historical_twin;
   const nodalRisk = getArticleNodalSwapRisk(item, getStoredVulnerabilityIndex());
   const policyChain = matchDispatchToPolicyChain(item.headline, item.ministry, summary?.bullets?.join(' '), item.chain_id);
@@ -218,18 +207,46 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
             <details className="brief-disclosure brief-study-connections">
               <summary>
                 <span className="brief-disclosure-label">Study connections</span>
-                <span className="brief-disclosure-preview">{policyChain ? 'Exam focus & policy chain' : 'Exam focus'}</span>
+                <span className="brief-disclosure-preview">
+                  {policyChain
+                    ? 'Policy chain & study focus'
+                    : examInsights.status === 'ready'
+                    ? 'What to remember'
+                    : item.primary_operator
+                    ? 'Exam focus'
+                    : 'Study connections'}
+                </span>
                 <ChevronDown size={16} strokeWidth={1.6} aria-hidden="true" />
               </summary>
               <dl className="brief-connection-list">
-                <div>
-                  <dt><Target size={16} strokeWidth={1.6} aria-hidden="true" />Exam focus</dt>
-                  <dd>
-                    <strong>{examFocus}</strong>
-                    <p>{operatorMeta.description}</p>
-                    {!item.primary_operator && <span className="brief-connection-note">Suggested by article text</span>}
-                  </dd>
-                </div>
+                {examInsights.status === 'ready' && examInsights.facts.length > 0 ? (
+                  <div>
+                    <dt><Target size={16} strokeWidth={1.6} aria-hidden="true" />What to remember</dt>
+                    <dd>
+                      <ul className="brief-insights-list">
+                        {examInsights.facts.map((fact) => (
+                          <li key={fact.id}>
+                            {fact.label && <strong>{fact.label}: </strong>}
+                            <span>{fact.statement}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      {examInsights.distinction && (
+                        <p className="brief-distinction-note">
+                          <strong>Read carefully:</strong> {examInsights.distinction.statement}
+                        </p>
+                      )}
+                    </dd>
+                  </div>
+                ) : item.primary_operator ? (
+                  <div>
+                    <dt><Target size={16} strokeWidth={1.6} aria-hidden="true" />Exam focus</dt>
+                    <dd>
+                      <strong>{EXAMINER_OPERATORS[item.primary_operator]?.shortLabel || item.primary_operator}</strong>
+                      <p>{EXAMINER_OPERATORS[item.primary_operator]?.description}</p>
+                    </dd>
+                  </div>
+                ) : null}
                 {policyChain && <div>
                   <dt><GitFork size={16} strokeWidth={1.6} aria-hidden="true" />Policy chain</dt>
                   <dd>
@@ -287,7 +304,7 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
               {(summary?.prelims_trap_radar || historicalTwin) && <aside className="brief-pitfall" aria-labelledby="brief-pitfall-title">
                 <h4 id="brief-pitfall-title">
                   <ShieldAlert size={17} strokeWidth={1.6} aria-hidden="true" />
-                  <span>Exam focus: {examFocus}</span>
+                  <span>Exam focus: {item.primary_operator ? (EXAMINER_OPERATORS[item.primary_operator]?.shortLabel || item.primary_operator) : (examInsights.distinction ? 'Key distinction' : 'Critical nuance')}</span>
                 </h4>
                 {summary?.prelims_trap_radar && <p>{summary.prelims_trap_radar}</p>}
                 {historicalTwin && <div className="brief-historical-example">
@@ -304,7 +321,7 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
                 {summary.mains_analysis.core_implications && <Note title="Policy implications & federal dynamics"><p>{summary.mains_analysis.core_implications}</p></Note>}
                 {summary.mains_analysis.way_forward && <Note title="Way forward & reform roadmap"><p>{summary.mains_analysis.way_forward}</p></Note>}
               </> : summary?.mains ? <Note title="Mains perspective"><p>{summary.mains}</p></Note> : (
-                <Note title="Mains analysis blueprint"><p>Apply this policy development to GS Paper II (Governance, Executive & Judicial Accountability) and GS Paper III (Inclusive Growth & Macroeconomic Stability). Formulate arguments focusing on implementation bottlenecks, constitutional checks, and administrative efficacy.</p></Note>
+                <Note title="Mains analysis"><p className="brief-secondary">Structured Mains analysis is not yet available for this release. Refer to the primary source and syllabus linkages above.</p></Note>
               )}
               {summary?.mains && summary?.mains_analysis && <Note title="Analytical thesis pointer"><p className="brief-thesis">{summary.mains}</p></Note>}
             </NoteSection>
