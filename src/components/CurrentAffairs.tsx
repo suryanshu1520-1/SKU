@@ -1073,7 +1073,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                   window.dispatchEvent(new PopStateEvent('popstate'));
                 }}
               >
-                Explore policy chain: {chain.title} (ring {item.ring_depth ?? 2})
+                Explore policy chain: {chain.title}{typeof item.ring_depth === 'number' && Number.isFinite(item.ring_depth) ? ` (ring ${item.ring_depth})` : ''}
               </a>
             )}
             {twin && (

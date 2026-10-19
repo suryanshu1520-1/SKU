@@ -234,7 +234,7 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
                   <dt><GitFork size={16} strokeWidth={1.6} aria-hidden="true" />Policy chain</dt>
                   <dd>
                     <strong>{policyChain.title}</strong>
-                    {item.ring_depth !== undefined && <p>Connection depth: {item.ring_depth}</p>}
+                    {typeof item.ring_depth === 'number' && Number.isFinite(item.ring_depth) && <p>Connection depth: {item.ring_depth}</p>}
                     <a href={`/observatory?tab=ripple&chain=${encodeURIComponent(policyChain.chain_id)}`}
                       onClick={event => {
                         if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
