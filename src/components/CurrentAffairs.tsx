@@ -25,6 +25,7 @@ import NewsSignalGrid from './NewsSignalGrid';
 import DailyBriefHeader, { DailyBriefFilters } from './DailyBriefHeader';
 import { getStoredVulnerabilityIndex } from '../lib/vulnerabilityIndex';
 import { EXAMINER_OPERATORS, type ExaminerOperatorType } from '../types';
+import { resolveArticleExamInsights } from '../lib/article-exam-insights';
 
 import prsVaultDossiers from '../data/prs-vault-dossiers.json';
 import type { CandidatePreferences } from '../types';
@@ -1016,6 +1017,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
     const optional = candidatePreferences
       ? matchOptionalRelevance(item.headline, item.summary?.bullets, candidatePreferences.optionalSubject)
       : null;
+    const examInsights = resolveArticleExamInsights(item);
 
     return (
       <NewsSignalCard
@@ -1046,14 +1048,41 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
         examContext={(
           <div className="news-signal__exam-details">
             <dl className="news-signal__facts">
-              <div>
-                <dt>{item.primary_operator ? 'Exam focus' : 'Suggested focus'}</dt>
-                <dd>
-                  {operatorMeta.label}{isPersonalBlindSpot(operator) && <strong> · Your blind spot</strong>}
-                  <p>{operatorMeta.description}</p>
-                  {!item.primary_operator && <p>Suggested from the article text; this is not a confirmed examiner trap.</p>}
-                </dd>
-              </div>
+              {examInsights.status === 'ready' && examInsights.facts.length > 0 ? (
+                <div>
+                  <dt>What to remember</dt>
+                  <dd>
+                    <ul className="news-signal__insights-list">
+                      {examInsights.facts.map((fact) => (
+                        <li key={fact.id} className="news-signal__insight-item">
+                          {fact.label && <strong className="news-signal__insight-label">{fact.label}: </strong>}
+                          <span>{fact.statement}</span>
+                          {fact.evidence?.length > 0 && fact.evidence[0].quote && (
+                            <span
+                              className="news-signal__evidence-tag"
+                              title={`Source excerpt: "${fact.evidence[0].quote}"`}
+                            >
+                              · Source verified
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                    {examInsights.distinction && (
+                      <div className="news-signal__insight-distinction">
+                        <strong>Read carefully:</strong> {examInsights.distinction.statement}
+                      </div>
+                    )}
+                  </dd>
+                </div>
+              ) : item.primary_operator ? (
+                <div>
+                  <dt>Exam focus</dt>
+                  <dd>
+                    <strong>{operatorMeta.label}</strong>{isPersonalBlindSpot(operator) && <strong> · Your blind spot</strong>}
+                  </dd>
+                </div>
+              ) : null}
               {optional?.matches && <div><dt>Optional subject</dt><dd>{optional.optionalName} · Paper 2 anchor</dd></div>}
               {volcano?.volcano_status === 'ERUPTING' && (
                 <div>
