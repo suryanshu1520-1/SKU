@@ -53,14 +53,14 @@
   - **Reading Metadata**: Display actual Prelims/Mains relevance only when supplied. A quiet “Sources & verification” action opens the evidence ledger without claiming verification in the header.
   - **Syllabus Mapping**: A native disclosure summarizes the topic count and papers, then reveals the full supplied mapping.
   - **Study Connections**: A separate native disclosure groups exam focus, policy-chain navigation, and topic resurgence into labeled rows with consistent Lucide icons. Inferred focus is marked as a suggestion; resurgence is identified as a model signal.
-  - **Agency Advisory**: No ministry-wide warning or generic Government of India risk label. A source-check advisory can appear beside a specific nodal fact only with at least three evidenced agency-role attempts and a negative net score, plus relevant article content.
+  - **Agency Advisory**: No ministry-wide warning or generic Government of India risk label. A source-check advisory can appear beside a specific nodal fact only with at least three evidenced agency-role attempts and a negative net score, plus relevant article content. Cold-start cohort flags, generic Polity labels and opaque question IDs do not establish personal agency-role evidence.
   - **Historical Examples**: Show an article's supplied historical twin only; never substitute a generic example selected from a heuristic operator.
 
 #### Reading-first news feed (`NewsSignalCard.tsx`)
 
 This scoped pattern governs the current-affairs feed cards and lead story; the full dossier reader remains a separate reading surface.
 
-- **Implementation**: `src/components/NewsSignalCard.tsx` and `NewsSignalCard.css`, composed by `CurrentAffairs.tsx`.
+- **Implementation**: `src/components/NewsSignalCard.tsx`, `NewsSignalCard.css` and `NewsSignalGrid.tsx`, composed by `CurrentAffairs.tsx`.
 - **Surface**: Flat navy (`#071630`, lead `#041936`), cream headlines (`#e8e0cf`), restrained gold (`#e0d0ab`) and cyan (`#0194a8`), with thin borders and no card shadows or tilt.
 - **Light mode**: Warm cream surfaces (`#f9f5ee`, `#f1ebdf`), navy headings, dark gold actions and cyan details retain the same hierarchy.
 - **Byline**: Quiet linked source and valid article date (`created_at`), with a separate bookmark control exposing saved and saving states.
@@ -68,7 +68,7 @@ This scoped pattern governs the current-affairs feed cards and lead story; the f
 - **Preview**: Up to two summary bullets on the lead and one on standard cards; inline evidence anchors and contested warnings stay visible.
 - **Primary action**: “Read brief” opens the full brief; “Exam context” discloses the supporting study detail.
 - **Disclosure**: Holds ministry, grounding inspection, exam focus, matching optional-subject relevance, volcano activity, an article's supplied historical twin, policy-chain link and sharing when available. Cards open independently; inferred focus is labeled as a suggestion.
-- **Feed layout**: The first displayed item leads. Remaining briefs use an auto-fit grid with a `22rem` minimum, contracting to one column. A ResizeObserver measures intrinsic card heights and updates grid row spans, packing subsequent cards below available space with approximately 20px gaps. Expanded cards never stretch their neighbours. DOM and keyboard order remain chronological; browsers without ResizeObserver retain a normal grid with natural card heights.
+- **Feed layout**: The first displayed item leads. Remaining briefs use an auto-fit grid with a `22rem` minimum, contracting to one column. A ResizeObserver measures intrinsic card heights and updates spans in 4px grid rows, packing subsequent cards below available space with approximately 20px gaps. Expanded cards never stretch their neighbours. DOM and keyboard order remain chronological; browsers without ResizeObserver retain a normal grid with natural card heights.
 - **Access and motion**: Card actions have at least 44px targets, visible gold focus outlines, `aria-expanded`/`aria-controls` on the disclosure and reduced-motion transition suppression.
 - **Narrow screens**: At 639px and below, padding becomes 20px horizontally and exam facts stack into one column; headlines and actions wrap naturally.
 
