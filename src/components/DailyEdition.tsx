@@ -17,8 +17,14 @@ import {
   ExternalLink,
   BookOpen,
   LayoutList,
-  Rows3
+  Rows3,
+  Flame,
+  GitFork
 } from 'lucide-react';
+import {
+  matchDispatchToPolicyChain,
+  getVolcanoTelemetryForNode,
+} from '../lib/policy-ripple-radar-shared';
 import {
   SourceAnchor,
   GroundingBadge,
@@ -60,6 +66,9 @@ interface EditionItem {
   url: string;
   summary: EditionSummary;
   created_at?: string;
+  chain_id?: string;
+  ring_depth?: number;
+  node_id?: string;
 }
 
 interface Mcq {
@@ -331,6 +340,8 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
           const isCardExpanded = !isDensityCompact || expandedCards.has(item.url);
           const colors = getCategoryColor(item.ministry, s.tags);
           const corroboration = (s.cluster_size || (s.sources?.length ?? 1)) - 1;
+          const chain = matchDispatchToPolicyChain(item.headline, item.ministry, (s.bullets || []).join(' '), item.chain_id);
+          const volcano = getVolcanoTelemetryForNode(item.node_id, item.headline, item.ministry);
 
           return (
             <motion.article
@@ -375,6 +386,35 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
                       </span>
                     )}
                     <GroundingBadge grounding={s.grounding} verificationMethod={s.verification_method} source={item.source} sourceUrl={item.url} />
+
+                    {/* Volcano Node Telemetry Badge */}
+                    {volcano && volcano.volcano_status === 'ERUPTING' && (
+                      <span
+                        className="inline-flex items-center gap-1 px-2 py-0.5 bg-rose-500/15 text-rose-300 text-[9px] font-mono font-bold uppercase tracking-wider rounded-xs border border-rose-500/40 shadow-xs"
+                        title={`Volcano Node: ${volcano.title} (${volcano.years_dormant}-yr drought rebound)`}
+                      >
+                        <Flame className="w-2.5 h-2.5 text-rose-400 animate-pulse" />
+                        VOLCANO V_j: {volcano.volcano_index.toFixed(1)} // {volcano.years_dormant}-YR DROUGHT REBOUND
+                      </span>
+                    )}
+
+                    {/* Clickable Policy Ripple Pill */}
+                    {chain && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const targetUrl = `/observatory?tab=ripple&chain=${chain.chain_id}`;
+                          window.history.pushState(null, '', targetUrl);
+                          window.dispatchEvent(new PopStateEvent('popstate'));
+                        }}
+                        className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[rgba(1,148,168,0.2)] text-[#5fe3f5] hover:bg-[rgba(1,148,168,0.35)] hover:text-white border border-[rgba(1,148,168,0.5)] text-[9px] font-mono font-bold tracking-wider rounded-xs transition-colors cursor-pointer shadow-xs"
+                        title={`View cross-ministry policy chain: ${chain.title}`}
+                      >
+                        <GitFork className="w-2.5 h-2.5 text-[#0194a8]" />
+                        <span>[RIPPLE r{item.ring_depth ?? 2} // {chain.title.toUpperCase()} → VIEW CHAIN]</span>
+                      </button>
+                    )}
                   </div>
 
                   {/* Syllabus tag chips */}

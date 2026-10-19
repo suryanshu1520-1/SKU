@@ -27,9 +27,22 @@ import {
   RefreshCw,
   ExternalLink,
   GitFork,
+  Target,
+  Swords,
 } from 'lucide-react';
 import { InlineMath, BlockMath } from './MathView';
 import PolicyRippleRadar, { CANONICAL_RIPPLE_CHAINS } from './observatory/PolicyRippleRadar';
+import {
+  CANONICAL_VOLCANO_BASELINES,
+  getVolcanoTelemetryForNode,
+  type VolcanoNodeTelemetry,
+} from '../lib/policy-ripple-radar-shared';
+import {
+  computeCalibrated5050EV,
+  type EvExecutionProtocol,
+  type Calibrated5050Metrics,
+} from '../lib/examiner_psyche';
+import { EXAMINER_OPERATORS, type ExaminerOperatorType } from '../types';
 import './observatory/PolicyRippleRadar.css';
 
 function SonarIcon({ className }: { className?: string }) {
@@ -720,14 +733,53 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
     };
   }, [calcCertain, calcTwoOptions, calcThreeOptions, calcBlind]);
 
+  // Calibrated 50:50 Examiner Operators Ledger (Mathematical continuous curve: EV = 2.00 - 2.66 * P_trap)
+  const OPERATORS_LEDGER = useMemo(() => {
+    const defaultAccuracies: Record<string, { correct: number; total: number }> = {
+      PSY_01_INST_SWAP: { correct: 1, total: 5 },       // 20% accuracy -> inverted! (STRICT ABSTENTION)
+      PSY_02_QUAL_POLARITY: { correct: 3, total: 4 },   // 75% accuracy (MANDATORY EXECUTION)
+      PSY_03_LEGAL_TIER: { correct: 2, total: 4 },      // 50% accuracy (STANDARD EXECUTION)
+      PSY_04_CAUSAL_INV: { correct: 2, total: 5 },      // 40% accuracy (SELECTIVE CAUTION)
+      PSY_05_SCOPE_MUTATE: { correct: 3, total: 5 },    // 60% accuracy (AGGRESSIVE EXECUTION)
+      PSY_06_PAIR_DECOY: { correct: 2, total: 4 },      // 50% accuracy (STANDARD EXECUTION)
+      PSY_07_CHRONO_INVERT: { correct: 1, total: 4 },   // 25% accuracy -> near inversion (SELECTIVE CAUTION)
+    };
+
+    return (Object.keys(EXAMINER_OPERATORS) as ExaminerOperatorType[]).map((opKey) => {
+      const meta = EXAMINER_OPERATORS[opKey];
+      const data = defaultAccuracies[opKey] || { correct: 2, total: 4 };
+      const metrics = computeCalibrated5050EV(meta.code, data.correct, data.total);
+      return {
+        key: opKey,
+        meta,
+        metrics,
+      };
+    });
+  }, []);
+
+  // Top erupting volcano nodes
+  const topVolcanoNodes = useMemo(() => {
+    return Object.values(CANONICAL_VOLCANO_BASELINES).sort(
+      (a, b) => b.volcano_index - a.volcano_index
+    );
+  }, []);
+
   // --------------------------------------------------------------------------
-  // Tab 3: High-Yield Topic Matrix
+  // Tab 3: High-Yield Topic Matrix & Volcano Radar
   // --------------------------------------------------------------------------
   const [selectedMatrixSubject, setSelectedMatrixSubject] = useState<string>('All');
+  const [volcanoFilter, setVolcanoFilter] = useState<'all' | 'erupting' | 'heating'>('all');
+
   const filteredMatrixTopics = useMemo(() => {
-    if (selectedMatrixSubject === 'All') return HIGH_YIELD_TOPICS;
-    return HIGH_YIELD_TOPICS.filter((t) => t.subject.toLowerCase() === selectedMatrixSubject.toLowerCase());
-  }, [selectedMatrixSubject]);
+    return HIGH_YIELD_TOPICS.filter((t) => {
+      const matchSubject = selectedMatrixSubject === 'All' || t.subject.toLowerCase() === selectedMatrixSubject.toLowerCase();
+      if (!matchSubject) return false;
+      const v = getVolcanoTelemetryForNode(t.id, t.topic, t.subject);
+      if (volcanoFilter === 'erupting') return v?.volcano_status === 'ERUPTING';
+      if (volcanoFilter === 'heating') return v?.volcano_status === 'HEATING';
+      return true;
+    });
+  }, [selectedMatrixSubject, volcanoFilter]);
 
   // --------------------------------------------------------------------------
   // Tab 4: Examiner Traps & Live Statement Sandbox
@@ -1547,10 +1599,108 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                   {showMathDetails && (
                     <div className="mt-2 p-3 rounded-sm bg-[rgba(3,16,38,0.9)] border border-[rgba(19,108,153,0.3)] text-[11px] text-[#8fa2bd] space-y-1 font-mono">
                       <div>E(X) = n₁·(+2.0) + n₂·[0.5·(2.0) - 0.5·(0.66)] + n₃·[0.33·(2.0) - 0.67·(0.66)]</div>
-                      <div className="text-[#34d399]">For 50:50: EV = 1.00 - 0.33 = +0.67 marks per attempt.</div>
+                      <div className="text-[#34d399]">For 50:50: EV = 1.00 - 0.33 = +0.67 marks per attempt (Naive Baseline).</div>
+                      <div className="text-amber-300">Continuous Calibrated Formula: EV(P_trap) = 2.00 - 2.66·P_trap.</div>
                     </div>
                   )}
                 </div>
+              </div>
+            </div>
+
+            {/* Calibrated 50:50 EV Degradation Ledger Panel (Continuous Formula & Inversion Horizon) */}
+            <div className="p-5 rounded-sm bg-[rgba(4,25,54,0.7)] border border-[rgba(19,108,153,0.35)] space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[rgba(19,108,153,0.3)] pb-3">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Target className="w-4 h-4 text-[#e0d0ab]" />
+                    <h3 className="text-sm font-serif font-bold text-[#e8e0cf]">
+                      Examiner Psyche & Calibrated 50:50 EV Degradation Curve
+                    </h3>
+                  </div>
+                  <p className="text-xs text-[#9fb0c8]">
+                    Mathematical degradation curve: <strong className="text-[#e0d0ab] font-mono">EV(P_trap) = 2.00 − 2.66·P_trap</strong>. Breakeven Inversion Horizon at <strong className="text-rose-400 font-mono">P_trap ≥ 75.2% (Accuracy ≤ 24.8%)</strong>.
+                  </p>
+                </div>
+                <div className="px-3 py-1.5 rounded-sm bg-rose-950/40 border border-rose-500/40 text-[11px] font-mono text-rose-300 font-bold flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                  <span>INVERSION HORIZON: 24.8% ACCURACY (0.000 EV)</span>
+                </div>
+              </div>
+
+              {/* 7 Examiner Operators Breakdown Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                {OPERATORS_LEDGER.map(({ key, meta, metrics }) => {
+                  const isInv = metrics.isEvInverted;
+                  return (
+                    <div
+                      key={key}
+                      className={`p-3.5 rounded-sm border space-y-2 transition-all ${
+                        isInv
+                          ? 'bg-rose-950/40 border-rose-500/60 text-rose-200 ring-1 ring-rose-500/40'
+                          : metrics.protocol === 'MANDATORY_EXECUTION'
+                          ? 'bg-emerald-950/30 border-emerald-500/40 text-emerald-200'
+                          : metrics.protocol === 'AGGRESSIVE_EXECUTION'
+                          ? 'bg-teal-950/30 border-teal-500/40 text-teal-200'
+                          : metrics.protocol === 'SELECTIVE_CAUTION'
+                          ? 'bg-amber-950/30 border-amber-500/40 text-amber-200'
+                          : 'bg-[#041228] border-[rgba(19,108,153,0.35)] text-[#e8e0cf]'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-xs font-bold text-[#e0d0ab]">{meta.code}</span>
+                        <span
+                          className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-xs border uppercase ${
+                            isInv
+                              ? 'bg-rose-500/20 text-rose-300 border-rose-500/50 animate-pulse'
+                              : metrics.protocol === 'MANDATORY_EXECUTION'
+                              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50'
+                              : metrics.protocol === 'AGGRESSIVE_EXECUTION'
+                              ? 'bg-teal-500/20 text-teal-300 border-teal-500/50'
+                              : metrics.protocol === 'SELECTIVE_CAUTION'
+                              ? 'bg-amber-500/20 text-amber-300 border-amber-500/50'
+                              : 'bg-sky-500/20 text-sky-300 border-sky-500/50'
+                          }`}
+                        >
+                          {metrics.protocol.replace('_', ' ')}
+                        </span>
+                      </div>
+
+                      <div className="font-serif text-xs font-semibold text-[#f4ecd8] leading-tight line-clamp-1">
+                        {meta.shortLabel}
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-1.5 text-[10.5px] font-mono pt-1 border-t border-[rgba(224,208,171,0.1)]">
+                        <div>
+                          <span className="text-[#8fa2bd] block">Accuracy:</span>
+                          <span className="font-bold">{(metrics.empiricalAccuracy * 100).toFixed(0)}%</span>
+                        </div>
+                        <div>
+                          <span className="text-[#8fa2bd] block">Trap Rate:</span>
+                          <span className={isInv ? 'text-rose-400 font-bold' : ''}>{(metrics.trapAttractionRate * 100).toFixed(0)}%</span>
+                        </div>
+                        <div>
+                          <span className="text-[#8fa2bd] block">Calibrated EV:</span>
+                          <span className={`font-bold ${metrics.calibratedEvPerCall <= 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                            {metrics.calibratedEvPerCall > 0 ? `+${metrics.calibratedEvPerCall}` : metrics.calibratedEvPerCall}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-[#8fa2bd] block">15-Call Net:</span>
+                          <span className={`font-bold ${metrics.cumulativeEv15Calls <= 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                            {metrics.cumulativeEv15Calls > 0 ? `+${metrics.cumulativeEv15Calls}` : metrics.cumulativeEv15Calls}m
+                          </span>
+                        </div>
+                      </div>
+
+                      {isInv && (
+                        <div className="text-[10px] font-mono text-rose-300 pt-1 border-t border-rose-500/30 flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3 text-rose-400 shrink-0" />
+                          <span>EV INVERTED: STRICT ABSTENTION</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </motion.div>
@@ -1589,6 +1739,66 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                   </button>
                 ))}
               </div>
+
+              {/* Volcano Node Telemetry Bar */}
+              <div className="flex items-center justify-between gap-3 flex-wrap pt-3 border-t border-[rgba(19,108,153,0.25)]">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mr-1 flex items-center gap-1">
+                    <Flame className="w-3.5 h-3.5 text-rose-400" /> Volcano Radar (V_j):
+                  </span>
+                  {[
+                    { id: 'all', label: 'All 25 Nodes' },
+                    { id: 'erupting', label: '🔥 Erupting (V_j > 8.0)' },
+                    { id: 'heating', label: '⚡ Heating (4.0–8.0)' },
+                  ].map((f) => (
+                    <button
+                      key={f.id}
+                      onClick={() => setVolcanoFilter(f.id as any)}
+                      className={`px-2.5 py-1 rounded-xs text-[11px] font-mono font-semibold cursor-pointer transition-colors ${
+                        volcanoFilter === f.id
+                          ? 'bg-rose-500/20 text-rose-200 border border-rose-500/50'
+                          : 'bg-[rgba(3,16,38,0.7)] text-[#8fa2bd] border border-[rgba(19,108,153,0.3)] hover:text-white'
+                      }`}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+                <span className="text-[10px] font-mono text-[#8fa2bd]">
+                  Formula: V_j = [(2026 - Last Tested) / Recurrence] · ln(1 + 2·News_{2026})
+                </span>
+              </div>
+            </div>
+
+            {/* Pinned Top Erupting Volcano Nodes Strip */}
+            <div className="p-3.5 rounded-sm bg-[rgba(3,16,38,0.85)] border border-rose-500/40 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-rose-300 font-bold flex items-center gap-1.5">
+                  <Flame className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
+                  <span>Top Erupting Volcano Nodes (Drought Rebound + 2026 Velocity)</span>
+                </span>
+                <span className="text-[10px] font-mono text-[#8fa2bd]">Morning Run Priority Queue</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {topVolcanoNodes.slice(0, 3).map((vn) => (
+                  <div
+                    key={vn.node_id}
+                    className="p-2.5 rounded-xs bg-[#041228] border border-rose-500/30 space-y-1"
+                  >
+                    <div className="flex items-center justify-between text-[10px] font-mono">
+                      <span className="text-[#e0d0ab] font-bold">{vn.node_id}</span>
+                      <span className="text-rose-400 font-extrabold">V_j = {vn.volcano_index.toFixed(2)}</span>
+                    </div>
+                    <div className="text-xs text-[#e8e0cf] font-serif font-medium truncate">
+                      {vn.title}
+                    </div>
+                    <div className="text-[10px] text-[#8fa2bd] font-mono flex items-center justify-between">
+                      <span>{vn.years_dormant}y dormant (last: {vn.last_tested_year})</span>
+                      <span className="text-[#34d399] font-bold">{vn.news_count_2026} dispatches</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Matrix Topic Cards */}
@@ -1614,6 +1824,25 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                     <h3 className="font-serif font-bold text-sm sm:text-base text-[#e8e0cf] leading-snug">
                       {topic.topic}
                     </h3>
+
+                    {/* Volcano Telemetry Badge on Card */}
+                    {(() => {
+                      const v = getVolcanoTelemetryForNode(topic.id, topic.topic, topic.subject);
+                      if (!v || v.volcano_status === 'STABLE') return null;
+                      return (
+                        <div className={`p-2 rounded-xs border text-[10px] font-mono flex items-center justify-between ${
+                          v.volcano_status === 'ERUPTING'
+                            ? 'bg-rose-950/40 border-rose-500/40 text-rose-300'
+                            : 'bg-amber-950/40 border-amber-500/40 text-amber-300'
+                        }`}>
+                          <span className="flex items-center gap-1 font-bold">
+                            <Flame className="w-3 h-3 text-rose-400 animate-pulse" />
+                            VOLCANO V_j: {v.volcano_index.toFixed(2)} // {v.volcano_status}
+                          </span>
+                          <span>{v.years_dormant}y dormant • {v.news_count_2026} articles (2026)</span>
+                        </div>
+                      );
+                    })()}
 
                     <div className="space-y-1 text-xs">
                       <span className="text-[10px] font-mono text-[#0194a8] uppercase tracking-wider block font-bold">

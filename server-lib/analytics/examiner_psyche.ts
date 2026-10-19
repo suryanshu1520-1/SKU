@@ -1050,6 +1050,61 @@ export async function getNodePsycheProfile(nodeId: string): Promise<NodePsychePr
   };
 }
 
+export type EvExecutionProtocol =
+  | 'MANDATORY_EXECUTION'   // P_trap <= 0.25 (EV >= +1.335)
+  | 'AGGRESSIVE_EXECUTION'  // 0.25 < P_trap <= 0.35 (EV >= +1.069)
+  | 'STANDARD_EXECUTION'    // 0.35 < P_trap <= 0.50 (EV >= +0.670)
+  | 'SELECTIVE_CAUTION'     // 0.50 < P_trap < 0.752 (0.000 < EV < +0.670)
+  | 'STRICT_ABSTENTION';    // P_trap >= 0.752 (EV <= 0.000 — EV INVERSION HORIZON)
+
+export interface Calibrated5050Metrics {
+  operator: string;
+  sampleSize: number;
+  empiricalAccuracy: number;     // P_correct in [0, 1]
+  trapAttractionRate: number;    // P_trap = 1 - P_correct in [0, 1]
+  naiveEv: number;               // Fixed +0.670
+  calibratedEvPerCall: number;   // 2.00 - 2.66 * P_trap
+  cumulativeEv15Calls: number;   // calibratedEvPerCall * 15
+  isEvInverted: boolean;         // true when P_trap >= 0.7518 (Accuracy <= 24.8%)
+  protocol: EvExecutionProtocol;
+}
+
+export function computeCalibrated5050EV(
+  operator: string,
+  correct5050Count: number,
+  total5050Count: number,
+  priorTrapRate = 0.50
+): Calibrated5050Metrics {
+  // Bayesian Laplace smoothing with weight k=2 toward operator prior until user logs >= 3 calls
+  const pCorrect =
+    total5050Count >= 3
+      ? correct5050Count / total5050Count
+      : (correct5050Count + 2 * (1 - priorTrapRate)) / (total5050Count + 2);
+
+  const pTrap = Math.max(0, Math.min(1, 1 - pCorrect));
+  const calibratedEvPerCall = Number((2.0 - 2.66 * pTrap).toFixed(3));
+  const cumulativeEv15Calls = Number((calibratedEvPerCall * 15).toFixed(2));
+  const isEvInverted = pTrap >= 0.7518 || calibratedEvPerCall <= 0;
+
+  let protocol: EvExecutionProtocol = 'STANDARD_EXECUTION';
+  if (isEvInverted) protocol = 'STRICT_ABSTENTION';
+  else if (pTrap > 0.50) protocol = 'SELECTIVE_CAUTION';
+  else if (pTrap <= 0.25) protocol = 'MANDATORY_EXECUTION';
+  else if (pTrap <= 0.35) protocol = 'AGGRESSIVE_EXECUTION';
+
+  return {
+    operator,
+    sampleSize: total5050Count,
+    empiricalAccuracy: Number(pCorrect.toFixed(3)),
+    trapAttractionRate: Number(pTrap.toFixed(3)),
+    naiveEv: 0.67,
+    calibratedEvPerCall,
+    cumulativeEv15Calls,
+    isEvInverted,
+    protocol,
+  };
+}
+
 /**
  * 2. getUserPsycheAutopsy(userId: string)
  * Computes candidate cognitive blind spots and 50:50 Ledger Expected Value across all 7 operators.
@@ -1059,7 +1114,7 @@ export async function getUserPsycheAutopsy(userId: string): Promise<UserPsycheAu
 
   const fiftyFiftyMap: Record<
     ExaminerOperatorType,
-    { calls: number; correct: number; wrong: number; netMarks: number; expectedValuePerQuestion: number }
+    { calls: number; correct: number; wrong: number; netMarks: number; expectedValuePerQuestion: number; calibratedMetrics?: Calibrated5050Metrics }
   > = {
     PSY_01_INST_SWAP: { calls: 0, correct: 0, wrong: 0, netMarks: 0, expectedValuePerQuestion: 0 },
     PSY_02_QUAL_POLARITY: { calls: 0, correct: 0, wrong: 0, netMarks: 0, expectedValuePerQuestion: 0 },
@@ -1121,6 +1176,7 @@ export async function getUserPsycheAutopsy(userId: string): Promise<UserPsycheAu
   for (const op of CANONICAL_OPERATORS) {
     const entry = fiftyFiftyMap[op];
     entry.expectedValuePerQuestion = entry.calls > 0 ? Number((entry.netMarks / entry.calls).toFixed(2)) : 0;
+    entry.calibratedMetrics = computeCalibrated5050EV(op, entry.correct, entry.calls);
   }
 
   // Determine worst bleed operator (the one with the largest totalBleedMarks > 0)

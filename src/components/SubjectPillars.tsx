@@ -41,6 +41,7 @@ import { ExaminerPsycheModal } from './ExaminerPsycheModal';
 import AnimatedNavIcon from './AnimatedNavIcon';
 import type { CandidatePreferences } from '../types';
 import { getOptionalSubject } from '../data/optional-subjects';
+import { getVolcanoTelemetryForNode } from '../lib/policy-ripple-radar-shared';
 
 interface SubjectPillarsProps {
   candidatePreferences?: CandidatePreferences;
@@ -240,6 +241,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
   const [selectedPillarId, setSelectedPillarId] = useState<string>(defaultPillarId);
   const [activeDossierTab, setActiveDossierTab] = useState<'concepts' | 'mindmaps' | 'pyq-evidence' | 'mains-blueprints' | 'static-vault'>('concepts');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [volcanoFilter, setVolcanoFilter] = useState<'all' | 'erupting' | 'heating'>('all');
   const [isExaminerPsycheOpen, setIsExaminerPsycheOpen] = useState<boolean>(false);
   const [activeMindmapSteps, setActiveMindmapSteps] = useState<Record<string, number>>({});
   const getActiveStep = (mindmapId: string) => activeMindmapSteps[mindmapId] ?? 0;
@@ -272,11 +274,20 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
     }
   };
 
-  // Filter concepts based on search query
+  // Filter concepts based on search query & volcano telemetry status
   const filteredConcepts = useMemo(() => {
-    if (!searchQuery.trim()) return selectedPillar.foundationalConcepts;
+    let list = selectedPillar.foundationalConcepts;
+    if (volcanoFilter !== 'all') {
+      list = list.filter((c) => {
+        const v = getVolcanoTelemetryForNode(c.syllabusTag, c.title);
+        if (volcanoFilter === 'erupting') return v.volcano_status === 'ERUPTING';
+        if (volcanoFilter === 'heating') return v.volcano_status === 'HEATING';
+        return true;
+      });
+    }
+    if (!searchQuery.trim()) return list;
     const q = searchQuery.toLowerCase();
-    return selectedPillar.foundationalConcepts.filter(
+    return list.filter(
       (c) =>
         c.title.toLowerCase().includes(q) ||
         c.syllabusTag.toLowerCase().includes(q) ||
@@ -284,7 +295,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
         c.criticalProvisions.some((p) => p.toLowerCase().includes(q)) ||
         c.examinerPerspective.toLowerCase().includes(q)
     );
-  }, [selectedPillar, searchQuery]);
+  }, [selectedPillar, searchQuery, volcanoFilter]);
 
   // Filter static matrices based on search query
   const filteredMatrices = useMemo(() => {
@@ -374,11 +385,35 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-sans text-secondary hover:text-primary"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-sans text-secondary hover:text-primary cursor-pointer"
               >
                 Clear
               </button>
             )}
+          </div>
+
+          {/* Volcano Node Telemetry Filter Bar */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mr-1 flex items-center gap-1">
+              <Flame className="w-3.5 h-3.5 text-rose-400" /> Volcano Radar (V_j):
+            </span>
+            {[
+              { id: 'all', label: 'All Concepts' },
+              { id: 'erupting', label: '🔥 Erupting (V_j > 8.0)' },
+              { id: 'heating', label: '⚡ Heating (4.0–8.0)' },
+            ].map((f) => (
+              <button
+                key={f.id}
+                onClick={() => setVolcanoFilter(f.id as any)}
+                className={`px-2.5 py-1 rounded-xs text-[11px] font-mono font-semibold cursor-pointer transition-colors ${
+                  volcanoFilter === f.id
+                    ? 'bg-rose-500/20 text-rose-200 border border-rose-500/50 shadow-xs'
+                    : 'bg-surface-elevated text-secondary border border-border hover:text-primary'
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -739,11 +774,32 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                       className="p-6 rounded-sm bg-surface-elevated/40 border border-border/90 space-y-5"
                     >
                       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-3">
-                        <div>
-                          <span className="text-[10px] font-mono text-[#e0d0ab] bg-[#e0d0ab]/10 border border-[#e0d0ab]/20 px-2 py-0.5 rounded font-bold mr-2">
-                            {concept.syllabusTag}
-                          </span>
-                          <h3 className="text-lg font-serif font-bold text-primary inline-block mt-1">
+                        <div className="space-y-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-[10px] font-mono text-[#e0d0ab] bg-[#e0d0ab]/10 border border-[#e0d0ab]/20 px-2 py-0.5 rounded font-bold">
+                              {concept.syllabusTag}
+                            </span>
+                            {(() => {
+                              const v = getVolcanoTelemetryForNode(concept.syllabusTag, concept.title);
+                              if (v.volcano_index <= 0) return null;
+                              return (
+                                <span
+                                  className={`text-[9.5px] font-mono px-2 py-0.5 rounded border flex items-center gap-1 font-bold ${
+                                    v.volcano_status === 'ERUPTING'
+                                      ? 'bg-rose-950/60 text-rose-300 border-rose-500/50 shadow-xs'
+                                      : v.volcano_status === 'HEATING'
+                                      ? 'bg-amber-950/50 text-amber-300 border-amber-500/40'
+                                      : 'bg-slate-900/60 text-slate-300 border-slate-700/50'
+                                  }`}
+                                  title={`Volcano Index V_j = ${v.volcano_index.toFixed(2)} | Dormancy: ${v.years_dormant} yrs (last tested: ${v.last_tested_year}) | 2026 Velocity: ${v.news_count_2026} dispatches`}
+                                >
+                                  <Flame className="w-2.5 h-2.5 text-rose-400 shrink-0" />
+                                  <span>V_j: {v.volcano_index.toFixed(1)} // {v.years_dormant}Y DORMANT ({v.news_count_2026} DISPATCHES)</span>
+                                </span>
+                              );
+                            })()}
+                          </div>
+                          <h3 className="text-lg font-serif font-bold text-primary block mt-1">
                             {concept.title}
                           </h3>
                         </div>
@@ -936,9 +992,30 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                       className="p-6 rounded-sm bg-surface-elevated/30 border border-border/90 space-y-4"
                     >
                       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-3">
-                        <h4 className="font-serif font-bold text-primary text-base md:text-lg">
-                          {ev.theme}
-                        </h4>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            {(() => {
+                              const v = getVolcanoTelemetryForNode(selectedPillar.paper, ev.theme);
+                              if (v.volcano_index <= 0) return null;
+                              return (
+                                <span
+                                  className={`text-[9.5px] font-mono px-2 py-0.5 rounded border flex items-center gap-1 font-bold ${
+                                    v.volcano_status === 'ERUPTING'
+                                      ? 'bg-rose-950/60 text-rose-300 border-rose-500/50 shadow-xs'
+                                      : 'bg-amber-950/50 text-amber-300 border-amber-500/40'
+                                  }`}
+                                  title={`Volcano Index V_j = ${v.volcano_index.toFixed(2)} | Dormancy: ${v.years_dormant} yrs | 2026 Velocity: ${v.news_count_2026} dispatches`}
+                                >
+                                  <Flame className="w-2.5 h-2.5 text-rose-400 shrink-0" />
+                                  <span>V_j: {v.volcano_index.toFixed(1)} // {v.years_dormant}Y DORMANT</span>
+                                </span>
+                              );
+                            })()}
+                          </div>
+                          <h4 className="font-serif font-bold text-primary text-base md:text-lg">
+                            {ev.theme}
+                          </h4>
+                        </div>
                         <div className="flex items-center gap-2">
                           <span className="px-2.5 py-1 rounded text-[10px] font-mono font-bold bg-emerald-950/40 text-emerald-300 border border-emerald-800/40">
                             Editorial Priority: {ev.testabilityScore}

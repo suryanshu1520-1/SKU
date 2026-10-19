@@ -22,8 +22,11 @@ import {
   ShieldAlert,
   AlertTriangle,
   Crosshair,
-  ChevronDown
+  ChevronDown,
+  Flame,
+  GitFork
 } from 'lucide-react';
+import { matchDispatchToPolicyChain, getVolcanoTelemetryForNode } from '../lib/policy-ripple-radar-shared';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
@@ -83,6 +86,9 @@ export interface CurrentAffairsItem {
   url: string;
   primary_operator?: ExaminerOperatorType;
   node_id?: string;
+  chain_id?: string;
+  ring_depth?: number;
+  entity_slugs?: string[];
   historical_twin?: {
     id: string;
     year: number;
@@ -1264,6 +1270,43 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                       </span>
                     );
                   })()}
+
+                  {/* Volcano Node Telemetry Badge */}
+                  {(() => {
+                    const v = getVolcanoTelemetryForNode(leadItem.node_id, leadItem.headline, leadItem.ministry);
+                    if (!v || v.volcano_status !== 'ERUPTING') return null;
+                    return (
+                      <span
+                        className="px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider rounded-xs border flex items-center gap-1.5 bg-rose-950/70 text-rose-300 border-rose-500/60 shadow-xs"
+                        title={`Volcano Node: ${v.title} (${v.years_dormant}-yr drought rebound)`}
+                      >
+                        <Flame className="w-3 h-3 text-rose-400 animate-pulse" />
+                        <span>VOLCANO V_j: {v.volcano_index.toFixed(1)} // {v.years_dormant}-YR REBOUND</span>
+                      </span>
+                    );
+                  })()}
+
+                  {/* Clickable Policy Ripple Pill */}
+                  {(() => {
+                    const chain = matchDispatchToPolicyChain(leadItem.headline, leadItem.ministry, leadItem.summary?.bullets?.join(' '), leadItem.chain_id);
+                    if (!chain) return null;
+                    return (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const targetUrl = `/observatory?tab=ripple&chain=${chain.chain_id}`;
+                          window.history.pushState(null, '', targetUrl);
+                          window.dispatchEvent(new PopStateEvent('popstate'));
+                        }}
+                        className="px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider rounded-xs border flex items-center gap-1.5 bg-[rgba(1,148,168,0.2)] text-[#5fe3f5] hover:bg-[rgba(1,148,168,0.35)] hover:text-white border-[rgba(1,148,168,0.5)] transition-colors cursor-pointer shadow-xs"
+                        title={`Deep-link to Policy Ripple Radar: ${chain.title}`}
+                      >
+                        <GitFork className="w-3 h-3 text-[#0194a8]" />
+                        <span>[RIPPLE r{leadItem.ring_depth ?? 2} // {chain.title.toUpperCase()} → VIEW CHAIN]</span>
+                      </button>
+                    );
+                  })()}
                 </div>
 
                 {leadItem.created_at && (
@@ -1514,6 +1557,43 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                                 <Crosshair className={`w-2.5 h-2.5 ${isBlindSpot ? 'text-amber-400' : 'text-[#0194a8]'}`} />
                                 <span>{opMeta?.code || op}{isBlindSpot ? ' • BLIND SPOT' : ''}</span>
                               </span>
+                            );
+                          })()}
+
+                          {/* Volcano Telemetry Badge */}
+                          {(() => {
+                            const v = getVolcanoTelemetryForNode(item.node_id, item.headline, item.ministry);
+                            if (!v || v.volcano_status !== 'ERUPTING') return null;
+                            return (
+                              <span
+                                className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider rounded-xs border flex items-center gap-1 bg-rose-950/70 text-rose-300 border-rose-500/60 shrink-0"
+                                title={`Volcano Node: ${v.title} (${v.years_dormant}-yr drought rebound)`}
+                              >
+                                <Flame className="w-2.5 h-2.5 text-rose-400 animate-pulse" />
+                                <span>VOLCANO V_j: {v.volcano_index.toFixed(1)}</span>
+                              </span>
+                            );
+                          })()}
+
+                          {/* Clickable Policy Ripple Pill */}
+                          {(() => {
+                            const chain = matchDispatchToPolicyChain(item.headline, item.ministry, item.summary?.bullets?.join(' '), item.chain_id);
+                            if (!chain) return null;
+                            return (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const targetUrl = `/observatory?tab=ripple&chain=${chain.chain_id}`;
+                                  window.history.pushState(null, '', targetUrl);
+                                  window.dispatchEvent(new PopStateEvent('popstate'));
+                                }}
+                                className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider rounded-xs border flex items-center gap-1 bg-[rgba(1,148,168,0.2)] text-[#5fe3f5] hover:bg-[rgba(1,148,168,0.35)] hover:text-white border-[rgba(1,148,168,0.5)] transition-colors cursor-pointer shrink-0"
+                                title={`Deep-link to Policy Ripple Radar: ${chain.title}`}
+                              >
+                                <GitFork className="w-2.5 h-2.5 text-[#0194a8]" />
+                                <span>[RIPPLE r{item.ring_depth ?? 2} // {chain.title.toUpperCase()}]</span>
+                              </button>
                             );
                           })()}
                         </div>

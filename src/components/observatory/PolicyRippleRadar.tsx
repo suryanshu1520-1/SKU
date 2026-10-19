@@ -1,4 +1,19 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import {
+  Swords,
+  Flame,
+  AlertTriangle,
+  CheckCircle2,
+  XCircle,
+  RotateCcw,
+  BookOpen,
+  GitFork,
+  X,
+  Target,
+  Crosshair,
+  Shield,
+  Zap
+} from 'lucide-react';
 import SNAPSHOT from '../../data/policy-radar-snapshot.json';
 import {
   CHAINS,
@@ -8,6 +23,13 @@ import {
   RippleChain,
   EntityRecord,
 } from './policy-ripple-data';
+import {
+  getBossMcqForChain,
+  getVolcanoTelemetryForNode,
+  getPolicyEntityForText,
+  type BossMcqDefinition,
+} from '../../lib/policy-ripple-radar-shared';
+import { computeCalibrated5050EV } from '../../lib/examiner_psyche';
 import './PolicyRippleRadar.css';
 
 export { CANONICAL_RIPPLE_CHAINS };
@@ -27,7 +49,17 @@ export default function PolicyRippleRadar() {
   const [entities, setEntities] = useState<EntityRecord[]>(
     ((SNAPSHOT?.entities as unknown) as EntityRecord[]) || ENTITIES
   );
-  const [chainIndex, setChainIndex] = useState<number>(0);
+  const [chainIndex, setChainIndex] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const targetChain = new URLSearchParams(window.location.search).get('chain');
+      if (targetChain) {
+        const initialChains = ((SNAPSHOT?.chains as unknown) as RippleChain[]) || CHAINS;
+        const found = initialChains.findIndex((c) => c.chain_id === targetChain);
+        if (found !== -1) return found;
+      }
+    }
+    return 0;
+  });
   const [activeStep, setActiveStep] = useState<number>(0);
   const [tracing, setTracing] = useState<boolean>(false);
   const [hoverStep, setHoverStep] = useState<number>(-1);
@@ -38,6 +70,12 @@ export default function PolicyRippleRadar() {
   const [entityAuthority, setEntityAuthority] = useState<string>(
     SNAPSHOT?.entities?.[0]?.authority || ENTITIES[0]?.authority || ''
   );
+
+  // Full-Chain Boss MCQ Interactive State
+  const [bossMcqOpen, setBossMcqOpen] = useState<boolean>(false);
+  const [bossSelectedOption, setBossSelectedOption] = useState<number | null>(null);
+  const [bossStruckOptions, setBossStruckOptions] = useState<Set<number>>(new Set());
+  const [bossSubmitted, setBossSubmitted] = useState<boolean>(false);
 
   // Background Edge Hydration: updates with fresh live dispatches if online
   useEffect(() => {
@@ -192,6 +230,15 @@ export default function PolicyRippleRadar() {
     setPathOpen(false);
     setRefsOpen(false);
     setHoverStep(-1);
+    setBossMcqOpen(false);
+    setBossSubmitted(false);
+    setBossSelectedOption(null);
+    setBossStruckOptions(new Set());
+    if (typeof window !== 'undefined' && chains[idx]) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('chain', chains[idx].chain_id);
+      window.history.replaceState({}, '', url.toString());
+    }
   };
 
   const handleSelectStep = (stepIdx: number) => {
@@ -351,6 +398,19 @@ export default function PolicyRippleRadar() {
                   Twin PYQ: {currentChain.historical_twin_pyq_id}
                 </span>
               )}
+              {(() => {
+                const v = getVolcanoTelemetryForNode(currentChain.node_id);
+                if (!v || v.volcano_status !== 'ERUPTING') return null;
+                return (
+                  <span
+                    className="px-2 py-0.5 rounded-sm bg-rose-500/15 text-rose-300 border border-rose-500/40 text-[10px] font-mono font-bold flex items-center gap-1 shadow-xs"
+                    title={`Volcano Node ${v.node_id}: ${v.years_dormant} years since tested, high news velocity`}
+                  >
+                    <Flame className="w-3 h-3 text-rose-400 animate-pulse" />
+                    <span>VOLCANO V_j: {v.volcano_index.toFixed(1)} // {v.years_dormant}-YR REBOUND</span>
+                  </span>
+                );
+              })()}
               <span className="text-xs text-[#8fa2bd]">
                 {steps.length} sequential checkpoints
               </span>
@@ -726,8 +786,296 @@ export default function PolicyRippleRadar() {
                   {currentChain.lead_driver}
                 </p>
               </div>
+
+              {/* Fight Full-Chain Boss MCQ CTA */}
+              {(steps.length >= 3 || currentChain.boss_mcq) && (
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setBossMcqOpen(!bossMcqOpen);
+                      setBossSubmitted(false);
+                      setBossSelectedOption(null);
+                      setBossStruckOptions(new Set());
+                    }}
+                    className="w-full py-2.5 px-4 rounded-sm bg-gradient-to-r from-[#e0d0ab] via-[#f4ecd8] to-[#e0d0ab] hover:brightness-110 active:scale-[0.99] text-[#072e63] font-mono font-bold text-xs uppercase tracking-wider transition-all duration-150 shadow-md flex items-center justify-center gap-2 cursor-pointer border border-[#e0d0ab]"
+                  >
+                    <Swords className="w-4 h-4 text-[#072e63]" />
+                    <span>[FIGHT FULL-CHAIN BOSS MCQ (+2.00 / −0.66)]</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
+
+          {/* Interactive Full-Chain Boss MCQ Drawer */}
+          {bossMcqOpen && (() => {
+            const boss = getBossMcqForChain(currentChain);
+            if (!boss) return null;
+            const keyMap: Record<string, number> = { a: 0, b: 1, c: 2, d: 3 };
+            const correctIdx = keyMap[boss.official_key] ?? 0;
+            const isCorrect = bossSelectedOption === correctIdx;
+            const is5050 = bossStruckOptions.size === 2;
+            const op = boss.primary_operator || 'PSY_01_INST_SWAP';
+            const entity = getPolicyEntityForText(
+              `${boss.stem} ${boss.statements.join(' ')} ${boss.statutory_anchor}`,
+              []
+            );
+            const evMetrics = is5050
+              ? computeCalibrated5050EV(op, isCorrect ? 1 : 0, 4, isCorrect ? 0.30 : 0.76)
+              : null;
+
+            return (
+              <div className="rounded-sm bg-[#050b1a] border-2 border-[#e0d0ab]/50 p-5 sm:p-6 space-y-5 shadow-lg relative my-4">
+                {/* Header Strip */}
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[rgba(224,208,171,0.15)] pb-3.5">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="px-2 py-0.5 rounded bg-[#e0d0ab] text-[#072e63] font-mono text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                        <Swords className="w-3 h-3 text-[#072e63]" />
+                        FULL-CHAIN BOSS MCQ // MULTI-RING
+                      </span>
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 font-mono text-[10px] font-bold uppercase">
+                        FACT HALF-LIFE: T_1/2 = {boss.claim_half_life_days.toFixed(1)} DAYS
+                      </span>
+                    </div>
+                    <div className="text-xs text-[#8fa2bd] font-mono">
+                      r0 Origin Mandate + r1 Statutory Swap [PSY_01] + r2 Legal Tier Trap [PSY_03]
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setBossMcqOpen(false)}
+                    className="p-1.5 rounded bg-[#071630] border border-[rgba(224,208,171,0.2)] text-[#8fa2bd] hover:text-[#f4ecd8] cursor-pointer"
+                    title="Close Boss MCQ"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Stem & Statements */}
+                <div className="space-y-3 font-serif text-[#e8e0cf] text-sm sm:text-base leading-relaxed">
+                  <p className="font-semibold">{boss.stem}</p>
+                  <div className="space-y-2.5 pl-2 sm:pl-4 border-l-2 border-[#0194a8]/40">
+                    {boss.statements.map((stmt, sIdx) => (
+                      <p key={sIdx} className="text-sm text-[#f4ecd8] leading-relaxed">
+                        {stmt}
+                      </p>
+                    ))}
+                  </div>
+                  <p className="text-xs font-mono font-bold uppercase text-[#e0d0ab] pt-1">
+                    How many of the above statements are correct?
+                  </p>
+                </div>
+
+                {/* Options List */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                  {(['a', 'b', 'c', 'd'] as const).map((optKey, optIdx) => {
+                    const isSelected = bossSelectedOption === optIdx;
+                    const isStruck = bossStruckOptions.has(optIdx);
+                    const optText = boss.options[optKey];
+
+                    return (
+                      <div
+                        key={optKey}
+                        className={`p-3 rounded-sm border flex items-center justify-between gap-3 transition-all ${
+                          bossSubmitted
+                            ? optIdx === correctIdx
+                              ? 'bg-emerald-950/40 border-emerald-500/60 text-emerald-200'
+                              : isSelected
+                              ? 'bg-rose-950/40 border-rose-500/60 text-rose-200'
+                              : 'bg-[#071630]/40 border-[rgba(224,208,171,0.1)] opacity-50'
+                            : isSelected
+                            ? 'bg-[#e0d0ab]/15 border-[#e0d0ab] text-[#f4ecd8]'
+                            : isStruck
+                            ? 'bg-[#071630]/30 border-dashed border-red-500/40 text-red-300 line-through opacity-60'
+                            : 'bg-[#071630]/70 border-[rgba(224,208,171,0.2)] text-[#e8e0cf] hover:border-[#e0d0ab]/60'
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          disabled={bossSubmitted}
+                          onClick={() => {
+                            if (!isStruck) setBossSelectedOption(optIdx);
+                          }}
+                          className="flex-1 text-left flex items-center gap-2 cursor-pointer font-sans text-xs sm:text-sm font-medium"
+                        >
+                          <span className="font-mono text-xs font-bold text-[#e0d0ab]">
+                            ({optKey})
+                          </span>
+                          <span className={isStruck ? 'line-through text-red-300' : ''}>
+                            {optText}
+                          </span>
+                        </button>
+
+                        {!bossSubmitted && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const next = new Set(bossStruckOptions);
+                              if (next.has(optIdx)) {
+                                next.delete(optIdx);
+                              } else {
+                                if (bossSelectedOption === optIdx) setBossSelectedOption(null);
+                                next.add(optIdx);
+                              }
+                              setBossStruckOptions(next);
+                            }}
+                            className={`p-1 rounded text-[10px] font-mono border transition-colors cursor-pointer shrink-0 ${
+                              isStruck
+                                ? 'bg-red-500/20 text-red-300 border-red-500/40 hover:bg-red-500/30'
+                                : 'bg-[#041228] text-[#8fa2bd] border-[rgba(224,208,171,0.2)] hover:text-[#f4ecd8]'
+                            }`}
+                            title="Strike out option (Elimination)"
+                          >
+                            {isStruck ? 'Undo Strike' : 'Strike'}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Submit / Retake Controls */}
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[rgba(224,208,171,0.12)]">
+                  <div className="text-[11px] font-mono text-[#8fa2bd]">
+                    {bossStruckOptions.size === 2 ? (
+                      <span className="text-purple-300 font-bold">
+                        ★ 50:50 PROTOCOL ACTIVE (2 Options Eliminated)
+                      </span>
+                    ) : (
+                      <span>Tip: Strike out 2 options to compute your Calibrated 50:50 EV</span>
+                    )}
+                  </div>
+
+                  {!bossSubmitted ? (
+                    <button
+                      type="button"
+                      disabled={bossSelectedOption === null}
+                      onClick={() => setBossSubmitted(true)}
+                      className="px-5 py-2 rounded-sm bg-[#e0d0ab] hover:bg-white text-[#072e63] font-mono text-xs font-bold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                    >
+                      Lock In Answer
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBossSubmitted(false);
+                        setBossSelectedOption(null);
+                        setBossStruckOptions(new Set());
+                      }}
+                      className="px-4 py-1.5 rounded-sm bg-[#071630] border border-[rgba(224,208,171,0.3)] text-[#e0d0ab] hover:text-white font-mono text-xs flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>Re-fight Boss MCQ</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Instant Forensic BAY_02 Dissection & BAY_03 Synthesis */}
+                {bossSubmitted && (
+                  <div className="pt-4 border-t border-[rgba(224,208,171,0.15)] space-y-4">
+                    {/* Verdict Banner */}
+                    <div className="flex items-center justify-between gap-3 p-3.5 rounded-sm bg-[#041228] border border-[rgba(224,208,171,0.2)]">
+                      <div className="flex items-center gap-3">
+                        <span className={`text-3xl font-mono font-black ${isCorrect ? 'text-emerald-400' : 'text-rose-400'}`}>
+                          {isCorrect ? '+2.00' : '−0.66'}
+                        </span>
+                        <div>
+                          <span className={`text-xs font-bold uppercase font-mono block ${isCorrect ? 'text-emerald-300' : 'text-rose-300'}`}>
+                            {isCorrect ? 'FULL-CHAIN SYNTHESIS VALIDATED' : 'TRAPPED IN MULTI-RING DECEPTION'}
+                          </span>
+                          <span className="text-[11px] font-mono text-[#8fa2bd]">
+                            Official Key: <strong>({boss.official_key})</strong> • Primary Operator: <strong>{boss.primary_operator}</strong>
+                          </span>
+                        </div>
+                      </div>
+                      <span className="px-2.5 py-1 rounded-xs bg-[#e0d0ab]/10 border border-[#e0d0ab]/30 text-[#e0d0ab] font-mono text-[10px] font-bold uppercase">
+                        BAY_02 AUTOPSY
+                      </span>
+                    </div>
+
+                    {/* Statement Dissection Grid */}
+                    <div className="space-y-2">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold block">
+                        Statement-by-Statement Ring Dissection:
+                      </span>
+                      {boss.statement_dissection.map((sd) => (
+                        <div
+                          key={sd.stmt_num}
+                          className={`p-3 rounded-sm border text-xs font-mono space-y-1 ${
+                            sd.is_true
+                              ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-200'
+                              : 'bg-rose-950/20 border-rose-500/30 text-rose-200'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between font-bold">
+                            <span>Statement {sd.stmt_num}: {sd.is_true ? 'TRUE (Sovereign Anchor)' : 'FALSE (Examiner Trap)'}</span>
+                            {sd.operator && (
+                              <span className="px-1.5 py-0.2 rounded bg-rose-900/50 text-rose-300 text-[9.5px]">
+                                {sd.operator}
+                              </span>
+                            )}
+                          </div>
+                          {sd.anchor && (
+                            <div className="text-[11px] text-[#f4ecd8] font-sans">
+                              <strong>Anchor:</strong> {sd.anchor}
+                            </div>
+                          )}
+                          {sd.marked_trap && (
+                            <div className="text-[11px] font-sans text-rose-100">
+                              <span className="line-through text-rose-400 font-bold">{sd.marked_trap}</span> &rarr; Truth: <strong className="text-emerald-300">{sd.truth_key}</strong>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* 5-Tier Legal Authority Dissection Block */}
+                    {entity && (
+                      <div className="p-3.5 rounded-sm bg-[rgba(1,148,168,0.08)] border border-[rgba(1,148,168,0.3)] space-y-1">
+                        <div className="font-mono text-[10.5px] text-[#5fe3f5] font-bold uppercase tracking-wider">
+                          AUTHORITY TIER // TIER {entity.tier_number}: {entity.tier_name.toUpperCase()}
+                        </div>
+                        <div className="font-sans text-xs text-[#e8e0cf]">
+                          <strong className="text-[#e0d0ab]">ENTITY:</strong> {entity.authority} • <span className="text-[#9fb0c8]">Parent: {entity.parent_ministry}</span>
+                        </div>
+                        <div className="font-mono text-[11px] text-[#fca5a5] pt-0.5">
+                          <strong className="text-[#f87171]">TRAP DEFENSE [{entity.neutralized_trap || 'PSY_03'}]:</strong> {entity.trap_explanation}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Calibrated 50:50 EV Degradation Ledger */}
+                    {is5050 && evMetrics && (
+                      evMetrics.isEvInverted ? (
+                        <div className="p-3.5 rounded-sm bg-rose-950/70 border border-rose-500/60 text-rose-200 space-y-1">
+                          <div className="font-mono text-[11px] font-bold text-rose-300 uppercase flex items-center gap-1.5">
+                            <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                            <span>EV INVERSION ALERT [{evMetrics.operator}]: STRICT ABSTENTION</span>
+                          </div>
+                          <p className="font-sans text-xs text-rose-100 m-0 leading-relaxed">
+                            Your calibrated 50:50 accuracy on {op} is {(evMetrics.empiricalAccuracy * 100).toFixed(1)}% (EV: {evMetrics.calibratedEvPerCall > 0 ? `+${evMetrics.calibratedEvPerCall}` : evMetrics.calibratedEvPerCall} marks/call). Continuous trap attraction exceeds the 75.2% breakeven horizon. Protocol: <strong>STRICT ABSTENTION</strong>.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="p-3 rounded-sm font-mono text-xs border bg-[rgba(168,85,247,0.10)] border-[rgba(168,85,247,0.35)] text-[#d8b4fe] space-y-1">
+                          <div>
+                            <strong>CALIBRATED 50:50 EV [{evMetrics.operator}]:</strong> {evMetrics.calibratedEvPerCall > 0 ? `+${evMetrics.calibratedEvPerCall}` : evMetrics.calibratedEvPerCall} marks/call (Naive: +0.67 marks).
+                          </div>
+                          <div className="text-[11px] text-[#c4b5fd]">
+                            Protocol: <strong>{evMetrics.protocol}</strong> • Projected 15 Calls: {evMetrics.cumulativeEv15Calls > 0 ? `+${evMetrics.cumulativeEv15Calls}` : evMetrics.cumulativeEv15Calls} marks.
+                          </div>
+                        </div>
+                      )
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Collapsible Section 1: Full Propagation Path Timeline */}
           <div className="rounded-sm bg-[#041228] border border-[rgba(224,208,171,0.14)] overflow-hidden">

@@ -230,6 +230,25 @@ export interface NodePsycheProfile {
   }>;
 }
 
+export type EvExecutionProtocol =
+  | 'MANDATORY_EXECUTION'   // P_trap <= 0.25 (EV >= +1.335)
+  | 'AGGRESSIVE_EXECUTION'  // 0.25 < P_trap <= 0.35 (EV >= +1.069)
+  | 'STANDARD_EXECUTION'    // 0.35 < P_trap <= 0.50 (EV >= +0.670)
+  | 'SELECTIVE_CAUTION'     // 0.50 < P_trap < 0.752 (0.000 < EV < +0.670)
+  | 'STRICT_ABSTENTION';    // P_trap >= 0.752 (EV <= 0.000 — EV INVERSION HORIZON)
+
+export interface Calibrated5050Metrics {
+  operator: string;
+  sampleSize: number;
+  empiricalAccuracy: number;     // P_correct in [0, 1]
+  trapAttractionRate: number;    // P_trap = 1 - P_correct in [0, 1]
+  naiveEv: number;               // Fixed +0.670
+  calibratedEvPerCall: number;   // 2.00 - 2.66 * P_trap
+  cumulativeEv15Calls: number;   // calibratedEvPerCall * 15
+  isEvInverted: boolean;         // true when P_trap >= 0.7518 (Accuracy <= 24.8%)
+  protocol: EvExecutionProtocol;
+}
+
 export interface UserPsycheAutopsy {
   userId: string;
   totalAttempts: number;
@@ -246,8 +265,10 @@ export interface UserPsycheAutopsy {
       wrong: number;
       netMarks: number;
       expectedValuePerQuestion: number;
+      calibratedMetrics?: Calibrated5050Metrics;
     }
   >;
 }
+
 
 

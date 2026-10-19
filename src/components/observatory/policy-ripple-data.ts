@@ -16,8 +16,12 @@ export interface RippleChain {
   primary_pillar: string;
   lead_driver: string;
   historical_twin_pyq_id?: string | null;
-  status?: 'active' | 'dormant' | 'resolved';
   has_sync_debt?: boolean;
+  boss_mcq?: any;
+  boss_mcq_id?: string;
+  volcano_index?: number;
+  volcano_status?: string;
+  last_tested_year?: number;
   nodes_flow: RippleNode[];
   linked_dispatches: string[];
 }

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { RotateCcw, AlertTriangle, ShieldAlert, Crosshair, BookOpen, Sparkles } from 'lucide-react';
+import { RotateCcw, AlertTriangle, ShieldAlert, Crosshair, BookOpen, Sparkles, Flame, GitFork } from 'lucide-react';
 import { EXAMINER_OPERATORS, type ExaminerOperatorType, type StatementDissectionItem, type ArenaLaunchConfig } from '../types';
+import { getPolicyEntityForText } from '../lib/policy-ripple-radar-shared';
+import { computeCalibrated5050EV } from '../lib/examiner_psyche';
 
 interface SampleQuestion {
   id: string;
@@ -19,6 +21,7 @@ interface SampleQuestion {
   node_id: string;
   primary_operator: ExaminerOperatorType;
   secondary_operator?: ExaminerOperatorType;
+  entity_slugs?: string[];
   statutory_anchor: string;
   marked_trap_label?: string;
   truth_key_label?: string;
@@ -240,10 +243,64 @@ const SAMPLE_QUESTIONS: SampleQuestion[] = [
         anchor: 'Tenth Schedule, Paragraph 2(3) (disqualification if joining after 6 months)',
       },
     ],
+  },
+  {
+    id: 'sample-pib-semicon-nexus',
+    subject: 'Science & Industry Policy',
+    yearTag: 'Full-Chain Boss MCQ (r0→r2)',
+    tabLabel: 'Boss: Semicon Nexus',
+    isPibTrap: true,
+    node_id: 'GS3.SCI.IT_COMP',
+    primary_operator: 'PSY_01_INST_SWAP',
+    secondary_operator: 'PSY_03_LEGAL_TIER',
+    entity_slugs: ['ENT_ISM'],
+    statutory_anchor: 'Semicon India Programme Guidelines, MeitY Gazette ID 2022-774',
+    marked_trap_label: '(b) Only two [Statutory Authority & Ministry Trap]',
+    truth_key_label: '(a) Only one [Sovereign Fiscal Anchor True]',
+    question: 'With reference to the India Semiconductor Mission (ISM) and Semicon 2.0 architecture, consider the following statements:',
+    statements: [
+      'Under Semicon 2.0 guidelines approved by the Union Cabinet, fiscal support of up to 50% of project cost is extended on an equal pari-passu basis for setting up Silicon Semiconductor Fabs in India.',
+      'The operationalization of compound semiconductor units and execution of the Electronic Components and Manufacturing Scheme (ECMS) is administered directly under the statutory authority of the Ministry of Heavy Industries.',
+      'The India Semiconductor Mission (ISM) is a statutory regulatory body established pursuant to an Act of Parliament to adjudicate technology transfer disputes.'
+    ],
+    prompt: 'How many of the above statements are correct?',
+    options: [
+      'Only one',
+      'Only two',
+      'All three',
+      'None'
+    ],
+    correctIndex: 0,
+    trap: 'Multi-Ring Policy Ripple Trap. Statement 1 is TRUE (r0 origin). Statement 2 swaps the executing ministry—ISM is under MeitY (Digital India Corporation), NOT Ministry of Heavy Industries. Statement 3 misattributes Legal Tier—ISM is a Tier-4 Autonomous Society / division within a Section-8 company, NOT a statutory body.',
+    weakness: 'Semiconductors & Deep Tech Policy chain vulnerability detected (−0.66 marks). Fact half-life anchored: T_1/2 >= 231 days.',
+    statement_dissection: [
+      {
+        stmt_num: 1,
+        is_true: true,
+        operator: null,
+        anchor: 'Cabinet Approval December 2021 / Modified Scheme 2022 (50% pari-passu subsidy)',
+      },
+      {
+        stmt_num: 2,
+        is_true: false,
+        operator: 'PSY_01_INST_SWAP',
+        marked_trap: 'Ministry of Heavy Industries',
+        truth_key: 'Ministry of Electronics and Information Technology (MeitY) / Digital India Corporation',
+        anchor: 'ISM Operational Guidelines, Para 1.2',
+      },
+      {
+        stmt_num: 3,
+        is_true: false,
+        operator: 'PSY_03_LEGAL_TIER',
+        marked_trap: 'Tier-2 statutory regulatory body created under an Act of Parliament',
+        truth_key: 'Tier-4 Autonomous Nodal Division within Digital India Corporation (Section 8 Company)',
+        anchor: 'Digital India Corporation Bye-laws, 2021',
+      },
+    ],
   }
 ];
 
-const TRAP_DEFAULTS = [1, 2, 1, 2, 0];
+const TRAP_DEFAULTS = [1, 2, 1, 2, 0, 1];
 
 interface DiagnosticPreviewProps {
   onLaunchFullArena: (config?: ArenaLaunchConfig) => void;
@@ -695,33 +752,86 @@ export default function DiagnosticPreview({ onLaunchFullArena }: DiagnosticPrevi
                     </>
                   )}
 
-                  {/* BAY_03 // SYNTHESIS: Blind Spot & 50:50 Ledger */}
-                  <div className="font-mono text-[10px] text-[#e0d0ab] tracking-[0.16em] uppercase pt-0.5 font-bold">
-                    BAY_03 Synthesis
-                  </div>
-                  <div className="space-y-2">
-                    <div className="p-3 rounded bg-[rgba(224,208,171,0.06)] border border-[rgba(224,208,171,0.20)]">
-                      <div className="font-mono text-[11px] text-[#e0d0ab] font-bold uppercase mb-1">
-                        PSYCHE VULNERABILITY: {opMeta.code} // {opMeta.label}
-                      </div>
-                      <p className="font-serif text-xs text-[#f4ecd8] leading-relaxed m-0">
-                        Historical telemetry confirms paper-setters exploit this exact mutation to extract marks on <strong>{q.node_id}</strong>. Without operator-level awareness, repeat misses on this structural pattern bleed an average of <strong>−2.64 marks</strong> across Prelims.
-                      </p>
-                    </div>
+                  {/* 5-Tier Legal Authority Dissection Block (BAY_02) */}
+                  {(() => {
+                    const policyEntity = getPolicyEntityForText(
+                      `${q.question} ${q.trap} ${q.statutory_anchor || ''} ${q.statements?.join(' ') || ''}`,
+                      q.entity_slugs
+                    );
+                    if (!policyEntity) return null;
+                    return (
+                      <>
+                        <div className="font-mono text-[10px] text-[#0194a8] tracking-[0.16em] uppercase pt-0.5 font-bold">
+                          5-Tier Authority
+                        </div>
+                        <div className="p-3 rounded bg-[rgba(1,148,168,0.08)] border border-[rgba(1,148,168,0.3)] space-y-1">
+                          <div className="font-mono text-[10.5px] text-[#5fe3f5] font-bold uppercase tracking-wider">
+                            AUTHORITY TIER // TIER {policyEntity.tier_number}: {policyEntity.tier_name.toUpperCase()}
+                          </div>
+                          <div className="font-sans text-xs text-[#e8e0cf]">
+                            <strong className="text-[#e0d0ab]">ENTITY:</strong> {policyEntity.authority} • <span className="text-[#9fb0c8]">Parent: {policyEntity.parent_ministry}</span>
+                          </div>
+                          <div className="font-mono text-[11px] text-[#fca5a5] pt-0.5">
+                            <strong className="text-[#f87171]">TRAP DEFENSE [{policyEntity.neutralized_trap || 'PSY_03'}]:</strong> {policyEntity.trap_explanation}
+                          </div>
+                        </div>
+                      </>
+                    );
+                  })()}
 
-                    {/* 50:50 Ledger Expected Value Callout */}
-                    <div className={`p-2.5 rounded font-mono text-xs border ${is5050Call ? 'bg-[rgba(168,85,247,0.10)] border-[rgba(168,85,247,0.35)] text-[#d8b4fe]' : 'bg-[rgba(5,11,26,0.4)] border-[rgba(224,208,171,0.12)] text-[#7d8ca4]'}`}>
-                      {is5050Call ? (
-                        <span>
-                          <strong>50:50 LEDGER CALL LOGGED:</strong> Strike-out eliminated 2 options. Expected Value (EV) on {opMeta.shortLabel} recorded: {isCorrect ? '+2.00 EV' : '−0.66 EV'}.
-                        </span>
-                      ) : (
-                        <span>
-                          <strong>50:50 LEDGER:</strong> Full-set attempt recorded. (Strike out 2 options on your next question to compute your operator-level elimination EV).
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                  {/* BAY_03 // SYNTHESIS: Blind Spot & Calibrated 50:50 Ledger */}
+                  {(() => {
+                    // Bayesian-calibrated 50:50 EV degradation metrics
+                    const calibratedMetrics = is5050Call
+                      ? computeCalibrated5050EV(opMeta.code, isCorrect ? 1 : 0, 4, isCorrect ? 0.30 : 0.76)
+                      : null;
+
+                    return (
+                      <>
+                        <div className="font-mono text-[10px] text-[#e0d0ab] tracking-[0.16em] uppercase pt-0.5 font-bold">
+                          BAY_03 Synthesis
+                        </div>
+                        <div className="space-y-2">
+                          <div className="p-3 rounded bg-[rgba(224,208,171,0.06)] border border-[rgba(224,208,171,0.20)]">
+                            <div className="font-mono text-[11px] text-[#e0d0ab] font-bold uppercase mb-1">
+                              PSYCHE VULNERABILITY: {opMeta.code} // {opMeta.label}
+                            </div>
+                            <p className="font-serif text-xs text-[#f4ecd8] leading-relaxed m-0">
+                              Historical telemetry confirms paper-setters exploit this exact mutation to extract marks on <strong>{q.node_id}</strong>. Without operator-level awareness, repeat misses on this structural pattern bleed an average of <strong>−2.64 marks</strong> across Prelims.
+                            </p>
+                          </div>
+
+                          {/* 50:50 Ledger Expected Value Callout & Continuous Inversion Alert */}
+                          {is5050Call && calibratedMetrics ? (
+                            calibratedMetrics.isEvInverted ? (
+                              <div className="p-3 rounded bg-rose-950/70 border border-rose-500/60 text-rose-200 space-y-1">
+                                <div className="font-mono text-[11px] font-bold text-rose-300 uppercase flex items-center gap-1.5">
+                                  <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                                  <span>EV INVERSION ALERT [{calibratedMetrics.operator}]: STRICT ABSTENTION</span>
+                                </div>
+                                <p className="font-sans text-xs text-rose-100 m-0 leading-relaxed">
+                                  Your 50:50 accuracy on {opMeta.shortLabel} is {(calibratedMetrics.empiricalAccuracy * 100).toFixed(1)}% (EV: {calibratedMetrics.calibratedEvPerCall > 0 ? `+${calibratedMetrics.calibratedEvPerCall}` : calibratedMetrics.calibratedEvPerCall} marks/call). Continuous trap attraction exceeds the 75.2% breakeven horizon. Protocol: <strong>STRICT ABSTENTION</strong>.
+                                </p>
+                              </div>
+                            ) : (
+                              <div className="p-2.5 rounded font-mono text-xs border bg-[rgba(168,85,247,0.10)] border-[rgba(168,85,247,0.35)] text-[#d8b4fe] space-y-1">
+                                <div>
+                                  <strong>CALIBRATED 50:50 EV [{calibratedMetrics.operator}]:</strong> {calibratedMetrics.calibratedEvPerCall > 0 ? `+${calibratedMetrics.calibratedEvPerCall}` : calibratedMetrics.calibratedEvPerCall} marks/call (Naive: +0.67 marks).
+                                </div>
+                                <div className="text-[11px] text-[#c4b5fd]">
+                                  Protocol: <strong>{calibratedMetrics.protocol}</strong> • Projected 15 Calls: {calibratedMetrics.cumulativeEv15Calls > 0 ? `+${calibratedMetrics.cumulativeEv15Calls}` : calibratedMetrics.cumulativeEv15Calls} marks.
+                                </div>
+                              </div>
+                            )
+                          ) : (
+                            <div className="p-2.5 rounded font-mono text-xs border bg-[rgba(5,11,26,0.4)] border-[rgba(224,208,171,0.12)] text-[#7d8ca4]">
+                              <strong>50:50 LEDGER:</strong> Full-set attempt recorded. (Strike out 2 options on your next question to compute your calibrated operator-level elimination EV curve).
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    );
+                  })()}
 
                   {/* BAY_04 // RESOLUTION */}
                   <div className="font-mono text-[10px] text-[#6e7d94] tracking-[0.16em] uppercase pt-0.5">

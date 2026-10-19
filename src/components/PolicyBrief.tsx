@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, useReducedMotion } from 'motion/react';
-import { AlertCircle, Bookmark, BookOpen, ExternalLink, Share2, Target, X, AlertTriangle, ShieldAlert, Crosshair } from 'lucide-react';
+import { AlertCircle, Bookmark, BookOpen, ExternalLink, Share2, Target, X, AlertTriangle, ShieldAlert, Crosshair, Flame, GitFork } from 'lucide-react';
 import { getDispatchOperator, HISTORICAL_TWIN_VAULT, type CurrentAffairsItem, type ParsedSyllabusTag } from './CurrentAffairs';
+import { matchDispatchToPolicyChain, getVolcanoTelemetryForNode } from '../lib/policy-ripple-radar-shared';
 import { EXAMINER_OPERATORS } from '../types';
 import { ContestedCard, GroundingBadge, SourceAnchor } from './TrustUI';
 import { TheHinduLogo, PibLogo } from './SourceLogos';
@@ -204,6 +205,43 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
                   </span>
                 );
               })()}
+
+              {/* Volcano Telemetry Badge */}
+              {(() => {
+                const v = getVolcanoTelemetryForNode(item.node_id, item.headline, item.ministry);
+                if (!v || v.volcano_status !== 'ERUPTING') return null;
+                return (
+                  <span
+                    className="font-mono text-[11px] font-bold text-rose-300 bg-rose-950/70 px-2 py-0.5 rounded border border-rose-500/50 inline-flex items-center gap-1 shadow-xs"
+                    title={`Volcano Node ${v.node_id}: ${v.years_dormant} years since last tested, high 2026 news velocity`}
+                  >
+                    <Flame size={12} className="text-rose-400 animate-pulse" />
+                    <span>VOLCANO V_j: {v.volcano_index.toFixed(1)} // {v.years_dormant}-YR REBOUND</span>
+                  </span>
+                );
+              })()}
+
+              {/* Clickable Policy Ripple Pill */}
+              {(() => {
+                const chain = matchDispatchToPolicyChain(item.headline, item.ministry, item.summary?.bullets?.join(' '), item.chain_id);
+                if (!chain) return null;
+                return (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const targetUrl = `/observatory?tab=ripple&chain=${chain.chain_id}`;
+                      window.history.pushState(null, '', targetUrl);
+                      window.dispatchEvent(new PopStateEvent('popstate'));
+                    }}
+                    className="font-mono text-[11px] font-bold text-[#5fe3f5] bg-[rgba(1,148,168,0.2)] hover:bg-[rgba(1,148,168,0.35)] px-2 py-0.5 rounded border border-[rgba(1,148,168,0.5)] inline-flex items-center gap-1 transition-colors cursor-pointer"
+                    title={`Deep-link to Policy Ripple Radar: ${chain.title}`}
+                  >
+                    <GitFork size={12} className="text-[#0194a8]" />
+                    <span>[RIPPLE r{item.ring_depth ?? 2} // {chain.title.toUpperCase()} → VIEW CHAIN]</span>
+                  </button>
+                );
+              })()}
+
               <GroundingBadge grounding={summary?.grounding} verificationMethod={summary?.verification_method}
                 headline={item.headline} source={item.source} sourceUrl={item.url} claims={summary?.claims} onClick={onInspectGrounding} />
 
