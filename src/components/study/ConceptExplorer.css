@@ -1,0 +1,192 @@
+.study-concept {
+  container-type: inline-size;
+  width: 100%;
+  max-width: 650px;
+  color: #e8e0cf;
+  font-family: var(--font-sans, "Bricolage Grotesque", sans-serif);
+}
+
+.study-concept-question {
+  margin: 0 0 22px;
+  color: #e8e0cf;
+  font-family: var(--font-serif, "Newsreader", Georgia, serif);
+  font-size: 21px;
+  line-height: 1.45;
+}
+
+.study-concept-workspace {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.9fr) minmax(0, 1.2fr);
+  gap: 26px;
+  align-items: start;
+}
+
+.study-concept-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.study-concept-choice {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-height: 44px;
+  padding: 12px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: #b5c1d1;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease;
+}
+
+.study-concept-choice:hover {
+  color: #e8e0cf;
+  background: rgba(224, 208, 171, 0.04);
+}
+
+.study-concept-choice[aria-pressed="true"] {
+  color: #e0d0ab;
+  border-color: rgba(224, 208, 171, 0.36);
+  background: rgba(224, 208, 171, 0.07);
+}
+
+.study-concept-number {
+  min-width: 1ch;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.study-concept-reading {
+  min-width: 0;
+  padding-top: 11px;
+}
+
+.study-concept-position {
+  margin: 0 0 12px;
+  color: #b5c1d1;
+  font-size: 12px;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+}
+
+.study-concept-detail {
+  margin: 0;
+  color: #e8e0cf;
+  font-family: var(--font-serif, "Newsreader", Georgia, serif);
+  font-size: 20px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.study-concept-example {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(224, 208, 171, 0.16);
+}
+
+.study-concept-example h4 {
+  margin: 0 0 8px;
+  color: #e0d0ab;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.study-concept-example p {
+  margin: 0;
+  color: #b5c1d1;
+  font-size: 14px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.study-concept-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 24px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(224, 208, 171, 0.16);
+}
+
+.study-concept-pagination button {
+  min-height: 44px;
+  padding: 8px 0;
+  border: 0;
+  color: #e0d0ab;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.study-concept-pagination button:hover:not(:disabled) {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.study-concept-pagination button:disabled {
+  color: #b5c1d1;
+  opacity: 0.45;
+  cursor: default;
+}
+
+.study-concept button:focus-visible {
+  outline: 2px solid #e0d0ab;
+  outline-offset: 3px;
+}
+
+.study-concept-empty {
+  color: #b5c1d1;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.study-concept-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@container (max-width: 520px) {
+  .study-concept-workspace {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .study-concept-choices {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .study-concept-reading {
+    padding-top: 16px;
+    border-top: 1px solid rgba(224, 208, 171, 0.16);
+  }
+}
+
+@container (max-width: 330px) {
+  .study-concept-choices {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .study-concept-choice {
+    transition: none;
+  }
+}
