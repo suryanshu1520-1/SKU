@@ -7,6 +7,13 @@ export interface ConceptExplorerProps {
   map: MindMapNode;
 }
 
+// Short navigation labels describe the existing editorial steps; the reading
+// panel keeps their full wording instead of repeating a paragraph in each button.
+const STEP_LABELS: Record<string, string[]> = {
+  'mm-case-study': ['Identify stakeholders', 'Name the dilemma', 'Compare options', 'Check duties & values', 'Choose & justify', 'Prevent recurrence'],
+  'mm-rc-rules': ['Stay within the passage', 'Test the assumption', 'Check the scope'],
+};
+
 function choiceLabel(detail: string, sequential: boolean): string {
   const colon = detail.indexOf(':');
   if (colon < 0) return detail;
@@ -51,7 +58,7 @@ function Explorer({ map }: ConceptExplorerProps) {
               onClick={() => setSelectedIndex(index)}
             >
               {sequential && <span className="study-concept-number" aria-hidden="true">{index + 1}</span>}
-              <span>{choiceLabel(detail, sequential)}</span>
+              <span>{STEP_LABELS[map.id]?.[index] || choiceLabel(detail, sequential)}</span>
               {sequential && <span className="study-concept-sr-only">, step {index + 1} of {map.details.length}</span>}
             </button>
           ))}

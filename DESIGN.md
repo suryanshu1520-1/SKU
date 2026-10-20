@@ -71,6 +71,8 @@ Tark pairs an academic reading voice with an analytical interface. A dark field 
 
 This record captures the completed landing page. Its display sizes, generous spacing and persuasive rhythm belong to that surface. They do not replace the denser layouts, state colors or interaction patterns of Intelligence, the Test Arena or other operating screens. The landing sequence is recorded separately in its surface brief.
 
+The Study library is an additional operating and reading surface within the same identity. Its compact subject navigation, resource index and single reader have a separate surface brief and the component guidance below. The landing frontmatter and composition remain scoped to the landing; the library retains its own observed interface sizes, cream ink and responsive workspace behavior.
+
 **Key Characteristics:**
 
 - Clear editorial hierarchy before interface decoration.
@@ -149,6 +151,16 @@ One canonical question uses native radio controls inside a fieldset. Selection, 
 ### Membership and footer
 
 Membership is a quiet aside with price, account action and refund link. The footer keeps the existing wordmark and direct legal links. Availability and purchase state belong to the account flow; the landing does not simulate live seat counts.
+
+### Study library
+
+The library organises the existing editorial collection into six subjects and three available activity groups: Study notes, Compare & recall, and Answer writing. Desktop pairs compact subject and resource navigation with a single reader. Gold selected states, navy tonal changes and fine warm rules establish hierarchy. At narrower container widths the subject navigation becomes a labelled native select, then the resource index becomes a disclosure above the reader. These workspace patterns do not replace the landing composition.
+
+The reading voice uses Newsreader at approximately 18–20px with a generous line height and a clear 30px resource title. Bricolage carries the compact controls and labels; mono stays with numerical notation. Visible gold focus, native links and controls, at least 44px interaction heights and bounded Previous/Next navigation are part of this surface's working character.
+
+Global local search opens real resources across subjects, including table cells and existing worked examples. Concept explorers select actual categories or ordered steps without implying completion. Reference tables offer a keyboard-accessible comparison region and an optional Recall view: reveal the existing details, then move to another entry. Answer outlines offer Opening, Arguments and Conclusion rather than a wall of simultaneous text. Source information stays available through a quiet disclosure, and editorial outlines are distinguished from official marking schemes.
+
+State changes stay brief: a new resource reveals over 200ms, an outline part over 220ms, a concept choice over 260ms and recall details over 240ms. Reduced motion removes transitions. Selection and recall do not record mastery or progress. This surface does not display the former hardcoded volcano indicators, trap percentages or unsupported examination forecasts; backend evidence and reviewed sources remain a separate integration responsibility.
 
 ## Do's and Don'ts
 
