@@ -34,3 +34,4 @@ Existing source-linked current-affairs briefs and canonical UPSC question-bank c
 - Use original evidence and distinguish demonstrations from live data.
 - Offer a clear next action without duplicating the entire application navigation.
 - Preserve accessible, responsive operation and reduced-motion behavior.
+- Showcase actual supported product behavior on the landing page. Never invent a teaching method or article format to make a preview more impressive; this reflects the user's correction on 20 October 2026.
