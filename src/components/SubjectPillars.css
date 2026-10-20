@@ -178,7 +178,7 @@
 }
 .study-note__overview { margin-bottom: 28px; }
 .study-disclosure { padding-block: 16px; border-top: 1px solid var(--study-rule); }
-.study-disclosure summary { min-height: 30px; color: var(--study-gold); font-size: 14px; line-height: 1.6; cursor: pointer; }
+.study-disclosure summary { min-height: 44px; padding-block: 10px; color: var(--study-gold); font-size: 14px; line-height: 1.6; cursor: pointer; }
 .study-disclosure summary span { margin-left: 8px; color: var(--study-muted); font-size: 12px; }
 .study-disclosure ul { padding-left: 20px; margin-bottom: 0; }
 .study-disclosure[open] ul { margin-top: 18px; }
@@ -198,7 +198,7 @@
 .study-answer__body section + section { margin-top: 26px; }
 .study-material-note { margin: 20px 0 0; color: var(--study-muted); font-size: 12px; line-height: 1.7; }
 .study-source-note { margin-top: 30px; padding-block: 12px; border-top: 1px solid var(--study-rule); }
-.study-source-note summary { min-height: 32px; color: var(--study-muted); font-size: 12px; line-height: 2; cursor: pointer; }
+.study-source-note summary { min-height: 44px; padding-block: 10px; color: var(--study-muted); font-size: 12px; line-height: 2; cursor: pointer; }
 .study-source-note p { max-width: 65ch; margin: 10px 0 8px; color: var(--study-body); font-size: 12px; line-height: 1.75; }
 .study-reader-paging { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 14px; border-top: 1px solid var(--study-rule); }
 .study-reader-paging button, .study-text-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 0; border: 0; color: var(--study-gold); background: transparent; font-size: 13px; line-height: 1.5; }
@@ -256,6 +256,9 @@
   .study-note__overview, .study-answer__body > p, .study-answer__body li { font-size: 19px; }
   .study-pointer { padding: 18px; }
   .study-answer__parts button { padding-inline: 12px; font-size: 12px; }
+}
+@media (min-width: 768px) and (max-width: 1279px) {
+  .study-library { padding-left: 20px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .study-library *, .study-library *::before, .study-library *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }

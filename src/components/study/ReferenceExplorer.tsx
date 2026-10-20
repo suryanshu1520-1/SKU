@@ -122,6 +122,7 @@ function ReferenceExplorerBody({ matrix }: ReferenceExplorerProps) {
               {revealed ? 'Hide details' : 'Reveal details'}
             </button>
             <div
+              key={filteredRows[safePosition].originalIndex}
               id={`${id}-details`}
               className={`study-reference-details${revealed ? ' is-revealed' : ''}`}
               aria-hidden={!revealed}

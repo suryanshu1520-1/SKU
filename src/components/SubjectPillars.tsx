@@ -60,9 +60,10 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
     if (window.location.pathname + window.location.search !== url) window.history.pushState(null, '', url);
     if (focusReader) window.requestAnimationFrame(() => {
       headingRef.current?.focus({ preventScroll: true });
-      if (window.matchMedia('(max-width: 760px)').matches) {
-        headingRef.current?.scrollIntoView({ block: 'start', behavior: reducedMotion ? 'auto' : 'smooth' });
-      }
+      headingRef.current?.scrollIntoView({
+        block: window.matchMedia('(max-width: 760px)').matches ? 'start' : 'nearest',
+        behavior: reducedMotion ? 'auto' : 'smooth',
+      });
     });
   }
   function selectSubject(subjectId: string) {
