@@ -21,6 +21,7 @@ import "../load-env.js";
 import { createClient } from "@supabase/supabase-js";
 import { llmGenerate, llmAvailable } from "../llm.js";
 import type { ExaminerOperatorType } from "../analytics/examiner_psyche.js";
+import { onFailure } from "../policy/worker-state.js";
 
 function getSupabase() {
   const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
@@ -46,139 +47,12 @@ export interface PolicyDispatchCandidate {
   url?: string;
   published_at?: string;
   graph_processed_at?: string;
+  graph_status?: string;
+  graph_attempts?: number;
+  graph_next_attempt_at?: string | null;
 }
 
-export const CANONICAL_BOSS_MCQ_FALLBACKS: Record<string, any> = {
-  CHAIN_01_SEMICON_NEXUS: {
-    stem: "With reference to the India Semiconductor Mission (ISM) and Semicon 2.0 architecture, consider the following statements:",
-    statements: [
-      "1. Under Semicon 2.0 guidelines approved by the Union Cabinet, fiscal support of up to 50% of project cost is extended on an equal pari-passu basis for setting up Silicon Semiconductor Fabs in India.",
-      "2. The operationalization of compound semiconductor units and execution of the Electronic Components and Manufacturing Scheme (ECMS) is administered directly under the statutory authority of the Ministry of Heavy Industries.",
-      "3. The India Semiconductor Mission (ISM) is a statutory regulatory body established pursuant to an Act of Parliament to adjudicate technology transfer disputes."
-    ],
-    options: {
-      a: "Only one",
-      b: "Only two",
-      c: "All three",
-      d: "None"
-    },
-    official_key: "a",
-    primary_operator: "PSY_01_INST_SWAP",
-    secondary_operator: "PSY_03_LEGAL_TIER",
-    claim_half_life_days: 231.0,
-    statutory_anchor: "Cabinet Semicon 2.0 Approval / MeitY Notification ISM-2022/01",
-    statement_dissection: [
-      {
-        stmt_num: 1,
-        is_true: true,
-        operator: null,
-        anchor: "Sovereign Cabinet approval provides 50% capital subsidy on pari-passu basis for approved Silicon Fabs."
-      },
-      {
-        stmt_num: 2,
-        is_true: false,
-        operator: "PSY_01_INST_SWAP",
-        marked_trap: "Ministry of Heavy Industries",
-        truth_key: "Ministry of Electronics and Information Technology (MeitY) / Digital India Corporation",
-        anchor: "ECMS and ISM are administered directly by MeitY, NOT Ministry of Heavy Industries."
-      },
-      {
-        stmt_num: 3,
-        is_true: false,
-        operator: "PSY_03_LEGAL_TIER",
-        marked_trap: "Tier-2 Statutory Regulatory Body pursuant to Act of Parliament",
-        truth_key: "Tier-4 Autonomous Nodal Division / Society within Digital India Corporation",
-        anchor: "ISM is an autonomous business division under Digital India Corporation (Section 8 company), NOT a statutory body established by Parliament."
-      }
-    ]
-  },
-  CHAIN_02_CIRCULAR_EWASTE: {
-    stem: "With reference to the Extended Producer Responsibility (EPR) and Circular Economy framework for electrical and electronic equipment, consider the following statements:",
-    statements: [
-      "1. Under the E-Waste (Management) Rules, producers of electronic goods are mandated to achieve specified recycling targets through registered recyclers generating online EPR certificates.",
-      "2. The centralized digital EPR portal for registering recycling certificates and monitoring trading compliance is managed directly by NITI Aayog.",
-      "3. The Commission for Air Quality Management (CAQM) is an executive advisory committee constituted under an administrative order of the Ministry of Power."
-    ],
-    options: {
-      a: "Only one",
-      b: "Only two",
-      c: "All three",
-      d: "None"
-    },
-    official_key: "a",
-    primary_operator: "PSY_01_INST_SWAP",
-    secondary_operator: "PSY_03_LEGAL_TIER",
-    claim_half_life_days: 231.0,
-    statutory_anchor: "Environment (Protection) Act, 1986 / E-Waste (Management) Rules, 2022",
-    statement_dissection: [
-      {
-        stmt_num: 1,
-        is_true: true,
-        operator: null,
-        anchor: "E-Waste Rules 2022 introduce market-based EPR recycling credit trading system for registered producers."
-      },
-      {
-        stmt_num: 2,
-        is_true: false,
-        operator: "PSY_01_INST_SWAP",
-        marked_trap: "NITI Aayog",
-        truth_key: "Central Pollution Control Board (CPCB) / MoEFCC",
-        anchor: "Centralized EPR portal and compliance enforcement is vested in CPCB under MoEFCC, NOT NITI Aayog."
-      },
-      {
-        stmt_num: 3,
-        is_true: false,
-        operator: "PSY_03_LEGAL_TIER",
-        marked_trap: "Executive advisory committee under Ministry of Power",
-        truth_key: "Tier-2 Statutory Commission established by an Act of Parliament (CAQM Act, 2021)",
-        anchor: "CAQM is a statutory body created by the Commission for Air Quality Management in NCR Act, 2021, NOT an executive advisory panel."
-      }
-    ]
-  },
-  CHAIN_03_DEFENSE_EXPORT_SURGE: {
-    stem: "With reference to the Defense Indigenization and Defense Acquisition Procedure (DAP) architecture, consider the following statements:",
-    statements: [
-      "1. Under the Positive Indigenization Lists notified by the Ministry of Defense, embargoes are placed on the import of designated defense systems to promote domestic manufacturing.",
-      "2. The issuance of industrial licenses for manufacturing defense aircraft, warships, and specialized combat equipment is regulated exclusively by the Ministry of Defense.",
-      "3. The Society of Indian Defense Manufacturers (SIDM) is a statutory authority established by an Act of Parliament to set mandatory defense export quotas."
-    ],
-    options: {
-      a: "Only one",
-      b: "Only two",
-      c: "All three",
-      d: "None"
-    },
-    official_key: "a",
-    primary_operator: "PSY_01_INST_SWAP",
-    secondary_operator: "PSY_03_LEGAL_TIER",
-    claim_half_life_days: 231.0,
-    statutory_anchor: "Industries (Development & Regulation) Act, 1951 / DAP Guidelines",
-    statement_dissection: [
-      {
-        stmt_num: 1,
-        is_true: true,
-        operator: null,
-        anchor: "Defense Ministry notifications enforce progressive import bans across 500+ defense hardware items."
-      },
-      {
-        stmt_num: 2,
-        is_true: false,
-        operator: "PSY_01_INST_SWAP",
-        marked_trap: "Ministry of Defense",
-        truth_key: "Department for Promotion of Industry and Internal Trade (DPIIT) / Ministry of Commerce",
-        anchor: "Defense industrial licensing is administered by DPIIT under IDRA 1951, in consultation with MoD."
-      },
-      {
-        stmt_num: 3,
-        is_true: false,
-        operator: "PSY_03_LEGAL_TIER",
-        marked_trap: "Tier-2 Statutory Authority established by Parliament",
-        truth_key: "Tier-4 Apex Industry Association / Registered Society (non-statutory)",
-        anchor: "SIDM is a non-governmental apex defense industry body, NOT a statutory commission created by Parliament."
-      }
-    ]
-  }
-};
+
 
 /**
  * Auto-synthesizes a 3-statement Full-Chain Boss MCQ for a policy chain with >= 3 nodes.
@@ -294,11 +168,7 @@ Return strictly valid JSON:
 
   // Fallback to pre-authored canonical boss MCQ if LLM cold or unparseable
   if (!parsed || !parsed.stem || !Array.isArray(parsed.statements) || parsed.statements.length !== 3) {
-    if (CANONICAL_BOSS_MCQ_FALLBACKS[chain.chain_id]) {
-      parsed = CANONICAL_BOSS_MCQ_FALLBACKS[chain.chain_id];
-    } else {
-      return { ok: false, reason: "SYNTHESIS_FAILED_NO_FALLBACK" };
-    }
+    return { ok: false, reason: "SYNTHESIS_FAILED_NO_FALLBACK" };
   }
 
   const keyIndexMap: Record<string, number> = { a: 0, b: 1, c: 2, d: 3 };
@@ -382,37 +252,57 @@ export async function processDispatchIntoPolicyGraph(item: PolicyDispatchCandida
 
   const dispatchId = item.id || item.url || item.headline;
 
-  // 0. Quota Idempotency Guard: check graph_processed_at first
+  // 0. Quota Idempotency Guard: check graph_processed_at or status first
   if (item.id) {
     const { data: ca } = await supabase
       .from("current_affairs")
-      .select("graph_processed_at, chain_id")
+      .select("graph_processed_at, chain_id, graph_status, graph_attempts")
       .eq("id", item.id)
       .maybeSingle();
 
-    if (ca?.graph_processed_at) {
+    if (ca?.graph_processed_at || ca?.graph_status === "linked" || ca?.graph_status === "no_event") {
       return { ok: true, matched: Boolean(ca.chain_id), chain_id: ca.chain_id || undefined, reason: "ALREADY_PROCESSED" };
+    }
+    if (typeof item.graph_attempts !== "number" && typeof ca?.graph_attempts === "number") {
+      item.graph_attempts = ca.graph_attempts;
     }
   }
 
-  // 1. Check if this dispatch has already been linked to any chain
-  let query = supabase.from("policy_chain_nodes").select("id");
-  if (item.id && item.url) {
-    query = query.or(`dispatch_id.eq.${item.id},pib_url.eq.${item.url}`);
-  } else if (item.id) {
-    query = query.eq("dispatch_id", item.id);
-  } else if (item.url) {
-    query = query.eq("pib_url", item.url);
-  } else {
-    query = query.eq("action", item.headline);
+  // 1. Check if this dispatch has already been linked to any chain (parameterized queries, no comma injection)
+  let existingNode: any = null;
+  if (item.id) {
+    const { data } = await supabase
+      .from("policy_chain_nodes")
+      .select("id")
+      .eq("dispatch_id", item.id)
+      .maybeSingle();
+    existingNode = data;
+  }
+  if (!existingNode && item.url) {
+    const { data } = await supabase
+      .from("policy_chain_nodes")
+      .select("id")
+      .eq("pib_url", item.url)
+      .maybeSingle();
+    existingNode = data;
+  }
+  if (!existingNode && !item.id && !item.url) {
+    const { data } = await supabase
+      .from("policy_chain_nodes")
+      .select("id")
+      .eq("action", item.headline)
+      .maybeSingle();
+    existingNode = data;
   }
 
-  const { data: existingNode } = await query.maybeSingle();
   if (existingNode) {
     if (item.id) {
       await supabase
         .from("current_affairs")
-        .update({ graph_processed_at: new Date().toISOString() })
+        .update({
+          graph_status: "linked",
+          graph_processed_at: new Date().toISOString(),
+        })
         .eq("id", item.id);
     }
     return { ok: true, matched: true, reason: "ALREADY_LINKED" };
@@ -518,6 +408,7 @@ Return STRICT JSON matching:
         await supabase
           .from("current_affairs")
           .update({
+            graph_status: "no_event",
             graph_processed_at: new Date().toISOString(),
             chain_id: null,
             ring_depth: null,
@@ -535,6 +426,7 @@ Return STRICT JSON matching:
         await supabase
           .from("current_affairs")
           .update({
+            graph_status: "no_event",
             graph_processed_at: new Date().toISOString(),
             chain_id: null,
             ring_depth: null,
@@ -545,13 +437,31 @@ Return STRICT JSON matching:
       return { ok: true, matched: false, reason: "UNKNOWN_CHAIN_ID" };
     }
 
+    // Ring: if parsed.ring_depth is not an integer 0-3, treat as no match (no_event); remove the default 2
+    const isIntegerRing = Number.isInteger(parsed.ring_depth) && parsed.ring_depth >= 0 && parsed.ring_depth <= 3;
+    if (!isIntegerRing) {
+      if (item.id) {
+        await supabase
+          .from("current_affairs")
+          .update({
+            graph_status: "no_event",
+            graph_processed_at: new Date().toISOString(),
+            chain_id: null,
+            ring_depth: null,
+            entity_slugs: [],
+          })
+          .eq("id", item.id);
+      }
+      return { ok: true, matched: false, reason: "INVALID_RING_DEPTH" };
+    }
+    const ringDepth = parsed.ring_depth;
+
     const { count } = await supabase
       .from("policy_chain_nodes")
       .select("id", { count: "exact", head: true })
       .eq("chain_id", parsed.matched_chain_id);
 
     const stepOrder = (count || 0) + 1;
-    const ringDepth = Math.max(0, Math.min(3, typeof parsed.ring_depth === "number" ? parsed.ring_depth : 2));
 
     const { error: nodeErr } = await supabase.from("policy_chain_nodes").insert({
       chain_id: parsed.matched_chain_id,
@@ -621,11 +531,12 @@ Return STRICT JSON matching:
       }
     }
 
-    // Mark current_affairs row as processed
+    // Mark current_affairs row as processed and linked
     if (item.id) {
       await supabase
         .from("current_affairs")
         .update({
+          graph_status: "linked",
           graph_processed_at: new Date().toISOString(),
           chain_id: parsed.matched_chain_id,
           ring_depth: ringDepth,
@@ -634,8 +545,8 @@ Return STRICT JSON matching:
         .eq("id", item.id);
     }
 
-    // Check if chain now has >= 3 nodes and needs Boss MCQ synthesis
-    if (stepOrder >= 3 && stepOrder > (targetChain.last_synthesized_node_count || 0)) {
+    // Check if chain now has >= 3 nodes and needs Boss MCQ synthesis (only if legacy env flag is set)
+    if (process.env.RADAR_LEGACY_BOSS_MCQ === "1" && stepOrder >= 3 && stepOrder > (targetChain.last_synthesized_node_count || 0)) {
       try {
         await synthesizeChainBossMcq(parsed.matched_chain_id);
       } catch (bossErr) {
@@ -647,14 +558,10 @@ Return STRICT JSON matching:
   } catch (err: any) {
     console.warn(`[policy-graph-worker] Error processing dispatch ${dispatchId}:`, err);
     if (item.id) {
+      const failureState = onFailure(item.graph_attempts ?? 0, new Date());
       await supabase
         .from("current_affairs")
-        .update({
-          graph_processed_at: new Date().toISOString(),
-          chain_id: null,
-          ring_depth: null,
-          entity_slugs: [],
-        })
+        .update(failureState)
         .eq("id", item.id);
     }
     return { ok: false, matched: false, reason: err?.message || String(err) };
@@ -662,7 +569,7 @@ Return STRICT JSON matching:
 }
 
 export async function runPolicyGraphWorker(options: { maxDispatches?: number } = {}) {
-  const limit = options.maxDispatches || 10;
+  const limit = options.maxDispatches || Number(process.env.RADAR_BATCH_SIZE ?? 40);
   const supabase = getSupabase();
 
   if (!supabase) {
@@ -672,11 +579,13 @@ export async function runPolicyGraphWorker(options: { maxDispatches?: number } =
 
   console.log("[policy-graph-worker] Starting Policy Ripple Radar graph worker...");
 
-  // Query ONLY unprocessed dispatches to prevent duplicate LLM RPD burn
+  const nowIso = new Date().toISOString();
+  // Query pending dispatches whose next attempt timestamp is null or due
   const { data: dispatches, error: dispErr } = await supabase
     .from("current_affairs")
-    .select("id, headline, ministry, summary, url, published_at")
-    .is("graph_processed_at", null)
+    .select("id, headline, ministry, summary, url, published_at, graph_attempts")
+    .eq("graph_status", "pending")
+    .or(`graph_next_attempt_at.is.null,graph_next_attempt_at.lte.${nowIso}`)
     .order("published_at", { ascending: false })
     .limit(limit);
 

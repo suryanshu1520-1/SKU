@@ -20,8 +20,11 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { getSources } from "./sources.js";
-import { synthesizeStructured, synthesizeGrounded, type StructuredSynthesis } from "./synthesize.js";
+import { synthesizeStructured, synthesizeGrounded, type StructuredSynthesis, type GroundedSynthesis } from "./synthesize.js";
 import type { VerifiedClaim } from "./verify.js";
+import { gateEvent, defaultResolveActor } from "../../policy/events.ts";
+import { buildIndex, resolve, aliasVariants, type ResolverIndex, type AliasRow } from "../../policy/resolve.ts";
+import { enqueueReview } from "../../policy/review-queue.ts";
 import { deriveMinistry, isExcluded, isEphemeralTrivia, policyConfidence } from "./classify.js";
 import { getEmbedder, cosine } from "./embeddings.js";
 import { clusterCandidates, makeStory, storyCentroid, embedText } from "./cluster.js";
@@ -33,6 +36,8 @@ import { upsertCurrentAffairs, upsertPibDigest } from "../db.js";
 import { callUpdateSourceReputation } from "../../internal/reputation.js";
 import { llmAvailable } from "../../llm.js";
 import { processDispatchIntoPolicyGraph, runPolicyGraphWorker } from "../policy-graph-worker.js";
+import { rebuildLineage } from "../policy-lineage-worker.js";
+import { assignNode } from "../../policy/node-assign.ts";
 import {
   startIngestRun,
   finishIngestRun,
@@ -60,6 +65,138 @@ function sb() {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
   if (!url) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing");
   return createClient(url, key);
+}
+
+let cachedProgramIndex: ResolverIndex | null = null;
+let lastProgramFetch = 0;
+
+async function getProgramResolver(client: ReturnType<typeof sb>): Promise<(m: string) => string | null> {
+  const now = Date.now();
+  if (!cachedProgramIndex || now - lastProgramFetch > 60_000) {
+    try {
+      const { data } = await client.from("policy_programs").select("program_slug, name, aliases");
+      const rows: AliasRow[] = [];
+      if (Array.isArray(data)) {
+        for (const p of data) {
+          const names = [p.name, ...(Array.isArray(p.aliases) ? p.aliases : [])];
+          for (const name of names) {
+            if (!name) continue;
+            for (const v of aliasVariants(name)) {
+              rows.push({ alias_norm: v, entity_slug: p.program_slug });
+            }
+          }
+        }
+      }
+      cachedProgramIndex = buildIndex(rows);
+      lastProgramFetch = now;
+    } catch {
+      if (!cachedProgramIndex) cachedProgramIndex = buildIndex([]);
+    }
+  }
+
+  return (mention: string) => {
+    if (!cachedProgramIndex) return null;
+    const res = resolve(mention, cachedProgramIndex);
+    return res.status === "resolved" ? res.slug : null;
+  };
+}
+
+async function processPolicyEventsForDispatch(params: {
+  dispatchId: string;
+  sourceUrl: string;
+  publishedAt: string | null;
+  nodeId: string | null;
+  grounded: GroundedSynthesis | null;
+  ingestRunId?: string;
+  sourceId: string;
+}): Promise<{ storedCount: number; hadError: boolean }> {
+  const { dispatchId, sourceUrl, publishedAt, nodeId, grounded, ingestRunId, sourceId } = params;
+  const frames = grounded?.policy_events ?? [];
+  const spans = grounded?.spans ?? [];
+
+  if (!frames.length || !spans.length) {
+    return { storedCount: 0, hadError: false };
+  }
+
+  const client = sb();
+  const resolveProgram = await getProgramResolver(client);
+  let storedCount = 0;
+  let hadError = false;
+
+  for (let seq = 0; seq < frames.length; seq++) {
+    const frame = frames[seq];
+    const actorRes = defaultResolveActor(frame.actor);
+
+    let reviewId: number | null = null;
+    if (actorRes.status !== "resolved") {
+      const citedQuote =
+        (frame.spans || [])
+          .map((idx) => spans[idx]?.text)
+          .filter(Boolean)
+          .join(" ") || frame.summary;
+      try {
+        const rev = await enqueueReview(frame.actor, citedQuote, sourceUrl, actorRes);
+        if (rev.ok && rev.id) {
+          reviewId = rev.id;
+        }
+      } catch (revErr) {
+        console.warn(`[ingest][events] Review enqueue warning:`, revErr);
+      }
+    }
+
+    const gate = gateEvent(frame, spans, {
+      dispatchId,
+      seq,
+      sourceUrl,
+      releaseDate: publishedAt,
+      ingestedAt: new Date().toISOString(),
+      resolveActor: () => actorRes,
+      resolveProgram,
+      extractorVersion: "events_v1",
+      reviewId,
+      nodeId,
+    });
+
+    if (!gate.ok) {
+      if (ingestRunId) {
+        const reason = "reason" in gate ? gate.reason : "unknown";
+        void recordIngestDecision({
+          ingestRunId,
+          sourceId,
+          candidateUrl: sourceUrl,
+          candidateFingerprint: `${sourceUrl}#event${seq}`,
+          decision: "excluded",
+          reasonCode: `event_${reason}`,
+        });
+      }
+      continue;
+    }
+
+    try {
+      if (gate.autoProgram) {
+        await client
+          .from("policy_programs")
+          .upsert([gate.autoProgram], { onConflict: "program_slug" });
+      }
+
+      const { ring_depth: _rd, ...insertPayload } = gate.row;
+      const { error: eventErr } = await client
+        .from("policy_events")
+        .upsert([insertPayload], { onConflict: "dispatch_id,event_seq" });
+
+      if (eventErr) {
+        console.error(`[ingest][events] Failed to insert policy event:`, eventErr.message);
+        hadError = true;
+      } else {
+        storedCount++;
+      }
+    } catch (persistErr) {
+      console.error(`[ingest][events] Exception persisting policy event:`, persistErr);
+      hadError = true;
+    }
+  }
+
+  return { storedCount, hadError };
 }
 
 /** Exponential-backoff gate, mirroring the sync-feed dispatcher's logic. */
@@ -176,7 +313,7 @@ async function gatherSource(
         taken++;
         out.push({
           source: src.id, tier: src.tier, lang: src.lang, url: ref.url,
-          headline, body, ministryHint: ref.ministryHint, preSummarized: true,
+          headline, body, ministryHint: extracted?.ministryHint || ref.ministryHint, preSummarized: true,
           bullets: [body],
         });
         continue;
@@ -200,7 +337,7 @@ async function gatherSource(
       taken++;
       out.push({
         source: src.id, tier: src.tier, lang: src.lang, url: ref.url,
-        headline, body, ministryHint: ref.ministryHint,
+        headline, body, ministryHint: extracted?.ministryHint || ref.ministryHint,
       });
     }
   } catch (err: any) {
@@ -377,6 +514,7 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
       let structuredData: StructuredSynthesis | null = null;
       let claims: Array<VerifiedClaim & { source: string; url: string; verification_method?: string }> = [];
       let grounding: number | undefined;
+      let groundedResult: GroundedSynthesis | null = null;
 
       if (lead.preSummarized && lead.bullets?.length) {
         bullets = lead.bullets;
@@ -389,6 +527,7 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
           body: lead.body,
           lang: lead.lang,
         });
+        groundedResult = grounded;
         const structured =
           grounded ??
           (await synthesizeStructured({
@@ -443,7 +582,8 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
 
       const ministry = deriveMinistry(
         `${lead.headline} ${lead.body.slice(0, 400)}`,
-        lead.ministryHint ?? (lead.tier === "world" ? "International Affairs" : "Government of India")
+        lead.tier === "world" ? "International Affairs" : "Government of India",
+        lead.ministryHint
       );
 
       // Top K=8 significance non-preSummarized stories get MCQs
@@ -507,12 +647,19 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
         ...(contested ? { contested } : {}),
       };
 
+      const nodeAssignment = assignNode({
+        headline: lead.headline,
+        bullets,
+        tags,
+      });
+
       const upsert = await upsertCurrentAffairs({
         source: lead.source,
         ministry,
         headline: lead.headline,
         url: lead.url,
         summary,
+        node_id: nodeAssignment.nodeId,
       });
 
       if (!upsert.ok) {
@@ -561,18 +708,70 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
           }
         }
 
-        // Non-blocking Policy Ripple Radar extraction
-        try {
-          await processDispatchIntoPolicyGraph({
-            id: lead.url,
-            headline: lead.headline,
-            ministry,
-            summary,
-            url: lead.url,
-            published_at: new Date().toISOString(),
-          });
-        } catch (graphErr) {
-          console.warn(`[ingest] Policy graph extraction hiccup:`, graphErr);
+        // Policy Ripple Radar extraction
+        if (upsert.id) {
+          let eventOutcome = { storedCount: 0, hadError: false };
+          try {
+            eventOutcome = await processPolicyEventsForDispatch({
+              dispatchId: upsert.id,
+              sourceUrl: lead.url,
+              publishedAt: editionDate || null,
+              nodeId: nodeAssignment.nodeId,
+              grounded: groundedResult,
+              ingestRunId: runId,
+              sourceId: lead.source,
+            });
+          } catch (evErr) {
+            console.warn(`[ingest][events] Processing exception:`, evErr);
+            eventOutcome.hadError = true;
+          }
+
+          if (process.env.RADAR_V2 === "1") {
+            try {
+              const client = sb();
+              if (eventOutcome.hadError) {
+                await client
+                  .from("current_affairs")
+                  .update({
+                    graph_status: "failed",
+                    graph_attempts: 1,
+                  })
+                  .eq("id", upsert.id);
+              } else if (eventOutcome.storedCount >= 1) {
+                await client
+                  .from("current_affairs")
+                  .update({
+                    graph_status: "linked",
+                    graph_processed_at: new Date().toISOString(),
+                  })
+                  .eq("id", upsert.id);
+              } else {
+                await client
+                  .from("current_affairs")
+                  .update({
+                    graph_status: "no_event",
+                    graph_processed_at: new Date().toISOString(),
+                  })
+                  .eq("id", upsert.id);
+              }
+            } catch (statusErr) {
+              console.warn(`[ingest] Failed to update graph_status:`, statusErr);
+            }
+          } else {
+            // Non-blocking Policy Ripple Radar extraction (legacy V1)
+            try {
+              await processDispatchIntoPolicyGraph({
+                id: upsert.id,
+                headline: lead.headline,
+                ministry,
+                summary,
+                url: lead.url,
+                published_at: new Date().toISOString(),
+              });
+            } catch (graphErr) {
+              console.warn(`[ingest] Policy graph extraction hiccup:`, graphErr);
+            }
+          }
         }
 
         if (runId) {
@@ -625,10 +824,18 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
     }
 
     // Trigger Policy Ripple Radar worker batch update
-    try {
-      await runPolicyGraphWorker({ maxDispatches: 10 });
-    } catch (graphCycleErr) {
-      console.warn("[ingest] Policy graph worker cycle hiccup:", graphCycleErr);
+    if (process.env.RADAR_V2 === "1") {
+      try {
+        await rebuildLineage({ sinceHours: 72 });
+      } catch (lineageErr) {
+        console.warn("[ingest] Policy lineage rebuild hiccup:", lineageErr);
+      }
+    } else {
+      try {
+        await runPolicyGraphWorker({ maxDispatches: 10 });
+      } catch (graphCycleErr) {
+        console.warn("[ingest] Policy graph worker cycle hiccup:", graphCycleErr);
+      }
     }
   }
 

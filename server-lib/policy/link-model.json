@@ -1,0 +1,36 @@
+{
+  "version": "link_v1",
+  "features": [
+    "shared_actor",
+    "shared_node_id",
+    "jaccard_entities",
+    "cosine_embeddings",
+    "ring_step_0_or_1",
+    "log_days_decay",
+    "explicit_reference"
+  ],
+  "w": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "b": 0,
+  "lambda": 0.0001,
+  "tau": null,
+  "metrics": {
+    "auc": 0,
+    "brier": 1,
+    "precision": 0,
+    "recall": 0,
+    "wilson_lb": 0,
+    "n_pos": 0,
+    "n_neg": 0
+  },
+  "passed": false,
+  "trained_at": "2026-10-20T16:24:31.752Z",
+  "labels_sha256": "b67fbbe238f131a4b5a02c7525c8c82e09cdb681cd98c6d8f882fa6861eb1dd3"
+}

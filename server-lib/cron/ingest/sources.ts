@@ -91,12 +91,21 @@ const PIB: SourceAdapter = {
   discover: () => fetchFeed("https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3"),
   extract: async (ref) => {
     // PIB's own container class carries a triple-'n' typo — verified live.
+    const html = await fetchText(ref.url);
+    let ministryHint: string | undefined;
+    if (html) {
+      const $ = cheerio.load(html);
+      const heading = $("#MinistryName, .MinistryNameSubhead").first().text().trim();
+      if (heading) {
+        ministryHint = heading;
+      }
+    }
     const body = await extractFromUrl(ref.url, [
       ".innner-page-main-about-us-content-right-part",
       "#PdfDiv",
     ]);
     if (!body || body.length < 200) return null;
-    return { title: ref.title, body };
+    return { title: ref.title, body, ministryHint };
   },
 };
 

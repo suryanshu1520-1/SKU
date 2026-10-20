@@ -3,7 +3,9 @@ import { createPortal } from 'react-dom';
 import { motion, useReducedMotion } from 'motion/react';
 import { ArrowUpRight, Bookmark, BookOpen, ChevronDown, ExternalLink, Share2, ShieldCheck, Target, X, ShieldAlert, Flame, GitFork } from 'lucide-react';
 import { type CurrentAffairsItem, type ParsedSyllabusTag } from './CurrentAffairs';
-import { matchDispatchToPolicyChain, getVolcanoTelemetryForNode } from '../lib/policy-ripple-radar-shared';
+import { useDispatchLineage, useNodeSignal } from './radar/useRadarV2';
+import { RING_LABEL, INSTRUMENT_LABEL } from './observatory/radar-v2/labels';
+import { sourceHref, sourceLabel } from './observatory/radar-v2/sourceLink';
 import { EXAMINER_OPERATORS } from '../types';
 import { resolveArticleExamInsights } from '../lib/article-exam-insights';
 import { ContestedCard, SourceAnchor } from './TrustUI';
@@ -60,9 +62,8 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
   const examInsights = resolveArticleExamInsights(item);
   const historicalTwin = item.historical_twin;
   const nodalRisk = getArticleNodalSwapRisk(item, getStoredVulnerabilityIndex());
-  const policyChain = matchDispatchToPolicyChain(item.headline, item.ministry, summary?.bullets?.join(' '), item.chain_id);
-  const volcano = getVolcanoTelemetryForNode(item.node_id, item.headline, item.ministry);
-  const resurgingTopic = volcano?.volcano_status === 'ERUPTING' ? volcano : null;
+  const lineage = useDispatchLineage(item.id);
+  const signal = useNodeSignal(item.node_id);
   const syllabusPapers = Array.from(new Set(syllabusTags.map(tag => tag.paper)));
   const singleSyllabusTopic = syllabusTags.length === 1 ? `${syllabusTags[0].paper} · ${syllabusTags[0].topic}` : '';
   const syllabusOverview = singleSyllabusTopic && singleSyllabusTopic.length <= 48
@@ -208,7 +209,7 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
               <summary>
                 <span className="brief-disclosure-label">Study connections</span>
                 <span className="brief-disclosure-preview">
-                  {policyChain
+                  {lineage
                     ? 'Policy chain & study focus'
                     : examInsights.status === 'ready'
                     ? 'What to remember'
@@ -247,29 +248,57 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
                     </dd>
                   </div>
                 ) : null}
-                {policyChain && <div>
-                  <dt><GitFork size={16} strokeWidth={1.6} aria-hidden="true" />Policy chain</dt>
-                  <dd>
-                    <strong>{policyChain.title}</strong>
-                    {typeof item.ring_depth === 'number' && Number.isFinite(item.ring_depth) && <p>Connection depth: {item.ring_depth}</p>}
-                    <a href={`/observatory?tab=ripple&chain=${encodeURIComponent(policyChain.chain_id)}`}
-                      onClick={event => {
-                        if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
-                        event.preventDefault();
-                        window.history.pushState(null, '', event.currentTarget.getAttribute('href'));
-                        window.dispatchEvent(new PopStateEvent('popstate'));
-                      }}
-                      className="brief-connection-link">Explore policy chain <ArrowUpRight size={15} aria-hidden="true" /></a>
-                  </dd>
-                </div>}
-                {resurgingTopic && <div>
-                  <dt><Flame size={16} strokeWidth={1.6} aria-hidden="true" />Topic resurgence</dt>
-                  <dd>
-                    <strong>{resurgingTopic.years_dormant} years since last tested</strong>
-                    <p>Volcano index {resurgingTopic.volcano_index.toFixed(1)} · {resurgingTopic.node_id}</p>
-                    <span className="brief-connection-note">Historical model signal</span>
-                  </dd>
-                </div>}
+                {lineage && (
+                  <div>
+                    <dt><GitFork size={16} strokeWidth={1.6} aria-hidden="true" />Policy lineage</dt>
+                    <dd>
+                      <strong>
+                        {lineage.program_name} · {(INSTRUMENT_LABEL as Record<string, string>)[lineage.instrument] || lineage.instrument} ({RING_LABEL[lineage.ring] || 'Stage'})
+                      </strong>
+                      {lineage.gap_sentence && (
+                        <p className="brief-connection-gap italic text-[#8fa2bd]">{lineage.gap_sentence}</p>
+                      )}
+                      {lineage.evidence && (
+                        <div className="pt-1">
+                          <a
+                            href={sourceHref(lineage.evidence)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Open source: ${sourceLabel(lineage.evidence.source_url)}`}
+                            className="inline-flex items-center gap-1 text-[11px] font-mono text-[#5fe3f5] hover:underline"
+                          >
+                            <span>Source: {sourceLabel(lineage.evidence.source_url)}</span>
+                            <span aria-hidden="true">↗</span>
+                          </a>
+                        </div>
+                      )}
+                      <a
+                        href={`/observatory?tab=ripple&program=${encodeURIComponent(lineage.program_slug)}`}
+                        onClick={event => {
+                          if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+                          event.preventDefault();
+                          window.history.pushState(null, '', event.currentTarget.getAttribute('href'));
+                          window.dispatchEvent(new PopStateEvent('popstate'));
+                        }}
+                        className="brief-connection-link"
+                      >
+                        Open in Policy Radar <ArrowUpRight size={15} aria-hidden="true" />
+                      </a>
+                    </dd>
+                  </div>
+                )}
+                {signal && signal.surging && (
+                  <div>
+                    <dt><Flame size={16} strokeWidth={1.6} aria-hidden="true" />Topic resurgence</dt>
+                    <dd>
+                      <strong>
+                        {signal.x_recent} items in the last 14 days vs {signal.expected.toFixed(1)} expected for this syllabus node
+                      </strong>
+                      <p>Exam weight {signal.exam_weight.toFixed(2)} · {signal.node_id}</p>
+                      <span className="brief-connection-note">Verified false-discovery pass</span>
+                    </dd>
+                  </div>
+                )}
               </dl>
             </details>
           </header>

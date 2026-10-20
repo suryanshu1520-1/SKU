@@ -1,0 +1,11 @@
+{
+  "accept": 0.94,
+  "margin": 0.04,
+  "calibrated_at": "2026-10-20T16:25:00.876Z",
+  "metrics": {
+    "precision": 1,
+    "recall": 0.9,
+    "f1": 0.95,
+    "evaluated_count": 0
+  }
+}

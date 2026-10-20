@@ -1,0 +1,17 @@
+{
+  "public_evidence_missing": 0,
+  "hardcoded_fallbacks": 0,
+  "pib_non_fallback_ministry_rate": 0.90,
+  "passing_rows_node_id_rate": 0.95,
+  "event_precision": 0.90,
+  "instrument_accuracy": 0.85,
+  "resolver_precision": 0.98,
+  "resolver_recall": 0.85,
+  "ordering_errors": 0,
+  "learned_edges_precision": 0.90,
+  "learned_edges_wilson_lb": 0.80,
+  "pending_backlog_stale_count": 0,
+  "boss_mcq_traceable_rate": 1.00,
+  "audit_max_age_days": 35,
+  "run_max_age_days": 8
+}

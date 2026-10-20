@@ -31,12 +31,7 @@ import {
   Swords,
 } from 'lucide-react';
 import { InlineMath, BlockMath } from './MathView';
-import PolicyRippleRadar, { CANONICAL_RIPPLE_CHAINS } from './observatory/PolicyRippleRadar';
-import {
-  CANONICAL_VOLCANO_BASELINES,
-  getVolcanoTelemetryForNode,
-  type VolcanoNodeTelemetry,
-} from '../lib/policy-ripple-radar-shared';
+import RadarV2Panel from './observatory/radar-v2/RadarV2Panel';
 import {
   computeCalibrated5050EV,
   type EvExecutionProtocol,
@@ -505,6 +500,19 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
     return 'vault';
   });
 
+  useEffect(() => {
+    const syncTabFromUrl = () => {
+      if (typeof window === 'undefined') return;
+      const urlTab = new URLSearchParams(window.location.search).get('tab') as ObservatoryTab;
+      if (urlTab && ['vault', 'calculator', 'matrix', 'traps', 'pacing', 'ripple'].includes(urlTab)) {
+        setActiveTab(urlTab);
+      }
+    };
+    syncTabFromUrl();
+    window.addEventListener('popstate', syncTabFromUrl);
+    return () => window.removeEventListener('popstate', syncTabFromUrl);
+  }, []);
+
   const handleTabChange = (newTab: ObservatoryTab) => {
     setActiveTab(newTab);
     if (typeof window !== 'undefined' && window.history) {
@@ -757,11 +765,31 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
     });
   }, []);
 
+  const [radarProgramsCount, setRadarProgramsCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetch('/api/policy-radar/v2')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (
+          isMounted &&
+          data &&
+          (data.status === 'ok' || data.status === 'stale') &&
+          Array.isArray(data.programs)
+        ) {
+          setRadarProgramsCount(data.programs.length);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // Top erupting volcano nodes
-  const topVolcanoNodes = useMemo(() => {
-    return Object.values(CANONICAL_VOLCANO_BASELINES).sort(
-      (a, b) => b.volcano_index - a.volcano_index
-    );
+  const topVolcanoNodes: any[] = useMemo(() => {
+    return [];
   }, []);
 
   // --------------------------------------------------------------------------
@@ -774,12 +802,9 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
     return HIGH_YIELD_TOPICS.filter((t) => {
       const matchSubject = selectedMatrixSubject === 'All' || t.subject.toLowerCase() === selectedMatrixSubject.toLowerCase();
       if (!matchSubject) return false;
-      const v = getVolcanoTelemetryForNode(t.id, t.topic, t.subject);
-      if (volcanoFilter === 'erupting') return v?.volcano_status === 'ERUPTING';
-      if (volcanoFilter === 'heating') return v?.volcano_status === 'HEATING';
       return true;
     });
-  }, [selectedMatrixSubject, volcanoFilter]);
+  }, [selectedMatrixSubject]);
 
   // --------------------------------------------------------------------------
   // Tab 4: Examiner Traps & Live Statement Sandbox
@@ -838,7 +863,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
     { id: 'matrix' as const, label: 'High-yield', icon: Flame, badge: 'Top 75%' },
     { id: 'traps' as const, label: 'Traps', icon: Crosshair, badge: '4' },
     { id: 'pacing' as const, label: 'Pacing & Rubric', icon: Clock, badge: null },
-    { id: 'ripple' as const, label: 'Ripple Radar', icon: SonarIcon, badge: `${CANONICAL_RIPPLE_CHAINS.length} chains` },
+    { id: 'ripple' as const, label: 'Policy Radar', icon: SonarIcon, badge: radarProgramsCount && radarProgramsCount > 0 ? `${radarProgramsCount}` : null },
   ];
 
   return (
@@ -874,7 +899,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
               <button
                 type="button"
                 onClick={() => handleTabChange('ripple')}
-                aria-label={`New: Policy Ripple Radar — ${CANONICAL_RIPPLE_CHAINS.length} chains, 5 legal tiers`}
+                aria-label={radarProgramsCount && radarProgramsCount > 0 ? `Policy Radar — ${radarProgramsCount} programs` : 'Policy Radar'}
                 className="inline-flex items-center gap-3 py-1.5 px-3.5 pl-1.5 rounded bg-[rgba(4,18,40,0.55)] hover:bg-[rgba(4,18,40,0.9)] border border-[rgba(224,208,171,0.16)] hover:border-[rgba(224,208,171,0.42)] text-[#f4ecd8] text-[13px] transition-all cursor-pointer group shadow-sm"
               >
                 <span aria-hidden="true" className="relative shrink-0 w-[26px] h-[26px] rounded-full border border-[rgba(224,208,171,0.35)] overflow-hidden bg-[#041228]">
@@ -885,8 +910,10 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                 </span>
                 <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-[#e0d0ab] font-medium">New</span>
                 <span aria-hidden="true" className="w-px h-3.5 bg-[rgba(224,208,171,0.2)]" />
-                <span className="font-serif text-[15px] text-[#f4ecd8]">Policy Ripple Radar</span>
-                <span className="text-xs text-[#8fa2bd]">{CANONICAL_RIPPLE_CHAINS.length} chains · 5 legal tiers</span>
+                <span className="font-serif text-[15px] text-[#f4ecd8]">Policy Radar</span>
+                {radarProgramsCount && radarProgramsCount > 0 ? (
+                  <span className="text-xs text-[#8fa2bd]">{radarProgramsCount} programs</span>
+                ) : null}
                 <ArrowRight className="w-3.5 h-3.5 text-[#e0d0ab] group-hover:translate-x-0.5 transition-transform" />
               </button>
             </div>
@@ -1741,65 +1768,69 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
               </div>
 
               {/* Volcano Node Telemetry Bar */}
-              <div className="flex items-center justify-between gap-3 flex-wrap pt-3 border-t border-[rgba(19,108,153,0.25)]">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mr-1 flex items-center gap-1">
-                    <Flame className="w-3.5 h-3.5 text-rose-400" /> Volcano Radar (V_j):
+              {topVolcanoNodes.length > 0 && (
+                <div className="flex items-center justify-between gap-3 flex-wrap pt-3 border-t border-[rgba(19,108,153,0.25)]">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mr-1 flex items-center gap-1">
+                      <Flame className="w-3.5 h-3.5 text-rose-400" /> Volcano Radar (V_j):
+                    </span>
+                    {[
+                      { id: 'all', label: 'All 25 Nodes' },
+                      { id: 'erupting', label: '🔥 Erupting (V_j > 8.0)' },
+                      { id: 'heating', label: '⚡ Heating (4.0–8.0)' },
+                    ].map((f) => (
+                      <button
+                        key={f.id}
+                        onClick={() => setVolcanoFilter(f.id as any)}
+                        className={`px-2.5 py-1 rounded-xs text-[11px] font-mono font-semibold cursor-pointer transition-colors ${
+                          volcanoFilter === f.id
+                            ? 'bg-rose-500/20 text-rose-200 border border-rose-500/50'
+                            : 'bg-[rgba(3,16,38,0.7)] text-[#8fa2bd] border border-[rgba(19,108,153,0.3)] hover:text-white'
+                        }`}
+                      >
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
+                  <span className="text-[10px] font-mono text-[#8fa2bd]">
+                    Formula: V_j = [(2026 - Last Tested) / Recurrence] · ln(1 + 2·News_{2026})
                   </span>
-                  {[
-                    { id: 'all', label: 'All 25 Nodes' },
-                    { id: 'erupting', label: '🔥 Erupting (V_j > 8.0)' },
-                    { id: 'heating', label: '⚡ Heating (4.0–8.0)' },
-                  ].map((f) => (
-                    <button
-                      key={f.id}
-                      onClick={() => setVolcanoFilter(f.id as any)}
-                      className={`px-2.5 py-1 rounded-xs text-[11px] font-mono font-semibold cursor-pointer transition-colors ${
-                        volcanoFilter === f.id
-                          ? 'bg-rose-500/20 text-rose-200 border border-rose-500/50'
-                          : 'bg-[rgba(3,16,38,0.7)] text-[#8fa2bd] border border-[rgba(19,108,153,0.3)] hover:text-white'
-                      }`}
-                    >
-                      {f.label}
-                    </button>
-                  ))}
                 </div>
-                <span className="text-[10px] font-mono text-[#8fa2bd]">
-                  Formula: V_j = [(2026 - Last Tested) / Recurrence] · ln(1 + 2·News_{2026})
-                </span>
-              </div>
+              )}
             </div>
 
             {/* Pinned Top Erupting Volcano Nodes Strip */}
-            <div className="p-3.5 rounded-sm bg-[rgba(3,16,38,0.85)] border border-rose-500/40 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-mono uppercase tracking-wider text-rose-300 font-bold flex items-center gap-1.5">
-                  <Flame className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
-                  <span>Top Erupting Volcano Nodes (Drought Rebound + 2026 Velocity)</span>
-                </span>
-                <span className="text-[10px] font-mono text-[#8fa2bd]">Morning Run Priority Queue</span>
+            {topVolcanoNodes.length > 0 && (
+              <div className="p-3.5 rounded-sm bg-[rgba(3,16,38,0.85)] border border-rose-500/40 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-rose-300 font-bold flex items-center gap-1.5">
+                    <Flame className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
+                    <span>Top Erupting Volcano Nodes (Drought Rebound + 2026 Velocity)</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-[#8fa2bd]">Morning Run Priority Queue</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {topVolcanoNodes.slice(0, 3).map((vn) => (
+                    <div
+                      key={vn.node_id}
+                      className="p-2.5 rounded-xs bg-[#041228] border border-rose-500/30 space-y-1"
+                    >
+                      <div className="flex items-center justify-between text-[10px] font-mono">
+                        <span className="text-[#e0d0ab] font-bold">{vn.node_id}</span>
+                        <span className="text-rose-400 font-extrabold">V_j = {vn.volcano_index.toFixed(2)}</span>
+                      </div>
+                      <div className="text-xs text-[#e8e0cf] font-serif font-medium truncate">
+                        {vn.title}
+                      </div>
+                      <div className="text-[10px] text-[#8fa2bd] font-mono flex items-center justify-between">
+                        <span>{vn.years_dormant}y dormant (last: {vn.last_tested_year})</span>
+                        <span className="text-[#34d399] font-bold">{vn.news_count_2026} dispatches</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                {topVolcanoNodes.slice(0, 3).map((vn) => (
-                  <div
-                    key={vn.node_id}
-                    className="p-2.5 rounded-xs bg-[#041228] border border-rose-500/30 space-y-1"
-                  >
-                    <div className="flex items-center justify-between text-[10px] font-mono">
-                      <span className="text-[#e0d0ab] font-bold">{vn.node_id}</span>
-                      <span className="text-rose-400 font-extrabold">V_j = {vn.volcano_index.toFixed(2)}</span>
-                    </div>
-                    <div className="text-xs text-[#e8e0cf] font-serif font-medium truncate">
-                      {vn.title}
-                    </div>
-                    <div className="text-[10px] text-[#8fa2bd] font-mono flex items-center justify-between">
-                      <span>{vn.years_dormant}y dormant (last: {vn.last_tested_year})</span>
-                      <span className="text-[#34d399] font-bold">{vn.news_count_2026} dispatches</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            )}
 
             {/* Matrix Topic Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
@@ -1825,24 +1856,6 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
                       {topic.topic}
                     </h3>
 
-                    {/* Volcano Telemetry Badge on Card */}
-                    {(() => {
-                      const v = getVolcanoTelemetryForNode(topic.id, topic.topic, topic.subject);
-                      if (!v || v.volcano_status === 'STABLE') return null;
-                      return (
-                        <div className={`p-2 rounded-xs border text-[10px] font-mono flex items-center justify-between ${
-                          v.volcano_status === 'ERUPTING'
-                            ? 'bg-rose-950/40 border-rose-500/40 text-rose-300'
-                            : 'bg-amber-950/40 border-amber-500/40 text-amber-300'
-                        }`}>
-                          <span className="flex items-center gap-1 font-bold">
-                            <Flame className="w-3 h-3 text-rose-400 animate-pulse" />
-                            VOLCANO V_j: {v.volcano_index.toFixed(2)} // {v.volcano_status}
-                          </span>
-                          <span>{v.years_dormant}y dormant • {v.news_count_2026} articles (2026)</span>
-                        </div>
-                      );
-                    })()}
 
                     <div className="space-y-1 text-xs">
                       <span className="text-[10px] font-mono text-[#0194a8] uppercase tracking-wider block font-bold">
@@ -2145,7 +2158,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
             ══════════════════════════════════════════════════════════════════ */}
         {activeTab === 'ripple' && (
           <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-            <PolicyRippleRadar />
+            <RadarV2Panel />
           </motion.div>
         )}
       </div>

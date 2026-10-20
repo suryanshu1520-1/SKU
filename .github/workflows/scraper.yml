@@ -34,4 +34,6 @@ jobs:
           # every non-pre-summarized item is dropped (the old silent-failure bug).
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          RADAR_V2: ${{ vars.RADAR_V2 }}
+          RADAR_V2_SINCE: ${{ vars.RADAR_V2_SINCE }}
         run: npx tsx scripts/run-scraper.ts

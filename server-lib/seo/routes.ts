@@ -13,6 +13,13 @@ import { INDEXNOW_KEY, submitToIndexNow } from './indexnow.js';
 
 export const seoRouter = Router();
 
+function shouldServeSeoHtml(req: Request): boolean {
+  if (req.query.seo === 'true' || req.query.seo === '1') return true;
+  if (process.env.NODE_ENV === 'production') return true;
+  const ua = req.headers['user-agent'] || '';
+  return /googlebot|bingbot|yandex|baiduspider|facebookexternalhit|twitterbot|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|outbrain|pinterest|slackbot|vkShare|W3C_Validator|whatsapp/i.test(ua);
+}
+
 // 1. IndexNow Verification Key Route
 seoRouter.get([`/${INDEXNOW_KEY}.txt`, `/api/${INDEXNOW_KEY}.txt`], (_req: Request, res: Response) => {
   res.setHeader('Content-Type', 'text/plain; charset=utf-8');
@@ -71,6 +78,7 @@ seoRouter.get(['/sitemap-news.xml', '/api/sitemap-news.xml'], async (_req: Reque
 seoRouter.get(
   ['/intelligence/gs-:paper', '/news/gs-:paper'],
   async (req: Request, res: Response, next: NextFunction) => {
+    if (!shouldServeSeoHtml(req)) return next();
     try {
       const paper = req.params.paper || '1';
       const html = await renderGsHubSeoHtml(`gs-${paper}`);
@@ -88,6 +96,7 @@ seoRouter.get(
 seoRouter.get(
   ['/intelligence/ministry/:slug', '/news/ministry/:slug'],
   async (req: Request, res: Response, next: NextFunction) => {
+    if (!shouldServeSeoHtml(req)) return next();
     try {
       const slug = req.params.slug || '';
       const html = await renderMinistryHubSeoHtml(slug);
@@ -103,6 +112,7 @@ seoRouter.get(
 
 // 7. Daily Edition Archive SSR (/daily-edition/:date and /daily-edition)
 seoRouter.get('/daily-edition/:date', async (req: Request, res: Response, next: NextFunction) => {
+  if (!shouldServeSeoHtml(req)) return next();
   try {
     const html = await renderDailyEditionSeoHtml(req.params.date);
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -114,7 +124,8 @@ seoRouter.get('/daily-edition/:date', async (req: Request, res: Response, next: 
   }
 });
 
-seoRouter.get('/daily-edition', async (_req: Request, res: Response, next: NextFunction) => {
+seoRouter.get('/daily-edition', async (req: Request, res: Response, next: NextFunction) => {
+  if (!shouldServeSeoHtml(req)) return next();
   try {
     const html = await renderDailyEditionSeoHtml();
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -128,6 +139,7 @@ seoRouter.get('/daily-edition', async (_req: Request, res: Response, next: NextF
 
 // 8. Intelligence & News Article Routes Handler
 async function handleIntelligenceRoute(req: Request, res: Response, next: NextFunction) {
+  if (!shouldServeSeoHtml(req)) return next();
   try {
     const queryId = typeof req.query.id === 'string' ? req.query.id : undefined;
     const article = await fetchArticleForSeo(req.path, queryId);
@@ -151,6 +163,7 @@ async function handleIntelligenceRoute(req: Request, res: Response, next: NextFu
 
 // 9. PRS Legislative Vault Routes Handler
 async function handlePrsRoute(req: Request, res: Response, next: NextFunction) {
+  if (!shouldServeSeoHtml(req)) return next();
   try {
     const queryId = typeof req.query.id === 'string' ? req.query.id : undefined;
     const article = await fetchArticleForSeo(req.path, queryId);
@@ -178,7 +191,8 @@ seoRouter.get(['/prs', '/prs/:slug'], handlePrsRoute);
 // 10. Legal & Statutory Compliance Routes (Privacy Policy, Terms of Service, Refund Policy)
 seoRouter.get(
   ['/privacy', '/terms', '/refund', '/api/privacy', '/api/terms', '/api/refund'],
-  (req: Request, res: Response) => {
+  (req: Request, res: Response, next: NextFunction) => {
+    if (!shouldServeSeoHtml(req)) return next();
     const path = req.path.toLowerCase();
     let type: 'privacy' | 'terms' | 'refund' = 'privacy';
     if (path.includes('terms')) type = 'terms';
@@ -204,7 +218,8 @@ const HUB_ROUTES: Record<string, Parameters<typeof renderHubSeoHtml>[0]> = {
 };
 
 for (const [routePath, section] of Object.entries(HUB_ROUTES)) {
-  seoRouter.get([routePath, `${routePath}/:sub*`], async (_req: Request, res: Response, next: NextFunction) => {
+  seoRouter.get([routePath, `${routePath}/:sub*`], async (req: Request, res: Response, next: NextFunction) => {
+    if (!shouldServeSeoHtml(req)) return next();
     try {
       const html = await renderHubSeoHtml(section);
       res.setHeader('Content-Type', 'text/html; charset=utf-8');

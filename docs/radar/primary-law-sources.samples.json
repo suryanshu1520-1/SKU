@@ -1,0 +1,193 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-10-20T18:34:28.362Z",
+  "target_mapping_classes": [
+    "bill_introduced",
+    "bill_passed",
+    "act_assented",
+    "rules_notified",
+    "regulation_issued",
+    "commencement_or_entry_into_force"
+  ],
+  "sources": {
+    "prs_legislative_research": {
+      "source_name": "PRS Legislative Research (Bill Track)",
+      "source_url": "https://prsindia.org/billtrack",
+      "extraction_method": {
+        "container_selector": "table tr, .views-row",
+        "field_selectors": {
+          "title": "a[href*='/billtrack/']",
+          "stable_url": "a[href*='/billtrack/'] (href attribute)",
+          "status": "Regex /(Passed|Rules|Introduced|In Committee)/ on container text",
+          "identifier": "Slug derived from URL path /billtrack/<slug>"
+        }
+      },
+      "sample_count": 5,
+      "records": [
+        {
+          "title": "Foreign Contribution (Regulation) Amendment Rules, 2026",
+          "date": "2026",
+          "instrument_class": "rules_notified",
+          "issuing_authority": "Parliament of India",
+          "stable_url": "https://prsindia.org/billtrack/foreign-contribution-regulation-amendment-rules-2026",
+          "identifier": "foreign-contribution-regulation-amendment-rules-2026"
+        },
+        {
+          "title": "The National Co-operative Development Corporation (Amendment) Bill, 2026",
+          "date": "2026",
+          "instrument_class": "bill_passed",
+          "issuing_authority": "Parliament of India",
+          "stable_url": "https://prsindia.org/billtrack/the-national-co-operative-development-corporation-amendment-bill-2026",
+          "identifier": "the-national-co-operative-development-corporation-amendment-bill-2026"
+        },
+        {
+          "title": "The Mines and Minerals (Development and Regulation) Amendment Bill, 2026",
+          "date": "2026",
+          "instrument_class": "bill_passed",
+          "issuing_authority": "Parliament of India",
+          "stable_url": "https://prsindia.org/billtrack/the-mines-and-minerals-development-and-regulation-amendment-bill-2026",
+          "identifier": "the-mines-and-minerals-development-and-regulation-amendment-bill-2026"
+        },
+        {
+          "title": "The Tribunals Reforms Bill, 2026",
+          "date": "2026",
+          "instrument_class": "bill_passed",
+          "issuing_authority": "Parliament of India",
+          "stable_url": "https://prsindia.org/billtrack/the-tribunals-reforms-bill-2026",
+          "identifier": "the-tribunals-reforms-bill-2026"
+        },
+        {
+          "title": "The Kerala (Alteration of Name) Bill, 2026",
+          "date": "2026",
+          "instrument_class": "bill_passed",
+          "issuing_authority": "Parliament of India",
+          "stable_url": "https://prsindia.org/billtrack/the-kerala-alteration-of-name-bill-2026",
+          "identifier": "the-kerala-alteration-of-name-bill-2026"
+        }
+      ]
+    },
+    "reserve_bank_of_india": {
+      "source_name": "Reserve Bank of India (Notifications)",
+      "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx",
+      "extraction_method": {
+        "container_selector": "table.tablebg tr",
+        "field_selectors": {
+          "title": "a[href*='NotificationUser.aspx?Id=']",
+          "date": "Previous section header or tr text matching /([A-Z][a-z]{2}\\s+\\d{1,2},\\s+\\d{4})/",
+          "stable_url": "a (href with Id query param)",
+          "identifier": "Regex /Id=(\\d+)/ on link href"
+        }
+      },
+      "sample_count": 5,
+      "records": [
+        {
+          "title": "Implementation of Section 51A of UAPA, 1967: Updates to UNSC’s 1267/ 1989 ISIL (Da'esh) & Al-Qaida Sanctions List: Amendment of 03 Entries",
+          "date": "Oct 19, 2026",
+          "instrument_class": "regulation_issued",
+          "issuing_authority": "Reserve Bank of India",
+          "stable_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13742&Mode=0",
+          "identifier": "RBI-NOTIF-13742"
+        },
+        {
+          "title": "Reserve Bank of India (Small Finance Banks - Miscellaneous) Amendment Directions, 2026",
+          "date": "Oct 19, 2026",
+          "instrument_class": "regulation_issued",
+          "issuing_authority": "Reserve Bank of India",
+          "stable_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13741&Mode=0",
+          "identifier": "RBI-NOTIF-13741"
+        },
+        {
+          "title": "Reserve Bank of India (Commercial Banks - Miscellaneous) Second Amendment Directions, 2026",
+          "date": "Oct 19, 2026",
+          "instrument_class": "regulation_issued",
+          "issuing_authority": "Reserve Bank of India",
+          "stable_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13740&Mode=0",
+          "identifier": "RBI-NOTIF-13740"
+        },
+        {
+          "title": "Risk Management and Inter-Bank Dealings",
+          "date": "Oct 12, 2026",
+          "instrument_class": "regulation_issued",
+          "issuing_authority": "Reserve Bank of India",
+          "stable_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13739&Mode=0",
+          "identifier": "RBI-NOTIF-13739"
+        },
+        {
+          "title": "Risk Management and Inter-Bank Dealings - Foreign Exchange Risk Reserve",
+          "date": "Oct 10, 2026",
+          "instrument_class": "regulation_issued",
+          "issuing_authority": "Reserve Bank of India",
+          "stable_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13738&Mode=0",
+          "identifier": "RBI-NOTIF-13738"
+        }
+      ]
+    },
+    "egazette_of_india": {
+      "source_name": "e-Gazette of India (Recent Gazettes)",
+      "source_url": "https://egazette.gov.in",
+      "extraction_method": {
+        "container_selector": "table tr with >= 4 td elements",
+        "field_selectors": {
+          "identifier": "td text matching /^CG-[A-Z]{2}-[EW]-\\d{8}-\\d+$/",
+          "date": "td preceding identifier (DD-MMM-YYYY)",
+          "title": "td preceding date (Gazette subject summary)",
+          "issuing_authority": "td preceding subject (Ministry name)",
+          "stable_url": "Direct UGID reference (PDF postback endpoint)"
+        }
+      },
+      "sample_count": 5,
+      "records": [
+        {
+          "title": "Publication of notification under Section 3D...",
+          "date": "19-Oct-2026",
+          "instrument_class": "rules_notified",
+          "issuing_authority": "Ministry of Road Transport and Highways",
+          "stable_url": "https://egazette.gov.in/ (UGID: CG-DL-E-19102026-277296)",
+          "identifier": "CG-DL-E-19102026-277296"
+        },
+        {
+          "title": "Implementation of the UNSC 1267/1988 Related ...",
+          "date": "19-Oct-2026",
+          "instrument_class": "rules_notified",
+          "issuing_authority": "Ministry of External Affairs",
+          "stable_url": "https://egazette.gov.in/ (UGID: CG-DL-E-19102026-277295)",
+          "identifier": "CG-DL-E-19102026-277295"
+        },
+        {
+          "title": "Publication of notification in the Gazette of...",
+          "date": "19-Oct-2026",
+          "instrument_class": "rules_notified",
+          "issuing_authority": "Ministry of Railways",
+          "stable_url": "https://egazette.gov.in/ (UGID: CG-AS-E-19102026-277294)",
+          "identifier": "CG-AS-E-19102026-277294"
+        },
+        {
+          "title": "Publication of notification in the Extra ordi...",
+          "date": "19-Oct-2026",
+          "instrument_class": "rules_notified",
+          "issuing_authority": "Ministry of Railways",
+          "stable_url": "https://egazette.gov.in/ (UGID: CG-UP-E-19102026-277293)",
+          "identifier": "CG-UP-E-19102026-277293"
+        },
+        {
+          "title": "This Gazette may contains Multiple Subjects",
+          "date": "19-Oct-2026",
+          "instrument_class": "rules_notified",
+          "issuing_authority": "This Gazette may contains Multiple Ministries",
+          "stable_url": "https://egazette.gov.in/ (UGID: CG-DL-W-19102026-277272)",
+          "identifier": "CG-DL-W-19102026-277272"
+        }
+      ]
+    }
+  },
+  "unparsed_sources": {
+    "sansad_in": {
+      "status": "UNPARSED_AT_HTTP_LAYER",
+      "reason": "Client-side rendered Next.js SPA with empty table placeholder in static HTML; requires headless browser or reverse-engineered internal REST API."
+    },
+    "indiacode_nic_in": {
+      "status": "UNPARSED_AT_HTTP_LAYER",
+      "reason": "Legacy domain indiacode.nic.in redirects to indiacode.gov.in; new domain is an Angular SPA on DSpace 7 (<ds-app></ds-app>) with anti-scraping key-blocks; requires headless browser or DSpace REST API access."
+    }
+  }
+}

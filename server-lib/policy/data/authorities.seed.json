@@ -1,0 +1,2044 @@
+[
+  {
+    "entity_slug": "ENT_PRESIDENT",
+    "authority": "President's Secretariat",
+    "aliases_en": [],
+    "aliases_hi": [
+      "राष्ट्रपति सचिवालय"
+    ],
+    "kind": "department",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1"
+  },
+  {
+    "entity_slug": "ENT_VICE_PRESIDENT",
+    "authority": "Vice-President's Secretariat",
+    "aliases_en": [],
+    "aliases_hi": [
+      "उप राष्ट्रपति सचिवालय"
+    ],
+    "kind": "department",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=2"
+  },
+  {
+    "entity_slug": "ENT_PMO",
+    "authority": "Prime Minister's Office",
+    "aliases_en": [],
+    "aliases_hi": [
+      "प्रधानमंत्री कार्यालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=3"
+  },
+  {
+    "entity_slug": "ENT_LOK_SABHA",
+    "authority": "Lok Sabha Secretariat",
+    "aliases_en": [],
+    "aliases_hi": [
+      "लोकसभा सचिवालय"
+    ],
+    "kind": "department",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=2608"
+  },
+  {
+    "entity_slug": "ENT_RAJYA_SABHA",
+    "authority": "Rajya Sabha Secretariat",
+    "aliases_en": [],
+    "aliases_hi": [
+      "राज्यसभा सचिवालय"
+    ],
+    "kind": "department",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=2934"
+  },
+  {
+    "entity_slug": "ENT_CABINET",
+    "authority": "Cabinet",
+    "aliases_en": [],
+    "aliases_hi": [
+      "मंत्रिमण्‍डल",
+      "मंत्रिमण्डल"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=61"
+  },
+  {
+    "entity_slug": "ENT_CABINET_DECISIONS",
+    "authority": "Cabinet Committee Decisions",
+    "aliases_en": [],
+    "aliases_hi": [
+      "मंत्रिमण्‍डल समिति निर्णय",
+      "मंत्रिमण्डल समिति निर्णय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=62"
+  },
+  {
+    "entity_slug": "ENT_CCEA",
+    "authority": "Cabinet Committee on Economic Affairs (CCEA)",
+    "aliases_en": [],
+    "aliases_hi": [
+      "आर्थिक मामलों की मंत्रिमण्‍डलीय समिति (सीसीईए)",
+      "आर्थिक मामलों की मंत्रिमण्डलीय समिति (सीसीईए)"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=63"
+  },
+  {
+    "entity_slug": "ENT_CAB_SEC",
+    "authority": "Cabinet Secretariat",
+    "aliases_en": [],
+    "aliases_hi": [
+      "मंत्रिमण्‍डल सचिवालय",
+      "मंत्रिमण्डल सचिवालय"
+    ],
+    "kind": "department",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=68"
+  },
+  {
+    "entity_slug": "ENT_AYUSH",
+    "authority": "Ministry of AYUSH",
+    "aliases_en": [],
+    "aliases_hi": [
+      "आयुष"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=80"
+  },
+  {
+    "entity_slug": "ENT_SPACE",
+    "authority": "Department of Space",
+    "aliases_en": [],
+    "aliases_hi": [
+      "अंतरिक्ष विभाग"
+    ],
+    "kind": "department",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=14"
+  },
+  {
+    "entity_slug": "ENT_DOD",
+    "authority": "Department of Ocean Development",
+    "aliases_en": [],
+    "aliases_hi": [
+      "सागर विकास विभाग"
+    ],
+    "kind": "department",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=45"
+  },
+  {
+    "entity_slug": "ENT_DAE",
+    "authority": "Department of Atomic Energy",
+    "aliases_en": [],
+    "aliases_hi": [
+      "अणु ऊर्जा विभाग",
+      "परमाणु ऊर्जा विभाग"
+    ],
+    "kind": "department",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=56"
+  },
+  {
+    "entity_slug": "ENT_ECI",
+    "authority": "Election Commission of India",
+    "aliases_en": [
+      "ECI",
+      "Election Commission"
+    ],
+    "aliases_hi": [
+      "भारत निर्वाचन आयोग",
+      "चुनाव आयोग"
+    ],
+    "kind": "constitutional_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "constitution_article",
+    "legal_basis_ref": "Article 324, Constitution of India",
+    "parent_entity_slug": null,
+    "source_url": "https://eci.gov.in"
+  },
+  {
+    "entity_slug": "ENT_FIN_COMM",
+    "authority": "Finance Commission",
+    "aliases_en": [],
+    "aliases_hi": [
+      "फाइनेंस कमीशन",
+      "वित्त आयोग"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1330"
+  },
+  {
+    "entity_slug": "ENT_MOAFW",
+    "authority": "Ministry of Agriculture & Farmers Welfare",
+    "aliases_en": [
+      "Ministry of Agriculture and Farmers Welfare"
+    ],
+    "aliases_hi": [
+      "कृषि एवं किसान कल्‍याण मंत्रालय",
+      "कृषि एवं किसान कल्याण मंत्रालय",
+      "कृषि मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=27"
+  },
+  {
+    "entity_slug": "ENT_FERTILIZERS",
+    "authority": "Ministry of Chemicals and Fertilizers",
+    "aliases_en": [],
+    "aliases_hi": [
+      "रसायन एवं उर्वरक मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=41"
+  },
+  {
+    "entity_slug": "ENT_CIVIL_AV",
+    "authority": "Ministry of Civil Aviation",
+    "aliases_en": [],
+    "aliases_hi": [
+      "नागरिक उड्डयन मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=26"
+  },
+  {
+    "entity_slug": "ENT_COAL",
+    "authority": "Ministry of Coal",
+    "aliases_en": [],
+    "aliases_hi": [
+      "कोयला मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=42"
+  },
+  {
+    "entity_slug": "ENT_MOCI",
+    "authority": "Ministry of Commerce & Industry",
+    "aliases_en": [
+      "Ministry of Commerce and Industry"
+    ],
+    "aliases_hi": [
+      "वाणिज्‍य एवं उद्योग मंत्रालय",
+      "वाणिज्य एवं उद्योग मंत्रालय",
+      "वाणिज्य मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=16"
+  },
+  {
+    "entity_slug": "ENT_COMMUNICATIONS",
+    "authority": "Ministry of Communications",
+    "aliases_en": [],
+    "aliases_hi": [
+      "संचार मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=24"
+  },
+  {
+    "entity_slug": "ENT_CONSUMER",
+    "authority": "Ministry of Consumer Affairs, Food & Public Distribution",
+    "aliases_en": [
+      "Ministry of Consumer Affairs, Food and Public Distribution"
+    ],
+    "aliases_hi": [
+      "उपभोक्‍ता कार्य, खाद्य एवं सार्वजनिक वितरण मंत्रालय",
+      "उपभोक्ता कार्य, खाद्य एवं सार्वजनिक वितरण मंत्रालय",
+      "उपभोक्ता मामले, खाद्य और सार्वजनिक वितरण मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=39"
+  },
+  {
+    "entity_slug": "ENT_COOPERATION",
+    "authority": "Ministry of Cooperation",
+    "aliases_en": [],
+    "aliases_hi": [
+      "सहकारिता मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1440"
+  },
+  {
+    "entity_slug": "ENT_CORP_AFFAIRS",
+    "authority": "Ministry of Corporate Affairs",
+    "aliases_en": [],
+    "aliases_hi": [
+      "कॉरपोरेट कार्य मंत्रालय",
+      "कॉरपोरेट मामलों का मंत्रालय",
+      "कंपनी कार्य मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=66"
+  },
+  {
+    "entity_slug": "ENT_CULTURE",
+    "authority": "Ministry of Culture",
+    "aliases_en": [],
+    "aliases_hi": [
+      "संस्‍कृति मंत्रालय",
+      "संस्कृति मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=17"
+  },
+  {
+    "entity_slug": "ENT_MOD",
+    "authority": "Ministry of Defence",
+    "aliases_en": [],
+    "aliases_hi": [
+      "रक्षा मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=33"
+  },
+  {
+    "entity_slug": "ENT_DONER",
+    "authority": "Ministry of Development of North Eastern Region",
+    "aliases_en": [],
+    "aliases_hi": [
+      "पूर्वोत्‍तर क्षेत्र विकास मंत्रालय",
+      "पूर्वोत्तर क्षेत्र विकास मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=57"
+  },
+  {
+    "entity_slug": "ENT_DIPAM",
+    "authority": "Ministry of Disinvestment",
+    "aliases_en": [],
+    "aliases_hi": [
+      "विनिवेश मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=48"
+  },
+  {
+    "entity_slug": "ENT_DDWS",
+    "authority": "Ministry of Drinking Water and Sanitation",
+    "aliases_en": [],
+    "aliases_hi": [
+      "पेयजल एवं स्‍वच्‍छता मंत्रालय",
+      "पेयजल एवं स्वच्छता मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=73"
+  },
+  {
+    "entity_slug": "ENT_EARTH_SCI",
+    "authority": "Ministry of Earth Sciences",
+    "aliases_en": [],
+    "aliases_hi": [
+      "पृथ्‍वी विज्ञान मंत्रालय",
+      "पृथ्वी विज्ञान मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=67"
+  },
+  {
+    "entity_slug": "ENT_EDUCATION",
+    "authority": "Ministry of Education",
+    "aliases_en": [],
+    "aliases_hi": [
+      "शिक्षा मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=8"
+  },
+  {
+    "entity_slug": "ENT_MEITY",
+    "authority": "Ministry of Electronics & IT",
+    "aliases_en": [
+      "Ministry of Electronics and IT"
+    ],
+    "aliases_hi": [
+      "इलेक्ट्रानिक्स एवं आईटी मंत्रालय",
+      "इलेक्ट्रॉनिक्स और सूचना प्रौद्योगिकी मंत्रालय",
+      "इलेक्ट्रॉनिक्स एवं आईटी मंत्रालय",
+      "इलेक्ट्रॉनिकी और सूचना प्रौद्योगिकी मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1323"
+  },
+  {
+    "entity_slug": "ENT_MOEFCC",
+    "authority": "Ministry of Environment, Forest and Climate Change",
+    "aliases_en": [],
+    "aliases_hi": [
+      "पर्यावरण, वन एवं जलवायु परिवर्तन मंत्रालय",
+      "पर्यावरण वन और जलवायु परिवर्तन मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=30"
+  },
+  {
+    "entity_slug": "ENT_MEA",
+    "authority": "Ministry of External Affairs",
+    "aliases_en": [],
+    "aliases_hi": [
+      "विदेश मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=4"
+  },
+  {
+    "entity_slug": "ENT_MOF",
+    "authority": "Ministry of Finance",
+    "aliases_en": [],
+    "aliases_hi": [
+      "वित्‍त मंत्रालय",
+      "वित्त मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=15"
+  },
+  {
+    "entity_slug": "ENT_FISHERIES",
+    "authority": "Ministry of Fisheries, Animal Husbandry & Dairying",
+    "aliases_en": [
+      "Ministry of Fisheries, Animal Husbandry and Dairying"
+    ],
+    "aliases_hi": [
+      "मत्स्यपालन, पशुपालन और डेयरी मंत्रालय",
+      "मत्स्य पालन, पशुपालन और डेयरी मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1340"
+  },
+  {
+    "entity_slug": "ENT_FPI",
+    "authority": "Ministry of Food Processing Industries",
+    "aliases_en": [],
+    "aliases_hi": [
+      "खाद्य प्रसंस्करण उद्योग मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=40"
+  },
+  {
+    "entity_slug": "ENT_MOHFW",
+    "authority": "Ministry of Health and Family Welfare",
+    "aliases_en": [],
+    "aliases_hi": [
+      "स्‍वास्‍थ्‍य एवं परिवार कल्‍याण मंत्रालय",
+      "स्वास्थ्य एवं परिवार कल्याण मंत्रालय",
+      "स्वास्थ्य और परिवार कल्याण मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=31"
+  },
+  {
+    "entity_slug": "ENT_HEAVY_IND",
+    "authority": "Ministry of Heavy Industries",
+    "aliases_en": [],
+    "aliases_hi": [
+      "भारी उद्योग मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=53"
+  },
+  {
+    "entity_slug": "ENT_MHA",
+    "authority": "Ministry of Home Affairs",
+    "aliases_en": [],
+    "aliases_hi": [
+      "गृह मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=5"
+  },
+  {
+    "entity_slug": "ENT_HOUSING",
+    "authority": "Ministry of Housing & Urban Affairs",
+    "aliases_en": [
+      "Ministry of Housing and Urban Affairs"
+    ],
+    "aliases_hi": [
+      "आवासन और शहरी कार्य मंत्रालय",
+      "शहरी विकास मंत्रालय",
+      "आवास एवं शहरी गरीबी उपशमन मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=47"
+  },
+  {
+    "entity_slug": "ENT_MIB",
+    "authority": "Ministry of Information & Broadcasting",
+    "aliases_en": [
+      "Ministry of Information and Broadcasting"
+    ],
+    "aliases_hi": [
+      "सूचना और प्रसारण मंत्रालय",
+      "सूचना एवं प्रसारण मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=11"
+  },
+  {
+    "entity_slug": "ENT_JAL_SHAKTI",
+    "authority": "Ministry of Jal Shakti",
+    "aliases_en": [],
+    "aliases_hi": [
+      "जल शक्ति मंत्रालय",
+      "जल संसाधन, नदी विकास एवं गंगा संरक्षण मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1336"
+  },
+  {
+    "entity_slug": "ENT_LABOUR",
+    "authority": "Ministry of Labour & Employment",
+    "aliases_en": [
+      "Ministry of Labour and Employment"
+    ],
+    "aliases_hi": [
+      "श्रम और रोजगार मंत्रालय",
+      "श्रम एवं रोजगार मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=21"
+  },
+  {
+    "entity_slug": "ENT_LAW_JUSTICE",
+    "authority": "Ministry of Law and Justice",
+    "aliases_en": [],
+    "aliases_hi": [
+      "विधि एवं न्‍याय मंत्रालय",
+      "विधि एवं न्याय मंत्रालय",
+      "कानून और न्याय मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=7"
+  },
+  {
+    "entity_slug": "ENT_MSME",
+    "authority": "Ministry of Micro, Small & Medium Enterprises",
+    "aliases_en": [
+      "Ministry of Micro, Small and Medium Enterprises"
+    ],
+    "aliases_hi": [
+      "सूक्ष्‍म, लघु एवं मध्‍यम उद्यम मंत्रालय",
+      "सूक्ष्म, लघु एवं मध्यम उद्यम मंत्रालय",
+      "एमएसएमई मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=51"
+  },
+  {
+    "entity_slug": "ENT_MINES",
+    "authority": "Ministry of Mines",
+    "aliases_en": [],
+    "aliases_hi": [
+      "खान मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=44"
+  },
+  {
+    "entity_slug": "ENT_MINORITY",
+    "authority": "Ministry of Minority Affairs",
+    "aliases_en": [],
+    "aliases_hi": [
+      "अल्‍पसंख्‍यक कार्य मंत्रालय",
+      "अल्पसंख्यक कार्य मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=65"
+  },
+  {
+    "entity_slug": "ENT_MNRE",
+    "authority": "Ministry of New and Renewable Energy",
+    "aliases_en": [],
+    "aliases_hi": [
+      "नवीन एवं नवीकरणीय ऊर्जा मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=28"
+  },
+  {
+    "entity_slug": "ENT_PANCHAYAT",
+    "authority": "Ministry of Panchayati Raj",
+    "aliases_en": [],
+    "aliases_hi": [
+      "पंचायती राज मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=10"
+  },
+  {
+    "entity_slug": "ENT_PARLIAMENT",
+    "authority": "Ministry of Parliamentary Affairs",
+    "aliases_en": [],
+    "aliases_hi": [
+      "संसदीय कार्य मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=12"
+  },
+  {
+    "entity_slug": "ENT_DOPT",
+    "authority": "Ministry of Personnel, Public Grievances & Pensions",
+    "aliases_en": [
+      "Ministry of Personnel, Public Grievances and Pensions"
+    ],
+    "aliases_hi": [
+      "कार्मिक, लोक शिकायत एवं पेंशन मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=6"
+  },
+  {
+    "entity_slug": "ENT_PETRO",
+    "authority": "Ministry of Petroleum & Natural Gas",
+    "aliases_en": [
+      "Ministry of Petroleum and Natural Gas"
+    ],
+    "aliases_hi": [
+      "पेट्रोलियम एवं प्राकृतिक गैस मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=20"
+  },
+  {
+    "entity_slug": "ENT_PLANNING",
+    "authority": "Ministry of Planning",
+    "aliases_en": [],
+    "aliases_hi": [
+      "योजना मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=79"
+  },
+  {
+    "entity_slug": "ENT_POWER",
+    "authority": "Ministry of Power",
+    "aliases_en": [],
+    "aliases_hi": [
+      "विद्युत मंत्रालय",
+      "ऊर्जा मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=52"
+  },
+  {
+    "entity_slug": "ENT_RAIL",
+    "authority": "Ministry of Railways",
+    "aliases_en": [],
+    "aliases_hi": [
+      "रेल मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=23"
+  },
+  {
+    "entity_slug": "ENT_MORT",
+    "authority": "Ministry of Road Transport & Highways",
+    "aliases_en": [
+      "Ministry of Road Transport and Highways"
+    ],
+    "aliases_hi": [
+      "सड़क परिवहन एवं राजमार्ग मंत्रालय",
+      "सडक परिवहन एवं राजमार्ग मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=69"
+  },
+  {
+    "entity_slug": "ENT_RURAL_DEV",
+    "authority": "Ministry of Rural Development",
+    "aliases_en": [],
+    "aliases_hi": [
+      "ग्रामीण विकास मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=43"
+  },
+  {
+    "entity_slug": "ENT_S_AND_T",
+    "authority": "Ministry of Science & Technology",
+    "aliases_en": [
+      "Ministry of Science and Technology"
+    ],
+    "aliases_hi": [
+      "विज्ञान एवं प्रौद्योगिकी मंत्रालय",
+      "विज्ञान और प्रौद्योगिकी मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=13"
+  },
+  {
+    "entity_slug": "ENT_PORTS",
+    "authority": "Ministry of Ports, Shipping and Waterways",
+    "aliases_en": [],
+    "aliases_hi": [
+      "पत्तन, पोत परिवहन और जलमार्ग मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=46"
+  },
+  {
+    "entity_slug": "ENT_SKILL_DEV",
+    "authority": "Ministry of Skill Development and Entrepreneurship",
+    "aliases_en": [],
+    "aliases_hi": [
+      "कौशल विकास एवं उद्यमिता मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=77"
+  },
+  {
+    "entity_slug": "ENT_SOCIAL_JUSTICE",
+    "authority": "Ministry of Social Justice & Empowerment",
+    "aliases_en": [
+      "Ministry of Social Justice and Empowerment"
+    ],
+    "aliases_hi": [
+      "सामाजिक न्‍याय एवं अधिकारिता मंत्रालय",
+      "सामाजिक न्याय एवं अधिकारिता मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=50"
+  },
+  {
+    "entity_slug": "ENT_STATISTICS",
+    "authority": "Ministry of Statistics & Programme Implementation",
+    "aliases_en": [
+      "Ministry of Statistics and Programme Implementation"
+    ],
+    "aliases_hi": [
+      "सांख्यिकी एवं कार्यक्रम कार्यान्‍वयन मंत्रालय",
+      "सांख्यिकी एवं कार्यक्रम कार्यान्वयन मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=55"
+  },
+  {
+    "entity_slug": "ENT_STEEL",
+    "authority": "Ministry of Steel",
+    "aliases_en": [],
+    "aliases_hi": [
+      "इस्‍पात मंत्रालय",
+      "इस्पात मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=18"
+  },
+  {
+    "entity_slug": "ENT_TEXTILES",
+    "authority": "Ministry of Textiles",
+    "aliases_en": [],
+    "aliases_hi": [
+      "वस्‍त्र मंत्रालय",
+      "वस्त्र मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=19"
+  },
+  {
+    "entity_slug": "ENT_TOURISM",
+    "authority": "Ministry of Tourism",
+    "aliases_en": [],
+    "aliases_hi": [
+      "पर्यटन मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=36"
+  },
+  {
+    "entity_slug": "ENT_TRIBAL",
+    "authority": "Ministry of Tribal Affairs",
+    "aliases_en": [],
+    "aliases_hi": [
+      "जनजातीय कार्य मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=49"
+  },
+  {
+    "entity_slug": "ENT_WCD",
+    "authority": "Ministry of Women and Child Development",
+    "aliases_en": [],
+    "aliases_hi": [
+      "महिला एवं बाल विकास मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=64"
+  },
+  {
+    "entity_slug": "ENT_YOUTH",
+    "authority": "Ministry of Youth Affairs and Sports",
+    "aliases_en": [],
+    "aliases_hi": [
+      "युवा कार्यक्रम एवं खेल मंत्रालय",
+      "युवा मामले और खेल मंत्रालय"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=9"
+  },
+  {
+    "entity_slug": "ENT_NITI",
+    "authority": "NITI Aayog",
+    "aliases_en": [
+      "National Institution for Transforming India"
+    ],
+    "aliases_hi": [
+      "नीति आयोग"
+    ],
+    "kind": "attached_office",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Cabinet Resolution No. 511/2/1/2015-Cab",
+    "parent_entity_slug": null,
+    "source_url": "https://niti.gov.in"
+  },
+  {
+    "entity_slug": "ENT_UPSC",
+    "authority": "Union Public Service Commission",
+    "aliases_en": [
+      "UPSC"
+    ],
+    "aliases_hi": [
+      "संघ लोक सेवा आयोग"
+    ],
+    "kind": "constitutional_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "constitution_article",
+    "legal_basis_ref": "Article 315, Constitution of India",
+    "parent_entity_slug": null,
+    "source_url": "https://upsc.gov.in"
+  },
+  {
+    "entity_slug": "ENT_NFRA",
+    "authority": "National Financial Reporting Authority (NFRA)",
+    "aliases_en": [],
+    "aliases_hi": [
+      "राष्ट्रीय वित्तीय रिपोर्टिंग प्राधिकरण"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1454"
+  },
+  {
+    "entity_slug": "ENT_CCI",
+    "authority": "Competition Commission of India",
+    "aliases_en": [
+      "CCI"
+    ],
+    "aliases_hi": [
+      "भारतीय प्रतिस्पर्धा आयोग"
+    ],
+    "kind": "regulator",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Competition Act, 2002",
+    "parent_entity_slug": null,
+    "source_url": "https://www.cci.gov.in"
+  },
+  {
+    "entity_slug": "ENT_IFSCA",
+    "authority": "International Financial Services Centres Authority (IFSCA)",
+    "aliases_en": [],
+    "aliases_hi": [
+      "आईएफएससी प्राधिकरण"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1470"
+  },
+  {
+    "entity_slug": "ENT_NSCS",
+    "authority": "National Security Council Secretariat",
+    "aliases_en": [],
+    "aliases_hi": [
+      "राष्ट्रीय सुरक्षा परिषद सचिवालय"
+    ],
+    "kind": "department",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1484"
+  },
+  {
+    "entity_slug": "ENT_NHRC",
+    "authority": "National Human Rights Commission",
+    "aliases_en": [
+      "NHRC"
+    ],
+    "aliases_hi": [
+      "राष्ट्रीय मानवाधिकार आयोग"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Protection of Human Rights Act, 1993",
+    "parent_entity_slug": null,
+    "source_url": "https://nhrc.nic.in"
+  },
+  {
+    "entity_slug": "ENT_LOKPAL",
+    "authority": "Lokpal of India",
+    "aliases_en": [],
+    "aliases_hi": [
+      "भारत के लोकपाल"
+    ],
+    "kind": "ministry",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=2611"
+  },
+  {
+    "entity_slug": "ENT_DOP",
+    "authority": "Department of Pharmaceuticals",
+    "aliases_en": [],
+    "aliases_hi": [
+      "औषधि विभाग"
+    ],
+    "kind": "department",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=2943"
+  },
+  {
+    "entity_slug": "ENT_DOF",
+    "authority": "Department of Fertilizers",
+    "aliases_en": [],
+    "aliases_hi": [
+      "उर्वरक विभाग",
+      "रसायन एवं उर्वरक मंत्रालय : उर्वरक विभाग"
+    ],
+    "kind": "department",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=2944"
+  },
+  {
+    "entity_slug": "ENT_DCPC",
+    "authority": "Department of Chemicals and Petrochemicals",
+    "aliases_en": [],
+    "aliases_hi": [
+      "रसायन एवं पेट्रो-रसायन विभाग"
+    ],
+    "kind": "department",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": null,
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=2945"
+  },
+  {
+    "entity_slug": "ENT_RBI",
+    "authority": "Reserve Bank of India",
+    "aliases_en": [
+      "RBI"
+    ],
+    "aliases_hi": [
+      "भारतीय रिज़र्व बैंक"
+    ],
+    "kind": "regulator",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Reserve Bank of India Act, 1934",
+    "parent_entity_slug": null,
+    "source_url": "https://www.rbi.org.in"
+  },
+  {
+    "entity_slug": "ENT_CAG",
+    "authority": "Comptroller and Auditor General of India",
+    "aliases_en": [
+      "CAG"
+    ],
+    "aliases_hi": [
+      "भारत के नियंत्रक एवं महालेखापरीक्षक"
+    ],
+    "kind": "constitutional_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "constitution_article",
+    "legal_basis_ref": "Article 148, Constitution of India",
+    "parent_entity_slug": null,
+    "source_url": "https://cag.gov.in"
+  },
+  {
+    "entity_slug": "ENT_NCSC",
+    "authority": "National Commission for Scheduled Castes",
+    "aliases_en": [
+      "NCSC"
+    ],
+    "aliases_hi": [
+      "राष्ट्रीय अनुसूचित जाति आयोग"
+    ],
+    "kind": "constitutional_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "constitution_article",
+    "legal_basis_ref": "Article 338, Constitution of India",
+    "parent_entity_slug": null,
+    "source_url": "https://ncsc.nic.in"
+  },
+  {
+    "entity_slug": "ENT_NCST",
+    "authority": "National Commission for Scheduled Tribes",
+    "aliases_en": [
+      "NCST"
+    ],
+    "aliases_hi": [
+      "राष्ट्रीय अनुसूचित जनजाति आयोग"
+    ],
+    "kind": "constitutional_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "constitution_article",
+    "legal_basis_ref": "Article 338A, Constitution of India",
+    "parent_entity_slug": null,
+    "source_url": "https://ncst.nic.in"
+  },
+  {
+    "entity_slug": "ENT_NCBC",
+    "authority": "National Commission for Backward Classes",
+    "aliases_en": [
+      "NCBC"
+    ],
+    "aliases_hi": [
+      "राष्ट्रीय पिछड़ा वर्ग आयोग"
+    ],
+    "kind": "constitutional_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "constitution_article",
+    "legal_basis_ref": "Article 338B, Constitution of India",
+    "parent_entity_slug": null,
+    "source_url": "https://ncbc.nic.in"
+  },
+  {
+    "entity_slug": "ENT_AGI",
+    "authority": "Attorney General for India",
+    "aliases_en": [
+      "AGI",
+      "Attorney General of India"
+    ],
+    "aliases_hi": [
+      "भारत के महान्यायवादी"
+    ],
+    "kind": "constitutional_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "constitution_article",
+    "legal_basis_ref": "Article 76, Constitution of India",
+    "parent_entity_slug": null,
+    "source_url": "https://legalaffairs.gov.in"
+  },
+  {
+    "entity_slug": "ENT_SEBI",
+    "authority": "Securities and Exchange Board of India",
+    "aliases_en": [
+      "SEBI"
+    ],
+    "aliases_hi": [
+      "भारतीय प्रतिभूति और विनिमय बोर्ड"
+    ],
+    "kind": "regulator",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Securities and Exchange Board of India Act, 1992",
+    "parent_entity_slug": null,
+    "source_url": "https://www.sebi.gov.in"
+  },
+  {
+    "entity_slug": "ENT_TRAI",
+    "authority": "Telecom Regulatory Authority of India",
+    "aliases_en": [
+      "TRAI"
+    ],
+    "aliases_hi": [
+      "भारतीय दूरसंचार विनियामक प्राधिकरण"
+    ],
+    "kind": "regulator",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Telecom Regulatory Authority of India Act, 1997",
+    "parent_entity_slug": null,
+    "source_url": "https://www.trai.gov.in"
+  },
+  {
+    "entity_slug": "ENT_IRDAI",
+    "authority": "Insurance Regulatory and Development Authority of India",
+    "aliases_en": [
+      "IRDAI",
+      "IRDA"
+    ],
+    "aliases_hi": [
+      "भारतीय बीमा विनियामक और विकास प्राधिकरण"
+    ],
+    "kind": "regulator",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Insurance Regulatory and Development Authority Act, 1999",
+    "parent_entity_slug": null,
+    "source_url": "https://irdai.gov.in"
+  },
+  {
+    "entity_slug": "ENT_IBBI",
+    "authority": "Insolvency and Bankruptcy Board of India",
+    "aliases_en": [
+      "IBBI"
+    ],
+    "aliases_hi": [
+      "भारतीय दिवाला और दिवालियापन बोर्ड"
+    ],
+    "kind": "regulator",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Insolvency and Bankruptcy Code, 2016",
+    "parent_entity_slug": null,
+    "source_url": "https://ibbi.gov.in"
+  },
+  {
+    "entity_slug": "ENT_PFRDA",
+    "authority": "Pension Fund Regulatory and Development Authority",
+    "aliases_en": [
+      "PFRDA"
+    ],
+    "aliases_hi": [
+      "पेंशन निधि विनियामक और विकास प्राधिकरण"
+    ],
+    "kind": "regulator",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Pension Fund Regulatory and Development Authority Act, 2013",
+    "parent_entity_slug": null,
+    "source_url": "https://pfrda.org.in"
+  },
+  {
+    "entity_slug": "ENT_FSSAI",
+    "authority": "Food Safety and Standards Authority of India",
+    "aliases_en": [
+      "FSSAI"
+    ],
+    "aliases_hi": [
+      "भारतीय खाद्य संरक्षा एवं मानक प्राधिकरण"
+    ],
+    "kind": "regulator",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Food Safety and Standards Act, 2006",
+    "parent_entity_slug": null,
+    "source_url": "https://fssai.gov.in"
+  },
+  {
+    "entity_slug": "ENT_BIS",
+    "authority": "Bureau of Indian Standards",
+    "aliases_en": [
+      "BIS"
+    ],
+    "aliases_hi": [
+      "भारतीय मानक ब्यूरो"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Bureau of Indian Standards Act, 2016",
+    "parent_entity_slug": null,
+    "source_url": "https://bis.gov.in"
+  },
+  {
+    "entity_slug": "ENT_UIDAI",
+    "authority": "Unique Identification Authority of India",
+    "aliases_en": [
+      "UIDAI"
+    ],
+    "aliases_hi": [
+      "भारतीय विशिष्ट पहचान प्राधिकरण"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Aadhaar (Targeted Delivery of Financial and Other Subsidies, Benefits and Services) Act, 2016",
+    "parent_entity_slug": null,
+    "source_url": "https://uidai.gov.in"
+  },
+  {
+    "entity_slug": "ENT_CIC",
+    "authority": "Central Information Commission",
+    "aliases_en": [
+      "CIC"
+    ],
+    "aliases_hi": [
+      "केंद्रीय सूचना आयोग"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Right to Information Act, 2005",
+    "parent_entity_slug": null,
+    "source_url": "https://cic.gov.in"
+  },
+  {
+    "entity_slug": "ENT_CVC",
+    "authority": "Central Vigilance Commission",
+    "aliases_en": [
+      "CVC"
+    ],
+    "aliases_hi": [
+      "केंद्रीय सतर्कता आयोग"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Central Vigilance Commission Act, 2003",
+    "parent_entity_slug": null,
+    "source_url": "https://cvc.gov.in"
+  },
+  {
+    "entity_slug": "ENT_NGT",
+    "authority": "National Green Tribunal",
+    "aliases_en": [
+      "NGT"
+    ],
+    "aliases_hi": [
+      "राष्ट्रीय हरित अधिकरण"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "National Green Tribunal Act, 2010",
+    "parent_entity_slug": null,
+    "source_url": "https://greentribunal.gov.in"
+  },
+  {
+    "entity_slug": "ENT_TEXTILES_COMM",
+    "authority": "Textiles Committee",
+    "aliases_en": [
+      "Textiles Committee India"
+    ],
+    "aliases_hi": [
+      "वस्त्र समिति"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Textiles Committee Act, 1963",
+    "parent_entity_slug": "ENT_TEXTILES",
+    "source_url": "https://textilescommittee.nic.in"
+  },
+  {
+    "entity_slug": "ENT_CPCB",
+    "authority": "Central Pollution Control Board",
+    "aliases_en": [
+      "CPCB"
+    ],
+    "aliases_hi": [
+      "केंद्रीय प्रदूषण नियंत्रण बोर्ड"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Water (Prevention and Control of Pollution) Act, 1974",
+    "parent_entity_slug": "ENT_MOEFCC",
+    "source_url": "https://cpcb.nic.in"
+  },
+  {
+    "entity_slug": "ENT_NDMA",
+    "authority": "National Disaster Management Authority",
+    "aliases_en": [
+      "NDMA"
+    ],
+    "aliases_hi": [
+      "राष्ट्रीय आपदा प्रबंधन प्राधिकरण"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Disaster Management Act, 2005",
+    "parent_entity_slug": "ENT_MHA",
+    "source_url": "https://ndma.gov.in"
+  },
+  {
+    "entity_slug": "ENT_NCPCR",
+    "authority": "National Commission for Protection of Child Rights",
+    "aliases_en": [
+      "NCPCR"
+    ],
+    "aliases_hi": [
+      "राष्ट्रीय बाल अधिकार संरक्षण आयोग"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Commissions for Protection of Child Rights Act, 2005",
+    "parent_entity_slug": "ENT_WCD",
+    "source_url": "https://ncpcr.gov.in"
+  },
+  {
+    "entity_slug": "ENT_NCW",
+    "authority": "National Commission for Women",
+    "aliases_en": [
+      "NCW"
+    ],
+    "aliases_hi": [
+      "राष्ट्रीय महिला आयोग"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "National Commission for Women Act, 1990",
+    "parent_entity_slug": "ENT_WCD",
+    "source_url": "https://ncw.nic.in"
+  },
+  {
+    "entity_slug": "ENT_NCM",
+    "authority": "National Commission for Minorities",
+    "aliases_en": [
+      "NCM"
+    ],
+    "aliases_hi": [
+      "राष्ट्रीय अल्पसंख्यक आयोग"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "National Commission for Minorities Act, 1992",
+    "parent_entity_slug": "ENT_MINORITY",
+    "source_url": "https://ncm.nic.in"
+  },
+  {
+    "entity_slug": "ENT_EPFO",
+    "authority": "Employees' Provident Fund Organisation",
+    "aliases_en": [
+      "EPFO"
+    ],
+    "aliases_hi": [
+      "कर्मचारी भविष्य निधि संगठन"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Employees' Provident Funds and Miscellaneous Provisions Act, 1952",
+    "parent_entity_slug": "ENT_LABOUR",
+    "source_url": "https://epfindia.gov.in"
+  },
+  {
+    "entity_slug": "ENT_ESIC",
+    "authority": "Employees' State Insurance Corporation",
+    "aliases_en": [
+      "ESIC"
+    ],
+    "aliases_hi": [
+      "कर्मचारी राज्य बीमा निगम"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Employees' State Insurance Act, 1948",
+    "parent_entity_slug": "ENT_LABOUR",
+    "source_url": "https://esic.gov.in"
+  },
+  {
+    "entity_slug": "ENT_NABARD",
+    "authority": "National Bank for Agriculture and Rural Development",
+    "aliases_en": [
+      "NABARD"
+    ],
+    "aliases_hi": [
+      "राष्ट्रीय कृषि और ग्रामीण विकास बैंक"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "National Bank for Agriculture and Rural Development Act, 1981",
+    "parent_entity_slug": null,
+    "source_url": "https://nabard.org"
+  },
+  {
+    "entity_slug": "ENT_SIDBI",
+    "authority": "Small Industries Development Bank of India",
+    "aliases_en": [
+      "SIDBI"
+    ],
+    "aliases_hi": [
+      "भारतीय लघु उद्योग विकास बैंक"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Small Industries Development Bank of India Act, 1989",
+    "parent_entity_slug": null,
+    "source_url": "https://sidbi.in"
+  },
+  {
+    "entity_slug": "ENT_BEE",
+    "authority": "Bureau of Energy Efficiency",
+    "aliases_en": [
+      "BEE"
+    ],
+    "aliases_hi": [
+      "ऊर्जा दक्षता ब्यूरो"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Energy Conservation Act, 2001",
+    "parent_entity_slug": "ENT_POWER",
+    "source_url": "https://beeindia.gov.in"
+  },
+  {
+    "entity_slug": "ENT_CEA",
+    "authority": "Central Electricity Authority",
+    "aliases_en": [
+      "CEA"
+    ],
+    "aliases_hi": [
+      "केंद्रीय विद्युत प्राधिकरण"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Electricity Act, 2003",
+    "parent_entity_slug": "ENT_POWER",
+    "source_url": "https://cea.nic.in"
+  },
+  {
+    "entity_slug": "ENT_CERC",
+    "authority": "Central Electricity Regulatory Commission",
+    "aliases_en": [
+      "CERC"
+    ],
+    "aliases_hi": [
+      "केंद्रीय विद्युत विनियामक आयोग"
+    ],
+    "kind": "regulator",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Electricity Act, 2003",
+    "parent_entity_slug": "ENT_POWER",
+    "source_url": "https://cercind.gov.in"
+  },
+  {
+    "entity_slug": "ENT_PNGRB",
+    "authority": "Petroleum and Natural Gas Regulatory Board",
+    "aliases_en": [
+      "PNGRB"
+    ],
+    "aliases_hi": [
+      "पेट्रोलियम और प्राकृतिक गैस विनियामक बोर्ड"
+    ],
+    "kind": "regulator",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Petroleum and Natural Gas Regulatory Board Act, 2006",
+    "parent_entity_slug": "ENT_PETRO",
+    "source_url": "https://pngrb.gov.in"
+  },
+  {
+    "entity_slug": "ENT_NMC",
+    "authority": "National Medical Commission",
+    "aliases_en": [
+      "NMC"
+    ],
+    "aliases_hi": [
+      "राष्ट्रीय चिकित्सा आयोग"
+    ],
+    "kind": "regulator",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "National Medical Commission Act, 2019",
+    "parent_entity_slug": "ENT_MOHFW",
+    "source_url": "https://nmc.org.in"
+  },
+  {
+    "entity_slug": "ENT_UGC",
+    "authority": "University Grants Commission",
+    "aliases_en": [
+      "UGC"
+    ],
+    "aliases_hi": [
+      "विश्वविद्यालय अनुदान आयोग"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "University Grants Commission Act, 1956",
+    "parent_entity_slug": "ENT_EDUCATION",
+    "source_url": "https://ugc.gov.in"
+  },
+  {
+    "entity_slug": "ENT_AICTE",
+    "authority": "All India Council for Technical Education",
+    "aliases_en": [
+      "AICTE"
+    ],
+    "aliases_hi": [
+      "अखिल भारतीय तकनीकी शिक्षा परिषद"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "All India Council for Technical Education Act, 1987",
+    "parent_entity_slug": "ENT_EDUCATION",
+    "source_url": "https://aicte-india.org"
+  },
+  {
+    "entity_slug": "ENT_NHAI",
+    "authority": "National Highways Authority of India",
+    "aliases_en": [
+      "NHAI"
+    ],
+    "aliases_hi": [
+      "भारतीय राष्ट्रीय राजमार्ग प्राधिकरण"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "National Highways Authority of India Act, 1988",
+    "parent_entity_slug": "ENT_MORT",
+    "source_url": "https://nhai.gov.in"
+  },
+  {
+    "entity_slug": "ENT_IWAI",
+    "authority": "Inland Waterways Authority of India",
+    "aliases_en": [
+      "IWAI"
+    ],
+    "aliases_hi": [
+      "भारतीय अंतर्देशीय जलमार्ग प्राधिकरण"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Inland Waterways Authority of India Act, 1985",
+    "parent_entity_slug": "ENT_PORTS",
+    "source_url": "https://iwai.nic.in"
+  },
+  {
+    "entity_slug": "ENT_AAI",
+    "authority": "Airports Authority of India",
+    "aliases_en": [
+      "AAI"
+    ],
+    "aliases_hi": [
+      "भारतीय विमानपत्तन प्राधिकरण"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Airports Authority of India Act, 1994",
+    "parent_entity_slug": "ENT_CIVIL_AV",
+    "source_url": "https://aai.aero"
+  },
+  {
+    "entity_slug": "ENT_CBDT",
+    "authority": "Central Board of Direct Taxes",
+    "aliases_en": [
+      "CBDT"
+    ],
+    "aliases_hi": [
+      "केंद्रीय प्रत्यक्ष कर बोर्ड"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Central Boards of Revenue Act, 1963",
+    "parent_entity_slug": "ENT_MOF",
+    "source_url": "https://incometaxindia.gov.in"
+  },
+  {
+    "entity_slug": "ENT_CBIC",
+    "authority": "Central Board of Indirect Taxes and Customs",
+    "aliases_en": [
+      "CBIC"
+    ],
+    "aliases_hi": [
+      "केंद्रीय अप्रत्यक्ष कर एवं सीमा शुल्क बोर्ड"
+    ],
+    "kind": "statutory_body",
+    "jurisdiction": "union",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Central Boards of Revenue Act, 1963",
+    "parent_entity_slug": "ENT_MOF",
+    "source_url": "https://cbic.gov.in"
+  },
+  {
+    "entity_slug": "ENT_ISRO",
+    "authority": "Indian Space Research Organisation",
+    "aliases_en": [
+      "ISRO"
+    ],
+    "aliases_hi": [
+      "भारतीय अंतरिक्ष अनुसंधान संगठन"
+    ],
+    "kind": "attached_office",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Presidential Notification Doc. No. CD-320/72",
+    "parent_entity_slug": "ENT_SPACE",
+    "source_url": "https://isro.gov.in"
+  },
+  {
+    "entity_slug": "ENT_DRDO",
+    "authority": "Defence Research and Development Organisation",
+    "aliases_en": [
+      "DRDO"
+    ],
+    "aliases_hi": [
+      "रक्षा अनुसंधान एवं विकास संगठन"
+    ],
+    "kind": "attached_office",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Government Resolution of 1958",
+    "parent_entity_slug": "ENT_MOD",
+    "source_url": "https://drdo.gov.in"
+  },
+  {
+    "entity_slug": "ENT_DGFT",
+    "authority": "Directorate General of Foreign Trade",
+    "aliases_en": [
+      "DGFT"
+    ],
+    "aliases_hi": [
+      "विदेश व्यापार महानिदेशालय"
+    ],
+    "kind": "attached_office",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "parent_entity_slug": "ENT_MOCI",
+    "source_url": "https://dgft.gov.in"
+  },
+  {
+    "entity_slug": "ENT_ED",
+    "authority": "Directorate of Enforcement",
+    "aliases_en": [
+      "Enforcement Directorate",
+      "ED"
+    ],
+    "aliases_hi": [
+      "प्रवर्तन निदेशालय"
+    ],
+    "kind": "attached_office",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Department of Economic Affairs Order 1956",
+    "parent_entity_slug": "ENT_MOF",
+    "source_url": "https://enforcementdirectorate.gov.in"
+  },
+  {
+    "entity_slug": "ENT_CBI",
+    "authority": "Central Bureau of Investigation",
+    "aliases_en": [
+      "CBI"
+    ],
+    "aliases_hi": [
+      "केंद्रीय अन्वेषण ब्यूरो"
+    ],
+    "kind": "attached_office",
+    "jurisdiction": "union",
+    "legal_basis_kind": "executive_order",
+    "legal_basis_ref": "Ministry of Home Affairs Resolution No. 4/31/61-T",
+    "parent_entity_slug": "ENT_PMO",
+    "source_url": "https://cbi.gov.in"
+  },
+  {
+    "entity_slug": "ENT_CSIR",
+    "authority": "Council of Scientific and Industrial Research",
+    "aliases_en": [
+      "CSIR"
+    ],
+    "aliases_hi": [
+      "वैज्ञानिक तथा औद्योगिक अनुसंधान परिषद"
+    ],
+    "kind": "society",
+    "jurisdiction": "union",
+    "legal_basis_kind": "society_registration",
+    "legal_basis_ref": "Societies Registration Act, 1860",
+    "parent_entity_slug": "ENT_S_AND_T",
+    "source_url": "https://csir.res.in"
+  },
+  {
+    "entity_slug": "ENT_ICAR",
+    "authority": "Indian Council of Agricultural Research",
+    "aliases_en": [
+      "ICAR"
+    ],
+    "aliases_hi": [
+      "भारतीय कृषि अनुसंधान परिषद"
+    ],
+    "kind": "society",
+    "jurisdiction": "union",
+    "legal_basis_kind": "society_registration",
+    "legal_basis_ref": "Societies Registration Act, 1860",
+    "parent_entity_slug": "ENT_MOAFW",
+    "source_url": "https://icar.org.in"
+  },
+  {
+    "entity_slug": "ENT_ICMR",
+    "authority": "Indian Council of Medical Research",
+    "aliases_en": [
+      "ICMR"
+    ],
+    "aliases_hi": [
+      "भारतीय आयुर्विज्ञान अनुसंधान परिषद"
+    ],
+    "kind": "society",
+    "jurisdiction": "union",
+    "legal_basis_kind": "society_registration",
+    "legal_basis_ref": "Societies Registration Act, 1860",
+    "parent_entity_slug": "ENT_MOHFW",
+    "source_url": "https://icmr.gov.in"
+  },
+  {
+    "entity_slug": "ENT_ISM",
+    "authority": "India Semiconductor Mission",
+    "aliases_en": [
+      "ISM"
+    ],
+    "aliases_hi": [
+      "इंडिया सेमीकंडक्टर मिशन"
+    ],
+    "kind": "section8",
+    "jurisdiction": "union",
+    "legal_basis_kind": "companies_act_section8",
+    "legal_basis_ref": "Companies Act, 2013, Section 8 (Digital India Corporation)",
+    "parent_entity_slug": "ENT_MEITY",
+    "source_url": "https://ism.gov.in"
+  },
+  {
+    "entity_slug": "ENT_ONGC",
+    "authority": "Oil and Natural Gas Corporation",
+    "aliases_en": [
+      "ONGC"
+    ],
+    "aliases_hi": [
+      "तेल एवं प्राकृतिक गैस निगम"
+    ],
+    "kind": "cpse",
+    "jurisdiction": "union",
+    "legal_basis_kind": "companies_act_cpse",
+    "legal_basis_ref": "Companies Act, 1956",
+    "parent_entity_slug": "ENT_PETRO",
+    "source_url": "https://ongcindia.com"
+  },
+  {
+    "entity_slug": "ENT_NTPC",
+    "authority": "NTPC Limited",
+    "aliases_en": [
+      "NTPC"
+    ],
+    "aliases_hi": [
+      "एनटीपीसी लिमिटेड"
+    ],
+    "kind": "cpse",
+    "jurisdiction": "union",
+    "legal_basis_kind": "companies_act_cpse",
+    "legal_basis_ref": "Companies Act, 1956",
+    "parent_entity_slug": "ENT_POWER",
+    "source_url": "https://ntpc.co.in"
+  },
+  {
+    "entity_slug": "ENT_CIL",
+    "authority": "Coal India Limited",
+    "aliases_en": [
+      "CIL"
+    ],
+    "aliases_hi": [
+      "कोल इंडिया लिमिटेड"
+    ],
+    "kind": "cpse",
+    "jurisdiction": "union",
+    "legal_basis_kind": "companies_act_cpse",
+    "legal_basis_ref": "Companies Act, 1956",
+    "parent_entity_slug": "ENT_COAL",
+    "source_url": "https://coalindia.in"
+  },
+  {
+    "entity_slug": "ENT_SAIL",
+    "authority": "Steel Authority of India Limited",
+    "aliases_en": [
+      "SAIL"
+    ],
+    "aliases_hi": [
+      "भारतीय इस्पात प्राधिकरण लिमिटेड"
+    ],
+    "kind": "cpse",
+    "jurisdiction": "union",
+    "legal_basis_kind": "companies_act_cpse",
+    "legal_basis_ref": "Companies Act, 1956",
+    "parent_entity_slug": "ENT_STEEL",
+    "source_url": "https://sail.co.in"
+  }
+]

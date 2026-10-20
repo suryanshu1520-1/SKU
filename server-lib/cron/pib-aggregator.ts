@@ -19,7 +19,6 @@ import { createClient } from "@supabase/supabase-js";
 import WebSocket from "ws";
 import dotenv from "dotenv";
 import { isEphemeralTrivia } from "./ingest/classify.js";
-import { processDispatchIntoPolicyGraph } from "./policy-graph-worker.js";
 
 dotenv.config();
 
@@ -568,18 +567,6 @@ export async function runPibAggregatorPipeline(): Promise<{ processed: number; s
     const writeResult = await upsertDigest(digest, article.url);
     if (writeResult.ok) {
       successCount++;
-      try {
-        await processDispatchIntoPolicyGraph({
-          id: article.url,
-          headline: article.title,
-          ministry: "Government of India",
-          summary: { bullets: [digest.title] },
-          url: article.url,
-          published_at: new Date().toISOString(),
-        });
-      } catch (graphErr) {
-        console.warn("[pib-aggregator] Policy graph extraction hiccup:", graphErr);
-      }
     } else {
       console.error(`[pib-aggregator] Persistence failure: ${writeResult.errorMessage}`);
     }

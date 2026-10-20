@@ -20,6 +20,12 @@ import { analyticsRouter } from "./server-lib/analytics/routes.js";
 import { seoRouter } from "./server-lib/seo/routes.js";
 import { policyRadarHandler } from "./server-lib/policy-radar.js";
 import {
+  radarV2Handler,
+  radarV2ByDispatchHandler,
+  radarV2AuthoritiesHandler,
+  radarV2BossMcqCheckHandler,
+} from "./server-lib/policy-radar-v2.js";
+import {
   examCatalogHandler,
   examStartHandler,
   examActiveHandler,
@@ -175,6 +181,10 @@ async function startServer() {
   app.use("/api/analytics", analyticsRouter);
   app.get("/api/questions", questionsHandler);
   app.get("/api/policy-radar", policyRadarHandler);
+  app.get("/api/policy-radar/v2", radarV2Handler);
+  app.get("/api/policy-radar/v2/by-dispatch", radarV2ByDispatchHandler);
+  app.get("/api/policy-radar/v2/authorities", radarV2AuthoritiesHandler);
+  app.post("/api/policy-radar/v2/boss-mcq/:id/check", radarV2BossMcqCheckHandler);
 
   app.get("/api/exam/catalog", examCatalogHandler);
   app.post("/api/exam/start", examStartHandler);

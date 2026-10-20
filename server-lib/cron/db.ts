@@ -11,8 +11,9 @@ export async function upsertCurrentAffairs(params: {
   summary: { bullets: string[]; prelims?: string; mains?: string; [k: string]: unknown };
   published_at?: string;
   primary_operator?: string;
-}): Promise<{ ok: boolean; errorMessage?: string }> {
-  let { source, headline, url, ministry, summary, published_at, primary_operator } = params;
+  node_id?: string | null;
+}): Promise<{ ok: boolean; id?: string; errorMessage?: string }> {
+  let { source, headline, url, ministry, summary, published_at, primary_operator, node_id } = params;
 
   // Auto-translate Hindi headlines into rich contextual English
   if (headline && DEVANAGARI_REGEX.test(headline)) {
@@ -58,14 +59,19 @@ Output ONLY the clean translated English headline string without quotes or prefi
   if (primary_operator) {
     row.primary_operator = primary_operator;
   }
+  if (node_id) {
+    row.node_id = node_id;
+  }
 
   try {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("current_affairs")
-      .upsert([row], { onConflict: "url" });
+      .upsert([row], { onConflict: "url" })
+      .select("id")
+      .single();
 
     if (error) return { ok: false, errorMessage: error.message };
-    return { ok: true };
+    return { ok: true, id: data?.id };
   } catch (e: any) {
     return { ok: false, errorMessage: e?.message ?? String(e) };
   }

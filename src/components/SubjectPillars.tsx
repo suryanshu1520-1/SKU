@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
-import { ArrowLeft, ArrowRight, BookOpen, ChevronDown, FileText, Layers, Search, X } from 'lucide-react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
+import { ArrowLeft, ArrowRight, BookOpen, Brain, ChevronDown, FileText, Layers, Search, X } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import type { CandidatePreferences } from '../types';
 import { getOptionalSubject } from '../data/optional-subjects';
@@ -19,6 +19,7 @@ interface SubjectPillarsProps {
 
 const VIEW_ICONS = { notes: BookOpen, explore: Layers, writing: FileText };
 const VIEWS: StudyView[] = ['notes', 'explore', 'writing'];
+const ExaminerPsycheModal = lazy(() => import('./ExaminerPsycheModal').then((module) => ({ default: module.ExaminerPsycheModal })));
 function plainClick(event: MouseEvent<HTMLAnchorElement>) {
   return event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
 }
@@ -33,6 +34,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
   ));
   const [query, setQuery] = useState('');
   const [resourcePickerOpen, setResourcePickerOpen] = useState(false);
+  const [psycheOpen, setPsycheOpen] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const reducedMotion = useReducedMotion();
   const subject = STUDY_SUBJECTS.find((entry) => entry.id === selection.subjectId)!;
@@ -47,6 +49,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
       setSelection(resolveStudySelection(new URLSearchParams(window.location.search), preferredSubjectId));
       setQuery('');
       setResourcePickerOpen(false);
+      setPsycheOpen(false);
     };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
@@ -87,17 +90,22 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
           <h1>Study library</h1>
           <p>Find a concept. Compare the details. Put your understanding to work.</p>
         </div>
-        <div className="study-search" role="search">
-          <label htmlFor="study-library-search"><Search size={17} aria-hidden="true" /><span className="study-sr-only">Search the study library</span></label>
-          <input
-            id="study-library-search"
-            type="search"
-            placeholder="Search every subject…"
-            autoComplete="off"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-          {query && <button type="button" aria-label="Clear library search" onClick={() => setQuery('')}><X size={16} aria-hidden="true" /></button>}
+        <div className="study-header-actions">
+          <div className="study-search" role="search">
+            <label htmlFor="study-library-search"><Search size={17} aria-hidden="true" /><span className="study-sr-only">Search the study library</span></label>
+            <input
+              id="study-library-search"
+              type="search"
+              placeholder="Search library…"
+              autoComplete="off"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+            />
+            {query && <button type="button" aria-label="Clear library search" onClick={() => setQuery('')}><X size={16} aria-hidden="true" /></button>}
+          </div>
+          <button type="button" className="study-psyche-trigger" aria-haspopup="dialog" onClick={() => setPsycheOpen(true)}>
+            <Brain size={17} aria-hidden="true" /> Examiner’s Psyche
+          </button>
         </div>
       </header>
 
@@ -153,13 +161,6 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
                 );
               })}
             </nav>
-            {optionalSubject && (
-              <details className="study-optional">
-                <summary>Your optional subject <ChevronDown size={14} aria-hidden="true" /></summary>
-                <h3>{optionalSubject.name}</h3>
-                <p>{optionalSubject.mainsStrategyTip}</p>
-              </details>
-            )}
           </aside>
 
           <div className="study-workspace">
@@ -173,7 +174,7 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
               <div>
                 <h2>{subject.title}</h2>
                 <p>{subject.description}</p>
-                <span className="study-subject-meta">{subject.paperLabel} · {resourcesForSubject(subject.id).length} resources in this collection</span>
+                <span className="study-subject-meta">{subject.paperLabel} · {resourcesForSubject(subject.id).length} resources</span>
               </div>
               {(practiceAvailable || onNavigateArena) && (
                 <button
@@ -253,8 +254,23 @@ export default function SubjectPillars({ candidatePreferences, onLaunchPractice,
               </article>
             </div>
           </div>
+          {optionalSubject && (
+            <details className="study-optional">
+              <summary>Your optional subject <ChevronDown size={14} aria-hidden="true" /></summary>
+              <h3>{optionalSubject.name}</h3>
+              <p>{optionalSubject.mainsStrategyTip}</p>
+            </details>
+          )}
         </div>
       )}
+      {psycheOpen && <Suspense fallback={<p role="status" className="study-modal-loading">Opening Examiner’s Psyche…</p>}>
+        <ExaminerPsycheModal
+          isOpen={psycheOpen}
+          onClose={() => setPsycheOpen(false)}
+          onLaunchPractice={onLaunchPractice ? (paper) => { setPsycheOpen(false); onLaunchPractice(paper); } : undefined}
+          onNavigateArena={onNavigateArena ? () => { setPsycheOpen(false); onNavigateArena(); } : undefined}
+        />
+      </Suspense>}
     </div>
   );
 }

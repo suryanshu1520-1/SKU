@@ -14,25 +14,17 @@ import {
   Shield,
   Zap
 } from 'lucide-react';
-import SNAPSHOT from '../../data/policy-radar-snapshot.json';
 import {
-  CHAINS,
-  ENTITIES,
   TIERS,
-  CANONICAL_RIPPLE_CHAINS,
-  RippleChain,
-  EntityRecord,
-} from './policy-ripple-data';
+  type RippleChain,
+  type EntityRecord,
+} from './policy-ripple-types';
 import {
   getBossMcqForChain,
-  getVolcanoTelemetryForNode,
-  getPolicyEntityForText,
   type BossMcqDefinition,
 } from '../../lib/policy-ripple-radar-shared';
 import { computeCalibrated5050EV } from '../../lib/examiner_psyche';
 import './PolicyRippleRadar.css';
-
-export { CANONICAL_RIPPLE_CHAINS };
 
 export const RING_META: Record<number, { label: string; desc: string }> = {
   0: { label: 'R0 · Sovereign Origin', desc: 'Cabinet, CCEA, Parliament, or Apex Court trigger' },
@@ -43,23 +35,10 @@ export const RING_META: Record<number, { label: string; desc: string }> = {
 
 export default function PolicyRippleRadar() {
   const [view, setView] = useState<'ripple' | 'entities'>('ripple');
-  const [chains, setChains] = useState<RippleChain[]>(
-    ((SNAPSHOT?.chains as unknown) as RippleChain[]) || CHAINS
-  );
-  const [entities, setEntities] = useState<EntityRecord[]>(
-    ((SNAPSHOT?.entities as unknown) as EntityRecord[]) || ENTITIES
-  );
-  const [chainIndex, setChainIndex] = useState<number>(() => {
-    if (typeof window !== 'undefined') {
-      const targetChain = new URLSearchParams(window.location.search).get('chain');
-      if (targetChain) {
-        const initialChains = ((SNAPSHOT?.chains as unknown) as RippleChain[]) || CHAINS;
-        const found = initialChains.findIndex((c) => c.chain_id === targetChain);
-        if (found !== -1) return found;
-      }
-    }
-    return 0;
-  });
+  const [chains, setChains] = useState<RippleChain[]>([]);
+  const [entities, setEntities] = useState<EntityRecord[]>([]);
+  const [radarStatus, setRadarStatus] = useState<'loading' | 'empty' | 'ready'>('loading');
+  const [chainIndex, setChainIndex] = useState<number>(0);
   const [activeStep, setActiveStep] = useState<number>(0);
   const [tracing, setTracing] = useState<boolean>(false);
   const [hoverStep, setHoverStep] = useState<number>(-1);
@@ -67,9 +46,7 @@ export default function PolicyRippleRadar() {
   const [refsOpen, setRefsOpen] = useState<boolean>(false);
   const [entitySearch, setEntitySearch] = useState<string>('');
   const [tierFilter, setTierFilter] = useState<string>('all');
-  const [entityAuthority, setEntityAuthority] = useState<string>(
-    SNAPSHOT?.entities?.[0]?.authority || ENTITIES[0]?.authority || ''
-  );
+  const [entityAuthority, setEntityAuthority] = useState<string>('');
 
   // Full-Chain Boss MCQ Interactive State
   const [bossMcqOpen, setBossMcqOpen] = useState<boolean>(false);
@@ -85,15 +62,28 @@ export default function PolicyRippleRadar() {
         const res = await fetch('/api/policy-radar');
         if (res.ok) {
           const liveData = await res.json();
-          if (isMounted && liveData?.chains?.length > 0) {
-            setChains(liveData.chains);
-            if (liveData?.entities?.length > 0) {
-              setEntities(liveData.entities);
+          if (isMounted) {
+            const nextChains = Array.isArray(liveData?.chains) ? liveData.chains : [];
+            const nextEntities = Array.isArray(liveData?.entities) ? liveData.entities : [];
+            setChains(nextChains);
+            setEntities(nextEntities);
+            if (nextEntities.length > 0) {
+              setEntityAuthority(nextEntities[0].authority || '');
             }
+            if (typeof window !== 'undefined') {
+              const targetChain = new URLSearchParams(window.location.search).get('chain');
+              if (targetChain) {
+                const found = nextChains.findIndex((c: RippleChain) => c.chain_id === targetChain);
+                if (found !== -1) setChainIndex(found);
+              }
+            }
+            setRadarStatus(nextChains.length > 0 ? 'ready' : 'empty');
           }
+        } else {
+          if (isMounted) setRadarStatus('empty');
         }
       } catch {
-        // Silently preserve prebaked snapshot fallback
+        if (isMounted) setRadarStatus('empty');
       }
     }
     hydrateLiveRadar();
@@ -105,14 +95,17 @@ export default function PolicyRippleRadar() {
   const traceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const TRACE_MS = 1800;
 
-  const currentChain: RippleChain = chains[chainIndex] || chains[0] || CHAINS[0];
-  const steps = currentChain.nodes_flow;
+  const currentChain: RippleChain | undefined = chains.length > 0 ? (chains[chainIndex] || chains[0]) : undefined;
+  const steps = currentChain?.nodes_flow || [];
   const n = steps.length;
-  const currentStepIndex = Math.min(activeStep, n - 1);
+  const currentStepIndex = Math.min(activeStep, Math.max(0, n - 1));
   const currentStep = steps[currentStepIndex];
 
   // 4-Ring Deterministic Radar Polar Coordinate Geometry (r0..r3)
   const geometry = useMemo(() => {
+    if (steps.length === 0) {
+      return { points: [], links: [] };
+    }
     const points = steps.map((node, i) => {
       const ringDepth = node.ring_depth;
       const radius =
@@ -214,12 +207,11 @@ export default function PolicyRippleRadar() {
     });
   }, [entities, entitySearch, tierFilter]);
 
-  const selectedEntity: EntityRecord = useMemo(() => {
+  const selectedEntity: EntityRecord | undefined = useMemo(() => {
     return (
       filteredEntities.find((e) => e.authority === entityAuthority) ||
       filteredEntities[0] ||
-      entities[0] ||
-      ENTITIES[0]
+      entities[0]
     );
   }, [entities, filteredEntities, entityAuthority]);
 
@@ -250,6 +242,7 @@ export default function PolicyRippleRadar() {
     if (tracing) {
       setTracing(false);
     } else {
+      if (n === 0) return;
       if (activeStep >= n - 1) setActiveStep(0);
       setTracing(true);
     }
@@ -268,9 +261,11 @@ export default function PolicyRippleRadar() {
             <span className="px-2 py-0.5 rounded-sm bg-[#e0d0ab]/10 text-[#e0d0ab] border border-[#e0d0ab]/30 text-[10px] font-mono uppercase tracking-wider font-semibold">
               Sovereign Knowledge Web
             </span>
-            <span className="text-xs text-[#8fa2bd] font-mono">
-              {chains.length} Chains · 5 Legal Tiers
-            </span>
+            {chains.length > 0 && (
+              <span className="text-xs text-[#8fa2bd] font-mono">
+                {chains.length} Chains
+              </span>
+            )}
           </div>
           <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#e0d0ab] tracking-tight">
             Policy Ripple Radar
@@ -326,7 +321,17 @@ export default function PolicyRippleRadar() {
           VIEW 1: RADAR RIPPLE SIMULATOR
           ══════════════════════════════════════════════════════════════════ */}
       {view === 'ripple' && (
-        <div className="space-y-6">
+        radarStatus === 'loading' ? (
+          <div className="p-12 text-center rounded-sm bg-[#041228] border border-[rgba(224,208,171,0.14)] text-[#8fa2bd]">
+            <p className="text-sm font-mono text-[#e0d0ab]">Loading policy radar...</p>
+          </div>
+        ) : !currentChain || chains.length === 0 ? (
+          <div className="p-12 text-center rounded-sm bg-[#041228] border border-[rgba(224,208,171,0.14)] text-[#8fa2bd]">
+            <p className="text-sm font-mono text-[#e0d0ab]">No source-backed policy chains yet</p>
+            <p className="text-xs text-[#8fa2bd] mt-1">Observed policy dispatches will appear here once verified.</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
           {/* Chain Selection Ribbon */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-sm bg-[#041228] border border-[rgba(224,208,171,0.14)]">
             <div className="flex items-center gap-3 flex-1 min-w-[240px]">
@@ -398,19 +403,6 @@ export default function PolicyRippleRadar() {
                   Twin PYQ: {currentChain.historical_twin_pyq_id}
                 </span>
               )}
-              {(() => {
-                const v = getVolcanoTelemetryForNode(currentChain.node_id);
-                if (!v || v.volcano_status !== 'ERUPTING') return null;
-                return (
-                  <span
-                    className="px-2 py-0.5 rounded-sm bg-rose-500/15 text-rose-300 border border-rose-500/40 text-[10px] font-mono font-bold flex items-center gap-1 shadow-xs"
-                    title={`Volcano Node ${v.node_id}: ${v.years_dormant} years since tested, high news velocity`}
-                  >
-                    <Flame className="w-3 h-3 text-rose-400 animate-pulse" />
-                    <span>VOLCANO V_j: {v.volcano_index.toFixed(1)} // {v.years_dormant}-YR REBOUND</span>
-                  </span>
-                );
-              })()}
               <span className="text-xs text-[#8fa2bd]">
                 {steps.length} sequential checkpoints
               </span>
@@ -817,10 +809,6 @@ export default function PolicyRippleRadar() {
             const isCorrect = bossSelectedOption === correctIdx;
             const is5050 = bossStruckOptions.size === 2;
             const op = boss.primary_operator || 'PSY_01_INST_SWAP';
-            const entity = getPolicyEntityForText(
-              `${boss.stem} ${boss.statements.join(' ')} ${boss.statutory_anchor}`,
-              []
-            );
             const evMetrics = is5050
               ? computeCalibrated5050EV(op, isCorrect ? 1 : 0, 4, isCorrect ? 0.30 : 0.76)
               : null;
@@ -1033,20 +1021,6 @@ export default function PolicyRippleRadar() {
                       ))}
                     </div>
 
-                    {/* 5-Tier Legal Authority Dissection Block */}
-                    {entity && (
-                      <div className="p-3.5 rounded-sm bg-[rgba(1,148,168,0.08)] border border-[rgba(1,148,168,0.3)] space-y-1">
-                        <div className="font-mono text-[10.5px] text-[#5fe3f5] font-bold uppercase tracking-wider">
-                          AUTHORITY TIER // TIER {entity.tier_number}: {entity.tier_name.toUpperCase()}
-                        </div>
-                        <div className="font-sans text-xs text-[#e8e0cf]">
-                          <strong className="text-[#e0d0ab]">ENTITY:</strong> {entity.authority} • <span className="text-[#9fb0c8]">Parent: {entity.parent_ministry}</span>
-                        </div>
-                        <div className="font-mono text-[11px] text-[#fca5a5] pt-0.5">
-                          <strong className="text-[#f87171]">TRAP DEFENSE [{entity.neutralized_trap || 'PSY_03'}]:</strong> {entity.trap_explanation}
-                        </div>
-                      </div>
-                    )}
 
                     {/* Calibrated 50:50 EV Degradation Ledger */}
                     {is5050 && evMetrics && (
@@ -1181,7 +1155,7 @@ export default function PolicyRippleRadar() {
             )}
           </div>
         </div>
-      )}
+      ))}
 
       {/* ══════════════════════════════════════════════════════════════════
           VIEW 2: 5 LEGAL TIERS ENTITY DISAMBIGUATION MATRIX
@@ -1249,7 +1223,7 @@ export default function PolicyRippleRadar() {
                   Showing {filteredEntities.length} Authorities
                 </span>
                 {filteredEntities.map((ent) => {
-                  const isSelected = selectedEntity.authority === ent.authority;
+                  const isSelected = selectedEntity?.authority === ent.authority;
                   return (
                     <button
                       key={ent.authority}
@@ -1278,7 +1252,8 @@ export default function PolicyRippleRadar() {
               </div>
 
               {/* Right Column: Authority Dossier & 5-Tier Ladder (Cols 6-12) */}
-              <div className="lg:col-span-7 p-6 rounded-sm bg-[#041228] border border-[rgba(224,208,171,0.18)] space-y-5">
+              {selectedEntity ? (
+                <div className="lg:col-span-7 p-6 rounded-sm bg-[#041228] border border-[rgba(224,208,171,0.18)] space-y-5">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="px-2 py-0.5 rounded-sm bg-[#e0d0ab]/10 text-[#e0d0ab] border border-[#e0d0ab]/30 text-[10px] font-mono uppercase font-bold">
@@ -1384,6 +1359,7 @@ export default function PolicyRippleRadar() {
                   )}
                 </div>
               </div>
+              ) : null}
             </div>
           )}
         </div>

@@ -40,6 +40,7 @@ export type RawRef = {
 export type Extracted = {
   title: string;
   body: string;
+  ministryHint?: string | null;
 };
 
 /** A source adapter: how to discover items and extract their bodies. */

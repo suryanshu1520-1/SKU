@@ -1,0 +1,699 @@
+[
+  {
+    "slug": "ENT_PRESIDENT",
+    "en": "President's Secretariat",
+    "hi": [
+      "राष्ट्रपति सचिवालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1"
+  },
+  {
+    "slug": "ENT_VICE_PRESIDENT",
+    "en": "Vice-President's Secretariat",
+    "hi": [
+      "उप राष्ट्रपति सचिवालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=2"
+  },
+  {
+    "slug": "ENT_PMO",
+    "en": "Prime Minister's Office",
+    "hi": [
+      "प्रधानमंत्री कार्यालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=3"
+  },
+  {
+    "slug": "ENT_LOK_SABHA",
+    "en": "Lok Sabha Secretariat",
+    "hi": [
+      "लोकसभा सचिवालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=2608"
+  },
+  {
+    "slug": "ENT_RAJYA_SABHA",
+    "en": "Rajya Sabha Secretariat",
+    "hi": [
+      "राज्यसभा सचिवालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=2934"
+  },
+  {
+    "slug": "ENT_CABINET",
+    "en": "Cabinet",
+    "hi": [
+      "मंत्रिमण्‍डल",
+      "मंत्रिमण्डल"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=61"
+  },
+  {
+    "slug": "ENT_CABINET_DECISIONS",
+    "en": "Cabinet Committee Decisions",
+    "hi": [
+      "मंत्रिमण्‍डल समिति निर्णय",
+      "मंत्रिमण्डल समिति निर्णय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=62"
+  },
+  {
+    "slug": "ENT_CCEA",
+    "en": "Cabinet Committee on Economic Affairs (CCEA)",
+    "hi": [
+      "आर्थिक मामलों की मंत्रिमण्‍डलीय समिति (सीसीईए)",
+      "आर्थिक मामलों की मंत्रिमण्डलीय समिति (सीसीईए)"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=63"
+  },
+  {
+    "slug": "ENT_CAB_SEC",
+    "en": "Cabinet Secretariat",
+    "hi": [
+      "मंत्रिमण्‍डल सचिवालय",
+      "मंत्रिमण्डल सचिवालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=68"
+  },
+  {
+    "slug": "ENT_AYUSH",
+    "en": "Ministry of AYUSH",
+    "hi": [
+      "आयुष"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=80"
+  },
+  {
+    "slug": "ENT_SPACE",
+    "en": "Department of Space",
+    "hi": [
+      "अंतरिक्ष विभाग"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=14"
+  },
+  {
+    "slug": "ENT_DOD",
+    "en": "Department of Ocean Development",
+    "hi": [
+      "सागर विकास विभाग"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=45"
+  },
+  {
+    "slug": "ENT_DAE",
+    "en": "Department of Atomic Energy",
+    "hi": [
+      "अणु ऊर्जा विभाग",
+      "परमाणु ऊर्जा विभाग"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=56"
+  },
+  {
+    "slug": "ENT_ECI",
+    "en": "Election Commission",
+    "hi": [
+      "निर्वाचन आयोग",
+      "भारत निर्वाचन आयोग"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=35"
+  },
+  {
+    "slug": "ENT_FIN_COMM",
+    "en": "Finance Commission",
+    "hi": [
+      "फाइनेंस कमीशन",
+      "वित्त आयोग"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1330"
+  },
+  {
+    "slug": "ENT_MOAFW",
+    "en": "Ministry of Agriculture & Farmers Welfare",
+    "hi": [
+      "कृषि एवं किसान कल्‍याण मंत्रालय",
+      "कृषि एवं किसान कल्याण मंत्रालय",
+      "कृषि मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=27"
+  },
+  {
+    "slug": "ENT_FERTILIZERS",
+    "en": "Ministry of Chemicals and Fertilizers",
+    "hi": [
+      "रसायन एवं उर्वरक मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=41"
+  },
+  {
+    "slug": "ENT_CIVIL_AV",
+    "en": "Ministry of Civil Aviation",
+    "hi": [
+      "नागरिक उड्डयन मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=26"
+  },
+  {
+    "slug": "ENT_COAL",
+    "en": "Ministry of Coal",
+    "hi": [
+      "कोयला मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=42"
+  },
+  {
+    "slug": "ENT_MOCI",
+    "en": "Ministry of Commerce & Industry",
+    "hi": [
+      "वाणिज्‍य एवं उद्योग मंत्रालय",
+      "वाणिज्य एवं उद्योग मंत्रालय",
+      "वाणिज्य मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=16"
+  },
+  {
+    "slug": "ENT_COMMUNICATIONS",
+    "en": "Ministry of Communications",
+    "hi": [
+      "संचार मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=24"
+  },
+  {
+    "slug": "ENT_CONSUMER",
+    "en": "Ministry of Consumer Affairs, Food & Public Distribution",
+    "hi": [
+      "उपभोक्‍ता कार्य, खाद्य एवं सार्वजनिक वितरण मंत्रालय",
+      "उपभोक्ता कार्य, खाद्य एवं सार्वजनिक वितरण मंत्रालय",
+      "उपभोक्ता मामले, खाद्य और सार्वजनिक वितरण मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=39"
+  },
+  {
+    "slug": "ENT_COOPERATION",
+    "en": "Ministry of Cooperation",
+    "hi": [
+      "सहकारिता मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1440"
+  },
+  {
+    "slug": "ENT_CORP_AFFAIRS",
+    "en": "Ministry of Corporate Affairs",
+    "hi": [
+      "कॉरपोरेट कार्य मंत्रालय",
+      "कॉरपोरेट मामलों का मंत्रालय",
+      "कंपनी कार्य मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=66"
+  },
+  {
+    "slug": "ENT_CULTURE",
+    "en": "Ministry of Culture",
+    "hi": [
+      "संस्‍कृति मंत्रालय",
+      "संस्कृति मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=17"
+  },
+  {
+    "slug": "ENT_MOD",
+    "en": "Ministry of Defence",
+    "hi": [
+      "रक्षा मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=33"
+  },
+  {
+    "slug": "ENT_DONER",
+    "en": "Ministry of Development of North Eastern Region",
+    "hi": [
+      "पूर्वोत्‍तर क्षेत्र विकास मंत्रालय",
+      "पूर्वोत्तर क्षेत्र विकास मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=57"
+  },
+  {
+    "slug": "ENT_DIPAM",
+    "en": "Ministry of Disinvestment",
+    "hi": [
+      "विनिवेश मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=48"
+  },
+  {
+    "slug": "ENT_DDWS",
+    "en": "Ministry of Drinking Water and Sanitation",
+    "hi": [
+      "पेयजल एवं स्‍वच्‍छता मंत्रालय",
+      "पेयजल एवं स्वच्छता मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=73"
+  },
+  {
+    "slug": "ENT_EARTH_SCI",
+    "en": "Ministry of Earth Sciences",
+    "hi": [
+      "पृथ्‍वी विज्ञान मंत्रालय",
+      "पृथ्वी विज्ञान मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=67"
+  },
+  {
+    "slug": "ENT_EDUCATION",
+    "en": "Ministry of Education",
+    "hi": [
+      "शिक्षा मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=8"
+  },
+  {
+    "slug": "ENT_MEITY",
+    "en": "Ministry of Electronics & IT",
+    "hi": [
+      "इलेक्ट्रानिक्स एवं आईटी मंत्रालय",
+      "इलेक्ट्रॉनिक्स और सूचना प्रौद्योगिकी मंत्रालय",
+      "इलेक्ट्रॉनिक्स एवं आईटी मंत्रालय",
+      "इलेक्ट्रॉनिकी और सूचना प्रौद्योगिकी मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1323"
+  },
+  {
+    "slug": "ENT_MOEFCC",
+    "en": "Ministry of Environment, Forest and Climate Change",
+    "hi": [
+      "पर्यावरण, वन एवं जलवायु परिवर्तन मंत्रालय",
+      "पर्यावरण वन और जलवायु परिवर्तन मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=30"
+  },
+  {
+    "slug": "ENT_MEA",
+    "en": "Ministry of External Affairs",
+    "hi": [
+      "विदेश मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=4"
+  },
+  {
+    "slug": "ENT_MOF",
+    "en": "Ministry of Finance",
+    "hi": [
+      "वित्‍त मंत्रालय",
+      "वित्त मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=15"
+  },
+  {
+    "slug": "ENT_FISHERIES",
+    "en": "Ministry of Fisheries, Animal Husbandry & Dairying",
+    "hi": [
+      "मत्स्यपालन, पशुपालन और डेयरी मंत्रालय",
+      "मत्स्य पालन, पशुपालन और डेयरी मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1340"
+  },
+  {
+    "slug": "ENT_FPI",
+    "en": "Ministry of Food Processing Industries",
+    "hi": [
+      "खाद्य प्रसंस्करण उद्योग मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=40"
+  },
+  {
+    "slug": "ENT_MOHFW",
+    "en": "Ministry of Health and Family Welfare",
+    "hi": [
+      "स्‍वास्‍थ्‍य एवं परिवार कल्‍याण मंत्रालय",
+      "स्वास्थ्य एवं परिवार कल्याण मंत्रालय",
+      "स्वास्थ्य और परिवार कल्याण मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=31"
+  },
+  {
+    "slug": "ENT_HEAVY_IND",
+    "en": "Ministry of Heavy Industries",
+    "hi": [
+      "भारी उद्योग मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=53"
+  },
+  {
+    "slug": "ENT_MHA",
+    "en": "Ministry of Home Affairs",
+    "hi": [
+      "गृह मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=5"
+  },
+  {
+    "slug": "ENT_HOUSING",
+    "en": "Ministry of Housing & Urban Affairs",
+    "hi": [
+      "आवासन और शहरी कार्य मंत्रालय",
+      "शहरी विकास मंत्रालय",
+      "आवास एवं शहरी गरीबी उपशमन मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=47"
+  },
+  {
+    "slug": "ENT_MIB",
+    "en": "Ministry of Information & Broadcasting",
+    "hi": [
+      "सूचना और प्रसारण मंत्रालय",
+      "सूचना एवं प्रसारण मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=11"
+  },
+  {
+    "slug": "ENT_JAL_SHAKTI",
+    "en": "Ministry of Jal Shakti",
+    "hi": [
+      "जल शक्ति मंत्रालय",
+      "जल संसाधन, नदी विकास एवं गंगा संरक्षण मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1336"
+  },
+  {
+    "slug": "ENT_LABOUR",
+    "en": "Ministry of Labour & Employment",
+    "hi": [
+      "श्रम और रोजगार मंत्रालय",
+      "श्रम एवं रोजगार मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=21"
+  },
+  {
+    "slug": "ENT_LAW_JUSTICE",
+    "en": "Ministry of Law and Justice",
+    "hi": [
+      "विधि एवं न्‍याय मंत्रालय",
+      "विधि एवं न्याय मंत्रालय",
+      "कानून और न्याय मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=7"
+  },
+  {
+    "slug": "ENT_MSME",
+    "en": "Ministry of Micro, Small & Medium Enterprises",
+    "hi": [
+      "सूक्ष्‍म, लघु एवं मध्‍यम उद्यम मंत्रालय",
+      "सूक्ष्म, लघु एवं मध्यम उद्यम मंत्रालय",
+      "एमएसएमई मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=51"
+  },
+  {
+    "slug": "ENT_MINES",
+    "en": "Ministry of Mines",
+    "hi": [
+      "खान मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=44"
+  },
+  {
+    "slug": "ENT_MINORITY",
+    "en": "Ministry of Minority Affairs",
+    "hi": [
+      "अल्‍पसंख्‍यक कार्य मंत्रालय",
+      "अल्पसंख्यक कार्य मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=65"
+  },
+  {
+    "slug": "ENT_MNRE",
+    "en": "Ministry of New and Renewable Energy",
+    "hi": [
+      "नवीन एवं नवीकरणीय ऊर्जा मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=28"
+  },
+  {
+    "slug": "ENT_PANCHAYAT",
+    "en": "Ministry of Panchayati Raj",
+    "hi": [
+      "पंचायती राज मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=10"
+  },
+  {
+    "slug": "ENT_PARLIAMENT",
+    "en": "Ministry of Parliamentary Affairs",
+    "hi": [
+      "संसदीय कार्य मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=12"
+  },
+  {
+    "slug": "ENT_DOPT",
+    "en": "Ministry of Personnel, Public Grievances & Pensions",
+    "hi": [
+      "कार्मिक, लोक शिकायत एवं पेंशन मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=6"
+  },
+  {
+    "slug": "ENT_PETRO",
+    "en": "Ministry of Petroleum & Natural Gas",
+    "hi": [
+      "पेट्रोलियम एवं प्राकृतिक गैस मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=20"
+  },
+  {
+    "slug": "ENT_PLANNING",
+    "en": "Ministry of Planning",
+    "hi": [
+      "योजना मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=79"
+  },
+  {
+    "slug": "ENT_POWER",
+    "en": "Ministry of Power",
+    "hi": [
+      "विद्युत मंत्रालय",
+      "ऊर्जा मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=52"
+  },
+  {
+    "slug": "ENT_RAIL",
+    "en": "Ministry of Railways",
+    "hi": [
+      "रेल मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=23"
+  },
+  {
+    "slug": "ENT_MORT",
+    "en": "Ministry of Road Transport & Highways",
+    "hi": [
+      "सड़क परिवहन एवं राजमार्ग मंत्रालय",
+      "सडक परिवहन एवं राजमार्ग मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=69"
+  },
+  {
+    "slug": "ENT_RURAL_DEV",
+    "en": "Ministry of Rural Development",
+    "hi": [
+      "ग्रामीण विकास मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=43"
+  },
+  {
+    "slug": "ENT_S_AND_T",
+    "en": "Ministry of Science & Technology",
+    "hi": [
+      "विज्ञान एवं प्रौद्योगिकी मंत्रालय",
+      "विज्ञान और प्रौद्योगिकी मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=13"
+  },
+  {
+    "slug": "ENT_PORTS",
+    "en": "Ministry of Ports, Shipping and Waterways",
+    "hi": [
+      "पत्तन, पोत परिवहन और जलमार्ग मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=46"
+  },
+  {
+    "slug": "ENT_SKILL_DEV",
+    "en": "Ministry of Skill Development and Entrepreneurship",
+    "hi": [
+      "कौशल विकास एवं उद्यमिता मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=77"
+  },
+  {
+    "slug": "ENT_SOCIAL_JUSTICE",
+    "en": "Ministry of Social Justice & Empowerment",
+    "hi": [
+      "सामाजिक न्‍याय एवं अधिकारिता मंत्रालय",
+      "सामाजिक न्याय एवं अधिकारिता मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=50"
+  },
+  {
+    "slug": "ENT_STATISTICS",
+    "en": "Ministry of Statistics & Programme Implementation",
+    "hi": [
+      "सांख्यिकी एवं कार्यक्रम कार्यान्‍वयन मंत्रालय",
+      "सांख्यिकी एवं कार्यक्रम कार्यान्वयन मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=55"
+  },
+  {
+    "slug": "ENT_STEEL",
+    "en": "Ministry of Steel",
+    "hi": [
+      "इस्‍पात मंत्रालय",
+      "इस्पात मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=18"
+  },
+  {
+    "slug": "ENT_TEXTILES",
+    "en": "Ministry of Textiles",
+    "hi": [
+      "वस्‍त्र मंत्रालय",
+      "वस्त्र मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=19"
+  },
+  {
+    "slug": "ENT_TOURISM",
+    "en": "Ministry of Tourism",
+    "hi": [
+      "पर्यटन मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=36"
+  },
+  {
+    "slug": "ENT_TRIBAL",
+    "en": "Ministry of Tribal Affairs",
+    "hi": [
+      "जनजातीय कार्य मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=49"
+  },
+  {
+    "slug": "ENT_WCD",
+    "en": "Ministry of Women and Child Development",
+    "hi": [
+      "महिला एवं बाल विकास मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=64"
+  },
+  {
+    "slug": "ENT_YOUTH",
+    "en": "Ministry of Youth Affairs and Sports",
+    "hi": [
+      "युवा कार्यक्रम एवं खेल मंत्रालय",
+      "युवा मामले और खेल मंत्रालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=9"
+  },
+  {
+    "slug": "ENT_NITI",
+    "en": "NITI Aayog",
+    "hi": [
+      "नीति आयोग"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=78"
+  },
+  {
+    "slug": "ENT_UPSC",
+    "en": "Union Public Service Commission",
+    "hi": [
+      "संघ लोक सेवा आयोग"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=34"
+  },
+  {
+    "slug": "ENT_NFRA",
+    "en": "National Financial Reporting Authority (NFRA)",
+    "hi": [
+      "राष्ट्रीय वित्तीय रिपोर्टिंग प्राधिकरण"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1454"
+  },
+  {
+    "slug": "ENT_CCI",
+    "en": "Competition Commission of India",
+    "hi": [
+      "भारतीय प्रतिस्पर्धा आयोग"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1458"
+  },
+  {
+    "slug": "ENT_IFSCA",
+    "en": "International Financial Services Centres Authority (IFSCA)",
+    "hi": [
+      "आईएफएससी प्राधिकरण"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1470"
+  },
+  {
+    "slug": "ENT_NSCS",
+    "en": "National Security Council Secretariat",
+    "hi": [
+      "राष्ट्रीय सुरक्षा परिषद सचिवालय"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1484"
+  },
+  {
+    "slug": "ENT_NHRC",
+    "en": "National Human Rights Commission",
+    "hi": [
+      "राष्ट्रीय मानव अधिकार आयोग"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=2586"
+  },
+  {
+    "slug": "ENT_LOKPAL",
+    "en": "Lokpal of India",
+    "hi": [
+      "भारत के लोकपाल"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=2611"
+  },
+  {
+    "slug": "ENT_DOP",
+    "en": "Department of Pharmaceuticals",
+    "hi": [
+      "औषधि विभाग"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=2943"
+  },
+  {
+    "slug": "ENT_DOF",
+    "en": "Department of Fertilizers",
+    "hi": [
+      "उर्वरक विभाग",
+      "रसायन एवं उर्वरक मंत्रालय : उर्वरक विभाग"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=2944"
+  },
+  {
+    "slug": "ENT_DCPC",
+    "en": "Department of Chemicals and Petrochemicals",
+    "hi": [
+      "रसायन एवं पेट्रो-रसायन विभाग"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=2945"
+  },
+  {
+    "slug": "ENT_RBI",
+    "en": "Reserve Bank of India",
+    "hi": [
+      "भारतीय रिजर्व बैंक",
+      "रिजर्व बैंक ऑफ इंडिया",
+      "रिज़र्व बैंक",
+      "रिजर्व बैंक"
+    ],
+    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=9999"
+  }
+]

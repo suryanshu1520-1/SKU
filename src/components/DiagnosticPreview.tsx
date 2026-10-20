@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { RotateCcw, AlertTriangle, ShieldAlert, Crosshair, BookOpen, Sparkles, Flame, GitFork } from 'lucide-react';
+import { RotateCcw, AlertTriangle, ShieldAlert, Crosshair, BookOpen, Sparkles } from 'lucide-react';
 import { EXAMINER_OPERATORS, type ExaminerOperatorType, type StatementDissectionItem, type ArenaLaunchConfig } from '../types';
-import { getPolicyEntityForText } from '../lib/policy-ripple-radar-shared';
+import { useAuthority } from './radar/useRadarV2';
+import { sourceLabel } from './observatory/radar-v2/sourceLink';
 import { computeCalibrated5050EV } from '../lib/examiner_psyche';
 
 interface SampleQuestion {
@@ -316,6 +317,7 @@ export default function DiagnosticPreview({ onLaunchFullArena }: DiagnosticPrevi
 
   const q = SAMPLE_QUESTIONS[currentIndex];
   const opMeta = EXAMINER_OPERATORS[q.primary_operator];
+  const authority = useAuthority(q.entity_slugs);
 
   // Timer countdown
   useEffect(() => {
@@ -753,31 +755,35 @@ export default function DiagnosticPreview({ onLaunchFullArena }: DiagnosticPrevi
                   )}
 
                   {/* 5-Tier Legal Authority Dissection Block (BAY_02) */}
-                  {(() => {
-                    const policyEntity = getPolicyEntityForText(
-                      `${q.question} ${q.trap} ${q.statutory_anchor || ''} ${q.statements?.join(' ') || ''}`,
-                      q.entity_slugs
-                    );
-                    if (!policyEntity) return null;
-                    return (
-                      <>
-                        <div className="font-mono text-[10px] text-[#0194a8] tracking-[0.16em] uppercase pt-0.5 font-bold">
-                          5-Tier Authority
+                  {authority && (
+                    <>
+                      <div className="font-mono text-[10px] text-[#0194a8] tracking-[0.16em] uppercase pt-0.5 font-bold">
+                        5-Tier Authority
+                      </div>
+                      <div className="p-3 rounded bg-[rgba(1,148,168,0.08)] border border-[rgba(1,148,168,0.3)] space-y-1">
+                        <div className="font-mono text-[10.5px] text-[#5fe3f5] font-bold uppercase tracking-wider">
+                          Tier {authority.tier_number ?? '—'} · {authority.legal_basis_ref || authority.legal_basis_kind || 'Statutory Basis'}
                         </div>
-                        <div className="p-3 rounded bg-[rgba(1,148,168,0.08)] border border-[rgba(1,148,168,0.3)] space-y-1">
-                          <div className="font-mono text-[10.5px] text-[#5fe3f5] font-bold uppercase tracking-wider">
-                            AUTHORITY TIER // TIER {policyEntity.tier_number}: {policyEntity.tier_name.toUpperCase()}
-                          </div>
-                          <div className="font-sans text-xs text-[#e8e0cf]">
-                            <strong className="text-[#e0d0ab]">ENTITY:</strong> {policyEntity.authority} • <span className="text-[#9fb0c8]">Parent: {policyEntity.parent_ministry}</span>
-                          </div>
-                          <div className="font-mono text-[11px] text-[#fca5a5] pt-0.5">
-                            <strong className="text-[#f87171]">TRAP DEFENSE [{policyEntity.neutralized_trap || 'PSY_03'}]:</strong> {policyEntity.trap_explanation}
-                          </div>
+                        <div className="font-sans text-xs text-[#e8e0cf]">
+                          <strong className="text-[#e0d0ab]">ENTITY:</strong> {authority.authority}
                         </div>
-                      </>
-                    );
-                  })()}
+                        {authority.source_url && (
+                          <div className="pt-0.5">
+                            <a
+                              href={authority.source_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label={`Open source: ${sourceLabel(authority.source_url)}`}
+                              className="inline-flex items-center gap-1 text-[10px] font-mono text-[#5fe3f5] hover:underline"
+                            >
+                              <span>Source: {sourceLabel(authority.source_url)}</span>
+                              <span aria-hidden="true">↗</span>
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
 
                   {/* BAY_03 // SYNTHESIS: Blind Spot & Calibrated 50:50 Ledger */}
                   {(() => {

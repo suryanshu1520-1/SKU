@@ -56,25 +56,135 @@ const MINISTRY_ALIASES: Record<string, string[]> = {
   "Reserve Bank of India": ["RBI"],
 };
 
-function norm(t: string): string {
-  return t.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+import { normUnicode } from "../../text/normalize.ts";
+import pibMinistriesData from "./data/pib-ministries.json" with { type: "json" };
+
+export interface PibMinistryEntry {
+  slug: string;
+  en: string;
+  hi: string[];
+  source_url: string;
+}
+
+export interface MinistryAttribution {
+  ministry: string;
+  ministry_source: "pib_heading" | "hi_alias" | "en_alias" | "fallback";
+  slug?: string;
+  confidence?: number;
+}
+
+const pibEntries = pibMinistriesData as PibMinistryEntry[];
+
+/**
+ * Derive ministry attribution with detailed source provenance.
+ * Order of evaluation:
+ *  1. ministryHint (from PIB release heading / metadata)
+ *  2. Hindi alias match on the first 200 chars of body
+ *  3. English aliases & canonical entities
+ *  4. Fallback default
+ */
+export function deriveMinistryDetailed(
+  text: string,
+  fallback = "Government of India",
+  ministryHint?: string | null
+): MinistryAttribution {
+  // 1. ministryHint
+  if (ministryHint && ministryHint.trim()) {
+    const normHint = normUnicode(ministryHint);
+    if (normHint) {
+      // Exact match in pib-ministries.json (Hindi or English)
+      for (const entry of pibEntries) {
+        if (normUnicode(entry.en) === normHint) {
+          return { ministry: entry.en, slug: entry.slug, ministry_source: "pib_heading", confidence: 1.0 };
+        }
+        for (const h of entry.hi) {
+          if (normUnicode(h) === normHint) {
+            return { ministry: entry.en, slug: entry.slug, ministry_source: "pib_heading", confidence: 1.0 };
+          }
+        }
+      }
+      // Partial / containment in pib-ministries.json
+      for (const entry of pibEntries) {
+        for (const h of entry.hi) {
+          const normH = normUnicode(h);
+          if (normH.length >= 4 && (normHint.includes(normH) || normH.includes(normHint))) {
+            return { ministry: entry.en, slug: entry.slug, ministry_source: "pib_heading", confidence: 0.95 };
+          }
+        }
+        const normEn = normUnicode(entry.en);
+        if (normEn.length >= 6 && (normHint.includes(normEn) || normEn.includes(normHint))) {
+          return { ministry: entry.en, slug: entry.slug, ministry_source: "pib_heading", confidence: 0.95 };
+        }
+      }
+      // English aliases / canonical entities check for hint
+      const hintHay = ` ${normHint} `;
+      for (const [ministry, aliases] of Object.entries(MINISTRY_ALIASES)) {
+        for (const alias of aliases) {
+          if (hintHay.includes(` ${normUnicode(alias)} `)) {
+            const match = pibEntries.find((p) => p.en.toLowerCase() === ministry.toLowerCase());
+            return { ministry, slug: match?.slug, ministry_source: "pib_heading", confidence: 0.9 };
+          }
+        }
+      }
+      for (const ministry of CANONICAL_ENTITIES) {
+        if (hintHay.includes(normUnicode(ministry))) {
+          const match = pibEntries.find((p) => p.en.toLowerCase() === ministry.toLowerCase());
+          return { ministry, slug: match?.slug, ministry_source: "pib_heading", confidence: 0.9 };
+        }
+      }
+    }
+  }
+
+  // 2. Hindi alias match on the first 200 chars of body
+  const headSnippet = normUnicode((text || "").slice(0, 200));
+  if (headSnippet) {
+    let bestMatch: { entry: PibMinistryEntry; length: number } | null = null;
+    for (const entry of pibEntries) {
+      for (const h of entry.hi) {
+        const normH = normUnicode(h);
+        if (normH.length >= 3 && headSnippet.includes(normH)) {
+          if (!bestMatch || normH.length > bestMatch.length) {
+            bestMatch = { entry, length: normH.length };
+          }
+        }
+      }
+    }
+    if (bestMatch) {
+      return { ministry: bestMatch.entry.en, slug: bestMatch.entry.slug, ministry_source: "hi_alias", confidence: 0.9 };
+    }
+  }
+
+  // 3. Existing English aliases
+  const hay = ` ${normUnicode(text || "")} `;
+  for (const [ministry, aliases] of Object.entries(MINISTRY_ALIASES)) {
+    for (const alias of aliases) {
+      if (hay.includes(` ${normUnicode(alias)} `)) {
+        const match = pibEntries.find((p) => p.en.toLowerCase() === ministry.toLowerCase());
+        return { ministry, slug: match?.slug, ministry_source: "en_alias", confidence: 0.85 };
+      }
+    }
+  }
+  for (const ministry of CANONICAL_ENTITIES) {
+    if (hay.includes(normUnicode(ministry))) {
+      const match = pibEntries.find((p) => p.en.toLowerCase() === ministry.toLowerCase());
+      return { ministry, slug: match?.slug, ministry_source: "en_alias", confidence: 0.8 };
+    }
+  }
+
+  // 4. Fallback
+  return { ministry: fallback, ministry_source: "fallback", confidence: 0 };
 }
 
 /**
  * Derive a ministry tag from text. `fallback` lets primary sources supply a
  * sensible default (e.g. RBI -> "Reserve Bank of India").
  */
-export function deriveMinistry(text: string, fallback = "Government of India"): string {
-  const hay = ` ${norm(text)} `;
-  for (const [ministry, aliases] of Object.entries(MINISTRY_ALIASES)) {
-    for (const alias of aliases) {
-      if (hay.includes(` ${norm(alias)} `)) return ministry;
-    }
-  }
-  for (const ministry of CANONICAL_ENTITIES) {
-    if (hay.includes(norm(ministry))) return ministry;
-  }
-  return fallback;
+export function deriveMinistry(
+  text: string,
+  fallback = "Government of India",
+  ministryHint?: string | null
+): string {
+  return deriveMinistryDetailed(text, fallback, ministryHint).ministry;
 }
 
 // ------------------------------------------------------------

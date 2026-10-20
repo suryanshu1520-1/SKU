@@ -162,6 +162,8 @@ Global local search opens real resources across subjects, including table cells 
 
 State changes stay brief: a new resource reveals over 200ms, an outline part over 220ms, a concept choice over 260ms and recall details over 240ms. Reduced motion removes transitions. Selection and recall do not record mastery or progress. This surface does not display the former hardcoded volcano indicators, trap percentages or unsupported examination forecasts; backend evidence and reviewed sources remain a separate integration responsibility.
 
+The library masthead follows the Daily Brief's Newsreader hierarchy. Controls use shared semantic text/surface/border tokens, 4px framed corners and explicit interface font sizes; parent resets must not overwrite child sizing. Activity, reference-view, answer-part and category selectors share restrained underline states. Category choices wrap above full-width reading, and mobile compresses repeated context before the material. A visible Examiner’s Psyche action retains the analysis modal; its presentation follows these same rules rather than a separate glowing dashboard style.
+
 ## Do's and Don'ts
 
 ### Do:

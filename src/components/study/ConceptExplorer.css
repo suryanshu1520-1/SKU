@@ -1,14 +1,14 @@
 .study-concept {
-  container-type: inline-size;
   width: 100%;
   max-width: 650px;
-  color: #e8e0cf;
+  min-width: 0;
+  color: var(--text-primary);
   font-family: var(--font-sans, "Bricolage Grotesque", sans-serif);
 }
 
 .study-concept-question {
-  margin: 0 0 22px;
-  color: #e8e0cf;
+  margin: 0 0 16px;
+  color: var(--text-primary);
   font-family: var(--font-serif, "Newsreader", Georgia, serif);
   font-size: 21px;
   line-height: 1.45;
@@ -16,16 +16,17 @@
 
 .study-concept-workspace {
   display: grid;
-  grid-template-columns: minmax(160px, 0.9fr) minmax(0, 1.2fr);
-  gap: 26px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
   align-items: start;
 }
 
 .study-concept-choices {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
+  gap: 0 12px;
   min-width: 0;
+  border-bottom: 1px solid var(--border);
 }
 
 .study-concept-choice {
@@ -33,10 +34,10 @@
   align-items: baseline;
   gap: 10px;
   min-height: 44px;
-  padding: 12px;
-  border: 1px solid transparent;
-  border-radius: 3px;
-  color: #b5c1d1;
+  padding: 10px 4px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
   background: transparent;
   text-align: left;
   font: inherit;
@@ -44,18 +45,17 @@
   line-height: 1.5;
   overflow-wrap: anywhere;
   cursor: pointer;
-  transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease;
+  transition: color 180ms ease, border-color 180ms ease;
 }
 
 .study-concept-choice:hover {
-  color: #e8e0cf;
-  background: rgba(224, 208, 171, 0.04);
+  color: var(--text-primary);
 }
 
 .study-concept-choice[aria-pressed="true"] {
-  color: #e0d0ab;
-  border-color: rgba(224, 208, 171, 0.36);
-  background: rgba(224, 208, 171, 0.07);
+  color: var(--text-accent);
+  border-bottom-color: var(--text-accent);
+  font-weight: 500;
 }
 
 .study-concept-number {
@@ -67,12 +67,11 @@
 
 .study-concept-reading {
   min-width: 0;
-  padding-top: 11px;
 }
 
 .study-concept-position {
   margin: 0 0 12px;
-  color: #b5c1d1;
+  color: var(--text-secondary);
   font-size: 12px;
   line-height: 1.4;
   font-variant-numeric: tabular-nums;
@@ -80,7 +79,7 @@
 
 .study-concept-detail {
   margin: 0;
-  color: #e8e0cf;
+  color: var(--text-primary);
   font-family: var(--font-serif, "Newsreader", Georgia, serif);
   font-size: 20px;
   line-height: 1.6;
@@ -90,12 +89,12 @@
 .study-concept-example {
   margin-top: 24px;
   padding-top: 18px;
-  border-top: 1px solid rgba(224, 208, 171, 0.16);
+  border-top: 1px solid var(--border);
 }
 
 .study-concept-example h4 {
   margin: 0 0 8px;
-  color: #e0d0ab;
+  color: var(--text-accent);
   font: inherit;
   font-size: 13px;
   font-weight: 500;
@@ -103,7 +102,7 @@
 
 .study-concept-example p {
   margin: 0;
-  color: #b5c1d1;
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.7;
   overflow-wrap: anywhere;
@@ -116,17 +115,17 @@
   gap: 8px;
   margin-top: 24px;
   padding-top: 12px;
-  border-top: 1px solid rgba(224, 208, 171, 0.16);
+  border-top: 1px solid var(--border);
 }
 
 .study-concept-pagination button {
   min-height: 44px;
   padding: 8px 0;
   border: 0;
-  color: #e0d0ab;
+  color: var(--text-accent);
   background: transparent;
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
 }
 
@@ -136,18 +135,18 @@
 }
 
 .study-concept-pagination button:disabled {
-  color: #b5c1d1;
+  color: var(--text-secondary);
   opacity: 0.45;
   cursor: default;
 }
 
 .study-concept button:focus-visible {
-  outline: 2px solid #e0d0ab;
+  outline: 2px solid var(--focus-ring);
   outline-offset: 3px;
 }
 
 .study-concept-empty {
-  color: #b5c1d1;
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.6;
 }
@@ -159,30 +158,6 @@
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
-}
-
-@container (max-width: 520px) {
-  .study-concept-workspace {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 20px;
-  }
-
-  .study-concept-choices {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
-  }
-
-  .study-concept-reading {
-    padding-top: 16px;
-    border-top: 1px solid rgba(224, 208, 171, 0.16);
-  }
-}
-
-@container (max-width: 330px) {
-  .study-concept-choices {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,0 +1,29 @@
+name: Radar Daily
+on:
+  schedule:
+    - cron: '0 3 * * *'   # after the 02:30 UTC ingest run
+  workflow_dispatch:
+jobs:
+  radar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      RADAR_V2_SINCE: ${{ vars.RADAR_V2_SINCE }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: 'npm' }
+      - run: npm ci
+      # --- radar steps (order: gaps, node signals, boss MCQs, eval) ---
+      - name: Lifecycle gaps
+        run: npx tsx server-lib/cron/policy-gap-worker.ts
+      - name: Node signals
+        run: npx tsx server-lib/cron/node-signal-worker.ts
+      - name: Boss MCQs
+        run: npx tsx server-lib/cron/boss-mcq-worker.ts
+      - name: Radar eval
+        run: npx tsx scripts/radar/eval.ts --write

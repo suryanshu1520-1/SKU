@@ -14,7 +14,7 @@ import {
   AlertCircle,
   Scale,
 } from 'lucide-react';
-import { matchDispatchToPolicyChain, getVolcanoTelemetryForNode } from '../lib/policy-ripple-radar-shared';
+import { RadarCardExtras } from './radar/RadarCardExtras';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeSanitize from 'rehype-sanitize';
@@ -1012,8 +1012,6 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
     const operatorMeta = EXAMINER_OPERATORS[operator];
     const twin = item.historical_twin;
     const statutoryAnchor = twin?.statutory_anchor;
-    const volcano = getVolcanoTelemetryForNode(item.node_id, item.headline, item.ministry);
-    const chain = matchDispatchToPolicyChain(item.headline, item.ministry, item.summary?.bullets?.join(' '), item.chain_id);
     const optional = candidatePreferences
       ? matchOptionalRelevance(item.headline, item.summary?.bullets, candidatePreferences.optionalSubject)
       : null;
@@ -1084,27 +1082,8 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
                 </div>
               ) : null}
               {optional?.matches && <div><dt>Optional subject</dt><dd>{optional.optionalName} · Paper 2 anchor</dd></div>}
-              {volcano?.volcano_status === 'ERUPTING' && (
-                <div>
-                  <dt>Topic activity</dt>
-                  <dd>{volcano.title} · {volcano.years_dormant}-year rebound <span>(Volcano index {volcano.volcano_index.toFixed(1)})</span></dd>
-                </div>
-              )}
             </dl>
-            {chain && (
-              <a
-                href={`/observatory?tab=ripple&chain=${encodeURIComponent(chain.chain_id)}`}
-                className="news-signal__context-link"
-                onClick={(event) => {
-                  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-                  event.preventDefault();
-                  window.history.pushState(null, '', event.currentTarget.href);
-                  window.dispatchEvent(new PopStateEvent('popstate'));
-                }}
-              >
-                Explore policy chain: {chain.title}{typeof item.ring_depth === 'number' && Number.isFinite(item.ring_depth) ? ` (ring ${item.ring_depth})` : ''}
-              </a>
-            )}
+            <RadarCardExtras dispatchId={item.id} nodeId={item.node_id} variant="signal" />
             {twin && (
               <section className="news-signal__historical">
                 <h4>Historical twin · Prelims {twin.year}</h4>

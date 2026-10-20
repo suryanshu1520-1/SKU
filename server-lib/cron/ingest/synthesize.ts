@@ -16,6 +16,7 @@
 import { llmGenerate } from "../../llm.js";
 import type { SourceLang } from "./types.js";
 import { segmentSpans, verifyClaim, groundingScore, type VerifiedClaim, type EvidenceSpan } from "./verify.js";
+import type { EventFrame } from "../../policy/events.ts";
 import {
   validateArticleExamInsights,
   computeSourceFingerprint,
@@ -118,7 +119,7 @@ const HI_STRUCTURED_SYSTEM = [
   "- If purely ceremonial or non-exam-relevant, respond with: {\"relevance\": \"NULL\"} or NULL.",
 ].join("\n");
 
-const EN_GROUNDED_SYSTEM = [
+export const EN_GROUNDED_SYSTEM = [
   "You are a policy analyst and exam intelligence distiller for UPSC Civil Services aspirants.",
   "The source is given as NUMBERED sentences. Judge UPSC relevance as for a Vision IAS / InsightsIAS compilation; routine crime, local incidents, accidents, non-major sports, celebrity, market moves and corporate results are NOT relevant → return NULL.",
   "If and only if UPSC-relevant, distill into structured JSON matching this schema:",
@@ -137,13 +138,20 @@ const EN_GROUNDED_SYSTEM = [
   '  "exam_insights": {',
   '    "facts": [{ "kind": "mechanism" | "institution" | "scope" | "metric" | "legal" | "other", "label": string, "statement": string, "spans": number[] }],',
   '    "distinction": { "statement": string, "spans": number[], "operator": "PSY_01_INST_SWAP" | "PSY_02_QUAL_POLARITY" | "PSY_03_LEGAL_TIER" | "PSY_04_CAUSAL_INV" | "PSY_05_SCOPE_MUTATE" }',
-  '  }',
+  '  },',
+  '  "policy_events": [{ "instrument": "cabinet_approval"|"budget_announcement"|"executive_announcement"|"treaty_signed"|"bill_introduced"|"bill_passed"|"act_assented"|"ordinance_promulgated"|"rules_notified"|"regulation_issued"|"commencement_or_entry_into_force"|"guidelines_issued"|"institution_constituted"|"funds_released"|"tender_awarded"|"interagency_mou"|"state_rollout"|"project_commissioned"|"beneficiary_milestone"|"enforcement_action"|"review_meeting"|"visit_or_courtesy"|"campaign_or_awareness"|"award_or_ceremony"|"conference_or_seminar"|"other",',
+  '    "actor": string, // exactly as written in the source span',
+  '    "program": string | null, // exactly as written in the source span',
+  '    "program_en": string | null, // English name, used only for slug/display, never for gating',
+  '    "program_kind": "scheme"|"mission"|"act"|"bill"|"treaty"|"regulation"|"policy"|null,',
+  '    "date_text": string | null, "summary": string, "spans": number[] }] // 0-3 items; only formal government actions. In summary, write full terms (e.g. "free trade agreement" not "FTA") unless the acronym appears verbatim in the cited spans.',
   "}",
+  "Meetings, visits, campaigns, ceremonies, conferences and awareness drives are not policy events.",
   "HARD GROUNDING RULE: every figure, percentage, currency amount, date/year and acronym in a bullet MUST appear in its cited source sentences. If you cannot ground a fact in a specific numbered sentence, omit that fact or that bullet. Never introduce facts absent from the cited sentences. If no exam insights can be verified from the source text, omit exam_insights.",
   "If not UPSC-relevant, respond with exactly: NULL.",
 ].join("\n");
 
-const HI_GROUNDED_SYSTEM = [
+export const HI_GROUNDED_SYSTEM = [
   "You are a policy analyst and exam intelligence distiller for UPSC Civil Services aspirants.",
   "The source is an Indian GOVERNMENT press release in HINDI, given as NUMBERED sentences. Read the Hindi accurately and write the distillation in clear ENGLISH.",
   "Judge UPSC relevance; ceremonial greetings, tributes or protocol notices without policy substance are NOT relevant → return NULL.",
@@ -163,8 +171,15 @@ const HI_GROUNDED_SYSTEM = [
   '  "exam_insights": {',
   '    "facts": [{ "kind": "mechanism" | "institution" | "scope" | "metric" | "legal" | "other", "label": string, "statement": string, "spans": number[] }],',
   '    "distinction": { "statement": string, "spans": number[], "operator": "PSY_01_INST_SWAP" | "PSY_02_QUAL_POLARITY" | "PSY_03_LEGAL_TIER" | "PSY_04_CAUSAL_INV" | "PSY_05_SCOPE_MUTATE" }',
-  '  }',
+  '  },',
+  '  "policy_events": [{ "instrument": "cabinet_approval"|"budget_announcement"|"executive_announcement"|"treaty_signed"|"bill_introduced"|"bill_passed"|"act_assented"|"ordinance_promulgated"|"rules_notified"|"regulation_issued"|"commencement_or_entry_into_force"|"guidelines_issued"|"institution_constituted"|"funds_released"|"tender_awarded"|"interagency_mou"|"state_rollout"|"project_commissioned"|"beneficiary_milestone"|"enforcement_action"|"review_meeting"|"visit_or_courtesy"|"campaign_or_awareness"|"award_or_ceremony"|"conference_or_seminar"|"other",',
+  '    "actor": string, // exactly as written in the source span (Hindi stays Hindi)',
+  '    "program": string | null, // exactly as written in the source span',
+  '    "program_en": string | null, // English name, used only for slug/display, never for gating',
+  '    "program_kind": "scheme"|"mission"|"act"|"bill"|"treaty"|"regulation"|"policy"|null,',
+  '    "date_text": string | null, "summary": string, "spans": number[] }] // 0-3 items; only formal government actions. In summary, write full terms (e.g. "free trade agreement" not "FTA") unless the acronym appears verbatim in the cited spans.',
   "}",
+  "Meetings, visits, campaigns, ceremonies, conferences and awareness drives are not policy events.",
   "HARD GROUNDING RULE: preserve scheme names, figures, dates and acronyms exactly; every such fact in a bullet MUST appear in its cited source sentences. Omit any fact you cannot ground. Never invent details.",
   "If not exam-relevant or purely ceremonial, respond with exactly: NULL.",
 ].join("\n");
@@ -211,6 +226,8 @@ export type GroundedSynthesis = StructuredSynthesis & {
   claims: VerifiedClaim[];
   /** Fraction of produced bullets that passed the deterministic fact check (0..1). */
   grounding: number;
+  policy_events?: EventFrame[];
+  spans?: EvidenceSpan[];
 };
 
 /**
@@ -485,12 +502,46 @@ export async function synthesizeGrounded(params: {
     sourceFingerprint: computeSourceFingerprint(body),
   });
 
+  const rawEvents = Array.isArray(parsed.policy_events) ? parsed.policy_events : [];
+  const policy_events: EventFrame[] = [];
+  for (const ev of rawEvents) {
+    if (!ev || typeof ev !== "object") continue;
+    if (typeof ev.instrument !== "string" || !ev.instrument.trim()) continue;
+    if (typeof ev.actor !== "string" || !ev.actor.trim()) continue;
+    if (typeof ev.summary !== "string" || !ev.summary.trim()) continue;
+    const evSpans = (Array.isArray(ev.spans) ? ev.spans : [])
+      .map((n: unknown) => Number(n))
+      .filter((n: number) => Number.isInteger(n) && n >= 0 && n < spans.length);
+
+    policy_events.push({
+      instrument: ev.instrument.trim(),
+      actor: ev.actor.trim(),
+      program: typeof ev.program === "string" && ev.program.trim() ? ev.program.trim() : null,
+      program_en: typeof ev.program_en === "string" && ev.program_en.trim() ? ev.program_en.trim() : null,
+      program_kind: typeof ev.program_kind === "string" && ev.program_kind.trim() ? ev.program_kind.trim() : null,
+      date_text: typeof ev.date_text === "string" && ev.date_text.trim() ? ev.date_text.trim() : null,
+      summary: ev.summary.trim(),
+      spans: evSpans,
+    });
+    if (policy_events.length >= 3) break;
+  }
+
   // grounding = kept/total across ALL produced bullets (honest drop-rate gauge).
   const grounding = groundingScore(claims);
   console.log(
     `[ingest][llm] grounded (${kept.length}/${claims.length} bullets, ${tags.join(", ")}) via ${result.provider}/${result.model}`
   );
-  return { bullets: kept.map((c) => c.text), tags, prelims, mains, claims: kept, grounding, ...rich };
+  return {
+    bullets: kept.map((c) => c.text),
+    tags,
+    prelims,
+    mains,
+    claims: kept,
+    grounding,
+    policy_events,
+    spans,
+    ...rich,
+  };
 }
 
 /**

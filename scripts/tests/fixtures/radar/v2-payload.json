@@ -1,0 +1,226 @@
+{
+  "status": "ok",
+  "programs": [
+    {
+      "slug": "green-hydrogen-mission",
+      "name": "National Green Hydrogen Mission",
+      "kind": "mission",
+      "nodal": "ENT_MNRE",
+      "nodes": [
+        {
+          "event_id": "ev1",
+          "event_date": "2023-01-04",
+          "date_source": "release_meta",
+          "ring": 0,
+          "instrument": "cabinet_approval",
+          "actor": {
+            "slug": "ENT_CABINET",
+            "name": "Union Cabinet",
+            "tier": 1,
+            "legal_basis_ref": null
+          },
+          "summary": "Union Cabinet approves National Green Hydrogen Mission with ₹19,744 crore outlay.",
+          "evidence": [
+            {
+              "quote": "Union Cabinet approves National Green Hydrogen Mission with ₹19,744 crore outlay",
+              "source_url": "https://pib.gov.in/PressReleasePage.aspx?PRID=1888547"
+            }
+          ],
+          "parent_event_id": null
+        },
+        {
+          "event_id": "ev2",
+          "event_date": "2024-03-15",
+          "date_source": "release_meta",
+          "ring": 2,
+          "instrument": "guidelines_issued",
+          "actor": {
+            "slug": "ENT_MNRE",
+            "name": "Ministry of New and Renewable Energy",
+            "tier": 2,
+            "legal_basis_ref": "Executive Allocation of Business"
+          },
+          "summary": "MNRE issues scheme guidelines for funding testing facilities.",
+          "evidence": [
+            {
+              "quote": "MNRE issues scheme guidelines for funding testing facilities",
+              "source_url": "https://pib.gov.in/PressReleasePage.aspx?PRID=2014890"
+            }
+          ],
+          "parent_event_id": "ev1"
+        }
+      ],
+      "gap": {
+        "lastStage": "guidelines_issued",
+        "lastDate": "2024-03-15",
+        "nextStage": "project_commissioned",
+        "elapsedDays": 120,
+        "nObserved": 14,
+        "medianDays": 180,
+        "q25Days": 90,
+        "status": "on_track",
+        "sentence": "Next stage project commissioned typically follows in 180 days (n=14); 120 days elapsed."
+      },
+      "mutations": [
+        {
+          "headline": "Outlay: ₹19,744 crore → ₹21,000 crore",
+          "effectiveAt": "2024-03-15",
+          "sources": [
+            {
+              "quote": "Outlay ₹19,744 crore",
+              "url": "https://pib.gov.in/1"
+            },
+            {
+              "quote": "Revised outlay ₹21,000 crore",
+              "url": "https://pib.gov.in/2"
+            }
+          ],
+          "event_id": "ev2"
+        }
+      ],
+      "boss_mcq": {
+        "id": "00000000-0000-4000-8000-000000000001",
+        "edition_date": "2025-01-10",
+        "question": "With reference to the National Green Hydrogen Mission, consider the following statements:\n1. It is implemented by the Ministry of Power.\n2. The initial outlay was ₹19,744 crore.\n3. Testing facility guidelines were notified in 2024.\nHow many of the statements given above are correct?",
+        "options": ["Only one", "Only two", "All three", "None"]
+      },
+      "ripples": [
+        {
+          "direction": "upstream",
+          "other_program": "national-solar-mission",
+          "other_name": "National Solar Mission",
+          "anchor_kind": "explicit_reference",
+          "p": null,
+          "evidence": {
+            "quote": "Builds on solar capacity under National Solar Mission",
+            "source_url": "https://pib.gov.in/PressReleasePage.aspx?PRID=1888547"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "india-new-zealand-fta",
+      "name": "India-New Zealand FTA",
+      "kind": "treaty",
+      "nodal": "ENT_COMMERCE",
+      "nodes": [
+        {
+          "event_id": "ev3",
+          "event_date": "2024-06-20",
+          "date_source": "release_meta",
+          "ring": 1,
+          "instrument": "treaty_signed",
+          "actor": {
+            "slug": "ENT_COMMERCE",
+            "name": "वाणिज्य एवं उद्योग मंत्रालय",
+            "tier": 2,
+            "legal_basis_ref": null
+          },
+          "summary": "भारत और न्यूज़ीलैंड ने मुक्त व्यापार समझौते पर वार्ता को आगे बढ़ाया।",
+          "evidence": [
+            {
+              "quote": "भारत और न्यूज़ीलैंड ने मुक्त व्यापार समझौते पर हस्ताक्षर किए",
+              "source_url": "https://pib.gov.in/PressReleasePage.aspx?PRID=2025001"
+            }
+          ],
+          "parent_event_id": null
+        }
+      ],
+      "gap": {
+        "lastStage": "treaty_signed",
+        "lastDate": "2024-06-20",
+        "nextStage": "act_assented",
+        "elapsedDays": 310,
+        "nObserved": 5,
+        "medianDays": 240,
+        "q25Days": 180,
+        "status": "longer_than_usual",
+        "sentence": "Next stage act assented typically observed in 240 days (n=5); 310 days elapsed."
+      },
+      "mutations": [],
+      "boss_mcq": null,
+      "ripples": []
+    },
+    {
+      "slug": "pm-pranam",
+      "name": "PM-PRANAM Scheme",
+      "kind": "scheme",
+      "nodal": "ENT_FERTILIZERS",
+      "nodes": [
+        {
+          "event_id": "ev4",
+          "event_date": "2023-06-28",
+          "date_source": "release_meta",
+          "ring": 0,
+          "instrument": "cabinet_approval",
+          "actor": {
+            "slug": "ENT_CABINET",
+            "name": "Union Cabinet",
+            "tier": 1,
+            "legal_basis_ref": null
+          },
+          "summary": "Cabinet approves PM-PRANAM to promote alternative fertilizers.",
+          "evidence": [
+            {
+              "quote": "Cabinet approves PM-PRANAM to promote alternative fertilizers",
+              "source_url": "https://pib.gov.in/PressReleasePage.aspx?PRID=1935890"
+            }
+          ],
+          "parent_event_id": null
+        }
+      ],
+      "gap": null,
+      "mutations": [],
+      "boss_mcq": null,
+      "ripples": []
+    }
+  ],
+  "node_signals": [
+    {
+      "node_id": "GS3.ECO.EXTERNAL",
+      "x_recent": 8,
+      "n_baseline": 24,
+      "expected": 3.5,
+      "p": 0.02,
+      "score": 2.3,
+      "surging": true,
+      "exam_weight": 0.85,
+      "computed_at": "2025-01-15T00:00:00.000Z",
+      "title": "External Sector"
+    },
+    {
+      "node_id": "GS2.IR.BILATERAL",
+      "x_recent": 2,
+      "n_baseline": 15,
+      "expected": 2.1,
+      "p": 0.45,
+      "score": 0.9,
+      "surging": false,
+      "exam_weight": 0.65,
+      "computed_at": "2025-01-15T00:00:00.000Z",
+      "title": "Bilateral Relations"
+    }
+  ],
+  "coverage": {
+    "events": 4,
+    "programs": 3,
+    "since": "2023-01-04",
+    "generated_at": "2025-01-15T00:00:00.000Z",
+    "last_event_at": "2024-06-20",
+    "dropped_no_evidence": 0
+  },
+  "by_dispatch": {
+    "bd10b312-a808-413e-a884-a740de900b79": {
+      "program_slug": "green-hydrogen-mission",
+      "program_name": "National Green Hydrogen Mission",
+      "ring": 0,
+      "instrument": "cabinet_approval",
+      "gap_sentence": "Next stage project commissioned typically follows in 180 days (n=14); 120 days elapsed.",
+      "evidence": {
+        "quote": "Union Cabinet approves National Green Hydrogen Mission with ₹19,744 crore outlay",
+        "source_url": "https://pib.gov.in/PressReleasePage.aspx?PRID=1888547"
+      }
+    }
+  },
+  "version": "v2"
+}

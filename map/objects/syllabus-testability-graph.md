@@ -40,3 +40,11 @@ The reservoir the ingestion pipe fills. A persistent graph of ~130 UPSC syllabus
 - Design rationale: `docs/handoffs/innovation-session-superprompt.md` session.
 - Corpus handoff: `docs/handoffs/syllabus-corpus-antigravity.md` (gitignored — local only).
 - Related: [[ingestion-pipeline]], [[news-intelligence-architecture]].
+
+## 8. Study library interface (2026-10-20)
+
+`src/components/SubjectPillars.tsx` now presents a Study library at `/library` (legacy `/pillars` also resolves). `src/lib/study-library.ts` adapts the local editorial data into subject collections and stable resource IDs, with notes, concept explorers, reference tables/recall and answer outlines. It does not read the canonical graph or represent its local IDs as canonical syllabus nodes.
+
+The interface omits the former hardcoded Volcano telemetry, trap percentages and uncited frequency claims. Resource counts mean actual local resources, not syllabus coverage or past-question frequency. Reviewed sources, canonical mappings, exact-topic practice and personal history require separate backend integration; no mastery or examination prediction is inferred from reading interactions. Preserve the URL adapter and this distinction when connecting graph data.
+
+The library also retains `ExaminerPsycheModal.tsx`, opened by its header action and loaded on demand. Its view adapter `src/lib/examiner-psyche-view.ts` consumes the existing public analytics endpoints with explicit empty/error states. All eight analysis/guidance sections and the question archive remain accessible. Descriptive samples and editorial guidance are distinguished from forecasts; no client baseline or blanket verification badge substitutes for unavailable data. Archive topic associations still require backend review.

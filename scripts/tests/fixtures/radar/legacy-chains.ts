@@ -1,0 +1,326 @@
+import type { RippleChain, EntityRecord } from '../../../src/components/observatory/policy-ripple-types';
+
+export const CHAINS: RippleChain[] = [
+  {
+    chain_id: 'CHAIN_01_SEMICON_NEXUS',
+    title: 'The Semiconductor Ecosystem & Critical Materials Nexus',
+    primary_pillar: 'GS3 Science & Economy',
+    lead_driver: 'Cabinet approval of Semicon 2.0 with ₹1.27 Lakh Crore outlay and domestic component localization.',
+    nodes_flow: [
+      { ministry: 'Cabinet / PMO', action: 'Announced Semicon 2.0 guidelines and national AI computing infrastructure mission.' },
+      { ministry: 'Ministry of Power', action: 'Notified 552 GW non-fossil capacity target and ultra-reliable industrial grid standards for fabs.' },
+      { ministry: 'Ministry of Mines', action: 'Auctioned offshore critical minerals (Lithium, Rare Earths, Silicon) for chip substrate inputs.' },
+      { ministry: 'Ministry of Steel', action: 'Implemented green steel ship-recycling circulars to supply low-carbon structural housing.' },
+      { ministry: 'MeitY / ISM', action: 'Operationalized 5 approved semiconductor units and notified the ₹40,000 Cr ECMS scheme.' },
+      { ministry: 'Ministry of Commerce', action: 'Negotiated duty-free reciprocal access in New Zealand & Tajikistan FTAs for electronics.' },
+      { ministry: 'Reserve Bank of India', action: 'Calibrated overnight VRRR auctions to absorb massive foreign direct capex inflows.' },
+    ],
+    linked_dispatches: [
+      'Dispatch #001 (BHAVYA 51:49 Clusters)',
+      'Dispatch #018 (Power for AI Engagements)',
+      'Dispatch #021 (Semiconductor CEO Roundtable)',
+      'Dispatch #022 (ECMS Component Scheme)',
+      'Dispatch #024 (India-NZ Free Trade Agreement)',
+      'Dispatch #229 (Semicon India 2026 Conclave)',
+    ],
+  },
+  {
+    chain_id: 'CHAIN_02_CIRCULAR_EWASTE',
+    title: 'Circular Economy & Industrial Effluent Compliance Cascades',
+    primary_pillar: 'GS3 Environment & GS2 Governance',
+    lead_driver: 'Special Campaign 6.0 and nationwide enforcement of E-Waste (Management) Rules, 2022.',
+    nodes_flow: [
+      { ministry: 'MoEFCC / CPCB', action: 'Notified strict extended producer responsibility (EPR) recycling targets.' },
+      { ministry: 'Ministry of Steel', action: 'Mandated institutional segregation and electronic disposal across all public steel plants.' },
+      { ministry: 'MeitY', action: 'Directed electronics manufacturers and GeM vendors to supply certified recyclable devices.' },
+      { ministry: 'Ministry of Law & Justice', action: 'Conducted judicial and legislative record disposal workshops at Kartavya Bhawan.' },
+    ],
+    linked_dispatches: [
+      'Dispatch #019 (Steel E-Waste)',
+      'Dispatch #039 (ECL Sustainability)',
+      'Dispatch #457 (Namami Gange Pollution)',
+      'Dispatch #493 (E-Waste Kartavya Bhawan)',
+    ],
+  },
+  {
+    chain_id: 'CHAIN_03_DEFENSE_EXPORT_SURGE',
+    title: 'Defense Indigenization & Private Sector Export Explosion',
+    primary_pillar: 'GS3 Security & Economy',
+    lead_driver: 'Defense exports reaching all-time high of ₹38,424 Crore in FY 2025-26 under DAP indigenization lists.',
+    nodes_flow: [
+      { ministry: 'Cabinet Secretariat', action: 'Approved higher capital acquisition budget allocation for domestic vendors.' },
+      { ministry: 'Ministry of Defence', action: 'Presented SIDM Champion Awards 2026 to incentivize private defense R&D.' },
+      { ministry: 'DRDO & Ordnance', action: 'Transferred missile propulsion and radar technology packages to private consortia.' },
+      { ministry: 'Indian Navy', action: 'Showcased indigenous stealth assets (INS Sahyadri, INS Kulish) at AIME-2026 in Philippines.' },
+      { ministry: 'Ministry of Commerce / DGFT', action: 'Streamlined military export authorizations toward ₹50,000 Crore 2029 target.' },
+    ],
+    linked_dispatches: [
+      'Dispatch #241 (Surya Kiran Aerobatics)',
+      'Dispatch #361 (INS Sahyadri & Kulish at AIME-26)',
+      'Dispatch #421 (SIDM Champion Awards 2026)',
+      'Dispatch #433 (Ex-Servicemen Special Campaign)',
+    ],
+  },
+  {
+    chain_id: 'CHAIN_04_AGRI_MSP_COOP',
+    title: 'Agrarian Price Stabilization & Primary Cooperative Modernization',
+    primary_pillar: 'GS3 Agriculture & GS2 Cooperation',
+    lead_driver: 'Kharif price fixings, PM-KISAN biometric saturation, and PACS computerization.',
+    nodes_flow: [
+      { ministry: 'Cabinet Committee on Economic Affairs', action: 'Approved Kharif Minimum Support Prices guaranteeing 1.5x production cost.' },
+      { ministry: 'Ministry of Agriculture & FW', action: 'Disbursed PM-KISAN direct transfers and expanded digital crop insurance monitoring.' },
+      { ministry: 'Ministry of Cooperation', action: 'Connected Primary Agricultural Credit Societies (PACS) to common cloud accounting.' },
+      { ministry: 'Department of Fertilizers', action: 'Subsidized nano-urea and rationalized nutrient-based subsidies (NBS) for soil health.' },
+    ],
+    linked_dispatches: [
+      'Dispatch #008 (NAFED Welfare Suite)',
+      'Dispatch #020 (Agri Development)',
+      'Dispatch #349 (India-Netherlands Agri Pact)',
+    ],
+  },
+  {
+    chain_id: 'CHAIN_05_MONETARY_LIQUIDITY_CORRIDOR',
+    title: 'Monetary Liquidity Corridor & Sovereign Balance Sheet Calibrations',
+    primary_pillar: 'GS3 Economy & Monetary Policy',
+    lead_driver: 'RBI Variable Rate Reverse Repo (VRRR) liquidity absorption and corporate reporting rigor.',
+    nodes_flow: [
+      { ministry: 'Ministry of Finance', action: 'Tracked direct tax buoyant collections and maintained fiscal deficit trajectory.' },
+      { ministry: 'Reserve Bank of India (MPC)', action: 'Operated VRRR auctions at 5.49% to anchor short-term rates to policy repo.' },
+      { ministry: 'National Financial Reporting Authority (NFRA)', action: 'Enforced audit quality and technology assurance across corporate books.' },
+      { ministry: 'Ministry of Corporate Affairs', action: 'Expanded learner registrations for corporate governance and insolvency norms.' },
+    ],
+    linked_dispatches: [
+      'Dispatch #003 (DigiDukaan Platform)',
+      'Dispatch #045 (NFRA Audit Quality)',
+      'Dispatch #046 (MCA Registrations)',
+    ],
+  },
+  {
+    chain_id: 'CHAIN_06_GREEN_HYDROGEN_SIGHT',
+    title: 'National Green Hydrogen Mission & Electrolyser Supply Chain',
+    primary_pillar: 'GS3 Environment & Energy',
+    lead_driver: 'Strategic Interventions for Green Hydrogen Transition (SIGHT) tenders under MNRE.',
+    nodes_flow: [
+      { ministry: 'MNRE', action: 'Allocated electrolyser manufacturing capacity under Component I of SIGHT mission.' },
+      { ministry: 'Ministry of Petroleum & NG', action: 'Mandated green hydrogen blending in public sector refinery operations.' },
+      { ministry: 'Ministry of Power', action: 'Granted open-access green energy transmission waivers for hydrogen production.' },
+    ],
+    linked_dispatches: [
+      'Dispatch #038 (Geothermal Energy Policy)',
+      'Dispatch #253 (Telecom Manufacturing Investments)',
+    ],
+  },
+  {
+    chain_id: 'CHAIN_07_GATISHAKTI_LOGISTICS',
+    title: 'PM GatiShakti Multimodal Logistics & Transit De-bottlenecking',
+    primary_pillar: 'GS3 Infrastructure',
+    lead_driver: 'Network Planning Group (NPG) integrated clearances across transport ministries.',
+    nodes_flow: [
+      { ministry: 'DPIIT / PM GatiShakti', action: 'Synchronized infrastructure corridors using GIS multi-layer mapping.' },
+      { ministry: 'Ministry of Railways', action: 'Expanded Kavach 4.0 train collision avoidance rollout and freight corridors.' },
+      { ministry: 'Ministry of Road Transport & Highways', action: 'Monetized highway stretches and expedited economic corridor tunnels.' },
+      { ministry: 'Ministry of Ports & Shipping', action: 'Commissioned zero-emission green port tugs and coastal shipping nodes.' },
+    ],
+    linked_dispatches: [
+      'Dispatch #029 (Zero Emission Green Shipping)',
+      'Dispatch #051 (CRRI Urban Pavement Tech)',
+    ],
+  },
+  {
+    chain_id: 'CHAIN_08_AYUSH_UNIVERSAL_HEALTH',
+    title: 'Universal Senior Healthcare & Traditional Medicine Integration',
+    primary_pillar: 'GS2 Social Justice & Health',
+    lead_driver: 'Expansion of Ayushman Bharat to senior citizens aged 70+ and 11th Ayurveda Day.',
+    nodes_flow: [
+      { ministry: 'Cabinet / MoHFW', action: 'Approved universal health coverage for all citizens 70+ regardless of income.' },
+      { ministry: 'Ministry of Ayush', action: 'Organized 11th Ayurveda Day globally and standardized CCRAS pharmacopoeia.' },
+      { ministry: 'National Health Authority', action: 'Digitized electronic health records under the Ayushman Bharat Digital Mission.' },
+    ],
+    linked_dispatches: [
+      'Dispatch #032 (Health Infrastructure Updates)',
+      'Dispatch #047 (CCRAS Internal Finance)',
+      'Dispatch #265 (11th Ayurveda Day Mandate)',
+    ],
+  },
+  {
+    chain_id: 'CHAIN_09_NUCLEAR_SPACE_EXPANSION',
+    title: 'Nuclear Energy, Space Economy & Atomic R&D Scaling',
+    primary_pillar: 'GS3 Science & Technology',
+    lead_driver: 'Uranium mining capacity augmentation and commercial satellite launch commercialization under IN-SPACe.',
+    nodes_flow: [
+      { ministry: 'Department of Atomic Energy (DAE)', action: 'Expanded indigenous Pressurized Heavy Water Reactor (PHWR) fleet and Fast Breeder testing.' },
+      { ministry: 'Department of Space / ISRO', action: 'Transferred SSLV small launcher technology to private consortia and cleared commercial orbital slots.' },
+      { ministry: 'Uranium Corporation of India Limited (UCIL)', action: 'Celebrated Diamond Jubilee milestone and augmented domestic milling recovery rates in Jharkhand and AP.' },
+    ],
+    linked_dispatches: ['Dispatch #001 (BRICS Science Forum)', 'Dispatch #012 (UCIL Diamond Jubilee)', 'Dispatch #485 (NRF RDI Space Economy)'],
+  },
+  {
+    chain_id: 'CHAIN_10_CYBERSECURITY_CRITICAL_INFRA',
+    title: 'Critical Infrastructure Cybersecurity & Incident Disclosures',
+    primary_pillar: 'GS3 Cybersecurity & Internal Security',
+    lead_driver: 'CERT-In mandatory 6-hour cybersecurity incident reporting and National Critical Information Infrastructure Protection Centre (NCIIPC) auditing.',
+    nodes_flow: [
+      { ministry: 'MeitY / CERT-In', action: 'Enforced synchronous log retention and cloud cyber audits across all digital banking and telecom nodes.' },
+      { ministry: 'NCIIPC / NTRO', action: 'Designated power grid load-despatch centres and nuclear SCADA systems as Protected Systems.' },
+      { ministry: 'Ministry of Home Affairs (I4C)', action: 'Interdicted mule account networks and coordinated financial cyber-fraud takedowns across state police.' },
+    ],
+    linked_dispatches: ['Dispatch #006 (NIXI Open Internet Routing)', 'Dispatch #477 (MHA PITNDPS Interdictions)'],
+  },
+  {
+    chain_id: 'CHAIN_11_INLAND_WATERWAYS_MULTIMODAL',
+    title: 'Inland Waterways & Coastal Multimodal Cargo Expansion',
+    primary_pillar: 'GS3 Infrastructure & Economy',
+    lead_driver: 'Inland Waterways Authority of India (IWAI) crossing 218 Million Metric Tonnes under Maritime India Vision 2030.',
+    nodes_flow: [
+      { ministry: 'Ministry of Ports, Shipping & Waterways', action: 'Notified National Waterway 1 (Ganga) and NW 2 (Brahmaputra) night navigation and fairway maintenance.' },
+      { ministry: 'Inland Waterways Authority of India (IWAI)', action: 'Commissioned multimodal terminals at Varanasi, Sahibganj, and Haldia for containerized transit.' },
+      { ministry: 'Central Board of Indirect Taxes & Customs (CBIC)', action: 'Allowed electronic seal manifest clearances for Indo-Bangladesh Protocol Route transit cargo.' },
+    ],
+    linked_dispatches: ['Dispatch #493 (IWAI 218 MMT Cargo Record)', 'Dispatch #029 (Green Port Tug Directives)'],
+  },
+  {
+    chain_id: 'CHAIN_12_ADMINISTRATIVE_DECLUTTERING',
+    title: 'Administrative De-cluttering & Grievance Redressal Saturation',
+    primary_pillar: 'GS2 Governance & Administrative Reforms',
+    lead_driver: 'Special Campaign 6.0 across Union Ministries and CPGRAMS grievance redressal milestone of 2.38 Lakh cases in September 2026.',
+    nodes_flow: [
+      { ministry: 'Department of Administrative Reforms (DARPG)', action: 'Monitored digital grievance turnaround times and de-cluttered Central Secretariat office space.' },
+      { ministry: 'Ministry of Housing and Urban Affairs', action: 'Repurposed freed administrative acreage at Kartavya Bhawan and disposed institutional scrap.' },
+    ],
+    linked_dispatches: ['Dispatch #460 (DARPG CPGRAMS September Redressal)', 'Dispatch #468 (Legislative Dept Special Campaign 6)']
+  },
+  {
+    chain_id: 'CHAIN_13_BILATERAL_TRADE_ENERGY',
+    title: 'Bilateral Trade Alliances & Strategic Energy Corridor Access',
+    primary_pillar: 'GS2 International Relations',
+    lead_driver: 'Union Finance Minister official visit to Qatar and New Zealand Free Trade Agreement.',
+    nodes_flow: [
+      { ministry: 'Ministry of Finance', action: 'Held bilateral investment facilitation talks with Qatar Investment Authority.' },
+      { ministry: 'Ministry of Commerce', action: 'Secured zero-duty market access for Indian textiles and pharmaceuticals in New Zealand.' },
+    ],
+    linked_dispatches: ['Dispatch #024 (India-NZ FTA)', 'Dispatch #325 (Qatar Bilateral Summit)']
+  },
+  {
+    chain_id: 'CHAIN_14_TRIBAL_PVTG_SATURATION',
+    title: 'PM-JANMAN & Particularly Vulnerable Tribal Group (PVTG) Saturation',
+    primary_pillar: 'GS2 Social Justice & Tribal Welfare',
+    lead_driver: 'Direct saturation of 11 critical interventions across 75 PVTG communities.',
+    nodes_flow: [
+      { ministry: 'Ministry of Tribal Affairs', action: 'Disbursed housing, clean water, and solar home lighting grants under Article 275(1).' },
+      { ministry: 'Ministry of Rural Development', action: 'Constructed all-weather connecting roads to remote tribal habitations.' },
+    ],
+    linked_dispatches: ['Dispatch #037 (PM-JANMAN Rural Saturation)']
+  },
+  {
+    chain_id: 'CHAIN_15_DIGITAL_GOVERNANCE_DATA',
+    title: 'Digital Public Infrastructure, Open Networks & Data Protection Rules',
+    primary_pillar: 'GS3 Science & GS2 Governance',
+    lead_driver: 'Notification of Digital Personal Data Protection (DPDP) Act subordinate rules.',
+    nodes_flow: [
+      { ministry: 'MeitY', action: 'Formulated Data Protection Board operating procedures and open network DigiDukaan rails.' },
+      { ministry: 'Ministry of Law & Justice', action: 'Vetted statutory compliance for cross-border data transfer safeguards.' },
+    ],
+    linked_dispatches: ['Dispatch #003 (DigiDukaan Platform)', 'Dispatch #006 (NIXI DPDP Subordinate Rules)']
+  }
+];
+
+export const ENTITIES: EntityRecord[] = [
+  {
+    authority: 'Election Commission of India (ECI)',
+    appearances_count: 12,
+    tier_number: 1,
+    tier_name: 'Constitutional Body',
+    tier_description: 'Article 324 of the Constitution. Autonomous, permanent constitutional organ with superintendence, direction, and control over elections to Parliament and State Legislatures.',
+    neutralized_trap: 'PSY_03_LEGAL_TIER (Examiners misclaiming ECI is created under Representation of the People Act 1951)',
+  },
+  {
+    authority: 'National Commission for Scheduled Castes (NCSC)',
+    appearances_count: 8,
+    tier_number: 1,
+    tier_name: 'Constitutional Body',
+    tier_description: 'Article 338 of the Constitution. Direct constitutional grievance redressal powers with civil court powers during enquiry into atrocities or deprivation of rights.',
+    neutralized_trap: 'PSY_03_LEGAL_TIER (Confusing constitutional origin with statutory commission acts)',
+  },
+  {
+    authority: 'Cabinet Secretariat',
+    appearances_count: 22,
+    tier_number: 1,
+    tier_name: 'Constitutional / Allocation of Business Organ',
+    tier_description: 'Functions under Government of India (Allocation of Business) Rules, 1961 and Article 77(3) of the Constitution. Administered directly under the Prime Minister.',
+    neutralized_trap: 'PSY_01_INST_SWAP (Confusing Cabinet Secretariat with Prime Minister Office or Ministry of Parliamentary Affairs)',
+  },
+  {
+    authority: 'Reserve Bank of India (RBI)',
+    appearances_count: 103,
+    tier_number: 2,
+    tier_name: 'Statutory Apex Regulator',
+    tier_description: 'Reserve Bank of India Act, 1934. Statutory central bank and monetary regulator governing currency issuance, bank licensing, foreign exchange, and policy rates.',
+    neutralized_trap: 'PSY_01_INST_SWAP (Swapping RBI with SEBI, NPCI, or Ministry of Finance)',
+  },
+  {
+    authority: 'National Financial Reporting Authority (NFRA)',
+    appearances_count: 9,
+    tier_number: 2,
+    tier_name: 'Statutory Apex Regulator',
+    tier_description: 'Section 132 of the Companies Act, 2013. Quasi-judicial corporate auditor regulator with independent investigation and debarment powers over public interest entities.',
+    neutralized_trap: 'PSY_01_INST_SWAP (Confusing NFRA with ICAI professional body or MCA internal division)',
+  },
+  {
+    authority: 'Bureau of Indian Standards (BIS)',
+    appearances_count: 26,
+    tier_number: 2,
+    tier_name: 'Statutory National Standards Body',
+    tier_description: 'Bureau of Indian Standards Act, 2016. Statutory body operating under Ministry of Consumer Affairs, Food & Public Distribution for product standardization, hallmark verification, and testing.',
+    neutralized_trap: 'PSY_01_INST_SWAP (Asserting BIS is an executive wing of Ministry of Commerce or MSME)',
+  },
+  {
+    authority: 'Commission for Air Quality Management (CAQM)',
+    appearances_count: 15,
+    tier_number: 2,
+    tier_name: 'Statutory Environmental Commission',
+    tier_description: 'Commission for Air Quality Management in National Capital Region and Adjoining Areas Act, 2021. Replaced EPCA with statutory powers superseding state pollution boards.',
+    neutralized_trap: 'PSY_01_INST_SWAP (Confusing CAQM powers with CPCB advisory limits or NGT judicial orders)',
+  },
+  {
+    authority: 'India Semiconductor Mission (ISM)',
+    appearances_count: 34,
+    tier_number: 3,
+    tier_name: 'Executive Business Division',
+    tier_description: 'Business Division under Digital India Corporation (Section 8 company, MeitY). No separate Act of Parliament; operates as an executive nodal secretariat.',
+    neutralized_trap: 'PSY_03_LEGAL_TIER (Examiners asserting ISM was established via a parliamentary statute)',
+  },
+  {
+    authority: 'PM GatiShakti Network Planning Group (NPG)',
+    appearances_count: 18,
+    tier_number: 3,
+    tier_name: 'Executive Business Division',
+    tier_description: 'Inter-ministerial coordination group under DPIIT / Ministry of Commerce & Industry. Synchronizes multi-modal connectivity projects without statutory veto.',
+    neutralized_trap: 'PSY_01_INST_SWAP (Claiming NPG has independent statutory veto powers over state cabinets)',
+  },
+  {
+    authority: 'Society of Indian Defence Manufacturers (SIDM)',
+    appearances_count: 14,
+    tier_number: 4,
+    tier_name: 'Registered Industry Society',
+    tier_description: 'Apex non-profit industry body (registered under Societies Registration Act, 1860) representing public and private defense manufacturers. Not a government agency.',
+    neutralized_trap: 'PSY_01_INST_SWAP (Misattributing SIDM as a direct Department of Ministry of Defence)',
+  },
+  {
+    authority: 'Textiles Committee',
+    appearances_count: 7,
+    tier_number: 4,
+    tier_name: 'Statutory Body / Industry Facilitation Council',
+    tier_description: 'Textiles Committee Act, 1963. Statutory body under Ministry of Textiles ensuring quality of textiles and textile machinery for domestic and export markets.',
+    neutralized_trap: 'PSY_01_INST_SWAP (Confusing Textiles Committee with private export promotion councils)',
+  },
+  {
+    authority: 'Uranium Corporation of India Limited (UCIL)',
+    appearances_count: 6,
+    tier_number: 5,
+    tier_name: 'Public Sector Undertaking (PSU)',
+    tier_description: 'Central Public Sector Enterprise (CPSE) under Department of Atomic Energy (DAE). Commercial corporate entity mining and processing uranium ore.',
+    neutralized_trap: 'PSY_01_INST_SWAP (Confusing UCIL commercial mining with AERB nuclear safety regulator)',
+  },
+];
+
+export const CANONICAL_RIPPLE_CHAINS = CHAINS;
