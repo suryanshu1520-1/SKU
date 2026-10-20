@@ -166,7 +166,7 @@ export default function App() {
         setGameState('arena');
         setActiveTab('humanities');
         updateDocumentMeta(ROUTE_META_DEFAULTS.humanities);
-      } else if (currentPath.startsWith('/library')) {
+      } else if (currentPath.startsWith('/library') || currentPath.startsWith('/pillars')) {
         setTargetPillar(null);
         setArenaConfig(null);
         setGameState('arena');
