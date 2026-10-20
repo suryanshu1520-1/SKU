@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
-import { Swords, Globe, Layers, BookOpen, Sparkles, Trophy } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import DiagnosticPreview from './DiagnosticPreview';
-import MobileLanding from './MobileLanding';
-import InteractiveLoopSection from './InteractiveLoopSection';
+import type { MouseEvent } from 'react';
+import { ArrowDown, ArrowRight, BookOpen, ChevronRight } from 'lucide-react';
+import IntelligencePreview from './landing/IntelligencePreview';
+import LandingTrial from './landing/LandingTrial';
 import type { CandidatePreferences } from '../types';
+import './Landing.css';
 
 interface LandingProps {
   onNavigateArena: () => void;
@@ -21,10 +19,11 @@ interface LandingProps {
   candidatePreferences?: CandidatePreferences;
 }
 
-interface SeatCountData {
-  max_capacity: number;
-  claimed_seats: number;
-  remaining_seats: number;
+// Keep real hrefs for new tabs, link previews and native browser navigation.
+function navigateLocally(event: MouseEvent<HTMLAnchorElement>, navigate?: () => void) {
+  if (!navigate || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  navigate();
 }
 
 export default function Landing({
@@ -32,613 +31,124 @@ export default function Landing({
   onNavigateTracker,
   onNavigateProfile,
   onNavigateLibrary,
-  onNavigateHumanities,
-  onNavigateObservatory,
-  onNavigateLeaderboard,
   onNavigateManifesto,
   onNavigateLegal,
   onLaunchConveyor,
-  candidatePreferences,
 }: LandingProps) {
-  const [seatData, setSeatData] = useState<SeatCountData | null>(null);
-
-  // Fetch live Postgres-locked seat data
-  useEffect(() => {
-    async function fetchSeats() {
-      try {
-        const { data, error } = await supabase.rpc('get_available_seat_count');
-        if (!error && data) {
-          setSeatData(data as SeatCountData);
-        }
-      } catch (e) {
-        console.warn('Could not load live seat count:', e);
-      }
-    }
-    fetchSeats();
-  }, []);
-
-  const claimedCount = (seatData?.claimed_seats && seatData.claimed_seats > 0) ? seatData.claimed_seats : 137;
-  const maxCapacity = seatData?.max_capacity ?? 500;
-  const remainingCount = maxCapacity - claimedCount;
-
-  const scrollToDiagnostic = () => {
-    const el = document.getElementById('diagnostic-embed');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  };
-
-  const dispatchRailPeek = (id: string | null) => {
-    window.dispatchEvent(new CustomEvent('tark:rail-peek', { detail: { id } }));
-  };
-
-  // 100-cell question palette for Test Arena card preview
-  const PALETTE_MARKED = [7, 19, 23, 31, 40];
-  const arenaPalette = Array.from({ length: 100 }, (_, i) => {
-    let status: 'answered' | 'review' | 'current' | 'unvisited' = 'unvisited';
-    if (i < 46 && !PALETTE_MARKED.includes(i)) status = 'answered';
-    else if (PALETTE_MARKED.includes(i)) status = 'review';
-    else if (i === 46) status = 'current';
-    return { id: i, status };
-  });
-
   return (
-    <div className="w-full min-h-screen bg-[#050b1a] text-[#f4ecd8] font-serif relative overflow-x-hidden selection:bg-[#e0d0ab] selection:text-[#050b1a]">
-      {/* ── Ambient Radial Glows (Seamless Full-Bleed Atmosphere, Zero Hard Seams) ── */}
-      <div
-        className="pointer-events-none absolute -top-[280px] left-1/2 -translate-x-1/2 w-[1920px] h-[980px] z-0"
-        style={{
-          background: 'radial-gradient(ellipse 70% 60% at 50% 35%, rgba(14,44,92,0.78) 0%, rgba(10,33,72,0.36) 42%, rgba(5,11,26,0) 72%)',
-        }}
-      />
-      <div
-        className="pointer-events-none absolute top-[60px] left-[5%] w-[1100px] h-[750px] z-0 opacity-70"
-        style={{
-          background: 'radial-gradient(ellipse 60% 50% at center, rgba(14,44,92,0.50) 0%, rgba(10,33,72,0.18) 48%, transparent 72%)',
-        }}
-      />
-      <div
-        className="pointer-events-none absolute top-[180px] -right-[150px] w-[800px] h-[800px] z-0"
-        style={{
-          background: 'radial-gradient(circle at center, rgba(224,208,171,0.06) 0%, rgba(224,208,171,0.0) 60%)',
-        }}
-      />
-
-      {/* ── Mobile Viewport Switch (< 768px) ── */}
-      <div className="block md:hidden relative z-10">
-        <MobileLanding
-          onNavigateArena={onNavigateArena}
-          onNavigateTracker={onNavigateTracker}
-          onNavigateProfile={onNavigateProfile}
-          onNavigateLibrary={onNavigateLibrary}
-          onNavigateHumanities={onNavigateHumanities}
-          onNavigateObservatory={onNavigateObservatory}
-          onNavigateLeaderboard={onNavigateLeaderboard}
-          onNavigateManifesto={onNavigateManifesto}
-          onNavigateLegal={onNavigateLegal}
-          candidatePreferences={candidatePreferences}
-          seatData={seatData}
-        />
-      </div>
-
-      {/* ── Desktop & Tablet Viewport (>= 768px) ── */}
-      {/* Note: In DesignV3, the rail IS the desktop chrome. No duplicate top bar! */}
-      <div className="hidden md:block relative z-10 w-full max-w-[1366px] mx-auto">
-        
-        {/* ═══════════════════════════════════════════════════════════════════
-             SECTION 1: FOLD (Hero Promise + Diagnostic Preview)
-             ═══════════════════════════════════════════════════════════════════ */}
-        <section aria-labelledby="h-promise" className="relative px-10 lg:px-16 pt-16 lg:pt-20 pb-16">
-          <motion.h1
-            id="h-promise"
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
-            className="m-0 max-w-[1120px] font-sans font-extrabold text-[58px] lg:text-[76px] leading-[1.06] tracking-[-0.035em] text-[#f4ecd8] text-balance"
-          >
-            Diagnose your UPSC readiness and improve with <span className="text-[#e0d0ab]">evidence.</span>
-          </motion.h1>
-
-          <div className="relative mt-11 grid grid-cols-1 lg:grid-cols-[464px_minmax(0,1fr)] gap-12 lg:gap-14 items-start">
-            {/* Left: Lead + CTAs + 3-tier Proof DL */}
-            <div>
-              <motion.p
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1, ease: [0.32, 0.72, 0, 1] }}
-                className="m-0 max-w-[440px] font-serif text-[19px] lg:text-[20px] leading-[1.55] text-[#b5c1d1]"
-              >
-                Authentic Prelims pressure (+2.00 / −0.66) and wire-verified Daily PIB Intelligence. Test if you can spot the examiner's trap under a ticking timer before it costs you in the real exam.
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2, ease: [0.32, 0.72, 0, 1] }}
-                className="mt-8 flex items-center gap-7"
-              >
-                <button
-                  type="button"
-                  onClick={onLaunchConveyor || scrollToDiagnostic}
-                  className="cta-primary inline-flex items-center gap-3.5 py-1.5 pl-6 pr-1.5 bg-[#e0d0ab] text-[#050b1a] font-sans font-semibold text-[15px] rounded-full shadow-[0_12px_36px_-16px_rgba(224,208,171,0.5)] cursor-pointer"
-                >
-                  <span>Enter 8-Min Conveyor Belt</span>
-                  <span className="w-10 h-10 rounded-full bg-[rgba(5,11,26,0.12)] inline-flex items-center justify-center">
-                    <svg className="cta-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M5 12h14" />
-                      <path d="m12 5 7 7-7 7" />
-                    </svg>
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={scrollToDiagnostic}
-                  className="text-link font-sans text-[15px] font-medium text-[#b5c1d1] hover:text-[#f0dfb8] cursor-pointer"
-                >
-                  The −1.32 Mark Diagnostic
-                </button>
-              </motion.div>
-
-              {/* 3-tier Proof DL */}
-              <dl className="m-0 mt-12 pt-6 border-t border-[rgba(224,208,171,0.10)] grid grid-cols-[124px_minmax(0,1fr)] column-gap-[18px] row-gap-[14px] items-baseline">
-                <dt className="font-sans text-[15px] font-semibold text-[#e0d0ab] tabular-nums">+2.00 / −0.66</dt>
-                <dd className="m-0 font-serif text-[15px] leading-[1.5] text-[#b5c1d1]">
-                  Authentic Prelims negative marking. Every miss autopsied down to the statutory clause.
-                </dd>
-                <dt className="font-sans text-[15px] font-semibold text-[#e0d0ab]">50:50 Ledger</dt>
-                <dd className="m-0 font-serif text-[15px] leading-[1.5] text-[#b5c1d1]">
-                  Calculates whether your elimination calls gain or bleed marks when stuck between two options.
-                </dd>
-                <dt className="font-sans text-[15px] font-semibold text-[#e0d0ab] tabular-nums">10 a day</dt>
-                <dd className="m-0 font-serif text-[15px] leading-[1.5] text-[#b5c1d1]">
-                  Wire-verified dispatches from PIB, Gazette, and Cabinet releases, every statement cited.
-                </dd>
-              </dl>
-            </div>
-
-            {/* Right: Authentic Prelims Embedded Diagnostic */}
-            <div id="diagnostic-embed" className="w-full">
-              <DiagnosticPreview onLaunchFullArena={onNavigateArena} />
-            </div>
-          </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════════════
-             SECTION 2: LOOP (What happens after you answer)
-             ═══════════════════════════════════════════════════════════════════ */}
-        <InteractiveLoopSection onNavigateArena={onNavigateArena} />
-
-        {/* ═══════════════════════════════════════════════════════════════════
-             SECTION 3: CONTRARIAN ARCHITECTURE (Fused Loop + Instant Rail)
-             ═══════════════════════════════════════════════════════════════════ */}
-        <section aria-labelledby="h-rooms" className="px-10 lg:px-16 py-24 border-t border-[rgba(224,208,171,0.06)]">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 font-mono text-xs font-semibold uppercase tracking-wider mb-3">
-            The Contrarian Arena Architecture
-          </div>
-          <h2 id="h-rooms" className="m-0 font-sans font-extrabold text-[44px] lg:text-[52px] leading-[1.04] tracking-[-0.03em] text-[#f4ecd8]">
-            Stop room-hopping. Fused into one 8-minute loop.
-          </h2>
-          <p className="mt-3.5 m-0 max-w-[680px] font-serif text-[18px] leading-[1.55] text-[#b5c1d1]">
-            EdTech workspaces fatigue aspirants with separate tabs for news, tests, and archives. In Tark, reading a PIB dispatch immediately springs an examiner trap, auto-opening the 2000–2025 PYQ twin and constitutional quote on a single screen. Or jump directly to any vault with Alt + number.
+    <div className="landing-v3">
+      <section className="landing-hero landing-shell" aria-labelledby="landing-promise">
+        <div className="landing-hero-copy">
+          <h1 id="landing-promise">
+            <span>Less noise.</span>
+            <span>More <em>insight.</em></span>
+          </h1>
+          <p className="landing-intro">
+            Current affairs for a deeper kind of preparation.
+            Understand the story, find its place in the syllabus,
+            and carry it into practice.
           </p>
-
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-5">
-            
-            {/* ROOM 1: Test Arena (Spans 2 cols, 2 rows) */}
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={onNavigateArena}
-              onKeyDown={(e) => e.key === 'Enter' && onNavigateArena()}
-              onMouseEnter={() => dispatchRailPeek('arena')}
-              onMouseLeave={() => dispatchRailPeek(null)}
-              onFocus={() => dispatchRailPeek('arena')}
-              onBlur={() => dispatchRailPeek(null)}
-              className="room-cell md:col-span-2 md:row-span-2 p-1.5 rounded-[20px] bg-gradient-to-br from-[rgba(224,208,171,0.08)] to-[rgba(224,208,171,0.015)] border border-[rgba(224,208,171,0.12)] hover:border-[rgba(224,208,171,0.38)] cursor-pointer outline-none transition-all"
-            >
-              <div className="h-full bg-gradient-to-b from-[#0a2148] to-[#071630] rounded-[14px] border border-[rgba(224,208,171,0.07)] p-7 lg:p-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-3">
-                    <Swords className="w-5.5 h-5.5 text-[#e0d0ab]" strokeWidth={1.75} />
-                    <h3 className="m-0 font-sans font-bold text-[28px] lg:text-[30px] tracking-[-0.025em] text-[#f4ecd8]">
-                      Test Arena
-                    </h3>
-                    <span className="ml-auto inline-flex gap-1">
-                      <kbd className="inline-flex items-center justify-center h-[22px] px-2 border border-[rgba(224,208,171,0.22)] border-b-2 rounded-[5px] bg-[rgba(224,208,171,0.03)] font-mono text-[11px] text-[#b5c1d1]">Alt</kbd>
-                      <kbd className="inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 border border-[rgba(224,208,171,0.22)] border-b-2 rounded-[5px] bg-[rgba(224,208,171,0.03)] font-mono text-[11px] text-[#b5c1d1]">3</kbd>
-                    </span>
-                  </div>
-
-                  <div className="mt-6 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_274px] gap-8 lg:gap-11 items-start">
-                    <p className="m-0 font-serif text-[17px] leading-[1.6] text-[#b5c1d1]">
-                      Timed Prelims practice with real negative marking (+2.00 / −0.66) and mathematical 50-50 elimination risk tracking. Skip, mark for review, and autopsy your calls before you submit.
-                    </p>
-
-                    <div>
-                      {/* 100-cell question palette */}
-                      <div aria-hidden="true" className="grid grid-cols-10 gap-1.5">
-                        {arenaPalette.map((cell) => (
-                          <span
-                            key={cell.id}
-                            className={`w-[22px] h-[22px] rounded-[5px] border transition-colors ${
-                              cell.status === 'answered'
-                                ? 'bg-[#e0d0ab] border-[#e0d0ab]'
-                                : cell.status === 'review'
-                                ? 'bg-[rgba(224,208,171,0.14)] border-[#e0d0ab]'
-                                : cell.status === 'current'
-                                ? 'border-[#f4ecd8] shadow-[0_0_0_2px_rgba(244,236,216,0.28)]'
-                                : 'bg-transparent border-[rgba(224,208,171,0.16)]'
-                            }`}
-                          />
-                        ))}
-                      </div>
-
-                      <div className="mt-4 flex gap-4 font-serif text-[13px] text-[#7d8ca4]">
-                        <span className="inline-flex items-center gap-1.5">
-                          <span className="w-2.5 h-2.5 rounded-[3px] bg-[#e0d0ab]" /> Answered
-                        </span>
-                        <span className="inline-flex items-center gap-1.5">
-                          <span className="w-2.5 h-2.5 rounded-[3px] bg-[rgba(224,208,171,0.14)] border border-[#e0d0ab]" /> For review
-                        </span>
-                        <span className="inline-flex items-center gap-1.5">
-                          <span className="w-2.5 h-2.5 rounded-[3px] border border-[rgba(224,208,171,0.28)]" /> Not visited
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* ROOM 2: Daily Brief (Col 3, Row 1) */}
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={onNavigateTracker}
-              onKeyDown={(e) => e.key === 'Enter' && onNavigateTracker()}
-              onMouseEnter={() => dispatchRailPeek('brief')}
-              onMouseLeave={() => dispatchRailPeek(null)}
-              onFocus={() => dispatchRailPeek('brief')}
-              onBlur={() => dispatchRailPeek(null)}
-              className="room-cell p-1.5 rounded-[20px] bg-gradient-to-br from-[rgba(224,208,171,0.06)] to-[rgba(224,208,171,0.01)] border border-[rgba(224,208,171,0.12)] hover:border-[rgba(224,208,171,0.38)] cursor-pointer outline-none transition-all flex flex-col"
-            >
-              <div className="h-full bg-[#071630] rounded-[14px] border border-[rgba(224,208,171,0.07)] p-6.5 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-2.5">
-                    <Globe className="w-5 h-5 text-[#e0d0ab]" strokeWidth={1.75} />
-                    <h3 className="m-0 font-sans font-bold text-[22px] tracking-[-0.02em] text-[#f4ecd8]">
-                      Daily Brief
-                    </h3>
-                    <span className="ml-auto inline-flex gap-1">
-                      <kbd className="inline-flex items-center justify-center h-[22px] px-2 border border-[rgba(224,208,171,0.22)] border-b-2 rounded-[5px] font-mono text-[11px] text-[#b5c1d1]">Alt</kbd>
-                      <kbd className="inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 border border-[rgba(224,208,171,0.22)] border-b-2 rounded-[5px] font-mono text-[11px] text-[#b5c1d1]">2</kbd>
-                    </span>
-                  </div>
-                  <p className="mt-4 m-0 font-serif text-[15px] leading-[1.55] text-[#b5c1d1]">
-                    Ten dispatches a day from PIB and Cabinet releases. Each sentence links to its source, and ten questions follow.
-                  </p>
-                </div>
-                <p className="mt-6 m-0 font-serif italic text-[14px] text-[#7d8ca4]">
-                  About four minutes to read.
-                </p>
-              </div>
-            </div>
-
-            {/* ROOM 3: Syllabus Pillars (Col 3, Row 2) */}
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={onNavigateLibrary || onNavigateArena}
-              onKeyDown={(e) => e.key === 'Enter' && (onNavigateLibrary || onNavigateArena)()}
-              onMouseEnter={() => dispatchRailPeek('pillars')}
-              onMouseLeave={() => dispatchRailPeek(null)}
-              onFocus={() => dispatchRailPeek('pillars')}
-              onBlur={() => dispatchRailPeek(null)}
-              className="room-cell p-1.5 rounded-[20px] bg-gradient-to-br from-[rgba(224,208,171,0.06)] to-[rgba(224,208,171,0.01)] border border-[rgba(224,208,171,0.12)] hover:border-[rgba(224,208,171,0.38)] cursor-pointer outline-none transition-all flex flex-col"
-            >
-              <div className="h-full bg-[#071630] rounded-[14px] border border-[rgba(224,208,171,0.07)] p-6.5 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-2.5">
-                    <Layers className="w-5 h-5 text-[#e0d0ab]" strokeWidth={1.75} />
-                    <h3 className="m-0 font-sans font-bold text-[22px] tracking-[-0.02em] text-[#f4ecd8]">
-                      Syllabus Pillars
-                    </h3>
-                    <span className="ml-auto inline-flex gap-1">
-                      <kbd className="inline-flex items-center justify-center h-[22px] px-2 border border-[rgba(224,208,171,0.22)] border-b-2 rounded-[5px] font-mono text-[11px] text-[#b5c1d1]">Alt</kbd>
-                      <kbd className="inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 border border-[rgba(224,208,171,0.22)] border-b-2 rounded-[5px] font-mono text-[11px] text-[#b5c1d1]">4</kbd>
-                    </span>
-                  </div>
-                  <p className="mt-4 m-0 font-serif text-[15px] leading-[1.55] text-[#b5c1d1]">
-                    The Prelims syllabus laid out by subject. Open any topic and practise only that.
-                  </p>
-                </div>
-                <p className="mt-6 m-0 font-serif text-[14px] leading-[1.5] text-[#7d8ca4]">
-                  Polity, History, Geography, Economy, Environment, Science
-                </p>
-              </div>
-            </div>
-
-            {/* ROOM 4: Primary Thinkers (Spans 2 cols, Row 3) */}
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={onNavigateHumanities || onNavigateArena}
-              onKeyDown={(e) => e.key === 'Enter' && (onNavigateHumanities || onNavigateArena)()}
-              onMouseEnter={() => dispatchRailPeek('thinkers')}
-              onMouseLeave={() => dispatchRailPeek(null)}
-              onFocus={() => dispatchRailPeek('thinkers')}
-              onBlur={() => dispatchRailPeek(null)}
-              className="room-cell md:col-span-2 p-1.5 rounded-[20px] bg-gradient-to-br from-[rgba(224,208,171,0.07)] to-[rgba(224,208,171,0.015)] border border-[rgba(224,208,171,0.12)] hover:border-[rgba(224,208,171,0.38)] cursor-pointer outline-none transition-all"
-            >
-              <div className="h-full bg-[#071630] rounded-[14px] border border-[rgba(224,208,171,0.07)] p-6.5 lg:p-7.5 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-2.5">
-                    <BookOpen className="w-5 h-5 text-[#e0d0ab]" strokeWidth={1.75} />
-                    <h3 className="m-0 font-sans font-bold text-[22px] tracking-[-0.02em] text-[#f4ecd8]">
-                      Primary Thinkers
-                    </h3>
-                    <span className="ml-auto inline-flex gap-1">
-                      <kbd className="inline-flex items-center justify-center h-[22px] px-2 border border-[rgba(224,208,171,0.22)] border-b-2 rounded-[5px] font-mono text-[11px] text-[#b5c1d1]">Alt</kbd>
-                      <kbd className="inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 border border-[rgba(224,208,171,0.22)] border-b-2 rounded-[5px] font-mono text-[11px] text-[#b5c1d1]">5</kbd>
-                    </span>
-                  </div>
-
-                  <div className="mt-4.5 grid grid-cols-1 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] gap-8 items-start">
-                    <figure className="m-0 relative pl-7">
-                      <span aria-hidden="true" className="absolute -left-0.5 -top-3 font-serif text-[56px] leading-none text-[#e0d0ab]">“</span>
-                      <blockquote className="m-0 font-serif italic text-[20px] lg:text-[21px] leading-[1.45] text-[#f4ecd8]">
-                        Constitutional morality is not a natural sentiment. It has to be cultivated.
-                      </blockquote>
-                      <figcaption className="mt-2.5 font-sans text-[13px] font-medium text-[#7d8ca4]">
-                        B. R. Ambedkar, Constituent Assembly, 4 November 1948
-                      </figcaption>
-                    </figure>
-                    <p className="m-0 font-serif text-[15px] leading-[1.55] text-[#b5c1d1]">
-                      The original texts the examiner keeps quoting, read in full for GS-4 and the Essay paper.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* ROOM 5: The Observatory (Col 3, Row 3) */}
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={onNavigateObservatory || onNavigateArena}
-              onKeyDown={(e) => e.key === 'Enter' && (onNavigateObservatory || onNavigateArena)()}
-              onMouseEnter={() => dispatchRailPeek('observatory')}
-              onMouseLeave={() => dispatchRailPeek(null)}
-              onFocus={() => dispatchRailPeek('observatory')}
-              onBlur={() => dispatchRailPeek(null)}
-              className="room-cell p-1.5 rounded-[20px] bg-gradient-to-br from-[rgba(224,208,171,0.06)] to-[rgba(224,208,171,0.01)] border border-[rgba(224,208,171,0.12)] hover:border-[rgba(224,208,171,0.38)] cursor-pointer outline-none transition-all flex flex-col"
-            >
-              <div className="h-full bg-[#071630] rounded-[14px] border border-[rgba(224,208,171,0.07)] p-6.5 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-2.5">
-                    <Sparkles className="w-5 h-5 text-[#e0d0ab]" strokeWidth={1.75} />
-                    <h3 className="m-0 font-sans font-bold text-[22px] tracking-[-0.02em] text-[#f4ecd8]">
-                      The Observatory
-                    </h3>
-                    <span className="ml-auto inline-flex gap-1">
-                      <kbd className="inline-flex items-center justify-center h-[22px] px-2 border border-[rgba(224,208,171,0.22)] border-b-2 rounded-[5px] font-mono text-[11px] text-[#b5c1d1]">Alt</kbd>
-                      <kbd className="inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 border border-[rgba(224,208,171,0.22)] border-b-2 rounded-[5px] font-mono text-[11px] text-[#b5c1d1]">6</kbd>
-                    </span>
-                  </div>
-                  <p className="mt-4 m-0 font-serif text-[15px] leading-[1.55] text-[#b5c1d1]">
-                    Prelims papers from 2000 to 2025, sorted by subject and year, so you can see where marks have come from.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* ROOM 6: Leaderboard (Spans 3 cols, Row 4) */}
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={onNavigateLeaderboard || onNavigateArena}
-              onKeyDown={(e) => e.key === 'Enter' && (onNavigateLeaderboard || onNavigateArena)()}
-              onMouseEnter={() => dispatchRailPeek('leaderboard')}
-              onMouseLeave={() => dispatchRailPeek(null)}
-              onFocus={() => dispatchRailPeek('leaderboard')}
-              onBlur={() => dispatchRailPeek(null)}
-              className="room-cell md:col-span-3 p-1.5 rounded-[20px] bg-[rgba(224,208,171,0.02)] border border-[rgba(224,208,171,0.10)] hover:border-[rgba(224,208,171,0.38)] cursor-pointer outline-none transition-all"
-            >
-              <div className="h-full bg-[#071630] rounded-[14px] border border-[rgba(224,208,171,0.06)] px-7 py-4.5 flex items-center gap-4">
-                <Trophy className="w-5 h-5 text-[#e0d0ab]" strokeWidth={1.75} />
-                <h3 className="m-0 font-sans font-bold text-[20px] tracking-[-0.02em] text-[#f4ecd8]">
-                  Leaderboard
-                </h3>
-                <p className="m-0 ml-2.5 font-serif text-[15px] text-[#b5c1d1] hidden sm:inline">
-                  See how your scores rank against other Tark aspirants.
-                </p>
-                <span className="ml-auto inline-flex gap-1">
-                  <kbd className="inline-flex items-center justify-center h-[22px] px-2 border border-[rgba(224,208,171,0.22)] border-b-2 rounded-[5px] font-mono text-[11px] text-[#b5c1d1]">Alt</kbd>
-                  <kbd className="inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 border border-[rgba(224,208,171,0.22)] border-b-2 rounded-[5px] font-mono text-[11px] text-[#b5c1d1]">7</kbd>
-                </span>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════════════
-             SECTION 4: TRUST (How scoring and sources work)
-             ═══════════════════════════════════════════════════════════════════ */}
-        <section aria-labelledby="h-trust" className="px-10 lg:px-16 py-20 border-t border-[rgba(224,208,171,0.06)]">
-          <h2 id="h-trust" className="m-0 font-sans font-extrabold text-[44px] lg:text-[52px] leading-[1.04] tracking-[-0.03em] text-[#f4ecd8]">
-            How scoring and sources work.
-          </h2>
-
-          <div className="mt-10 max-w-[1080px] grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-8">
-            <p className="m-0 font-serif text-[17px] leading-[1.6] text-[#b5c1d1]">
-              <strong className="font-sans font-semibold text-[#f4ecd8]">Questions.</strong> Taken from UPSC Prelims papers from 2000 to 2025, each tagged with its year and paper.
-            </p>
-            <p className="m-0 font-serif text-[17px] leading-[1.6] text-[#b5c1d1]">
-              <strong className="font-sans font-semibold text-[#f4ecd8]">Scoring.</strong> Answers are checked on our server at +2.00 and −0.66. A score cannot be changed from the browser.
-            </p>
-            <p className="m-0 font-serif text-[17px] leading-[1.6] text-[#b5c1d1]">
-              <strong className="font-sans font-semibold text-[#f4ecd8]">Briefs.</strong> Every sentence in the Daily Brief links to the PIB release or Gazette notice it came from. A sentence without a source is dropped.
-            </p>
-            <p className="m-0 font-serif text-[17px] leading-[1.6] text-[#b5c1d1]">
-              <strong className="font-sans font-semibold text-[#f4ecd8]">Privacy.</strong> No ads, no affiliate links, no sponsored content. Your answers are never sold.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={onNavigateManifesto}
-            className="text-link inline-block mt-10 font-sans text-[15px] font-medium text-[#b5c1d1] hover:text-[#f0dfb8] cursor-pointer"
-          >
-            Read the method in the Manifesto
-          </button>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════════════
-             SECTION 5: SEATS (Five hundred lifetime seats)
-             ═══════════════════════════════════════════════════════════════════ */}
-        <section aria-labelledby="h-seats" className="px-10 lg:px-16 py-20 border-t border-[rgba(224,208,171,0.06)]">
-          <h2 id="h-seats" className="m-0 font-sans font-extrabold text-[44px] lg:text-[52px] leading-[1.04] tracking-[-0.03em] text-[#f4ecd8]">
-            Five hundred lifetime seats.
-          </h2>
-          <p className="mt-3.5 m-0 max-w-[620px] font-serif text-[18px] leading-[1.55] text-[#b5c1d1]">
-            One payment, lifetime access, no subscription. When all 500 are taken, membership closes.
-          </p>
-
-          <div className="mt-10 max-w-[1144px]">
-            <div className="flex justify-between items-baseline mb-3.5">
-              <span className="font-mono text-[14px] font-semibold text-[#e0d0ab] tabular-nums">
-                {claimedCount} taken
-              </span>
-              <span className="font-mono text-[14px] text-[#7d8ca4] tabular-nums">
-                {remainingCount} open
-              </span>
-            </div>
-
-            {/* 500-chair visual matrix (50 cols x 10 rows) */}
-            <div
-              role="img"
-              aria-label={`${claimedCount} of 500 seats taken`}
-              className="grid grid-cols-[repeat(50,minmax(0,1fr))] sm:grid-cols-[repeat(50,17px)] gap-1.5 overflow-x-auto pb-2"
-            >
-              {Array.from({ length: 500 }, (_, i) => {
-                const isClaimed = i < claimedCount;
-                return (
-                  <span
-                    key={i}
-                    title={`Seat #${i + 1}: ${isClaimed ? 'Claimed' : 'Available'}`}
-                    className={`block w-[17px] h-[17px] box-border rounded-t-[5px] rounded-b-[3px] transition-colors ${
-                      isClaimed
-                        ? 'bg-[#e0d0ab] border border-[#e0d0ab]'
-                        : 'bg-transparent border border-[rgba(224,208,171,0.20)] hover:border-[rgba(224,208,171,0.50)]'
-                    }`}
-                  />
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="mt-11 flex items-center gap-7 flex-wrap">
-            <button
-              type="button"
-              onClick={onNavigateProfile}
-              className="cta-primary inline-flex items-center gap-3.5 py-1.5 pl-6 pr-1.5 bg-[#e0d0ab] text-[#050b1a] font-sans font-semibold text-[16px] rounded-full shadow-[0_12px_36px_-16px_rgba(224,208,171,0.5)] cursor-pointer"
-            >
-              <span>Reserve a seat</span>
-              <span className="w-10 h-10 rounded-full bg-[rgba(5,11,26,0.12)] inline-flex items-center justify-center">
-                <svg className="cta-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M5 12h14" />
-                  <path d="m12 5 7 7-7 7" />
-                </svg>
-              </span>
-            </button>
-
-            <span className="font-sans text-[15px] font-medium text-[#f4ecd8]">
-              <span className="font-mono text-[#e0d0ab] border border-dashed border-[rgba(224,208,171,0.5)] rounded px-2 py-0.5 mr-1.5">₹399</span>
-              paid once
-            </span>
-
-            <span className="w-[1px] h-[22px] bg-[rgba(224,208,171,0.14)] hidden sm:block" />
-
-            <button
-              type="button"
-              onClick={scrollToDiagnostic}
-              className="text-link font-sans text-[15px] font-medium text-[#b5c1d1] hover:text-[#f0dfb8] cursor-pointer"
-            >
-              Start diagnostic
-            </button>
-
-            <a
-              href="/refund"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigateLegal?.('refund');
-              }}
-              className="text-link font-sans text-[15px] font-medium text-[#7d8ca4] hover:text-[#b5c1d1] cursor-pointer"
-            >
-              Refund terms
+          <div className="landing-hero-actions">
+            <a className="landing-primary" href="/intelligence" onClick={(event) => navigateLocally(event, onNavigateTracker)}>
+              Explore Intelligence <ArrowRight size={19} aria-hidden="true" />
+            </a>
+            <a className="landing-quiet-link" href="#landing-practice">
+              Try a question <ArrowDown size={15} aria-hidden="true" />
             </a>
           </div>
-        </section>
+          <p className="landing-hero-note">Made for UPSC. Built around understanding.</p>
+        </div>
+        <div className="landing-hero-preview"><IntelligencePreview /></div>
+        <div className="landing-hero-caption">
+          <span>A headline is a starting point.</span>
+          <span>The connections are where the learning begins.</span>
+        </div>
+      </section>
 
-        {/* ═══════════════════════════════════════════════════════════════════
-             SECTION 6: FOOTER
-             ═══════════════════════════════════════════════════════════════════ */}
-        <footer className="mt-auto px-10 lg:px-16 py-8 border-t border-[rgba(224,208,171,0.08)] flex flex-col justify-between gap-6">
-          <div className="flex items-baseline justify-between flex-wrap gap-4">
-            <span className="font-sans font-extrabold text-[17px] tracking-[0.04em] text-[#e0d0ab]">
-              TARK
-            </span>
-            <nav aria-label="Footer" className="flex gap-7 font-sans text-[13px] text-[#b5c1d1]">
-              <a
-                href="/manifesto"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onNavigateManifesto?.();
-                }}
-                className="text-link cursor-pointer"
-              >
-                Manifesto
-              </a>
-              <a
-                href="/refund"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onNavigateLegal?.('refund');
-                }}
-                className="text-link cursor-pointer"
-              >
-                Refund
-              </a>
-              <a
-                href="/privacy"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onNavigateLegal?.('privacy');
-                }}
-                className="text-link cursor-pointer"
-              >
-                Privacy
-              </a>
-              <a
-                href="/terms"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onNavigateLegal?.('terms');
-                }}
-                className="text-link cursor-pointer"
-              >
-                Terms
-              </a>
-            </nav>
+      <section className="landing-reading landing-shell" aria-labelledby="landing-reading-title">
+        <div className="landing-reading-heading">
+          <h2 id="landing-reading-title">A clearer way<br />to stay current.</h2>
+          <a className="landing-text-link" href="/intelligence" onClick={(event) => navigateLocally(event, onNavigateTracker)}>
+            Open the reading desk <ArrowRight size={17} aria-hidden="true" />
+          </a>
+        </div>
+        <div className="landing-reading-notes">
+          <div>
+            <h3>The story, in focus.</h3>
+            <p>Concise briefs put the key developments first. Follow the source when you want the full picture.</p>
           </div>
-          <p className="m-0 font-serif italic text-[13px] text-[#7d8ca4]">
-            No ads. No affiliate links. No sponsored content.
-          </p>
-        </footer>
+          <div>
+            <h3>A place in the syllabus.</h3>
+            <p>Move between the news and its wider themes, from governance and the economy to science and the environment.</p>
+          </div>
+          <div>
+            <h3>Something to return to.</h3>
+            <p>Save a useful article. Revisit the ideas that matter to your preparation, at your own pace.</p>
+          </div>
+        </div>
+      </section>
 
-      </div>
+      <section className="landing-practice" id="landing-practice" aria-labelledby="landing-practice-title">
+        <div className="landing-shell landing-practice-layout">
+          <div className="landing-practice-copy">
+            <BookOpen className="landing-practice-icon" size={29} strokeWidth={1.3} aria-hidden="true" />
+            <h2 id="landing-practice-title">Reading is a start.<br /><em>Make it stick.</em></h2>
+            <p>Put an idea to the test. Work through a question, examine your reasoning, and see what needs another look.</p>
+            <p className="landing-practice-invitation">Start with one from the UPSC archive.</p>
+            <div className="landing-practice-links">
+              <a className="landing-text-link" href="/arena" onClick={(event) => navigateLocally(event, onNavigateArena)}>
+                Enter the Test Arena <ArrowRight size={17} aria-hidden="true" />
+              </a>
+              {onNavigateLibrary && (
+                <a className="landing-quiet-link" href="/library" onClick={(event) => navigateLocally(event, onNavigateLibrary)}>
+                  Browse past papers
+                </a>
+              )}
+              {onLaunchConveyor && (
+                <button className="landing-quiet-link" type="button" onClick={onLaunchConveyor}>
+                  Try the 8-minute challenge <ChevronRight size={15} aria-hidden="true" />
+                </button>
+              )}
+            </div>
+          </div>
+          <LandingTrial onNavigateArena={onNavigateArena} />
+        </div>
+      </section>
+
+      <section className="landing-membership landing-shell" aria-labelledby="landing-membership-title">
+        <div>
+          <h2 id="landing-membership-title">Your preparation.<br />A little more deliberate.</h2>
+          <p>Find your next read in Intelligence. Make room for practice when you're ready.</p>
+          <a className="landing-primary" href="/intelligence" onClick={(event) => navigateLocally(event, onNavigateTracker)}>
+            Find your next read <ArrowRight size={19} aria-hidden="true" />
+          </a>
+        </div>
+        <aside className="landing-membership-note" aria-label="Tark membership">
+          <span className="landing-membership-price">₹399<span> / paid once</span></span>
+          <p>Make Tark part of your routine with lifetime membership.</p>
+          <button className="landing-text-link" type="button" onClick={onNavigateProfile}>
+            Explore membership <ArrowRight size={17} aria-hidden="true" />
+          </button>
+          <a className="landing-quiet-link" href="/refund" onClick={(event) => navigateLocally(event, onNavigateLegal ? () => onNavigateLegal('refund') : undefined)}>
+            Read the refund terms
+          </a>
+        </aside>
+      </section>
+
+      <footer className="landing-footer landing-shell">
+        <a className="landing-footer-brand" href="/" aria-label="Tark home">
+          <img src="/logos/tark-wordmark-gold.svg" alt="Tark" width="82" height="28" loading="lazy" />
+        </a>
+        <p>A little more clarity. Every day.</p>
+        <nav aria-label="Landing footer">
+          <a href="/manifesto" onClick={(event) => navigateLocally(event, onNavigateManifesto)}>Our approach</a>
+          {(['privacy', 'terms', 'refund'] as const).map((type) => (
+            <a key={type} href={`/${type}`} onClick={(event) => navigateLocally(event, onNavigateLegal ? () => onNavigateLegal(type) : undefined)}>
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </a>
+          ))}
+        </nav>
+      </footer>
     </div>
   );
 }

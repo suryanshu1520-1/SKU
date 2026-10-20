@@ -1,0 +1,323 @@
+.landing-trial {
+  width: 100%;
+  min-width: 0;
+  color: #f4ecd8;
+  background: #071630;
+  border: 1px solid rgba(224, 208, 171, 0.2);
+  font-family: var(--font-sans, "Bricolage Grotesque", sans-serif);
+}
+
+.landing-trial__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  min-height: 58px;
+  padding: 10px 26px;
+  border-bottom: 1px solid rgba(224, 208, 171, 0.12);
+  font-size: 12px;
+}
+
+.landing-trial__eyebrow {
+  color: #e0d0ab;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.landing-trial__header a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  color: #b5c1d1;
+  text-underline-offset: 4px;
+}
+
+.landing-trial__header a:hover {
+  color: #f4ecd8;
+}
+
+.landing-trial__paper {
+  padding: 28px 26px 22px;
+}
+
+.landing-trial__question {
+  margin: 0;
+  font-family: var(--font-serif, "Newsreader", Georgia, serif);
+  font-size: 25px;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+}
+
+.landing-trial__countries {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  list-style: none;
+  gap: 0 24px;
+  margin: 18px 0 20px;
+  padding: 0;
+}
+
+.landing-trial__country {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  font-family: var(--font-serif, "Newsreader", Georgia, serif);
+  font-size: 18px;
+  color: #b5c1d1;
+  transition: color 280ms ease;
+}
+
+.landing-trial__country.is-evidence {
+  color: #f4ecd8;
+}
+
+.landing-trial__country svg {
+  flex-shrink: 0;
+  color: #e0d0ab;
+}
+
+.landing-trial__country-number {
+  color: #b5c1d1;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.landing-trial__prompt {
+  margin: 0 0 21px;
+  max-width: 36ch;
+  font-family: var(--font-serif, "Newsreader", Georgia, serif);
+  font-size: 21px;
+  line-height: 1.45;
+}
+
+.landing-trial__options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.landing-trial__option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 52px;
+  padding: 11px 13px;
+  border: 1px solid rgba(224, 208, 171, 0.2);
+  color: #b5c1d1;
+  font-size: 13px;
+  line-height: 1.35;
+  cursor: pointer;
+  transition: color 220ms ease, border-color 220ms ease, background-color 220ms ease;
+}
+
+.landing-trial__option:hover,
+.landing-trial__option.is-selected {
+  border-color: #e0d0ab;
+  background: rgba(224, 208, 171, 0.06);
+  color: #f4ecd8;
+}
+
+.landing-trial__option:has(input:focus-visible) {
+  outline: 2px solid #e0d0ab;
+  outline-offset: 3px;
+}
+
+.landing-trial__option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.landing-trial__option-letter {
+  display: inline-flex;
+  flex: 0 0 22px;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(224, 208, 171, 0.28);
+  border-radius: 50%;
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+}
+
+.landing-trial__option.is-correct {
+  border-color: #0194a8;
+  color: #f4ecd8;
+  background: rgba(1, 148, 168, 0.1);
+}
+
+.landing-trial__option.is-correct .landing-trial__option-letter {
+  color: #050b1a;
+  background: #e0d0ab;
+  border-color: #e0d0ab;
+}
+
+.landing-trial__option.is-incorrect {
+  border-color: rgba(248, 113, 113, 0.65);
+  background: rgba(248, 113, 113, 0.05);
+}
+
+.landing-trial__options:disabled .landing-trial__option {
+  cursor: default;
+}
+
+.landing-trial__result-frame {
+  overflow: hidden;
+}
+
+.landing-trial__result {
+  margin-top: 21px;
+  padding: 18px 0 0 16px;
+  border-left: 1px solid #0194a8;
+}
+
+.landing-trial__result p {
+  margin: 8px 0 0;
+  color: #b5c1d1;
+  font-family: var(--font-serif, "Newsreader", Georgia, serif);
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.landing-trial__result .landing-trial__result-title {
+  margin-top: 0;
+  color: #e0d0ab;
+  font-family: var(--font-sans, "Bricolage Grotesque", sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.landing-trial__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 23px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(224, 208, 171, 0.14);
+}
+
+.landing-trial__actions :is(button, a) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.landing-trial__actions .landing-trial__check {
+  padding: 10px 16px;
+  border: 1px solid #e0d0ab;
+  background: #e0d0ab;
+  color: #050b1a;
+  font-weight: 600;
+  transition: opacity 200ms ease;
+}
+
+.landing-trial__check:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.landing-trial__arena {
+  padding: 10px 0;
+  border: 0;
+  background: transparent;
+  color: #e0d0ab;
+}
+
+.landing-trial__arena svg {
+  transition: transform 220ms ease;
+}
+
+.landing-trial__arena:hover svg {
+  transform: translateX(3px);
+}
+
+.landing-trial :is(a, button):focus-visible {
+  outline: 2px solid #e0d0ab;
+  outline-offset: 4px;
+}
+
+.landing-trial__note {
+  margin: 0;
+  padding: 14px 26px;
+  border-top: 1px solid rgba(224, 208, 171, 0.12);
+  color: #b5c1d1;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.landing-trial__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 480px) {
+  .landing-trial__header,
+  .landing-trial__note {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .landing-trial__header a {
+    min-height: 44px;
+  }
+
+  .landing-trial__paper {
+    padding: 24px 18px 18px;
+  }
+
+  .landing-trial__question {
+    font-size: 24px;
+  }
+
+  .landing-trial__option {
+    gap: 8px;
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .landing-trial__countries {
+    column-gap: 14px;
+  }
+
+  .landing-trial__actions {
+    column-gap: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-trial *,
+  .landing-trial *::before,
+  .landing-trial *::after {
+    transition: none !important;
+  }
+}
