@@ -136,7 +136,12 @@ export const STUDY_VIEW_LABEL: Record<StudyView, string> = {
 };
 
 export function resourcesForSubject(subjectId: string, view?: StudyView): StudyResource[] {
-  return STUDY_RESOURCES.filter((resource) => resource.subjectId === subjectId && (!view || resource.view === view));
+  const resources = STUDY_RESOURCES.filter((resource) => resource.subjectId === subjectId && (!view || resource.view === view));
+  // The reference collection leads with its lookup tables; explanations remain
+  // available alongside them rather than becoming the default entry point.
+  return STUDY_SUBJECTS.find((subject) => subject.id === subjectId)?.paper === 'STATIC_GK'
+    ? resources.sort((a, b) => Number(b.kind === 'reference') - Number(a.kind === 'reference'))
+    : resources;
 }
 export function searchStudyResources(query: string): StudyResource[] {
   const terms = query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);

@@ -77,7 +77,11 @@ export default function StudyResourceContent({ resource }: { resource: StudyReso
     case 'map':
       return <ConceptExplorer map={resource.content} />;
     case 'reference':
-      return <ReferenceExplorer matrix={resource.content} />;
+      return <ReferenceExplorer matrix={{
+        ...resource.content,
+        title: resource.title,
+        headers: resource.content.headers.map((header) => header.replace('Ecological / High-Yield Significance', 'Ecological significance')),
+      }} />;
     case 'answer':
       return <AnswerOutline outline={resource.content} />;
   }

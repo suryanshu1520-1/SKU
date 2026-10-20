@@ -85,6 +85,7 @@ test('static reference opens comparison resources by default, including after an
     const selected = assertUsableSelection(params);
     assert.equal(selected.subjectId, reference);
     assert.equal(selected.view, 'explore');
+    assert.equal(STUDY_RESOURCES.find((entry) => entry.id === selected.itemId)?.kind, 'reference');
   }
 });
 
