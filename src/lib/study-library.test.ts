@@ -97,6 +97,14 @@ test('CSAT writing links fall back to study notes without offering the unsupport
   assert.equal(searchStudyResources('guaranteed qualification').length, 0);
 });
 
+test('the unreviewed protected-area legal hierarchy is withheld from interactive study', () => {
+  assert.ok(!STUDY_RESOURCES.some((entry) => entry.kind === 'map' && entry.content.id === 'mm-pa-hierarchy'));
+  const selected = assertUsableSelection(new URLSearchParams({
+    subject: subjectId('STATIC_GK'), view: 'explore', item: `${subjectId('STATIC_GK')}:map:mm-pa-hierarchy`,
+  }));
+  assert.equal(selected.view, 'explore');
+});
+
 test('global search finds information inside reference-table cells across subjects', () => {
   const results = searchStudyResources('  SANGAI   deer  ');
   const wetlands = results.find((entry) => entry.kind === 'reference' && entry.content.id === 'stat-ramsar-matrix');

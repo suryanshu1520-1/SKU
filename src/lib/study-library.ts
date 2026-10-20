@@ -105,6 +105,9 @@ export const STUDY_RESOURCES: StudyResource[] = SUBJECT_PILLARS.flatMap((subject
       title: content.theme, content, searchText: [content.theme, content.examinerTrap].join(' ') });
   });
   subject.mindMaps.forEach((content) => {
+    // The legacy protected-area map asserts an unreviewed legal hierarchy.
+    // Withhold it rather than turn that claim into an interactive sequence.
+    if (content.id === 'mm-pa-hierarchy') return;
     const title = MAP_TITLES[content.id] || content.title;
     items.push({ ...base, id: `${subject.id}:map:${content.id}`, kind: 'map', view: 'explore', title, content,
       searchText: [title, content.title, content.subtitle, content.rootQuestion || '', ...content.details, ...(content.examples || [])].join(' ') });
