@@ -58,7 +58,7 @@ export default function Landing({
           </div>
           <p className="landing-hero-note">Made for UPSC. Built around understanding.</p>
         </div>
-        <div className="landing-hero-preview"><IntelligencePreview /></div>
+        <div className="landing-hero-preview"><IntelligencePreview onNavigateTracker={onNavigateTracker} /></div>
         <div className="landing-hero-caption">
           <span>A headline is a starting point.</span>
           <span>The connections are where the learning begins.</span>
