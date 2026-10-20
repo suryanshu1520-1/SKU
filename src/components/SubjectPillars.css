@@ -40,7 +40,7 @@
 }
 .study-header h1 {
   margin-bottom: 10px;
-  font-size: clamp(30px, 3.4vw, 40px);
+  font-size: 40px;
   font-weight: 550;
   line-height: 1.1;
   letter-spacing: -.04em;
@@ -231,6 +231,7 @@
   .study-reader-layout { grid-template-columns: 210px minmax(0, 1fr); }
 }
 @container study (max-width: 700px) {
+  .study-header h1 { font-size: 32px; }
   .study-header { align-items: stretch; flex-direction: column; gap: 22px; padding-bottom: 24px; margin-bottom: 24px; }
   .study-search { width: 100%; }
   .study-subject-header { flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }

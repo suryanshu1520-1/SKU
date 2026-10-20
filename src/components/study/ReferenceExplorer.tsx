@@ -110,7 +110,7 @@ function ReferenceExplorerBody({ matrix }: ReferenceExplorerProps) {
             <p className="study-reference-recall-instruction">Recall the details, then reveal them to compare.</p>
             <div className="study-reference-prompt" aria-live="polite" aria-atomic="true">
               <p>{headers[0]}</p>
-              <h3>{currentRow[0] || '—'}</h3>
+              <h4>{currentRow[0] || '—'}</h4>
             </div>
             <button
               type="button"
