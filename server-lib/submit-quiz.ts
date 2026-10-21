@@ -13,12 +13,12 @@ function cleanEnvValue(val: any): string {
   return cleaned.trim();
 }
 
-const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-if (!rawSupabaseUrl) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing.");
-const rawServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-if (!rawServiceKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
-
-const supabase = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawServiceKey));
+function getSupabase(): any {
+  const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+  const rawServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!rawSupabaseUrl || !rawServiceKey) return null;
+  return createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawServiceKey));
+}
 
 interface AnswerMap {
   [questionId: string]: string;
@@ -70,6 +70,11 @@ export default async function handler(req: any, res: any) {
   
   if (!token) {
     return res.status(401).json({ error: "UNAUTHORIZED", message: "Missing authorization token." });
+  }
+
+  const supabase = getSupabase();
+  if (!supabase) {
+    return res.status(503).json({ error: "SERVICE_UNAVAILABLE", message: "Evaluation service database unavailable." });
   }
   
   const { data: { user }, error: authError } = await supabase.auth.getUser(token);

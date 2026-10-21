@@ -24,7 +24,7 @@ function getSupabaseClient() {
 
 let cachedIndexHtml: string | null = null;
 
-function getBaseHtml(): string {
+export function getBaseHtml(): string {
   if (cachedIndexHtml && process.env.NODE_ENV === 'production') {
     return cachedIndexHtml;
   }

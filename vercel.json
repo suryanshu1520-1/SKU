@@ -48,7 +48,8 @@
   "functions": {
     "api/server.ts": {
       "memory": 512,
-      "maxDuration": 30
+      "maxDuration": 30,
+      "includeFiles": "{dist/**,src/data/**}"
     }
   },
   "crons": [

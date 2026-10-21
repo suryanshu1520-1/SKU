@@ -1,3 +1,4 @@
+import "../server-lib/load-env.js";
 import express from "express";
 import bookmarkHandler from "../server-lib/bookmark.js";
 import explanationHandler from "../server-lib/explanation.js";
@@ -25,6 +26,7 @@ import {
 import { analyticsRouter } from "../server-lib/analytics/routes.js";
 import { syllabusRouter, handleUserSyllabusProgress } from "../server-lib/syllabus/routes.js";
 import { seoRouter } from "../server-lib/seo/routes.js";
+import { getBaseHtml } from "../server-lib/seo/bot-renderer.js";
 import {
   examCatalogHandler,
   examStartHandler,
@@ -79,6 +81,26 @@ app.use("/api/analytics", analyticsRouter);
 app.use("/api/syllabus", syllabusRouter);
 app.get("/api/me/syllabus-progress", handleUserSyllabusProgress);
 
-export default async function handler(req: any, res: any) {
-  return app(req, res);
-}
+// Fallback route for SPA pages that were rewritten by vercel.json (e.g. /intelligence, /observatory, etc.)
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ success: false, error: 'Endpoint not found' });
+  }
+  const baseHtml = getBaseHtml();
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  return res.status(200).send(baseHtml);
+});
+
+// Centralized error handling middleware so uncaught exceptions never crash Vercel invocation
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error('[api/server] Unhandled server error:', err);
+  if (res.headersSent) return next(err);
+  if (req.path.startsWith('/api/')) {
+    return res.status(500).json({ success: false, error: 'Internal Server Error', message: err?.message || 'Unknown error' });
+  }
+  const baseHtml = getBaseHtml();
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  return res.status(200).send(baseHtml);
+});
+
+export default app;

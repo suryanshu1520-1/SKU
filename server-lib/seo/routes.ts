@@ -8,6 +8,7 @@ import {
   renderMinistryHubSeoHtml,
   renderDailyEditionSeoHtml,
   renderLegalSeoHtml,
+  getBaseHtml,
 } from './bot-renderer.js';
 import { INDEXNOW_KEY, submitToIndexNow } from './indexnow.js';
 
@@ -77,8 +78,11 @@ seoRouter.get(['/sitemap-news.xml', '/api/sitemap-news.xml'], async (_req: Reque
 // 5. Programmatic GS Syllabus Hubs (/intelligence/gs-1, /intelligence/gs-2, /intelligence/gs-3, /intelligence/gs-4)
 seoRouter.get(
   ['/intelligence/gs-:paper', '/news/gs-:paper'],
-  async (req: Request, res: Response, next: NextFunction) => {
-    if (!shouldServeSeoHtml(req)) return next();
+  async (req: Request, res: Response, _next: NextFunction) => {
+    if (!shouldServeSeoHtml(req)) {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(200).send(getBaseHtml());
+    }
     try {
       const paper = req.params.paper || '1';
       const html = await renderGsHubSeoHtml(`gs-${paper}`);
@@ -87,7 +91,8 @@ seoRouter.get(
       return res.status(200).send(html);
     } catch (err) {
       console.warn('[seo-router] Error rendering GS hub SEO:', err);
-      return next();
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(200).send(getBaseHtml());
     }
   }
 );
@@ -95,8 +100,11 @@ seoRouter.get(
 // 6. Programmatic Ministry Hubs (/intelligence/ministry/:slug)
 seoRouter.get(
   ['/intelligence/ministry/:slug', '/news/ministry/:slug'],
-  async (req: Request, res: Response, next: NextFunction) => {
-    if (!shouldServeSeoHtml(req)) return next();
+  async (req: Request, res: Response, _next: NextFunction) => {
+    if (!shouldServeSeoHtml(req)) {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(200).send(getBaseHtml());
+    }
     try {
       const slug = req.params.slug || '';
       const html = await renderMinistryHubSeoHtml(slug);
@@ -105,14 +113,18 @@ seoRouter.get(
       return res.status(200).send(html);
     } catch (err) {
       console.warn('[seo-router] Error rendering ministry hub SEO:', err);
-      return next();
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(200).send(getBaseHtml());
     }
   }
 );
 
 // 7. Daily Edition Archive SSR (/daily-edition/:date and /daily-edition)
-seoRouter.get('/daily-edition/:date', async (req: Request, res: Response, next: NextFunction) => {
-  if (!shouldServeSeoHtml(req)) return next();
+seoRouter.get('/daily-edition/:date', async (req: Request, res: Response, _next: NextFunction) => {
+  if (!shouldServeSeoHtml(req)) {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(200).send(getBaseHtml());
+  }
   try {
     const html = await renderDailyEditionSeoHtml(req.params.date);
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -120,12 +132,16 @@ seoRouter.get('/daily-edition/:date', async (req: Request, res: Response, next: 
     return res.status(200).send(html);
   } catch (err) {
     console.warn('[seo-router] Error rendering daily edition date SEO:', err);
-    return next();
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(200).send(getBaseHtml());
   }
 });
 
-seoRouter.get('/daily-edition', async (req: Request, res: Response, next: NextFunction) => {
-  if (!shouldServeSeoHtml(req)) return next();
+seoRouter.get('/daily-edition', async (req: Request, res: Response, _next: NextFunction) => {
+  if (!shouldServeSeoHtml(req)) {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(200).send(getBaseHtml());
+  }
   try {
     const html = await renderDailyEditionSeoHtml();
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -133,13 +149,17 @@ seoRouter.get('/daily-edition', async (req: Request, res: Response, next: NextFu
     return res.status(200).send(html);
   } catch (err) {
     console.warn('[seo-router] Error rendering daily edition SEO:', err);
-    return next();
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(200).send(getBaseHtml());
   }
 });
 
 // 8. Intelligence & News Article Routes Handler
-async function handleIntelligenceRoute(req: Request, res: Response, next: NextFunction) {
-  if (!shouldServeSeoHtml(req)) return next();
+async function handleIntelligenceRoute(req: Request, res: Response, _next: NextFunction) {
+  if (!shouldServeSeoHtml(req)) {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(200).send(getBaseHtml());
+  }
   try {
     const queryId = typeof req.query.id === 'string' ? req.query.id : undefined;
     const article = await fetchArticleForSeo(req.path, queryId);
@@ -157,13 +177,17 @@ async function handleIntelligenceRoute(req: Request, res: Response, next: NextFu
     return res.status(200).send(hubHtml);
   } catch (err) {
     console.warn('[seo-router] Error rendering intelligence SEO:', err);
-    return next();
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(200).send(getBaseHtml());
   }
 }
 
 // 9. PRS Legislative Vault Routes Handler
-async function handlePrsRoute(req: Request, res: Response, next: NextFunction) {
-  if (!shouldServeSeoHtml(req)) return next();
+async function handlePrsRoute(req: Request, res: Response, _next: NextFunction) {
+  if (!shouldServeSeoHtml(req)) {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(200).send(getBaseHtml());
+  }
   try {
     const queryId = typeof req.query.id === 'string' ? req.query.id : undefined;
     const article = await fetchArticleForSeo(req.path, queryId);
@@ -181,7 +205,8 @@ async function handlePrsRoute(req: Request, res: Response, next: NextFunction) {
     return res.status(200).send(hubHtml);
   } catch (err) {
     console.warn('[seo-router] Error rendering PRS SEO:', err);
-    return next();
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(200).send(getBaseHtml());
   }
 }
 
@@ -191,8 +216,11 @@ seoRouter.get(['/prs', '/prs/:slug'], handlePrsRoute);
 // 10. Legal & Statutory Compliance Routes (Privacy Policy, Terms of Service, Refund Policy)
 seoRouter.get(
   ['/privacy', '/terms', '/refund', '/api/privacy', '/api/terms', '/api/refund'],
-  (req: Request, res: Response, next: NextFunction) => {
-    if (!shouldServeSeoHtml(req)) return next();
+  (req: Request, res: Response, _next: NextFunction) => {
+    if (!shouldServeSeoHtml(req)) {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(200).send(getBaseHtml());
+    }
     const path = req.path.toLowerCase();
     let type: 'privacy' | 'terms' | 'refund' = 'privacy';
     if (path.includes('terms')) type = 'terms';
@@ -218,8 +246,11 @@ const HUB_ROUTES: Record<string, Parameters<typeof renderHubSeoHtml>[0]> = {
 };
 
 for (const [routePath, section] of Object.entries(HUB_ROUTES)) {
-  seoRouter.get([routePath, `${routePath}/:sub*`], async (req: Request, res: Response, next: NextFunction) => {
-    if (!shouldServeSeoHtml(req)) return next();
+  seoRouter.get([routePath, `${routePath}/:sub*`], async (req: Request, res: Response, _next: NextFunction) => {
+    if (!shouldServeSeoHtml(req)) {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(200).send(getBaseHtml());
+    }
     try {
       const html = await renderHubSeoHtml(section);
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -227,7 +258,8 @@ for (const [routePath, section] of Object.entries(HUB_ROUTES)) {
       return res.status(200).send(html);
     } catch (err) {
       console.warn(`[seo-router] Error rendering hub ${section}:`, err);
-      return next();
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(200).send(getBaseHtml());
     }
   });
 }

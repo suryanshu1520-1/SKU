@@ -14,11 +14,12 @@ function cleanEnvValue(val: any): string {
   return cleaned.trim();
 }
 
-const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-if (!rawSupabaseUrl) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing.");
-const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-if (!rawSupabaseKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
-const supabase = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey));
+function getSupabase(): any {
+  const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+  const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!rawSupabaseUrl || !rawSupabaseKey) return null;
+  return createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey));
+}
 
 const COOLDOWN_SECONDS = 300; // 5 minutes user-level throttle
 
@@ -36,6 +37,11 @@ export default async function handler(req: any, res: any) {
 
   if (!token) {
     return res.status(401).json({ error: 'UNAUTHORIZED', message: 'Missing authorization token.' });
+  }
+
+  const supabase = getSupabase();
+  if (!supabase) {
+    return res.status(503).json({ error: 'SERVICE_UNAVAILABLE', message: 'Feed sync service unavailable.' });
   }
 
   const { data: { user }, error: authError } = await supabase.auth.getUser(token);

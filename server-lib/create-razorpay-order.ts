@@ -13,16 +13,22 @@ function cleanEnvValue(val: any): string {
   return cleaned.trim();
 }
 
-const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-if (!rawSupabaseUrl) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing.");
-const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-if (!rawSupabaseKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
-const supabaseServer = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey));
+function getSupabaseServer(): any {
+  const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+  const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!rawSupabaseUrl || !rawSupabaseKey) return null;
+  return createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey));
+}
 
 export default async function handler(req: any, res: any) {
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
+  }
+
+  const supabaseServer = getSupabaseServer();
+  if (!supabaseServer) {
+    return res.status(503).json({ error: "SERVICE_UNAVAILABLE", message: "Order creation database unavailable." });
   }
 
   // Ensure it's a POST request

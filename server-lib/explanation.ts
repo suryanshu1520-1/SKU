@@ -16,16 +16,26 @@ function cleanEnvValue(val: any): string {
   return cleaned.trim();
 }
 
-const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-if (!rawSupabaseUrl) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase URL missing.");
-const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-if (!rawSupabaseKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Secret missing.");
-const supabaseServer = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey));
+let _supabaseServer: any = null;
+let _supabaseAnon: any = null;
 
-// Dedicated anon role client for accessing restricted tables (e.g., static_questions) bypass permission denied issues
-const rawSupabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
-if (!rawSupabaseAnonKey) throw new Error("CRITICAL_ENVIRONMENT_FAULT: Supabase Anon Key missing.");
-const supabaseAnon = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseAnonKey));
+function getSupabaseServer(): any {
+  if (_supabaseServer) return _supabaseServer;
+  const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+  const rawSupabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+  if (!rawSupabaseUrl || !rawSupabaseKey) return null;
+  _supabaseServer = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseKey));
+  return _supabaseServer;
+}
+
+function getSupabaseAnon(): any {
+  if (_supabaseAnon) return _supabaseAnon;
+  const rawSupabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+  const rawSupabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+  if (!rawSupabaseUrl || !rawSupabaseAnonKey) return null;
+  _supabaseAnon = createClient(cleanEnvValue(rawSupabaseUrl), cleanEnvValue(rawSupabaseAnonKey));
+  return _supabaseAnon;
+}
 
 // File-based cache removed for Vercel serverless compatibility.
 
@@ -74,7 +84,11 @@ async function generateContentWithRetry(aiClient: any, params: any, maxRetries =
  * Returns the new count on success, or throws on failure.
  */
 async function incrementInsightLedger(userId: string): Promise<number> {
-  const { data, error } = await supabaseServer.rpc('increment_insight_count', {
+  const supabase = getSupabaseServer();
+  if (!supabase) {
+    throw new Error("Supabase client unavailable");
+  }
+  const { data, error } = await supabase.rpc('increment_insight_count', {
     user_id_param: userId,
   });
 
@@ -115,6 +129,11 @@ export default async function handler(req: any, res: any) {
   const token = authHeader.replace(/^Bearer\s+/, '').trim();
   if (!token) {
     return res.status(401).json({ error: "UNAUTHORIZED", message: "Missing authorization token." });
+  }
+
+  const supabaseServer = getSupabaseServer();
+  if (!supabaseServer) {
+    return res.status(503).json({ error: "SERVICE_UNAVAILABLE", message: "Database service unavailable." });
   }
 
   const { data: { user }, error: authError } = await supabaseServer.auth.getUser(token);
