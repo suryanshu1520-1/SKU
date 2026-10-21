@@ -22,6 +22,9 @@ function getSupabase() {
   return createClient(url, key);
 }
 
+// classify.ts deriveMinistry() falls back to this literal; current_affairs stores no separate ministry_source.
+const FALLBACK_MINISTRY = "Government of India";
+
 function getGitSha(): string {
   if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA;
   try {
@@ -266,19 +269,13 @@ export async function gatherInputs(today: string, client?: any): Promise<EvalInp
       // 6.3 pib_non_fallback_ministry_rate
       const { data: pibRows, error: pibErr } = await supabase
         .from("current_affairs")
-        .select("id, source_meta")
+        .select("id, ministry")
         .eq("source", "PIB")
         .order("created_at", { ascending: false })
         .limit(200);
 
       if (!pibErr && Array.isArray(pibRows) && pibRows.length > 0) {
-        let nonFallback = 0;
-        for (const row of pibRows) {
-          const meta = row.source_meta || {};
-          if (meta.ministry_source !== "fallback") {
-            nonFallback++;
-          }
-        }
+        const nonFallback = pibRows.filter((row) => row.ministry && row.ministry !== FALLBACK_MINISTRY).length;
         inputs.pib_non_fallback_ministry_rate = nonFallback / pibRows.length;
         inputs.pib_total = pibRows.length;
       }
@@ -286,12 +283,12 @@ export async function gatherInputs(today: string, client?: any): Promise<EvalInp
       // 6.4 passing_rows_node_id_rate
       const { data: passRows, error: passErr } = await supabase
         .from("current_affairs")
-        .select("id, syllabus_node_id")
+        .select("id, node_id")
         .order("created_at", { ascending: false })
         .limit(200);
 
       if (!passErr && Array.isArray(passRows) && passRows.length > 0) {
-        const withNode = passRows.filter((r) => r.syllabus_node_id !== null).length;
+        const withNode = passRows.filter((r) => r.node_id != null).length;
         inputs.passing_rows_node_id_rate = withNode / passRows.length;
         inputs.passing_rows_total = passRows.length;
       }

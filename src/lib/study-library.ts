@@ -5,7 +5,7 @@ import {
   type StaticFactMatrix,
   type PyqEvidenceStat,
   type MainsBlueprint,
-} from '../data/subject-pillars-data';
+} from '../data/subject-pillars-data.js';
 
 export type StudyView = 'notes' | 'explore' | 'writing';
 export type StudyResourceKind = 'note' | 'map' | 'reference' | 'exam-note' | 'answer';

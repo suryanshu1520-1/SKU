@@ -5,7 +5,8 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "isolatedModules": false,
-    "noEmit": true
+    "noEmit": true,
+    "rewriteRelativeImportExtensions": true
   },
   "include": ["./**/*.ts", "./**/*.tsx", "../types/**/*.d.ts"]
 }
