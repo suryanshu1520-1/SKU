@@ -56,7 +56,7 @@ const MINISTRY_ALIASES: Record<string, string[]> = {
   "Reserve Bank of India": ["RBI"],
 };
 
-import { normUnicode } from "../../text/normalize.ts";
+import { normUnicode } from "../../text/normalize.js";
 import pibMinistriesData from "./data/pib-ministries.json" with { type: "json" };
 
 export interface PibMinistryEntry {

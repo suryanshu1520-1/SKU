@@ -9,10 +9,10 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
-import { surge, type SurgeNodeInput } from "../policy/surge.ts";
-import { NODES } from "./ingest/syllabus/nodes.ts";
-import { estimateTestability } from "./ingest/syllabus/testability.ts";
-import type { Evidence } from "./ingest/syllabus/types.ts";
+import { surge, type SurgeNodeInput } from "../policy/surge.js";
+import { NODES } from "./ingest/syllabus/nodes.js";
+import { estimateTestability } from "./ingest/syllabus/testability.js";
+import type { Evidence } from "./ingest/syllabus/types.js";
 
 function getSupabase() {
   const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;

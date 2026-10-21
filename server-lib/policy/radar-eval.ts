@@ -6,7 +6,7 @@
  * TASK_085R
  */
 
-import { wilsonLower } from "./logreg.ts";
+import { wilsonLower } from "./logreg.js";
 
 export type Metric = {
   key: string;

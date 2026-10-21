@@ -6,7 +6,7 @@
  * TASK_085J
  */
 
-import { normUnicode } from "../text/normalize.ts";
+import { normUnicode } from "../text/normalize.js";
 
 export type Ev = {
   id: string;

@@ -6,8 +6,8 @@
  * TASK_085L
  */
 
-import type { InstrumentClass, ProgramKind } from "./instruments.ts";
-import { TEMPLATES } from "./lifecycle-templates.ts";
+import type { InstrumentClass, ProgramKind } from "./instruments.js";
+import { TEMPLATES } from "./lifecycle-templates.js";
 
 export type Obs = { duration: number; event: boolean }; // event=false => right-censored
 

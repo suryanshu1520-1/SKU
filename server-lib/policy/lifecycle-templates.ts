@@ -5,7 +5,7 @@
  * TASK_085L
  */
 
-import type { InstrumentClass, ProgramKind } from "./instruments.ts";
+import type { InstrumentClass, ProgramKind } from "./instruments.js";
 
 export const TEMPLATES: Record<ProgramKind, InstrumentClass[]> = {
   act: [

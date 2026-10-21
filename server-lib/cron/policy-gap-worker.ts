@@ -12,7 +12,7 @@ import {
   programGap,
   type ProgramInput,
   type EventInput,
-} from "../policy/lifecycle.ts";
+} from "../policy/lifecycle.js";
 
 function getSupabase() {
   const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;

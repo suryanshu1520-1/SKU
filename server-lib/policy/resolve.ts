@@ -5,7 +5,7 @@
  * Maps an organisation mention to a canonical registry slug or returns ambiguous/unknown.
  */
 
-import { normUnicode } from "../text/normalize.ts";
+import { normUnicode } from "../text/normalize.js";
 
 export type AliasRow = {
   alias_norm: string;

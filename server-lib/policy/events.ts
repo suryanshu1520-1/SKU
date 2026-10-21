@@ -7,8 +7,8 @@
  */
 
 import fs from "node:fs";
-import { normUnicode } from "../text/normalize.ts";
-import { TRIGGERS } from "./instrument-lexicon.ts";
+import { normUnicode } from "../text/normalize.js";
+import { TRIGGERS } from "./instrument-lexicon.js";
 import {
   RING_OF,
   NON_EVENTS,
@@ -17,8 +17,8 @@ import {
   type InstrumentClass,
   type RingDepth,
   type EvidenceItem,
-} from "./instruments.ts";
-import { verifyClaim, type EvidenceSpan } from "../cron/ingest/verify.ts";
+} from "./instruments.js";
+import { verifyClaim, type EvidenceSpan } from "../cron/ingest/verify.js";
 import {
   type ResolveResult,
   buildIndex,
@@ -26,7 +26,7 @@ import {
   aliasVariants,
   type ResolverIndex,
   type AliasRow,
-} from "./resolve.ts";
+} from "./resolve.js";
 
 export type ProgramKind =
   | "scheme"

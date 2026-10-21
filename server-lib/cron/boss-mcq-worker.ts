@@ -8,9 +8,9 @@
 
 import fs from "node:fs";
 import { createClient } from "@supabase/supabase-js";
-import { buildBossMcq, type TrueStmt } from "../policy/boss-mcq.ts";
-import { extractFacts } from "./ingest/verify.ts";
-import type { RegistryRow } from "../policy/tiers.ts";
+import { buildBossMcq, type TrueStmt } from "../policy/boss-mcq.js";
+import { extractFacts } from "./ingest/verify.js";
+import type { RegistryRow } from "../policy/tiers.js";
 
 function loadSeedAuthorities(): RegistryRow[] {
   try {

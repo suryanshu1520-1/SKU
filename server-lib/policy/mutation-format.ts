@@ -5,7 +5,7 @@
  * TASK_085M
  */
 
-import { compareEv, type Ev } from "./lineage.ts";
+import { compareEv, type Ev } from "./lineage.js";
 
 export interface FormatChangeInput {
   metric: string;

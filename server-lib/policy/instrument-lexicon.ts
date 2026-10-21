@@ -5,7 +5,7 @@
  * An extracted event must match at least one trigger pattern in its cited spans to pass gating.
  */
 
-import type { InstrumentClass } from "./instruments.ts";
+import type { InstrumentClass } from "./instruments.js";
 
 export interface LexiconTrigger {
   en: RegExp[];

@@ -6,10 +6,10 @@
  * TASK_085O
  */
 
-import { fnv1a, mulberry32 } from "./prng.ts";
-import { extractFacts } from "../cron/ingest/verify.ts";
-import { jaroWinkler } from "./resolve.ts";
-import type { RegistryRow } from "./tiers.ts";
+import { fnv1a, mulberry32 } from "./prng.js";
+import { extractFacts } from "../cron/ingest/verify.js";
+import { jaroWinkler } from "./resolve.js";
+import type { RegistryRow } from "./tiers.js";
 
 export interface TrueStmt {
   text: string;

@@ -13,8 +13,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { Request, Response } from "express";
 import { createClient } from "@supabase/supabase-js";
-import { buildRadarV2Payload } from "./policy/radar-v2-payload.ts";
-import { isRadarPublic } from "./policy/radar-flags.ts";
+import { buildRadarV2Payload } from "./policy/radar-v2-payload.js";
+import { isRadarPublic } from "./policy/radar-flags.js";
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;

@@ -13,11 +13,11 @@ import {
   explicitReferences,
   assertAcyclic,
   type Ev,
-} from "../policy/lineage.ts";
-import { predict } from "../policy/logreg.ts";
-import { extractLinkFeatures } from "../policy/link-features.ts";
-import { buildMutationEdges } from "../policy/mutation-format.ts";
-import type { LinkModelConfig } from "../../scripts/radar/fit-link-model.ts";
+} from "../policy/lineage.js";
+import { predict } from "../policy/logreg.js";
+import { extractLinkFeatures } from "../policy/link-features.js";
+import { buildMutationEdges } from "../policy/mutation-format.js";
+import type { LinkModelConfig } from "../../scripts/radar/fit-link-model.js";
 
 function loadLinkModel(): LinkModelConfig | null {
   try {

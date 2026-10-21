@@ -22,9 +22,9 @@ import { createClient } from "@supabase/supabase-js";
 import { getSources } from "./sources.js";
 import { synthesizeStructured, synthesizeGrounded, type StructuredSynthesis, type GroundedSynthesis } from "./synthesize.js";
 import type { VerifiedClaim } from "./verify.js";
-import { gateEvent, defaultResolveActor } from "../../policy/events.ts";
-import { buildIndex, resolve, aliasVariants, type ResolverIndex, type AliasRow } from "../../policy/resolve.ts";
-import { enqueueReview } from "../../policy/review-queue.ts";
+import { gateEvent, defaultResolveActor } from "../../policy/events.js";
+import { buildIndex, resolve, aliasVariants, type ResolverIndex, type AliasRow } from "../../policy/resolve.js";
+import { enqueueReview } from "../../policy/review-queue.js";
 import { deriveMinistry, isExcluded, isEphemeralTrivia, policyConfidence } from "./classify.js";
 import { getEmbedder, cosine } from "./embeddings.js";
 import { clusterCandidates, makeStory, storyCentroid, embedText } from "./cluster.js";
@@ -37,7 +37,7 @@ import { callUpdateSourceReputation } from "../../internal/reputation.js";
 import { llmAvailable } from "../../llm.js";
 import { processDispatchIntoPolicyGraph, runPolicyGraphWorker } from "../policy-graph-worker.js";
 import { rebuildLineage } from "../policy-lineage-worker.js";
-import { assignNode } from "../../policy/node-assign.ts";
+import { assignNode } from "../../policy/node-assign.js";
 import {
   startIngestRun,
   finishIngestRun,

@@ -16,7 +16,7 @@
 import { llmGenerate } from "../../llm.js";
 import type { SourceLang } from "./types.js";
 import { segmentSpans, verifyClaim, groundingScore, type VerifiedClaim, type EvidenceSpan } from "./verify.js";
-import type { EventFrame } from "../../policy/events.ts";
+import type { EventFrame } from "../../policy/events.js";
 import {
   validateArticleExamInsights,
   computeSourceFingerprint,

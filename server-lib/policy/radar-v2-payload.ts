@@ -15,10 +15,10 @@ import type {
   Coverage,
   NodeSignalV2,
   ProgramRipple,
-} from "../../src/lib/policy-radar-v2-types.ts";
-import { compareEv, programParents, type Ev } from "./lineage.ts";
-import { formatChange, type FormatChangeInput } from "./mutation-format.ts";
-import { NODES } from "../cron/ingest/syllabus/nodes.ts";
+} from "../../src/lib/policy-radar-v2-types.js";
+import { compareEv, programParents, type Ev } from "./lineage.js";
+import { formatChange, type FormatChangeInput } from "./mutation-format.js";
+import { NODES } from "../cron/ingest/syllabus/nodes.js";
 
 export interface RadarV2InputRows {
   programs?: any[];

@@ -5,7 +5,7 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
-import { aliasNorm, type ResolveResult } from "./resolve.ts";
+import { aliasNorm, type ResolveResult } from "./resolve.js";
 
 export async function enqueueReview(
   mention: string,

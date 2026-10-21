@@ -5,8 +5,8 @@
  * Evaluates headline, bullets, and tags against the syllabus taxonomy without LLM cost.
  */
 
-import { keywordClassify } from "../cron/ingest/syllabus/keyword-classifier.ts";
-import { loadNodes, nodeById } from "../cron/ingest/syllabus/nodes.ts";
+import { keywordClassify } from "../cron/ingest/syllabus/keyword-classifier.js";
+import { loadNodes, nodeById } from "../cron/ingest/syllabus/nodes.js";
 
 export interface NodeAssignInput {
   headline: string;
