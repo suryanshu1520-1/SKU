@@ -23,6 +23,7 @@ import {
 } from "../server-lib/policy-radar-v2.js";
 
 import { analyticsRouter } from "../server-lib/analytics/routes.js";
+import { syllabusRouter, handleUserSyllabusProgress } from "../server-lib/syllabus/routes.js";
 import { seoRouter } from "../server-lib/seo/routes.js";
 import {
   examCatalogHandler,
@@ -75,6 +76,8 @@ app.get("/api/exam/attempts", examAttemptsHandler);
 app.get("/api/exam/result", examResultHandler);
 
 app.use("/api/analytics", analyticsRouter);
+app.use("/api/syllabus", syllabusRouter);
+app.get("/api/me/syllabus-progress", handleUserSyllabusProgress);
 
 export default async function handler(req: any, res: any) {
   return app(req, res);
