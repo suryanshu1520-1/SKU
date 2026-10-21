@@ -34,12 +34,12 @@
     "aliases_hi": [
       "प्रधानमंत्री कार्यालय"
     ],
-    "kind": "ministry",
+    "kind": "department",
     "jurisdiction": "union",
     "legal_basis_kind": "executive_order",
-    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "legal_basis_ref": "Government of India (Allocation of Business) Rules, 1961",
     "parent_entity_slug": null,
-    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=3"
+    "source_url": "https://www.pmindia.gov.in/en/proactive-disclosure-under-section-4-1-b-of-the-rti-act-2005/"
   },
   {
     "entity_slug": "ENT_LOK_SABHA",
@@ -77,12 +77,12 @@
       "मंत्रिमण्‍डल",
       "मंत्रिमण्डल"
     ],
-    "kind": "ministry",
+    "kind": "constitutional_body",
     "jurisdiction": "union",
-    "legal_basis_kind": "executive_order",
-    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "legal_basis_kind": "constitution_article",
+    "legal_basis_ref": "Constitution of India, Article 352(3) (Union Cabinet) read with Articles 74-75",
     "parent_entity_slug": null,
-    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=61"
+    "source_url": "https://www.legislative.gov.in/static/uploads/2025/07/c9fe9c9b6840524844316f74bb1c556c.pdf"
   },
   {
     "entity_slug": "ENT_CABINET_DECISIONS",
@@ -92,12 +92,12 @@
       "मंत्रिमण्‍डल समिति निर्णय",
       "मंत्रिमण्डल समिति निर्णय"
     ],
-    "kind": "ministry",
+    "kind": null,
     "jurisdiction": "union",
     "legal_basis_kind": "executive_order",
-    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "legal_basis_ref": "Government of India (Transaction of Business) Rules, 1961, First Schedule (Standing Committees of the Cabinet)",
     "parent_entity_slug": null,
-    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=62"
+    "source_url": "https://cabsec.gov.in/files/allocation/transaction_businessrule.pdf"
   },
   {
     "entity_slug": "ENT_CCEA",
@@ -107,12 +107,12 @@
       "आर्थिक मामलों की मंत्रिमण्‍डलीय समिति (सीसीईए)",
       "आर्थिक मामलों की मंत्रिमण्डलीय समिति (सीसीईए)"
     ],
-    "kind": "ministry",
+    "kind": null,
     "jurisdiction": "union",
     "legal_basis_kind": "executive_order",
-    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "legal_basis_ref": "Government of India (Transaction of Business) Rules, 1961, First Schedule (Standing Committees of the Cabinet)",
     "parent_entity_slug": null,
-    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=63"
+    "source_url": "https://cabsec.gov.in/files/allocation/transaction_businessrule.pdf"
   },
   {
     "entity_slug": "ENT_CAB_SEC",
@@ -212,12 +212,12 @@
       "फाइनेंस कमीशन",
       "वित्त आयोग"
     ],
-    "kind": "ministry",
+    "kind": "constitutional_body",
     "jurisdiction": "union",
-    "legal_basis_kind": "executive_order",
-    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "legal_basis_kind": "constitution_article",
+    "legal_basis_ref": "Constitution of India, Article 280(1)",
     "parent_entity_slug": null,
-    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1330"
+    "source_url": "https://fincomindia.nic.in/about-us"
   },
   {
     "entity_slug": "ENT_MOAFW",
@@ -1082,12 +1082,12 @@
     "aliases_hi": [
       "राष्ट्रीय वित्तीय रिपोर्टिंग प्राधिकरण"
     ],
-    "kind": "ministry",
+    "kind": "regulator",
     "jurisdiction": "union",
-    "legal_basis_kind": "executive_order",
-    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Companies Act, 2013, Section 132(1)",
     "parent_entity_slug": null,
-    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1454"
+    "source_url": "https://nfra.gov.in/"
   },
   {
     "entity_slug": "ENT_CCI",
@@ -1112,12 +1112,12 @@
     "aliases_hi": [
       "आईएफएससी प्राधिकरण"
     ],
-    "kind": "ministry",
+    "kind": "regulator",
     "jurisdiction": "union",
-    "legal_basis_kind": "executive_order",
-    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "International Financial Services Centres Authority Act, 2019",
     "parent_entity_slug": null,
-    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=1470"
+    "source_url": "https://www.ifsca.gov.in/"
   },
   {
     "entity_slug": "ENT_NSCS",
@@ -1156,12 +1156,12 @@
     "aliases_hi": [
       "भारत के लोकपाल"
     ],
-    "kind": "ministry",
+    "kind": "statutory_body",
     "jurisdiction": "union",
-    "legal_basis_kind": "executive_order",
-    "legal_basis_ref": "Allocation of Business Rules, 1961",
+    "legal_basis_kind": "central_act",
+    "legal_basis_ref": "Lokpal and Lokayuktas Act, 2013, Section 3",
     "parent_entity_slug": null,
-    "source_url": "https://pib.gov.in/AllRelease.aspx?minid=2611"
+    "source_url": "https://lokpal.gov.in/api/cms-file?path=%2Fuploads%2Fcms%2F6%2F58%2F1_FreqAQs.pdf"
   },
   {
     "entity_slug": "ENT_DOP",
