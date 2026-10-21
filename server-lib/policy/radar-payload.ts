@@ -53,12 +53,29 @@ export function isObservedNode(node: RadarNode | null | undefined): boolean {
   return true;
 }
 
+// What a boss MCQ may show before the candidate answers. An allowlist on purpose: the raw
+// current_affairs_mcqs row carries the answer key (correct_index, explanation, statement_dissection,
+// statutory_anchor, operators), and answers may only leave the server through
+// POST /api/policy-radar/v2/boss-mcq/:id/check.
+const PUBLIC_BOSS_MCQ_FIELDS = [
+  'id', 'chain_id', 'program_slug', 'question', 'options', 'headline', 'subject', 'edition_date',
+] as const;
+
+export function publicBossMcq(row: any): Record<string, any> | null {
+  if (!row || typeof row !== 'object') return null;
+  const out: Record<string, any> = {};
+  for (const key of PUBLIC_BOSS_MCQ_FIELDS) {
+    if (row[key] !== undefined) out[key] = row[key];
+  }
+  return out;
+}
+
 /**
  * Builds the v1 Radar payload strictly from observed, source-backed data:
  * - Drops synthetic/seeded nodes
  * - Drops chains that have zero kept nodes
  * - Uses only DB volcano rows (zero baseline padding)
- * - Returns boss_mcq: null unless the MCQ row exists in bossMcqs
+ * - Returns boss_mcq (answer fields stripped) or null unless the MCQ row exists in bossMcqs
  * - Includes coverage statistics
  */
 export function buildRadarPayloadV1(input: RadarPayloadInputV1): RadarPayloadV1 {
@@ -99,7 +116,7 @@ export function buildRadarPayloadV1(input: RadarPayloadInputV1): RadarPayloadV1 
   const bossMcqMap: Record<string, any> = {};
   for (const m of bossMcqs || []) {
     if (m && m.id) {
-      bossMcqMap[m.id] = m;
+      bossMcqMap[m.id] = publicBossMcq(m);
     }
   }
 
@@ -207,7 +224,7 @@ export function v1FromV2(payload: any): RadarPayloadV1 {
       volcano_index: 0,
       volcano_status: "STABLE",
       last_tested_year: null,
-      boss_mcq: prog.boss_mcq,
+      boss_mcq: publicBossMcq(prog.boss_mcq),
       nodes_flow: nodesFlow,
       linked_dispatches: nodesFlow.map((n: any) => n.dispatch_id).filter(Boolean),
     };
