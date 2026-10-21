@@ -468,6 +468,35 @@ export const NODES: SyllabusNode[] = [
   { id: "PRE.STAT.CONVENTIONS", paper: "PRELIMS", parent: "PRE.STAT", path: ["Static GK, Mapping & Reports (Prelims)", "International Conventions & Treaties"],
     gloss: "Environment conventions (Basel, Rotterdam, Stockholm, Minamata, Vienna/Montreal Protocol), disarmament treaties (NPT, CTBT), and international export control regimes (MTCR, Wassenaar, Australia Group).",
     entities: ["Stockholm Convention", "Minamata Convention", "Montreal Protocol", "Basel Convention", "Rotterdam Convention", "MTCR", "Wassenaar Arrangement"] },
+
+  // =========================================================================
+  // ===== CSAT Paper 2 — Analytical Core ====================================
+  // =========================================================================
+  { id: "CSAT.RC", paper: "CSAT", parent: null, path: ["CSAT Paper 2", "Reading Comprehension"],
+    gloss: "Reading comprehension passages, author's assumptions, critical inferences, and tone analysis.",
+    entities: ["Reading comprehension", "assumptions", "inferences", "central idea", "tone"] },
+  { id: "CSAT.QUAN", paper: "CSAT", parent: null, path: ["CSAT Paper 2", "Quantitative Aptitude & Number Theory"],
+    gloss: "Number theory, divisibility, remainders, permutations and combinations, speed-distance-time, percentages.",
+    entities: ["Number theory", "divisibility", "remainders", "permutations", "combinations", "arithmetic"] },
+  { id: "CSAT.REAS", paper: "CSAT", parent: null, path: ["CSAT Paper 2", "Reasoning & Analytical Ability"],
+    gloss: "Syllogisms, seating arrangements, blood relations, direction sense, and coding-decoding puzzles.",
+    entities: ["Syllogisms", "seating arrangement", "blood relations", "direction sense", "logic puzzles"] },
+  { id: "CSAT.DATA", paper: "CSAT", parent: null, path: ["CSAT Paper 2", "Data Interpretation & Sufficiency"],
+    gloss: "Charts, graphs, tables, and data sufficiency logic.",
+    entities: ["Data interpretation", "data sufficiency", "bar charts", "pie charts", "tables"] },
+
+  // =========================================================================
+  // ===== ESSAY Paper — Dialectical & Topical Reflection ====================
+  // =========================================================================
+  { id: "ESSAY.PHIL", paper: "ESSAY", parent: null, path: ["Essay Paper", "Philosophical & Epistemological Essays"],
+    gloss: "Epistemological reflections, human condition, truth, morality, existential questions, and wisdom aphorisms.",
+    entities: ["Philosophical essay", "human condition", "morality", "truth", "existential wisdom"] },
+  { id: "ESSAY.SOC", paper: "ESSAY", parent: null, path: ["Essay Paper", "Socio-Political & Governance Essays"],
+    gloss: "Democracy, federalism, gender justice, education, health, economic equity, and nation building.",
+    entities: ["Democracy", "federalism", "gender justice", "education", "health", "nation building"] },
+  { id: "ESSAY.ENV", paper: "ESSAY", parent: null, path: ["Essay Paper", "Science, Tech & Environmental Essays"],
+    gloss: "Artificial intelligence, climate change ethics, technology and human values, sustainability.",
+    entities: ["Artificial intelligence", "climate change ethics", "technology values", "sustainability"] },
 ];
 
 // ---------------------------------------------------------------------------

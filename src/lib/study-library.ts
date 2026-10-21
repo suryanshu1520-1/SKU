@@ -177,3 +177,45 @@ export function getStudyUrl(selection: StudySelection): string {
   const params = new URLSearchParams({ subject: selection.subjectId, view: selection.view, item: selection.itemId });
   return `/library?${params.toString()}`;
 }
+
+import {
+  getCanonicalNodesForResource,
+  resolveLegacyTagToCanonical,
+  type ResourceNodeMapping,
+} from './syllabus-mapping.js';
+
+export { getCanonicalNodesForResource, resolveLegacyTagToCanonical, type ResourceNodeMapping };
+
+export function getPrimaryCanonicalNode(resourceId: string): string | null {
+  const mappings = getCanonicalNodesForResource(resourceId);
+  const primary = mappings.find((m) => m.relationType === 'primary');
+  return primary ? primary.nodeId : (mappings[0]?.nodeId || null);
+}
+
+export async function fetchLiveNodeQuestions(nodeId: string, options: { page?: number; pageSize?: number; stage?: 'prelims' | 'mains' } = {}) {
+  try {
+    const params = new URLSearchParams();
+    if (options.page) params.set('page', String(options.page));
+    if (options.pageSize) params.set('pageSize', String(options.pageSize));
+    if (options.stage) params.set('stage', options.stage);
+    const res = await fetch(`/api/syllabus/nodes/${encodeURIComponent(nodeId)}/questions?${params.toString()}`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchLiveNodeArticles(nodeId: string, options: { page?: number; pageSize?: number } = {}) {
+  try {
+    const params = new URLSearchParams();
+    if (options.page) params.set('page', String(options.page));
+    if (options.pageSize) params.set('pageSize', String(options.pageSize));
+    const res = await fetch(`/api/syllabus/nodes/${encodeURIComponent(nodeId)}/articles?${params.toString()}`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+

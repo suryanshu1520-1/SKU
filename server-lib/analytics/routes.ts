@@ -5,6 +5,7 @@
  */
 
 import { Router, Request, Response } from "express";
+import { authenticateBearer } from "../auth/middleware.js";
 import {
   getExaminerPsycheOverview,
   getParetoAndDroughtAnalysis,
@@ -144,37 +145,6 @@ analyticsRouter.get("/examiner-psyche/node/:nodeId", async (req: Request, res: R
 
     let cleanPrelims: any[] = ((prelimsRes.data || []) as any[]).filter(isCleanPrelimsRow);
 
-    // If direct node_id lookup yielded few or zero prelims, perform intelligent entity / keyword fallback
-    const nodeData = nodeRes.data as any;
-    if (cleanPrelims.length < 3 && nodeData) {
-      const terms: string[] = [
-        ...(nodeData.entities || []),
-        nodeData.id ? nodeData.id.split('.').pop() : '',
-      ].filter((t: any) => typeof t === 'string' && t.length >= 4);
-
-      if (terms.length > 0) {
-        // Query recent pyq_prelims matching node entities
-        const { data: fallbackPrelims } = await sb
-          .from("pyq_prelims")
-          .select("id, year, paper, question_num, stem, statements, options, official_key, question_type, qualifiers")
-          .ilike("stem", `%${terms[0]}%`)
-          .order("year", { ascending: false })
-          .limit(10);
-
-        if (fallbackPrelims && fallbackPrelims.length > 0) {
-          const cleanFallback = (fallbackPrelims as any[]).filter(isCleanPrelimsRow);
-          const existingIds = new Set(cleanPrelims.map((p: any) => p.id));
-          for (const fb of cleanFallback) {
-            if (!existingIds.has((fb as any).id)) {
-              cleanPrelims.push(fb);
-              existingIds.add((fb as any).id);
-            }
-          }
-        }
-      }
-    }
-
-
     // Sort to prioritize year diversity across distinct testing cycles (e.g. 2024, 2022, 2020, 2018, 2015, 2012, etc.)
     const yearBuckets = new Map<number, any[]>();
     for (const q of cleanPrelims) {
@@ -230,7 +200,27 @@ analyticsRouter.get("/examiner-psyche/node-profile/:nodeId", async (req: Request
 // 9. Examiner's Psyche User Autopsy & 50:50 Ledger (TASK_080)
 analyticsRouter.get("/examiner-psyche/user-autopsy/:userId", async (req: Request, res: Response) => {
   try {
-    const data = await getUserPsycheAutopsy(req.params.userId);
+    const { user, error } = await authenticateBearer(req);
+    if (error || !user) {
+      return res.status(401).json({ success: false, error: "UNAUTHORIZED", message: error || "Authentication required" });
+    }
+    if (user.id !== req.params.userId) {
+      return res.status(403).json({ success: false, error: "FORBIDDEN", message: "Cannot access autopsy of another candidate." });
+    }
+    const data = await getUserPsycheAutopsy(user.id);
+    res.json({ success: true, data });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+analyticsRouter.get("/examiner-psyche/me/autopsy", async (req: Request, res: Response) => {
+  try {
+    const { user, error } = await authenticateBearer(req);
+    if (error || !user) {
+      return res.status(401).json({ success: false, error: "UNAUTHORIZED", message: error || "Authentication required" });
+    }
+    const data = await getUserPsycheAutopsy(user.id);
     res.json({ success: true, data });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
@@ -250,39 +240,59 @@ analyticsRouter.get("/examiner-psyche/target-operator/:nodeId", async (req: Requ
 // 11. User Psyche Telemetry Ingestion (TASK_080)
 analyticsRouter.post("/examiner-psyche/telemetry", async (req: Request, res: Response) => {
   try {
+    const { user, error: authError } = await authenticateBearer(req);
+    if (authError || !user) {
+      return res.status(401).json({ success: false, error: "UNAUTHORIZED", message: authError || "Authentication required" });
+    }
+
     const {
-      userId,
       questionId,
       nodeId,
       operatorTested,
       selectedOption,
-      officialKey,
-      isCorrect,
-      marksDelta,
       is5050Call,
       eliminatedOptions,
       responseMs,
     } = req.body;
 
-    if (!userId || !questionId || !nodeId || !operatorTested || !selectedOption || !officialKey) {
-      return res.status(400).json({ success: false, error: "Missing required telemetry fields" });
+    if (!questionId || !nodeId || !operatorTested || !selectedOption) {
+      return res.status(400).json({ success: false, error: "Missing required telemetry fields: questionId, nodeId, operatorTested, selectedOption" });
     }
 
+    // Operational Invariant #2: Quiz scoring and answers are validated strictly server-side.
+    const sb = getSupabase();
+    const { data: rawQuestion, error: qErr } = await sb
+      .from("pyq_prelims")
+      .select("id, official_key, node_id")
+      .eq("id", questionId)
+      .maybeSingle();
+
+    const question = rawQuestion as { id: string; official_key: string | null; node_id: string | null } | null;
+
+    if (qErr || !question || !question.official_key) {
+      return res.status(400).json({ success: false, error: "Invalid question ID or missing official answer key" });
+    }
+
+    const cleanSelected = String(selectedOption).trim().toLowerCase();
+    const cleanOfficialKey = String(question.official_key).trim().toLowerCase();
+    const isCorrect = cleanSelected === cleanOfficialKey;
+    const marksDelta = isCorrect ? 2.0 : -0.66;
+
     await recordPsycheTelemetry({
-      userId,
+      userId: user.id, // Strictly derived from authenticated session
       questionId,
-      nodeId,
+      nodeId: question.node_id || nodeId,
       operatorTested,
-      selectedOption,
-      officialKey,
-      isCorrect: Boolean(isCorrect),
-      marksDelta: Number(marksDelta),
+      selectedOption: cleanSelected,
+      officialKey: cleanOfficialKey,
+      isCorrect,
+      marksDelta,
       is5050Call: Boolean(is5050Call),
       eliminatedOptions: Array.isArray(eliminatedOptions) ? eliminatedOptions : [],
-      responseMs: typeof responseMs === 'number' ? responseMs : undefined,
+      responseMs: typeof responseMs === "number" ? responseMs : undefined,
     });
 
-    res.json({ success: true });
+    res.json({ success: true, isCorrect, marksDelta });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
   }

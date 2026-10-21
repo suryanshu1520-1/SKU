@@ -110,6 +110,7 @@ scripts/data/simulations/pib_categorized_*.json
 *-dryrun.ts
 *-dryrun.mjs
 *.dryrun.*
+*dryrun*
 cluster-test.ts
 tsconfig.verify*.json
 # ── HTML files (except root index.html) ──

@@ -5,6 +5,7 @@ import { EXAMINER_OPERATORS, type ExaminerOperatorType, type StatementDissection
 import { useAuthority } from './radar/useRadarV2';
 import { sourceLabel } from './observatory/radar-v2/sourceLink';
 import { computeCalibrated5050EV } from '../lib/examiner_psyche';
+import { fetchWithAuth } from '../lib/api';
 
 interface SampleQuestion {
   id: string;
@@ -369,22 +370,17 @@ export default function DiagnosticPreview({ onLaunchFullArena }: DiagnosticPrevi
     setIs5050Call(isFifty);
     setHasSubmitted(true);
 
-    // Fire telemetry in background best effort
+    // Fire telemetry in background best effort if authenticated
     try {
-      const marksDelta = selectedOption === q.correctIndex ? 2.0 : -0.66;
       const eliminatedArr = Array.from(struckOptions).map((i) => String.fromCharCode(97 + i));
-      fetch('/api/analytics/examiner-psyche/telemetry', {
+      fetchWithAuth('/api/analytics/examiner-psyche/telemetry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: '00000000-0000-0000-0000-000000000000',
           questionId: q.id,
           nodeId: q.node_id,
           operatorTested: q.primary_operator,
           selectedOption: String.fromCharCode(97 + selectedOption),
-          officialKey: String.fromCharCode(97 + q.correctIndex),
-          isCorrect: selectedOption === q.correctIndex,
-          marksDelta,
           is5050Call: isFifty,
           eliminatedOptions: eliminatedArr,
           responseMs: (107 - secondsRemaining) * 1000,

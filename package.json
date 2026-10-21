@@ -17,7 +17,7 @@
     "lint:web": "tsc --noEmit",
     "lint:api": "tsc -p api/tsconfig.json --noEmit",
     "lint": "npm run lint:web && npm run lint:api",
-    "test": "tsx --test scripts/test-rebase-contract.ts src/lib/vulnerabilityIndex.test.ts src/lib/study-library.test.ts src/lib/examiner-psyche-view.test.ts scripts/tests/examiner_psyche.test.ts scripts/tests/article-exam-insights.test.ts && npm run test:exam && npm run test:qbank && npm run test:radar",
+    "test": "tsx --test scripts/test-rebase-contract.ts src/lib/vulnerabilityIndex.test.ts src/lib/study-library.test.ts src/lib/syllabus-mapping.test.ts src/lib/examiner-psyche-view.test.ts scripts/tests/examiner_psyche.test.ts scripts/tests/analytics-security.test.ts scripts/tests/syllabus-api.test.ts scripts/tests/article-exam-insights.test.ts && npm run test:exam && npm run test:qbank && npm run test:radar",
     "test:exam": "tsx --test scripts/exam-tests/grading.test.ts scripts/exam-tests/assemble.test.ts scripts/exam-tests/sanitize.test.ts scripts/exam-tests/clock.test.ts scripts/exam-tests/sheetReducer.test.ts scripts/exam-tests/itemLayout.test.ts scripts/exam-tests/interpret.test.ts scripts/exam-tests/sessionHelpers.test.ts",
     "test:qbank": "tsx --test scripts/qbank-tests/validators.test.ts",
     "test:radar": "tsx --test \"scripts/tests/radar/**/*.test.ts\""

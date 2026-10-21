@@ -15,7 +15,7 @@
  *    by trust (Tier A..D). Only Tier A may judge the backtest.
  */
 
-export type Paper = "GS1" | "GS2" | "GS3" | "GS4" | "PRELIMS" | "CSAT";
+export type Paper = "GS1" | "GS2" | "GS3" | "GS4" | "PRELIMS" | "CSAT" | "ESSAY";
 
 /**
  * Evidence provenance, ranked by trust:
