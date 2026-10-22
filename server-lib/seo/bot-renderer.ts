@@ -155,12 +155,29 @@ export async function fetchArticleForSeo(
         }
 
         if (!article) {
-          // Try looking up recent records to find match
+          // 1. Try matching with ilike on the beginning of the headline
+          const slugWords = slug.split('-').filter((w) => w.length > 2).slice(0, 4).join('%');
+          if (slugWords) {
+            const { data, error } = await supabase
+              .from('current_affairs')
+              .select('*')
+              .ilike('headline', `%${slugWords}%`)
+              .order('created_at', { ascending: false })
+              .limit(10);
+            if (!error && data && data.length > 0) {
+              const matched = data.find((d: any) => slugify(d.headline) === slug) || data[0];
+              if (matched) article = matched as ArticleRecord;
+            }
+          }
+        }
+
+        if (!article) {
+          // 2. Fallback to querying recent records to find match
           const { data, error } = await supabase
             .from('current_affairs')
             .select('*')
             .order('created_at', { ascending: false })
-            .limit(250);
+            .limit(500);
 
           if (!error && data) {
             const matched = data.find((d: any) => slugify(d.headline) === slug);
@@ -533,16 +550,23 @@ export function renderSeoHtml(article: ArticleRecord, reqUrl: string): string {
   // Inject meta tags and replace title
   let modifiedHtml = baseHtml;
 
+  // 1. Title and meta name=title
   modifiedHtml = modifiedHtml.replace(
     /<title>.*?<\/title>/i,
     `<title>${escapeXml(pageTitle)}</title>`
   );
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+name=["']title["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta name="title" content="${escapeXml(pageTitle)}" />`
+  );
 
+  // 2. Meta description
   modifiedHtml = modifiedHtml.replace(
     /<meta\s+name=["']description["']\s+content=["'].*?["']\s*\/?>/i,
     `<meta name="description" content="${escapeXml(cleanDesc)}" />`
   );
 
+  // 3. Canonical Link
   if (modifiedHtml.includes('<link rel="canonical"')) {
     modifiedHtml = modifiedHtml.replace(
       /<link\s+rel=["']canonical["']\s+href=["'].*?["']\s*\/?>/i,
@@ -555,6 +579,7 @@ export function renderSeoHtml(article: ArticleRecord, reqUrl: string): string {
     );
   }
 
+  // 4. Open Graph tags
   modifiedHtml = modifiedHtml.replace(
     /<meta\s+property=["']og:title["']\s+content=["'].*?["']\s*\/?>/i,
     `<meta property="og:title" content="${escapeXml(pageTitle)}" />`
@@ -567,14 +592,29 @@ export function renderSeoHtml(article: ArticleRecord, reqUrl: string): string {
     /<meta\s+property=["']og:url["']\s+content=["'].*?["']\s*\/?>/i,
     `<meta property="og:url" content="${escapeXml(canonicalUrl)}" />`
   );
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+property=["']og:type["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta property="og:type" content="article" />`
+  );
+
+  // 5. Twitter card tags
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+property=["']twitter:title["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta property="twitter:title" content="${escapeXml(pageTitle)}" />`
+  );
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+property=["']twitter:description["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta property="twitter:description" content="${escapeXml(cleanDesc)}" />`
+  );
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+property=["']twitter:url["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta property="twitter:url" content="${escapeXml(canonicalUrl)}" />`
+  );
 
   const extraHead = `
-    <meta property="og:type" content="article" />
     <meta property="article:published_time" content="${publishedIso}" />
     <meta property="article:modified_time" content="${modifiedIso}" />
     <meta property="article:section" content="${escapeXml(article.ministry || 'Governance')}" />
-    <meta name="twitter:title" content="${escapeXml(pageTitle)}" />
-    <meta name="twitter:description" content="${escapeXml(cleanDesc)}" />
     <script type="application/ld+json">
       ${JSON.stringify(schemaJson)}
     </script>
@@ -1112,6 +1152,7 @@ export async function renderDailyEditionSeoHtml(dateStr?: string): Promise<strin
   let digest: any = null;
   let articles: any[] = [];
   let mcqs: McqRecord[] = [];
+  let pastEditions: string[] = [];
 
   if (supabase) {
     try {
@@ -1154,6 +1195,20 @@ export async function renderDailyEditionSeoHtml(dateStr?: string): Promise<strin
           .eq('edition_date', targetDate)
           .limit(3);
         if (mData && mData.length > 0) mcqs = mData as McqRecord[];
+      }
+
+      // Query past editions for crawlable archive links
+      try {
+        const { data: pastDigests } = await supabase
+          .from('pib_digests')
+          .select('date')
+          .order('date', { ascending: false })
+          .limit(14);
+        if (pastDigests) {
+          pastEditions = pastDigests.map((d: any) => d.date).filter(Boolean);
+        }
+      } catch {
+        // ignore
       }
     } catch (err) {
       console.warn('[bot-renderer] Failed to fetch daily edition data:', err);
@@ -1247,6 +1302,14 @@ export async function renderDailyEditionSeoHtml(dateStr?: string): Promise<strin
         </ul>
       </section>` : ''}
 
+      ${pastEditions.length > 0 ? `
+      <section class="mb-8 p-4 bg-slate-900/60 border border-slate-800 rounded-lg">
+        <h2 class="text-xs font-mono uppercase tracking-wider text-[#e0d0ab] font-bold mb-3">📅 Past Daily Editions Archive</h2>
+        <div class="flex flex-wrap gap-2 text-xs font-mono">
+          ${pastEditions.map((d) => `<a href="/daily-edition/${encodeURIComponent(d)}" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-[#e0d0ab]/40 transition-colors">${escapeXml(d)}</a>`).join('')}
+        </div>
+      </section>` : ''}
+
       <nav class="pt-6 border-t border-slate-800 text-xs font-mono text-slate-400 flex flex-wrap gap-4">
         <a href="/daily-edition" class="text-amber-300 hover:underline">← Latest Edition</a>
         <a href="/intelligence" class="hover:text-slate-200">All Intelligence Signals</a>
@@ -1257,6 +1320,10 @@ export async function renderDailyEditionSeoHtml(dateStr?: string): Promise<strin
 
   let modifiedHtml = baseHtml;
   modifiedHtml = modifiedHtml.replace(/<title>.*?<\/title>/i, `<title>${escapeXml(title)}</title>`);
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+name=["']title["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta name="title" content="${escapeXml(title)}" />`
+  );
   modifiedHtml = modifiedHtml.replace(
     /<meta\s+name=["']description["']\s+content=["'].*?["']\s*\/?>/i,
     `<meta name="description" content="${escapeXml(description)}" />`
@@ -1270,6 +1337,31 @@ export async function renderDailyEditionSeoHtml(dateStr?: string): Promise<strin
   } else {
     modifiedHtml = modifiedHtml.replace('</head>', `  <link rel="canonical" href="${escapeXml(canonicalUrl)}" />\n</head>`);
   }
+
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+property=["']og:title["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta property="og:title" content="${escapeXml(title)}" />`
+  );
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+property=["']og:description["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta property="og:description" content="${escapeXml(description)}" />`
+  );
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+property=["']og:url["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta property="og:url" content="${escapeXml(canonicalUrl)}" />`
+  );
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+property=["']twitter:title["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta property="twitter:title" content="${escapeXml(title)}" />`
+  );
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+property=["']twitter:description["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta property="twitter:description" content="${escapeXml(description)}" />`
+  );
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+property=["']twitter:url["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta property="twitter:url" content="${escapeXml(canonicalUrl)}" />`
+  );
 
   const extraHead = `
     <script type="application/ld+json">
@@ -1300,7 +1392,8 @@ export type HubSectionType =
   | 'humanities'
   | 'manifesto'
   | 'sources'
-  | 'leaderboard';
+  | 'leaderboard'
+  | 'library';
 
 export async function renderHubSeoHtml(section: HubSectionType): Promise<string> {
   if (section === 'daily-edition') {
@@ -1316,7 +1409,41 @@ export async function renderHubSeoHtml(section: HubSectionType): Promise<string>
   let h1 = 'Daily Policy & Governance Intelligence';
   let semanticBody = '';
 
-  if (section === 'prs') {
+  if (section === 'library') {
+    title = 'UPSC Subject Study Library & High-Yield Pillars | Tark';
+    description = 'Comprehensive static syllabus repository, foundational concepts, mind maps, static reference facts, and mains answer blueprints for UPSC CSE preparation.';
+    canonicalUrl = 'https://www.tark.live/library';
+    h1 = 'UPSC Subject Study Library & High-Yield Pillars';
+    semanticBody = `
+      <section class="space-y-6 text-sm text-slate-300">
+        <p class="leading-relaxed">
+          The Tark Study Library organizes foundational civil services concepts, mind maps, and high-yield examination notes across the four General Studies pillars and CSAT.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 bg-slate-900/80 border border-slate-800 rounded-lg">
+            <h2 class="font-mono text-xs uppercase tracking-wider text-amber-300 font-bold mb-1">GS-I // Heritage & Geography</h2>
+            <p class="text-xs text-slate-300 mb-2">Temple architecture, Gandhian movements, Buddhism & Jainism, physical & human geography.</p>
+            <a href="/library?subject=GS1&view=notes" class="text-xs font-mono text-[#e0d0ab] hover:underline">Explore GS-1 Notes →</a>
+          </div>
+          <div class="p-4 bg-slate-900/80 border border-slate-800 rounded-lg">
+            <h2 class="font-mono text-xs uppercase tracking-wider text-cyan-300 font-bold mb-1">GS-II // Polity & Governance</h2>
+            <p class="text-xs text-slate-300 mb-2">Basic structure doctrine, Centre-State relations, parliamentary committees, statutory bodies.</p>
+            <a href="/library?subject=GS2&view=notes" class="text-xs font-mono text-[#e0d0ab] hover:underline">Explore GS-2 Notes →</a>
+          </div>
+          <div class="p-4 bg-slate-900/80 border border-slate-800 rounded-lg">
+            <h2 class="font-mono text-xs uppercase tracking-wider text-purple-300 font-bold mb-1">GS-III // Economy & Environment</h2>
+            <p class="text-xs text-slate-300 mb-2">Monetary policy & liquidity, nuclear energy, balance of payments, Ramsar wetlands & protected areas.</p>
+            <a href="/library?subject=GS3&view=notes" class="text-xs font-mono text-[#e0d0ab] hover:underline">Explore GS-3 Notes →</a>
+          </div>
+          <div class="p-4 bg-slate-900/80 border border-slate-800 rounded-lg">
+            <h2 class="font-mono text-xs uppercase tracking-wider text-emerald-300 font-bold mb-1">GS-IV // Ethics & Integrity</h2>
+            <p class="text-xs text-slate-300 mb-2">Duty & utilitarianism in public policy, emotional intelligence, moral philosophy case studies.</p>
+            <a href="/library?subject=GS4&view=notes" class="text-xs font-mono text-[#e0d0ab] hover:underline">Explore GS-4 Notes →</a>
+          </div>
+        </div>
+      </section>
+    `;
+  } else if (section === 'prs') {
     title = 'PRS Legislative Vault — Parliamentary Acts & Bills Analysis | Tark';
     description = 'Dedicated statutory and policy intelligence archive containing deep analytical breakdowns of Parliamentary Bills, Acts, and Constitutional doctrines.';
     canonicalUrl = 'https://www.tark.live/prs';
@@ -1607,7 +1734,7 @@ export async function renderHubSeoHtml(section: HubSectionType): Promise<string>
           .select('id, headline, source, ministry, created_at, published_at')
           .neq('source', 'PIB_Digest')
           .order('created_at', { ascending: false })
-          .limit(20);
+          .limit(50);
 
         if (data && data.length > 0) {
           itemsHtml = data.map((item: any) => {
@@ -1634,6 +1761,8 @@ export async function renderHubSeoHtml(section: HubSectionType): Promise<string>
         <a href="/intelligence/gs-2" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-amber-300 hover:border-amber-400">GS-2 Hub</a>
         <a href="/intelligence/gs-3" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-amber-300 hover:border-amber-400">GS-3 Hub</a>
         <a href="/intelligence/gs-4" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-amber-300 hover:border-amber-400">GS-4 Hub</a>
+        <a href="/daily-edition" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-cyan-300 hover:border-cyan-400">Daily PIB Edition</a>
+        <a href="/prs" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-cyan-300 hover:border-cyan-400">PRS Vault</a>
       </div>
       <section>
         <ul class="space-y-3">
@@ -1676,6 +1805,10 @@ export async function renderHubSeoHtml(section: HubSectionType): Promise<string>
   let modifiedHtml = baseHtml;
   modifiedHtml = modifiedHtml.replace(/<title>.*?<\/title>/i, `<title>${escapeXml(title)}</title>`);
   modifiedHtml = modifiedHtml.replace(
+    /<meta\s+name=["']title["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta name="title" content="${escapeXml(title)}" />`
+  );
+  modifiedHtml = modifiedHtml.replace(
     /<meta\s+name=["']description["']\s+content=["'].*?["']\s*\/?>/i,
     `<meta name="description" content="${escapeXml(description)}" />`
   );
@@ -1700,6 +1833,18 @@ export async function renderHubSeoHtml(section: HubSectionType): Promise<string>
   modifiedHtml = modifiedHtml.replace(
     /<meta\s+property=["']og:url["']\s+content=["'].*?["']\s*\/?>/i,
     `<meta property="og:url" content="${escapeXml(canonicalUrl)}" />`
+  );
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+property=["']twitter:title["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta property="twitter:title" content="${escapeXml(title)}" />`
+  );
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+property=["']twitter:description["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta property="twitter:description" content="${escapeXml(description)}" />`
+  );
+  modifiedHtml = modifiedHtml.replace(
+    /<meta\s+property=["']twitter:url["']\s+content=["'].*?["']\s*\/?>/i,
+    `<meta property="twitter:url" content="${escapeXml(canonicalUrl)}" />`
   );
 
   const extraHead = `

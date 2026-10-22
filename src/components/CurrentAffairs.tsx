@@ -383,11 +383,15 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
 
       if (pathname.includes('/daily-edition')) {
         setBriefViewMode('edition');
-        updateDocumentMeta(ROUTE_META_DEFAULTS.edition);
+        if (pathname === '/daily-edition') {
+          updateDocumentMeta(ROUTE_META_DEFAULTS.edition);
+        }
       } else if (pathname.includes('/prs')) {
         setActiveCategoryTab('PRS');
         setSelectedSource('PRS');
-        updateDocumentMeta(ROUTE_META_DEFAULTS.prs);
+        if (pathname === '/prs') {
+          updateDocumentMeta(ROUTE_META_DEFAULTS.prs);
+        }
       } else if (pathname.includes('/gs-1') || pathname.includes('/gs-i')) {
         setActiveCategoryTab('ALL');
         setSearchQuery('GS-1');
@@ -507,8 +511,8 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
       const fallbackPath = activeCategoryTab === 'PRS' ? '/prs' : '/intelligence';
       if (window.location.pathname.startsWith('/intelligence/') || window.location.pathname.startsWith('/prs/')) {
         window.history.pushState(null, '', fallbackPath);
+        updateDocumentMeta(activeCategoryTab === 'PRS' ? ROUTE_META_DEFAULTS.prs : ROUTE_META_DEFAULTS.tracker);
       }
-      updateDocumentMeta(activeCategoryTab === 'PRS' ? ROUTE_META_DEFAULTS.prs : ROUTE_META_DEFAULTS.tracker);
     }
   }, [selectedDossier?.id]);
 

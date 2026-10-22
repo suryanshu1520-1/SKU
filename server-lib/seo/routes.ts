@@ -243,6 +243,7 @@ const HUB_ROUTES: Record<string, Parameters<typeof renderHubSeoHtml>[0]> = {
   '/manifesto': 'manifesto',
   '/sources': 'sources',
   '/leaderboard': 'leaderboard',
+  '/library': 'library',
 };
 
 for (const [routePath, section] of Object.entries(HUB_ROUTES)) {

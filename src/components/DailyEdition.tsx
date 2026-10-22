@@ -123,25 +123,47 @@ function getCategoryColor(ministry: string, tags?: string[]): { bar: string; tag
 export default function DailyEdition({ userId, compactModeDefault = false, onOpenArenaQuiz }: DailyEditionProps) {
   const prefersReducedMotion = useReducedMotion();
   const today = useMemo(istToday, []);
+  const initialDate = useMemo(() => {
+    if (typeof window === 'undefined') return today;
+    const match = window.location.pathname.match(/\/daily-edition\/(\d{4}-\d{2}-\d{2})/);
+    return match ? match[1] : today;
+  }, [today]);
 
+  const [currentDate, setCurrentDate] = useState<string>(initialDate);
   const [items, setItems] = useState<EditionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [readUrls, setReadUrls] = useState<Set<string>>(new Set());
   const [isDensityCompact, setIsDensityCompact] = useState(compactModeDefault);
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
 
+  // Listen to popstate for back/forward date navigation
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handlePop = () => {
+      const match = window.location.pathname.match(/\/daily-edition\/(\d{4}-\d{2}-\d{2})/);
+      if (match && match[1]) {
+        setCurrentDate(match[1]);
+      } else if (window.location.pathname === '/daily-edition') {
+        setCurrentDate(today);
+      }
+    };
+    window.addEventListener('popstate', handlePop);
+    return () => window.removeEventListener('popstate', handlePop);
+  }, [today]);
+
   // Quiz state
   const [quizOpen, setQuizOpen] = useState(false);
   const [mcqs, setMcqs] = useState<Mcq[]>([]);
   const [quizLoading, setQuizLoading] = useState(false);
 
-  const readKey = `tark_edition_read_${today}`;
+  const readKey = `tark_edition_read_${currentDate}`;
 
   // Restore per-day read state
   useEffect(() => {
     try {
       const raw = localStorage.getItem(readKey);
       if (raw) setReadUrls(new Set(JSON.parse(raw)));
+      else setReadUrls(new Set());
     } catch {
       /* ignore */
     }
@@ -150,17 +172,17 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
   // Synchronize Daily Edition URL and SEO meta
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const editionUrl = `/daily-edition/${today}`;
+      const editionUrl = `/daily-edition/${currentDate}`;
       if (window.location.pathname !== editionUrl && !window.location.search.includes('id=')) {
         window.history.pushState(null, '', editionUrl);
       }
       updateDocumentMeta({
-        title: `PIB & Daily Current Affairs Edition (${today}) | Tark Intelligence`,
-        description: `Verified daily government policy brief and PIB digests for UPSC CSE preparation. Curated on ${today}.`,
+        title: `PIB & Daily Current Affairs Edition (${currentDate}) | Tark Intelligence`,
+        description: `Verified daily government policy brief and PIB digests for UPSC CSE preparation. Curated on ${currentDate}.`,
         canonicalPath: editionUrl,
       });
     }
-  }, [today]);
+  }, [currentDate]);
 
   const persistRead = useCallback(
     (next: Set<string>) => {
@@ -174,21 +196,29 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
     [readKey]
   );
 
-  // Fetch today's edition
+  // Fetch edition items for currentDate
   useEffect(() => {
     let alive = true;
     (async () => {
       setLoading(true);
       try {
-        const since = new Date(Date.now() - 36 * 3600 * 1000).toISOString();
-        const { data, error } = await supabase
+        let query = supabase
           .from('current_affairs')
           .select('*')
           .neq('source', 'PIB_Digest')
-          .neq('source', 'PRS')
-          .gte('created_at', since)
+          .neq('source', 'PRS');
+
+        if (currentDate === today) {
+          const since = new Date(Date.now() - 36 * 3600 * 1000).toISOString();
+          query = query.gte('created_at', since);
+        } else {
+          query = query.or(`created_at.like.${currentDate}%,published_at.like.${currentDate}%`);
+        }
+
+        const { data, error } = await query
           .order('created_at', { ascending: false })
           .limit(120);
+
         if (error) throw error;
         if (!alive) return;
 
@@ -210,7 +240,7 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
     return () => {
       alive = false;
     };
-  }, [today]);
+  }, [currentDate, today]);
 
   const toggleRead = (url: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -247,6 +277,19 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
     }
   };
 
+  const prevDate = useMemo(() => {
+    const d = new Date(currentDate);
+    d.setDate(d.getDate() - 1);
+    return d.toISOString().split('T')[0];
+  }, [currentDate]);
+
+  const nextDate = useMemo(() => {
+    const d = new Date(currentDate);
+    d.setDate(d.getDate() + 1);
+    const nextStr = d.toISOString().split('T')[0];
+    return nextStr <= today ? nextStr : null;
+  }, [currentDate, today]);
+
   if (loading || items.length === 0) return null;
 
   const doneCount = items.filter((i) => readUrls.has(i.url)).length;
@@ -266,8 +309,46 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
             </span>
             <span className="text-[11.5px] font-mono text-[#9fb0c8] flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5 text-[#0194a8]" />
-              {new Date(today).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+              {new Date(currentDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
             </span>
+            <div className="flex items-center gap-1 text-[11px] font-mono">
+              <a
+                href={`/daily-edition/${prevDate}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setCurrentDate(prevDate);
+                }}
+                className="px-2 py-0.5 rounded-xs bg-[rgba(3,18,42,0.8)] border border-[rgba(19,108,153,0.4)] text-[#8fa2bd] hover:text-[#e0d0ab] hover:border-[#e0d0ab]/40 transition-colors"
+                title={`Previous Day (${prevDate})`}
+              >
+                &larr; Prev
+              </a>
+              {nextDate && (
+                <a
+                  href={`/daily-edition/${nextDate}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentDate(nextDate);
+                  }}
+                  className="px-2 py-0.5 rounded-xs bg-[rgba(3,18,42,0.8)] border border-[rgba(19,108,153,0.4)] text-[#8fa2bd] hover:text-[#e0d0ab] hover:border-[#e0d0ab]/40 transition-colors"
+                  title={`Next Day (${nextDate})`}
+                >
+                  Next &rarr;
+                </a>
+              )}
+              {currentDate !== today && (
+                <a
+                  href={`/daily-edition/${today}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCurrentDate(today);
+                  }}
+                  className="px-2 py-0.5 rounded-xs bg-[#e0d0ab]/10 border border-[#e0d0ab]/40 text-[#e0d0ab] hover:bg-[#e0d0ab] hover:text-[#072e63] transition-colors"
+                >
+                  Today
+                </a>
+              )}
+            </div>
             <span className="text-muted hidden sm:inline">&bull;</span>
             <span className="text-[11.5px] font-mono text-[#8fa2bd]">
               {items.length} curated briefs &bull; ~{minutes} min

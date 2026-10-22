@@ -51,6 +51,11 @@ export const ROUTE_META_DEFAULTS: Record<string, RouteMetaConfig> = {
     description: 'Autonomous policy & governance intelligence distilled directly from official PIB releases, Cabinet decisions, and The Hindu for UPSC CSE and State PSC prep.',
     canonicalPath: '/intelligence',
   },
+  library: {
+    title: 'UPSC Subject Study Library & High-Yield Pillars | Tark',
+    description: 'Explore comprehensive subject pillars, foundational concepts, mind maps, static reference facts, and mains answer blueprints for UPSC CSE preparation.',
+    canonicalPath: '/library',
+  },
   gs1: {
     title: 'UPSC GS 1 Current Affairs & Static Linkages | Heritage, Geography & Society | Tark',
     description: 'High-yield current affairs dossiers and Prelims MCQs mapped strictly to UPSC GS-1 syllabus: Indian Heritage, Modern History, Geography, and Social Demographics.',

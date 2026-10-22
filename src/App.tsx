@@ -86,7 +86,28 @@ export default function App() {
       ) {
         setGameState('arena');
         setActiveTab('tracker');
-        updateDocumentMeta(ROUTE_META_DEFAULTS.tracker);
+        const isDeepLink = pathname.includes('/daily-edition/') ||
+                           pathname.includes('/prs/') ||
+                           (pathname.startsWith('/intelligence/') && !pathname.startsWith('/intelligence/gs-') && !pathname.startsWith('/intelligence/ministry/')) ||
+                           (pathname.startsWith('/news/') && !pathname.startsWith('/news/gs-') && !pathname.startsWith('/news/ministry/')) ||
+                           params.has('id');
+        if (!isDeepLink) {
+          if (pathname.startsWith('/daily-edition')) {
+            updateDocumentMeta(ROUTE_META_DEFAULTS.edition);
+          } else if (pathname.startsWith('/prs')) {
+            updateDocumentMeta(ROUTE_META_DEFAULTS.prs);
+          } else if (pathname.startsWith('/intelligence/gs-1')) {
+            updateDocumentMeta(ROUTE_META_DEFAULTS.gs1);
+          } else if (pathname.startsWith('/intelligence/gs-2')) {
+            updateDocumentMeta(ROUTE_META_DEFAULTS.gs2);
+          } else if (pathname.startsWith('/intelligence/gs-3')) {
+            updateDocumentMeta(ROUTE_META_DEFAULTS.gs3);
+          } else if (pathname.startsWith('/intelligence/gs-4')) {
+            updateDocumentMeta(ROUTE_META_DEFAULTS.gs4);
+          } else {
+            updateDocumentMeta(ROUTE_META_DEFAULTS.tracker);
+          }
+        }
       } else if (pathname.startsWith('/arena')) {
         setGameState('arena');
         setActiveTab('arena');
@@ -102,6 +123,7 @@ export default function App() {
       } else if (pathname.startsWith('/library') || pathname.startsWith('/pillars')) {
         setGameState('arena');
         setActiveTab('library');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.library);
       } else if (pathname.startsWith('/leaderboard')) {
         setGameState('arena');
         setActiveTab('leaderboard');
@@ -147,7 +169,28 @@ export default function App() {
         setArenaConfig(null);
         setGameState('arena');
         setActiveTab('tracker');
-        updateDocumentMeta(ROUTE_META_DEFAULTS.tracker);
+        const isDeepLink = currentPath.includes('/daily-edition/') ||
+                           currentPath.includes('/prs/') ||
+                           (currentPath.startsWith('/intelligence/') && !currentPath.startsWith('/intelligence/gs-') && !currentPath.startsWith('/intelligence/ministry/')) ||
+                           (currentPath.startsWith('/news/') && !currentPath.startsWith('/news/gs-') && !currentPath.startsWith('/news/ministry/')) ||
+                           window.location.search.includes('id=');
+        if (!isDeepLink) {
+          if (currentPath.startsWith('/daily-edition')) {
+            updateDocumentMeta(ROUTE_META_DEFAULTS.edition);
+          } else if (currentPath.startsWith('/prs')) {
+            updateDocumentMeta(ROUTE_META_DEFAULTS.prs);
+          } else if (currentPath.startsWith('/intelligence/gs-1')) {
+            updateDocumentMeta(ROUTE_META_DEFAULTS.gs1);
+          } else if (currentPath.startsWith('/intelligence/gs-2')) {
+            updateDocumentMeta(ROUTE_META_DEFAULTS.gs2);
+          } else if (currentPath.startsWith('/intelligence/gs-3')) {
+            updateDocumentMeta(ROUTE_META_DEFAULTS.gs3);
+          } else if (currentPath.startsWith('/intelligence/gs-4')) {
+            updateDocumentMeta(ROUTE_META_DEFAULTS.gs4);
+          } else {
+            updateDocumentMeta(ROUTE_META_DEFAULTS.tracker);
+          }
+        }
       } else if (currentPath.startsWith('/arena')) {
         setTargetPillar(null);
         setArenaConfig(null);
@@ -171,6 +214,7 @@ export default function App() {
         setArenaConfig(null);
         setGameState('arena');
         setActiveTab('library');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.library);
       } else if (currentPath.startsWith('/leaderboard')) {
         setTargetPillar(null);
         setArenaConfig(null);
