@@ -1,16 +1,5 @@
-@import "@fontsource/inter/300.css";
-@import "@fontsource/inter/400.css";
-@import "@fontsource/inter/500.css";
-@import "@fontsource/inter/600.css";
-@import "@fontsource/merriweather/300.css";
-@import "@fontsource/merriweather/400.css";
-@import "@fontsource/merriweather/700.css";
-@import "@fontsource/merriweather/700-italic.css";
-@import "@fontsource/merriweather/300-italic.css";
 @import "@fontsource/jetbrains-mono/400.css";
 @import "@fontsource/jetbrains-mono/500.css";
-@import "@fontsource/jetbrains-mono/700.css";
-@import "katex/dist/katex.min.css";
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
@@ -260,7 +249,7 @@ a {
 /* ── Drop-cap on the very first <p> inside the content ── */
 .first-p-drop-cap > p:first-of-type::first-letter {
   float: left;
-  font-family: "Merriweather", serif;
+  font-family: var(--font-serif);
   font-size: 3.5rem;
   line-height: 0.8;
   font-weight: 700;

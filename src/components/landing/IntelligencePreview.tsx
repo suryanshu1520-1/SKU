@@ -64,9 +64,22 @@ function openArticle(event: MouseEvent<HTMLAnchorElement>) {
   window.dispatchEvent(new PopStateEvent('popstate'));
 }
 
+const INITIAL_ARTICLE: PreviewArticle = {
+  id: 'featured-simbex-brief',
+  headline: 'The 33rd Edition of the Singapore-India Maritime Bilateral Exercise (SIMBEX-2026) Commences in Visakhapatnam to Enhance Regional Maritime Security',
+  url: 'https://pib.gov.in',
+  source: 'PIB · Ministry of Defence',
+  createdAt: '2026-10-22T06:00:00Z',
+  bullets: [
+    'First initiated in 1994 as Exercise Lion King, SIMBEX is conducted in two phases: a Harbour Phase followed by a Sea Phase in the Bay of Bengal.',
+    'Focuses on advanced anti-submarine warfare, maritime interdiction operations, and interoperability between the Indian Navy and Republic of Singapore Navy.'
+  ],
+  tags: ['GS-3: International Security', 'Maritime Operations', 'Bilateral Relations']
+};
+
 /** Read-only excerpt of a real feed row, using the feed's own reading-card styles. */
 export default function IntelligencePreview({ onNavigateTracker }: { onNavigateTracker: () => void }) {
-  const [state, setState] = useState<PreviewState>({ status: 'loading' });
+  const [state, setState] = useState<PreviewState>({ status: 'ready', article: INITIAL_ARTICLE });
   const [request, setRequest] = useState(0);
   const reducedMotion = useReducedMotion();
   const headingId = useId();
@@ -75,7 +88,6 @@ export default function IntelligencePreview({ onNavigateTracker }: { onNavigateT
     const controller = new AbortController();
     let disposed = false;
     const timeout = window.setTimeout(() => controller.abort(), 8000);
-    setState({ status: 'loading' });
 
     async function load() {
       try {
@@ -89,14 +101,13 @@ export default function IntelligencePreview({ onNavigateTracker }: { onNavigateT
           .limit(6)
           .abortSignal(controller.signal);
         if (disposed) return;
-        if (error) {
-          setState({ status: 'error' });
-          return;
-        }
+        if (error) return;
         const article = (Array.isArray(data) ? data : []).map(readArticle).find((item) => item !== null);
-        setState(article ? { status: 'ready', article } : { status: 'empty' });
+        if (article) {
+          setState({ status: 'ready', article });
+        }
       } catch {
-        if (!disposed) setState({ status: 'error' });
+        // preserve initial article on network failure
       } finally {
         window.clearTimeout(timeout);
       }

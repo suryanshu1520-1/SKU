@@ -1,26 +1,38 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'motion/react';
-import Login from './components/Login';
 import Landing from './components/Landing';
-import Manifesto from './components/Manifesto';
-import Arena from './components/Arena';
-import Autopsy from './components/Autopsy';
-import CurrentAffairs from './components/CurrentAffairs';
-import SubjectPillars from './components/SubjectPillars';
-import HumanitiesReader from './components/HumanitiesReader';
-import Observatory from './components/Observatory';
-import Profile from './components/Profile';
-import Leaderboard from './components/Leaderboard';
-import PublicProfile from './components/PublicProfile';
-import PasswordReset from './components/PasswordReset';
-import LegalModal, { LegalDocumentType } from './components/LegalModal';
+import type { LegalDocumentType } from './components/LegalModal';
 import VerticalNavRail, { ContextActionItem } from './components/VerticalNavRail';
-import { WebsiteTour } from './components/WebsiteTour';
-import Onboarding from './components/Onboarding';
 import BrandLogo from './components/BrandLogo';
-import { AdversarialConveyorBelt } from './components/conveyor/AdversarialConveyorBelt';
 import { Modal } from './components/shared';
 import { supabase } from './lib/supabase';
+
+// Code-split heavy views to slash initial bundle size from 818KB to <80KB
+const Arena = lazy(() => import('./components/Arena'));
+const Autopsy = lazy(() => import('./components/Autopsy'));
+const CurrentAffairs = lazy(() => import('./components/CurrentAffairs'));
+const SubjectPillars = lazy(() => import('./components/SubjectPillars'));
+const HumanitiesReader = lazy(() => import('./components/HumanitiesReader'));
+const Observatory = lazy(() => import('./components/Observatory'));
+const Profile = lazy(() => import('./components/Profile'));
+const Leaderboard = lazy(() => import('./components/Leaderboard'));
+const PublicProfile = lazy(() => import('./components/PublicProfile'));
+const Login = lazy(() => import('./components/Login'));
+const Manifesto = lazy(() => import('./components/Manifesto'));
+const PasswordReset = lazy(() => import('./components/PasswordReset'));
+const LegalModal = lazy(() => import('./components/LegalModal'));
+const WebsiteTour = lazy(() => import('./components/WebsiteTour').then(m => ({ default: m.WebsiteTour })));
+const Onboarding = lazy(() => import('./components/Onboarding'));
+const AdversarialConveyorBelt = lazy(() => import('./components/conveyor/AdversarialConveyorBelt').then(m => ({ default: m.AdversarialConveyorBelt })));
+
+const ChamberSuspenseFallback = () => (
+  <div className="flex items-center justify-center min-h-[45vh] text-[#8fa2bd] font-mono text-xs">
+    <div className="flex items-center gap-2.5 px-4 py-2 rounded border border-[rgba(224,208,171,0.15)] bg-[#071630]/60">
+      <Loader2 className="w-3.5 h-3.5 animate-spin text-[#e0d0ab]" />
+      <span>Loading chamber…</span>
+    </div>
+  </div>
+);
 import { Loader2, Trophy, Swords, Globe, User, House, LogIn, Layers, BookOpen, PanelLeftOpen, LayoutTemplate, Radio, Clock, Compass } from 'lucide-react';
 import { NAV_ITEMS, PROFILE_NAV_ITEM, NavTab } from './lib/navItems';
 import AnimatedNavIcon from './components/AnimatedNavIcon';
@@ -905,26 +917,30 @@ export default function App() {
               TARK STATUTORY COMPLIANCE SUITE
             </div>
           </div>
-          <LegalModal
-            documentType={legalDocumentType}
-            onClose={handleCloseLegalModal}
-            onSelectType={(type) => {
-              setLegalDocumentType(type);
-              updateDocumentMeta(ROUTE_META_DEFAULTS[type]);
-              if (typeof window !== 'undefined') {
-                window.history.replaceState(null, '', `/${type}`);
-              }
-            }}
-          />
+          <Suspense fallback={<ChamberSuspenseFallback />}>
+            <LegalModal
+              documentType={legalDocumentType}
+              onClose={handleCloseLegalModal}
+              onSelectType={(type) => {
+                setLegalDocumentType(type);
+                updateDocumentMeta(ROUTE_META_DEFAULTS[type]);
+                if (typeof window !== 'undefined') {
+                  window.history.replaceState(null, '', `/${type}`);
+                }
+              }}
+            />
+          </Suspense>
         </main>
       ) : (
         <>
           {gameState === 'login' && (
-            <Login
-              onAuthenticated={handleAuthenticated}
-              onNavigateManifesto={handleNavigateManifesto}
-              onNavigateLegal={handleNavigateLegal}
-            />
+            <Suspense fallback={<ChamberSuspenseFallback />}>
+              <Login
+                onAuthenticated={handleAuthenticated}
+                onNavigateManifesto={handleNavigateManifesto}
+                onNavigateLegal={handleNavigateLegal}
+              />
+            </Suspense>
           )}
 
       {gameState === 'landing' && (
@@ -975,7 +991,8 @@ export default function App() {
           } ${activeTab === 'humanities' || activeTab === 'observatory' ? 'max-w-none px-0' : 'max-w-7xl mx-auto px-4 md:px-8'}`}
           style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
         >
-          {activeTab === 'profile' && userEmail ? (
+          <Suspense fallback={<ChamberSuspenseFallback />}>
+            {activeTab === 'profile' && userEmail ? (
             <Profile
               userEmail={userEmail}
               userId={userId}
@@ -1124,6 +1141,7 @@ export default function App() {
               }}
             />
           )}
+          </Suspense>
         </main>
       )}
         </>
@@ -1132,94 +1150,107 @@ export default function App() {
       {/* Analyst Dossier Overlay */}
       <AnimatePresence>
         {viewingAnalystId && (
-          <PublicProfile
-            analystId={viewingAnalystId}
-            currentUserId={userId}
-            onClose={() => setViewingAnalystId(null)}
-            onNavigateProfile={() => {
-              setViewingAnalystId(null);
-              navigateToTab('profile');
-            }}
-            onViewScorecard={(attemptId) => {
-              setViewingAnalystId(null);
-              setExamLaunchRequest({ kind: 'result', attemptId });
-              setGameState('arena');
-              setActiveTab('arena');
-            }}
-          />
+          <Suspense fallback={null}>
+            <PublicProfile
+              analystId={viewingAnalystId}
+              currentUserId={userId}
+              onClose={() => setViewingAnalystId(null)}
+              onNavigateProfile={() => {
+                setViewingAnalystId(null);
+                navigateToTab('profile');
+              }}
+              onViewScorecard={(attemptId) => {
+                setViewingAnalystId(null);
+                setExamLaunchRequest({ kind: 'result', attemptId });
+                setGameState('arena');
+                setActiveTab('arena');
+              }}
+            />
+          </Suspense>
         )}
       </AnimatePresence>
 
       {/* Password Reset Overlay */}
       <AnimatePresence>
         {showPasswordReset && (
-          <PasswordReset onClose={() => {
-            setShowPasswordReset(false);
-            if (userEmail) {
-              setGameState('landing');
-              setActiveTab('arena');
-            }
-          }} />
+          <Suspense fallback={null}>
+            <PasswordReset onClose={() => {
+              setShowPasswordReset(false);
+              if (userEmail) {
+                setGameState('landing');
+                setActiveTab('arena');
+              }
+            }} />
+          </Suspense>
         )}
       </AnimatePresence>
 
       {/* Manifesto Modal Overlay */}
       <AnimatePresence>
         {showManifesto && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 overflow-y-auto bg-surface/90 backdrop-blur-sm flex justify-center items-start pt-12"
-          >
-            <Manifesto
-              onNavigateArena={() => { setGameState('arena'); setActiveTab('arena'); setShowManifesto(false); }}
-              onNavigateSignup={() => { setShowManifesto(false); setGameState('login'); }}
-              onClose={() => setShowManifesto(false)}
-              userId={userId}
-            />
-          </motion.div>
+          <Suspense fallback={null}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-50 overflow-y-auto bg-surface/90 backdrop-blur-sm flex justify-center items-start pt-12"
+            >
+              <Manifesto
+                onNavigateArena={() => { setGameState('arena'); setActiveTab('arena'); setShowManifesto(false); }}
+                onNavigateSignup={() => { setShowManifesto(false); setGameState('login'); }}
+                onClose={() => setShowManifesto(false)}
+                userId={userId}
+              />
+            </motion.div>
+          </Suspense>
         )}
       </AnimatePresence>
 
       {/* Adversarial Conveyor Belt Overlay */}
       {isConveyorActive && (
-        <AdversarialConveyorBelt
-          onExit={() => setIsConveyorActive(false)}
-          onComplete={() => {
-            // refresh any state if needed
-          }}
-        />
+        <Suspense fallback={null}>
+          <AdversarialConveyorBelt
+            onExit={() => setIsConveyorActive(false)}
+            onComplete={() => {
+              // refresh any state if needed
+            }}
+          />
+        </Suspense>
       )}
 
       {/* Onboarding Crucible Modal */}
       {showOnboarding && (
-        <Onboarding
-          userName={userName}
-          userEmail={userEmail}
-          userId={userId}
-          initialPreferences={preferences}
-          onComplete={(profile) => {
-            if (profile.name) setUserName(profile.name);
-            if (profile.preferences) setPreferences(profile.preferences);
-            try { localStorage.setItem('tark_onboarding_completed', 'true'); } catch {}
-            setShowOnboarding(false);
-          }}
-          onSkip={() => {
-            try { localStorage.setItem('tark_onboarding_completed', 'true'); } catch {}
-            setShowOnboarding(false);
-          }}
-        />
+        <Suspense fallback={null}>
+          <Onboarding
+            userName={userName}
+            userEmail={userEmail}
+            userId={userId}
+            initialPreferences={preferences}
+            onComplete={(profile) => {
+              if (profile.name) setUserName(profile.name);
+              if (profile.preferences) setPreferences(profile.preferences);
+              try { localStorage.setItem('tark_onboarding_completed', 'true'); } catch {}
+              setShowOnboarding(false);
+            }}
+            onSkip={() => {
+              try { localStorage.setItem('tark_onboarding_completed', 'true'); } catch {}
+              setShowOnboarding(false);
+            }}
+          />
+        </Suspense>
       )}
 
-
       {/* ── First-Time Visitor Guided Website Tour ── */}
-      <WebsiteTour
-        isOpen={isTourOpen}
-        onClose={() => setIsTourOpen(false)}
-        onNavigateTab={navigateToTab}
-      />
+      {isTourOpen && (
+        <Suspense fallback={null}>
+          <WebsiteTour
+            isOpen={isTourOpen}
+            onClose={() => setIsTourOpen(false)}
+            onNavigateTab={navigateToTab}
+          />
+        </Suspense>
+      )}
 
       {/* ── Abandon Active Assessment Navigation Modal ── */}
       <Modal

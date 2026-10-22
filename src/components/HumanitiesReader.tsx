@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import '@fontsource/merriweather/400.css';
+import '@fontsource/merriweather/700.css';
 import { motion } from 'motion/react';
 import {
   Search,
