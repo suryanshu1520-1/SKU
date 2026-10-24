@@ -6,7 +6,7 @@ Single source of truth for pipeline state. **Orchestrator-exclusive file — a d
 
 | Field | Value |
 |---|---|
-| Active contract | TASK_074 → TASK_076 → TASK_077 (Exam Hall integration + two fast-follows, PENDING_EXECUTION; TASK_074 HARD gate cleared 2026-09-24). TASK_050–073 are all verified and in completed/. Still unverified: TASK_034–042 (active/), TASK_010–013 and TASK_020 (pending/). TASK_021, TASK_022, TASK_028 and TASK_030 remain ESCALATED. |
+| Active contract | **TASK_086 Wave 2 fast-follows**: 086D2 and 086G2 are runnable now; 086F2 runs after 086D2. 086I is HARD-gated on all three. Wave 2 (086D/E/F/G/H2) was verified on 2026-10-22: 2 VERIFIED, 3 VERIFIED_PARTIAL. Master plan: `02_CONTRACTS/pending/TASK_086_PYQ_BANK_FINAL_EDITION.md`. Earlier queue: TASK_074 → TASK_076 → TASK_077 (Exam Hall integration + two fast-follows, PENDING_EXECUTION; TASK_074 HARD gate cleared 2026-09-24). TASK_050–073 are all verified and in completed/. Still unverified: TASK_034–042 (active/), TASK_010–013 and TASK_020 (pending/). TASK_021, TASK_022, TASK_028 and TASK_030 remain ESCALATED. |
 | Pending queue depth | 6 (TASK_010–013 and TASK_020, all AWAITING_VERIFICATION; TASK_075_EXAM_HALL_E2E_VERIFICATION, HARD-gated on TASK_074/076/077 verification plus a human applying migration 20260924120000_mock_attempts.sql) |
 | Completed (session) | 24 (TASK_001 through TASK_009, TASK_014 through TASK_019, plus TASK_023, TASK_024, TASK_025, TASK_026 [VERIFIED_PARTIAL], TASK_027, TASK_029, TASK_031, TASK_032 [VERIFIED_PARTIAL], TASK_033 [VERIFIED_PARTIAL]) + 2026-09-24: TASK_050–073 (24 contracts; 14 VERIFIED, 10 VERIFIED_PARTIAL) |
 | Escalated | 0 (TASK_018 escalated mid-chain, resolved by user decision — see PYQ extraction closure below) |
@@ -203,6 +203,92 @@ Fast-follows dispatched to `active/`: **TASK_076_EXAM_SESSION_HARDENING** (F1–
 **Totals this pass: 24 contracts verified and moved to `completed/`** (050–073): 14 `VERIFIED`, 10 `VERIFIED_PARTIAL`, each with an in-place §6 note.
 
 **Antigravity queue:** TASK_074 (gate cleared), then TASK_076, then TASK_077. TASK_075 waits on those three plus the migration.
+
+## 2026-10-22 — TASK_086 dispatched: PYQ Bank Final Edition (086A–086L)
+
+The owner asked (2026-10-21) for a once-and-for-all, S-tier PYQ bank from 2011, built from VisionIAS's paper-solution page; a follow-up added Rau's IAS Compass for Mains. **Owner decision, 2026-10-22:** use only those sources plus the digitised data already held locally in `tark_pyq_handoff/`. No official-channel scraping, no scans, no OCR.
+
+- **Contracts.** The master plan is `02_CONTRACTS/pending/TASK_086_PYQ_BANK_FINAL_EDITION.md`; Antigravity does not execute it. The 12 sub-contracts are `02_CONTRACTS/active/TASK_086A…086L`, each under 4k tokens.
+- **Verified live by the Orchestrator (2026-10-21):**
+  - VisionIAS serves 32 items server-side, and a plain GET works. Each material page names its CDN PDF in an inline `const pdfPath`; a stale URL in a commented-out line must be ignored.
+  - English Prelims: GS-1 for 2011–2026 (16) and CSAT for 2017 and 2020–2026 (8). Mains: 2024 only.
+  - The sampled PDFs are native text. The GS-1 files are ruled tables that PyMuPDF `find_tables()` reads with the correct headers (10, 11 and 14 columns across 2011, 2019 and 2026). CSAT 2026 is linear.
+  - Rau's Mains: 65 PDFs, 2013–2025. The 2024 sample is bilingual text, with the Hindi in a legacy-font garble.
+- **Design choices.**
+  - Reuse `server-lib/qbank/types.ts` and its validators, adding one field: `KeyAssertion.accepted_keys`.
+  - VisionIAS keys stay `secondary-claimed`. The 900 local official keys (2020–24) join only through a proven series alignment (agreement ≥ 0.80), and they also measure VisionIAS's key accuracy.
+  - No LLM or OCR.
+  - Run dir: `_raw_source_archive/qbank-quality/final-2026-10/`, gitignored and asserted at start-up.
+  - No document-specific branches (anti-gaming, after TASK_019).
+  - Every gate is a computed report, never a self-reported number.
+- **Gaps by design.** CSAT 2011–2016, 2018 and 2019 (640 slots) have no digitised source in the owner's set. They go to `canonical/gaps.json` and are never filled.
+- **Gates.**
+  - G1: Orchestrator checkpoint after 086C. It is the HARD gate for 086D, 086E and 086G.
+  - G2: the owner works the review queue in the 086J CLI before the 086K release.
+  - G4/G5: the owner applies the migration and runs the loader with `--apply` (086L).
+  - Antigravity never applies migrations and never writes review decisions.
+- **Found in passing, not fixed here.** `pyq_prelims.official_key` is anon-readable: public SELECT with no column lockdown in `20260825150000_create_pyq_relational_vault.sql:76-84`. It needs its own small fix.
+
+## 2026-10-22 (later) — TASK_086 G1 checkpoint: Wave 1 verified; 086E amended; 086H2 fast-follow
+
+Nothing was trusted from the receipts; every check below was re-run independently.
+
+- **086A: VERIFIED.** Census: 97 rows (VisionIAS 32, Rau's 65), exactly as specified.
+- **086B: VERIFIED.** 93 bronze files re-hashed with 0 mismatches. Two append-only runs; the second run downloaded nothing.
+- **086C: VERIFIED.** The profiler is deterministic (the re-run reproduced the same sha256).
+  - The receipt quoted a wrong hash for `profile.json`: a self-reported-number defect, now recorded.
+  - Its 7 UNKNOWN documents (VisionIAS CSAT 2017 and 2020–2025) are really linear text with 80 answer markers each. The cause was ambiguity in my spec (the implementation tested a pattern per stripped line). I amended 086E with general rules for `Ans.`/`Ans:`/`Answer:`, a letter on the next line, `Q.N.` prefix mode, and explanation capture.
+- **086H: VERIFIED_PARTIAL.**
+  - All 900 keys were re-derived independently with 0 mismatches.
+  - The transcriptions overstated their provenance. Every CSV row claims a full proofread, but `HANDOFF.md:55` says only 2021 Q1–16, 2024 and 2025 were verified. That was my spec's assumption, and the fast-follow `TASK_086H2` fixes it.
+  - 086H also added `accepted_keys` early; that is harmless, and 086I has been amended to match.
+- **Rau's Mains: 40 of 65 papers are image-only scans** (2014 and 2016–2022). Under the owner's no-OCR rule they are gaps, so digitised Mains covers 2013, 2015 and 2023–2025. This is raised to the owner as a decision.
+- **Hygiene:** `__pycache__/` and `*.pyc` were added to `.gitignore`.
+- **Queue:** 086D, 086E, 086G and 086H2 can run now. 086F follows D and E. 086I is HARD-gated on F, G, H and H2.
+
+## 2026-10-22 (Wave 2) — TASK_086 Wave 2 verified: 2 VERIFIED, 3 VERIFIED_PARTIAL; three fast-follows
+
+Every check was independent: the whole chain was re-run (204 outputs, 0 changed, so it is deterministic and all receipt hashes match the disk); fresh random items were rendered from the PDFs and compared by eye; and the extractions were measured against the page word layer.
+
+- **086E linear and 086H2 scope: VERIFIED.**
+  - All 8 CSAT papers pass, with 80 items each.
+  - The handoff corroboration is now exactly 2021 Q1–16, 2024 and 2025.
+- **086D table: VERIFIED_PARTIAL.**
+  - A VisionIAS summary table was merged into the last option of an item.
+  - In 2016–2017 per-line sub-cell layouts, lines were dropped and words clipped (2016: 3 items, 2017: 14).
+  - The stored bboxes are sub-cells only.
+  - From 2018 to 2026, the extracted text matches the page words exactly.
+  - For 2011–2015 the geometric check is confounded by hidden or overlapping text, but 6 of 6 rendered visual checks are correct.
+  - Fast-follow: `TASK_086D2` (foreign-table guard, band-based gap-fill gated on measured agreement, band bboxes).
+- **086F parser: VERIFIED_PARTIAL.**
+  - The closing prompt is merged into the last statement (4 of 8 samples), and phrase regexes break on wrapped lines (only 15 `how_many` items).
+  - Zero repairs is genuine: the raw cells contain no U+FFFD.
+  - Fast-follow: `TASK_086F2`.
+- **086G Mains: VERIFIED_PARTIAL.**
+  - Rau's 2013 and 2015 Mains PDFs are **OCR text layers** (Acrobat Paper Capture, ABBYY FineReader), not digital text, so they are gaps under the owner's rule.
+  - 2024/2025 lose marks to an inner space in "(Answer in N words )" and to right-aligned marks sitting in separate blocks.
+  - Fast-follow: `TASK_086G2`.
+  - Digitised Mains coverage is therefore **2023–2025 only**.
+- **Unrelated:** an SEO commit `e713811` landed from another session during this work.
+
+## 2026-10-24 — TASK_086 fast-follows verified; two new defects found; 086E verdict corrected
+
+All checks were independent: a full chain re-run (204 files byte-identical), my own sweep code, and fresh render checks.
+
+- **086D2: VERIFIED.**
+  - The foreign-table guard removed summary-table text from Q100 in all of 2011–2015. The defect had hit every one of those years.
+  - Gap-fill restored 2016/2017 dropped lines; 2017 Q6 matches the page exactly.
+  - 2011–2015 are `geometry_unverifiable` and unchanged (495/500 byte-identical).
+- **086F2: VERIFIED.** Closing prompts are split (97.8% coverage) and `how_many` rose from 15 to 100. The 2025 wording "How many of them" is handled by an option-pattern rule added to 086I.
+- **086G2: VERIFIED_PARTIAL.**
+  - The OCR guard is correct.
+  - Three source defects were confirmed in Rau's PDFs: 2024 GS-M3 Q11 prints 10; 2025 GS-M1 Q14 and GS-M3 Q19 print no marks.
+  - **The GS-M4 model is wrong in every year.** (b) labels sit on the Hindi line, and case-study marks are printed once per case study. The 2023/2024 Σ = 250 results were coincidental, with null-marks records that would fail validation. Fast-follow: `TASK_086G3`.
+- **New finding: multi-passage CSAT blocks are mislinked.** 42 of 60 blocks print "N passages … each passage", but only Passage 1 was stored and linked to every item (2021 Q1–3 all carry Passage 1). **My Wave 2 VERIFIED verdict on 086E was wrong** (I checked presence, not identity); it is now corrected to VERIFIED_PARTIAL. Fast-follow: `TASK_086E2`.
+- **Contract amendments:**
+  - 086I: `G_MARKS` for marks missing in the source; marks or word-limit mismatches become `G_XSRC`; option-pattern `how_many`; `G_PASSAGE_MISSING` → `missing_passage`.
+  - 086J and 086K: handle `G_MARKS`.
+- **Queue:** `TASK_086E2` and `TASK_086G3` are runnable now. 086I is HARD-gated on both.
 
 ## PYQ Extraction Closure (TASK_017/018/019)
 

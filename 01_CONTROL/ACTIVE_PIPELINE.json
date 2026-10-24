@@ -1,10 +1,10 @@
 {
   "pipeline_version": "1.0.0",
-  "active_super_prompt": "EXAM_HALL_2026_09_24",
-  "current_stage": "EXAM_HALL_VERIFIED_FAST_FOLLOWS_DISPATCHED",
-  "tasks_total": 19,
-  "tasks_completed": 15,
-  "active_task_id": "TASK_074_THEN_TASK_076_THEN_TASK_077",
+  "active_super_prompt": "PYQ_BANK_FINAL_EDITION_2026_10_22",
+  "current_stage": "TASK_086_FAST_FOLLOWS_VERIFIED_E2_G3_DISPATCHED",
+  "tasks_total": 18,
+  "tasks_completed": 12,
+  "active_task_id": "TASK_086E2_AND_TASK_086G3_THEN_TASK_086I",
   "note_on_stale_counters_above": "These fields track ONE super-prompt batch at a time, not the whole pipeline lifetime. Prior values (WS0_PLATFORM_FOUNDATION_BATCH, tasks_total:13, tasks_completed:9) had already drifted from STATE.md's real count of 15 completed by 2026-08-30 -- found and reconciled here rather than left stale. The WS0 batch (TASK_010-013) is still real and still queued in 02_CONTRACTS/pending/ -- see STATE.md's Queue section, not this top-level counter, for its status. This file's per-task history array below is append-only and remains the accurate long-form record regardless of which batch these summary fields point at.",
   "history": [
     {
@@ -373,6 +373,30 @@
       "event": "VERIFIED_BATCH",
       "contract": "02_CONTRACTS/completed/ (TASK_050-073); fast-follows 02_CONTRACTS/active/TASK_076_EXAM_SESSION_HARDENING.md, TASK_077_EXAM_UI_HARDENING.md",
       "note": "2026-09-24: Independent Orchestrator verification of 24 receipts, none trusted as written. Exam Hall 059-073: an Orchestrator script re-asserted every precomputed expectation (88/88; the pool is field-identical to the Orchestrator's Python build); test/lint/build exit 0; live catalog and 401 checks pass; the client bundle carries no pool or explanations; handlers.ts and db.ts reviewed line by line. Two reviewers covered the hook and UI, with every finding re-confirmed in code: 2 BLOCKERs (resume clock drift; full screen can't scroll) plus ~12 MAJOR defects, several caused by the Orchestrator's own contract text. These are fast-followed as TASK_076 and TASK_077. Undisclosed deviations recorded: an extra GRANT line in the TASK_062 migration; TASK_072 importing types directly from server-lib. TASK_050-058 had been committed and pushed in f9ce930 before any review. They were verified after the fact: logic diff; live drill smoke test (select/lock/reveal/next/cache/reload/resume); a11y probes; token/font/jargon greps. TASK_053 fails its <=3-families goal (5 shipped after DesignV3). TASK_057's receipt falsely claims 0 'zero-trust evaluation' matches (ArenaLobby.tsx:127). The live landing hard-codes '2,063 UPSC Prelims questions' (non-placeholder rows including non-UPSC and placeholder-key items). 14 VERIFIED, 10 VERIFIED_PARTIAL. TASK_074 HARD gate cleared."
+    },
+    {
+      "task_id": "TASK_086",
+      "event": "DISPATCHED",
+      "contract": "02_CONTRACTS/pending/TASK_086_PYQ_BANK_FINAL_EDITION.md (master plan, not executed); 02_CONTRACTS/active/TASK_086A ... TASK_086L",
+      "note": "2026-10-22: PYQ Bank Final Edition. Owner-selected sources only (VisionIAS paper solutions; Rau's IAS Compass Mains; local tark_pyq_handoff keys/transcriptions as a verification layer); no official channels, scans or OCR by owner decision. Wave 1 (086A census, 086B bronze, 086C profiler) is executable now; 086D/086E/086G are HARD-gated on the Orchestrator's G1 verification of 086C; 086I HARD on 086F/086G/086H; 086K waits for G2 (owner review decisions); 086L writes the migration file only (G4/G5 human). CSAT 2011-2016, 2018, 2019 are explicit gaps (no digitised source)."
+    },
+    {
+      "task_id": "TASK_086",
+      "event": "G1_VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_086A, 086B, 086C (VERIFIED), 086H (VERIFIED_PARTIAL); new 02_CONTRACTS/active/TASK_086H2_HANDOFF_TRANSCRIPTION_SCOPE_FIX.md; amended TASK_086E, TASK_086I",
+      "note": "2026-10-22: Independent re-verification (tests 40/40 TS + 4/4 Py, lint 0; census 97 rows exact; 93 bronze files re-hashed 0 mismatches; profiler deterministic; 900 keys re-derived 0 mismatches). Receipt defect: 086C quoted a wrong profile.json sha256. 7 VisionIAS CSAT docs UNKNOWN due to spec ambiguity (per-stripped-line number regex) -> 086E amended with general linear rules. 086H transcription provenance overstated vs HANDOFF.md:55 -> fast-follow 086H2. 40 Rau's Mains PDFs (2014, 2016-2022) are image-only scans -> gaps under the owner's no-OCR rule; raised to owner."
+    },
+    {
+      "task_id": "TASK_086",
+      "event": "WAVE2_VERIFIED",
+      "contract": "02_CONTRACTS/completed/TASK_086D (VERIFIED_PARTIAL), 086E (VERIFIED), 086F (VERIFIED_PARTIAL), 086G (VERIFIED_PARTIAL), 086H2 (VERIFIED); new active/TASK_086D2, 086F2, 086G2",
+      "note": "2026-10-22: full-chain re-run reproduced 204 outputs byte-identical (deterministic; receipt hashes match). Fresh random visual spot checks + word-layer measurement found: foreign summary-table rows merged; dropped/clipped lines in 2016-2017 per-line sub-cell tables; closing prompts merged into last statements; line-break-intolerant phrase regexes; Rau's 2013/2015 Mains are OCR text layers (not digitised) and 2024/2025 Mains lose marks. Each fixed by a general-rule fast-follow with sweeps. Digitised Mains coverage = 2023-2025."
+    },
+    {
+      "task_id": "TASK_086",
+      "event": "FAST_FOLLOWS_VERIFIED",
+      "contract": "completed/TASK_086D2 (VERIFIED), 086F2 (VERIFIED), 086G2 (VERIFIED_PARTIAL); 086E corrected to VERIFIED_PARTIAL; new active/TASK_086E2, TASK_086G3; amended 086I/J/K",
+      "note": "2026-10-24: chain re-run 204 files byte-identical. Found: CSAT multi-passage blocks mislinked (42/60 blocks; items 2..N carry Passage 1) - an Orchestrator miss at Wave 2, corrected; GS-M4 subpart/case-study modelling wrong in all years (coincidental 250 sums). 3 Rau's Mains source defects confirmed (marks misprinted/missing) -> G_MARKS review path."
     }
   ]
 }

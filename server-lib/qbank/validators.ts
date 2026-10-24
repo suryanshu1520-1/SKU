@@ -203,6 +203,25 @@ export function validateQuestionRecord(record: QuestionRecord): ValidationResult
   if ((record.key.authority === 'unavailable' || record.key.authority === 'not-applicable') && record.key.key != null)
     errors.push(err('key.key', `${record.key.authority} must not carry a key`));
 
+  if (record.key.accepted_keys != null) {
+    if (!Array.isArray(record.key.accepted_keys)) {
+      errors.push(err('key.accepted_keys', 'must be an array'));
+    } else {
+      const uniqueKeys = new Set(record.key.accepted_keys);
+      if (uniqueKeys.size < 2) {
+        errors.push(err('key.accepted_keys', 'must hold >= 2 unique valid OptionKeys'));
+      }
+      for (const k of record.key.accepted_keys) {
+        if (!isOptionKey(k)) {
+          errors.push(err('key.accepted_keys', `invalid: ${k}`));
+        }
+      }
+      if (record.key.key != null && !uniqueKeys.has(record.key.key)) {
+        errors.push(err('key.accepted_keys', 'must include key.key'));
+      }
+    }
+  }
+
   if (record.evidence.length === 0) errors.push(err('evidence', 'empty (not authentic)'));
   for (const [i, e] of record.evidence.entries()) {
     if (!SHA256_RE.test(e.sha256)) errors.push(err(`evidence[${i}].sha256`, 'malformed'));
@@ -218,7 +237,14 @@ export function validateQuestionRecord(record: QuestionRecord): ValidationResult
   if (!Number.isInteger(record.version) || record.version < 1) errors.push(err('version', `invalid: ${record.version}`));
 
   const derived = deriveEligibility(record);
-  if (JSON.stringify(derived) !== JSON.stringify(record.eligibility))
+  if (
+    derived.authentic !== record.eligibility.authentic ||
+    derived.text_complete !== record.eligibility.text_complete ||
+    derived.key_verified !== record.eligibility.key_verified ||
+    derived.scored !== record.eligibility.scored ||
+    derived.reference_only !== record.eligibility.reference_only ||
+    JSON.stringify(derived.blocking) !== JSON.stringify(record.eligibility.blocking)
+  )
     errors.push(err('eligibility', 'does not match derived value'));
 
   return { ok: errors.length === 0, errors };

@@ -133,3 +133,9 @@ copilot/
 gemini-scribe/
 YOLO/
 hive/
+# Python bytecode (qbank pipeline, TASK_086)
+__pycache__/
+*.pyc
+scratch/
+docs/brand/Handover
+docs/brand/TARK_Complete_Handover.txt

@@ -156,6 +156,8 @@ export interface KeyAssertion {
   authority: KeyAuthority;
   /** Present only when authority admits a letter (official-final, etc.). */
   key?: OptionKey | null;
+  /** Accepted keys when multiple answers were accepted (e.g. UPSC CSE 2021 GS2 Q39). */
+  accepted_keys?: OptionKey[] | null;
   /** The key document + page this was read from. */
   source_ref?: EvidenceRef;
   /** Note describing the validated paper/series join, when applicable. */

@@ -149,6 +149,40 @@ test('unavailable key must not carry a letter', () => {
   assert.ok(res.errors.some((e) => e.message.includes('must not carry a key')));
 });
 
+test('accepted_keys validation: valid case passes', () => {
+  const rec = makeRecord();
+  rec.key = { authority: 'official-final', key: 'b', accepted_keys: ['a', 'b'] };
+  const res = validateQuestionRecord(rec);
+  assert.ok(res.ok);
+});
+
+test('accepted_keys validation: < 2 unique OptionKeys fails', () => {
+  const rec1 = makeRecord();
+  rec1.key = { authority: 'official-final', key: 'b', accepted_keys: ['b'] };
+  assert.ok(validateQuestionRecord(rec1).errors.some((e) => e.message.includes('>= 2 unique')));
+
+  const rec2 = makeRecord();
+  rec2.key = { authority: 'official-final', key: 'b', accepted_keys: ['b', 'b'] };
+  assert.ok(validateQuestionRecord(rec2).errors.some((e) => e.message.includes('>= 2 unique')));
+});
+
+test('accepted_keys validation: must include key.key', () => {
+  const rec = makeRecord();
+  rec.key = { authority: 'official-final', key: 'b', accepted_keys: ['a', 'c'] };
+  const res = validateQuestionRecord(rec);
+  assert.ok(res.errors.some((e) => e.message.includes('must include key.key')));
+});
+
+test('accepted_keys validation: invalid key or non-array fails', () => {
+  const rec1 = makeRecord();
+  rec1.key = { authority: 'official-final', key: 'b', accepted_keys: ['b', 'z' as any] };
+  assert.ok(validateQuestionRecord(rec1).errors.some((e) => e.message.includes('invalid: z')));
+
+  const rec2 = makeRecord();
+  rec2.key = { authority: 'official-final', key: 'b', accepted_keys: 'ab' as any };
+  assert.ok(validateQuestionRecord(rec2).errors.some((e) => e.message.includes('must be an array')));
+});
+
 test('no evidence means not authentic', () => {
   const rec = makeRecord();
   rec.evidence = [];
