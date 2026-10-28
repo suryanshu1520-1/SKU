@@ -34,6 +34,19 @@ export function slugify(text: string): string {
   return toCleanSlug(text, 72);
 }
 
+export const MINISTRY_CANONICAL_ALIASES: Record<string, string> = {
+  'ministry-of-commerce-and-industry': 'ministry-of-commerce-industry',
+  'ministry-of-law-and-justice': 'ministry-of-law-justice',
+  'ministry-of-youth-affairs-and-sports': 'ministry-of-youth-affairs-sports',
+  'election-commission': 'election-commission-of-india',
+  'parliamentary-affairs': 'ministry-of-parliamentary-affairs',
+};
+
+export function normalizeMinistrySlug(rawSlug: string): string {
+  const s = slugify(rawSlug);
+  return MINISTRY_CANONICAL_ALIASES[s] || s;
+}
+
 export function escapeXml(unsafe: string): string {
   return (unsafe || '').replace(/[<>&'"]/g, (c) => {
     switch (c) {
@@ -146,10 +159,12 @@ export async function generateMainSitemap(): Promise<string> {
           }
         }
 
-        // Programmatic Ministry Hubs
+        // Programmatic Ministry Hubs (deduplicated by canonical slug)
+        const seenMinistries = new Set<string>();
         for (const min of ministrySet) {
-          const mSlug = slugify(min);
-          if (mSlug && mSlug.length > 3) {
+          const mSlug = normalizeMinistrySlug(min);
+          if (mSlug && mSlug.length > 3 && !seenMinistries.has(mSlug)) {
+            seenMinistries.add(mSlug);
             urls.push({
               loc: `https://www.tark.live/intelligence/ministry/${mSlug}`,
               lastmod: todayStr,
@@ -163,7 +178,7 @@ export async function generateMainSitemap(): Promise<string> {
       console.warn('[sitemap] Supabase current affairs query error:', err);
     }
 
-    // 3. Query PIB Digests for daily edition archives
+    // 3. Query PIB Digests for daily edition archives (strictly deduplicated by date)
     try {
       const { data: digests, error } = await supabase
         .from('pib_digests')
@@ -172,8 +187,10 @@ export async function generateMainSitemap(): Promise<string> {
         .limit(120);
 
       if (!error && digests) {
+        const seenDates = new Set<string>();
         for (const dig of digests) {
-          if (dig.date) {
+          if (dig.date && !seenDates.has(dig.date)) {
+            seenDates.add(dig.date);
             urls.push({
               loc: `https://www.tark.live/daily-edition/${encodeURIComponent(dig.date)}`,
               lastmod: formatDate(dig.created_at || dig.date),

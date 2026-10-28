@@ -172,8 +172,9 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
   // Synchronize Daily Edition URL and SEO meta
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const editionUrl = `/daily-edition/${currentDate}`;
-      if (window.location.pathname !== editionUrl && !window.location.search.includes('id=')) {
+      const isRoot = window.location.pathname === '/daily-edition';
+      const editionUrl = isRoot ? '/daily-edition' : `/daily-edition/${currentDate}`;
+      if (!isRoot && window.location.pathname !== editionUrl && !window.location.search.includes('id=')) {
         window.history.pushState(null, '', editionUrl);
       }
       updateDocumentMeta({

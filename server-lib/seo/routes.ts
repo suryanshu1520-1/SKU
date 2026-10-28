@@ -75,6 +75,30 @@ seoRouter.get(['/sitemap-news.xml', '/api/sitemap-news.xml'], async (_req: Reque
   }
 });
 
+// Timeout protection helper to ensure Googlebot and clients never hit Vercel 504 / 500
+async function safeRender(renderFn: () => Promise<string>, fallbackHtml: string, maxMs = 3500): Promise<string> {
+  let timer: NodeJS.Timeout;
+  const timeoutPromise = new Promise<string>((resolve) => {
+    timer = setTimeout(() => resolve(fallbackHtml), maxMs);
+  });
+  try {
+    return await Promise.race([renderFn(), timeoutPromise]);
+  } catch (err) {
+    console.warn('[seo-router] safeRender error fallback:', err);
+    return fallbackHtml;
+  } finally {
+    clearTimeout(timer!);
+  }
+}
+
+const MINISTRY_ALIASES: Record<string, string> = {
+  'ministry-of-commerce-and-industry': 'ministry-of-commerce-industry',
+  'ministry-of-law-and-justice': 'ministry-of-law-justice',
+  'ministry-of-youth-affairs-and-sports': 'ministry-of-youth-affairs-sports',
+  'election-commission': 'election-commission-of-india',
+  'parliamentary-affairs': 'ministry-of-parliamentary-affairs',
+};
+
 // 5. Programmatic GS Syllabus Hubs (/intelligence/gs-1, /intelligence/gs-2, /intelligence/gs-3, /intelligence/gs-4)
 seoRouter.get(
   ['/intelligence/gs-:paper', '/news/gs-:paper'],
@@ -83,17 +107,14 @@ seoRouter.get(
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       return res.status(200).send(getBaseHtml());
     }
-    try {
-      const paper = req.params.paper || '1';
-      const html = await renderGsHubSeoHtml(`gs-${paper}`);
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
-      return res.status(200).send(html);
-    } catch (err) {
-      console.warn('[seo-router] Error rendering GS hub SEO:', err);
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      return res.status(200).send(getBaseHtml());
-    }
+    const paper = req.params.paper || '1';
+    const html = await safeRender(
+      () => renderGsHubSeoHtml(`gs-${paper}`),
+      getBaseHtml()
+    );
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
+    return res.status(200).send(html);
   }
 );
 
@@ -101,21 +122,23 @@ seoRouter.get(
 seoRouter.get(
   ['/intelligence/ministry/:slug', '/news/ministry/:slug'],
   async (req: Request, res: Response, _next: NextFunction) => {
+    const rawSlug = req.params.slug || '';
+    if (MINISTRY_ALIASES[rawSlug]) {
+      return res.redirect(301, `/intelligence/ministry/${MINISTRY_ALIASES[rawSlug]}`);
+    }
+
     if (!shouldServeSeoHtml(req)) {
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
       return res.status(200).send(getBaseHtml());
     }
-    try {
-      const slug = req.params.slug || '';
-      const html = await renderMinistryHubSeoHtml(slug);
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
-      return res.status(200).send(html);
-    } catch (err) {
-      console.warn('[seo-router] Error rendering ministry hub SEO:', err);
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      return res.status(200).send(getBaseHtml());
-    }
+
+    const html = await safeRender(
+      () => renderMinistryHubSeoHtml(rawSlug),
+      getBaseHtml()
+    );
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
+    return res.status(200).send(html);
   }
 );
 
@@ -125,16 +148,14 @@ seoRouter.get('/daily-edition/:date', async (req: Request, res: Response, _next:
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     return res.status(200).send(getBaseHtml());
   }
-  try {
-    const html = await renderDailyEditionSeoHtml(req.params.date);
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
-    return res.status(200).send(html);
-  } catch (err) {
-    console.warn('[seo-router] Error rendering daily edition date SEO:', err);
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.status(200).send(getBaseHtml());
-  }
+  const dateStr = req.params.date;
+  const html = await safeRender(
+    () => renderDailyEditionSeoHtml(dateStr),
+    getBaseHtml()
+  );
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
+  return res.status(200).send(html);
 });
 
 seoRouter.get('/daily-edition', async (req: Request, res: Response, _next: NextFunction) => {
@@ -142,16 +163,13 @@ seoRouter.get('/daily-edition', async (req: Request, res: Response, _next: NextF
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     return res.status(200).send(getBaseHtml());
   }
-  try {
-    const html = await renderDailyEditionSeoHtml();
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
-    return res.status(200).send(html);
-  } catch (err) {
-    console.warn('[seo-router] Error rendering daily edition SEO:', err);
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.status(200).send(getBaseHtml());
-  }
+  const html = await safeRender(
+    () => renderDailyEditionSeoHtml(),
+    getBaseHtml()
+  );
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
+  return res.status(200).send(html);
 });
 
 // 8. Intelligence & News Article Routes Handler
@@ -160,26 +178,20 @@ async function handleIntelligenceRoute(req: Request, res: Response, _next: NextF
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     return res.status(200).send(getBaseHtml());
   }
-  try {
-    const queryId = typeof req.query.id === 'string' ? req.query.id : undefined;
-    const article = await fetchArticleForSeo(req.path, queryId);
-
-    if (article) {
-      const html = renderSeoHtml(article, req.url);
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
-      return res.status(200).send(html);
-    }
-
-    const hubHtml = await renderHubSeoHtml('intelligence');
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
-    return res.status(200).send(hubHtml);
-  } catch (err) {
-    console.warn('[seo-router] Error rendering intelligence SEO:', err);
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.status(200).send(getBaseHtml());
-  }
+  const html = await safeRender(
+    async () => {
+      const queryId = typeof req.query.id === 'string' ? req.query.id : undefined;
+      const article = await fetchArticleForSeo(req.path, queryId);
+      if (article) {
+        return renderSeoHtml(article, req.url);
+      }
+      return renderHubSeoHtml('intelligence');
+    },
+    getBaseHtml()
+  );
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
+  return res.status(200).send(html);
 }
 
 // 9. PRS Legislative Vault Routes Handler
@@ -188,26 +200,20 @@ async function handlePrsRoute(req: Request, res: Response, _next: NextFunction) 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     return res.status(200).send(getBaseHtml());
   }
-  try {
-    const queryId = typeof req.query.id === 'string' ? req.query.id : undefined;
-    const article = await fetchArticleForSeo(req.path, queryId);
-
-    if (article) {
-      const html = renderSeoHtml(article, req.url);
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
-      return res.status(200).send(html);
-    }
-
-    const hubHtml = await renderHubSeoHtml('prs');
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
-    return res.status(200).send(hubHtml);
-  } catch (err) {
-    console.warn('[seo-router] Error rendering PRS SEO:', err);
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.status(200).send(getBaseHtml());
-  }
+  const html = await safeRender(
+    async () => {
+      const queryId = typeof req.query.id === 'string' ? req.query.id : undefined;
+      const article = await fetchArticleForSeo(req.path, queryId);
+      if (article) {
+        return renderSeoHtml(article, req.url);
+      }
+      return renderHubSeoHtml('prs');
+    },
+    getBaseHtml()
+  );
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
+  return res.status(200).send(html);
 }
 
 seoRouter.get(['/intelligence', '/intelligence/:slug', '/news', '/news/:slug', '/current-affairs'], handleIntelligenceRoute);

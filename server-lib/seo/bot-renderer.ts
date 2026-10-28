@@ -24,6 +24,25 @@ function getSupabaseClient() {
 
 let cachedIndexHtml: string | null = null;
 
+// Multi-tier in-memory bot rendering caches to guarantee sub-10ms response times
+const ministryHubCache = new Map<string, { html: string; timestamp: number }>();
+const gsHubCache = new Map<string, { html: string; timestamp: number }>();
+const hubCache = new Map<string, { html: string; timestamp: number }>();
+const dailyEditionCache = new Map<string, { html: string; timestamp: number }>();
+const articleCache = new Map<string, { html: string; timestamp: number }>();
+
+const TTL_2_HOURS = 2 * 60 * 60 * 1000;
+const TTL_1_HOUR = 60 * 60 * 1000;
+const TTL_15_MINS = 15 * 60 * 1000;
+
+function setWithLruLimit(cache: Map<string, { html: string; timestamp: number }>, key: string, html: string, limit = 500) {
+  if (cache.size >= limit) {
+    const oldestKey = cache.keys().next().value;
+    if (oldestKey) cache.delete(oldestKey);
+  }
+  cache.set(key, { html, timestamp: Date.now() });
+}
+
 export function getBaseHtml(): string {
   if (cachedIndexHtml && process.env.NODE_ENV === 'production') {
     return cachedIndexHtml;
@@ -172,16 +191,24 @@ export async function fetchArticleForSeo(
         }
 
         if (!article) {
-          // 2. Fallback to querying recent records to find match
+          // 2. Fallback to querying recent records with minimal columns to find match
           const { data, error } = await supabase
             .from('current_affairs')
-            .select('*')
+            .select('id, headline')
             .order('created_at', { ascending: false })
-            .limit(500);
+            .limit(200);
 
           if (!error && data) {
             const matched = data.find((d: any) => slugify(d.headline) === slug);
-            if (matched) article = matched as ArticleRecord;
+            if (matched) {
+              const { data: fullArt } = await supabase
+                .from('current_affairs')
+                .select('*')
+                .eq('id', matched.id)
+                .limit(1)
+                .maybeSingle();
+              if (fullArt) article = fullArt as ArticleRecord;
+            }
           }
         }
       }
@@ -196,6 +223,7 @@ export async function fetchArticleForSeo(
             .from('current_affairs_mcqs')
             .select('*')
             .eq('affair_url', article.url)
+            .limit(1)
             .maybeSingle();
           if (data) mcqFound = data as McqRecord;
         }
@@ -204,6 +232,7 @@ export async function fetchArticleForSeo(
             .from('current_affairs_mcqs')
             .select('*')
             .eq('headline', article.headline)
+            .limit(1)
             .maybeSingle();
           if (data) mcqFound = data as McqRecord;
         }
@@ -380,6 +409,13 @@ function renderHistoricalTwinHtml(article: ArticleRecord): string {
 }
 
 export function renderSeoHtml(article: ArticleRecord, reqUrl: string): string {
+  const cacheKey = article.id || slugify(article.headline);
+  const now = Date.now();
+  const cached = articleCache.get(cacheKey);
+  if (cached && (now - cached.timestamp < TTL_2_HOURS)) {
+    return cached.html;
+  }
+
   const baseHtml = getBaseHtml();
   const slug = slugify(article.headline);
   const canonicalUrl = `https://www.tark.live/intelligence/${slug}?id=${encodeURIComponent(article.id || '')}`;
@@ -627,6 +663,7 @@ export function renderSeoHtml(article: ArticleRecord, reqUrl: string): string {
     `<div id="root">${semanticArticleHtml}</div>`
   );
 
+  setWithLruLimit(articleCache, cacheKey, modifiedHtml, 1000);
   return modifiedHtml;
 }
 
@@ -708,15 +745,21 @@ const GS_PAPERS: Record<string, {
  * Programmatic GS Paper Syllabus Hub Pre-Renderer (/intelligence/gs-1, /intelligence/gs-2, etc.)
  */
 export async function renderGsHubSeoHtml(rawPaper: string): Promise<string> {
-  const baseHtml = getBaseHtml();
-  const supabase = getSupabaseClient();
-
   // Normalize gs-1, gs-i, 1, gs-2, etc.
   const normKey = rawPaper.toLowerCase().replace('gs-', '').replace('gs', '');
   let paperKey = 'gs-1';
   if (normKey === '2' || normKey === 'ii') paperKey = 'gs-2';
   else if (normKey === '3' || normKey === 'iii') paperKey = 'gs-3';
   else if (normKey === '4' || normKey === 'iv') paperKey = 'gs-4';
+
+  const now = Date.now();
+  const cached = gsHubCache.get(paperKey);
+  if (cached && (now - cached.timestamp < TTL_2_HOURS)) {
+    return cached.html;
+  }
+
+  const baseHtml = getBaseHtml();
+  const supabase = getSupabaseClient();
 
   const meta = GS_PAPERS[paperKey] || GS_PAPERS['gs-1'];
   const canonicalUrl = `https://www.tark.live/intelligence/${paperKey}`;
@@ -941,6 +984,7 @@ export async function renderGsHubSeoHtml(rawPaper: string): Promise<string> {
     `<div id="root">${semanticHtml}</div>`
   );
 
+  setWithLruLimit(gsHubCache, paperKey, modifiedHtml, 10);
   return modifiedHtml;
 }
 
@@ -948,6 +992,13 @@ export async function renderGsHubSeoHtml(rawPaper: string): Promise<string> {
  * Programmatic Ministry Hub Pre-Renderer (/intelligence/ministry/:slug)
  */
 export async function renderMinistryHubSeoHtml(slug: string): Promise<string> {
+  const cleanSlug = slugify(slug);
+  const now = Date.now();
+  const cached = ministryHubCache.get(cleanSlug);
+  if (cached && (now - cached.timestamp < TTL_2_HOURS)) {
+    return cached.html;
+  }
+
   const baseHtml = getBaseHtml();
   const supabase = getSupabaseClient();
 
@@ -959,7 +1010,7 @@ export async function renderMinistryHubSeoHtml(slug: string): Promise<string> {
 
   const title = `${formattedName} PIB Policy Briefs & UPSC Current Affairs | Tark`;
   const description = `Official policy releases, schemes, circulars, and Prelims practice questions from ${formattedName} distilled for UPSC Civil Services Examination.`;
-  const canonicalUrl = `https://www.tark.live/intelligence/ministry/${slugify(slug)}`;
+  const canonicalUrl = `https://www.tark.live/intelligence/ministry/${cleanSlug}`;
 
   let articles: any[] = [];
   let mcqs: McqRecord[] = [];
@@ -968,28 +1019,31 @@ export async function renderMinistryHubSeoHtml(slug: string): Promise<string> {
     try {
       // Query articles where ministry loosely matches
       const keywords = slug.split('-').filter(w => !['ministry', 'of', 'and', 'the', 'for'].includes(w));
-      const searchKey = keywords[0] || slug;
+      const rawSearchKey = keywords[0] || slug;
+      const searchKey = rawSearchKey.replace(/[^a-zA-Z0-9]/g, '');
 
-      const { data: rawArticles } = await supabase
-        .from('current_affairs')
-        .select('id, headline, source, ministry, summary, created_at, published_at')
-        .ilike('ministry', `%${searchKey}%`)
-        .order('created_at', { ascending: false })
-        .limit(30);
+      if (searchKey) {
+        const { data: rawArticles } = await supabase
+          .from('current_affairs')
+          .select('id, headline, source, ministry, summary, created_at, published_at')
+          .ilike('ministry', `%${searchKey}%`)
+          .order('created_at', { ascending: false })
+          .limit(25);
 
-      if (rawArticles && rawArticles.length > 0) {
-        articles = rawArticles;
-      }
+        if (rawArticles && rawArticles.length > 0) {
+          articles = rawArticles;
+        }
 
-      // Query MCQs for this subject
-      const { data: rawMcqs } = await supabase
-        .from('current_affairs_mcqs')
-        .select('*')
-        .or(`question.ilike.%${searchKey}%,subject.ilike.%${searchKey}%`)
-        .limit(2);
+        // Query MCQs safely for this subject category (avoids unindexed full-table question scan)
+        const { data: rawMcqs } = await supabase
+          .from('current_affairs_mcqs')
+          .select('*')
+          .ilike('subject', `%${searchKey}%`)
+          .limit(2);
 
-      if (rawMcqs) {
-        mcqs = rawMcqs as McqRecord[];
+        if (rawMcqs) {
+          mcqs = rawMcqs as McqRecord[];
+        }
       }
     } catch (err) {
       console.warn(`[bot-renderer] Failed to fetch ministry hub for ${slug}:`, err);
@@ -1138,6 +1192,7 @@ export async function renderMinistryHubSeoHtml(slug: string): Promise<string> {
     `<div id="root">${semanticHtml}</div>`
   );
 
+  setWithLruLimit(ministryHubCache, cleanSlug, modifiedHtml, 100);
   return modifiedHtml;
 }
 
@@ -1145,10 +1200,24 @@ export async function renderMinistryHubSeoHtml(slug: string): Promise<string> {
  * Daily Edition Archive SSR Pre-Renderer (/daily-edition/:date or /daily-edition)
  */
 export async function renderDailyEditionSeoHtml(dateStr?: string): Promise<string> {
+  const requestedDate = (dateStr || '').trim();
+  const now = Date.now();
+  const cacheKey = requestedDate || '__root__';
+  const cached = dailyEditionCache.get(cacheKey);
+  const ttl = requestedDate ? TTL_1_HOUR : TTL_15_MINS;
+  if (cached && (now - cached.timestamp < ttl)) {
+    return cached.html;
+  }
+
   const baseHtml = getBaseHtml();
   const supabase = getSupabaseClient();
 
-  let targetDate = dateStr || '';
+  // Canonical URL is strictly derived from the requested route - NEVER OVERWRITTEN BY DB FALLBACK!
+  const canonicalUrl = requestedDate
+    ? `https://www.tark.live/daily-edition/${encodeURIComponent(requestedDate)}`
+    : 'https://www.tark.live/daily-edition';
+
+  let targetDate = requestedDate;
   let digest: any = null;
   let articles: any[] = [];
   let mcqs: McqRecord[] = [];
@@ -1156,25 +1225,28 @@ export async function renderDailyEditionSeoHtml(dateStr?: string): Promise<strin
 
   if (supabase) {
     try {
-      if (targetDate) {
+      if (requestedDate) {
+        // Query digest specifically for requested date, with .limit(1) to handle duplicates safely
         const { data: dData } = await supabase
           .from('pib_digests')
           .select('*')
-          .eq('date', targetDate)
+          .eq('date', requestedDate)
+          .order('created_at', { ascending: false })
+          .limit(1)
           .maybeSingle();
         if (dData) digest = dData;
-      }
-
-      if (!digest) {
+      } else {
+        // Root /daily-edition: load the latest available digest for display
         const { data: dData } = await supabase
           .from('pib_digests')
           .select('*')
           .order('date', { ascending: false })
+          .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle();
         if (dData) {
           digest = dData;
-          targetDate = dData.date;
+          targetDate = dData.date; // only used for body content, CANONICAL REMAINS /daily-edition!
         }
       }
 
@@ -1203,9 +1275,15 @@ export async function renderDailyEditionSeoHtml(dateStr?: string): Promise<strin
           .from('pib_digests')
           .select('date')
           .order('date', { ascending: false })
-          .limit(14);
+          .limit(30);
         if (pastDigests) {
-          pastEditions = pastDigests.map((d: any) => d.date).filter(Boolean);
+          const uniqueDates = new Set<string>();
+          for (const d of pastDigests) {
+            if (d.date && !uniqueDates.has(d.date)) {
+              uniqueDates.add(d.date);
+            }
+          }
+          pastEditions = Array.from(uniqueDates).slice(0, 14);
         }
       } catch {
         // ignore
@@ -1215,9 +1293,9 @@ export async function renderDailyEditionSeoHtml(dateStr?: string): Promise<strin
     }
   }
 
-  const title = `PIB Daily Edition & UPSC Policy Digest (${targetDate || 'Today'}) | Tark`;
-  const description = `Autonomous verified briefing of government policy notifications, Cabinet decisions, and high-yield Prelims MCQs for ${targetDate || 'today'}.`;
-  const canonicalUrl = targetDate ? `https://www.tark.live/daily-edition/${encodeURIComponent(targetDate)}` : 'https://www.tark.live/daily-edition';
+  const titleDate = requestedDate || targetDate || 'Today';
+  const title = `PIB Daily Edition & UPSC Policy Digest (${titleDate}) | Tark`;
+  const description = `Autonomous verified briefing of government policy notifications, Cabinet decisions, and high-yield Prelims MCQs for ${titleDate}.`;
 
   const graphElements: any[] = [
     {
@@ -1375,6 +1453,7 @@ export async function renderDailyEditionSeoHtml(dateStr?: string): Promise<strin
     `<div id="root">${semanticHtml}</div>`
   );
 
+  setWithLruLimit(dailyEditionCache, cacheKey, modifiedHtml, 100);
   return modifiedHtml;
 }
 
@@ -1398,6 +1477,12 @@ export type HubSectionType =
 export async function renderHubSeoHtml(section: HubSectionType): Promise<string> {
   if (section === 'daily-edition') {
     return renderDailyEditionSeoHtml();
+  }
+
+  const now = Date.now();
+  const cached = hubCache.get(section);
+  if (cached && (now - cached.timestamp < TTL_2_HOURS)) {
+    return cached.html;
   }
 
   const baseHtml = getBaseHtml();
@@ -1883,6 +1968,7 @@ export async function renderHubSeoHtml(section: HubSectionType): Promise<string>
     /<div\s+id=["']root["']>[\s\S]*?<\/div>/i,
     `<div id="root">${semanticHtml}</div>`
   );
+  setWithLruLimit(hubCache, section, modifiedHtml, 20);
   return modifiedHtml;
 }
 
