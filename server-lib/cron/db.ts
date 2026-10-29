@@ -13,8 +13,9 @@ export async function upsertCurrentAffairs(params: {
   primary_operator?: string;
   node_id?: string | null;
   source_published_at?: string | null;
+  coverage_scope?: string;
 }): Promise<{ ok: boolean; id?: string; errorMessage?: string }> {
-  let { source, headline, url, ministry, summary, published_at, primary_operator, node_id, source_published_at } = params;
+  let { source, headline, url, ministry, summary, published_at, primary_operator, node_id, source_published_at, coverage_scope } = params;
 
   // Auto-translate Hindi headlines into rich contextual English
   if (headline && DEVANAGARI_REGEX.test(headline)) {
@@ -88,6 +89,9 @@ Output ONLY the clean translated English headline string without quotes or prefi
   }
   if (node_id) {
     row.node_id = node_id;
+  }
+  if (coverage_scope) {
+    row.coverage_scope = coverage_scope;
   }
 
   try {

@@ -72,7 +72,7 @@ export interface CurrentAffairsItem {
   ministry: string;
   headline: string;
   url: string;
-  coverage_scope?: 'domestic' | 'international' | 'cross_border';
+  coverage_scope?: 'india' | 'domestic' | 'international' | 'cross_border' | 'unclassified';
   content_version?: number;
   source_published_at?: string;
   story_id?: string;

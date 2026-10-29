@@ -33,6 +33,7 @@ import { findContestedClaims } from "./contested.js";
 import { generateMcq } from "./mcq.js";
 import { upsertMcq } from "./mcq-db.js";
 import { upsertCurrentAffairs, upsertPibDigest } from "../db.js";
+import { determineCoverageScope } from "../../news/coverage-classifier.js";
 import { callUpdateSourceReputation } from "../../internal/reputation.js";
 import { llmAvailable } from "../../llm.js";
 import { processDispatchIntoPolicyGraph, runPolicyGraphWorker } from "../policy-graph-worker.js";
@@ -668,6 +669,14 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
         tags,
       });
 
+      const coverageScope = determineCoverageScope({
+        source: lead.source,
+        ministry,
+        headline: lead.headline,
+        body: bullets.join(" "),
+        tags,
+      });
+
       const upsert = await upsertCurrentAffairs({
         source: lead.source,
         ministry,
@@ -677,6 +686,7 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
         node_id: nodeAssignment.nodeId,
         published_at: lead.sourcePublishedAt || undefined,
         source_published_at: lead.sourcePublishedAt || undefined,
+        coverage_scope: coverageScope,
       });
 
       if (!upsert.ok) {

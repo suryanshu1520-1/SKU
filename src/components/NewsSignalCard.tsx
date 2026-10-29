@@ -3,6 +3,7 @@ import { useReducedMotion } from 'motion/react';
 import { ArrowUpRight, Bookmark, Check, ChevronDown, Share2 } from 'lucide-react';
 import type { CurrentAffairsItem } from './CurrentAffairs';
 import { ContestedCard, GroundingBadge, SourceAnchor } from './TrustUI';
+import { deriveArticleSyllabusTag } from '../lib/syllabus-tagger';
 import './NewsSignalCard.css';
 
 const DISCLOSURE_DURATION = { open: 320, close: 260 };
@@ -51,6 +52,13 @@ export default function NewsSignalCard({
   const date = item.created_at ? new Date(item.created_at) : null;
   const validDate = date && Number.isFinite(date.getTime()) ? date : null;
   const bullets = item.summary?.bullets?.slice(0, lead ? 2 : 1) || [];
+  const syllabusTag = deriveArticleSyllabusTag({
+    source: item.source,
+    ministry: item.ministry,
+    headline: item.headline,
+    tags: item.summary?.tags,
+    node_id: item.node_id,
+  });
 
   useLayoutEffect(() => {
     const card = cardRef.current;
@@ -152,9 +160,22 @@ export default function NewsSignalCard({
           >
             {item.source || 'Original source'}
           </a>
-          {item.coverage_scope && item.coverage_scope !== 'domestic' && (
-            <span className="px-1.5 py-0.5 bg-amber-950/40 border border-amber-600/40 text-amber-300 text-[10px] font-mono rounded uppercase tracking-wider">
-              {item.coverage_scope === 'international' ? 'International' : 'Cross-Border'}
+          {item.coverage_scope === 'international' && (
+            <span className="px-1.5 py-0.5 bg-cyan-950/40 border border-cyan-500/40 text-cyan-300 text-[10px] font-mono rounded uppercase tracking-wider font-semibold">
+              International
+            </span>
+          )}
+          {item.coverage_scope === 'cross_border' && (
+            <span className="px-1.5 py-0.5 bg-amber-950/40 border border-amber-500/40 text-amber-300 text-[10px] font-mono rounded uppercase tracking-wider font-semibold">
+              Cross-Border
+            </span>
+          )}
+          {syllabusTag && (
+            <span
+              className="px-1.5 py-0.5 bg-[#072448]/60 border border-[rgba(224,208,171,0.22)] text-[#e0d0ab] text-[10px] font-mono rounded tracking-wider font-semibold"
+              title={`${syllabusTag.paper}: ${syllabusTag.topic}`}
+            >
+              {syllabusTag.badge}
             </span>
           )}
           {validDate && (
