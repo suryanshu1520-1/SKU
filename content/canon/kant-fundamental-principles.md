@@ -10,7 +10,7 @@ format_note: "OCR-cleaned, mechanically reformatted from public-domain source. N
 *** START OF THE PROJECT GUTENBERG EBOOK 5682 ***
  
 
- FUNDAMENTAL PRINCIPLES OF THE METAPHYSIC OF MORALS
+# FUNDAMENTAL PRINCIPLES OF THE METAPHYSIC OF MORALS
  
  
 
@@ -118,7 +118,7 @@ format_note: "OCR-cleaned, mechanically reformatted from public-domain source. N
  
  
 
- PREFACE
+## PREFACE
  
  
 
@@ -374,7 +374,7 @@ format_note: "OCR-cleaned, mechanically reformatted from public-domain source. N
  
  
 
- FIRST SECTION—TRANSITION FROM THE COMMON RATIONAL KNOWLEDGE OF
+## FIRST SECTION: Transition from Common Rational Knowledge to Philosophical
  MORALITY TO THE PHILOSOPHICAL
  
  
@@ -898,8 +898,7 @@ format_note: "OCR-cleaned, mechanically reformatted from public-domain source. N
  
  
 
- SECOND SECTION—TRANSITION FROM POPULAR MORAL PHILOSOPHY TO THE
- METAPHYSIC OF MORALS
+## SECOND SECTION: Transition from Popular Moral Philosophy to Metaphysics of Morals
  
  
 
@@ -2609,7 +2608,7 @@ format_note: "OCR-cleaned, mechanically reformatted from public-domain source. N
  
  
 
- THIRD SECTION—TRANSITION FROM THE METAPHYSIC OF MORALS TO THE
+## THIRD SECTION: Transition to Critique of Pure Practical Reason
  CRITIQUE OF PURE PRACTICAL REASON
  
  

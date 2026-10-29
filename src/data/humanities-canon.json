@@ -69,6 +69,74 @@
               "note": "Bhakti in politics vs rational institutional accountability."
             }
           ]
+        },
+        {
+          "id": "ambedkar-aoc-p5",
+          "text": "Fraternity means a sense of common brotherhood of all Indians—if Indians being one people. It is the principle which gives unity and solidarity to social life. Without fraternity, equality and liberty will be no deeper than coats of paint. Associated living is to its members what a nervous system is to the physical body.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2020,
+              "paper": "GS-IV",
+              "note": "Fraternity as the bedrock of constitutional democracy"
+            },
+            {
+              "year": 2021,
+              "paper": "GS-II",
+              "note": "Preamble values and societal cohesion"
+            }
+          ]
+        },
+        {
+          "id": "ambedkar-cad-p6",
+          "text": "In politics, Bhakti or hero-worship is a sure road to degradation and to eventual dictatorship. On the 26th of January 1950, we are going to enter into a life of contradictions. In politics we will have equality and in social and economic life we will have inequality. We must remove this contradiction at the earliest possible moment or else those who suffer from inequality will blow up the structure of political democracy.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2019,
+              "paper": "GS-II",
+              "note": "Constituent Assembly warnings on political vs social equality"
+            },
+            {
+              "year": 2022,
+              "paper": "Essay",
+              "note": "Bhakti in politics and the vulnerability of democratic institutions"
+            }
+          ]
+        },
+        {
+          "id": "ambedkar-aoc-p7",
+          "text": "You cannot build anything on the foundations of caste. You cannot build up a nation, you cannot build up a morality. Anything that you will build on the foundations of caste will crack and will never be a whole. Caste is not a physical object like a wall of bricks or a line of barbed wire; it is a notion, a state of mind.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2021,
+              "paper": "GS-I",
+              "note": "Caste system and obstacles to national integration"
+            },
+            {
+              "year": 2022,
+              "paper": "GS-IV",
+              "note": "Moral disintegration caused by endogamous social compartmentalization"
+            }
+          ]
+        },
+        {
+          "id": "ambedkar-rights-p8",
+          "text": "Rights are protected not by law, but by the social and moral conscience of society. If social conscience is such that it is prepared to recognize the rights which law chooses to enact, rights will be safe and will be respected. But if the fundamental rights are opposed by the community, no law, no parliament, no judiciary can guarantee them in the real sense of the word.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2018,
+              "paper": "GS-IV",
+              "note": "Law versus societal morality in the protection of vulnerable rights"
+            },
+            {
+              "year": 2023,
+              "paper": "GS-II",
+              "note": "Institutional guarantees versus civic morality"
+            }
+          ]
         }
       ]
     },
@@ -136,6 +204,79 @@
               "note": "Gandhian Doctrine of Trusteeship as an ethical model for corporate governance and wealth stewardship."
             }
           ]
+        },
+        {
+          "id": "gandhi-satyagraha-p5",
+          "text": "Satyagraha differs from Passive Resistance as the North Pole from the South. The latter has been conceived as a weapon of the weak and does not exclude the use of physical force or violence for the purpose of gaining one's end; whereas Satyagraha has been conceived as a weapon of the strongest and excludes the use of violence in any shape or form. Satyagraha is soul-force, pure and unadulterated.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2017,
+              "paper": "GS-IV",
+              "note": "Distinction between passive resistance and active moral soul-force"
+            },
+            {
+              "year": 2022,
+              "paper": "GS-IV",
+              "note": "Non-violence as strength rather than resignation"
+            }
+          ]
+        },
+        {
+          "id": "gandhi-talisman-p6",
+          "text": "I will give you a talisman. Whenever you are in doubt, or when the self becomes too much with you, apply the following test: Recall the face of the poorest and the weakest man whom you may have seen, and ask yourself, if the step you contemplate is going to be of any use to him. Will he gain anything by it? Will it restore him to a control over his own life and destiny? Then you will find your doubts and your self melt away.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2016,
+              "paper": "GS-IV",
+              "note": "Ethical decision-making test for civil servants"
+            },
+            {
+              "year": 2021,
+              "paper": "GS-IV",
+              "note": "Sarvodaya and prioritizing the marginalized"
+            },
+            {
+              "year": 2023,
+              "paper": "Essay",
+              "note": "The measure of civilizational progress is the condition of the vulnerable"
+            }
+          ]
+        },
+        {
+          "id": "gandhi-sins-p7",
+          "text": "The seven social sins that destroy human community are: Politics without principle, Wealth without work, Pleasure without conscience, Knowledge without character, Commerce without morality, Science without humanity, and Worship without sacrifice. When knowledge is separated from moral character, intellect becomes an engine of ruin.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2015,
+              "paper": "GS-IV",
+              "note": "Seven Social Sins and public ethics"
+            },
+            {
+              "year": 2023,
+              "paper": "GS-IV",
+              "note": "Commerce without morality and science without humanity"
+            }
+          ]
+        },
+        {
+          "id": "gandhi-swaraj-p8",
+          "text": "Real Swaraj will come, not by the acquisition of authority by a few, but by the acquisition of the capacity by all to resist authority when it is abused. In other words, Swaraj is to be attained by educating the masses to a sense of their capacity to regulate and control authority. Self-government means continuous effort to be independent of government control, whether it is foreign or national.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2019,
+              "paper": "GS-II",
+              "note": "Substantive democracy versus mere formal transfer of power"
+            },
+            {
+              "year": 2020,
+              "paper": "GS-IV",
+              "note": "Civic courage and holding public power accountable"
+            }
+          ]
         }
       ]
     },
@@ -179,6 +320,86 @@
               "year": 2023,
               "paper": "GS-IV",
               "note": "Formula of Humanity as an end in itself vs instrumental exploitation and commodification."
+            }
+          ]
+        },
+        {
+          "id": "kant-fpm-p4",
+          "text": "Act so that the maxim of your will could always hold at the same time as a principle establishing universal law. Rational nature exists as an end in itself. So act as to treat humanity, whether in your own person or in that of any other, in every case as an end, never as means only. This principle of humanity as an end in itself is the supreme limiting condition of every man's freedom of action.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2018,
+              "paper": "GS-IV",
+              "note": "Deontology and the Formula of Humanity in administrative discretion"
+            },
+            {
+              "year": 2021,
+              "paper": "GS-IV",
+              "note": "Treating individuals as ends versus utilitarian exploitation"
+            }
+          ]
+        },
+        {
+          "id": "kant-fpm-p5",
+          "text": "The autonomy of the will is the sole principle of all moral laws and of all duties which conform to them; on the other hand, heteronomy of the elective will not only cannot be the basis of any obligation, but is, on the contrary, opposed to the principle thereof and to the morality of will. Morality consists in the relation of all actions to the legislation which alone makes a kingdom of ends possible.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2019,
+              "paper": "GS-IV",
+              "note": "Autonomy of will versus external compulsion in ethical conduct"
+            },
+            {
+              "year": 2023,
+              "paper": "GS-IV",
+              "note": "Moral self-legislation and professional integrity"
+            }
+          ]
+        },
+        {
+          "id": "kant-fpm-p6",
+          "text": "A kingdom of ends is possible in an analogy to a kingdom of nature, the former only by maxims, that is, self-imposed rules, the latter only by the laws of efficient causes acting under necessity from without. A rational being belongs to it as a member when he gives universal laws therein, but is also himself subject to these laws. He belongs to it as sovereign when, while giving laws, he is not subject to the will of any other.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2017,
+              "paper": "GS-IV",
+              "note": "The Kingdom of Ends as an ideal framework for equal moral citizenship"
+            },
+            {
+              "year": 2021,
+              "paper": "Essay",
+              "note": "Universal legislation and reciprocal dignity among human beings"
+            }
+          ]
+        },
+        {
+          "id": "kant-duty-p7",
+          "text": "An action done from duty has its moral worth, not in the purpose to be attained by it, but in the maxim in accordance with which it is decided upon; it depends therefore, not on the realization of the object of the action, but solely on the principle of volition. Duty is the necessity of an action done out of respect for the moral law.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2022,
+              "paper": "GS-IV",
+              "note": "Duty versus inclination in professional public service"
+            }
+          ]
+        },
+        {
+          "id": "kant-peace-p8",
+          "text": "No state shall by force interfere with the constitution or government of another state. For what can justify it in doing so? The scandal given to its subjects? Rather the example of the great evils which a people has brought upon itself by its lawlessness is of service as a warning. Civilized states must organize into a league of nations (federation of free states) to preserve peace perpetually.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2020,
+              "paper": "GS-II",
+              "note": "Kant's Perpetual Peace and norms of non-intervention in international relations"
+            },
+            {
+              "year": 2021,
+              "paper": "GS-IV",
+              "note": "International ethics and peaceful coexistence between sovereign entities"
             }
           ]
         }
@@ -236,6 +457,91 @@
               "note": "Qualitative Utilitarianism: higher intellectual and moral pleasures vs base physical hedonism."
             }
           ]
+        },
+        {
+          "id": "mill-lib-p4",
+          "text": "Protection, therefore, against the tyranny of the magistrate is not enough: there needs protection also against the tyranny of the prevailing opinion and feeling; against the tendency of society to impose, by other means than civil penalties, its own ideas and practices as rules of conduct on those who dissent from them; to fetter the development, and, if possible, prevent the formation, of any individuality not in harmony with its ways.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2019,
+              "paper": "GS-IV",
+              "note": "Social tyranny of the majority and protection of dissenters"
+            },
+            {
+              "year": 2021,
+              "paper": "GS-II",
+              "note": "Majoritarian pressure on fundamental constitutional liberties"
+            }
+          ]
+        },
+        {
+          "id": "mill-lib-p5",
+          "text": "The only freedom which deserves the name, is that of pursuing our own good in our own way, so long as we do not attempt to deprive others of theirs, or impede their efforts to obtain it. Each is the proper guardian of his own health, whether bodily, or mental and spiritual. Mankind are greater gainers by suffering each other to live as seems good to themselves, than by compelling each to live as seems good to the rest.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2020,
+              "paper": "GS-IV",
+              "note": "The Harm Principle and the limits of state paternalism"
+            },
+            {
+              "year": 2021,
+              "paper": "Essay",
+              "note": "Individual autonomy as the prerequisite for civilizational vitality"
+            }
+          ]
+        },
+        {
+          "id": "mill-lib-p6",
+          "text": "As it is useful that while mankind are imperfect there should be different opinions, so is it that there should be different experiments of living; that free scope should be given to varieties of character, short of injury to others; and that the worth of different modes of life should be proved practically, when any one thinks fit to try them. Individuality is the same thing with development.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2022,
+              "paper": "GS-IV",
+              "note": "Experiments in living and tolerance of diverse lifestyles"
+            },
+            {
+              "year": 2023,
+              "paper": "GS-I",
+              "note": "Social diversity and protection of pluralism"
+            }
+          ]
+        },
+        {
+          "id": "mill-subjection-p7",
+          "text": "The principle which regulates the existing social relations between the two sexes—the legal subordination of one sex to the other—is wrong itself, and now one of the chief hindrances to human improvement; and it ought to be replaced by a principle of perfect equality, admitting no power or privilege on the one side, nor disability on the other.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2019,
+              "paper": "GS-I",
+              "note": "Gender equality and dismantling patriarchal institutional barriers"
+            },
+            {
+              "year": 2023,
+              "paper": "GS-IV",
+              "note": "Subjection of women and ethical foundations of justice in private life"
+            }
+          ]
+        },
+        {
+          "id": "mill-util-p8",
+          "text": "The utilitarian morality does recognise in human beings the power of sacrificing their own greatest good for the good of others. It only refuses to admit that the sacrifice is itself a good. A sacrifice which does not increase, or tend to increase, the sum total of happiness, it considers as wasted. The happiness which forms the utilitarian standard of what is right in conduct, is not the agent's own happiness, but that of all concerned.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2016,
+              "paper": "GS-IV",
+              "note": "Altruism and the utilitarian calculus of the common good"
+            },
+            {
+              "year": 2021,
+              "paper": "GS-IV",
+              "note": "Public welfare maximization versus self-aggrandizement"
+            }
+          ]
         }
       ]
     },
@@ -291,6 +597,91 @@
               "note": "The Saptanga theory of organic statehood and institutional equilibrium."
             }
           ]
+        },
+        {
+          "id": "kautilya-arth-p4",
+          "text": "When all the limbs of the state are sound and functioning in harmony, even a small kingdom can withstand a powerful aggressor. But when the king lacks discipline or the ministers lack integrity, even an empire with vast territory collapses from within like dry wood infested with termites. Self-discipline (Indriya-jaya) is the foundation of statecraft.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2021,
+              "paper": "GS-II",
+              "note": "Institutional health and governance stability"
+            },
+            {
+              "year": 2023,
+              "paper": "GS-IV",
+              "note": "Personal moral discipline as prerequisite for public office"
+            }
+          ]
+        },
+        {
+          "id": "kautilya-arth-p5",
+          "text": "Whoever imposes severe punishment becomes repulsive to the people; while he who awards mild punishment becomes contemptible. But whoever imposes punishment as deserved becomes respectable. Punishment, when directed with care and wisdom according to the shastras, purifies the people with both happiness and virtue.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2017,
+              "paper": "GS-IV",
+              "note": "Dandaniti and proportionate justice in administrative law"
+            },
+            {
+              "year": 2020,
+              "paper": "GS-IV",
+              "note": "Balance between deterrence and mercy in governance"
+            }
+          ]
+        },
+        {
+          "id": "kautilya-arth-p6",
+          "text": "A king who administers justice in accordance with sacred law, evidence, history, and enacted ordinances, shall be able to conquer the whole world. When truth is hidden under false testimony, the king himself shall decide the case on the touchstone of righteous equity (Nyaya). Royal decree must conform to moral order (Dharma).",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2019,
+              "paper": "GS-IV",
+              "note": "Sources of law and judicial integrity in Kautilyan jurisprudence"
+            },
+            {
+              "year": 2022,
+              "paper": "GS-II",
+              "note": "The rule of law and judicial fairness in ancient Indian statecraft"
+            }
+          ]
+        },
+        {
+          "id": "kautilya-arth-p7",
+          "text": "All undertakings depend upon finance. Hence, foremost attention shall be paid to the treasury. Public revenue shall be collected like the bee gathers honey from flowers without harming them, and never through oppressive taxation that leaves the cultivator impoverished. An empty treasury devours the king himself.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2018,
+              "paper": "GS-IV",
+              "note": "Fiscal ethics and non-extractive revenue generation"
+            },
+            {
+              "year": 2021,
+              "paper": "GS-III",
+              "note": "Resource mobilization and agricultural protection"
+            }
+          ]
+        },
+        {
+          "id": "kautilya-arth-p8",
+          "text": "An ally whose friendship is constant and who is not greedy is superior to an ally whose friendship is temporary or bought with gifts. In the mandala of interstate relations, peace is always to be preferred to war, for war brings loss of men, dissipation of wealth, and uncertainty of victory. The wise ruler exhausts diplomacy, alliance, and conciliation before unsheathing the sword.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2020,
+              "paper": "GS-II",
+              "note": "Mandala theory and realism in foreign policy"
+            },
+            {
+              "year": 2022,
+              "paper": "GS-IV",
+              "note": "Ethics of warfare and preference for peaceful statecraft"
+            }
+          ]
         }
       ]
     },
@@ -339,6 +730,91 @@
               "year": 2018,
               "paper": "GS-II",
               "note": "The purpose of the state: living well and collective civic justice."
+            }
+          ]
+        },
+        {
+          "id": "aristotle-ne-p4",
+          "text": "Moral virtue comes about as a result of habit, whence also its name is one that is formed by a slight variation from the word for habit. None of the moral virtues arises in us by nature; for nothing that exists by nature can form a habit contrary to its nature. We become just by doing just acts, temperate by doing temperate acts, brave by doing brave acts. States of character arise out of like activities.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2018,
+              "paper": "GS-IV",
+              "note": "Habituation and character formation in ethical leadership"
+            },
+            {
+              "year": 2022,
+              "paper": "GS-IV",
+              "note": "Virtue ethics versus rule-based compliance"
+            }
+          ]
+        },
+        {
+          "id": "aristotle-ne-p5",
+          "text": "Justice is that state of character which makes people disposed to do what is just and not merely refrain from injustice. In justice is every virtue comprehended. It is complete virtue in its fullest sense, because it is the actual exercise of complete virtue in relation to one's neighbour. He who is just exercises his virtue not only on himself but on others as well.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2020,
+              "paper": "GS-IV",
+              "note": "Justice as sovereign among the social virtues"
+            },
+            {
+              "year": 2023,
+              "paper": "GS-IV",
+              "note": "Distributive and corrective justice in administration"
+            }
+          ]
+        },
+        {
+          "id": "aristotle-ne-p6",
+          "text": "Without friends no one would choose to live, though he had all other goods. Perfect friendship is the friendship of men who are good, and alike in virtue; for these wish well alike to each other qua good, and they are good in themselves. Those who wish well to their friends for their sake are most truly friends; for they do this by reason of their own nature and not incidentally.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2016,
+              "paper": "GS-IV",
+              "note": "Philia (virtuous friendship) and civic fraternity in political society"
+            },
+            {
+              "year": 2021,
+              "paper": "Essay",
+              "note": "Human connection and virtuous fellowship in the good life"
+            }
+          ]
+        },
+        {
+          "id": "aristotle-ne-p7",
+          "text": "The master virtue is practical wisdom (Phronesis). It is not possible to be good in the strict sense without practical wisdom, nor practically wise without moral excellence. Practical wisdom is a true and reasoned state of capacity to act with regard to the things that are good or bad for man. It is concerned not only with universals but with particulars, which become familiar through experience.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2019,
+              "paper": "GS-IV",
+              "note": "Phronesis (practical wisdom) in administrative discretion"
+            },
+            {
+              "year": 2021,
+              "paper": "GS-IV",
+              "note": "Deliberation and contextual judgment in complex moral dilemmas"
+            }
+          ]
+        },
+        {
+          "id": "aristotle-pol-p8",
+          "text": "The state comes into existence for the sake of mere life, but continues in existence for the sake of the good life. He who by nature and not by mere accident is without a state is either a bad man or above humanity; he is either a beast or a god. Law is reason unaffected by desire. To seek to govern by law is to seek to govern by God and reason alone.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2019,
+              "paper": "GS-II",
+              "note": "The teleological purpose of the state and the rule of law"
+            },
+            {
+              "year": 2021,
+              "paper": "GS-IV",
+              "note": "Law as reason free from passion in public administration"
             }
           ]
         }
@@ -401,6 +877,96 @@
               "note": "Redistributive justice and moral obligations toward the least advantaged."
             }
           ]
+        },
+        {
+          "id": "rawls-toj-p4",
+          "text": "Each person possesses an inviolability founded on justice that even the welfare of society as a whole cannot override. For this reason justice denies that the loss of freedom for some is made right by a greater good shared by others. It does not allow that the sacrifices imposed on a few are outweighed by the larger sum of advantages enjoyed by many. In a just society the basic liberties are taken as settled.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2018,
+              "paper": "GS-IV",
+              "note": "Inviolability of individual rights against utilitarian aggregation"
+            },
+            {
+              "year": 2021,
+              "paper": "GS-IV",
+              "note": "Basic liberties and human dignity in constitutional theory"
+            },
+            {
+              "year": 2022,
+              "paper": "Essay",
+              "note": "Individual rights versus majoritarian welfare claims"
+            }
+          ]
+        },
+        {
+          "id": "rawls-toj-p5",
+          "text": "The natural distribution of abilities and talents is neither just nor unjust; nor is it unjust that persons are born into society at some particular position. These are simply natural facts. What is just and unjust is the way that institutions deal with these facts. The basic structure of society must be arranged so that these contingencies work for the good of the least fortunate.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2020,
+              "paper": "GS-IV",
+              "note": "Natural lottery and the moral duty to structure institutions fairly"
+            },
+            {
+              "year": 2022,
+              "paper": "GS-II",
+              "note": "Affirmative action and corrective institutional justice"
+            }
+          ]
+        },
+        {
+          "id": "rawls-toj-p6",
+          "text": "First Principle: Each person is to have an equal right to the most extensive total system of equal basic liberties compatible with a similar system of liberty for all. Liberty can be restricted only for the sake of liberty itself. A less extensive liberty must strengthen the total system of liberty shared by all, and a less than equal liberty must be acceptable to those citizens with the lesser liberty.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2020,
+              "paper": "GS-II",
+              "note": "Lexical priority of basic liberties over economic gains"
+            },
+            {
+              "year": 2022,
+              "paper": "GS-IV",
+              "note": "The constitutional hierarchy between fundamental rights and material welfare"
+            }
+          ]
+        },
+        {
+          "id": "rawls-pl-p7",
+          "text": "An overlapping consensus of reasonable comprehensive doctrines is the foundation of political stability in a modern constitutional democracy. Citizens must be prepared to offer one another fair terms of cooperation and explain their political decisions in terms of public reason. Public reason requires that we justify our fundamental political positions by appeal to shared political values rather than sectarian doctrines.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2021,
+              "paper": "GS-II",
+              "note": "Overlapping consensus and public reason in a pluralistic society"
+            },
+            {
+              "year": 2023,
+              "paper": "GS-IV",
+              "note": "Secular public reason versus sectarian imposition in governance"
+            }
+          ]
+        },
+        {
+          "id": "rawls-toj-p8",
+          "text": "The perspective of eternity is not a perspective from a certain place beyond the world, nor the point of view of a transcendent being; rather it is a certain form of thought and feeling that rational persons can adopt within the world. To see our place in society from the perspective of the original position is to see it sub specie aeternitatis: to regard the human condition from all social and temporal points of view.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2017,
+              "paper": "GS-IV",
+              "note": "Objectivity, impartiality, and the moral imagination"
+            },
+            {
+              "year": 2020,
+              "paper": "Essay",
+              "note": "Impartiality and the universal standpoint in moral reasoning"
+            }
+          ]
         }
       ]
     },
@@ -456,6 +1022,91 @@
               "note": "Moral courage, psychological fortitude, and fearlessness in public duty."
             }
           ]
+        },
+        {
+          "id": "vivekananda-ky-p4",
+          "text": "Do not figure out whether you will get money or name or praise. Do not figure out whether work will succeed or fail. Work for work's sake. Worship work. Selfishness is the chief cause of all misery. The only true test of good work is that it brings unselfishness. He who can become completely unselfish is the most successful man, though he may live in a cave and not be known to anyone.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2017,
+              "paper": "GS-IV",
+              "note": "Nishkama Karma (unattached work) and purity of motive in public duty"
+            },
+            {
+              "year": 2020,
+              "paper": "GS-IV",
+              "note": "Selflessness as the core metric of moral excellence"
+            }
+          ]
+        },
+        {
+          "id": "vivekananda-pv-p5",
+          "text": "You may invent an engine in America and bring it to India, and we will buy it; but if you want religion, you must come to India. That religion is not an intellectual assent, it is being and becoming. Practical Vedanta teaches that there is no difference between the secular and the spiritual. All life is sacred. To worship God in spirit and in truth is to serve Him in every living soul that breathes.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2019,
+              "paper": "GS-I",
+              "note": "Practical Vedanta and Indian philosophical contribution to world thought"
+            },
+            {
+              "year": 2022,
+              "paper": "GS-IV",
+              "note": "Integration of spiritual ethics into secular life and administration"
+            }
+          ]
+        },
+        {
+          "id": "vivekananda-edu-p6",
+          "text": "Education is the manifestation of the perfection already in man. We want that education by which character is formed, strength of mind is increased, the intellect is expanded, and by which one can stand on one's own feet. What we need are muscles of iron and nerves of steel, gigantic wills which nothing can resist, which can penetrate into the mysteries and secrets of the universe.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2019,
+              "paper": "GS-IV",
+              "note": "Man-making education versus mere literacy"
+            },
+            {
+              "year": 2021,
+              "paper": "Essay",
+              "note": "Character building and intellectual strength as the ends of learning"
+            }
+          ]
+        },
+        {
+          "id": "vivekananda-parliament-p7",
+          "text": "Sectarianism, bigotry, and its horrible descendant, fanaticism, have long possessed this beautiful earth. They have filled the earth with violence, drenched it often and often with human blood, destroyed civilization, and sent whole nations to despair. Had it not been for these horrible demons, human society would be far more advanced than it is now. But their time is come; and I fervently hope that the bell that tolled this morning in honor of this convention may be the death-knell of all fanaticism.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2020,
+              "paper": "GS-I",
+              "note": "Universal tolerance and critique of sectarian fanaticism"
+            },
+            {
+              "year": 2021,
+              "paper": "GS-IV",
+              "note": "Religious pluralism and peaceful coexistence"
+            }
+          ]
+        },
+        {
+          "id": "vivekananda-service-p8",
+          "text": "Where should you go to seek for God—are not all the poor, the miserable, the weak, Gods? Why not worship them first? Why go to dig a well on the shores of the Ganga? Him I call a Mahatman (great soul) whose heart bleeds for the poor, otherwise he is a Duratman (wicked soul). So long as millions live in hunger and ignorance, I hold every man a traitor who having been educated at their expense, pays not the least heed to them.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2015,
+              "paper": "GS-IV",
+              "note": "Daridra Narayana (service to the poor) and ethical obligation of educated elites"
+            },
+            {
+              "year": 2023,
+              "paper": "GS-IV",
+              "note": "Compassion and empathy as essential virtues of civil servants"
+            }
+          ]
         }
       ]
     },
@@ -499,6 +1150,113 @@
               "note": "Ethics of intellectual integrity and critical questioning of blind tradition."
             }
           ]
+        },
+        {
+          "id": "tagore-nat-p3",
+          "text": "The nation, with all its paraphernalia of power and prosperity, its flags and hymns, its patriotism and scientific efficiency, was invented by man for a particular purpose; but when it turns into an engine of greed and mechanical domination, it mutilates the human soul. Man in his fullness is creative; the nation in its mechanical organization is destructive.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2019,
+              "paper": "GS-I",
+              "note": "Tagore's critique of aggressive nationalism and mechanical statism"
+            },
+            {
+              "year": 2020,
+              "paper": "Essay",
+              "note": "Humanity versus the idolatry of national power"
+            }
+          ]
+        },
+        {
+          "id": "tagore-sadhana-p4",
+          "text": "Civilization must be judged and prized, not by the amount of power it has developed, but by how much it has evolved and given expression to, by its laws and institutions, the love of humanity. In the West the ideal is power; in India the ideal has been realization. When the pursuit of wealth becomes an end in itself, society loses its balance and moral vision.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2020,
+              "paper": "GS-IV",
+              "note": "Civilizational metrics: love of humanity versus development of raw power"
+            },
+            {
+              "year": 2023,
+              "paper": "Essay",
+              "note": "Spiritual realization versus material accumulation in civilizational progress"
+            }
+          ]
+        },
+        {
+          "id": "tagore-crisis-p5",
+          "text": "As I look around I see the crumbling ruins of a proud civilization strewn like a vast heap of futility. And yet I shall not commit the grievous sin of losing faith in Man. I would rather look forward to the opening of a new chapter in his history after the cataclysm is over and the atmosphere rendered clean with the spirit of service and sacrifice. The dawn will come from this horizon, from the East where the sun rises.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2021,
+              "paper": "Essay",
+              "note": "Tagore's Crisis in Civilization and irrepressible faith in human spirit"
+            },
+            {
+              "year": 2022,
+              "paper": "GS-IV",
+              "note": "Ethical resilience and hope in times of institutional crisis"
+            }
+          ]
+        },
+        {
+          "id": "tagore-edu-p6",
+          "text": "The highest education is that which does not merely give us information but makes our life in harmony with all existence. Children must be given their freedom of schooling in the open air, where nature provides the true background of life and living wisdom. An education that severs children from nature and cages them in brick classrooms turns the soul into a dried flower in an herbarium.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2018,
+              "paper": "GS-IV",
+              "note": "Holistic education and environmental harmony (Visva-Bharati vision)"
+            },
+            {
+              "year": 2022,
+              "paper": "Essay",
+              "note": "Education as communion with nature versus rote knowledge acquisition"
+            }
+          ]
+        },
+        {
+          "id": "tagore-patriotism-p7",
+          "text": "Patriotism cannot be our final spiritual shelter; my refuge is humanity. I will not buy glass for the price of diamonds, and I will never allow patriotism to triumph over humanity as long as I live. To love one's country is natural, but to make one's country an idol and place it above moral truth is to invite destruction upon oneself and the world.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2017,
+              "paper": "GS-IV",
+              "note": "Universal humanism versus parochial patriotism"
+            },
+            {
+              "year": 2021,
+              "paper": "GS-IV",
+              "note": "Ethical boundaries of patriotic duty"
+            },
+            {
+              "year": 2022,
+              "paper": "Essay",
+              "note": "Refuge in humanity: Tagore's universal moral horizon"
+            }
+          ]
+        },
+        {
+          "id": "tagore-sadhana-p8",
+          "text": "True freedom is not the freedom from all restraint, but the freedom to give oneself completely in love and service. Just as the musician finds freedom not in escaping the laws of melody, but in complete harmony with them, so does the human soul find freedom in universal communion. When man boundaries himself in selfishness, he becomes a captive; when he expands in empathy, he attains liberation.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2019,
+              "paper": "GS-IV",
+              "note": "Freedom as harmonious communion and self-transcendence"
+            },
+            {
+              "year": 2023,
+              "paper": "Essay",
+              "note": "The paradox of freedom: discipline and service as paths to true liberty"
+            }
+          ]
         }
       ]
     },
@@ -540,6 +1298,108 @@
               "year": 2021,
               "paper": "GS-IV",
               "note": "Ethical duty of a civil servant to uphold the public interest over sectional lobbying."
+            }
+          ]
+        },
+        {
+          "id": "rousseau-sc-p3",
+          "text": "The social pact gives the body politic absolute power over all its members also; and it is this same power which, directed by the general will, bears, as I have said, the name of Sovereignty. In giving himself to all, each gives himself to nobody; and as there is no associate over whom he does not acquire the same right as he yields others over himself, he gains an equivalent for everything he loses, and an increase of force for the preservation of what he has.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2018,
+              "paper": "GS-IV",
+              "note": "The Social Contract and the exchange of natural for civil liberty"
+            },
+            {
+              "year": 2021,
+              "paper": "GS-II",
+              "note": "Sovereignty as the expression of collective civic commitment"
+            }
+          ]
+        },
+        {
+          "id": "rousseau-sc-p4",
+          "text": "In order then that the social compact may not be an empty formula, it tacitly includes the undertaking, which alone can give force to the rest, that whoever refuses to obey the general will shall be compelled to do so by the whole body. This means nothing less than that he will be forced to be free; for such is the condition which, by giving each citizen to his country, secures him against all personal dependence.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2019,
+              "paper": "GS-IV",
+              "note": "Forced to be free: reconciliation of liberty with civic duty"
+            },
+            {
+              "year": 2022,
+              "paper": "GS-II",
+              "note": "The coercive authority of legitimate constitutional law"
+            }
+          ]
+        },
+        {
+          "id": "rousseau-inequality-p5",
+          "text": "The first man who, having enclosed a piece of ground, bethought himself of saying 'This is mine', and found people simple enough to believe him, was the real founder of civil society. From how many crimes, wars, and murders, from how many horrors and misfortunes might not any one have saved mankind, by pulling up the stakes, or filling up the ditch, and crying to his fellows: 'Beware of listening to this impostor; you are undone if you once forget that the fruits of the earth belong to us all, and the earth itself to nobody.'",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2020,
+              "paper": "GS-IV",
+              "note": "Origins of inequality and the moral hazards of private property"
+            },
+            {
+              "year": 2021,
+              "paper": "Essay",
+              "note": "The fruits of the earth belong to all: early critiques of structural inequality"
+            }
+          ]
+        },
+        {
+          "id": "rousseau-inequality-p6",
+          "text": "There is another principle which has escaped Hobbes; which, having been bestowed on mankind, to moderate, on certain occasions, the impetuosity of egoism (amour-propre), tempers that ardour with an innate reluctance to see fellow-creatures suffer. I speak of Compassion (Pity), a disposition suitable to creatures so weak and subject to so many evils as we are: so much the more universal and useful to mankind, as it comes before any reflection.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2017,
+              "paper": "GS-IV",
+              "note": "Natural compassion (pity) as an innate moral restraint in human nature"
+            },
+            {
+              "year": 2022,
+              "paper": "GS-IV",
+              "note": "Amour-propre (vanity) versus Amour de soi (self-preservation with empathy)"
+            }
+          ]
+        },
+        {
+          "id": "rousseau-sc-p7",
+          "text": "Sovereignty cannot be represented, for the same reason that it cannot be alienated. It consists essentially in the general will, and will cannot be represented; it is the same or it is different; there is no middle ground. The deputies of the people, therefore, are not and cannot be its representatives: they are only its commissioners; they cannot conclude anything definitely. Any law which the people has not ratified in person is void; it is not law at all.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2020,
+              "paper": "GS-II",
+              "note": "Direct versus representative democracy and popular sovereignty"
+            },
+            {
+              "year": 2023,
+              "paper": "GS-IV",
+              "note": "Elected officials as trustees and commissioners, not absolute masters"
+            }
+          ]
+        },
+        {
+          "id": "rousseau-sc-p8",
+          "text": "What man loses by the social contract is his natural liberty and an unlimited right to everything he tries to get and succeeds in getting; what he gains is civil liberty and the proprietorship of all he possesses. We must also add moral liberty, which alone makes him truly master of himself; for the mere impulse of appetite is slavery, while obedience to a law which we prescribe to ourselves is liberty.",
+          "isPlaceholder": false,
+          "pyqCitations": [
+            {
+              "year": 2021,
+              "paper": "GS-IV",
+              "note": "Moral liberty: self-legislation as the highest form of freedom"
+            },
+            {
+              "year": 2022,
+              "paper": "Essay",
+              "note": "The impulse of appetite is slavery; obedience to self-prescribed law is liberty"
             }
           ]
         }

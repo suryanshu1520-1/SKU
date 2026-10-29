@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import '@fontsource/merriweather/400.css';
-import '@fontsource/merriweather/700.css';
 import { motion } from 'motion/react';
 import {
   Search,
@@ -9,6 +7,8 @@ import {
 import canonData from '../data/humanities-canon.json';
 import type { HumanitiesCanon, Thinker, Passage, PyqCitation } from '../types/humanities';
 import ThinkerEngravingSvg from './ThinkerEngravingSvg';
+import ReactMarkdown from 'react-markdown';
+import { CANON_ORIGINAL_WORKS, getCanonOriginalWork, type CanonWorkMeta } from '../data/canon-original-works';
 
 const canon = canonData as HumanitiesCanon;
 
@@ -141,6 +141,24 @@ export default function HumanitiesReader() {
   const [vw, setVw] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 1280);
   const [copiedPassage, setCopiedPassage] = useState<boolean>(false);
   const [copiedSynthesis, setCopiedSynthesis] = useState<boolean>(false);
+  const [readTab, setReadTab] = useState<'passages' | 'original'>('passages');
+  const [originalWorkText, setOriginalWorkText] = useState<string>('');
+  const [loadingWork, setLoadingWork] = useState<boolean>(false);
+  const [workSearchQuery, setWorkSearchQuery] = useState<string>('');
+
+  const currentWorkMeta = getCanonOriginalWork(readId);
+
+  const filteredWorkText = useMemo(() => {
+    if (!originalWorkText) return '';
+    const q = workSearchQuery.trim().toLowerCase();
+    if (!q) return originalWorkText;
+    const sections = originalWorkText.split(/\n(?=## )/);
+    const matched = sections.filter((s) => s.toLowerCase().includes(q));
+    if (matched.length === 0) {
+      return `_No chapters or sections found matching "${workSearchQuery}". Try general terms like "virtue", "liberty", "caste", "duty", "sovereignty"._`;
+    }
+    return matched.join('\n\n---\n\n');
+  }, [originalWorkText, workSearchQuery]);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -199,10 +217,39 @@ export default function HumanitiesReader() {
     setReadId(id);
     setReadIdx(idx);
     setActiveId(id);
+    setReadTab('passages');
   };
+
+  const openOriginalWork = (id: string) => {
+    setMode('read');
+    setReadId(id);
+    setActiveId(id);
+    setReadTab('original');
+  };
+
+  useEffect(() => {
+    if (readTab === 'original' && readId) {
+      const meta = getCanonOriginalWork(readId);
+      if (meta) {
+        setLoadingWork(true);
+        meta.loadContent()
+          .then((text) => {
+            const clean = text.replace(/^---[\s\S]*?---\s*/, '');
+            setOriginalWorkText(clean);
+          })
+          .catch((err) => {
+            console.error('Failed to load canonical original work:', err);
+            setOriginalWorkText('# Error\n\nCould not load canonical text.');
+          })
+          .finally(() => setLoadingWork(false));
+      }
+    }
+  }, [readTab, readId]);
 
   const exitRead = () => {
     setMode('hall');
+    setReadTab('passages');
+    setWorkSearchQuery('');
   };
 
   const stepPassage = (delta: number) => {
@@ -844,6 +891,17 @@ export default function HumanitiesReader() {
                         ↵
                       </motion.span>
                     </motion.button>
+
+                    {getCanonOriginalWork(activeThinker.id) && (
+                      <button
+                        type="button"
+                        onClick={() => openOriginalWork(activeThinker.id)}
+                        className="w-full py-2.5 px-3 bg-[rgba(3,18,42,0.85)] hover:bg-[#e0d0ab]/15 border border-[rgba(1,148,168,0.5)] hover:border-[#e0d0ab] text-[#e0d0ab] font-sans font-medium text-xs tracking-wide rounded-md transition-all cursor-pointer flex items-center justify-center gap-2 group"
+                      >
+                        <span>📜 Read Original Work: {getCanonOriginalWork(activeThinker.id)?.title.split('/')[0].split(':')[0].trim()}</span>
+                        <span className="font-mono text-[#8fa2bd] group-hover:translate-x-0.5 transition-transform text-xs">→</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1111,44 +1169,65 @@ export default function HumanitiesReader() {
 
             {/* Reading Measure Center Container */}
             <div style={{ flex: 1, minWidth: 0, display: 'flex', justifyContent: 'center' }}>
-              <article style={{ width: '100%', maxWidth: measure, animation: 'rise .55s ease-out both' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '14px' }}>
-                  <span
-                    role="button"
-                    tabIndex={0}
-                    onClick={exitRead}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        exitRead();
-                      }
-                    }}
-                    className="hover:text-[#e0d0ab] hover:border-[#e0d0ab]"
-                    style={{
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: '9.5px',
-                      letterSpacing: '.14em',
-                      color: '#9fb0c8',
-                      cursor: 'pointer',
-                      border: '1px solid rgba(1,148,168,.45)',
-                      padding: '5px 10px',
-                      borderRadius: '2px',
-                      transition: 'all .2s'
-                    }}
-                  >
-                    ESC — BACK TO THE HALL
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: "'JetBrains Mono', monospace",
-                      fontSize: '9.5px',
-                      letterSpacing: '.12em',
-                      color: '#8fa2bd'
-                    }}
-                  >
-                    {read.indexLabel}
-                  </span>
+              <div style={{ width: '100%', maxWidth: readTab === 'original' ? '820px' : measure, animation: 'rise .55s ease-out both' }}>
+                {/* View Mode Switcher: Exam Passages vs Original Work */}
+                <div className="flex items-center justify-between gap-3 flex-wrap mb-6 pb-3 border-b border-[rgba(19,108,153,0.35)]">
+                  <div className="flex items-center gap-1.5 p-1 bg-[rgba(3,18,42,0.85)] border border-[rgba(1,148,168,0.4)] rounded-md">
+                    <button
+                      type="button"
+                      onClick={() => setReadTab('passages')}
+                      className={`px-3.5 py-1.5 text-xs font-mono uppercase tracking-wider rounded transition-all cursor-pointer ${
+                        readTab === 'passages'
+                          ? 'bg-[#e0d0ab] text-[#072e63] font-bold shadow-sm'
+                          : 'text-[#9fb0c8] hover:text-[#e0d0ab] bg-transparent'
+                      }`}
+                    >
+                      ❖ Exam Passages ({rt.passages.length})
+                    </button>
+                    {currentWorkMeta && (
+                      <button
+                        type="button"
+                        onClick={() => setReadTab('original')}
+                        className={`px-3.5 py-1.5 text-xs font-mono uppercase tracking-wider rounded transition-all cursor-pointer flex items-center gap-1.5 ${
+                          readTab === 'original'
+                            ? 'bg-[#e0d0ab] text-[#072e63] font-bold shadow-sm'
+                            : 'text-[#9fb0c8] hover:text-[#e0d0ab] bg-transparent'
+                        }`}
+                      >
+                        <span>📜 Original Work</span>
+                        <span className="text-[10.5px] opacity-80 font-serif italic">
+                          ({currentWorkMeta.title.split('/')[0].split(':')[0].trim()})
+                        </span>
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={exitRead}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          exitRead();
+                        }
+                      }}
+                      className="font-mono text-[9.5px] tracking-[0.14em] text-[#9fb0c8] hover:text-[#e0d0ab] cursor-pointer border border-[rgba(1,148,168,0.45)] hover:border-[#e0d0ab] px-2.5 py-1.5 rounded-xs transition-colors"
+                    >
+                      ESC — BACK TO THE HALL
+                    </span>
+                    {readTab === 'passages' && (
+                      <span className="font-mono text-[9.5px] tracking-[0.12em] text-[#8fa2bd]">
+                        {read.indexLabel}
+                      </span>
+                    )}
+                  </div>
                 </div>
+
+                {/* TAB 1: CURATED EXAM PASSAGES VIEW */}
+                {readTab === 'passages' && (
+                  <article style={{ width: '100%' }}>
 
                 {/* Progress Bar */}
                 <div style={{ height: '2px', background: 'rgba(19,108,153,.4)', marginBottom: '36px' }}>
@@ -1386,6 +1465,160 @@ export default function HumanitiesReader() {
                   </span>
                 </div>
               </article>
+                )}
+
+                {/* TAB 2: ORIGINAL WORK COMPREHENSIVE TEXT VIEW */}
+                {readTab === 'original' && currentWorkMeta && (
+                  <article className="space-y-6">
+                    {/* Work Metadata Header Banner */}
+                    <div className="p-6 bg-[rgba(3,18,42,0.75)] border border-[rgba(19,108,153,0.35)] rounded-md shadow-lg">
+                      <div className="flex items-center justify-between text-xs font-mono text-[#8fa2bd] mb-2.5 flex-wrap gap-2">
+                        <span className="px-2.5 py-0.5 bg-[#0194a8]/20 border border-[#0194a8]/40 rounded text-[#7fd4e0] font-semibold text-[10.5px] uppercase tracking-wider">
+                          Verified Primary Source
+                        </span>
+                        <span>{currentWorkMeta.pdBasis}</span>
+                      </div>
+                      <h2 className="font-serif text-3xl sm:text-4xl text-[#e0d0ab] font-light tracking-tight mt-1 mb-2">
+                        {currentWorkMeta.title}
+                      </h2>
+                      <div className="font-serif italic text-sm text-[#9fb0c8] mb-4">
+                        By {currentWorkMeta.author} · Published {currentWorkMeta.year}
+                      </div>
+                      <p className="text-xs text-[#c8b998] leading-relaxed mb-4 font-sans">
+                        {currentWorkMeta.summary}
+                      </p>
+                      <div className="flex items-center gap-4 text-xs font-mono text-[#8fa2bd] pt-3 border-t border-[rgba(19,108,153,0.3)] flex-wrap">
+                        <span>~{currentWorkMeta.wordCountApprox.toLocaleString()} words</span>
+                        <span>•</span>
+                        <span>~{currentWorkMeta.readingTimeMinutes} min study time</span>
+                        <span>•</span>
+                        <a
+                          href={currentWorkMeta.source}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#0194a8] hover:text-[#e0d0ab] underline flex items-center gap-1"
+                        >
+                          <span>Repository Provenance</span>
+                          <span>↗</span>
+                        </a>
+                      </div>
+                    </div>
+
+                    {/* Chapter Jump Pills */}
+                    {currentWorkMeta.chapters && currentWorkMeta.chapters.length > 0 && (
+                      <div className="p-4 bg-[rgba(4,25,54,0.55)] border border-[rgba(1,148,168,0.35)] rounded-md">
+                        <div className="font-mono text-[10px] uppercase tracking-wider text-[#0194a8] mb-2.5 font-semibold">
+                          Jump to Chapter / Section
+                        </div>
+                        <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto pr-1">
+                          {currentWorkMeta.chapters.map((ch) => (
+                            <button
+                              key={ch.id}
+                              type="button"
+                              onClick={() => {
+                                const headings = Array.from(document.querySelectorAll('h2, h3'));
+                                const term = ch.title.split(':')[0].toLowerCase();
+                                const target = headings.find((h) => h.textContent?.toLowerCase().includes(term));
+                                if (target) {
+                                  target.scrollIntoView({ behavior: 'smooth' });
+                                }
+                              }}
+                              className="px-2.5 py-1 text-xs font-sans text-[#c8b998] hover:text-[#e0d0ab] bg-[rgba(3,18,42,0.65)] hover:bg-[#e0d0ab]/15 border border-[rgba(19,108,153,0.4)] hover:border-[#e0d0ab] rounded cursor-pointer transition-colors"
+                            >
+                              {ch.title}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Search Within Work Filter */}
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={workSearchQuery}
+                        onChange={(e) => setWorkSearchQuery(e.target.value)}
+                        placeholder={`Search within ${currentWorkMeta.title}... (e.g. duty, liberty, justice, virtue)`}
+                        className="w-full py-2.5 px-4 bg-[rgba(3,18,42,0.85)] border border-[rgba(1,148,168,0.4)] focus:border-[#e0d0ab] rounded text-[#e0d0ab] text-xs font-sans outline-none placeholder:text-[#8fa2bd]/60"
+                      />
+                      {workSearchQuery && (
+                        <button
+                          type="button"
+                          onClick={() => setWorkSearchQuery('')}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono text-[#8fa2bd] hover:text-[#e0d0ab] cursor-pointer"
+                        >
+                          ✕ CLEAR
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Loading State or Markdown Body */}
+                    {loadingWork ? (
+                      <div className="py-20 text-center space-y-3">
+                        <div className="w-6 h-6 border-2 border-[#e0d0ab] border-t-transparent rounded-full animate-spin mx-auto" />
+                        <div className="font-mono text-xs text-[#9fb0c8]">
+                          Loading canonical text for {currentWorkMeta.title}...
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="prose prose-invert max-w-none font-serif text-[#e8e0cf] text-[16px] sm:text-[17.5px] leading-[1.9] selection:bg-[#e0d0ab] selection:text-[#072e63]">
+                        <ReactMarkdown
+                          components={{
+                            h1: ({ children }) => (
+                              <h1 className="font-serif text-2xl sm:text-3xl font-light text-[#e0d0ab] tracking-tight pb-3 mb-6 border-b border-[rgba(224,208,171,0.25)]">
+                                {children}
+                              </h1>
+                            ),
+                            h2: ({ children }) => (
+                              <h2 className="font-serif text-xl sm:text-2xl font-normal text-[#e0d0ab] tracking-tight mt-10 mb-4 pt-4 border-t border-[rgba(19,108,153,0.3)]">
+                                {children}
+                              </h2>
+                            ),
+                            h3: ({ children }) => (
+                              <h3 className="font-serif text-lg font-medium text-[#c8b998] mt-6 mb-3">
+                                {children}
+                              </h3>
+                            ),
+                            p: ({ children }) => (
+                              <p className="mb-5 leading-[1.9] text-[#e8e0cf] font-light">
+                                {children}
+                              </p>
+                            ),
+                            blockquote: ({ children }) => (
+                              <blockquote className="border-l-2 border-[#0194a8] pl-4 my-6 italic text-[#9fb0c8] bg-[rgba(1,148,168,0.05)] py-2 rounded-r">
+                                {children}
+                              </blockquote>
+                            ),
+                            hr: () => (
+                              <hr className="my-8 border-t border-[rgba(19,108,153,0.4)]" />
+                            )
+                          }}
+                        >
+                          {filteredWorkText}
+                        </ReactMarkdown>
+                      </div>
+                    )}
+
+                    {/* Bottom Navigation in Original Work View */}
+                    <div className="flex items-center justify-between gap-4 pt-8 border-t border-[rgba(19,108,153,0.4)] flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => setReadTab('passages')}
+                        className="px-4 py-2.5 bg-[#e0d0ab] text-[#072e63] font-sans font-semibold text-xs rounded hover:bg-white transition-colors cursor-pointer"
+                      >
+                        ← Back to Key Exam Passages ({rt.passages.length})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        className="px-4 py-2.5 bg-[rgba(3,18,42,0.8)] border border-[rgba(1,148,168,0.4)] hover:border-[#e0d0ab] text-[#c8b998] hover:text-[#e0d0ab] font-sans text-xs rounded transition-colors cursor-pointer"
+                      >
+                        ↑ Top of Work
+                      </button>
+                    </div>
+                  </article>
+                )}
+              </div>
             </div>
           </div>
         </section>
