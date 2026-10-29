@@ -31,7 +31,7 @@ import {
   Swords,
 } from 'lucide-react';
 import { InlineMath, BlockMath } from './MathView';
-import RadarV2Panel from './observatory/radar-v2/RadarV2Panel';
+import PolicyRippleRadar from './observatory/PolicyRippleRadar';
 import {
   computeCalibrated5050EV,
   type EvExecutionProtocol,
@@ -769,16 +769,17 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
 
   useEffect(() => {
     let isMounted = true;
-    fetch('/api/policy-radar/v2')
+    fetch('/api/policy-radar')
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (
           isMounted &&
           data &&
-          (data.status === 'ok' || data.status === 'stale') &&
-          Array.isArray(data.programs)
+          (data.status === 'ok' || data.status === 'ready') &&
+          Array.isArray(data.chains) &&
+          data.chains.length > 0
         ) {
-          setRadarProgramsCount(data.programs.length);
+          setRadarProgramsCount(data.chains.length);
         }
       })
       .catch(() => {});
@@ -2158,7 +2159,7 @@ export default function Observatory({ onNavigateArena, onLaunchPractice }: Obser
             ══════════════════════════════════════════════════════════════════ */}
         {activeTab === 'ripple' && (
           <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-            <RadarV2Panel />
+            <PolicyRippleRadar />
           </motion.div>
         )}
       </div>

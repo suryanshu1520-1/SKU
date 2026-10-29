@@ -24,6 +24,7 @@ import {
   type BossMcqDefinition,
 } from '../../lib/policy-ripple-radar-shared';
 import { computeCalibrated5050EV } from '../../lib/examiner_psyche';
+import RadarV2Panel from './radar-v2/RadarV2Panel';
 import './PolicyRippleRadar.css';
 
 export const RING_META: Record<number, { label: string; desc: string }> = {
@@ -34,7 +35,13 @@ export const RING_META: Record<number, { label: string; desc: string }> = {
 };
 
 export default function PolicyRippleRadar() {
-  const [view, setView] = useState<'ripple' | 'entities'>('ripple');
+  const [view, setView] = useState<'ripple' | 'entities' | 'lineage'>(() => {
+    if (typeof window !== 'undefined') {
+      const v = new URLSearchParams(window.location.search).get('view');
+      if (v === 'entities' || v === 'lineage') return v;
+    }
+    return 'ripple';
+  });
   const [chains, setChains] = useState<RippleChain[]>([]);
   const [entities, setEntities] = useState<EntityRecord[]>([]);
   const [radarStatus, setRadarStatus] = useState<'loading' | 'empty' | 'ready'>('loading');
@@ -71,9 +78,17 @@ export default function PolicyRippleRadar() {
               setEntityAuthority(nextEntities[0].authority || '');
             }
             if (typeof window !== 'undefined') {
-              const targetChain = new URLSearchParams(window.location.search).get('chain');
-              if (targetChain) {
-                const found = nextChains.findIndex((c: RippleChain) => c.chain_id === targetChain);
+              const params = new URLSearchParams(window.location.search);
+              const target = params.get('chain') || params.get('program');
+              if (target) {
+                const targetLower = target.toLowerCase();
+                const found = nextChains.findIndex((c: RippleChain) => {
+                  if (c.chain_id.toLowerCase() === targetLower) return true;
+                  const cWords = c.chain_id.toLowerCase().split('_');
+                  const tWords = targetLower.split(/[-_]/);
+                  return tWords.some((w) => w.length > 3 && c.chain_id.toLowerCase().includes(w)) ||
+                         c.title.toLowerCase().includes(targetLower);
+                });
                 if (found !== -1) setChainIndex(found);
               }
             }
@@ -228,7 +243,20 @@ export default function PolicyRippleRadar() {
     setBossStruckOptions(new Set());
     if (typeof window !== 'undefined' && chains[idx]) {
       const url = new URL(window.location.href);
+      url.searchParams.set('tab', 'ripple');
       url.searchParams.set('chain', chains[idx].chain_id);
+      url.searchParams.delete('program');
+      window.history.replaceState({}, '', url.toString());
+    }
+  };
+
+  const handleViewChange = (newView: 'ripple' | 'entities' | 'lineage') => {
+    setTracing(false);
+    setView(newView);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('tab', 'ripple');
+      url.searchParams.set('view', newView);
       window.history.replaceState({}, '', url.toString());
     }
   };
@@ -275,11 +303,11 @@ export default function PolicyRippleRadar() {
           </p>
         </div>
 
-        {/* View Switcher: Radar vs Legal Tiers */}
-        <div className="flex items-center gap-1.5 bg-[#041228] p-1 rounded-sm border border-[rgba(224,208,171,0.16)] shrink-0">
+        {/* View Switcher: Radar vs Legal Tiers vs Lineage */}
+        <div className="flex items-center gap-1.5 bg-[#041228] p-1 rounded-sm border border-[rgba(224,208,171,0.16)] shrink-0 flex-wrap">
           <button
             type="button"
-            onClick={() => setView('ripple')}
+            onClick={() => handleViewChange('ripple')}
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-sm text-xs font-semibold cursor-pointer transition-all duration-150 ${
               view === 'ripple'
                 ? 'bg-[#e0d0ab] text-[#072e63] shadow-sm'
@@ -295,10 +323,7 @@ export default function PolicyRippleRadar() {
           </button>
           <button
             type="button"
-            onClick={() => {
-              setTracing(false);
-              setView('entities');
-            }}
+            onClick={() => handleViewChange('entities')}
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-sm text-xs font-semibold cursor-pointer transition-all duration-150 ${
               view === 'entities'
                 ? 'bg-[#e0d0ab] text-[#072e63] shadow-sm'
@@ -313,6 +338,18 @@ export default function PolicyRippleRadar() {
               <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" />
             </svg>
             <span>5 Legal Tiers</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleViewChange('lineage')}
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-sm text-xs font-semibold cursor-pointer transition-all duration-150 ${
+              view === 'lineage'
+                ? 'bg-[#e0d0ab] text-[#072e63] shadow-sm'
+                : 'text-[#8fa2bd] hover:text-[#f4ecd8]'
+            }`}
+          >
+            <GitFork className="w-3.5 h-3.5" />
+            <span>Lineage Lanes</span>
           </button>
         </div>
       </div>
@@ -1362,6 +1399,15 @@ export default function PolicyRippleRadar() {
               ) : null}
             </div>
           )}
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════
+          VIEW 3: LINEAGE LANES & RADAR V2 HARNESS
+          ══════════════════════════════════════════════════════════════════ */}
+      {view === 'lineage' && (
+        <div className="pt-2">
+          <RadarV2Panel />
         </div>
       )}
     </div>
