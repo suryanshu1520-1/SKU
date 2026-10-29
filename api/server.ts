@@ -26,6 +26,7 @@ import {
 import { analyticsRouter } from "../server-lib/analytics/routes.js";
 import { syllabusRouter, handleUserSyllabusProgress } from "../server-lib/syllabus/routes.js";
 import { seoRouter } from "../server-lib/seo/routes.js";
+import { intelligenceRouter } from "../server-lib/news/routes.js";
 import { getBaseHtml } from "../server-lib/seo/bot-renderer.js";
 import {
   examCatalogHandler,
@@ -79,6 +80,7 @@ app.get("/api/exam/result", examResultHandler);
 
 app.use("/api/analytics", analyticsRouter);
 app.use("/api/syllabus", syllabusRouter);
+app.use("/api/intelligence", intelligenceRouter);
 app.get("/api/me/syllabus-progress", handleUserSyllabusProgress);
 
 // Fallback route for SPA pages that were rewritten by vercel.json (e.g. /intelligence, /observatory, etc.)

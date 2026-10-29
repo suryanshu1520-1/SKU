@@ -378,6 +378,12 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
               <ContestedCard contested={summary?.contested} />
               <dl className="brief-source-record">
                 <div><dt>Primary source</dt><dd>{item.source}</dd></div>
+                {item.coverage_scope && (
+                  <div><dt>Scope</dt><dd className="capitalize">{item.coverage_scope}</dd></div>
+                )}
+                {summary?.india_posture && (
+                  <div><dt>India Posture</dt><dd className="font-mono text-amber-300 font-bold">{summary.india_posture.replace(/_/g, ' ')}</dd></div>
+                )}
                 <div><dt>Verification protocol</dt><dd className="brief-protocol">{summary?.verification_method || 'live_cite_or_drop_v1'}</dd></div>
               </dl>
               {item.url && <a className="brief-source-link" href={item.url} target="_blank" rel="noopener noreferrer">

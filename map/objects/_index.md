@@ -11,4 +11,5 @@
 | [`syllabus-testability-graph.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/map/objects/syllabus-testability-graph.md) | `live` | `verified 2026-08-19` | Syllabus node graph + two-axis (frequency×drought) testability prior, relevance gate, backtest |
 | [`continuous-readiness-ledger.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/map/objects/continuous-readiness-ledger.md) | `planned` | `drafted 2026-08-20` | Versioned verified numeric claims, learn/replace mutations, omission ledger, and user checkpoints |
 | [`policy-radar-lineage.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/map/objects/policy-radar-lineage.md) | `live` | `verified 2026-10-21` | Verified primary-source policy lineage DAG, authority registry, lifecycle gaps, and surge signals |
+| [`international-news-pipeline.md`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/map/objects/international-news-pipeline.md) | `live` | `verified 2026-10-29` | First-class international section, India posture verifier, disjointness gate, and scoped feed API |
 

@@ -216,6 +216,24 @@ async function handlePrsRoute(req: Request, res: Response, _next: NextFunction) 
   return res.status(200).send(html);
 }
 
+// Reserved International News Hub route
+seoRouter.get(
+  ['/intelligence/international', '/news/international'],
+  async (req: Request, res: Response, _next: NextFunction) => {
+    if (!shouldServeSeoHtml(req)) {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.status(200).send(getBaseHtml());
+    }
+    const html = await safeRender(
+      () => renderHubSeoHtml('international'),
+      getBaseHtml()
+    );
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400');
+    return res.status(200).send(html);
+  }
+);
+
 seoRouter.get(['/intelligence', '/intelligence/:slug', '/news', '/news/:slug', '/current-affairs'], handleIntelligenceRoute);
 seoRouter.get(['/prs', '/prs/:slug'], handlePrsRoute);
 

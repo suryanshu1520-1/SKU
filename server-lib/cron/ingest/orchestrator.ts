@@ -226,6 +226,13 @@ async function reputationEligible(
   return eligible;
 }
 
+function parseIsoDate(d?: string | null): string | null {
+  if (!d) return null;
+  const parsed = Date.parse(d);
+  if (Number.isNaN(parsed)) return null;
+  return new Date(parsed).toISOString();
+}
+
 // ============================================================
 // Tier 1 — GATHER
 // ============================================================
@@ -241,11 +248,13 @@ async function gatherSource(
   const stat: SourceStat = { discovered: 0, processed: 0, dropped: 0 };
   result.by_source[src.id] = stat;
   const started = Date.now();
-  let sawSuccess = false;
+  let pollSuccess = false;
   let taken = 0;
 
   try {
     const refs = await src.discover();
+    // Transport and feed retrieval succeeded without exception
+    pollSuccess = true;
     stat.discovered = refs.length;
     result.total_discovered += refs.length;
     console.log(`[ingest] ${src.id}: discovered ${refs.length}`);
@@ -309,12 +318,14 @@ async function gatherSource(
           result.dropped_no_text++;
           continue;
         }
-        sawSuccess = true;
         taken++;
+        const sourcePublishedAt = parseIsoDate(ref.pubDate);
         out.push({
           source: src.id, tier: src.tier, lang: src.lang, url: ref.url,
           headline, body, ministryHint: extracted?.ministryHint || ref.ministryHint, preSummarized: true,
           bullets: [body],
+          pubDate: ref.pubDate ?? null,
+          sourcePublishedAt,
         });
         continue;
       }
@@ -326,7 +337,6 @@ async function gatherSource(
         result.dropped_no_text++;
         continue;
       }
-      sawSuccess = true; // real text extracted → source-health success
 
       // Wire sources: relevance confidence (primary/world relevant by construction).
       if (src.tier === "wire" && policyConfidence(headline, body, src.id) < 0.5) {
@@ -335,16 +345,21 @@ async function gatherSource(
       }
 
       taken++;
+      const sourcePublishedAt = parseIsoDate(ref.pubDate);
       out.push({
         source: src.id, tier: src.tier, lang: src.lang, url: ref.url,
         headline, body, ministryHint: extracted?.ministryHint || ref.ministryHint,
+        pubDate: ref.pubDate ?? null,
+        sourcePublishedAt,
       });
     }
   } catch (err: any) {
     console.error(`[ingest] ${src.id} source failed: ${err?.message ?? err}`);
     result.errors++;
   } finally {
-    await callUpdateSourceReputation(src.id, sawSuccess, Date.now() - started);
+    // A poll is healthy if transport/discovery ran without network or parsing exceptions,
+    // even if it was a quiet news day (0 items) or all items were already seen duplicates.
+    await callUpdateSourceReputation(src.id, pollSuccess, Date.now() - started);
   }
 }
 
@@ -660,6 +675,8 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
         url: lead.url,
         summary,
         node_id: nodeAssignment.nodeId,
+        published_at: lead.sourcePublishedAt || undefined,
+        source_published_at: lead.sourcePublishedAt || undefined,
       });
 
       if (!upsert.ok) {
@@ -795,6 +812,7 @@ export async function runIngest(options: IngestOptions = {}): Promise<IngestResu
                   sourceId: lead.source,
                   sourceUrl: lead.url,
                   sourceBody: lead.body,
+                  coverageScope: (lead as any).coverage_scope || (lead as any).scope,
                   syllabusTags: tags,
                   syllabusNodeId: null,
                 },

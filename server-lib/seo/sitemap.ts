@@ -99,6 +99,7 @@ export async function generateMainSitemap(): Promise<string> {
     { loc: 'https://www.tark.live/intelligence/gs-2', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
     { loc: 'https://www.tark.live/intelligence/gs-3', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
     { loc: 'https://www.tark.live/intelligence/gs-4', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
+    { loc: 'https://www.tark.live/intelligence/international', lastmod: todayStr, changefreq: 'daily', priority: '0.9' },
     { loc: 'https://www.tark.live/humanities', lastmod: todayStr, changefreq: 'monthly', priority: '0.75' },
     { loc: 'https://www.tark.live/library', lastmod: todayStr, changefreq: 'weekly', priority: '0.85' },
     { loc: 'https://www.tark.live/leaderboard', lastmod: todayStr, changefreq: 'hourly', priority: '0.7' },

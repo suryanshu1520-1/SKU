@@ -110,9 +110,9 @@ function geminiEmbedder(key: string): Embedder {
     // (see syllabus/backtest.ts for the harness pattern) and pin via env.
     threshold: Number(env("GEMINI_EMBED_THRESHOLD")) || 0.82,
     embed: async (texts) => {
-      const out: number[][] = [];
-      for (const text of texts) {
-        try {
+      try {
+        const out: number[][] = [];
+        for (const text of texts) {
           const res: any = await ai.models.embedContent({
             model: GEMINI_EMBED_MODEL,
             contents: text.slice(0, 2000),
@@ -123,20 +123,24 @@ function geminiEmbedder(key: string): Embedder {
           });
           const values: number[] =
             res?.embeddings?.[0]?.values ?? res?.embedding?.values ?? [];
-          if (values.length) {
-            recordModelInvocation({ model_id: GEMINI_EMBED_MODEL, mode: "primary", caller: "geminiEmbedder.embed" });
-            out.push(l2normalize(values));
-          } else {
-            recordModelInvocation({ model_id: "local-hashed-bow", mode: "fallback", caller: "geminiEmbedder.embed", metadata: { reason: "empty_embedding" } });
-            out.push(localEmbed(text));
+          if (!values.length) {
+            throw new Error("empty_embedding_returned");
           }
-        } catch (err: any) {
-          console.warn(`[ingest][embed] gemini failed, local fallback: ${err?.message ?? err}`);
-          recordModelInvocation({ model_id: "local-hashed-bow", mode: "fallback", caller: "geminiEmbedder.embed", metadata: { error: err?.message ?? String(err) } });
-          out.push(localEmbed(text));
+          out.push(l2normalize(values));
         }
+        recordModelInvocation({ model_id: GEMINI_EMBED_MODEL, mode: "primary", caller: "geminiEmbedder.embed" });
+        return out;
+      } catch (err: any) {
+        console.warn(`[ingest][embed] gemini batch embedding failed, falling back entire batch to local embedder: ${err?.message ?? err}`);
+        recordModelInvocation({
+          model_id: "local-hashed-bow",
+          mode: "fallback",
+          caller: "geminiEmbedder.embed",
+          metadata: { error: err?.message ?? String(err) },
+        });
+        // Architectural invariant: Never mix 768-dim neural and 512-dim lexical vectors in one batch
+        return LOCAL.embed(texts);
       }
-      return out;
     },
   };
 }

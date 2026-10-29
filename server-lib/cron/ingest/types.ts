@@ -79,6 +79,10 @@ export type Candidate = {
   preSummarized?: boolean;
   /** Ready-made bullets for pre-summarized sources (Wikipedia). */
   bullets?: string[];
+  /** Preserved raw publication date string from feed item if available. */
+  pubDate?: string | null;
+  /** Normalized ISO-8601 publication timestamp from source document. */
+  sourcePublishedAt?: string | null;
 };
 
 /**

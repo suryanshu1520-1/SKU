@@ -72,6 +72,7 @@ export interface RebaseContext {
   sourceId: string;
   sourceUrl: string;
   sourceBody: string;
+  coverageScope?: string;
   syllabusTags?: string[];
   syllabusNodeId?: string | null;
 }
@@ -104,6 +105,17 @@ export function deriveNumericObservations(
   claim: VerifiedClaim,
   context: RebaseContext
 ): { observations: NumericObservation[]; skippedAmbiguous: boolean } {
+  // Precision Gate 0: Rebase v1 Domestic Isolation Invariant
+  // International sources and cross-border releases are strictly excluded from numeric Rebase v1
+  const normSource = (context.sourceId || "").toUpperCase();
+  if (
+    context.coverageScope === "international" ||
+    context.coverageScope === "cross_border" ||
+    ["MEA", "UN NEWS", "WTO", "WIKIPEDIA"].includes(normSource)
+  ) {
+    return { observations: [], skippedAmbiguous: false };
+  }
+
   // Precision Gate 1: Claim must be verified
   if (!claim.verified) return { observations: [], skippedAmbiguous: false };
 

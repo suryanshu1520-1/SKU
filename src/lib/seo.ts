@@ -51,6 +51,11 @@ export const ROUTE_META_DEFAULTS: Record<string, RouteMetaConfig> = {
     description: 'Autonomous policy & governance intelligence distilled directly from official PIB releases, Cabinet decisions, and The Hindu for UPSC CSE and State PSC prep.',
     canonicalPath: '/intelligence',
   },
+  international: {
+    title: 'International Affairs & Foreign Policy Intelligence | Bilateral, Treaties & Multilateral | Tark',
+    description: 'Track sovereign state actions, multilateral treaties, bilateral accords, and India-posture verification across MEA, UN, WTO, and wire intelligence for UPSC CSE.',
+    canonicalPath: '/intelligence/international',
+  },
   library: {
     title: 'UPSC Subject Study Library & High-Yield Pillars | Tark',
     description: 'Explore comprehensive subject pillars, foundational concepts, mind maps, static reference facts, and mains answer blueprints for UPSC CSE preparation.',

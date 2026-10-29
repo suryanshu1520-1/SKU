@@ -1462,6 +1462,7 @@ export async function renderDailyEditionSeoHtml(dateStr?: string): Promise<strin
  */
 export type HubSectionType =
   | 'intelligence'
+  | 'international'
   | 'prs'
   | 'daily-edition'
   | 'observatory'
@@ -1806,6 +1807,53 @@ export async function renderHubSeoHtml(section: HubSectionType): Promise<string>
         </div>
       </section>
     `;
+  } else if (section === 'international') {
+    title = 'International Affairs & Foreign Policy Intelligence | Bilateral, Treaties & Multilateral | Tark';
+    description = 'Track sovereign state actions, multilateral treaties, bilateral accords, and India-posture verification across MEA, UN, WTO, and wire intelligence for UPSC CSE.';
+    canonicalUrl = 'https://www.tark.live/intelligence/international';
+    h1 = 'International Affairs & Foreign Policy Intelligence';
+
+    let itemsHtml = '';
+    if (supabase) {
+      try {
+        const { data } = await supabase
+          .from('current_affairs')
+          .select('id, headline, source, ministry, created_at, published_at, coverage_scope')
+          .or('coverage_scope.in.(international,cross_border),source.in.(MEA,UN NEWS,WTO,WIKIPEDIA),ministry.ilike.%External Affairs%')
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (data && data.length > 0) {
+          itemsHtml = data.map((item: any) => {
+            const slug = slugify(item.headline);
+            const url = `/intelligence/${slug}?id=${encodeURIComponent(item.id)}`;
+            return `
+              <li class="p-3.5 bg-slate-900/60 border border-slate-800 rounded">
+                <span class="text-xs uppercase font-mono text-[#e0d0ab]">${escapeXml(item.source)} · ${escapeXml(item.ministry || 'International')}</span>
+                <h2 class="text-base font-serif font-bold text-white mt-1">
+                  <a href="${url}" class="hover:underline">${escapeXml(item.headline)}</a>
+                </h2>
+              </li>
+            `;
+          }).join('');
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    semanticBody = `
+      <div class="flex flex-wrap gap-2 mb-6 text-xs font-mono">
+        <a href="/intelligence" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-amber-300 hover:border-amber-400">All Intelligence</a>
+        <a href="/intelligence/gs-2" class="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-amber-300 hover:border-amber-400">GS-2 Hub (Polity & IR)</a>
+        <a href="/intelligence/international" class="px-2.5 py-1 rounded bg-amber-950/40 border border-amber-600/50 text-amber-300 font-bold">International & IR</a>
+      </div>
+      <section>
+        <ul class="space-y-3">
+          ${itemsHtml || '<li class="text-slate-400 text-sm">No international dispatches currently available.</li>'}
+        </ul>
+      </section>
+    `;
   } else {
     // intelligence default
     canonicalUrl = 'https://www.tark.live/intelligence';
@@ -1935,31 +1983,31 @@ export async function renderHubSeoHtml(section: HubSectionType): Promise<string>
   const extraHead = `
     <script type="application/ld+json">
       ${JSON.stringify({
-        '@context': 'https://schema.org',
-        '@graph': [
-          {
-            '@type': 'WebPage',
-            '@id': `${canonicalUrl}#webpage`,
-            'name': title,
-            'description': description,
-            'url': canonicalUrl,
-            'isPartOf': {
-              '@type': 'WebSite',
-              '@id': 'https://www.tark.live/#website',
-              'name': 'Tark | तर्क',
-              'url': 'https://www.tark.live/'
-            }
-          },
-          {
-            '@type': 'BreadcrumbList',
-            '@id': `${canonicalUrl}#breadcrumb`,
-            'itemListElement': [
-              { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://www.tark.live/' },
-              { '@type': 'ListItem', 'position': 2, 'name': section.toUpperCase(), 'item': canonicalUrl }
-            ]
-          }
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${canonicalUrl}#webpage`,
+        'name': title,
+        'description': description,
+        'url': canonicalUrl,
+        'isPartOf': {
+          '@type': 'WebSite',
+          '@id': 'https://www.tark.live/#website',
+          'name': 'Tark | तर्क',
+          'url': 'https://www.tark.live/'
+        }
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${canonicalUrl}#breadcrumb`,
+        'itemListElement': [
+          { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': 'https://www.tark.live/' },
+          { '@type': 'ListItem', 'position': 2, 'name': section.toUpperCase(), 'item': canonicalUrl }
         ]
-      })}
+      }
+    ]
+  })}
     </script>
   `;
   modifiedHtml = modifiedHtml.replace('</head>', `${extraHead}\n</head>`);

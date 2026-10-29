@@ -19,6 +19,7 @@ import { handleGetRebase, handlePostRebaseAck } from "./server-lib/rebase.js";
 import { analyticsRouter } from "./server-lib/analytics/routes.js";
 import { syllabusRouter, handleUserSyllabusProgress } from "./server-lib/syllabus/routes.js";
 import { seoRouter } from "./server-lib/seo/routes.js";
+import { intelligenceRouter } from "./server-lib/news/routes.js";
 import { policyRadarHandler } from "./server-lib/policy-radar.js";
 import {
   radarV2Handler,
@@ -181,6 +182,7 @@ async function startServer() {
   app.post("/api/rebase/ack", handlePostRebaseAck);
   app.use("/api/analytics", analyticsRouter);
   app.use("/api/syllabus", syllabusRouter);
+  app.use("/api/intelligence", intelligenceRouter);
   app.get("/api/me/syllabus-progress", handleUserSyllabusProgress);
   app.get("/api/questions", questionsHandler);
   app.get("/api/policy-radar", policyRadarHandler);

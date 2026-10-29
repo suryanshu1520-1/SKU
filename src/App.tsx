@@ -100,14 +100,16 @@ export default function App() {
         setActiveTab('tracker');
         const isDeepLink = pathname.includes('/daily-edition/') ||
                            pathname.includes('/prs/') ||
-                           (pathname.startsWith('/intelligence/') && !pathname.startsWith('/intelligence/gs-') && !pathname.startsWith('/intelligence/ministry/')) ||
-                           (pathname.startsWith('/news/') && !pathname.startsWith('/news/gs-') && !pathname.startsWith('/news/ministry/')) ||
+                           (pathname.startsWith('/intelligence/') && !pathname.startsWith('/intelligence/gs-') && !pathname.startsWith('/intelligence/ministry/') && !pathname.startsWith('/intelligence/international')) ||
+                           (pathname.startsWith('/news/') && !pathname.startsWith('/news/gs-') && !pathname.startsWith('/news/ministry/') && !pathname.startsWith('/news/international')) ||
                            params.has('id');
         if (!isDeepLink) {
           if (pathname.startsWith('/daily-edition')) {
             updateDocumentMeta(ROUTE_META_DEFAULTS.edition);
           } else if (pathname.startsWith('/prs')) {
             updateDocumentMeta(ROUTE_META_DEFAULTS.prs);
+          } else if (pathname.startsWith('/intelligence/international') || pathname.startsWith('/news/international')) {
+            updateDocumentMeta(ROUTE_META_DEFAULTS.international || ROUTE_META_DEFAULTS.tracker);
           } else if (pathname.startsWith('/intelligence/gs-1')) {
             updateDocumentMeta(ROUTE_META_DEFAULTS.gs1);
           } else if (pathname.startsWith('/intelligence/gs-2')) {

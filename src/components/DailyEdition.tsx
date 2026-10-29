@@ -362,18 +362,16 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
               <button
                 onClick={() => setIsDensityCompact(false)}
                 title="Detailed View"
-                className={`p-1.5 rounded-xs text-xs transition-colors cursor-pointer ${
-                  !isDensityCompact ? 'bg-[#e0d0ab] text-[#072e63]' : 'text-[#8fa2bd] hover:text-[#e0d0ab]'
-                }`}
+                className={`p-1.5 rounded-xs text-xs transition-colors cursor-pointer ${!isDensityCompact ? 'bg-[#e0d0ab] text-[#072e63]' : 'text-[#8fa2bd] hover:text-[#e0d0ab]'
+                  }`}
               >
                 <Rows3 className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setIsDensityCompact(true)}
                 title="Compact Scannable View"
-                className={`p-1.5 rounded-xs text-xs transition-colors cursor-pointer ${
-                  isDensityCompact ? 'bg-[#e0d0ab] text-[#072e63]' : 'text-[#8fa2bd] hover:text-[#e0d0ab]'
-                }`}
+                className={`p-1.5 rounded-xs text-xs transition-colors cursor-pointer ${isDensityCompact ? 'bg-[#e0d0ab] text-[#072e63]' : 'text-[#8fa2bd] hover:text-[#e0d0ab]'
+                  }`}
               >
                 <LayoutList className="w-3.5 h-3.5" />
               </button>
@@ -424,11 +422,10 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: prefersReducedMotion ? 0 : idx * 0.025, duration: 0.25 }}
-              className={`group relative rounded-xs border transition-all duration-200 overflow-hidden ${
-                isRead
+              className={`group relative rounded-xs border transition-all duration-200 overflow-hidden ${isRead
                   ? 'border-[rgba(19,108,153,0.3)] bg-[rgba(4,25,54,0.3)] opacity-70'
                   : 'border-[rgba(19,108,153,0.45)] bg-[rgba(4,25,54,0.55)] hover:border-[rgba(224,208,171,0.5)] hover:bg-[rgba(11,61,120,0.35)] shadow-sm'
-              }`}
+                }`}
             >
               {/* Left Category Accent Strip */}
               <span
@@ -482,9 +479,8 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
                 {/* Headline */}
                 <h3
                   onClick={() => isDensityCompact && toggleCardExpand(item.url)}
-                  className={`font-serif font-bold text-[15px] sm:text-[16.5px] text-[#e8e0cf] group-hover:text-[#e0d0ab] transition-colors leading-[1.38] mb-2.5 ${
-                    isDensityCompact ? 'cursor-pointer' : ''
-                  }`}
+                  className={`font-serif font-bold text-[15px] sm:text-[16.5px] text-[#e8e0cf] group-hover:text-[#e0d0ab] transition-colors leading-[1.38] mb-2.5 ${isDensityCompact ? 'cursor-pointer' : ''
+                    }`}
                 >
                   {item.headline}
                 </h3>
@@ -547,15 +543,13 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
                 <div className="flex items-center justify-between pt-2.5 border-t border-[rgba(19,108,153,0.3)]">
                   <button
                     onClick={(e) => toggleRead(item.url, e)}
-                    className={`inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold uppercase tracking-wider transition-colors cursor-pointer ${
-                      isRead ? 'text-emerald-400' : 'text-[#8fa2bd] hover:text-[#e0d0ab]'
-                    }`}
+                    className={`inline-flex items-center gap-1.5 text-[11px] font-mono font-semibold uppercase tracking-wider transition-colors cursor-pointer ${isRead ? 'text-emerald-400' : 'text-[#8fa2bd] hover:text-[#e0d0ab]'
+                      }`}
                   >
-                    <span className={`w-4 h-4 rounded-xs border flex items-center justify-center transition-all ${
-                      isRead
+                    <span className={`w-4 h-4 rounded-xs border flex items-center justify-center transition-all ${isRead
                         ? 'bg-emerald-400/20 border-emerald-400'
                         : 'border-[rgba(19,108,153,0.6)] bg-[rgba(3,18,42,0.6)]'
-                    }`}>
+                      }`}>
                       {isRead && <Check className="w-3 h-3 text-emerald-400" />}
                     </span>
                     <span>{isRead ? 'Completed' : 'Mark as Read'}</span>

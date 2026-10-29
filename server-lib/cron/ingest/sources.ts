@@ -312,11 +312,11 @@ export const SOURCES: SourceAdapter[] = [
   }),
 ];
 
-export function getSources(ids?: string[]): SourceAdapter[] {
-  const enabled = SOURCES.filter((s) => s.enabled);
-  if (!ids || ids.length === 0) return enabled;
+export function getSources(ids?: string[], includeDisabled = false): SourceAdapter[] {
+  const pool = includeDisabled ? SOURCES : SOURCES.filter((s) => s.enabled);
+  if (!ids || ids.length === 0) return pool;
   const want = new Set(ids.map((s) => s.toUpperCase()));
-  return SOURCES.filter((s) => want.has(s.id.toUpperCase()));
+  return pool.filter((s) => want.has(s.id.toUpperCase()));
 }
 
 export { cap };

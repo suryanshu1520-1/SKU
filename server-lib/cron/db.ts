@@ -12,8 +12,9 @@ export async function upsertCurrentAffairs(params: {
   published_at?: string;
   primary_operator?: string;
   node_id?: string | null;
+  source_published_at?: string | null;
 }): Promise<{ ok: boolean; id?: string; errorMessage?: string }> {
-  let { source, headline, url, ministry, summary, published_at, primary_operator, node_id } = params;
+  let { source, headline, url, ministry, summary, published_at, primary_operator, node_id, source_published_at } = params;
 
   // Auto-translate Hindi headlines into rich contextual English
   if (headline && DEVANAGARI_REGEX.test(headline)) {
@@ -47,14 +48,40 @@ Output ONLY the clean translated English headline string without quotes or prefi
 
   const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
+  const nowIso = new Date().toISOString();
+
+  // Thread source_published_at into summary metadata if provided
+  if (source_published_at && !summary.source_published_at) {
+    summary.source_published_at = source_published_at;
+  }
+
+  // Preserve immutable created_at and original published_at on updates
+  let createdAtToUse = nowIso;
+  let publishedAtToUse = published_at || nowIso;
+
+  try {
+    const { data: existing } = await supabase
+      .from("current_affairs")
+      .select("id, created_at, published_at")
+      .eq("url", url)
+      .maybeSingle();
+
+    if (existing) {
+      if (existing.created_at) createdAtToUse = existing.created_at;
+      if (existing.published_at && !published_at) publishedAtToUse = existing.published_at;
+    }
+  } catch (lookupErr: any) {
+    console.warn(`[db][upsertCurrentAffairs] existing row lookup error for ${url}:`, lookupErr?.message ?? lookupErr);
+  }
+
   const row: Record<string, any> = {
     source,
     headline,
     summary, // { bullets: string[] } — matches frontend contract
     url,
     ministry,
-    published_at: published_at || new Date().toISOString(),
-    created_at: new Date().toISOString(),
+    published_at: publishedAtToUse,
+    created_at: createdAtToUse,
   };
   if (primary_operator) {
     row.primary_operator = primary_operator;

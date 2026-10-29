@@ -121,6 +121,15 @@ export default function VerticalNavRail({
             tooltip: 'Open Statutory Acts & Parliamentary Bills (PRS Vault)',
           },
           {
+            id: 'international',
+            label: 'International & IR',
+            shortLabel: 'Global',
+            icon: Globe,
+            accentColor: 'gold',
+            onClick: () => window.dispatchEvent(new CustomEvent('tark:brief-action', { detail: 'international' })),
+            tooltip: 'International Dispatches & Multilateral Accords',
+          },
+          {
             id: 'pib',
             label: 'PIB Daily Digest',
             shortLabel: 'PIB',

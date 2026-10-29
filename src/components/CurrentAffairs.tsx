@@ -72,6 +72,10 @@ export interface CurrentAffairsItem {
   ministry: string;
   headline: string;
   url: string;
+  coverage_scope?: 'domestic' | 'international' | 'cross_border';
+  content_version?: number;
+  source_published_at?: string;
+  story_id?: string;
   primary_operator?: ExaminerOperatorType;
   node_id?: string;
   chain_id?: string;
@@ -105,6 +109,9 @@ export interface CurrentAffairsItem {
     prelims_trap_radar?: string;
     prelims_relevance?: 'HIGH' | 'MEDIUM' | 'LOW';
     mains_relevance?: 'HIGH' | 'MEDIUM' | 'LOW';
+    india_posture?: 'party_signatory' | 'party_ratified' | 'non_party_commentator' | 'observer' | 'disputed_unspecified';
+    posture_evidence_span?: string;
+    accepted_match_key?: string;
   };
   created_at?: string;
 }
@@ -164,6 +171,7 @@ const editionVariants = {
 
 const CATEGORY_TABS = [
   { id: 'ALL', label: 'All Signals' },
+  { id: 'International', label: '🌐 International & IR', keywords: ['International', 'External Affairs', 'Bilateral', 'WTO', 'Treaty', 'UN', 'Global', 'Multilateral', 'Diplomacy', 'MEA', 'Foreign'] },
   { id: 'Governance', label: 'Polity & Cabinet', keywords: ['Cabinet', 'Prime Minister', 'Home Affairs', 'Law', 'Personnel', 'Parliament', 'Governance', 'Supreme Court', 'Judiciary'] },
   { id: 'Economy', label: 'Economy & RBI', keywords: ['Finance', 'Commerce', 'RBI', 'Corporate Affairs', 'NITI Aayog', 'Revenue', 'Economy', 'Budget', 'Tax'] },
   { id: 'SciTech', label: 'Science & Defence', keywords: ['Defence', 'Space', 'ISRO', 'Atomic Energy', 'Electronics', 'IT', 'Science', 'Technology', 'Missile', 'AI'] },
@@ -392,6 +400,9 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
         if (pathname === '/prs') {
           updateDocumentMeta(ROUTE_META_DEFAULTS.prs);
         }
+      } else if (pathname.startsWith('/intelligence/international') || pathname.startsWith('/news/international')) {
+        setActiveCategoryTab('International');
+        updateDocumentMeta(ROUTE_META_DEFAULTS.international || ROUTE_META_DEFAULTS.tracker);
       } else if (pathname.includes('/gs-1') || pathname.includes('/gs-i')) {
         setActiveCategoryTab('ALL');
         setSearchQuery('GS-1');
@@ -422,7 +433,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
         if (seg) resolvedId = seg;
       } else if (!resolvedId && (pathname.startsWith('/intelligence/') || pathname.startsWith('/news/'))) {
         const seg = pathname.split('/')[2]?.split('?')[0];
-        if (seg && !seg.startsWith('gs-') && seg !== 'ministry') {
+        if (seg && !seg.startsWith('gs-') && seg !== 'ministry' && seg !== 'international') {
           resolvedId = seg;
         }
       }
@@ -505,13 +516,14 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
       }
       const isSubRoute = window.location.pathname.startsWith('/intelligence/gs-') || 
                          window.location.pathname.startsWith('/intelligence/ministry/') ||
+                         window.location.pathname.startsWith('/intelligence/international') ||
                          window.location.pathname.startsWith('/daily-edition');
       if (isSubRoute) return;
 
-      const fallbackPath = activeCategoryTab === 'PRS' ? '/prs' : '/intelligence';
+      const fallbackPath = activeCategoryTab === 'PRS' ? '/prs' : activeCategoryTab === 'International' ? '/intelligence/international' : '/intelligence';
       if (window.location.pathname.startsWith('/intelligence/') || window.location.pathname.startsWith('/prs/')) {
         window.history.pushState(null, '', fallbackPath);
-        updateDocumentMeta(activeCategoryTab === 'PRS' ? ROUTE_META_DEFAULTS.prs : ROUTE_META_DEFAULTS.tracker);
+        updateDocumentMeta(activeCategoryTab === 'PRS' ? ROUTE_META_DEFAULTS.prs : activeCategoryTab === 'International' ? (ROUTE_META_DEFAULTS.international || ROUTE_META_DEFAULTS.tracker) : ROUTE_META_DEFAULTS.tracker);
       }
     }
   }, [selectedDossier?.id]);
@@ -703,6 +715,9 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
       if (categoryTab === 'PRS' || filterSource === 'PRS') {
         // Strictly fetch PRS Legislative Research items only
         query = query.eq('source', 'PRS');
+      } else if (categoryTab === 'International') {
+        // International scope: coverage_scope in (international, cross_border) or international sources/ministries
+        query = query.or('coverage_scope.in.(international,cross_border),source.in.(MEA,UN NEWS,WTO,WIKIPEDIA),ministry.ilike.%External Affairs%');
       } else {
         // Daily current affairs feed NEVER contains PRS
         if (filterSource === 'ALL') {
@@ -905,7 +920,17 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
       });
     } else if (activeCategoryTab !== 'ALL') {
       const tab = CATEGORY_TABS.find((t) => t.id === activeCategoryTab);
-      if (tab?.keywords) {
+      if (activeCategoryTab === 'International') {
+        list = list.filter((item) =>
+          item.coverage_scope === 'international' ||
+          item.coverage_scope === 'cross_border' ||
+          ['MEA', 'UN NEWS', 'WTO', 'WIKIPEDIA'].includes((item.source || '').toUpperCase()) ||
+          tab?.keywords?.some((kw) =>
+            item.ministry?.toLowerCase().includes(kw.toLowerCase()) ||
+            item.headline?.toLowerCase().includes(kw.toLowerCase())
+          )
+        );
+      } else if (tab?.keywords) {
         list = list.filter((item) =>
           tab.keywords.some(
             (kw) =>
@@ -982,10 +1007,22 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
         setBriefViewMode('signals');
         setActiveCategoryTab('PRS');
         setSelectedSource('PRS');
+      } else if (action === 'international') {
+        setBriefViewMode('signals');
+        setActiveCategoryTab('International');
+        setSelectedSource('ALL');
+        if (typeof window !== 'undefined') {
+          window.history.pushState(null, '', '/intelligence/international');
+          updateDocumentMeta(ROUTE_META_DEFAULTS.international || ROUTE_META_DEFAULTS.tracker);
+        }
       } else if (action === 'pib') {
         setShowPibModal(true);
       } else if (action === 'signals') {
         setBriefViewMode('signals');
+        if (activeCategoryTab === 'PRS' || activeCategoryTab === 'International') {
+          setActiveCategoryTab('ALL');
+          setSelectedSource('ALL');
+        }
         try {
           localStorage.setItem('tark_brief_view_mode', 'signals');
         } catch {
@@ -1162,7 +1199,22 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
             open={isFilterDrawerOpen}
             resultCount={displayedItems.length}
             loading={loading}
-            onCategory={(value) => { setActiveCategoryTab(value); setPage(0); }}
+            onCategory={(value) => {
+              setActiveCategoryTab(value);
+              setPage(0);
+              if (typeof window !== 'undefined') {
+                if (value === 'International') {
+                  window.history.pushState(null, '', '/intelligence/international');
+                  updateDocumentMeta(ROUTE_META_DEFAULTS.international || ROUTE_META_DEFAULTS.tracker);
+                } else if (value === 'PRS') {
+                  window.history.pushState(null, '', '/prs');
+                  updateDocumentMeta(ROUTE_META_DEFAULTS.prs);
+                } else if (window.location.pathname.startsWith('/intelligence/international') || window.location.pathname.startsWith('/prs')) {
+                  window.history.pushState(null, '', '/intelligence');
+                  updateDocumentMeta(ROUTE_META_DEFAULTS.tracker);
+                }
+              }
+            }}
             onSource={(value) => { setSelectedSource(value); setPage(0); }}
             onMinistry={(value) => { setSelectedMinistry(value); setPage(0); }}
             onTime={(value) => { applyTimePreset(value); setPage(0); }}

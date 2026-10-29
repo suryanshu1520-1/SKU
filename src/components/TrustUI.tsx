@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { ShieldCheck, Scale, ExternalLink, AlertTriangle, Sparkles, Check, X } from 'lucide-react';
+import { resolveTrustStatus, parseHost, isVerifiedPrimaryHost, normalizeGroundingScore } from '../lib/trust-resolver';
 
 const ACCENT = '#e0d0ab';
 
@@ -246,18 +247,14 @@ export function SourceAnchor({ claim }: { claim: VerifiedClaim }) {
 }
 
 export function isVerifiedPrimarySource(source?: string, sourceUrl?: string): boolean {
-  const s = (source || '').toLowerCase();
-  const u = (sourceUrl || '').toLowerCase();
-  return (
-    u.includes('pib.gov.in') ||
-    u.includes('rbi.org.in') ||
-    u.includes('prsindia.org') ||
-    u.includes('egazette.nic.in') ||
-    u.includes('indiabudget.gov.in') ||
-    s.includes('pib') ||
-    s.includes('rbi') ||
-    s.includes('prs')
-  );
+  const host = parseHost(sourceUrl);
+  if (host && isVerifiedPrimaryHost(host)) return true;
+  // Fallback to strict source ID match for historical records lacking a full URL
+  if (source) {
+    const s = source.trim().toUpperCase();
+    return s === 'PIB' || s === 'RBI' || s === 'PRS' || s === 'MEA';
+  }
+  return false;
 }
 
 /**
@@ -281,19 +278,16 @@ export function GroundingBadge({
   sourceUrl?: string;
   claims?: VerifiedClaim[];
 }) {
-  const isPrimary = isVerifiedPrimarySource(source, sourceUrl);
+  const trust = resolveTrustStatus({
+    source,
+    sourceUrl,
+    grounding,
+    verificationMethod,
+    claims,
+  });
 
-  // If not primary and missing verificationMethod, do not render
-  if (!isPrimary && verificationMethod !== 'live_cite_or_drop_v1') return null;
+  if (trust.badgeLevel === 'none' || !trust.badgeLabel) return null;
 
-  // Never render a self-sabotaging "< 100% Grounded" badge (e.g. 33% or 50%) on public feed cards.
-  // Primary government releases represent authentic sovereign evidence -> 100% Grounded · Primary Source
-  const pct = isPrimary ? 100 : typeof grounding === 'number' && Number.isFinite(grounding) ? Math.round(grounding * 100) : 100;
-  if (pct < 100) {
-    return null;
-  }
-
-  const badgeLabel = isPrimary ? '100% Grounded · Primary Source' : '100% Grounded';
   const isInteractive = Boolean(onClick);
 
   return (
@@ -306,12 +300,12 @@ export function GroundingBadge({
       } bg-emerald-500/10 text-emerald-300 border-emerald-500/30 hover:border-emerald-500/60`}
       title={
         isInteractive
-          ? `${badgeLabel} — Click to inspect deterministic verification ledger`
-          : `100% of factual claims deterministically verified against primary source sentences`
+          ? `${trust.badgeLabel} — Click to inspect deterministic verification ledger`
+          : trust.badgeTooltip || 'Source verification ledger'
       }
     >
       <ShieldCheck className="w-2.5 h-2.5 shrink-0 text-emerald-400" />
-      <span>{badgeLabel}</span>
+      <span>{trust.badgeLabel}</span>
       {isInteractive && <span className="w-1 h-1 rounded-full bg-current opacity-70 animate-pulse ml-0.5" />}
     </button>
   );

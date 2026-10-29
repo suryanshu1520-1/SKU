@@ -152,6 +152,11 @@ export default function NewsSignalCard({
           >
             {item.source || 'Original source'}
           </a>
+          {item.coverage_scope && item.coverage_scope !== 'domestic' && (
+            <span className="px-1.5 py-0.5 bg-amber-950/40 border border-amber-600/40 text-amber-300 text-[10px] font-mono rounded uppercase tracking-wider">
+              {item.coverage_scope === 'international' ? 'International' : 'Cross-Border'}
+            </span>
+          )}
           {validDate && (
             <time className="news-signal__date" dateTime={validDate.toISOString()}>
               {validDate.toLocaleDateString('en-GB', {
@@ -221,6 +226,11 @@ export default function NewsSignalCard({
         <div ref={contentRef} className="news-signal__context">
           <div className="news-signal__provenance">
             {item.ministry && <p className="news-signal__ministry">{item.ministry}</p>}
+            {item.summary?.india_posture && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-mono text-amber-200 bg-amber-950/50 border border-amber-700/50 px-2 py-0.5 rounded">
+                Posture: {item.summary.india_posture.replace(/_/g, ' ')}
+              </span>
+            )}
             <div className="news-signal__grounding">
               <GroundingBadge
                 grounding={item.summary?.grounding}

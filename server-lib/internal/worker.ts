@@ -14,10 +14,18 @@ export default async function handler(req: any, res: any) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
 
-  // Authenticate via internal worker secret.
-  const workerSecret = process.env.INTERNAL_WORKER_SECRET || "";
-  if (req.headers.authorization !== `Bearer ${workerSecret}`) {
-    console.error("[worker] Auth failed");
+  // Authenticate via internal worker secret (fail closed if secret unconfigured or empty).
+  const workerSecret = process.env.INTERNAL_WORKER_SECRET?.trim();
+  if (!workerSecret) {
+    console.error("[worker] INTERNAL_WORKER_SECRET is not configured on the server");
+    return res.status(500).json({ error: "Server misconfiguration: INTERNAL_WORKER_SECRET not configured" });
+  }
+
+  const authHeader = req.headers?.authorization || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+
+  if (token !== workerSecret) {
+    console.error("[worker] Auth failed: missing or invalid bearer token");
     return res.status(403).json({ error: "Unauthorized" });
   }
 
@@ -30,7 +38,7 @@ export default async function handler(req: any, res: any) {
   const matched = getSources([normalized]);
   if (matched.length === 0) {
     return res.status(400).json({
-      error: `Unknown source: ${sourceKey}`,
+      error: `Unknown or disabled source: ${sourceKey}`,
       supported: getSources().map((s) => s.id),
     });
   }
