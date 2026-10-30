@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { llmGenerate } from "../llm.js";
+import { classificationSummary } from '../../src/lib/article-classification.js';
 
 const DEVANAGARI_REGEX = /[\u0900-\u097F]/;
 
@@ -55,6 +56,11 @@ Output ONLY the clean translated English headline string without quotes or prefi
   if (source_published_at && !summary.source_published_at) {
     summary.source_published_at = source_published_at;
   }
+
+  // Run after translation, using the same article text the reader will receive.
+  const classifiedSummary = classificationSummary({ source, ministry, headline, summary, node_id });
+  summary = { ...summary, ...classifiedSummary };
+  coverage_scope = classifiedSummary.classification.coverage.scope;
 
   // Preserve immutable created_at and original published_at on updates
   let createdAtToUse = nowIso;

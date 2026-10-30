@@ -29,6 +29,7 @@ import {
 } from './TrustUI';
 import { ConceptInsightRenderer } from './shared';
 import { updateDocumentMeta } from '../lib/seo';
+import { articleIssuerLabel, classifyArticle } from '../lib/article-classification';
 
 const GOLD = '#e0d0ab';
 const MUTED_GOLD = '#c8b998';
@@ -411,6 +412,7 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
       <div className="space-y-3">
         {items.map((item, idx) => {
           const s = item.summary;
+          const classification = classifyArticle({ ...item, summary: { ...s } });
           const isRead = readUrls.has(item.url);
           const isCardExpanded = !isDensityCompact || expandedCards.has(item.url);
           const colors = getCategoryColor(item.ministry, s.tags);
@@ -444,7 +446,7 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
                       className="px-2 py-0.5 text-[9.5px] font-mono font-semibold uppercase tracking-wider rounded-xs border border-[rgba(19,108,153,0.5)]"
                       style={{ background: 'rgba(3,18,42,0.6)', color: colors.tagColor }}
                     >
-                      {item.ministry}
+                      {articleIssuerLabel(item)}
                     </span>
                     <span className="text-[9px] font-mono uppercase tracking-wider text-[#8fa2bd]">
                       {item.source}
@@ -463,17 +465,9 @@ export default function DailyEdition({ userId, compactModeDefault = false, onOpe
                     <RadarCardExtras dispatchId={item.id} nodeId={item.node_id} variant="edition" />
                   </div>
 
-                  {/* Syllabus tag chips */}
-                  <div className="flex items-center gap-1">
-                    {(s.tags || []).slice(0, 2).map((t) => (
-                      <span
-                        key={t}
-                        className="hidden sm:inline-block px-1.5 py-0.5 bg-[rgba(224,208,171,0.08)] text-[#c8b998] text-[9px] font-mono uppercase tracking-wider rounded-xs border border-[rgba(224,208,171,0.2)]"
-                      >
-                        {t.replace(/GS PAPER \d:?/i, 'GS').slice(0, 28)}
-                      </span>
-                    ))}
-                  </div>
+                  {classification.primary && <p className="text-xs leading-relaxed text-[#c8b998]">
+                    {classification.primary.paper} · {classification.primary.topic}
+                  </p>}
                 </div>
 
                 {/* Headline */}

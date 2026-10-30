@@ -8,6 +8,7 @@ import { RING_LABEL, INSTRUMENT_LABEL } from './observatory/radar-v2/labels';
 import { sourceHref, sourceLabel } from './observatory/radar-v2/sourceLink';
 import { EXAMINER_OPERATORS } from '../types';
 import { resolveArticleExamInsights } from '../lib/article-exam-insights';
+import { articleIssuerLabel, classifyArticle } from '../lib/article-classification';
 import { ContestedCard, SourceAnchor } from './TrustUI';
 import { TheHinduLogo, PibLogo } from './SourceLogos';
 import { getCanonicalArticleUrl } from '../lib/seo';
@@ -50,6 +51,7 @@ function Note({ title, children }: { title: string; children: ReactNode }) {
 
 export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose, onSave, onShare, onPractice, onLaunchConveyor, onInspectGrounding }: PolicyBriefProps) {
   const summary = item.summary;
+  const classification = classifyArticle(item);
   const reducedMotion = useReducedMotion();
   const dialogRef = useRef<HTMLDivElement>(null);
   const readerRef = useRef<HTMLDivElement>(null);
@@ -177,7 +179,7 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
               })}</time>}
             </div>
             <h2 id="brief-title">{item.headline}</h2>
-            {item.ministry && <p className="brief-ministry">{item.ministry}</p>}
+            {articleIssuerLabel(item) && <p className="brief-ministry">{articleIssuerLabel(item)}</p>}
 
             <div className="brief-study-meta">
               {(summary?.prelims_relevance || summary?.mains_relevance) && <dl className="brief-relevance" aria-label="Exam relevance">
@@ -359,7 +361,7 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
               <p className="brief-section-context">Standard textbook & syllabus anchors · NCERT / Laxmikanth alignment</p>
               {summary?.static_linkages?.length ? summary.static_linkages.map((link, index) => (
                 <Note key={index} title={link.concept}><p>{link.textbook_context}</p></Note>
-              )) : <Note title="Core General Studies alignment"><p>This development maps directly to {(summary?.tags || ['General Studies']).join(', ')}. Review foundational constitutional provisions, statutory bodies, and standard economic metrics in your core notes.</p></Note>}
+              )) : <Note title="Core General Studies alignment"><p>{classification.primary ? `Start with ${classification.primary.paper} · ${classification.primary.topic}.` : 'The syllabus connection needs editorial review.'} Refer to the primary source when making your notes.</p></Note>}
               {!!summary?.thematic_pillars?.length && <div className="brief-themes">
                 <h4>Key thematic dimensions</h4>
                 {summary.thematic_pillars.map((pillar, index) => <Note key={index} title={pillar.title}><p>{pillar.description}</p></Note>)}
@@ -378,9 +380,8 @@ export default function PolicyBrief({ item, syllabusTags, saved, saving, onClose
               <ContestedCard contested={summary?.contested} />
               <dl className="brief-source-record">
                 <div><dt>Primary source</dt><dd>{item.source}</dd></div>
-                {item.coverage_scope && (
-                  <div><dt>Scope</dt><dd className="capitalize">{item.coverage_scope}</dd></div>
-                )}
+                <div><dt>Coverage</dt><dd>{classification.coverage.label}. {classification.coverage.reason}</dd></div>
+                <div><dt>Filed under</dt><dd>{classification.primary ? `${classification.primary.paper} · ${classification.primary.topic}` : 'Topic under review'}</dd></div>
                 {summary?.india_posture && (
                   <div><dt>India Posture</dt><dd className="font-mono text-amber-300 font-bold">{summary.india_posture.replace(/_/g, ' ')}</dd></div>
                 )}

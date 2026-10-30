@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
 import { slugify, escapeXml } from './sitemap.js';
+import { selectClassifiedPage } from '../../src/lib/article-feed-selection.js';
 
 function cleanEnvValue(val: any): string {
   if (typeof val !== 'string') return '';
@@ -1816,12 +1817,19 @@ export async function renderHubSeoHtml(section: HubSectionType): Promise<string>
     let itemsHtml = '';
     if (supabase) {
       try {
-        const { data } = await supabase
-          .from('current_affairs')
-          .select('id, headline, source, ministry, created_at, published_at, coverage_scope')
-          .or('coverage_scope.in.(international,cross_border),source.in.(MEA,UN NEWS,WTO,WIKIPEDIA),ministry.ilike.%External Affairs%')
-          .order('created_at', { ascending: false })
-          .limit(50);
+        const { items: data } = await selectClassifiedPage<{
+          id: string; headline: string; source: string; ministry: string; summary: { bullets?: string[] };
+        }>({
+          scope: 'international', offset: 0, limit: 50,
+          fetchBatch: async (offset, size) => {
+            const result = await supabase.from('current_affairs')
+              .select('id, headline, source, ministry, summary, node_id, coverage_scope')
+              .neq('source', 'PIB_Digest').order('created_at', { ascending: false }).order('id', { ascending: false })
+              .range(offset, offset + size - 1);
+            if (result.error) throw result.error;
+            return result.data || [];
+          },
+        });
 
         if (data && data.length > 0) {
           itemsHtml = data.map((item: any) => {

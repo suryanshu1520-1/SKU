@@ -26,6 +26,8 @@ import DailyBriefHeader, { DailyBriefFilters } from './DailyBriefHeader';
 import { getStoredVulnerabilityIndex } from '../lib/vulnerabilityIndex';
 import { EXAMINER_OPERATORS, type ExaminerOperatorType } from '../types';
 import { resolveArticleExamInsights } from '../lib/article-exam-insights';
+import { classifyArticle, isInternationalArticle } from '../lib/article-classification';
+import { selectClassifiedPage } from '../lib/article-feed-selection';
 
 import prsVaultDossiers from '../data/prs-vault-dossiers.json';
 import type { CandidatePreferences } from '../types';
@@ -171,12 +173,12 @@ const editionVariants = {
 
 const CATEGORY_TABS = [
   { id: 'ALL', label: 'All Signals' },
-  { id: 'International', label: '🌐 International & IR', keywords: ['International', 'External Affairs', 'Bilateral', 'WTO', 'Treaty', 'UN', 'Global', 'Multilateral', 'Diplomacy', 'MEA', 'Foreign'] },
-  { id: 'Governance', label: 'Polity & Cabinet', keywords: ['Cabinet', 'Prime Minister', 'Home Affairs', 'Law', 'Personnel', 'Parliament', 'Governance', 'Supreme Court', 'Judiciary'] },
-  { id: 'Economy', label: 'Economy & RBI', keywords: ['Finance', 'Commerce', 'RBI', 'Corporate Affairs', 'NITI Aayog', 'Revenue', 'Economy', 'Budget', 'Tax'] },
-  { id: 'SciTech', label: 'Science & Defence', keywords: ['Defence', 'Space', 'ISRO', 'Atomic Energy', 'Electronics', 'IT', 'Science', 'Technology', 'Missile', 'AI'] },
-  { id: 'Environment', label: 'Climate & Ecology', keywords: ['Environment', 'Forest', 'Climate', 'Renewable', 'Earth Sciences', 'Agriculture', 'Water', 'Pollution', 'Wildlife'] },
-  { id: 'Social', label: 'Social & Health', keywords: ['Health', 'Education', 'Social Justice', 'Women', 'Child', 'Tribal', 'Rural', 'Welfare', 'Caste'] },
+  { id: 'International', label: '🌐 International & IR' },
+  { id: 'Governance', label: 'Polity & Cabinet', subjectIds: ['polity', 'governance', 'ethics'] },
+  { id: 'Economy', label: 'Economy & RBI', subjectIds: ['banking', 'trade', 'economy', 'infrastructure'] },
+  { id: 'SciTech', label: 'Science & Defence', subjectIds: ['space', 'technology', 'security'] },
+  { id: 'Environment', label: 'Climate & Ecology', subjectIds: ['environment', 'energy', 'agriculture', 'disaster', 'geography'] },
+  { id: 'Social', label: 'Social & Health', subjectIds: ['health', 'education', 'welfare'] },
   { id: 'PRS', label: '⚖️ PRS Legislative Vault', isVault: true },
   { id: 'SAVED', label: '⭐ Saved Signals' },
 ];
@@ -707,44 +709,62 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
     if (showSkeleton && pageIndex === 0) setLoading(true);
     setErrorMsg('');
     try {
-      let query = supabase
-        .from('current_affairs')
-        .select('*')
-        .neq('source', 'PIB_Digest');
+      const makeQuery = () => {
+        let query = supabase
+          .from('current_affairs')
+          .select('*')
+          .neq('source', 'PIB_Digest');
 
-      if (categoryTab === 'PRS' || filterSource === 'PRS') {
-        // Strictly fetch PRS Legislative Research items only
-        query = query.eq('source', 'PRS');
-      } else if (categoryTab === 'International') {
-        // International scope: coverage_scope in (international, cross_border) or international sources/ministries
-        query = query.or('coverage_scope.in.(international,cross_border),source.in.(MEA,UN NEWS,WTO,WIKIPEDIA),ministry.ilike.%External Affairs%');
-      } else {
-        // Daily current affairs feed NEVER contains PRS
-        if (filterSource === 'ALL') {
-          query = query.neq('source', 'PRS');
+        if (categoryTab === 'PRS' || filterSource === 'PRS') {
+          // Strictly fetch PRS Legislative Research items only
+          query = query.eq('source', 'PRS');
+        } else if (categoryTab === 'International') {
+          if (filterSource !== 'ALL') query = query.eq('source', filterSource);
         } else {
-          query = query.eq('source', filterSource);
+          // Daily current affairs feed NEVER contains PRS
+          if (filterSource === 'ALL') {
+            query = query.neq('source', 'PRS');
+          } else {
+            query = query.eq('source', filterSource);
+          }
         }
-      }
 
-      if (filterMinistry !== 'ALL') {
-        query = query.eq('ministry', filterMinistry);
-      }
-      if (filterStartDate) {
-        query = query.gte('created_at', filterStartDate);
-      }
-      if (filterEndDate) {
-        const endInclusive = new Date(filterEndDate);
-        endInclusive.setDate(endInclusive.getDate() + 1);
-        query = query.lt('created_at', endInclusive.toISOString().split('T')[0]);
-      }
+        if (filterMinistry !== 'ALL') {
+          query = query.eq('ministry', filterMinistry);
+        }
+        if (filterStartDate) {
+          query = query.gte('created_at', filterStartDate);
+        }
+        if (filterEndDate) {
+          const endInclusive = new Date(filterEndDate);
+          endInclusive.setDate(endInclusive.getDate() + 1);
+          query = query.lt('created_at', endInclusive.toISOString().split('T')[0]);
+        }
+        return query.order('created_at', { ascending: false }).order('id', { ascending: false });
+      };
 
       const from = pageIndex * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
 
-      const { data, error } = await query.order('created_at', { ascending: false }).range(from, to);
-
-      if (error) throw error;
+      let data: CurrentAffairsItem[];
+      let more: boolean;
+      if (categoryTab === 'International') {
+        const page = await selectClassifiedPage<CurrentAffairsItem>({
+          scope: 'international', offset: from, limit: PAGE_SIZE,
+          fetchBatch: async (offset, size) => {
+            const result = await makeQuery().range(offset, offset + size - 1);
+            if (result.error) throw result.error;
+            return result.data || [];
+          },
+        });
+        data = page.items;
+        more = page.hasMore;
+      } else {
+        const result = await makeQuery().range(from, to);
+        if (result.error) throw result.error;
+        data = result.data || [];
+        more = data.length === PAGE_SIZE;
+      }
 
       if (data) {
         let finalData = data;
@@ -762,7 +782,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
           setItems((prev) => [...prev, ...finalData]);
         }
 
-        setHasMore(data.length === PAGE_SIZE);
+        setHasMore(more);
 
         const uniqueMinistries = Array.from(new Set(finalData.map((item: any) => item.ministry).filter(Boolean))) as string[];
         const uniqueSources = Array.from(new Set(finalData.map((item: any) => item.source).filter(Boolean))) as string[];
@@ -908,36 +928,19 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
         if (syn.matches) return true;
 
         // 2. Check if matches candidate's focus pillars
-        const p = candidatePreferences.focusPillars || [];
-        const text = (item.ministry + ' ' + item.headline + ' ' + (item.summary?.tags?.join(' ') || '')).toLowerCase();
-        
-        if (p.includes('gs2') && ['cabinet', 'prime minister', 'home affairs', 'law', 'personnel', 'parliament', 'governance', 'external affairs', 'supreme court', 'judiciary', 'rights', 'constitution'].some((k) => text.includes(k))) return true;
-        if (p.includes('gs3') && ['finance', 'commerce', 'rbi', 'corporate affairs', 'niti aayog', 'revenue', 'economy', 'budget', 'tax', 'defence', 'space', 'isro', 'atomic', 'electronics', 'science', 'technology', 'environment', 'forest', 'climate', 'renewable', 'agriculture', 'water', 'security'].some((k) => text.includes(k))) return true;
-        if (p.includes('gs1') && ['culture', 'heritage', 'monuments', 'history', 'geography', 'urban', 'society', 'women', 'child', 'tribal'].some((k) => text.includes(k))) return true;
-        if (p.includes('gs4') && ['ethics', 'social justice', 'welfare', 'integrity', 'charter', 'administrative'].some((k) => text.includes(k))) return true;
-        
-        return false;
+        const papers: Record<string, 'gs1' | 'gs2' | 'gs3' | 'gs4'> = { 'GS-I': 'gs1', 'GS-II': 'gs2', 'GS-III': 'gs3', 'GS-IV': 'gs4' };
+        const classification = classifyArticle(item);
+        return [classification.primary, ...classification.secondary].some(subject => subject && candidatePreferences.focusPillars?.includes(papers[subject.paper]));
       });
     } else if (activeCategoryTab !== 'ALL') {
       const tab = CATEGORY_TABS.find((t) => t.id === activeCategoryTab);
       if (activeCategoryTab === 'International') {
-        list = list.filter((item) =>
-          item.coverage_scope === 'international' ||
-          item.coverage_scope === 'cross_border' ||
-          ['MEA', 'UN NEWS', 'WTO', 'WIKIPEDIA'].includes((item.source || '').toUpperCase()) ||
-          tab?.keywords?.some((kw) =>
-            item.ministry?.toLowerCase().includes(kw.toLowerCase()) ||
-            item.headline?.toLowerCase().includes(kw.toLowerCase())
-          )
-        );
-      } else if (tab?.keywords) {
-        list = list.filter((item) =>
-          tab.keywords.some(
-            (kw) =>
-              item.ministry?.toLowerCase().includes(kw.toLowerCase()) ||
-              item.headline?.toLowerCase().includes(kw.toLowerCase())
-          )
-        );
+        list = list.filter(isInternationalArticle);
+      } else if (tab?.subjectIds) {
+        list = list.filter(item => {
+          const classification = classifyArticle(item);
+          return [classification.primary, ...classification.secondary].some(subject => subject && tab.subjectIds.includes(subject.id));
+        });
       }
     }
 
@@ -1345,7 +1348,10 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
           <PolicyBrief
             key={selectedDossier.id || selectedDossier.url}
             item={selectedDossier}
-            syllabusTags={(selectedDossier.summary?.tags || []).map(parseSyllabusTag)}
+            syllabusTags={(() => {
+              const { primary, secondary } = classifyArticle(selectedDossier);
+              return [primary, ...secondary].filter(subject => subject !== null).map(subject => ({ paper: subject.paper, topic: subject.topic, full: `${subject.paper} · ${subject.topic}` }));
+            })()}
             saved={savedArticleIds.has(selectedDossier.id || '')}
             saving={savingArticleIds.has(selectedDossier.id || '')}
             onClose={() => {
@@ -1356,7 +1362,7 @@ export default function CurrentAffairs({ userId, candidatePreferences, onLaunchP
             onSave={() => toggleBookmark(selectedDossier.id || '')}
             onShare={() => handleShareArticle(selectedDossier, undefined, true)}
             onPractice={onLaunchPractice ? () => {
-              const tag = selectedDossier.summary?.tags?.[0] || 'CURRENT_AFFAIRS';
+              const tag = classifyArticle(selectedDossier).primary?.nodeId || 'CURRENT_AFFAIRS';
               setSelectedDossier(null);
               onLaunchPractice(tag);
             } : undefined}

@@ -14,6 +14,7 @@
 import { Router, type Request, type Response } from "express";
 import { queryIntelligenceFeed, queryCoverageReceipt } from "./read.js";
 import { createClient } from "@supabase/supabase-js";
+import { classificationSummary } from '../../src/lib/article-classification.js';
 
 export const intelligenceRouter = Router();
 
@@ -96,7 +97,8 @@ intelligenceRouter.get("/article/:id", async (req: Request, res: Response) => {
     }
 
     res.setHeader("Cache-Control", "public, max-age=300, s-maxage=1800");
-    return res.status(200).json(data);
+    const summary = classificationSummary(data);
+    return res.status(200).json({ ...data, summary, coverage_scope: summary.classification.coverage.scope });
   } catch (err: any) {
     console.error("[intelligenceRouter] /article/:id error:", err);
     return res.status(500).json({ error: "Failed to retrieve article", details: err?.message });

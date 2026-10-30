@@ -5,11 +5,13 @@
  *
  * Implements one selection contract:
  *   - Applies section, scope, visibility, and search before pagination
- *   - Keyset pagination with deterministic tie-breaker
+ *   - Stable pagination with a deterministic tie-breaker
  *   - Exposes safe public DTOs (sanitizes private operational state)
  */
 
 import { createClient } from "@supabase/supabase-js";
+import { classificationSummary } from '../../src/lib/article-classification.js';
+import { selectClassifiedPage } from '../../src/lib/article-feed-selection.js';
 
 function getSupabase() {
   const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
@@ -68,77 +70,78 @@ export async function queryIntelligenceFeed(opts: FeedQueryOptions = {}): Promis
   const limit = Math.min(Math.max(opts.limit ?? 45, 1), 100);
   const offset = Math.max(opts.offset ?? 0, 0);
 
-  let query = supabase
-    .from("current_affairs")
-    .select(
-      "id, headline, summary, url, source, ministry, published_at, source_published_at, coverage_scope, content_version",
-      { count: "exact" }
-    )
-    .neq("source", "PIB_Digest");
+  const makeQuery = () => {
+    let query = supabase
+      .from("current_affairs")
+      .select(
+        "id, headline, summary, url, source, ministry, node_id, published_at, source_published_at, coverage_scope, content_version",
+        { count: "exact" }
+      )
+      .neq("source", "PIB_Digest");
 
-  // Scope filter
-  if (opts.scope === "international") {
-    // Select international and cross_border developments or official external sources
-    query = query.or(
-      "coverage_scope.in.(international,cross_border),ministry.eq.Ministry of External Affairs,source.in.(MEA,WTO)"
-    );
-  } else if (opts.scope === "india") {
-    query = query.or("coverage_scope.in.(india,unclassified),ministry.neq.Ministry of External Affairs");
+    // Source filter
+    if (opts.source && opts.source !== "ALL") {
+      query = query.eq("source", opts.source);
+    }
+
+    // Ministry filter
+    if (opts.ministry && opts.ministry !== "ALL") {
+      query = query.eq("ministry", opts.ministry);
+    }
+
+    // Date filters
+    if (opts.startDate) {
+      query = query.gte("created_at", opts.startDate);
+    }
+    if (opts.endDate) {
+      const endInclusive = new Date(opts.endDate);
+      endInclusive.setDate(endInclusive.getDate() + 1);
+      query = query.lt("created_at", endInclusive.toISOString().split("T")[0]);
+    }
+
+    // Search filter
+    if (opts.searchQuery?.trim()) {
+      const q = opts.searchQuery.trim();
+      query = query.or(`headline.ilike.%${q}%,ministry.ilike.%${q}%`);
+    }
+
+    return query.order('created_at', { ascending: false }).order('id', { ascending: false });
+  };
+
+  let data: Array<PublicArticleDTO & { node_id?: string }>;
+  let total: number;
+  if (opts.scope && opts.scope !== 'all') {
+    const page = await selectClassifiedPage<PublicArticleDTO & { node_id?: string }>({
+      scope: opts.scope, offset, limit, countAll: true,
+      fetchBatch: async (start, size) => {
+        const result = await makeQuery().range(start, start + size - 1);
+        if (result.error) throw result.error;
+        return result.data || [];
+      },
+    });
+    data = page.items;
+    total = page.totalCount ?? 0;
+  } else {
+    const result = await makeQuery().range(offset, offset + limit - 1);
+    if (result.error) throw result.error;
+    data = result.data || [];
+    total = result.count ?? data.length;
   }
 
-  // Source filter
-  if (opts.source && opts.source !== "ALL") {
-    query = query.eq("source", opts.source);
-  }
-
-  // Ministry filter
-  if (opts.ministry && opts.ministry !== "ALL") {
-    query = query.eq("ministry", opts.ministry);
-  }
-
-  // Date filters
-  if (opts.startDate) {
-    query = query.gte("created_at", opts.startDate);
-  }
-  if (opts.endDate) {
-    const endInclusive = new Date(opts.endDate);
-    endInclusive.setDate(endInclusive.getDate() + 1);
-    query = query.lt("created_at", endInclusive.toISOString().split("T")[0]);
-  }
-
-  // Search filter
-  if (opts.searchQuery?.trim()) {
-    const q = opts.searchQuery.trim();
-    query = query.or(`headline.ilike.%${q}%,ministry.ilike.%${q}%`);
-  }
-
-  // Bounded pagination
-  const from = offset;
-  const to = offset + limit - 1;
-
-  const { data, count, error } = await query
-    .order("created_at", { ascending: false })
-    .range(from, to);
-
-  if (error) {
-    console.error("[read] Query error in queryIntelligenceFeed:", error);
-    throw error;
-  }
-
-  const items: PublicArticleDTO[] = (data || []).map((row: any) => ({
+  const items: PublicArticleDTO[] = data.map(row => {
+    const summary = classificationSummary(row);
+    return {
     id: row.id,
     headline: row.headline,
-    summary: row.summary,
+    summary: { ...row.summary, ...summary },
     url: row.url,
     source: row.source,
     ministry: row.ministry,
     published_at: row.published_at,
-    source_published_at: row.source_published_at || row.summary?.source_published_at || null,
-    coverage_scope: row.coverage_scope || "unclassified",
+    source_published_at: row.source_published_at || (typeof row.summary?.source_published_at === 'string' ? row.summary.source_published_at : null),
+    coverage_scope: summary.classification.coverage.scope,
     content_version: row.content_version || 1,
-  }));
-
-  const total = count ?? items.length;
+  }; });
   const hasMore = offset + items.length < total;
 
   return {

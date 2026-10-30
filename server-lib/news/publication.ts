@@ -12,6 +12,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { validateDispatchEvidence, type IndiaPosture, type EvidenceQuote } from "./evidence.js";
+import { classificationSummary } from '../../src/lib/article-classification.js';
 
 function getServiceSupabase() {
   const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
@@ -83,7 +84,8 @@ export async function publishNewsDispatch(
   const supabase = getServiceSupabase();
 
   // Build structured summary snapshot conforming to shared Tark article contract
-  const summarySnapshot = {
+  const summarySnapshot = classificationSummary({ source: params.source, ministry: params.ministry, headline: params.headline, summary: {
+    ...(params.extraSummaryFields || {}),
     bullets: params.bullets,
     sources: [params.source],
     coverage_scope: params.coverageScope,
@@ -94,8 +96,8 @@ export async function publishNewsDispatch(
       method: "source_support_v2",
       quotes: params.evidenceQuotes,
     },
-    ...(params.extraSummaryFields || {}),
-  };
+  } });
+  summarySnapshot.coverage_scope = summarySnapshot.classification.coverage.scope;
 
   try {
     // 2. Invoke atomic advisory-locked RPC in PostgreSQL
@@ -106,7 +108,7 @@ export async function publishNewsDispatch(
       p_institution: params.institutionOrForum || null,
       p_action_domain: params.actionDomain,
       p_event_window: params.eventWindow,
-      p_coverage_scope: params.coverageScope,
+      p_coverage_scope: summarySnapshot.classification.coverage.scope,
       p_development_id: params.developmentId,
       p_change_kind: params.changeKind || "initial_release",
       p_headline: params.headline,

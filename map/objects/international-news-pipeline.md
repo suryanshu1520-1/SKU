@@ -31,6 +31,7 @@ First-class International section within Tark Intelligence using shared publishe
 - **Surfaces**: [`src/components/CurrentAffairs.tsx`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/src/components/CurrentAffairs.tsx) (Category Tab `International`), [`src/components/VerticalNavRail.tsx`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/src/components/VerticalNavRail.tsx) (`Global` rail action), [`src/components/NewsSignalCard.tsx`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/src/components/NewsSignalCard.tsx) (scope badge and posture indicator), [`src/components/PolicyBrief.tsx`](file:///c:/Users/bentn/OneDrive/Desktop/SKU/src/components/PolicyBrief.tsx).
 
 ## 5. If You Change This
+- **Classification contract**: `src/lib/article-classification.ts` resolves subject and coverage from article text with evidence and review reasons. Feed cards, Daily Edition, briefs, API reads, ingestion and publication share it; historical stored scopes do not control public filtering. `src/lib/article-feed-selection.ts` applies classification before pagination. See `docs/article-classification.md` for the read-only audit and regression workflow.
 - **Hits**: `/api/intelligence/feed`, `/intelligence/international` routing, `CurrentAffairs.tsx` filtering, and crawler hub SEO rendering.
 - **Does not hit**: Numeric Rebase v1 (strictly firewalled from international content); Razorpay checkout.
 

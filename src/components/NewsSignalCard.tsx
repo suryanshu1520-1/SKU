@@ -3,7 +3,7 @@ import { useReducedMotion } from 'motion/react';
 import { ArrowUpRight, Bookmark, Check, ChevronDown, Share2 } from 'lucide-react';
 import type { CurrentAffairsItem } from './CurrentAffairs';
 import { ContestedCard, GroundingBadge, SourceAnchor } from './TrustUI';
-import { deriveArticleSyllabusTag } from '../lib/syllabus-tagger';
+import { articleIssuerLabel, classifyArticle } from '../lib/article-classification';
 import './NewsSignalCard.css';
 
 const DISCLOSURE_DURATION = { open: 320, close: 260 };
@@ -52,13 +52,7 @@ export default function NewsSignalCard({
   const date = item.created_at ? new Date(item.created_at) : null;
   const validDate = date && Number.isFinite(date.getTime()) ? date : null;
   const bullets = item.summary?.bullets?.slice(0, lead ? 2 : 1) || [];
-  const syllabusTag = deriveArticleSyllabusTag({
-    source: item.source,
-    ministry: item.ministry,
-    headline: item.headline,
-    tags: item.summary?.tags,
-    node_id: item.node_id,
-  });
+  const classification = classifyArticle(item);
 
   useLayoutEffect(() => {
     const card = cardRef.current;
@@ -160,24 +154,6 @@ export default function NewsSignalCard({
           >
             {item.source || 'Original source'}
           </a>
-          {item.coverage_scope === 'international' && (
-            <span className="px-1.5 py-0.5 bg-cyan-950/40 border border-cyan-500/40 text-cyan-300 text-[10px] font-mono rounded uppercase tracking-wider font-semibold">
-              International
-            </span>
-          )}
-          {item.coverage_scope === 'cross_border' && (
-            <span className="px-1.5 py-0.5 bg-amber-950/40 border border-amber-500/40 text-amber-300 text-[10px] font-mono rounded uppercase tracking-wider font-semibold">
-              Cross-Border
-            </span>
-          )}
-          {syllabusTag && (
-            <span
-              className="px-1.5 py-0.5 bg-[#072448]/60 border border-[rgba(224,208,171,0.22)] text-[#e0d0ab] text-[10px] font-mono rounded tracking-wider font-semibold"
-              title={`${syllabusTag.paper}: ${syllabusTag.topic}`}
-            >
-              {syllabusTag.badge}
-            </span>
-          )}
           {validDate && (
             <time className="news-signal__date" dateTime={validDate.toISOString()}>
               {validDate.toLocaleDateString('en-GB', {
@@ -202,6 +178,12 @@ export default function NewsSignalCard({
         </button>
       </div>
 
+      {(classification.primary || classification.coverage.scope === 'cross_border' || classification.coverage.scope === 'international') && (
+        <p className="news-signal__classification" aria-label="Article subject and coverage">
+          {classification.primary && <span>{classification.primary.topic}</span>}
+          {(classification.coverage.scope === 'cross_border' || classification.coverage.scope === 'international') && <span>{classification.coverage.label}</span>}
+        </p>
+      )}
       <Heading className="news-signal__headline" id={headlineId}>
         <button className="news-signal__headline-link" type="button" onClick={onOpen}>
           {item.headline}
@@ -246,12 +228,7 @@ export default function NewsSignalCard({
       <div ref={frameRef} className="news-signal__disclosure" id={contextId} aria-hidden={!contextOpen} inert={!contextOpen}>
         <div ref={contentRef} className="news-signal__context">
           <div className="news-signal__provenance">
-            {item.ministry && <p className="news-signal__ministry">{item.ministry}</p>}
-            {item.summary?.india_posture && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-mono text-amber-200 bg-amber-950/50 border border-amber-700/50 px-2 py-0.5 rounded">
-                Posture: {item.summary.india_posture.replace(/_/g, ' ')}
-              </span>
-            )}
+            {articleIssuerLabel(item) && <p className="news-signal__ministry">{articleIssuerLabel(item)}</p>}
             <div className="news-signal__grounding">
               <GroundingBadge
                 grounding={item.summary?.grounding}
@@ -264,6 +241,18 @@ export default function NewsSignalCard({
               />
             </div>
           </div>
+          <section className="news-signal__tag-explanation" aria-label="Article classification">
+            <h4>How this brief is filed</h4>
+            <dl>
+              <div><dt>Coverage</dt><dd>{classification.coverage.label}<p>{classification.coverage.reason}</p></dd></div>
+              <div><dt>Main subject</dt><dd>{classification.primary ? `${classification.primary.paper} · ${classification.primary.topic}` : 'Topic under review'}
+                {classification.primary && <p>Identified in the {classification.primary.evidence[0].basis}: “{classification.primary.evidence[0].quote}”.</p>}
+              </dd></div>
+              {classification.secondary.length > 0 && <div><dt>Also connects to</dt><dd>{classification.secondary.map(subject => `${subject.paper} · ${subject.topic}`).join('; ')}</dd></div>}
+              {item.summary?.india_posture && <div><dt>India’s role</dt><dd>{item.summary.india_posture.replace(/_/g, ' ')}</dd></div>}
+            </dl>
+            {classification.needsReview && <p className="news-signal__classification-review">{classification.reviewReasons.join(' ')}</p>}
+          </section>
           <div className="news-signal__exam-content">{examContext}</div>
           <div className="news-signal__context-actions">
             {saved && (
